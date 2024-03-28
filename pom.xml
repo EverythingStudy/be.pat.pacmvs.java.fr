@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <groupId>cn.staitech</groupId>
+        <artifactId>staitech-modules</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>staitech-modules-fr</artifactId>
+
+    <description>
+        staitech-modules-fr智能阅片
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>swagger-bootstrap-ui</artifactId>
+            <version>1.9.6</version>
+        </dependency>
+        <!-- SpringCloud Alibaba Nacos -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+
+        <!-- SpringCloud Alibaba Nacos Config -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+
+        <!-- SpringCloud Alibaba Sentinel -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
+
+        <!-- SpringBoot Actuator -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- Swagger UI -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${swagger.fox.version}</version>
+        </dependency>
+
+        <!-- Mysql Connector -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>${druid.version}</version>
+        </dependency>
+
+
+        <!-- SpringBoot Seata -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+        </dependency>
+
+        <!-- Staitech Common DataScope -->
+        <dependency>
+            <groupId>cn.staitech</groupId>
+            <artifactId>staitech-common-datascope</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.staitech</groupId>
+            <artifactId>staitech-common-datasource</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.5.0</version>
+        </dependency>
+
+        <!-- Staitech Common Log -->
+        <dependency>
+            <groupId>cn.staitech</groupId>
+            <artifactId>staitech-common-log</artifactId>
+        </dependency>
+
+        <!-- Staitech Common Log -->
+        <dependency>
+            <groupId>cn.staitech</groupId>
+            <artifactId>staitech-api-system</artifactId>
+        </dependency>
+
+        <!-- Staitech Common Swagger -->
+        <dependency>
+            <groupId>cn.staitech</groupId>
+            <artifactId>staitech-common-swagger</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.velocity</groupId>
+            <artifactId>velocity-tools</artifactId>
+            <version>2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itextpdf</artifactId>
+            <version>5.4.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext-asian</artifactId>
+            <version>5.2.0</version>
+        </dependency>
+
+        <!-- 热部署 https://blog.csdn.net/qq_34459728/article/details/99824793 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.7.16</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.75</version>
+        </dependency>
+
+        <!--Geometry 操作依赖-->
+        <dependency>
+            <groupId>com.vividsolutions</groupId>
+            <artifactId>jts</artifactId>
+            <version>1.13</version>
+        </dependency>
+
+        <!--  geotools依赖 -->
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-geojson</artifactId>
+            <version>19</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/gt-geojson-19.0.jar</systemPath>
+        </dependency>
+
+        <!--加入log4j -->
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+
+        <!--redisson-->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson</artifactId>
+            <version>3.12.0</version>
+        </dependency>
+
+        <!--poi-->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>4.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>4.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml-schemas</artifactId>
+            <version>4.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
+            <version>4.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>ooxml-schemas</artifactId>
+            <version>1.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+            <version>3.2.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus</artifactId>
+            <version>3.2.0</version>
+        </dependency>
+        <!-- swagger增强版 -->
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-spring-boot-starter</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20190722</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.4</version>
+            <classifier>jdk15</classifier>
+        </dependency>
+
+        <dependency>
+            <groupId>com.googlecode.json-simple</groupId>
+            <artifactId>json-simple</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.locationtech.jts/jts-core -->
+        <dependency>
+            <groupId>org.locationtech.jts</groupId>
+            <artifactId>jts-core</artifactId>
+            <version>1.19.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.github.shyiko/mysql-binlog-connector-java -->
+        <dependency>
+            <groupId>com.github.shyiko</groupId>
+            <artifactId>mysql-binlog-connector-java</artifactId>
+            <version>0.17.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/args4j/args4j -->
+        <dependency>
+            <groupId>args4j</groupId>
+            <artifactId>args4j</artifactId>
+            <version>2.33</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.6</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.*</include>
+                </includes>
+            </resource>
+
+            <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                    <include>**/*.xml</include>
+                </includes><!-- maven可以将mapper.xml进行打包处理，否则仅对java文件处理 -->
+            </resource>
+
+            <!-- 增加内容:MAVEN打包找不到本地LIB目录下的jar包解决办法 https://blog.csdn.net/asdfadafd/article/details/123985540  -->
+            <resource>
+                <!--需要打包的jar路径-->
+                <directory>src/main/resources/lib</directory>
+                <!--复制到的路径-->
+                <targetPath>BOOT-INF/lib/</targetPath>
+                <includes>
+                    <include>**/*.jar</include>
+                </includes>
+            </resource>
+            <resource>
+                <!--需要打包的jar路径-->
+                <directory>src/main/resources/template</directory>
+                <!--复制到的路径-->
+                <targetPath>BOOT-INF/template/</targetPath>
+                <includes>
+                    <include>**/*.docx</include>
+                </includes>
+            </resource>
+        </resources>
+
+
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>2.6.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <nonFilteredFileExtensions>
+                        <nonFilteredFileExtension>docx</nonFilteredFileExtension>
+                    </nonFilteredFileExtensions>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <!--配置profiles环境-->
+    <profiles>
+        <profile>
+            <!--108线开发环境-->
+            <id>patsaasdev</id>
+            <properties>
+                <activatedProperties>patsaasdev</activatedProperties>
+                <nacosNamespace>e3b5b4e0-b5b4-4604-9bed-d9f42fe23eee</nacosNamespace>
+                <nacosAddress>http://127.0.0.1:8848</nacosAddress>
+                <nacosGroup>DEFAULT_GROUP</nacosGroup>
+                <serverAddr>127.0.0.1:8848</serverAddr>
+            </properties>
+        </profile>
+        <profile>
+            <!--108线开发环境2-->
+            <id>patsaasdev2</id>
+            <properties>
+                <activatedProperties>patsaasdev2</activatedProperties>
+                <nacosNamespace>11a701e9-f4f3-4232-ad0e-fb5ba9c9e36a</nacosNamespace>
+                <nacosAddress>http://192.168.52.108:8848</nacosAddress>
+                <nacosGroup>DEFAULT_GROUP</nacosGroup>
+                <serverAddr>192.168.52.108:8848</serverAddr>
+            </properties>
+        </profile>
+        <profile>
+            <!--108线开发环境3-->
+            <id>patsaasdev3</id>
+            <properties>
+                <activatedProperties>patsaasdev3</activatedProperties>
+                <nacosNamespace>d46e90a7-0f09-4c81-80b8-9b7a37ea5dd0</nacosNamespace>
+                <nacosAddress>http://192.168.52.108:8848</nacosAddress>
+                <nacosGroup>DEFAULT_GROUP</nacosGroup>
+                <serverAddr>192.168.52.108:8848</serverAddr>
+            </properties>
+        </profile>
+        <profile>
+            <!--114线测试环境-->
+            <id>saastest</id>
+            <properties>
+                <activatedProperties>saastest</activatedProperties>
+                <nacosNamespace>301bbb5d-e3f9-4703-bb92-327d62eb1efd</nacosNamespace>
+                <nacosAddress>http://192.168.52.114:8848</nacosAddress>
+                <nacosGroup>DEFAULT_GROUP</nacosGroup>
+                <serverAddr>192.168.52.114:8848</serverAddr>
+            </properties>
+        </profile>
+
+        <!-- 以下为兔眼版本配置 -->
+        <profile>
+            <!--开发环境-->
+            <id>eyedev</id>
+            <properties>
+                <activatedProperties>eyedev</activatedProperties>
+                <nacosNamespace>759db948-170d-496a-9505-e77d3381b736</nacosNamespace>
+                <nacosAddress>http://192.168.52.108:8848</nacosAddress>
+                <nacosGroup>DEFAULT_GROUP</nacosGroup>
+                <serverAddr>192.168.52.108:8848</serverAddr>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 开发环境eyedevwlb -->
+            <id>eyedevwlb</id>
+            <properties>
+                <activatedProperties>eyedevwlb</activatedProperties>
+                <nacosNamespace>a1f59b06-a373-4676-98ae-3e5b27cfeae1</nacosNamespace>
+                <nacosAddress>http://192.168.52.108:8848</nacosAddress>
+                <nacosGroup>DEFAULT_GROUP</nacosGroup>
+                <serverAddr>192.168.52.108:8848</serverAddr>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 开发环境eyedevwf -->
+            <id>eyedevwf</id>
+            <properties>
+                <activatedProperties>eyedevwf</activatedProperties>
+                <nacosNamespace>581f2930-2ab6-4bc4-8792-c0b6cb56945b</nacosNamespace>
+                <nacosAddress>http://192.168.52.108:8848</nacosAddress>
+                <nacosGroup>DEFAULT_GROUP</nacosGroup>
+                <serverAddr>192.168.52.108:8848</serverAddr>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 开发环境eyedevwf1 -->
+            <id>eyedevwf1</id>
+            <properties>
+                <activatedProperties>eyedevwf1</activatedProperties>
+                <nacosNamespace>28797311-64b5-4e6c-8f2a-536c1bcdd1fb</nacosNamespace>
+                <nacosAddress>http://192.168.52.108:8848</nacosAddress>
+                <nacosGroup>DEFAULT_GROUP</nacosGroup>
+                <serverAddr>192.168.52.108:8848</serverAddr>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 开发环境eyedevzmj -->
+            <id>eyedevzmj</id>
+            <properties>
+                <activatedProperties>eyedevzmj</activatedProperties>
+                <nacosNamespace>bfed14f0-5013-42c6-a877-59375cdc830d</nacosNamespace>
+                <nacosAddress>http://192.168.52.108:8848</nacosAddress>
+                <nacosGroup>DEFAULT_GROUP</nacosGroup>
+                <serverAddr>192.168.52.108:8848</serverAddr>
+            </properties>
+        </profile>
+        <profile>
+            <!-- 测试环境eyetest -->
+            <id>eyetest</id>
+            <properties>
+                <activatedProperties>eyetest</activatedProperties>
+                <nacosNamespace>eyetest</nacosNamespace>
+                <nacosAddress>http://192.168.160.105:8848</nacosAddress>
+                <nacosGroup>DEFAULT_GROUP</nacosGroup>
+                <serverAddr>192.168.160.105:8848</serverAddr>
+            </properties>
+        </profile>
+
+    </profiles>
+</project>

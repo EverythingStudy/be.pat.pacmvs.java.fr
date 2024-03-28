@@ -1,0 +1,441 @@
+11:29:22.302 [background-preinit] INFO  o.h.v.i.util.Version - [<clinit>,21] - HV000001: Hibernate Validator 6.2.4.Final
+11:29:22.318 [restartedMain] INFO  o.s.b.d.r.ChangeableUrls - [logTo,255] - The Class-Path manifest attribute in D:\workspace2.0\be.pat.saas.java.fr\src\main\resources\lib\gt-geojson-19.0.jar referenced one or more files that do not exist: file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/gt-main-19.0.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/gt-api-19.0.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/jts-core-1.14.0.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/jdom2-2.0.6.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/json-simple-1.1.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/gt-referencing-19.0.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/ejml-ddense-0.32.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/ejml-core-0.32.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/commons-pool-1.5.4.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/gt-metadata-19.0.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/gt-opengis-19.0.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/jsr-275-1.0-beta-2.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/jgridshift-1.0.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/GeographicLib-Java-1.44.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/commons-lang-2.6.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/jai_core-1.1.3.jar
+11:29:22.318 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - [logTo,255] - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+11:29:22.522 [restartedMain] INFO  c.a.n.c.r.client - [lambda$createClient$0,80] - [RpcClientFactory] create a new rpc client of 8f84c13f-92a8-4c8f-8f52-f87163af48f5_config-0
+11:29:22.542 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 11 ms to scan 1 urls, producing 3 keys and 6 values 
+11:29:22.554 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 6 ms to scan 1 urls, producing 4 keys and 9 values 
+11:29:22.560 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 5 ms to scan 1 urls, producing 3 keys and 10 values 
+11:29:22.562 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 1 ms to scan 1 urls, producing 0 keys and 0 values 
+11:29:22.567 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 4 ms to scan 1 urls, producing 1 keys and 5 values 
+11:29:22.573 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 5 ms to scan 1 urls, producing 1 keys and 7 values 
+11:29:22.579 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 5 ms to scan 1 urls, producing 2 keys and 8 values 
+11:29:22.581 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 1 ms to scan 1 urls, producing 0 keys and 0 values 
+11:29:22.582 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [8f84c13f-92a8-4c8f-8f52-f87163af48f5_config-0] RpcClient init label, labels = {module=config, Vipserver-Tag=null, source=sdk, Amory-Tag=null, Location-Tag=null, taskId=0, AppName=unknown}
+11:29:22.582 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [8f84c13f-92a8-4c8f-8f52-f87163af48f5_config-0] Register server push request handler:com.alibaba.nacos.client.config.impl.ClientWorker$ConfigRpcTransportClient$$Lambda$466/0x0000000800f2bcb8
+11:29:22.582 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [8f84c13f-92a8-4c8f-8f52-f87163af48f5_config-0] Register server push request handler:com.alibaba.nacos.client.config.impl.ClientWorker$ConfigRpcTransportClient$$Lambda$467/0x0000000800f2bed8
+11:29:22.582 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [8f84c13f-92a8-4c8f-8f52-f87163af48f5_config-0] Registry connection listener to current client:com.alibaba.nacos.client.config.impl.ClientWorker$ConfigRpcTransportClient$1
+11:29:22.583 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [8f84c13f-92a8-4c8f-8f52-f87163af48f5_config-0] RpcClient init, ServerListFactory = com.alibaba.nacos.client.config.impl.ClientWorker$ConfigRpcTransportClient$2
+11:29:22.587 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [8f84c13f-92a8-4c8f-8f52-f87163af48f5_config-0] Try to connect to server on start up, server: {serverIp = '192.168.52.108', server main port = 8848}
+11:29:23.006 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [8f84c13f-92a8-4c8f-8f52-f87163af48f5_config-0] Success to connect to server [192.168.52.108:8848] on start up, connectionId = 1711596298261_172.31.2.61_57404
+11:29:23.007 [com.alibaba.nacos.client.remote.worker] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [8f84c13f-92a8-4c8f-8f52-f87163af48f5_config-0] Notify connected event to listeners.
+11:29:23.007 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [8f84c13f-92a8-4c8f-8f52-f87163af48f5_config-0] Register server push request handler:com.alibaba.nacos.common.remote.client.RpcClient$ConnectResetRequestHandler
+11:29:23.007 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [8f84c13f-92a8-4c8f-8f52-f87163af48f5_config-0] Register server push request handler:com.alibaba.nacos.common.remote.client.RpcClient$$Lambda$493/0x000000080102c830
+11:29:23.027 [restartedMain] DEBUG c.a.c.n.c.NacosPropertySourceBuilder - [loadNacosData,93] - Loading nacos data, dataId: 'application-patsaasdev.yml', group: 'DEFAULT_GROUP', data: spring:
+  autoconfigure:
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+# feign 配置
+feign:
+  sentinel:
+    enabled: false
+  okhttp:
+    enabled: false
+  httpclient:
+    enabled: false
+  client:
+    config:
+      default:
+        connectTimeout: 10000
+        readTimeout: 10000
+  compression:
+    request:
+      enabled: false
+    response:
+      enabled: false
+
+# 暴露监控端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+11:29:23.033 [restartedMain] WARN  c.a.c.n.c.NacosPropertySourceBuilder - [loadNacosData,87] - Ignore the empty nacos configuration and get it based on dataId[staitech-fr] & group[DEFAULT_GROUP]
+11:29:23.036 [restartedMain] WARN  c.a.c.n.c.NacosPropertySourceBuilder - [loadNacosData,87] - Ignore the empty nacos configuration and get it based on dataId[staitech-fr.yml] & group[DEFAULT_GROUP]
+11:29:23.038 [restartedMain] WARN  c.a.c.n.c.NacosPropertySourceBuilder - [loadNacosData,87] - Ignore the empty nacos configuration and get it based on dataId[staitech-fr-patsaasdev.yml] & group[DEFAULT_GROUP]
+11:29:23.038 [restartedMain] INFO  o.s.c.b.c.PropertySourceBootstrapConfiguration - [initialize,109] - Located property source: [BootstrapPropertySource {name='bootstrapProperties-staitech-fr-patsaasdev.yml,DEFAULT_GROUP'}, BootstrapPropertySource {name='bootstrapProperties-staitech-fr.yml,DEFAULT_GROUP'}, BootstrapPropertySource {name='bootstrapProperties-staitech-fr,DEFAULT_GROUP'}, BootstrapPropertySource {name='bootstrapProperties-application-patsaasdev.yml,DEFAULT_GROUP'}]
+11:29:23.041 [restartedMain] INFO  c.s.f.StaiTechFrApplication - [logStartupProfileInfo,640] - The following 1 profile is active: "patsaasdev"
+11:29:23.452 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [multipleStoresDetected,262] - Multiple Spring Data modules found, entering strict repository configuration mode
+11:29:23.452 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [registerRepositoriesIn,132] - Bootstrapping Spring Data Elasticsearch repositories in DEFAULT mode.
+11:29:23.484 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [registerRepositoriesIn,201] - Finished Spring Data repository scanning in 30 ms. Found 1 Elasticsearch repository interfaces.
+11:29:23.663 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [multipleStoresDetected,262] - Multiple Spring Data modules found, entering strict repository configuration mode
+11:29:23.663 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [registerRepositoriesIn,132] - Bootstrapping Spring Data Reactive Elasticsearch repositories in DEFAULT mode.
+11:29:23.665 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [registerRepositoriesIn,201] - Finished Spring Data repository scanning in 2 ms. Found 0 Reactive Elasticsearch repository interfaces.
+11:29:23.669 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [multipleStoresDetected,262] - Multiple Spring Data modules found, entering strict repository configuration mode
+11:29:23.670 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [registerRepositoriesIn,132] - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+11:29:23.676 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [registerRepositoriesIn,201] - Finished Spring Data repository scanning in 1 ms. Found 0 Redis repository interfaces.
+11:29:23.755 [restartedMain] WARN  o.m.s.m.ClassPathMapperScanner - [warn,44] - No MyBatis mapper was found in '[cn.staitech.fr.mapper]' package. Please check your configuration.
+11:29:23.801 [restartedMain] INFO  o.s.c.c.s.GenericScope - [setSerializationId,283] - BeanFactory id=0579032b-358c-380d-b9b0-558d3c0212b8
+11:29:23.851 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'io.seata.spring.boot.autoconfigure.SeataAutoConfiguration' of type [io.seata.spring.boot.autoconfigure.SeataAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:29:23.863 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'failureHandler' of type [io.seata.tm.api.DefaultFailureHandlerImpl] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:29:23.865 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration' of type [org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:29:23.866 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:29:23.866 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'loadBalancerClientsDefaultsMappingsProvider' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration$$Lambda$708/0x0000000801223060] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:29:23.866 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'defaultsBindHandlerAdvisor' of type [org.springframework.cloud.commons.config.DefaultsBindHandlerAdvisor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:29:23.868 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'springCloudAlibabaConfiguration' of type [io.seata.spring.boot.autoconfigure.properties.SpringCloudAlibabaConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:29:23.869 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'seataProperties' of type [io.seata.spring.boot.autoconfigure.properties.SeataProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:29:23.869 [restartedMain] INFO  i.s.s.b.a.SeataAutoConfiguration - [globalTransactionScanner,53] - Automatically configure Seata
+11:29:23.870 [restartedMain] INFO  i.s.c.FileConfiguration - [<init>,108] - The file name of the operation is registry
+11:29:23.885 [restartedMain] INFO  i.s.c.ConfigurationFactory - [load,69] - load Configuration:FileConfiguration$$EnhancerByCGLIB$$862af1eb
+11:29:23.887 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'configProperties' of type [io.seata.spring.boot.autoconfigure.properties.config.ConfigProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:29:23.889 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'configFileProperties' of type [io.seata.spring.boot.autoconfigure.properties.config.ConfigFileProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:29:23.889 [restartedMain] INFO  i.s.c.FileConfiguration - [<init>,108] - The file name of the operation is file.conf
+11:29:23.889 [restartedMain] INFO  i.s.c.ConfigurationFactory - [buildConfiguration,121] - load Configuration:FileConfiguration$$EnhancerByCGLIB$$862af1eb
+11:29:23.895 [restartedMain] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - [refresh,591] - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'globalTransactionScanner' defined in class path resource [io/seata/spring/boot/autoconfigure/SeataAutoConfiguration.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [io.seata.spring.annotation.GlobalTransactionScanner]: Factory method 'globalTransactionScanner' threw exception; nested exception is java.lang.ExceptionInInitializerError
+11:29:23.903 [restartedMain] INFO  o.s.b.a.l.ConditionEvaluationReportLoggingListener - [logMessage,136] - 
+
+Error starting ApplicationContext. To display the conditions report re-run your application with 'debug' enabled.
+11:29:23.917 [restartedMain] ERROR o.s.b.SpringApplication - [reportFailure,824] - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'globalTransactionScanner' defined in class path resource [io/seata/spring/boot/autoconfigure/SeataAutoConfiguration.class]: Bean instantiation via factory method failed; nested exception is org.springframework.beans.BeanInstantiationException: Failed to instantiate [io.seata.spring.annotation.GlobalTransactionScanner]: Factory method 'globalTransactionScanner' threw exception; nested exception is java.lang.ExceptionInInitializerError
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:658)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:638)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1352)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1195)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:582)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:542)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:335)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:333)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:213)
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.registerBeanPostProcessors(PostProcessorRegistrationDelegate.java:258)
+	at org.springframework.context.support.AbstractApplicationContext.registerBeanPostProcessors(AbstractApplicationContext.java:762)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:567)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:147)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:734)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:408)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:308)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1306)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1295)
+	at cn.staitech.fr.StaiTechFrApplication.main(StaiTechFrApplication.java:41)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:49)
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [io.seata.spring.annotation.GlobalTransactionScanner]: Factory method 'globalTransactionScanner' threw exception; nested exception is java.lang.ExceptionInInitializerError
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:185)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:653)
+	... 24 common frames omitted
+Caused by: java.lang.ExceptionInInitializerError: null
+	at net.sf.cglib.core.KeyFactory$Generator.generateClass(KeyFactory.java:166)
+	at net.sf.cglib.core.DefaultGeneratorStrategy.generate(DefaultGeneratorStrategy.java:25)
+	at net.sf.cglib.core.AbstractClassGenerator.create(AbstractClassGenerator.java:216)
+	at net.sf.cglib.core.KeyFactory$Generator.create(KeyFactory.java:144)
+	at net.sf.cglib.core.KeyFactory.create(KeyFactory.java:116)
+	at net.sf.cglib.core.KeyFactory.create(KeyFactory.java:108)
+	at net.sf.cglib.core.KeyFactory.create(KeyFactory.java:104)
+	at net.sf.cglib.proxy.Enhancer.<clinit>(Enhancer.java:69)
+	at io.seata.config.ConfigurationCache.proxy(ConfigurationCache.java:88)
+	at io.seata.config.ConfigurationFactory.buildConfiguration(ConfigurationFactory.java:136)
+	at io.seata.config.ConfigurationFactory.getInstance(ConfigurationFactory.java:94)
+	at io.seata.spring.annotation.GlobalTransactionScanner.<init>(GlobalTransactionScanner.java:87)
+	at io.seata.spring.annotation.GlobalTransactionScanner.<init>(GlobalTransactionScanner.java:143)
+	at io.seata.spring.boot.autoconfigure.SeataAutoConfiguration.globalTransactionScanner(SeataAutoConfiguration.java:55)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:154)
+	... 25 common frames omitted
+Caused by: java.lang.reflect.InaccessibleObjectException: Unable to make protected final java.lang.Class java.lang.ClassLoader.defineClass(java.lang.String,byte[],int,int,java.security.ProtectionDomain) throws java.lang.ClassFormatError accessible: module java.base does not "opens java.lang" to unnamed module @3bf9ce3e
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:354)
+	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:297)
+	at java.base/java.lang.reflect.Method.checkCanSetAccessible(Method.java:199)
+	at java.base/java.lang.reflect.Method.setAccessible(Method.java:193)
+	at net.sf.cglib.core.ReflectUtils$2.run(ReflectUtils.java:56)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:318)
+	at net.sf.cglib.core.ReflectUtils.<clinit>(ReflectUtils.java:46)
+	... 44 common frames omitted
+11:29:23.919 [Thread-4] WARN  c.a.n.c.h.HttpClientBeanHolder - [shutdown,108] - [HttpClientBeanHolder] Start destroying common HttpClient
+11:29:23.919 [Thread-8] WARN  c.a.n.c.n.NotifyCenter - [shutdown,136] - [NotifyCenter] Start destroying Publisher
+11:29:23.919 [Thread-8] WARN  c.a.n.c.n.NotifyCenter - [shutdown,153] - [NotifyCenter] Destruction of the end
+11:31:06.431 [background-preinit] INFO  o.h.v.i.util.Version - [<clinit>,21] - HV000001: Hibernate Validator 6.2.4.Final
+11:31:06.460 [restartedMain] INFO  o.s.b.d.r.ChangeableUrls - [logTo,255] - The Class-Path manifest attribute in D:\workspace2.0\be.pat.saas.java.fr\src\main\resources\lib\gt-geojson-19.0.jar referenced one or more files that do not exist: file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/gt-main-19.0.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/gt-api-19.0.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/jts-core-1.14.0.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/jdom2-2.0.6.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/json-simple-1.1.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/gt-referencing-19.0.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/ejml-ddense-0.32.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/ejml-core-0.32.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/commons-pool-1.5.4.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/gt-metadata-19.0.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/gt-opengis-19.0.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/jsr-275-1.0-beta-2.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/jgridshift-1.0.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/GeographicLib-Java-1.44.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/commons-lang-2.6.jar,file:/D:/workspace2.0/be.pat.saas.java.fr/src/main/resources/lib/jai_core-1.1.3.jar
+11:31:06.460 [restartedMain] INFO  o.s.b.d.e.DevToolsPropertyDefaultsPostProcessor - [logTo,255] - Devtools property defaults active! Set 'spring.devtools.add-properties' to 'false' to disable
+11:31:06.831 [restartedMain] INFO  c.a.n.c.r.client - [lambda$createClient$0,80] - [RpcClientFactory] create a new rpc client of f7622ef2-d6ab-4f96-a60b-a5ffe5681a73_config-0
+11:31:06.857 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 15 ms to scan 1 urls, producing 3 keys and 6 values 
+11:31:06.875 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 9 ms to scan 1 urls, producing 4 keys and 9 values 
+11:31:06.885 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 9 ms to scan 1 urls, producing 3 keys and 10 values 
+11:31:07.022 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 135 ms to scan 359 urls, producing 0 keys and 0 values 
+11:31:07.028 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 5 ms to scan 1 urls, producing 1 keys and 5 values 
+11:31:07.035 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 6 ms to scan 1 urls, producing 1 keys and 7 values 
+11:31:07.041 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 5 ms to scan 1 urls, producing 2 keys and 8 values 
+11:31:07.171 [restartedMain] INFO  o.r.Reflections - [scan,232] - Reflections took 127 ms to scan 359 urls, producing 0 keys and 0 values 
+11:31:07.172 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [f7622ef2-d6ab-4f96-a60b-a5ffe5681a73_config-0] RpcClient init label, labels = {module=config, Vipserver-Tag=null, source=sdk, Amory-Tag=null, Location-Tag=null, taskId=0, AppName=unknown}
+11:31:07.172 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [f7622ef2-d6ab-4f96-a60b-a5ffe5681a73_config-0] Register server push request handler:com.alibaba.nacos.client.config.impl.ClientWorker$ConfigRpcTransportClient$$Lambda$344/1648858914
+11:31:07.173 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [f7622ef2-d6ab-4f96-a60b-a5ffe5681a73_config-0] Register server push request handler:com.alibaba.nacos.client.config.impl.ClientWorker$ConfigRpcTransportClient$$Lambda$345/436290048
+11:31:07.173 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [f7622ef2-d6ab-4f96-a60b-a5ffe5681a73_config-0] Registry connection listener to current client:com.alibaba.nacos.client.config.impl.ClientWorker$ConfigRpcTransportClient$1
+11:31:07.173 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [f7622ef2-d6ab-4f96-a60b-a5ffe5681a73_config-0] RpcClient init, ServerListFactory = com.alibaba.nacos.client.config.impl.ClientWorker$ConfigRpcTransportClient$2
+11:31:07.177 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [f7622ef2-d6ab-4f96-a60b-a5ffe5681a73_config-0] Try to connect to server on start up, server: {serverIp = '127.0.0.1', server main port = 8848}
+11:31:07.830 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [f7622ef2-d6ab-4f96-a60b-a5ffe5681a73_config-0] Success to connect to server [127.0.0.1:8848] on start up, connectionId = 1711596667677_127.0.0.1_57640
+11:31:07.833 [com.alibaba.nacos.client.remote.worker] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [f7622ef2-d6ab-4f96-a60b-a5ffe5681a73_config-0] Notify connected event to listeners.
+11:31:07.834 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [f7622ef2-d6ab-4f96-a60b-a5ffe5681a73_config-0] Register server push request handler:com.alibaba.nacos.common.remote.client.RpcClient$ConnectResetRequestHandler
+11:31:07.836 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [f7622ef2-d6ab-4f96-a60b-a5ffe5681a73_config-0] Register server push request handler:com.alibaba.nacos.common.remote.client.RpcClient$$Lambda$353/1385468050
+11:31:07.866 [restartedMain] DEBUG c.a.c.n.c.NacosPropertySourceBuilder - [loadNacosData,93] - Loading nacos data, dataId: 'application-patsaasdev.yml', group: 'DEFAULT_GROUP', data: spring:
+  autoconfigure:
+    exclude: com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+
+# feign 配置
+feign:
+  sentinel:
+    enabled: false
+  okhttp:
+    enabled: false
+  httpclient:
+    enabled: false
+  client:
+    config:
+      default:
+        connectTimeout: 10000
+        readTimeout: 10000
+  compression:
+    request:
+      enabled: false
+    response:
+      enabled: false
+
+# 暴露监控端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+11:31:07.870 [restartedMain] WARN  c.a.c.n.c.NacosPropertySourceBuilder - [loadNacosData,87] - Ignore the empty nacos configuration and get it based on dataId[staitech-fr] & group[DEFAULT_GROUP]
+11:31:07.872 [restartedMain] WARN  c.a.c.n.c.NacosPropertySourceBuilder - [loadNacosData,87] - Ignore the empty nacos configuration and get it based on dataId[staitech-fr.yml] & group[DEFAULT_GROUP]
+11:31:07.877 [restartedMain] DEBUG c.a.c.n.c.NacosPropertySourceBuilder - [loadNacosData,93] - Loading nacos data, dataId: 'staitech-fr-patsaasdev.yml', group: 'DEFAULT_GROUP', data: feign:
+  httpclient:
+    connection-timeout: 30000
+# spring配置
+spring:
+
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+  elasticsearch:
+    uris: http://192.168.160.103:9200
+  redis:
+    host: 192.168.160.103
+    port: 6379
+    password: shengtong
+    # redisson:
+    redisson:
+      config: |
+        singleServerConfig:
+          idleConnectionTimeout: 10000
+          pingTimeout: 1000
+          connectTimeout: 10000
+          timeout: 3000
+          retryAttempts: 3
+          retryInterval: 1500
+          reconnectionTimeout: 3000
+          # failedSlaveReconnectionInterval: 3000
+          failedAttempts: 3
+          password: shengtong
+          subscriptionsPerConnection: 5
+          clientName: null
+          address: "redis://192.168.160.103:6379"
+          subscriptionConnectionMinimumIdleSize: 1
+          subscriptionConnectionPoolSize: 50
+          connectionMinimumIdleSize: 32
+          connectionPoolSize: 64
+          database: 2
+        threads: 0
+        nettyThreads: 0
+        codec: !<org.redisson.codec.JsonJacksonCodec> { }
+        "transportMode": "NIO"
+
+  datasource:
+    druid:
+      stat-view-servlet:
+        enabled: true
+        url-pattern: /druid/*
+        loginUsername: admin
+        loginPassword: admin      
+    dynamic:
+      druid:
+        initial-size: 5
+        min-idle: 5
+        maxActive: 20
+        maxWait: 60000
+        timeBetweenEvictionRunsMillis: 60000
+        minEvictableIdleTimeMillis: 300000
+        validationQuery: SELECT 1 FROM DUAL
+        testWhileIdle: true
+        testOnBorrow: false
+        testOnReturn: false
+        poolPreparedStatements: true
+        maxPoolPreparedStatementPerConnectionSize: 20
+        filters: stat,slf4j
+        connectionProperties: druid.stat.mergeSql\=true;druid.stat.slowSqlMillis\=5000
+      datasource:
+          # 主库数据源
+          master:
+            driver-class-name: com.mysql.cj.jdbc.Driver
+            url: jdbc:mysql://172.31.2.101:3306/patsaas?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8
+            username: root
+            password: shengtongdev
+          # 从库数据源
+          # slave:
+            # username: 
+            # password: 
+            # url: 
+            # driver-class-name: 
+      # seata: true    # 开启seata代理，开启后默认每个数据源都代理，如果某个不需要代理可单独关闭
+  rabbitmq:
+    host: 192.168.160.103
+    port: 5672
+    username: shengtong
+    password: shengtong
+    virtual-host: /
+    publisher-returns: true
+    publisher-confirm-type: correlated
+    listener:
+      simple:
+        default-requeue-rejected: false
+        acknowledge-mode: manual
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 2000
+      direct:
+        acknowledge-mode: manual
+
+
+# seata配置
+seata:
+  # 默认关闭，如需启用spring.datasource.dynami.seata需要同时开启
+  enabled: false
+  # Seata 应用编号，默认为 ${spring.application.name}
+  application-id: ${spring.application.name}
+  # Seata 事务组编号，用于 TC 集群名
+  tx-service-group: ${spring.application.name}-group
+  # 关闭自动代理
+  enable-auto-data-source-proxy: false
+  # 服务配置项
+  service:
+    # 虚拟组和分组的映射
+    vgroup-mapping:
+      ruoyi-system-group: default
+  config:
+    type: nacos
+    nacos:
+      serverAddr: 192.168.52.108:8848
+      group: SEATA_GROUP
+      namespace:
+  registry:
+    type: nacos
+    nacos:
+      application: seata-server
+      server-addr: 192.168.52.108:8848
+      namespace:
+
+# mybatis配置
+mybatis:
+  # 搜索指定包别名
+  typeAliasesPackage: cn.staitech.fr
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath:mapper/**/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+# swagger配置
+swagger:
+  title: 标注模块接口文档
+  license: Powered By staitech
+  licenseUrl: http://www.staitech.cn
+
+geometry:
+  insideMaxArea: 1000.0
+
+netty:
+  port: 9999
+
+annoSystem:
+  StaiTechSystemApplication: http://192.168.160.103:9201
+
+jsonFilePath: /home/json
+
+pdfFliePath: /home/json
+
+geojsonFilePath: /home/geojson
+
+jsonZipFilePath: /home/uploadPath/file/zipFile
+
+forward:
+  phyonUrl: http://172.31.2.210:8003/
+slidePath: /home/pat_saas/Slides
+
+uploadPath: /home/pat_saas/Upload
+
+11:31:07.881 [restartedMain] INFO  o.s.c.b.c.PropertySourceBootstrapConfiguration - [initialize,109] - Located property source: [BootstrapPropertySource {name='bootstrapProperties-staitech-fr-patsaasdev.yml,DEFAULT_GROUP'}, BootstrapPropertySource {name='bootstrapProperties-staitech-fr.yml,DEFAULT_GROUP'}, BootstrapPropertySource {name='bootstrapProperties-staitech-fr,DEFAULT_GROUP'}, BootstrapPropertySource {name='bootstrapProperties-application-patsaasdev.yml,DEFAULT_GROUP'}]
+11:31:07.885 [restartedMain] INFO  c.s.f.StaiTechFrApplication - [logStartupProfileInfo,640] - The following 1 profile is active: "patsaasdev"
+11:31:08.395 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [multipleStoresDetected,262] - Multiple Spring Data modules found, entering strict repository configuration mode
+11:31:08.396 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [registerRepositoriesIn,132] - Bootstrapping Spring Data Elasticsearch repositories in DEFAULT mode.
+11:31:08.431 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [registerRepositoriesIn,201] - Finished Spring Data repository scanning in 32 ms. Found 1 Elasticsearch repository interfaces.
+11:31:08.650 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [multipleStoresDetected,262] - Multiple Spring Data modules found, entering strict repository configuration mode
+11:31:08.650 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [registerRepositoriesIn,132] - Bootstrapping Spring Data Reactive Elasticsearch repositories in DEFAULT mode.
+11:31:08.653 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [registerRepositoriesIn,201] - Finished Spring Data repository scanning in 2 ms. Found 0 Reactive Elasticsearch repository interfaces.
+11:31:08.659 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [multipleStoresDetected,262] - Multiple Spring Data modules found, entering strict repository configuration mode
+11:31:08.660 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [registerRepositoriesIn,132] - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+11:31:08.667 [restartedMain] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - [registerRepositoriesIn,201] - Finished Spring Data repository scanning in 1 ms. Found 0 Redis repository interfaces.
+11:31:08.778 [restartedMain] WARN  o.m.s.m.ClassPathMapperScanner - [warn,44] - No MyBatis mapper was found in '[cn.staitech.fr.mapper]' package. Please check your configuration.
+11:31:08.849 [restartedMain] INFO  o.s.c.c.s.GenericScope - [setSerializationId,283] - BeanFactory id=f7247664-de3d-3442-8957-a7838ac46ef3
+11:31:08.985 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration' of type [org.springframework.cloud.commons.config.CommonsConfigAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:31:08.987 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:31:08.988 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'loadBalancerClientsDefaultsMappingsProvider' of type [org.springframework.cloud.client.loadbalancer.LoadBalancerDefaultMappingsProviderAutoConfiguration$$Lambda$559/1819653256] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:31:08.994 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'defaultsBindHandlerAdvisor' of type [org.springframework.cloud.commons.config.DefaultsBindHandlerAdvisor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:31:09.003 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'spring.datasource.dynamic-com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties' of type [com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:31:09.007 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceAutoConfiguration' of type [com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceAutoConfiguration$$EnhancerBySpringCGLIB$$280f9d56] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:31:09.020 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'dsProcessor' of type [com.baomidou.dynamic.datasource.processor.DsHeaderProcessor] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:31:09.040 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'cn.staitech.common.redis.configure.RedisConfig' of type [cn.staitech.common.redis.configure.RedisConfig$$EnhancerBySpringCGLIB$$1809d0f5] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:31:09.088 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'com.alibaba.cloud.seata.feign.SeataFeignClientAutoConfiguration$FeignBeanPostProcessorConfiguration' of type [com.alibaba.cloud.seata.feign.SeataFeignClientAutoConfiguration$FeignBeanPostProcessorConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:31:09.089 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'seataFeignObjectWrapper' of type [com.alibaba.cloud.seata.feign.SeataFeignObjectWrapper] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:31:09.114 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'spring.cloud.sentinel-com.alibaba.cloud.sentinel.SentinelProperties' of type [com.alibaba.cloud.sentinel.SentinelProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:31:09.117 [restartedMain] INFO  o.s.c.s.PostProcessorRegistrationDelegate$BeanPostProcessorChecker - [postProcessAfterInitialization,376] - Bean 'com.alibaba.cloud.sentinel.custom.SentinelAutoConfiguration' of type [com.alibaba.cloud.sentinel.custom.SentinelAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying)
+11:31:09.426 [restartedMain] INFO  o.s.b.w.e.t.TomcatWebServer - [initialize,108] - Tomcat initialized with port(s): 19998 (http)
+11:31:09.434 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Initializing ProtocolHandler ["http-nio-19998"]
+11:31:09.434 [restartedMain] INFO  o.a.c.c.StandardService - [log,173] - Starting service [Tomcat]
+11:31:09.434 [restartedMain] INFO  o.a.c.c.StandardEngine - [log,173] - Starting Servlet engine: [Apache Tomcat/9.0.65]
+11:31:09.514 [restartedMain] INFO  o.a.c.c.C.[.[.[/] - [log,173] - Initializing Spring embedded WebApplicationContext
+11:31:09.514 [restartedMain] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - [prepareWebApplicationContext,292] - Root WebApplicationContext: initialization completed in 1610 ms
+11:31:09.861 [restartedMain] INFO  c.a.d.p.DruidDataSource - [init,972] - {dataSource-1,master} inited
+11:31:09.862 [restartedMain] INFO  c.b.d.d.DynamicRoutingDataSource - [addDataSource,148] - dynamic-datasource - add a datasource named [master] success
+11:31:09.862 [restartedMain] INFO  c.b.d.d.DynamicRoutingDataSource - [afterPropertiesSet,228] - dynamic-datasource initial loaded [1] datasource,primary datasource named [master]
+11:31:10.017 [restartedMain] WARN  config - [setReconnectionTimeout,278] - 'reconnectionTimeout' setting in unavailable. Please use 'failedSlaveReconnectionInterval' setting instead!
+11:31:10.017 [restartedMain] WARN  config - [setFailedAttempts,287] - 'failedAttempts' setting in unavailable. Please use 'failedSlaveCheckInterval' setting instead!
+11:31:10.091 [restartedMain] INFO  org.redisson.Version - [logVersion,41] - Redisson 3.12.0
+11:31:10.509 [redisson-netty-2-20] INFO  o.r.c.p.MasterPubSubConnectionPool - [lambda$run$0,168] - 1 connections initialized for 192.168.160.103/192.168.160.103:6379
+11:31:10.510 [redisson-netty-2-27] INFO  o.r.c.p.MasterConnectionPool - [lambda$run$0,168] - 32 connections initialized for 192.168.160.103/192.168.160.103:6379
+11:31:10.794 [restartedMain] INFO  c.a.c.s.SentinelWebMvcConfigurer - [addInterceptors,52] - [Sentinel Starter] register SentinelWebInterceptor with urlPatterns: [/**].
+11:31:11.072 [restartedMain] INFO  c.a.n.c.r.client - [lambda$createClient$0,80] - [RpcClientFactory] create a new rpc client of e3e7e389-a251-4375-8790-c8c285dae52c
+11:31:11.072 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [e3e7e389-a251-4375-8790-c8c285dae52c] RpcClient init label, labels = {module=naming, source=sdk}
+11:31:11.073 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [e3e7e389-a251-4375-8790-c8c285dae52c] RpcClient init, ServerListFactory = com.alibaba.nacos.client.naming.core.ServerListManager
+11:31:11.073 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [e3e7e389-a251-4375-8790-c8c285dae52c] Registry connection listener to current client:com.alibaba.nacos.client.naming.remote.gprc.redo.NamingGrpcRedoService
+11:31:11.073 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [e3e7e389-a251-4375-8790-c8c285dae52c] Register server push request handler:com.alibaba.nacos.client.naming.remote.gprc.NamingPushRequestHandler
+11:31:11.073 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [e3e7e389-a251-4375-8790-c8c285dae52c] Try to connect to server on start up, server: {serverIp = '127.0.0.1', server main port = 8848}
+11:31:11.178 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [e3e7e389-a251-4375-8790-c8c285dae52c] Success to connect to server [127.0.0.1:8848] on start up, connectionId = 1711596671076_127.0.0.1_57763
+11:31:11.179 [com.alibaba.nacos.client.remote.worker] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [e3e7e389-a251-4375-8790-c8c285dae52c] Notify connected event to listeners.
+11:31:11.179 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [e3e7e389-a251-4375-8790-c8c285dae52c] Register server push request handler:com.alibaba.nacos.common.remote.client.RpcClient$ConnectResetRequestHandler
+11:31:11.180 [restartedMain] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [e3e7e389-a251-4375-8790-c8c285dae52c] Register server push request handler:com.alibaba.nacos.common.remote.client.RpcClient$$Lambda$353/1385468050
+11:31:11.551 [restartedMain] INFO  o.s.b.a.e.w.EndpointLinksResolver - [<init>,58] - Exposing 19 endpoint(s) beneath base path '/actuator'
+11:31:11.803 [restartedMain] INFO  o.s.b.d.a.OptionalLiveReloadServer - [startServer,59] - LiveReload server is running on port 35729
+11:31:12.149 [restartedMain] INFO  o.s.c.o.FeignClientFactoryBean - [getTarget,418] - For 'staitech-system' URL not provided. Will try picking an instance via load-balancing.
+11:31:12.829 [restartedMain] INFO  o.a.c.h.Http11NioProtocol - [log,173] - Starting ProtocolHandler ["http-nio-19998"]
+11:31:12.836 [restartedMain] INFO  o.s.b.w.e.t.TomcatWebServer - [start,220] - Tomcat started on port(s): 19998 (http) with context path ''
+11:31:12.843 [restartedMain] INFO  c.a.c.n.r.NacosServiceRegistry - [register,75] - nacos registry, DEFAULT_GROUP staitech-fr 172.31.2.61:19998 register finished
+11:31:12.973 [restartedMain] INFO  c.s.f.StaiTechFrApplication - [logStarted,61] - Started StaiTechFrApplication in 6.918 seconds (JVM running for 7.552)
+11:31:12.979 [restartedMain] INFO  c.a.c.n.r.NacosContextRefresher - [registerNacosListenersForApplications,105] - listening config: dataId=staitech-fr.yml, group=DEFAULT_GROUP
+11:31:12.979 [restartedMain] INFO  c.a.c.n.r.NacosContextRefresher - [registerNacosListenersForApplications,105] - listening config: dataId=staitech-fr-patsaasdev.yml, group=DEFAULT_GROUP
+11:31:12.980 [restartedMain] INFO  c.a.c.n.r.NacosContextRefresher - [registerNacosListenersForApplications,105] - listening config: dataId=staitech-fr, group=DEFAULT_GROUP
+11:31:13.429 [nacos-grpc-client-executor-7] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [e3e7e389-a251-4375-8790-c8c285dae52c] Receive server push request, request = NotifySubscriberRequest, requestId = 238
+11:31:13.433 [nacos-grpc-client-executor-7] INFO  c.a.n.c.r.client - [printIfInfoEnabled,60] - [e3e7e389-a251-4375-8790-c8c285dae52c] Ack server push request, request = NotifySubscriberRequest, requestId = 238
+11:31:13.442 [RMI TCP Connection(1)-172.31.2.61] INFO  o.a.c.c.C.[.[.[/] - [log,173] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+11:31:13.442 [RMI TCP Connection(1)-172.31.2.61] INFO  o.s.w.s.DispatcherServlet - [initServletBean,525] - Initializing Servlet 'dispatcherServlet'
+11:31:13.443 [RMI TCP Connection(1)-172.31.2.61] INFO  o.s.w.s.DispatcherServlet - [initServletBean,547] - Completed initialization in 1 ms

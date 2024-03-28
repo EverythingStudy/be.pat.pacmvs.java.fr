@@ -1,0 +1,41 @@
+# Tomcat
+server:
+  port: 19998
+
+knife4j:
+  enable: true
+# Spring
+spring:
+  messages:
+    basename: i18n/messages
+    cache-seconds: 3600
+    encoding: UTF-8
+    fallbackToSystemLocale: false
+  application:
+    # 应用名称
+    name: staitech-fr
+  profiles:
+    # 环境配置
+    active: patsaasdev
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        server-addr: 127.0.0.1:8848
+        # nacos namespace
+        namespace: e3b5b4e0-b5b4-4604-9bed-d9f42fe23eee
+        # nacos group
+        group: DEFAULT_GROUP
+      config:
+        # 配置中心地址
+        server-addr: 127.0.0.1:8848
+        # 配置文件格式
+        file-extension: yml
+        # nacos namespace
+        namespace: e3b5b4e0-b5b4-4604-9bed-d9f42fe23eee
+        # nacos group
+        group: DEFAULT_GROUP
+        # 共享配置
+        shared-configs:
+          - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+
