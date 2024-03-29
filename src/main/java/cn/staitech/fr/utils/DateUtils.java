@@ -1,5 +1,6 @@
 package cn.staitech.fr.utils;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Clock;
 import java.util.Date;
@@ -21,6 +22,15 @@ public class DateUtils {
     public static String getCurrentHHmmssString(String pattern) {
         return new SimpleDateFormat(pattern).format(new Date());
     }
+
+
+    public static Date stringToDate(String strTime, String formatType) throws ParseException {
+        SimpleDateFormat formatter = new SimpleDateFormat(formatType);
+        Date date = null;
+        date = formatter.parse(strTime);
+        return date;
+    }
+
 
     /**
      * 日期格式处理
