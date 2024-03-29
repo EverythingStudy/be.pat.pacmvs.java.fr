@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper">
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.PathologicalIndicatorCategory">
+        <id column="category_id" property="categoryId"/>
+        <result column="indicator_id" property="indicatorId"/>
+        <result column="category_name" property="categoryName"/>
+        <result column="structure_id" property="structureId"/>
+        <result column="rgb" property="rgb"/>
+        <result column="hex" property="hex"/>
+        <result column="color" property="color"/>
+        <result column="number" property="number"/>
+        <result column="order_number" property="orderNumber"/>
+        <result column="anno_type" property="annoType"/>
+        <result column="organization_id" property="organizationId"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="category_code" property="categoryCode"/>
+        <result column="group_number" property="groupNumber"/>
+        <result column="category_type" property="categoryType"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        category_id
+        , indicator_id, category_name, structure_id, rgb, hex, color, number, order_number, anno_type, del_flag, create_by,
+         update_by, create_time, update_time,category_code,organization_id,group_number,category_type
+    </sql>
+
+    <select id="selectRoe" parameterType="map" resultMap="BaseResultMap">
+        select *
+        from tb_pathological_indicator_category as p
+                 left join tb_structure as s on p.structure_id = s.structure_id
+        where p.category_code = #{categoryCode,jdbcType=BIGINT}
+          and s.type = "ROE"
+    </select>
+
+    <!--  根据主键查询单条标注信息-->
+    <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_pathological_indicator_category
+        where category_id = #{categoryId,jdbcType=BIGINT}
+    </select>
+
+
+    <!--  根据主键删除单挑标注信息-->
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+        delete
+        from tb_pathological_indicator_category
+        where category_id = #{categoryId,jdbcType=BIGINT}
+    </delete>
+
+    <!--添加数据-->
+    <insert id="insertSelective" parameterType="cn.staitech.fr.domain.PathologicalIndicatorCategory">
+        insert into tb_pathological_indicator_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="categoryId != null">
+                category_id,
+            </if>
+            <if test="indicatorId != null">
+                indicator_id,
+            </if>
+            <if test="structureId != null">
+                structure_id,
+            </if>
+            <if test="rgb != null">
+                rgb,
+            </if>
+            <if test="hex != null">
+                hex,
+            </if>
+            <if test="createBy != null">
+                create_by,
+            </if>
+            create_time,
+            <if test="categoryName != null">
+                category_name,
+            </if>
+            <if test="annoType != null">
+                anno_type,
+            </if>
+            <if test="orderNumber != null">
+                order_number,
+            </if>
+            <if test="number != null">
+                number,
+            </if>
+            <if test="categoryCode != null">
+                category_code,
+            </if>
+            <if test="organizationId != null">
+                organization_id,
+            </if>
+            <if test="groupNumber != null">
+                group_number,
+            </if>
+            <if test="categoryType != null">
+                category_type,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="categoryId != null">
+                #{categoryId,jdbcType=BIGINT},
+            </if>
+            <if test="indicatorId != null">
+                #{indicatorId,jdbcType=BIGINT},
+            </if>
+            <if test="structureId != null">
+                #{structureId,jdbcType=VARCHAR},
+            </if>
+            <if test="rgb != null">
+                #{rgb,jdbcType=VARCHAR},
+            </if>
+            <if test="hex != null">
+                #{hex,jdbcType=VARCHAR},
+            </if>
+            <if test="createBy != null">
+                #{createBy,jdbcType=BIGINT},
+            </if>
+            sysdate(),
+            <if test="categoryName != null">
+                #{categoryName,jdbcType=VARCHAR},
+            </if>
+            <if test="annoType != null">
+                #{annoType,jdbcType=BIGINT},
+            </if>
+            <if test="orderNumber != null">
+                #{orderNumber,jdbcType=INTEGER},
+            </if>
+            <if test="number != null">
+                #{number,jdbcType=VARCHAR},
+            </if>
+            <if test="categoryCode != null">
+                #{categoryCode,jdbcType=VARCHAR},
+            </if>
+            <if test="organizationId != null">
+                #{organizationId,jdbcType=BIGINT},
+            </if>
+            <if test="groupNumber != null">
+                #{groupNumber,jdbcType=INTEGER},
+            </if>
+            <if test="categoryType != null">
+                #{categoryType,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <!--  根据id更新数据-->
+    <update id="updateByPrimaryKeySelective" parameterType="cn.staitech.fr.domain.PathologicalIndicatorCategory">
+        update tb_pathological_indicator_category
+        <set>
+            <if test="structureId != null">
+                structure_id = #{structureId,jdbcType=VARCHAR},
+            </if>
+            <if test="rgb != null">
+                rgb = #{rgb,jdbcType=VARCHAR},
+            </if>
+            <if test="hex != null">
+                hex = #{hex,jdbcType=VARCHAR},
+            </if>
+            <if test="updateBy != null">
+                update_by = #{updateBy,jdbcType=BIGINT},
+            </if>
+            update_time = sysdate() ,
+            <if test="categoryName != null">
+                category_name = #{categoryName,jdbcType=VARCHAR},
+            </if>
+            <if test="number != null">
+                number = #{number,jdbcType=VARCHAR},
+            </if>
+            <if test="orderNumber != null">
+                order_number = #{orderNumber,jdbcType=INTEGER},
+            </if>
+            <if test="delFlag != null">
+                del_flag = #{delFlag,jdbcType=INTEGER},
+            </if>
+            <if test="organizationId != null">
+                organization_id = #{organizationId,jdbcType=BIGINT},
+            </if>
+            <if test="groupNumber != null">
+                group_number = #{groupNumber,jdbcType=INTEGER},
+            </if>
+        </set>
+        <where>
+            <if test="categoryId != null and categoryId != '' ">
+                AND category_id = #{categoryId}
+            </if>
+            <if test="indicatorId != null and indicatorId != '' ">
+                AND indicator_id = #{indicatorId}
+            </if>
+        </where>
+    </update>
+
+    <select id="selectIndicatorIdAll" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select *
+        from tb_pathological_indicator_category
+        where indicator_id = #{indicatorId}
+           or category_id = 0
+           or category_id = 1
+        order by order_number desc
+    </select>
+
+
+
+
+    <delete id="delIndicatorCategory" parameterType="java.lang.Long">
+        delete
+        from tb_pathological_indicator_category
+        where indicator_id = #{indicatorId}
+    </delete>
+
+    <select id="selectCategoryAll" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        select *
+        from tb_pathological_indicator_category
+        where category_id = #{categoryId}
+    </select>
+
+    <select id="selectProjectAndNumber" resultMap="BaseResultMap">
+        SELECT *
+        FROM tb_pathological_indicator_category AS pic
+        LEFT JOIN tb_project AS p ON p.indicator_id = pic.indicator_id
+        WHERE p.project_id = #{projectId}
+        AND pic.number = #{number}
+        and pic.del_flag = '0'
+        <if test="organizationId != null">
+            AND pic.organization_id = #{organizationId}
+        </if>
+    </select>
+
+    <select id="selectCategoryById" resultType="java.lang.String">
+        select group_concat(category_name) from tb_pathological_indicator_category
+        <where>
+            <if test="split != null and split.length>0">
+                AND category_id IN
+                <foreach item="item" index="index" collection="split" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <!-- 查询标签：不区分组织机构 结构编码在当前列表内不可重复；C：结构名称在当前列表内不可重复。D：图层顺序在当前列表内不可重复；E：颜色值在当前列表不可重复 -->
+    <select id="selectIndicatorMessage" parameterType="cn.staitech.fr.domain.PathologicalIndicatorCategory"
+            resultMap="BaseResultMap">
+        select *
+        from tb_pathological_indicator_category where del_flag = 0
+        <if test="indicatorId != null">
+            AND indicator_id = #{indicatorId}
+        </if>
+        <if test="orderNumber !=null">
+            AND order_number = #{orderNumber}
+        </if>
+        <if test="hex != null">
+            AND hex = #{hex}
+        </if>
+        <if test="categoryCode != null">
+            AND category_code = #{categoryCode}
+        </if>
+        <if test="structureId != null">
+            AND structure_id = #{structureId,jdbcType=VARCHAR}
+        </if>
+        <if test="structureIds != null  and categoryName != ''">
+            AND structure_id like concat(#{structureIds}, '%')
+        </if>
+        <if test="organizationId != null">
+            AND organization_id = #{organizationId}
+        </if>
+        <if test="organizationId != null">
+            AND organization_id = #{organizationId}
+        </if>
+    </select>
+
+
+    <!-- 查询标签：不区分组织机构 结构编码在当前列表内不可重复；C：结构名称在当前列表内不可重复。D：图层顺序在当前列表内不可重复；E：颜色值在当前列表不可重复 -->
+    <select id="selectIndicatorMessageForUpdate" parameterType="cn.staitech.fr.domain.PathologicalIndicatorCategory"
+            resultMap="BaseResultMap">
+        select *
+        from tb_pathological_indicator_category where del_flag = 0
+        <if test="indicatorId != null">
+            AND indicator_id = #{indicatorId}
+        </if>
+        <if test="categoryId != null">
+            AND category_id &lt;&gt; #{categoryId}
+        </if>
+        <if test="orderNumber !=null">
+            AND order_number = #{orderNumber}
+        </if>
+        <if test="hex != null">
+            AND hex = #{hex}
+        </if>
+        <if test="categoryCode != null">
+            AND category_code = #{categoryCode}
+        </if>
+        <if test="structureId != null">
+            AND structure_id = #{structureId,jdbcType=VARCHAR}
+        </if>
+    </select>
+
+    <!--通过项目ID查询标注类别-->
+    <select id="selectCategoryByProjectId" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT p.indicator_id,
+               pic.category_id,
+               pic.category_name,
+               pic.create_by
+        FROM tb_project p
+                 LEFT JOIN tb_pathological_indicator_category pic ON pic.indicator_id = p.indicator_id
+        WHERE p.project_id = #{projectId}
+    </select>
+
+    <!-- 查总数 -->
+    <select id="selectCategoryNumber" parameterType="java.lang.Long" resultType="java.lang.Long">
+        select count(*)
+        from tb_pathological_indicator_category
+        where del_flag = 0
+          and indicator_id = #{indicatorId}
+    </select>
+
+    <select id="selectProjectCategory" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        SELECT i.category_name, i.category_id
+        FROM `tb_pathological_indicator_category` as i
+                 left join tb_project as p
+                           on i.indicator_id = p.indicator_id
+        where p.project_id = #{projectId}
+    </select>
+
+    <select id="selectLabelNumByStructureId" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT cc
+        FROM (SELECT organ_id,
+                     count(1) cc
+              FROM (SELECT t2.organ_id, t1.structure_id
+                    FROM tb_pathological_indicator_category t1
+                             LEFT JOIN tb_structure t2 ON t1.structure_id = t2.structure_id) p
+              GROUP BY organ_id
+              ORDER BY organ_id) m
+                 RIGHT JOIN (SELECT t2.organ_id
+                             FROM tb_pathological_indicator_category t1
+                                      LEFT JOIN tb_structure t2 ON t1.structure_id = t2.structure_id
+                             WHERE t2.structure_id = #{structureId}) n ON m.organ_id = n.organ_id
+    </select>
+</mapper>
