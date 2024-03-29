@@ -1,5 +1,6 @@
 package cn.staitech.fr.domain;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -128,7 +129,7 @@ public class Measure implements Serializable {
     /**
      * 标注数据
      */
-    private Object contour;
+    private JSONObject contour;
 
     /**
      * 创建者
@@ -149,6 +150,16 @@ public class Measure implements Serializable {
      * 更新时间
      */
     private Date updateTime;
+
+    /**
+     * 更新时间
+     */
+    private String exception;
+
+    /**
+     * 更新时间
+     */
+    private String data;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

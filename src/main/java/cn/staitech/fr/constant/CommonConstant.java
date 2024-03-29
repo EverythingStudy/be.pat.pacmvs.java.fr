@@ -51,6 +51,7 @@ public class CommonConstant {
     public static final String CHILDREN_CNTS = "children_cnts";
     public static final String VIA_IMG_METADATA = "_via_img_metadata";
     public static final String LOGIN_TOKEN_KEY = "login_tokens:";
+    public static final String ANNO_TYPE_MEASURE = "Measure";
     /**
      * Annotation
      */

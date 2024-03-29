@@ -24,6 +24,8 @@ public class DateUtils {
     }
 
 
+
+
     public static Date stringToDate(String strTime, String formatType) throws ParseException {
         SimpleDateFormat formatter = new SimpleDateFormat(formatType);
         Date date = null;
