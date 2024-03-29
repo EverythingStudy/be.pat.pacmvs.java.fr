@@ -7,19 +7,12 @@ package cn.staitech.fr.constant;
  */
 public class CommonConstant {
 
-	 /**
-     * system
-     */
-	
-	public static final String SYS_USER = "SYS_USER_";
-	public static final Long SYS_USER_CACHE_HOURS = 7L;
+
     /**
      * cache key
      */
-    public static final String IMAGE_CACHE_KEY = "image_cache_key";
-    public static final String INDICATOR_CACHE_KEY = "indicator_cache_key";
-    public static final String PROJECT_CACHE_KEY = "project_cache_key";
     public static final String NUMBER_0 = "0";
+
     public static final String NUMBER_1 = "1";
     public static final String GLIDE_LINE = "_";
     public static final String FILE_SUFFIX = ".";
@@ -72,25 +65,25 @@ public class CommonConstant {
     public static final String PROJECT_ANNOTATION_REL = "PROJECT_ANNOTATION_REL_";
     public static final Long PROJECT_ANNOTATION_REL_CACHE_DAYS = 365L;
 	public static final String MATCHING_FAILED = "匹配失败";
-    
+
     /**
      * 上传下载限制
      */
     public static final double UPLOAD_FILE_LIMIT = 300;
     public static final double DOWN_FILE_LIMIT = 300;
-    
+
     /**
      * Viewer
      */
     public static final Double MICRON = 0.26;
-    
+
     /**
      * structure
      */
     public static final String STRUCTURE_RO = "RO";
     public static final String STRUCTURE_ROA = "ROA";
     public static final String STRUCTURE_ROE = "ROE";
-    
+
     /**
      * Statistic
      */
@@ -138,7 +131,7 @@ public class CommonConstant {
     public static final String ANNOTATION_CATEGORY = "标注类别";
     public static final String USER = "成员";
     public static final String SLIDE = "图像";
-    
+
     /**
      * 分表限制
      */
@@ -148,10 +141,15 @@ public class CommonConstant {
     private CommonConstant() {
         throw new IllegalStateException("CommonConstant class");
     }
-    /**
-     * review
-     */
 
-    public static final String NOT_EVALUATING = "不予评价";
+    public static final String MALE_FLAG = "雄性Male";
 
+    public static final String MALE = "M";
+
+    public static final String FEMALE = "F";
+    public static final String END_FLAG = "大体损伤";
+    public static final String SEMICOLON_FLAG =";";
+    public static final String EN_FLAG  = "[a-zA-Z]";
+    public static final String CODE_START  = "(";
+    public static final String CODE_END  = ")";
 }

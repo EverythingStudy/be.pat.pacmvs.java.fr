@@ -3,6 +3,7 @@ package cn.staitech.fr.service;
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.WaxBlockNumber;
+import cn.staitech.fr.domain.in.UploadWaxBlockIn;
 import cn.staitech.fr.domain.in.WaxBlockNumberEditIn;
 import cn.staitech.fr.domain.in.WaxBlockNumberListIn;
 import cn.staitech.fr.domain.out.WaxBlockNumberListOut;
@@ -27,5 +28,5 @@ public interface WaxBlockNumberService extends IService<WaxBlockNumber> {
 
     R delete(Long id);
 
-    R upload(MultipartFile file) throws IOException;
+    R upload( UploadWaxBlockIn req) throws IOException;
 }
