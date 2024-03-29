@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.WaxBlockNumberMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.WaxBlockNumber">
+        <id column="id" property="id" />
+        <result column="topic_id" property="topicId" />
+        <result column="topic_name" property="topicName" />
+        <result column="species_id" property="speciesId" />
+        <result column="species_name" property="speciesName" />
+        <result column="file_name" property="fileName" />
+        <result column="del_flag" property="delFlag" />
+        <result column="organization_id" property="organizationId" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, topic_id, topic_name, species_id, species_name, file_name, del_flag, organization_id, create_by, create_time, update_by, update_time
+    </sql>
+
+    <select id="getWaxList" parameterType="cn.staitech.fr.domain.in.WaxBlockNumberListIn"
+                  resultType="cn.staitech.fr.domain.out.WaxBlockNumberListOut">
+        select fwbn.id,tt.topic_name,fwbn.species_name,fwbn.file_name,so.organization_name,fwbn.create_time
+        from fr_wax_block_number fwbn
+                 left join sys_organization so on fwbn.organization_id = so.organization_id
+                 left join tb_topic tt on fwbn.topic_id=tt.topic_id
+        where fwbn.del_flag='0'
+        <if test="speciesId != null and speciesId != ''">
+            and fwbn.species_id = #{speciesId}
+        </if>
+        <if test="topicName != null and topicName != ''">
+            and tt.topic_name like concat('%',#{topicName},'%')
+        </if>
+        <if test="organizationId != null and organizationId != ''">
+            and fwbn.organization_id = #{organizationId}
+        </if>
+        <if test="createTimeParams!=null and createTimeParams.size() > 0">
+            <if test="createTimeParams.beginTime != null and createTimeParams.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(fwbn.create_time,'%Y%m%d') &gt;= date_format(#{createTimeParams.beginTime},'%Y%m%d')
+            </if>
+            <if test="createTimeParams.endTime != null and createTimeParams.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(fwbn.create_time,'%Y%m%d') &lt;= date_format(#{createTimeParams.endTime},'%Y%m%d')
+            </if>
+        </if>
+        order by fwbn.create_time desc
+
+    </select>
+
+</mapper>
