@@ -53,7 +53,7 @@ public class AlgorithmCallBackController {
     		Image image = new Image();
     		image.setImageId(imageId);
     		image.setStatus(userStatus);
-    		imageService.updateById(image);
+//    		imageService.updateById(image);
     	}
         return R.ok();
     }
