@@ -3,9 +3,11 @@ package cn.staitech.fr.mapper;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
 import cn.staitech.fr.domain.out.SlideListQueryOut;
+import cn.staitech.fr.domain.out.AlgorithmImageOut;
+import java.util.List;
+import java.util.Map;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-import java.util.List;
 
 /**
 * @author admin
@@ -15,6 +17,16 @@ import java.util.List;
 */
 public interface SlideMapper extends BaseMapper<Slide> {
     String selectBySpecialId(Long specialId);
+    /**
+     * 
+    * @Title: getAlgorithmImage
+    * @Description: 查下启动的所有切片信息
+    * @param @param queryMap
+    * @param @return
+    * @return List<AlgorithmImageOut>
+    * @throws
+     */
+    List<AlgorithmImageOut> getAlgorithmImage(Map<String,Object> queryMap);
 
     List<SlideListQueryOut> slideListQuery(SlideListQueryIn req);
 }
