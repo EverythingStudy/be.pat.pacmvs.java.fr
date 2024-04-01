@@ -15,6 +15,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.geotools.geojson.GeoJSONUtil;
 import org.geotools.geojson.geom.GeometryJSON;
 
+
+import java.io.IOException;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -28,6 +30,8 @@ import static cn.staitech.fr.utils.DateUtils.MillisDefaultZone;
 public class MarkingUtils {
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), 4326);
     private static final WKTReader WKT_READER = new WKTReader(GEOMETRY_FACTORY);
+
+    private static final String GEO_JSON_TYPE = "GeometryCollection";
 
 
 
@@ -48,6 +52,10 @@ public class MarkingUtils {
 
     public static String getSdId() {
         return SD + LABEL_NAME + MillisDefaultZone() + RandomNumbers();
+    }
+
+    public static String getSdId(String categoryName) {
+        return SD + categoryName + MillisDefaultZone() + RandomNumbers();
     }
 
     public static String getClId() {
@@ -455,6 +463,41 @@ public class MarkingUtils {
         geometryJson.put("coordinates", lists.get(0));
         return geometryJson;
     }
+
+    public static String jsonToWkt(JSONObject jsonObject) {
+        String wkt = null;
+        String type = jsonObject.getString("type");
+        GeometryJSON gJson = new GeometryJSON();
+        try {
+            // {"geometries":[{"coordinates":[4,6],"type":"Point"},{"coordinates":[[4,6],[7,10]],"type":"LineString"}],"type":"GeometryCollection"}
+            if (GEO_JSON_TYPE.equals(type)) {
+                // 由于解析上面的json语句会出现这个geometries属性没有采用以下办法
+                JSONArray geometriesArray = jsonObject.getJSONArray("geometries");
+                // 定义一个数组装图形对象
+                int size = geometriesArray.size();
+                Geometry[] geometries = new Geometry[size];
+                for (int i = 0; i < size; i++) {
+                    String str = geometriesArray.get(i).toString();
+                    // 使用GeoUtil去读取str
+                    Reader reader = GeoJSONUtil.toReader(str);
+                    Geometry geometry = gJson.read(reader);
+                    geometries[i] = geometry;
+                }
+                GeometryCollection geometryCollection = new GeometryCollection(geometries, new GeometryFactory());
+                wkt = geometryCollection.toText();
+            } else {
+                Reader reader = GeoJSONUtil.toReader(jsonObject.toString());
+                Geometry read = gJson.read(reader);
+                wkt = read.toText();
+            }
+
+        } catch (IOException e) {
+            System.out.println("GeoJson转WKT出现异常");
+            e.printStackTrace();
+        }
+        return wkt;
+    }
+
 
 
 }
