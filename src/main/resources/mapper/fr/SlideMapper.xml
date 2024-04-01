@@ -35,4 +35,43 @@
                  left join tb_topic tt on fsl.topic_id = tt.topic_id
         where special_id = #{specialId}
     </select>
+    <select id="slideListQuery" parameterType="cn.staitech.fr.domain.in.SlideListQueryIn"
+            resultType="cn.staitech.fr.domain.out.SlideListQueryOut">
+        select ti.thumb_url,
+        ti.file_name,
+        fs.group_code,
+        fs.wax_code,
+        fs.animal_code,
+        fs.gender_flag,
+        fs.organs,
+        fs.process_flag,
+        su.user_name createUser,
+        fs.create_time,
+        fs.slide_id
+        from fr_slide fs
+        left join tb_image ti on fs.image_id = ti.image_id
+        left join sys_user su on fs.create_by = su.user_id
+        <where>
+            fs.special_id = #{specialId}
+
+            <if test="fileName != null and fileName != ''">
+                and ti.file_name like concat('%',#{fileName},'%')
+            </if>
+            <if test="processFlag!= null and processFlag != ''">
+                and fs.process_flag = #{processFlag}
+            </if>
+            <if test="createBy != null and createBy != ''">
+                and fs.create_by = #{createBy}
+            </if>
+            <if test="createTimeParams!=null and createTimeParams.size() > 0">
+                <if test="createTimeParams.beginTime != null and createTimeParams.beginTime != ''"><!-- 开始时间检索 -->
+                    AND date_format(fs.create_time,'%Y%m%d') &gt;= date_format(#{createTimeParams.beginTime},'%Y%m%d')
+                </if>
+                <if test="createTimeParams.endTime != null and createTimeParams.endTime != ''"><!-- 结束时间检索 -->
+                    AND date_format(fs.create_time,'%Y%m%d') &lt;= date_format(#{createTimeParams.endTime},'%Y%m%d')
+                </if>
+            </if>
+        </where>
+        order by fs.create_time desc
+    </select>
 </mapper>

@@ -1,7 +1,11 @@
 package cn.staitech.fr.mapper;
 
 import cn.staitech.fr.domain.SpecialMember;
+import cn.staitech.fr.domain.in.SpecialMemberSelectIn;
+import cn.staitech.fr.domain.out.SpecialMemberSelectOut;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface SpecialMemberMapper extends BaseMapper<SpecialMember> {
 
+    List<SpecialMemberSelectOut> getSpecialMemberList(SpecialMemberSelectIn req);
 }

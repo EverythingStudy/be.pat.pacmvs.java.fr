@@ -6,6 +6,9 @@ import cn.staitech.common.core.utils.bean.BeanUtils;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Container;
+import cn.staitech.fr.domain.Group;
+import cn.staitech.fr.domain.Image;
+import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.SpecialRecycling;
 import cn.staitech.fr.domain.in.EditSpecialStatusIn;
@@ -14,7 +17,11 @@ import cn.staitech.fr.domain.in.SpecialEditIn;
 import cn.staitech.fr.domain.in.SpecialListQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
 import cn.staitech.fr.domain.out.WaxBlockNumberListOut;
+import cn.staitech.fr.mapper.ImageMapper;
+import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
+import cn.staitech.fr.service.GroupService;
+import cn.staitech.fr.service.ImageService;
 import cn.staitech.fr.service.SpecialRecyclingService;
 import cn.staitech.fr.service.SpecialService;
 import cn.staitech.system.api.domain.SysUser;
@@ -25,10 +32,13 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 
@@ -45,6 +55,15 @@ import java.util.List;
 public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> implements SpecialService {
     @Autowired
     private SpecialRecyclingService specialRecyclingService;
+
+    @Resource
+    private ImageMapper imageMapper;
+
+    @Resource
+    private SlideMapper slideMapper;
+
+    @Autowired
+    private GroupService groupService;
 
     @Override
     public PageResponse<SpecialListQueryOut> getSpecialList(SpecialListQueryIn req) {
@@ -67,6 +86,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public R addSpecial(SpecialAddIn req) {
         log.info("添加专题接口开始：");
         //校验专题编号唯一性
@@ -91,6 +111,22 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         special.setCreateBy(SecurityUtils.getUserId());
         special.setCreateTime(new Date());
         this.baseMapper.insert(special);
+        //初始化切片
+        LambdaQueryWrapper<Image> qw = new LambdaQueryWrapper<>();
+        qw.eq(Image::getOrganizationId, req.getOrganizationId());
+        qw.eq(Image::getStatus, CommonConstant.NUMBER_4);
+        qw.eq(Image::getTopicId,req.getTopicId());
+        List<Image> images = imageMapper.selectList(qw);
+        if (CollectionUtils.isNotEmpty(images)) {
+            for (Image image : images) {
+                Slide slide = new Slide();
+                slide.setCreateBy(SecurityUtils.getUserId());
+                slide.setCreateTime(new Date());
+                slide.setImageId(image.getImageId());
+                slide.setSpecialId(special.getSpecialId());
+                getExtInfo(image.getFileName(), slide, special.getSpecialId());
+            }
+        }
         return R.ok();
     }
 
@@ -149,4 +185,34 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         return R.ok();
     }
 
+    private Slide getExtInfo(String fileName, Slide slide, Long specialId) {
+        String[] s = fileName.split(" ");
+        if (s.length != 3) {
+            log.info("切片文件名格式错误：" + fileName);
+            return slide;
+        }
+        String s1 = slideMapper.selectBySpecialId(specialId);
+        if (!s[0].equals(s1)) {
+            log.info("切片文件名格式错误：" + fileName);
+            return slide;
+        }
+        slide.setAnimalCode(StringUtils.substringBeforeLast(s[1], "-"));
+        slide.setWaxCode(StringUtils.substringAfterLast(s[1], "-"));
+        //判断性别数据
+        if (!CommonConstant.MALE.equals(s[2].substring(s[2].length() - 1)) &&
+                !CommonConstant.FEMALE.equals(s[2].substring(s[2].length() - 1))) {
+            log.info("切片文件名格式错误：" + fileName);
+            return slide;
+        }
+        slide.setGenderFlag(s[2].substring(s[2].length() - 1));
+        //判断组别
+        Group byId = groupService.getById(s[2].substring(0, s[2].length() - 1));
+        if (ObjectUtils.isEmpty(byId)) {
+            log.info("切片文件名格式错误：" + fileName);
+            return slide;
+        }
+        slide.setGroupCode(s[2].substring(0, s[2].length() - 1));
+
+        return slide;
+    }
 }

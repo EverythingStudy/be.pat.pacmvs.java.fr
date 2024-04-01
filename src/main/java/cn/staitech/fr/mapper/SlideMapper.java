@@ -1,7 +1,11 @@
 package cn.staitech.fr.mapper;
 
 import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.in.SlideListQueryIn;
+import cn.staitech.fr.domain.out.SlideListQueryOut;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
 * @author admin
@@ -12,6 +16,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface SlideMapper extends BaseMapper<Slide> {
     String selectBySpecialId(Long specialId);
 
+    List<SlideListQueryOut> slideListQuery(SlideListQueryIn req);
 }
 
 

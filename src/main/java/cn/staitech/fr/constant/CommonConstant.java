@@ -14,6 +14,7 @@ public class CommonConstant {
     public static final String NUMBER_0 = "0";
 
     public static final String NUMBER_1 = "1";
+    public static final String NUMBER_4 = "4";
     public static final String GLIDE_LINE = "_";
     public static final String FILE_SUFFIX = ".";
     public static final String FILE_SUFFIX_DOCX = ".docx";

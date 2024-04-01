@@ -4,7 +4,9 @@ import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.in.ChoiceImageListInVo;
 import cn.staitech.fr.domain.in.ChoiceSaveInVo;
+import cn.staitech.fr.domain.in.SlideListQueryIn;
 import cn.staitech.fr.domain.out.ImageListOutVO;
+import cn.staitech.fr.domain.out.SlideListQueryOut;
 import cn.staitech.fr.service.ImageService;
 import cn.staitech.fr.service.SlideService;
 import io.swagger.annotations.Api;
@@ -46,5 +48,12 @@ public class SlideController {
     @PostMapping(value = "/choiceSave")
     public R choiceSave(@RequestBody @Validated ChoiceSaveInVo choiceSaveInVo) {
         return slideService.choiceSave(choiceSaveInVo);
+    }
+
+    @ApiOperation(value = "选片列表")
+    @PostMapping("/list")
+    public R<PageResponse<SlideListQueryOut>> list(@Validated @RequestBody SlideListQueryIn req) {
+        PageResponse<SlideListQueryOut> page = slideService.slideListQuery(req);
+        return R.ok(page);
     }
 }

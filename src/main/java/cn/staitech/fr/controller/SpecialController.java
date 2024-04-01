@@ -58,7 +58,7 @@ public class SpecialController {
 
     }
 
-    @ApiOperation(value = "专题新增")
+    @ApiOperation(value = "专题详情")
     @GetMapping("/info")
     public R<Special> info(@RequestParam("specialId") @ApiParam(name = "specialId", value ="专题id" ) Long specialId){
         return R.ok(specialService.getById(specialId));

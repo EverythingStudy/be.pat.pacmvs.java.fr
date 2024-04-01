@@ -1,5 +1,8 @@
 package cn.staitech.fr.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -8,7 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -27,6 +30,11 @@ public class SpecialMember implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+
+    @ApiModelProperty(value = "主键")
+    @TableId(value = "member_id", type = IdType.AUTO)
+    private Long memberId;
+
     @ApiModelProperty(value = "用户ID")
     private Long userId;
 
@@ -39,14 +47,17 @@ public class SpecialMember implements Serializable {
     @ApiModelProperty(value = "创建者")
     private Long createBy;
 
+    @ApiModelProperty(value = "删除标志（0代表存在 1代表删除）")
+    private String delFlag;
+
     @ApiModelProperty(value = "创建时间")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     @ApiModelProperty(value = "更新者")
     private Long updateBy;
 
     @ApiModelProperty(value = "更新时间")
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
 
 }
