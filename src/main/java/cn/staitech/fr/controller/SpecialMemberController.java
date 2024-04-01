@@ -2,10 +2,13 @@ package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
-import cn.staitech.fr.domain.SpecialMember;
+import cn.staitech.common.log.annotation.Log;
+import cn.staitech.common.log.enums.BusinessType;
+import cn.staitech.fr.domain.in.AddMemberIn;
 import cn.staitech.fr.domain.in.SpecialMemberSelectIn;
 import cn.staitech.fr.domain.out.SpecialMemberSelectOut;
 import cn.staitech.fr.service.SpecialMemberService;
+import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -17,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 
 /**
  * @Author wudi
@@ -44,4 +46,12 @@ public class SpecialMemberController {
        return specialMemberService.removeMember(memberId);
 
     }
+
+
+    @ApiOperation(value = "专题成员表增加")
+    @PostMapping("/addMember")
+    public R addProjectMember(@RequestBody AddMemberIn req) {
+        return specialMemberService.addMember(req);
+    }
+
 }

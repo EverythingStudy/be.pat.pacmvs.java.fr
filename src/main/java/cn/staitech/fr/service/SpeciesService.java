@@ -1,7 +1,10 @@
 package cn.staitech.fr.service;
 
 import cn.staitech.fr.domain.Species;
+import cn.staitech.fr.domain.out.SpeciesOut;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +16,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface SpeciesService extends IService<Species> {
 
+    List<Species> getSpeciesList();
 }
