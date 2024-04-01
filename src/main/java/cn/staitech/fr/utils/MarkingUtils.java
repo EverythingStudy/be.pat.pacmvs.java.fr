@@ -34,14 +34,12 @@ public class MarkingUtils {
     private static final String GEO_JSON_TYPE = "GeometryCollection";
 
 
-
-
-
     private static final String AI = "ai";
     private static final String SD = "sd";
     private static final String CL = "cl";
     private static final String LABEL_NAME = "labelname";
     private static final String MEASURE_NAME = "measure_name";
+
     public static int RandomNumbers() {
         return (int) (Math.random() * 90 + 10);
     }
@@ -170,14 +168,10 @@ public class MarkingUtils {
      * @return
      * @throws Exception
      */
-    public static Measure updateVerify(JSONObject oldLocations, JSONObject newLocations, String operation, boolean check, String resolution) {
-        Measure measure = new Measure();
+    public static Boolean updateVerify(JSONObject oldLocations, JSONObject newLocations, String operation, boolean check, String resolution) {
         try {
             String oldLocation = WktUtil.jsonToWkt(oldLocations);
             String newLocation = WktUtil.jsonToWkt(newLocations);
-            // WKT输出器，将Geometry对象写出为WKT文本
-            WKTWriter wktWriter = new WKTWriter();
-            String data = newLocation;
             // 校验是否有要执行的操作  相交或者相差
             if (StringUtils.isNotBlank(operation)) {
                 Geometry geometry1;
@@ -186,100 +180,39 @@ public class MarkingUtils {
                     geometry1 = WKT_READER.read(oldLocation);
                     geometry2 = WKT_READER.read(newLocation);
                 } catch (Exception e) {
-                    measure.setException(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
-                    return measure;
+                    return false;
                 }
                 if (check) {
                     try {
                         // 新图形自相交
                         if (!geometry2.isSimple()) {
-                            measure.setException(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
-                            return measure;
+                            return false;
                         }
                         String geometryType = geometry2.getGeometryType();
                         // 判断新增图形是否为Polygon
                         if (!"Polygon".equals(geometryType)) {
-                            measure.setException(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
-                            return measure;
+                            return false;
                         }
-
                         Geometry geometryIntersection = geometry1.intersection(geometry2);
                         // 判断图形是否有交集 数据为空,两图形之间没有交集
                         if (geometryIntersection.isEmpty()) {
-                            measure.setException(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
-                            return measure;
+                            return false;
                         }
                     } catch (Exception e) {
-                        measure.setException(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
-                        return measure;
+                        return false;
                     }
                 }
-                OverlayOp op = new OverlayOp(geometry1, geometry2);
-                int code = 0;
-                // 取出交集图形
                 if (check) {
                     if (geometry1.within(geometry2)) {
-                        // 修改失败,请检查后输入
-                        measure.setException(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
-                        return measure;
+                        return false;
                     }
-                    // 校验标注不能过小，不能小于1000.0
-//                        if (geometry2.within(geometry1) && geometry2.getArea() < insideMaxArea) {
-//                            throw new AnnoException(AnnotationResponseConstant.UPDATE_ANNO_ERROR + geometry2.getArea());
-//                        }
                 }
-                // 如果操作为相交
-                if ("UNION".equals(operation)) {
-                    code = OverlayOp.UNION;
-                    // 操作为相差
-                } else if ("DIFFERENCE".equals(operation)) {
-                    code = OverlayOp.DIFFERENCE;
-                }
-                // 返回结果
-                Geometry geometry;
-//            try {
-                // code=OverlayOp.UNION;相交  或者  code=OverlayOp.DIFFERENCE;相差
-                // 将code转换成Geometry对象
-                geometry = op.getResultGeometry(code);
-
-                // 获取geometry类型
-                String geometryType = geometry.getGeometryType();
-                // TODO：校验飞点 后续可写多种校验策略放入线程池中
-//                if ("Polygon".equals(geometryType)) {
-//                    geometry = removePolygonPoint(geometry.getCoordinates());
-//                }
-                // 判断合并后图形是否为复杂多边型(比如大标注嵌套小标注)
-                if (!"Polygon".equals(geometryType)) {
-                    // throw new AnnoException(AnnotationResponseConstant.NEW_GRAPHICS_MARK_NOT_RULES);
-                    // 新图形不符合规则
-                    measure.setException(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
-                    return measure;
-                }
-//            } catch (Exception e) {
-//                throw new Exception(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
-//            }
-//            System.out.println(geometry + "//////////////////////");
-//            if(geometry.isValid()){
-//                throw new Exception(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
-//            }
-                data = wktWriter.write(geometry);
-                measure.setData(data);
-                if (resolution != null) {
-                    double resolutions = Double.parseDouble(resolution);
-                    String area = String.valueOf(geometry.getArea() * resolutions * resolutions);
-                    measure.setArea(area);
-                    String per = String.valueOf(geometry.getLength() * resolutions);
-                    measure.setPerimeter(per);
-                }
-
             }
-            return measure;
-
+            return true;
         } catch (Exception e) {
-            measure.setException(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
-            return measure;
-        }
 
+            return false;
+        }
     }
 
     /**
@@ -366,10 +299,10 @@ public class MarkingUtils {
     }
 
 
-    public static Geometry unionGeometrys(Geometry[] geos){
+    public static Geometry unionGeometrys(Geometry[] geos) {
         GeometryFactory geometryFactory = new GeometryFactory();
         GeometryCollection geometryCollection = geometryFactory.createGeometryCollection(geos);
-        return  geometryCollection.union();
+        return geometryCollection.union();
 //        return Geometry geometry;
     }
 
@@ -497,7 +430,6 @@ public class MarkingUtils {
         }
         return wkt;
     }
-
 
 
 }

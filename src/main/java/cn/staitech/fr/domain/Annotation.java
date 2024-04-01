@@ -91,6 +91,9 @@ public class Annotation implements Serializable {
     private String contour;
 
     @TableField(exist = false)
+    private String  operation;
+
+    @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
     @Override

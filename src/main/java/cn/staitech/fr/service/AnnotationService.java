@@ -26,9 +26,9 @@ public interface AnnotationService extends IService<Annotation> {
     void delete(AnnotationById req) throws Exception;
 
     Long update(ViewAddIn marking) throws Exception;
-    int padding(AnnotationById req) throws Exception;
-    int stickup(AnnotationById req) throws Exception;
-    JSONObject markingMerge(MarkingMerge req) throws Exception;
+
+
+
     JSONObject updateOperation(UpdateOperationIn req, String traceId, Boolean isBatch) throws Exception;
 
 }

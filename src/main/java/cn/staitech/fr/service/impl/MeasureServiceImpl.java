@@ -200,15 +200,15 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
-        Measure measureBys = MarkingUtils.updateVerify(measureBy.getContour(), req.getGeometry(), req.getOperation(), req.getCheck(), req.getResolution());
-        if(measureBys.getException() != null){
-            throw new Exception(measureBys.getException());
-        }
-        JSONObject jsonObject = JSONObject.parseObject(WktUtil.wktToJson(measureBys.getData()));
+//        Measure measureBys = MarkingUtils.updateVerify(measureBy.getContour(), req.getGeometry(), req.getOperation(), req.getCheck(), req.getResolution());
+//        if(measureBys.getException() != null){
+//            throw new Exception(measureBys.getException());
+//        }
+//        JSONObject jsonObject = JSONObject.parseObject(WktUtil.wktToJson(measureBys.getData()));
         Measure measure = new Measure();
-        measure.setContour(jsonObject);
-        measure.setArea(measureBys.getArea());
-        measure.setPerimeter(measureBys.getPerimeter());
+//        measure.setContour(jsonObject);
+//        measure.setArea(measureBys.getArea());
+//        measure.setPerimeter(measureBys.getPerimeter());
         measure.setMeasureId(req.getMarking_id());
         measure.setUpdateBy(sysUser.getUserId());
         measure.setUpdateTime(new Date());
@@ -218,7 +218,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         Features features = MarkingUtils.socketData(measureBy.getAnnotationId(), measure.getContour(), properties);
         BroadcastVO broadcastVO = SendMessage.sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_MEASURE, UPDATE_STATUS, features);
         NioWebSocketHandler.sendAll(measureBy.getSlideId(), broadcastVO);
-        return jsonObject;
+        return new JSONObject();
     }
 
     @Override

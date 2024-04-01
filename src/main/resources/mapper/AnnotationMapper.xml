@@ -32,25 +32,17 @@
 
     <insert id="insert" parameterType="cn.staitech.fr.domain.Annotation" useGeneratedKeys="true"
             keyProperty="annotationId">
-        insert into fr_annotation_${sequenceNumber} (
+        insert into fr_annotation (
         <if test="area != null and area != '' ">area,</if>
         <if test="perimeter != null and perimeter != '' ">perimeter,</if>
         <if test="categoryId != null">category_id,</if>
         <if test="description != null and description != '' ">description,</if>
         <if test="locationType != null and locationType != '' ">location_type,</if>
         <if test="annotationType != null and annotationType != '' ">annotation_type,</if>
-        <if test="contour != null">
-            contour40000,
-            contour10000,
-            contour2500,
-            contour625,
-        </if>
+        <if test="contour != null">contour,</if>
         <if test="createBy != null and createBy != ''">create_by,</if>
         <if test="updateBy != null and updateBy != ''">update_by,</if>
         <if test="slideId != null and slideId != ''">slide_id,</if>
-        <if test="projectId != null and projectId != ''">project_id,</if>
-        <if test="structureId != null and structureId != ''">structure_id,</if>
-        <if test="structureSize != null and structureSize != ''">structure_size,</if>
         <if test="id != null and id != ''">id,</if>
         create_time,
         update_time
@@ -61,22 +53,10 @@
         <if test="description != null">#{description},</if>
         <if test="locationType != null and locationType != ''">#{locationType},</if>
         <if test="annotationType != null and annotationType != ''">#{annotationType},</if>
-        <if test="contour != null">
-            <!-- st_geomfromgeojson(#{contour}),
-            ST_SimplifyPreserveTopology(st_geomfromgeojson(#{contour}),0.5),
-            ST_SimplifyPreserveTopology(st_geomfromgeojson(#{contour}),4),
-            ST_SimplifyPreserveTopology(st_geomfromgeojson(#{contour}),32), -->
-            ST_SetSRID(st_geomfromgeojson(#{contour}),4327),
-            ST_SimplifyPreserveTopology(ST_SetSRID(st_geomfromgeojson(#{contour}),4327),0.5),
-            ST_SimplifyPreserveTopology(ST_SetSRID(st_geomfromgeojson(#{contour}),4327),4),
-            ST_SimplifyPreserveTopology(ST_SetSRID(st_geomfromgeojson(#{contour}),4327),32),
-        </if>
+        <if test="contour != null">st_geomfromgeojson(#{contour}),</if>
         <if test="createBy != null and createBy != ''">#{createBy},</if>
         <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
         <if test="slideId != null and slideId != ''">#{slideId},</if>
-        <if test="projectId != null and projectId != ''">#{projectId},</if>
-        <if test="structureId != null and structureId != ''">#{structureId},</if>
-        <if test="structureSize != null and structureSize != ''">#{structureSize},</if>
         <if test="id != null and id != ''">#{id},</if>
         now(),
         now()
@@ -84,85 +64,19 @@
     </insert>
 
     <update id="updateById" parameterType="cn.staitech.fr.domain.Annotation" useGeneratedKeys="true" keyProperty="annotationId">
-        update fr_annotation_${sequenceNumber}
+        update fr_annotation
         <set>
-            <if test="area != null and area != ''">area = #{area},</if>
-            <if test="perimeter != null and perimeter != ''">perimeter = #{perimeter},</if>
             <if test="categoryId != null">category_id = #{categoryId},</if>
             <if test="description != null">description = #{description},</if>
             <if test="locationType != null and locationType != ''">location_type = #{locationType},</if>
             <if test="annotationType != null and annotationType != ''">annotation_type = #{annotationType},</if>
-
-            <!--          <if test="contour != null and contour != ''">contour = st_geomfromgeojson(#{contour}),</if> -->
-
             <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
-            <if test="structureId != null and structureId != ''">structure_id = #{structureId},</if>
-            <if test="structureSize != null and structureSize != ''">structure_size = #{structureSize},</if>
+            <if test="contour != null and contour != ''">contour = st_geomfromgeojson(#{contour}),</if>
             <if test="id != null and id != ''">id = #{id},</if>
             update_time = now()
         </set>
         where annotation_id = #{annotationId}
     </update>
-
-    <insert id="batchSave"  parameterType="cn.staitech.fr.domain.Annotation">
-        insert into fr_annotation_${sequenceNumber} (
-        area,
-        perimeter,
-        category_id ,
-        contour40000,
-        contour625,
-        contour2500,
-        contour10000,
-        location_type,
-        annotation_type,
-        create_by,
-        create_time,
-        project_id,
-        slide_id,
-        structure_id,
-        structure_size,
-        review_round_id
-        ,id
-        )
-        values
-        <foreach collection="list" item="item" separator=",">
-            (
-            #{item.area},
-            #{item.perimeter},
-            #{item.categoryId},
-            <!-- st_geomfromgeojson(#{item.contour40000}),
-            st_geomfromgeojson(#{item.contour625}),
-            st_geomfromgeojson(#{item.contour2500}),
-            st_geomfromgeojson(#{item.contour10000}), -->
-
-
-            ST_SetSRID(st_geomfromgeojson(#{item.contour40000}),4327),
-            ST_SetSRID(st_geomfromgeojson(#{item.contour625}),4327),
-            ST_SetSRID(st_geomfromgeojson(#{item.contour2500}),4327),
-            ST_SetSRID(st_geomfromgeojson(#{item.contour10000}),4327),
-
-            <!--ST_GeomFromText(#{item.contour40000}, 4327),
-           ST_GeomFromText(#{item.contour625}, 4327),
-           ST_GeomFromText(#{item.contour2500}, 4327),
-           ST_GeomFromText(#{item.contour10000}, 4327),-->
-
-            <!-- ST_GeomFromText(#{item.contour40000}, 0),
-            ST_GeomFromText(#{item.contour625}, 0),
-            ST_GeomFromText(#{item.contour2500}, 0),
-            ST_GeomFromText(#{item.contour10000}, 0), -->
-            #{item.locationType},
-            #{item.annotationType},
-            #{item.createBy},
-            NOW(),
-            #{item.projectId},
-            #{item.slideId},
-            #{item.structureId},
-            #{item.structureSize},
-            #{item.reviewRoundId}
-            ,#{item.id}
-            )
-        </foreach>
-    </insert>
 
 
     <!--查询表下记录总数-->
@@ -170,114 +84,19 @@
         SELECT n_live_tup
         FROM pg_stat_user_tables
         where schemaname='public'
-          and  relname = 'fr_annotation_${sequenceNumber}'
+          and  relname = 'fr_annotation'
     </select>
 
     <!--查询是放存在表-->
     <select id="selectExistTable" parameterType="cn.staitech.fr.domain.Annotation" resultType="int">
-        select count(*) from pg_class where relname = 'fr_annotation_${sequenceNumber}'
+        select count(*) from pg_class where relname = 'fr_annotation'
     </select>
 
     <insert id="createTableSequence" parameterType="cn.staitech.fr.domain.Annotation">
-        DROP SEQUENCE IF EXISTS fr_annotation_${sequenceNumber}_annotation_id_seq;
-	    CREATE SEQUENCE fr_annotation_${sequenceNumber}_annotation_id_seq START 1;
+        DROP SEQUENCE IF EXISTS fr_annotation_annotation_id_seq;
+	    CREATE SEQUENCE fr_annotation_annotation_id_seq START 1;
     </insert>
 
-    <insert id="createTable" parameterType="cn.staitech.fr.domain.Annotation">
-        CREATE TABLE "public".fr_annotation_${sequenceNumber} (
-                                                                  "annotation_id" int8 NOT NULL DEFAULT nextval('fr_annotation_${sequenceNumber}_annotation_id_seq'::regclass),
-                                                                  "area" VARCHAR ( 50 ) COLLATE"pg_catalog"."default",
-                                                                  "perimeter" VARCHAR ( 50 ) COLLATE"pg_catalog"."default",
-                                                                  "description" VARCHAR ( 100 ) COLLATE"pg_catalog"."default",
-                                                                  "category_id" INT8,
-                                                                  "contour625" geometry ( GEOMETRY ),
-                                                                  "contour2500" geometry ( GEOMETRY ),
-                                                                  "contour10000" geometry ( GEOMETRY ),
-                                                                  "contour40000" geometry ( GEOMETRY ),
-                                                                  "location_type" VARCHAR ( 100 ) COLLATE"pg_catalog"."default",
-                                                                  "annotation_type" VARCHAR ( 50 ) COLLATE"pg_catalog"."default",
-                                                                  "create_by" INT8,
-                                                                  "create_time" DATE,
-                                                                  "update_by" INT8,
-                                                                  "update_time" DATE,
-                                                                  "project_id" INT8,
-                                                                  "slide_id" INT8,
-                                                                  "structure_id" VARCHAR ( 50 ) COLLATE"pg_catalog"."default",
-                                                                  "structure_size" INT2,
-                                                                  "review_round_id" INT8,
-                                                                  "id" VARCHAR ( 500 ) COLLATE"pg_catalog"."default",
-                                                                  CONSTRAINT "fr_annotation_${sequenceNumber}_pkey" PRIMARY KEY ( "annotation_id" )
-        );
-
-
-        ALTER TABLE"fr_annotation_${sequenceNumber}" OWNER TO "postgres";
-
-        CREATE INDEX "fr_annotation_${sequenceNumber}_project_id_idx" ON "public"."fr_annotation_${sequenceNumber}" USING btree (
-            "project_id" "pg_catalog"."int8_ops" ASC NULLS LAST
-            );
-
-        CREATE INDEX "fr_annotation_${sequenceNumber}_slide_id_idx" ON "public"."fr_annotation_${sequenceNumber}" USING btree (
-            "slide_id" "pg_catalog"."int8_ops" ASC NULLS LAST
-            );
-
-        CREATE INDEX "fr_annotation_${sequenceNumber}_contour40000_idx" ON "public"."fr_annotation_${sequenceNumber}" USING gist (
-            "contour40000" "public"."gist_geometry_ops_2d"
-            );
-
-        CREATE INDEX "fr_annotation_${sequenceNumber}_contour625_idx" ON "public"."fr_annotation_${sequenceNumber}" USING gist (
-            "contour625" "public"."gist_geometry_ops_2d"
-            );
-
-        CREATE INDEX "fr_annotation_${sequenceNumber}_contour2500_idx" ON "public"."fr_annotation_${sequenceNumber}" USING gist (
-            "contour2500" "public"."gist_geometry_ops_2d"
-            );
-
-        CREATE INDEX "fr_annotation_${sequenceNumber}_contour10000_idx" ON "public"."fr_annotation_${sequenceNumber}" USING gist (
-            "contour10000" "public"."gist_geometry_ops_2d"
-            );
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."annotation_id" IS '主键id';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."area" IS '面积';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."perimeter" IS '周长';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."description" IS '轮廓描述';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."category_id" IS '轮廓标签id';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."contour40000" IS '轮廓坐标';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."contour625" IS '轮廓坐标625';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."contour2500" IS '轮廓坐标2500';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."contour10000" IS '轮廓坐标10000';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."location_type" IS '轮廓类型';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."annotation_type" IS '标注类型(AI表示AI算出的标注，Draw表示前端绘制的标注)';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."create_by" IS '标注创建者';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."create_time" IS '创建时间';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."update_by" IS '更新者';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."update_time" IS '更新时间';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."project_id" IS '项目id';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."slide_id" IS '切片id';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."structure_id" IS '结构ID';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."structure_size" IS '结构大小';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."review_round_id" IS '轮次id';
-
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."id" IS 'geojson中数据id';
-    </insert>
 
     <select id="selectById" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
@@ -293,14 +112,10 @@
             create_time,
             update_by,
             update_time,
-            project_id,
             slide_id,
-            structure_id,
-            structure_size,
-            review_round_id,
             id,
-            ST_AsGeoJSON(contour40000) AS contour
-        from fr_annotation_${sequenceNumber}
+            ST_AsGeoJSON(contour) AS contour
+        from fr_annotation
         where annotation_id = #{annotationId}
     </select>
 
@@ -320,39 +135,31 @@
         update_time,
         project_id,
         slide_id,
-        structure_id,
-        structure_size,
-        review_round_id,123123
         id,
-        ST_AsGeoJSON(st_setsrid(contour${magnification},4327)) as contour
-        from fr_annotation_${sequenceNumber}
+        ST_AsGeoJSON(contour) as contour
+        from fr_annotation
         where slide_id = #{slideId}
-        <if test="createBy != null">
-            AND create_by = #{createBy}
+    </select>
+
+    <select id="mergeContour" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        <if test="operation != null and operation == 'UNION'">
+            select
+            ST_AsGeoJSON(ST_Union((select contour from fr_annotation where annotation_id  = #{annotationId}),st_geomfromgeojson(#{contour}))) as contour
         </if>
-        <if test="contour != null">
-            <!-- AND ST_Intersects(ST_SetSRID(st_geomfromgeojson(#{contour}),4327),contour${magnification}) -->
-            AND ST_Intersects(ST_SetSRID(st_geomfromgeojson(#{contour}),4327),st_setsrid(contour${magnification},4327))
-        </if>
-        <if test="annotationType != null">
-            AND annotation_type = #{annotationType}
-        </if>
-        <if test="structureSizeList != null and structureSizeList.size > 0">
-            AND structure_size in
-            <foreach collection="structureSizeList" item="structureSize" open="(" separator="," close=")">
-                #{structureSize}
-            </foreach>
-        </if>
-        <if test="categoryId != null">
-            AND category_id = 0
+        <if test="operation != null and operation == 'DIFFERENCE'">
+            select
+            ST_AsGeoJSON(ST_Difference((select contour from fr_annotation where annotation_id  = #{annotationId}),st_geomfromgeojson(#{contour}))) as contour
         </if>
     </select>
 
 
 
+
+
     <delete id="deleteById" parameterType="cn.staitech.fr.domain.Annotation">
         delete
-        from fr_annotation_${sequenceNumber}
+        from fr_annotation
         where annotation_id = #{annotationId}
     </delete>
 
@@ -378,7 +185,7 @@
         review_round_id,
         id,
         ST_AsGeoJSON(LOCATION) AS LOCATION
-        from fr_annotation_${sequenceNumber}
+        from fr_annotation
         <where>
             annotation_id in
             <foreach collection="markingIdList" item="annotationId" index="index" open="(" separator="," close=")">
@@ -390,7 +197,7 @@
 
     <select id="selectCategoryList" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
         SELECT category_id
-        FROM fr_annotation_${sequenceNumber}
+        FROM fr_annotation
         WHERE slide_id = #{slideId}
           AND category_id != 0
         GROUP BY category_id

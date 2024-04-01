@@ -66,35 +66,11 @@ public class AnnotationController {
     }
 
 
-    @ApiOperation(value = "填充轮廓")
-    @PostMapping("/padding")
-    public R<String> padding(@Validated @RequestBody AnnotationById req) throws Exception {
-        int res = annotationService.padding(req);
-        if (res > 0) {
-            return R.ok(null, MessageSource.M("OPERATE_SUCCEED"));
-        } else {
-            return R.fail(null, MessageSource.M("OPERATE_ERROR"));
-        }
-    }
 
-    @ApiOperation(value = "复制/粘贴轮廓")
-    @PostMapping("/stickup")
-    public R<String> stickup(@Validated @RequestBody AnnotationById req) throws Exception {
-        int res = annotationService.stickup(req);
-        if (res > 0) {
-            return R.ok(null, MessageSource.M("OPERATE_SUCCEED"));
-        } else {
-            return R.fail(null, MessageSource.M("OPERATE_ERROR"));
-        }
-    }
 
-    @ApiOperationSupport(author = "gjt")
-    @ApiOperation(value = "合并轮廓预览")
-    @PostMapping("/markingMerge")
-    public R<JSONObject> markingMerge(@Validated @RequestBody MarkingMerge req) throws Exception {
-        JSONObject res = annotationService.markingMerge(req);
-        return R.ok(res);
-    }
+
+
+
 
     @ApiOperation(value = "获取GeoJson数据")
     @PostMapping("/selectLists")

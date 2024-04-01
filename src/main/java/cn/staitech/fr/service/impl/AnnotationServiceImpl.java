@@ -37,13 +37,12 @@ import static cn.staitech.fr.utils.MarkingUtils.socketData;
 import static cn.staitech.fr.utils.SendMessage.sendOneMessages;
 
 /**
-* @author admin
-* @description 针对表【fr_annotation】的数据库操作Service实现
-* @createDate 2024-04-01 09:42:42
-*/
+ * @author admin
+ * @description 针对表【fr_annotation】的数据库操作Service实现
+ * @createDate 2024-04-01 09:42:42
+ */
 @Service
-public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotation>
-    implements AnnotationService{
+public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotation> implements AnnotationService {
 
 
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), 4326);
@@ -137,13 +136,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
 
-
     @Override
     public List<Features> selectListBy(AnnotationSelectList req) throws Exception {
         Slide slideBy = slideMapper.selectById(req.getSlideId());
-        if (!Optional.ofNullable(slideBy).isPresent()) {
-            throw new Exception(MessageSource.M("SLIDE_ABNORMAL_NO_INFORMATION"));
-        }
+//        if (!Optional.ofNullable(slideBy).isPresent()) {
+//            throw new Exception(MessageSource.M("SLIDE_ABNORMAL_NO_INFORMATION"));
+//        }
         List<Features> list = new ArrayList<Features>();
         Annotation annotation = new Annotation();
         annotation.setSlideId(req.getSlideId());
@@ -166,24 +164,22 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             throw new Exception("更新失败，轮廓数据不能为空");
         }
         String id = null;
-        String structureId = null;
-        Integer structureSize = null;
         if (req.getCategory_id() != null) {
             Category category = categoryMapper.selectById(req.getCategory_id());
-//            if (category != null) {
-//                id = MarkingUtils.getSdId(category.getCategoryName());
-//                structureId = category.getStructureId();
-//            }
+            if (category != null) {
+                id = MarkingUtils.getSdId(category.getCategoryFullName());
+            }
+        } else {
+            id = MarkingUtils.getSdId(null);
         }
-        Slide slideBy = slideMapper.selectById(req.getSlide_id());
         Annotation annotation = new Annotation();
         annotation.setSlideId(req.getSlide_id());
         annotation.setArea(req.getArea());
+        annotation.setCategoryId(req.getCategory_id());
         annotation.setContour(String.valueOf(req.getGeometry()));
         annotation.setLocationType(req.getLocation_type());
         annotation.setPerimeter(req.getPerimeter());
         annotation.setCreateBy(req.getCreate_by());
-        annotation.setCategoryId(req.getCategory_id());
         annotation.setId(id);
         annotation.setAnnotationType("Draw");
         annotationMapper.insert(annotation);
@@ -225,9 +221,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }
         Slide slide = slideMapper.selectById(slideId);
-        if (!Optional.ofNullable(slide).isPresent()) {
-            throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
-        }
+//        if (!Optional.ofNullable(slide).isPresent()) {
+//            throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
+//        }
         Annotation annotation = new Annotation();
         if (req.getCategory_id() == null && req.getDescription() == null) {
             if (req.getGeometry() != null) {
@@ -254,10 +250,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
         annotation.setId(id);
         annotation.setAnnotationId(Long.valueOf(req.getMarking_id()));
-        annotation.setArea(req.getArea());
-        annotation.setPerimeter(req.getPerimeter());
-        annotation.setSlideId(req.getSlide_id());
-        annotation.setContour(String.valueOf(req.getGeometry()));
+        annotation.setContour(null);
         annotationMapper.updateById(annotation);
         Annotation annotationBys = annotationMapper.selectById(annotation);
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBys);
@@ -268,98 +261,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
 
-    @Override
-    public int padding(AnnotationById req) throws Exception {
-
-
-        if (!Optional.ofNullable(req.getMarking_id()).isPresent()) {
-            throw new Exception(MessageSource.M("ARGUMENT_INVALID"));
-        }
-        Annotation annotations = new Annotation();
-        annotations.setAnnotationId(req.getMarking_id());
-        Annotation annotationBy = annotationMapper.selectById(annotations);
-        if (!Optional.ofNullable(annotationBy).isPresent()) {
-            throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
-        }
-
-        Long slideId = annotationBy.getSlideId();
-//        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
-//        Long loginUserId = sysUser.getUserId();
-//        String loginUserName = sysUser.getUserName();
-
-        JSONObject geometryJson = MarkingUtils.padding(JSON.parseObject(annotationBy.getContour()));
-        Annotation annotation = new Annotation();
-        annotation.setAnnotationId(req.getMarking_id());
-        annotation.setContour(String.valueOf(geometryJson));
-        Geometry geometry = WKT_READER.read(MarkingUtils.jsonToWkt(JSON.parseObject(annotation.getContour())));
-        Slide slide = slideMapper.selectById(slideId);
-        Image image = imageMapper.selectById(slide.getImageId());
-        if (image.getResolutionX() != null) {
-            double resolutions = Double.parseDouble(image.getResolutionX());
-            String area = String.valueOf(geometry.getArea() * resolutions * resolutions);
-            annotation.setArea(area);
-            String per = String.valueOf(geometry.getLength() * resolutions);
-            annotation.setPerimeter(per);
-        }
-        annotation.setUpdateBy(SecurityUtils.getUserId());
-        int res = annotationMapper.updateById(annotation);
-        Annotation annotationBys = annotationMapper.selectById(annotations);
-        cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBys);
-        Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), geometryJson, properties);
-        BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
-        NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
-        return res;
-    }
-
-
-    @Override
-    public int stickup(AnnotationById req) throws Exception {
-        if (!Optional.ofNullable(req.getMarking_id()).isPresent()) {
-            throw new Exception(MessageSource.M("ARGUMENT_INVALID"));
-        }
-        Annotation annotations = new Annotation();
-        annotations.setAnnotationId(req.getMarking_id());
-        Annotation annotation = annotationMapper.selectById(annotations);
-        int res = annotationMapper.insert(annotation);
-        Annotation annotationBys = annotationMapper.selectById(annotations);
-        cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBys);
-        Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), JSON.parseObject(annotation.getContour()), properties);
-        BroadcastVO broadcastVO = sendOneMessages(ADD_STATUS, features);
-        NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
-        return res;
-    }
-
-    @Override
-    public JSONObject markingMerge(MarkingMerge req) throws Exception {
-        List<Annotation> annotationList = annotationMapper.selectInList(req);
-        List<Geometry> geometryList = new ArrayList<>();
-        for (Annotation annotation : annotationList) {
-            Geometry geometry = WKT_READER.read(MarkingUtils.jsonToWkt(JSON.parseObject(annotation.getContour())));
-            geometryList.add(geometry);
-        }
-        if (geometryList.size() > 0) {
-            if (geometryList.size() == 1) {
-                return JSON.parseObject(annotationList.get(0).getContour());
-            }
-            Geometry geometry = null;
-            for (int i = 0; i < geometryList.size(); i++) {
-                if (i == 0) {
-                    geometry = geometryList.get(i);
-                }
-                Geometry geometryIntersection = geometry.intersection(geometryList.get(i));
-                if (geometryIntersection.isEmpty()) {
-                    return null;
-                } else {
-                    OverlayOp op = new OverlayOp(geometry, geometryList.get(i));
-                    int code = OverlayOp.UNION;
-                    geometry = op.getResultGeometry(code);
-                }
-            }
-            return JSONObject.parseObject(WktUtil.wktToJson(String.valueOf(geometry)));
-        } else {
-            return null;
-        }
-    }
 
 
     /**
@@ -371,45 +272,33 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
      */
     @Override
     public JSONObject updateOperation(UpdateOperationIn req, String traceId, Boolean isBatch) throws Exception {
-        if (annotationSet.contains(req.getMarking_id())) {
-            throw new Exception(MessageSource.M("DATA.PROCESSING"));
-        } else {
-            annotationSet.add(req.getMarking_id());
-        }
         Annotation annotations = new Annotation();
         annotations.setAnnotationId(Long.valueOf(req.getMarking_id()));
         Annotation annotation = annotationMapper.selectById(annotations);
         // 查询数据是否存在
         if (!Optional.ofNullable(annotation).isPresent()) {
-            annotationSet.remove(req.getMarking_id());
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }
-        // TODO
-        // 合并 - 校验飞点 TODO: MarkingUtils.updatePolygonPoint(jsonObject);
-        Measure annotationBy = MarkingUtils.updateVerify(JSON.parseObject(annotation.getContour()), req.getGeometry(), req.getOperation(), req.getCheck(), req.getResolution());
-        if (annotationBy.getException() != null) {
-            annotationSet.remove(req.getMarking_id());
-            throw new Exception(annotationBy.getException());
+        boolean res = MarkingUtils.updateVerify(JSON.parseObject(annotation.getContour()), req.getGeometry(), req.getOperation(), req.getCheck(), req.getResolution());
+        if(!res){
+            throw new Exception(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
         }
-        // 精度保留3位小数
-        JSONObject jsonObject = JSONObject.parseObject(WktUtil.wktToJson(annotationBy.getData()));
-        // 校验合并后的图形是否正常
         Annotation annotationBys = new Annotation();
-        // 此处不设置ID则where id=null,不能正常执行。
         annotationBys.setAnnotationId(Long.valueOf(req.getMarking_id()));
-        annotationBys.setContour(String.valueOf(jsonObject));
-        annotationBys.setArea(annotationBy.getArea());
-        annotationBys.setPerimeter(annotationBy.getPerimeter());
+        annotationBys.setContour(String.valueOf(req.getGeometry()));
         annotationBys.setUpdateBy(req.getUpdate_by());
+        annotationBys.setOperation(req.getOperation());
+        Annotation annotation1 = annotationMapper.mergeContour(annotationBys);
+        annotationBys.setContour(annotation1.getContour());
         annotationMapper.updateById(annotationBys);
         // 更新后查询数据并返回
         Annotation annotationById = annotationMapper.selectById(annotations);
         Properties properties = getProperties(annotationById);
-        Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), jsonObject, properties);
+        Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), JSON.parseObject(annotation1.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
         NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
         annotationSet.remove(req.getMarking_id());
-        return jsonObject;
+        return JSON.parseObject(annotation1.getContour());
     }
 
 }
