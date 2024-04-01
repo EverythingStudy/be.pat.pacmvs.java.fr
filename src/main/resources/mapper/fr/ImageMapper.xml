@@ -416,4 +416,72 @@
             where image_id = #{imageId}
         </if>
     </delete>
+
+    <select id="choiceImageList" parameterType="cn.staitech.fr.domain.in.ChoiceImageListInVo"
+            resultType="cn.staitech.fr.domain.out.ImageListOutVO">
+        select distinct i.image_id,
+        i.file_name,
+        i.image_name,
+        i.image_path,
+        i.image_url,
+        i.thumb_url,
+        i.macro_url,
+        i.label_url,
+        i.cache_url,
+        i.`size`,
+        i.global_size,
+        i.resolving_power,
+        i.tile_count_list,
+        i.level_count,
+        i.chunk_total,
+        i.md5,
+        i.resolution_x,
+        i.resolution_y,
+        i.source_lens,
+        i.create_by,
+        i.create_time,
+        i.update_by,
+        i.update_time,
+        i.image_code,
+        i.topic_id,
+        i.topic_name,
+        i.`status`,
+        i.host_id,
+        i.organization_id,
+        i.round_id,
+        i.biz_type,
+        i.`source`,
+        i.folder_id,
+        if(fs.special_id=#{specialId},1,0) choiceState
+        from tb_image i
+        left join fr_slide fs
+            on i.image_id = ms.image_id
+            and fs.special_id=#{specialId}
+        left join fr_special fsl
+            on fsl.topic_id = i.topic_id
+            and fsl.special_id = #{specialId}
+        <where>
+
+            and i.status = 4
+            and
+            <if test="orgId != null">
+                <!-- 组织机构编号 -->
+                and i.organization_id = #{orgId}
+            </if>
+
+            <if test="imageName != null and imageName != ''">
+                <!-- 图像名称 -->
+                and i.image_name like concat('%', #{imageName}, '%')
+            </if>
+
+            <if test="choiceState != null and choiceState==0">
+
+                and (fs.slide_id is null  or fs.special_id != #{specialId})
+            </if>
+            <if test="choiceState != null and choiceState==1">
+                and fs.special_id != #{specialId}
+            </if>
+        </where>
+        order by i.image_id desc
+    </select>
 </mapper>

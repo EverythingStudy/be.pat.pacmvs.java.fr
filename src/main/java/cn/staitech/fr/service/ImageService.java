@@ -2,6 +2,9 @@ package cn.staitech.fr.service;
 
 import java.util.List;
 
+import cn.staitech.common.core.domain.PageResponse;
+import cn.staitech.fr.domain.in.ChoiceImageListInVo;
+import cn.staitech.fr.domain.out.ImageListOutVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import cn.staitech.fr.domain.Image;
@@ -48,4 +51,6 @@ public interface ImageService extends IService<Image> {
      * @return
      */
     boolean exists(Image image) throws Exception;
+
+    PageResponse<ImageListOutVO> choiceImageList(ChoiceImageListInVo image);
 }

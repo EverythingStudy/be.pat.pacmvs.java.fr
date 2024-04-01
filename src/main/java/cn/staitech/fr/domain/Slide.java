@@ -24,12 +24,12 @@ public class Slide implements Serializable {
     /**
      * 专题ID
      */
-    private Integer specialId;
+    private Long specialId;
 
     /**
      * 图像ID
      */
-    private Integer imageId;
+    private Long imageId;
 
     /**
      * 组别号
@@ -39,7 +39,7 @@ public class Slide implements Serializable {
     /**
      * 蜡块编号
      */
-    private Integer waxCode;
+    private String waxCode;
 
     /**
      * 动物编号

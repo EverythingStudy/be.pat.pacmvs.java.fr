@@ -4,6 +4,12 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import cn.staitech.common.core.domain.PageResponse;
+import cn.staitech.common.security.utils.SecurityUtils;
+import cn.staitech.fr.domain.in.ChoiceImageListInVo;
+import cn.staitech.fr.domain.out.ImageListOutVO;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -13,6 +19,8 @@ import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.service.ImageService;
 import lombok.extern.slf4j.Slf4j;
+
+import static cn.staitech.common.security.utils.SecurityUtils.isAdmin;
 
 /**
  * 切片列表（原图像）服务层实现
@@ -79,5 +87,19 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
         queryWrapper.last("limit 1");
         return this.baseMapper.selectOne(queryWrapper) != null;
     }
+    @Override
+    public PageResponse<ImageListOutVO> choiceImageList(ChoiceImageListInVo image) {
+        log.info("评审选片列表分页查询接口开始：");
+        if(!isAdmin(SecurityUtils.getUserId())){
+            image.setOrgId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
+        }
+        PageResponse<ImageListOutVO> pageResponse = new PageResponse<>();
+        Page<ImageListOutVO> page = PageHelper.startPage(image.getPageNum(), image.getPageSize());
 
+        List<ImageListOutVO> respData=this.baseMapper.choiceImageList(image);
+        pageResponse.setTotal(page.getTotal());
+        pageResponse.setList(respData);
+        pageResponse.setPages(page.getPages());
+        return pageResponse;
+    }
 }

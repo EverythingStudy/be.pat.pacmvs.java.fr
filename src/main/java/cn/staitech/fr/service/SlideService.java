@@ -1,6 +1,8 @@
 package cn.staitech.fr.service;
 
+import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.in.ChoiceSaveInVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -10,4 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface SlideService extends IService<Slide> {
 
+    R choiceSave(ChoiceSaveInVo choiceSaveInVo);
 }

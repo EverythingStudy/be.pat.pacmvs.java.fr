@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @Entity cn.staitech.fr.domain.Slide
 */
 public interface SlideMapper extends BaseMapper<Slide> {
+    String selectBySpecialId(Long specialId);
 
 }
 
