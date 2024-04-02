@@ -29,7 +29,14 @@ public class SpecialListQueryOut {
     private String speciesNameEn;
 
     @ApiModelProperty(value = "试验类型")
+    private Integer trialId;
+
+    @ApiModelProperty(value = "试验类型")
     private String trialType;
+
+    @ApiModelProperty(value = "试验类型英文描述")
+    private String trialTypeEn;
+
 
     @ApiModelProperty(value = "染色类型id")
     private String colorType;

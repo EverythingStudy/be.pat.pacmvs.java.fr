@@ -25,19 +25,19 @@ public class SpecialListQueryIn extends PageRequest {
     private String speciesId;
 
     @ApiModelProperty(value = "试验类型")
-    private String trialType;
+    private Integer trialId;
 
     @ApiModelProperty(value = "染色类型")
     private Integer colorType;
 
-    @ApiModelProperty(value = "状态(0待启动，1进行中，2暂停，3锁定，4已完成)")
+    @ApiModelProperty(value = "状态(0待启动，1进行中，2暂停，3已完成，4锁定)")
     private Integer status;
 
     @ApiModelProperty(value = "专题名称")
     private String createName;
 
     @ApiModelProperty(value = "机构id",hidden = true)
-    private Long organzationId;
+    private Long organizationId;
 
     @ApiModelProperty(value = "时间范围")
     private Map<String, Date> createTimeParams;

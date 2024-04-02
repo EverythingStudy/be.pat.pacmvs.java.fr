@@ -27,8 +27,8 @@ public class SpecialAddIn {
     private String speciesId;
 
     @ApiModelProperty(value = "试验类型")
-    @NotBlank(message = "试验类型不能为空")
-    private String trialType;
+    @NotNull(message = "试验类型不能为空")
+    private Integer trialId;
 
     @ApiModelProperty(value = "染色类型")
     @NotNull(message = "染色类型不能为空")

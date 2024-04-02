@@ -11,24 +11,21 @@ import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.SpecialRecycling;
-import cn.staitech.fr.domain.WaxBlockInfo;
 import cn.staitech.fr.domain.in.EditSpecialStatusIn;
 import cn.staitech.fr.domain.in.SpecialAddIn;
 import cn.staitech.fr.domain.in.SpecialEditIn;
 import cn.staitech.fr.domain.in.SpecialListQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
-import cn.staitech.fr.domain.out.WaxBlockNumberListOut;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.mapper.WaxBlockInfoMapper;
 import cn.staitech.fr.service.GroupService;
-import cn.staitech.fr.service.ImageService;
+import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.SpecialRecyclingService;
 import cn.staitech.fr.service.SpecialService;
 import cn.staitech.system.api.domain.SysUser;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -41,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -65,6 +63,9 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     private SlideMapper slideMapper;
 
     @Autowired
+    private SlideService slideService;
+
+    @Autowired
     private GroupService groupService;
     @Resource
     private WaxBlockInfoMapper waxBlockInfoMapper;
@@ -75,12 +76,17 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         //创建响应
         PageResponse resp = new PageResponse();
         //分页查询
+        req.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
+
         Page<SysUser> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
         List<SpecialListQueryOut> specialList = this.baseMapper.getSpecialList(req);
         if (CollectionUtils.isNotEmpty(specialList)) {
             specialList.forEach(e -> {
-                e.setColorName(Container.COLOR_TYPE.get(e.getColorType()));
-                e.setColorNameEn(Container.COLOR_TYPE_EN.get(e.getColorType()));
+
+                e.setColorName(Container.COLOR_TYPE.get(Integer.valueOf(e.getColorType())));
+                e.setColorNameEn(Container.COLOR_TYPE_EN.get(Integer.valueOf(e.getColorType())));
+                e.setTrialType(Container.TRIAL_TYPE.get(e.getTrialId()));
+                e.setTrialTypeEn(Container.TRIAL_TYPE_EN.get(e.getTrialId()));
             });
         }
         resp.setTotal(page.getTotal());
@@ -121,6 +127,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         qw.eq(Image::getStatus, CommonConstant.NUMBER_4);
         qw.eq(Image::getTopicId,req.getTopicId());
         List<Image> images = imageMapper.selectList(qw);
+        List<Slide> arrayList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(images)) {
             for (Image image : images) {
                 Slide slide = new Slide();
@@ -129,8 +136,10 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
                 slide.setImageId(image.getImageId());
                 slide.setSpecialId(special.getSpecialId());
                 getExtInfo(image.getFileName(), slide, special.getSpecialId(),req);
+                arrayList.add(slide);
             }
         }
+        slideService.saveBatch(arrayList);
         return R.ok();
     }
 
@@ -150,6 +159,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         BeanUtils.copyProperties(req, special);
         special.setUpdateBy(SecurityUtils.getUserId());
         special.setUpdateTime(new Date());
+        this.baseMapper.updateById(special);
         return R.ok();
     }
 

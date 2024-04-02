@@ -4,25 +4,20 @@ import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.log.annotation.Log;
 import cn.staitech.common.log.enums.BusinessType;
-import cn.staitech.common.security.annotation.Logical;
-import cn.staitech.common.security.annotation.RequiresPermissions;
-import cn.staitech.common.security.utils.SecurityUtils;
+import cn.staitech.fr.constant.Container;
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.in.EditSpecialStatusIn;
 import cn.staitech.fr.domain.in.SpecialAddIn;
 import cn.staitech.fr.domain.in.SpecialEditIn;
 import cn.staitech.fr.domain.in.SpecialListQueryIn;
-import cn.staitech.fr.domain.in.WaxBlockNumberListIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
-import cn.staitech.fr.domain.out.WaxBlockNumberListOut;
 import cn.staitech.fr.service.SpecialService;
-import cn.staitech.system.api.domain.SysUser;
+import cn.staitech.fr.utils.LanguageUtils;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +25,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 /**
  * @Author wudi
@@ -82,6 +79,42 @@ public class SpecialController {
     public R editStatus(@Validated @RequestBody EditSpecialStatusIn req) {
         return specialService.editSpecialStatus(req);
 
+    }
+
+    @ApiOperation(value = "染色类型列表", notes = "染色类型列表")
+    @GetMapping("/colorType")
+    public R<Map<Integer, String>> colorType() {
+        Map<Integer, String> map;
+        if (LanguageUtils.isEn()) {
+            map = Container.COLOR_TYPE_EN;
+        } else {
+            map = Container.COLOR_TYPE;
+        }
+        return R.ok(map);
+    }
+
+    @ApiOperation(value = "试验类型列表", notes = "试验类型列表")
+    @GetMapping("/trialType")
+    public R<Map<Integer, String>> trialType() {
+        Map<Integer, String> map;
+        if (LanguageUtils.isEn()) {
+            map = Container.TRIAL_TYPE_EN;
+        } else {
+            map = Container.TRIAL_TYPE;
+        }
+        return R.ok(map);
+    }
+
+    @ApiOperation(value = "专题状态列表", notes = "专题状态列表")
+    @GetMapping("/specialStatus")
+    public R<Map<Integer, String>> specialStatus() {
+        Map<Integer, String> map;
+        if (LanguageUtils.isEn()) {
+            map = Container.SPECIAL_STATUS_EN;
+        } else {
+            map = Container.SPECIAL_STATUS;
+        }
+        return R.ok(map);
     }
 
 }

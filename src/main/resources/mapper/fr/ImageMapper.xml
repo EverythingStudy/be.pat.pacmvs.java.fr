@@ -455,15 +455,13 @@
         if(fs.special_id=#{specialId},1,0) choiceState
         from tb_image i
         left join fr_slide fs
-            on i.image_id = ms.image_id
+            on i.image_id = fs.image_id
             and fs.special_id=#{specialId}
         left join fr_special fsl
             on fsl.topic_id = i.topic_id
-            and fsl.special_id = #{specialId}
         <where>
-
+            and fsl.special_id = #{specialId}
             and i.status = 4
-            and
             <if test="orgId != null">
                 <!-- 组织机构编号 -->
                 and i.organization_id = #{orgId}

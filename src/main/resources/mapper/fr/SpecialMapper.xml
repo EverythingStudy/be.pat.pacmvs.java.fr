@@ -9,7 +9,7 @@
         <result column="topci_name" property="topicName"/>
         <result column="special_name" property="specialName"/>
         <result column="species_id" property="speciesId"/>
-        <result column="trial_type" property="trialType"/>
+        <result column="trial_id" property="trialId"/>
         <result column="color_type" property="colorType"/>
         <result column="indicator_id" property="indicatorId"/>
         <result column="status" property="status"/>
@@ -23,11 +23,11 @@
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         special_id
-        , topci_id,topci_name, special_name, species_id, trial_type, color_type, indicator_id, status, del_flag, create_by, create_time, update_by, update_time
+        , topci_id,topci_name, special_name, species_id, trial_id, color_type, indicator_id, status, del_flag, create_by, create_time, update_by, update_time
     </sql>
     <select id="getSpecialList" parameterType="cn.staitech.fr.domain.in.SpecialListQueryIn"
             resultType="cn.staitech.fr.domain.out.SpecialListQueryOut">
-        select fs.special_id, tt.topic_name, fs.color_type,fs.special_name,ts.trial_type, ts.name speciesName, ts.name_en
+        select fs.special_id, tt.topic_name, fs.color_type,fs.special_name,fs.trial_id, ts.name speciesName, ts.name_en
         speciesNameEn, fs.status, fs.create_time,su.user_name createName
         from fr_special fs
         left join tb_topic tt on fs.topic_id = tt.topic_id
@@ -35,6 +35,7 @@
         left join tb_species ts on fs.species_id = ts.species_id
         and ts.organization_id = #{organizationId}
         where fs.del_flag = '0'
+        and  fs.organization_id = #{organizationId}
         <if test="topicName != null and topicName != ''">
             and tt.topic_name like concat('%', #{topicName}, '%')
         </if>

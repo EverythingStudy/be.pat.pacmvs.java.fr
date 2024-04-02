@@ -15,6 +15,6 @@ public class EditSpecialStatusIn {
     /**
      * 以下属性暂未使用
      */
-    @ApiModelProperty( value = "状态:启动传2，暂停传3，完成传4")
+    @ApiModelProperty( value = "状态:启动传1，暂停传2，完成传3，锁定传4")
     private Integer status;
 }

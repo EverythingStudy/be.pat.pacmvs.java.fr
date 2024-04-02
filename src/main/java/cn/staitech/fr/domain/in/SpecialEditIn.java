@@ -11,7 +11,7 @@ import lombok.Data;
 @Data
 public class SpecialEditIn {
     @ApiModelProperty("专题id")
-    private String specialId;
+    private Long specialId;
 
     @ApiModelProperty("专题名称")
     private String specialName;
@@ -20,7 +20,7 @@ public class SpecialEditIn {
     private String speciesId;
 
     @ApiModelProperty(value = "试验类型")
-    private String trialType;
+    private Integer trialId;
 
     @ApiModelProperty(value = "染色类型")
     private Integer colorType;

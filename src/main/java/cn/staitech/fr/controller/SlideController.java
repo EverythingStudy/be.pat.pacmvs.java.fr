@@ -37,7 +37,7 @@ public class SlideController {
     private SlideService slideService;
 
 
-    @ApiOperation(value = "选片列表")
+    @ApiOperation(value = "选片列表-选前")
     @PostMapping("/choiceImageList")
     public R<PageResponse<ImageListOutVO>> choiceList(@Validated @RequestBody ChoiceImageListInVo image) {
         PageResponse<ImageListOutVO> page = imageService.choiceImageList(image);
@@ -50,7 +50,7 @@ public class SlideController {
         return slideService.choiceSave(choiceSaveInVo);
     }
 
-    @ApiOperation(value = "选片列表")
+    @ApiOperation(value = "选片列表-选后")
     @PostMapping("/list")
     public R<PageResponse<SlideListQueryOut>> list(@Validated @RequestBody SlideListQueryIn req) {
         PageResponse<SlideListQueryOut> page = slideService.slideListQuery(req);

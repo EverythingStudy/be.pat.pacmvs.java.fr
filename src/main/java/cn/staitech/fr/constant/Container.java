@@ -9,8 +9,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Map
- *
- * @author wangf
  */
 public class Container {
 
@@ -44,21 +42,23 @@ public class Container {
     /**
      * 项目状态
      */
-    public static final Map<Integer, String> PROJECT_STATUS = new ImmutableMap.Builder<Integer, String>()
-            .put(1, "待启动")
-            .put(2, "进行中")
-            .put(3, "暂停")
-            .put(4, "已完成")
+    public static final Map<Integer, String> SPECIAL_STATUS = new ImmutableMap.Builder<Integer, String>()
+            .put(0, "待启动")
+            .put(1, "进行中")
+            .put(2, "暂停")
+            .put(3, "已完成")
+            .put(4,"锁定")
             .build();
 
     /**
      * 项目状态 - EN
      */
-    public static final Map<Integer, String> PROJECT_STATUS_EN = new ImmutableMap.Builder<Integer, String>()
-            .put(1, "Pending Started")
-            .put(2, "In process")
-            .put(3, "Pause")
-            .put(4, "Done")
+    public static final Map<Integer, String> SPECIAL_STATUS_EN = new ImmutableMap.Builder<Integer, String>()
+            .put(0, "Pending Started")
+            .put(1, "In process")
+            .put(2, "Pause")
+            .put(3, "Done")
+            .put(4,"Locked")
             .build();
 
     /**
@@ -128,7 +128,51 @@ public class Container {
             .put(20, "Other")
             .put(21, "Argyrophilic staining")
             .build();
+    public static final Map<Integer, String> TRIAL_TYPE = new ImmutableMap.Builder<Integer, String>()
+            .put(1, "储备")
+            .put(2, "单次给药毒性试验")
+            .put(3, "重复给药毒性试验")
+            .put(4, "剂量探索毒性试验")
+            .put(5, "刺激试验")
+            .put(6, "过敏试验")
+            .put(7, "致癌试验")
+            .put(8, "Fertility (Segment Ⅰ)")
+            .put(9, "Embryo-toxicity (Segment Ⅱ)")
+            .put(10, "Peri ＆ Post-natal (Segment Ⅲ)")
+            .put(11, "监测实验")
+            .put(12, "安全药理")
+            .put(13, "致瘤性试验")
+            .put(14, "微核试验")
+            .put(15, "AMES试验")
+            .put(16, "染色体畸变试验")
+            .put(17, "单次给药药代试验")
+            .put(18, "重复给药药代试验")
+            .put(19, "热原试验")
+            .put(20, "其他试验")
+            .build();
 
+    public static final Map<Integer, String> TRIAL_TYPE_EN = new ImmutableMap.Builder<Integer, String>()
+            .put(1, "储备")
+            .put(2, "单次给药毒性试验")
+            .put(3, "重复给药毒性试验")
+            .put(4, "剂量探索毒性试验")
+            .put(5, "刺激试验")
+            .put(6, "过敏试验")
+            .put(7, "致癌试验")
+            .put(8, "Fertility (Segment Ⅰ)")
+            .put(9, "Embryo-toxicity (Segment Ⅱ)")
+            .put(10, "Peri ＆ Post-natal (Segment Ⅲ)")
+            .put(11, "监测实验")
+            .put(12, "安全药理")
+            .put(13, "致瘤性试验")
+            .put(14, "微核试验")
+            .put(15, "AMES试验")
+            .put(16, "染色体畸变试验")
+            .put(17, "单次给药药代试验")
+            .put(18, "重复给药药代试验")
+            .put(19, "热原试验")
+            .put(20, "其他试验")
+            .build();
     /**
      * 眼科-提示语
      */

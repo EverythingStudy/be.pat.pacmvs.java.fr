@@ -16,7 +16,7 @@ public class UploadWaxBlockIn {
     private MultipartFile file;
 
     @ApiModelProperty("机构id")
-    private Long organzationId;
+    private Long organizationId;
 
     @ApiModelProperty("专题id")
     private Long topicId;

@@ -50,7 +50,7 @@ public class SpecialMemberController {
 
     @ApiOperation(value = "专题成员表增加")
     @PostMapping("/addMember")
-    public R addProjectMember(@RequestBody AddMemberIn req) {
+    public R addMember(@RequestBody AddMemberIn req) {
         return specialMemberService.addMember(req);
     }
 

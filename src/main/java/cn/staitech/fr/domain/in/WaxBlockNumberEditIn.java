@@ -17,7 +17,7 @@ public class WaxBlockNumberEditIn {
     private Long numberId;
 
     @ApiModelProperty("机构id")
-    private Long organzationId;
+    private Long organizationId;
 
     @ApiModelProperty("文件名称")
     private String fileName;

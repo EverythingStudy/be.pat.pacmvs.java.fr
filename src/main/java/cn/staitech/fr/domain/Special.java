@@ -46,7 +46,7 @@ public class Special implements Serializable {
     private String speciesId;
 
     @ApiModelProperty(value = "试验类型")
-    private String trialType;
+    private Integer trialId;
 
     @ApiModelProperty(value = "染色类型")
     private Integer colorType;
