@@ -21,5 +21,8 @@ public class AnnotationSelectList {
     @ApiModelProperty(value = "分辨率")
     private Long magnification;
 
+    @ApiModelProperty(value = "标签id")
+    private Long categoryId;
+
 
 }

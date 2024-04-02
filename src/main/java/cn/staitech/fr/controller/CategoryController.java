@@ -29,7 +29,7 @@ public class CategoryController {
     @Resource
     private CategoryService categoryService;
 
-    @ApiOperation(value = "蜡块编号表列表分页查询")
+    @ApiOperation(value = "脏器标签表列表分页查询")
     @GetMapping("/selectListPage")
     public R<PageResponse<Category>> list(CategoryQueryPageIn req) throws ParseException {
         PageResponse<Category> resp = new PageResponse<>();
@@ -51,6 +51,13 @@ public class CategoryController {
         resp.setList(categories);
         resp.setPages(page.getPages());
         return R.ok(resp);
+    }
+
+
+    @ApiOperation(value = "脏器标签表列表查询")
+    @GetMapping("/selectList")
+    public R<List<Category>> list() {
+        return R.ok(categoryService.list());
     }
 
 }

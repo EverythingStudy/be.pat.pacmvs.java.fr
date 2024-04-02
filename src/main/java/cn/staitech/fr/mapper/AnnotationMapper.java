@@ -28,9 +28,9 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     void createTableSequence(Annotation annotation);
 
-    void createTable(Annotation annotation);
+    Annotation getArea(Annotation annotation);
 
-    void batchSave(Annotation annotation);
+
     @DS("slave")
     Annotation selectById(Annotation annotation);
 
