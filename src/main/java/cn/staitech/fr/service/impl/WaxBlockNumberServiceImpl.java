@@ -120,11 +120,11 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         log.info("导入文件接口开始：");
         //校验专题是否已经存在
         LambdaQueryWrapper<WaxBlockNumber> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(WaxBlockNumber::getTopicId,req.getTopicId());
-        queryWrapper.eq(WaxBlockNumber::getDelFlag,CommonConstant.NUMBER_0);
-        queryWrapper.eq(WaxBlockNumber::getOrganizationId,SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
+        queryWrapper.eq(WaxBlockNumber::getTopicId, req.getTopicId());
+        queryWrapper.eq(WaxBlockNumber::getDelFlag, CommonConstant.NUMBER_0);
+        queryWrapper.eq(WaxBlockNumber::getOrganizationId, SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
         List<WaxBlockNumber> waxList = list(queryWrapper);
-        if (waxList.size()>0){
+        if (waxList.size() > 0) {
             return R.fail("该专题下已经存在蜡块编号信息，请勿重复导入");
         }
         File file1 = new File("D:/words");
@@ -197,36 +197,36 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
                         continue;
                     }
 
-                }else{
+                } else {
 
                     String[] split1 = split[1].trim().split(CommonConstant.SEMICOLON_FLAG);
                     for (String s2 : split1) {
                         //设置详情信息
-                        if("NA".equals(s2)){
+                        if ("NA".equals(s2)) {
                             continue;
                         }
-                        extracted(getWaxBlockInfo(topic, species, waxBlockNumber, split[0].trim()), organList, insertList, s2,null);
+                        extracted(getWaxBlockInfo(topic, species, waxBlockNumber, split[0].trim()), organList, insertList, s2, null);
                     }
                 }
-            }else {
-                if (split.length !=4){
+            } else {
+                if (split.length != 4) {
                     return R.fail("文件内容格式错误！");
                 }
                 String[] split1 = split[1].trim().split(CommonConstant.SEMICOLON_FLAG);
                 for (String s2 : split1) {
-                    if("NA".equals(s2)){
+                    if ("NA".equals(s2)) {
                         continue;
                     }
                     //设置详情信息
-                    extracted(getWaxBlockInfo(topic, species, waxBlockNumber, split[0]), organList, insertList, s2,sexList.get(0));
+                    extracted(getWaxBlockInfo(topic, species, waxBlockNumber, split[0]), organList, insertList, s2, sexList.get(0));
                 }
                 String[] split2 = split[3].trim().split(CommonConstant.SEMICOLON_FLAG);
                 for (String s2 : split2) {
-                    if("NA".equals(s2)){
+                    if ("NA".equals(s2)) {
                         continue;
                     }
                     //设置详情信息
-                    extracted(getWaxBlockInfo(topic, species, waxBlockNumber, split[0]), organList, insertList, s2,sexList.get(1));
+                    extracted(getWaxBlockInfo(topic, species, waxBlockNumber, split[0]), organList, insertList, s2, sexList.get(1));
                 }
 
             }
@@ -236,13 +236,13 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         return R.ok();
     }
 
-    private void extracted(WaxBlockInfo waxBlockInfo1, Map<String, String> organList, List<WaxBlockInfo> insertList, String s2,String genderFlag) {
+    private void extracted(WaxBlockInfo waxBlockInfo1, Map<String, String> organList, List<WaxBlockInfo> insertList, String s2, String genderFlag) {
         Pattern pattern = Pattern.compile(CommonConstant.EN_FLAG);
-        log.info("错误"+s2);
+        log.info("错误" + s2);
         String[] parts = pattern.split(s2);
         String part = parts[0];
         log.info("脏器中文+数量:{}", part);
-        String s3 = StringUtils.substringBeforeLast(part, CommonConstant.CODE_START);
+        String s3 = StringUtils.substringBeforeLast(part, CommonConstant.CODE_START).trim();
         log.info("脏器中文:{}", s3);
         String s4 = StringUtils.substringAfterLast(part, CommonConstant.CODE_START);
         log.info("脏器数量+):{}", s4);
@@ -252,15 +252,36 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         log.info("脏器英文+数量:{}", s6);
         String s7 = StringUtils.substringBeforeLast(s6, CommonConstant.CODE_START);
         log.info("脏器英文:{}", s7);
-        WaxBlockInfo waxBlockInfo = waxBlockInfo1;
-        waxBlockInfo.setOrganId(organList.get(s3));
-        waxBlockInfo.setOrganName(s3);
-        waxBlockInfo.setOrganNumber(Integer.valueOf(s5));
-        waxBlockInfo.setOrganNameEn(s7);
-        waxBlockInfo.setGenderFlag(genderFlag);
-        waxBlockInfo.setCreateBy(SecurityUtils.getUserId());
-        waxBlockInfo.setCreateTime(new Date());
-        insertList.add(waxBlockInfo);
+        if (s3.contains("/")) {
+            String[] split = s3.split("/");
+            String[] split1 = s7.split("/");
+            for (int i = 0; i < split.length; i++) {
+                log.info("脏器中文:{}", split[i]);
+                log.info("脏器英文:{}", split1[i]);
+                WaxBlockInfo waxBlockInfo = new WaxBlockInfo();
+                BeanUtils.copyProperties(waxBlockInfo1, waxBlockInfo);
+                waxBlockInfo.setOrganId(organList.get(s3));
+                waxBlockInfo.setOrganName(split[i]);
+                waxBlockInfo.setOrganNumber(Integer.valueOf(s5));
+                waxBlockInfo.setOrganNameEn(split1[i]);
+                waxBlockInfo.setGenderFlag(genderFlag);
+                waxBlockInfo.setCreateBy(SecurityUtils.getUserId());
+                waxBlockInfo.setCreateTime(new Date());
+                insertList.add(waxBlockInfo);
+            }
+        } else {
+            WaxBlockInfo waxBlockInfo = new WaxBlockInfo();
+            BeanUtils.copyProperties(waxBlockInfo1, waxBlockInfo);
+            waxBlockInfo.setOrganId(organList.get(s3));
+            waxBlockInfo.setOrganName(s3);
+            waxBlockInfo.setOrganNumber(Integer.valueOf(s5));
+            waxBlockInfo.setOrganNameEn(s7);
+            waxBlockInfo.setGenderFlag(genderFlag);
+            waxBlockInfo.setCreateBy(SecurityUtils.getUserId());
+            waxBlockInfo.setCreateTime(new Date());
+            insertList.add(waxBlockInfo);
+        }
+
     }
 
     private WaxBlockInfo getWaxBlockInfo(Topic topic, Species species, WaxBlockNumber waxBlockNumber, String s2) {
