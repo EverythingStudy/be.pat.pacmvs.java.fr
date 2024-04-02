@@ -4,7 +4,7 @@
 
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.WaxBlockNumber">
-        <id column="id" property="id" />
+        <id column="number_id" property="numberId" />
         <result column="topic_id" property="topicId" />
         <result column="topic_name" property="topicName" />
         <result column="species_id" property="speciesId" />
@@ -20,12 +20,12 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, topic_id, topic_name, species_id, species_name, file_name, del_flag, organization_id, create_by, create_time, update_by, update_time
+        number_id, topic_id, topic_name, species_id, species_name, file_name, del_flag, organization_id, create_by, create_time, update_by, update_time
     </sql>
 
     <select id="getWaxList" parameterType="cn.staitech.fr.domain.in.WaxBlockNumberListIn"
                   resultType="cn.staitech.fr.domain.out.WaxBlockNumberListOut">
-        select fwbn.id,tt.topic_name,fwbn.species_name,fwbn.file_name,so.organization_name,fwbn.create_time
+        select fwbn.number_id,tt.topic_name,fwbn.species_name,fwbn.file_name,so.organization_name,fwbn.create_time
         from fr_wax_block_number fwbn
                  left join sys_organization so on fwbn.organization_id = so.organization_id
                  left join tb_topic tt on fwbn.topic_id=tt.topic_id

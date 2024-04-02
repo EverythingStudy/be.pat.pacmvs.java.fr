@@ -2,6 +2,7 @@ package cn.staitech.fr.mapper;
 
 import cn.staitech.fr.domain.WaxBlockInfo;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * <p>
@@ -12,5 +13,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @since 2024-03-29
  */
 public interface WaxBlockInfoMapper extends BaseMapper<WaxBlockInfo> {
+
+    String getOrganName(@Param("topicId") Long topicId, @Param("speciesId") String speciesId,@Param("waxCode") String waxCode);
 
 }

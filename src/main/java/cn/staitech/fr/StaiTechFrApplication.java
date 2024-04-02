@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import java.util.TimeZone;
 
 /**
- * 系统模块 .
  *
  * @author staitech
  * @EnableFeignClients 此注解报错：Field remoteLogService in cn.staitech.common.log.service.AsyncLogService required a bean of

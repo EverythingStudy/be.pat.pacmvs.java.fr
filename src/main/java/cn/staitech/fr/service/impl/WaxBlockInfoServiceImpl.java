@@ -27,7 +27,7 @@ public class WaxBlockInfoServiceImpl extends ServiceImpl<WaxBlockInfoMapper, Wax
     public R<List<WaxBlockInfo>> waxPreview(Long id) {
         log.info("蜡块编号预览接口查询开始：");
         LambdaQueryWrapper<WaxBlockInfo> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(WaxBlockInfo::getWaxId, id);
+        wrapper.eq(WaxBlockInfo::getNumberId, id);
         List<WaxBlockInfo> waxBlockInfos = this.baseMapper.selectList(wrapper);
         return R.ok(waxBlockInfos);
     }

@@ -31,8 +31,8 @@ public class WaxBlockNumber implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @ApiModelProperty(value = "自增ID")
-    @TableId(value = "id", type = IdType.AUTO)
-    private Long id;
+    @TableId(value = "number_id", type = IdType.AUTO)
+    private Long numberId;
 
     @ApiModelProperty(value = "专题ID")
     private Long topicId;

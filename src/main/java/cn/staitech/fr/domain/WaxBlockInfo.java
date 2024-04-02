@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * <p>
@@ -34,7 +35,7 @@ public class WaxBlockInfo implements Serializable {
     private Long id;
 
     @ApiModelProperty(value = "蜡块编号id")
-    private Long waxId;
+    private Long numberId;
 
     @ApiModelProperty(value = "蜡块编号")
     private String waxCode;
@@ -76,13 +77,13 @@ public class WaxBlockInfo implements Serializable {
     private Long createBy;
 
     @ApiModelProperty(value = "创建时间")
-    private LocalDateTime createTime;
+    private Date createTime;
 
     @ApiModelProperty(value = "更新者ID")
     private Long updateBy;
 
     @ApiModelProperty(value = "更新时间")
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
 
 }

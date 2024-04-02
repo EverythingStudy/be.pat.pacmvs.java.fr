@@ -11,6 +11,7 @@ import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.SpecialRecycling;
+import cn.staitech.fr.domain.WaxBlockInfo;
 import cn.staitech.fr.domain.in.EditSpecialStatusIn;
 import cn.staitech.fr.domain.in.SpecialAddIn;
 import cn.staitech.fr.domain.in.SpecialEditIn;
@@ -20,6 +21,7 @@ import cn.staitech.fr.domain.out.WaxBlockNumberListOut;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
+import cn.staitech.fr.mapper.WaxBlockInfoMapper;
 import cn.staitech.fr.service.GroupService;
 import cn.staitech.fr.service.ImageService;
 import cn.staitech.fr.service.SpecialRecyclingService;
@@ -64,6 +66,8 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 
     @Autowired
     private GroupService groupService;
+    @Resource
+    private WaxBlockInfoMapper waxBlockInfoMapper;
 
     @Override
     public PageResponse<SpecialListQueryOut> getSpecialList(SpecialListQueryIn req) {
@@ -124,7 +128,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
                 slide.setCreateTime(new Date());
                 slide.setImageId(image.getImageId());
                 slide.setSpecialId(special.getSpecialId());
-                getExtInfo(image.getFileName(), slide, special.getSpecialId());
+                getExtInfo(image.getFileName(), slide, special.getSpecialId(),req);
             }
         }
         return R.ok();
@@ -185,7 +189,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         return R.ok();
     }
 
-    private Slide getExtInfo(String fileName, Slide slide, Long specialId) {
+    private Slide getExtInfo(String fileName, Slide slide, Long specialId,SpecialAddIn req) {
         String[] s = fileName.split(" ");
         if (s.length != 3) {
             log.info("切片文件名格式错误：" + fileName);
@@ -212,6 +216,8 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
             return slide;
         }
         slide.setGroupCode(s[2].substring(0, s[2].length() - 1));
+
+        slide.setOrgans(waxBlockInfoMapper.getOrganName(req.getTopicId(),req.getSpeciesId(),slide.getWaxCode()));
 
         return slide;
     }

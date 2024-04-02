@@ -5,10 +5,13 @@ import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Group;
+import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.in.ChoiceSaveInVo;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
 import cn.staitech.fr.domain.out.ImageListOutVO;
 import cn.staitech.fr.domain.out.SlideListQueryOut;
+import cn.staitech.fr.mapper.SpecialMapper;
+import cn.staitech.fr.mapper.WaxBlockInfoMapper;
 import cn.staitech.fr.service.GroupService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.staitech.fr.domain.Slide;
@@ -38,6 +41,10 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide>
 
     @Resource
     private GroupService groupService;
+    @Resource
+    private WaxBlockInfoMapper waxBlockInfoMapper;
+    @Resource
+    private SpecialMapper specialMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -94,7 +101,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide>
             return slide;
         }
         slide.setGroupCode(s[2].substring(0, s[2].length() - 1));
-
+        Special special = specialMapper.selectById(specialId);
+        slide.setOrgans(waxBlockInfoMapper.getOrganName(special.getTopicId(),special.getSpeciesId(),slide.getWaxCode()));
         return slide;
     }
 

@@ -102,7 +102,15 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         log.info("蜡块编号删除接口开始：");
         WaxBlockNumber waxBlockNumber = new WaxBlockNumber();
         waxBlockNumber.setDelFlag(CommonConstant.NUMBER_1);
-        waxBlockNumber.setId(id);
+        waxBlockNumber.setNumberId(id);
+        this.baseMapper.updateById(waxBlockNumber);
+        //删除详情信息
+        WaxBlockInfo waxBlockInfo = new WaxBlockInfo();
+        waxBlockInfo.setDelFlag(CommonConstant.NUMBER_1);
+        LambdaQueryWrapper<WaxBlockInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(WaxBlockInfo::getNumberId, id);
+        wrapper.eq(WaxBlockInfo::getDelFlag, CommonConstant.NUMBER_0);
+        waxBlockInfoService.update(waxBlockInfo, wrapper);
         return R.ok();
     }
 
@@ -128,7 +136,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         String text = paragraphs.get(1).getText().trim();
         String s = StringUtils.substringAfter(text, "：");
         //专题号
-        String topicName = StringUtils.substringBefore(s, "动物种属");
+        String topicName = StringUtils.substringBefore(s, "动物种属").trim();
      /*   if(StringUtils.isEmpty(topicName)){
             return R.fail("上传文件专题号不存在！");
         }*/
@@ -139,7 +147,8 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         }
 
         //种属
-        String speciesName = StringUtils.substringAfterLast(text, "：");
+        String speciesName = StringUtils.substringAfterLast(text, "：").trim();
+        speciesName = StringUtils.substringBeforeLast(speciesName, "(");
         log.info("种属：{}", speciesName);
         Species species = getSpecies(speciesName);
         if (ObjectUtils.isEmpty(species)) {
@@ -159,7 +168,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
             return R.fail("文件内容为空！");
         }
         //查询所有脏器
-        Map<String, String> organList = extracted();
+        Map<String, String> organList = extracted(species.getSpeciesId());
         //蜡块详情信息
         List<WaxBlockInfo> insertList = new ArrayList<>();
         for (int i = 1; i < rows.size(); i++) {
@@ -170,7 +179,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
                     .orElse("");
 
             log.info("详情信息：{}", s1);
-            if (s.contains(CommonConstant.END_FLAG)) {
+            if (s1.contains(CommonConstant.END_FLAG)) {
                 continue;
             }
             String[] split = s1.split("\\|");
@@ -193,7 +202,10 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
                     String[] split1 = split[1].trim().split(CommonConstant.SEMICOLON_FLAG);
                     for (String s2 : split1) {
                         //设置详情信息
-                        extracted(getWaxBlockInfo(topic, species, waxBlockNumber, split[0]), organList, insertList, s2,null);
+                        if("NA".equals(s2)){
+                            continue;
+                        }
+                        extracted(getWaxBlockInfo(topic, species, waxBlockNumber, split[0].trim()), organList, insertList, s2,null);
                     }
                 }
             }else {
@@ -202,11 +214,17 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
                 }
                 String[] split1 = split[1].trim().split(CommonConstant.SEMICOLON_FLAG);
                 for (String s2 : split1) {
+                    if("NA".equals(s2)){
+                        continue;
+                    }
                     //设置详情信息
                     extracted(getWaxBlockInfo(topic, species, waxBlockNumber, split[0]), organList, insertList, s2,sexList.get(0));
                 }
                 String[] split2 = split[3].trim().split(CommonConstant.SEMICOLON_FLAG);
                 for (String s2 : split2) {
+                    if("NA".equals(s2)){
+                        continue;
+                    }
                     //设置详情信息
                     extracted(getWaxBlockInfo(topic, species, waxBlockNumber, split[0]), organList, insertList, s2,sexList.get(1));
                 }
@@ -220,6 +238,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
 
     private void extracted(WaxBlockInfo waxBlockInfo1, Map<String, String> organList, List<WaxBlockInfo> insertList, String s2,String genderFlag) {
         Pattern pattern = Pattern.compile(CommonConstant.EN_FLAG);
+        log.info("错误"+s2);
         String[] parts = pattern.split(s2);
         String part = parts[0];
         log.info("脏器中文+数量:{}", part);
@@ -239,12 +258,15 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         waxBlockInfo.setOrganNumber(Integer.valueOf(s5));
         waxBlockInfo.setOrganNameEn(s7);
         waxBlockInfo.setGenderFlag(genderFlag);
+        waxBlockInfo.setCreateBy(SecurityUtils.getUserId());
+        waxBlockInfo.setCreateTime(new Date());
         insertList.add(waxBlockInfo);
     }
 
     private WaxBlockInfo getWaxBlockInfo(Topic topic, Species species, WaxBlockNumber waxBlockNumber, String s2) {
         WaxBlockInfo waxBlockInfo = new WaxBlockInfo();
-        waxBlockInfo.setWaxId(waxBlockNumber.getId());
+        waxBlockInfo.setNumberId(
+                waxBlockNumber.getNumberId());
         waxBlockInfo.setWaxCode(s2.trim());
         waxBlockInfo.setTopicId(topic.getTopicId());
         waxBlockInfo.setTopicName(topic.getTopicName());
@@ -259,9 +281,10 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
      *
      * @return
      */
-    private Map<String, String> extracted() {
+    private Map<String, String> extracted(String speciesCode) {
         LambdaQueryWrapper<Organ> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Organ::getOrganizationId, SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
+        wrapper.eq(Organ::getSpeciesCode, speciesCode);
         List<Organ> organs = organService.list(wrapper);
         if (CollectionUtils.isEmpty(organs)) {
             throw new RuntimeException("脏器信息为空！");
@@ -297,30 +320,6 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         waxBlockNumber.setSpeciesId(species.getSpeciesId());
         waxBlockNumber.setSpeciesName(species.getName());
         return waxBlockNumber;
-    }
-
-    public static void main(String[] args) {
-        String input = "脑(3)Brain(3);脊髓(颈、胸、腰)(3) Spinal cord (cervical, thoracic, lumbar)(3)";
-        String[] split1 = input.trim().split(CommonConstant.SEMICOLON_FLAG);
-        for (String s2 : split1) {
-            Pattern pattern = Pattern.compile(CommonConstant.EN_FLAG);
-            String[] parts = pattern.split(s2);
-            String part = parts[0];
-            log.info("脏器中文+数量:{}", part);
-            String s3 = StringUtils.substringBeforeLast(part, CommonConstant.CODE_START);
-            log.info("脏器中文:{}", s3);
-            String s4 = StringUtils.substringAfterLast(part, CommonConstant.CODE_START);
-            log.info("脏器数量+):{}", s4);
-            String s5 = StringUtils.substringBeforeLast(s4, CommonConstant.CODE_END);
-            log.info("脏器数量:{}", s5);
-            String s6 = StringUtils.substringAfterLast(s2, part);
-            log.info("脏器英文+数量:{}", s6);
-            String s7 = StringUtils.substringBeforeLast(s6, CommonConstant.CODE_START);
-            log.info("脏器英文:{}", s7);
-
-
-        }
-
     }
 
     public static String[] splitByLetters(String str) {

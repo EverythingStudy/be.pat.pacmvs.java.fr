@@ -5,7 +5,7 @@
     <!-- 通用查询映射结果 -->
     <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.WaxBlockInfo">
         <id column="id" property="id" />
-        <result column="wax_id" property="waxId" />
+        <result column="number_id" property="numberId" />
         <result column="wax_code" property="waxCode" />
         <result column="topic_id" property="topicId" />
         <result column="topic_name" property="topicName" />
@@ -27,5 +27,13 @@
     <sql id="Base_Column_List">
         id, wax_id, wax_code, topic_id, topic_name, species_id, species_name, organ_name, organ_name_en, organ_number, gender_flag, del_flag, organization_id, create_by, create_time, update_by, update_time
     </sql>
+    <select id="getOrganName" resultType="java.lang.String">
+        select group_concat(organ_name)
+        from fr_wax_block_info
+        where topic_id = #{topicId}
+          and species_id = #{speciesId}
+          and wax_code = #{waxCode}
+          and del_flag = '0'
 
+    </select>
 </mapper>
