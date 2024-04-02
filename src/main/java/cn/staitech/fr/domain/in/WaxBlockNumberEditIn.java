@@ -1,9 +1,8 @@
 package cn.staitech.fr.domain.in;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-
 import javax.validation.constraints.NotNull;
+import lombok.Data;
 
 /**
  * @Author wudi
@@ -13,7 +12,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class WaxBlockNumberEditIn {
     @ApiModelProperty(value = "主键id")
-    @NotNull(message = "编号主键id不能为空")
+    @NotNull(message = "{ID.ISNULL}")
     private Long numberId;
 
     @ApiModelProperty("机构id")

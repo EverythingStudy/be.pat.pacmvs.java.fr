@@ -48,6 +48,7 @@ public class SpecialRecyclingServiceImpl extends ServiceImpl<SpecialRecyclingMap
         log.info("专题回收站分页查询家口开始：");
         //创建响应
         PageResponse resp = new PageResponse();
+        req.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
         //分页查询
         Page<SysUser> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
         List<SpecialRecyclingListQueryOut> specialList = this.baseMapper.getSpecialRecyclingList(req);

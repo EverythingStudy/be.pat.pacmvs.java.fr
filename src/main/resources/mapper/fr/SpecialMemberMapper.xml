@@ -43,6 +43,7 @@
             and sur.role_id = #{roleId}
         </if>
         </where>
+        group by (sm.member_id)
         order by sm.create_time desc
 
     </select>

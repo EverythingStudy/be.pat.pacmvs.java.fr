@@ -20,6 +20,9 @@ public class SpecialRecyclingListQueryIn extends PageRequest {
     @ApiModelProperty(value = "专题名称")
     private String specialName;
 
+    @ApiModelProperty(value = "机构id",hidden = true)
+    private Long organizationId;
+
     @ApiModelProperty(value = "专题创建时间")
     private Map<String, Date> createTimeParams;
 

@@ -1,8 +1,6 @@
 package cn.staitech.fr.domain.in;
-
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
+import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -15,23 +13,23 @@ import javax.validation.constraints.NotNull;
 public class SpecialAddIn {
 
     @ApiModelProperty(value = "专题id")
-    @NotNull(message = "专题编号不能为空")
+    @NotNull(message = "{StartPredictionIn.specialId.isnull}")
     private Long topicId;
 
     @ApiModelProperty(value = "专题名称")
-    @NotBlank(message = "专题名称不能为空")
+    @NotBlank(message = "{SpecialInsertVo.specialName.isnull}")
     private String specialName;
 
     @ApiModelProperty(value = "种属id")
-    @NotBlank(message = "种属id不能为空")
+    @NotBlank(message = "{SpecialInsertVo.species.isnull}")
     private String speciesId;
 
     @ApiModelProperty(value = "试验类型")
-    @NotNull(message = "试验类型不能为空")
+    @NotNull(message = "{SpecialInsertVo.trialType.isnull}")
     private Integer trialId;
 
     @ApiModelProperty(value = "染色类型")
-    @NotNull(message = "染色类型不能为空")
+    @NotNull(message = "{SpecialInsertVo.stainType.isnull}")
     private Integer colorType;
 
     @ApiModelProperty(value = "机构id")

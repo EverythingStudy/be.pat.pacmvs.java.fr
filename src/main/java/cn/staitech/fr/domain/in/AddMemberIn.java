@@ -14,10 +14,10 @@ import java.util.List;
  */
 @Data
 public class AddMemberIn {
-    @NotNull(message = "专题id不能为空")
+    @NotNull(message = "{StartPredictionIn.specialId.isnull}")
     @ApiModelProperty(value = "专题id", required = true)
     private Long specialId;
-    @NotEmpty(message = "用户列表不能为空")
+    @NotEmpty(message = "{AnnotationDeleteVO.createBy.isnull}")
     @ApiModelProperty(value = "用户id列表", required = true)
     private List<Long> userId;
 

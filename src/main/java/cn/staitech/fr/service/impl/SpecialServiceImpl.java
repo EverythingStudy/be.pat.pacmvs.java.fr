@@ -10,6 +10,7 @@ import cn.staitech.fr.domain.Group;
 import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
+import cn.staitech.fr.domain.SpecialMember;
 import cn.staitech.fr.domain.SpecialRecycling;
 import cn.staitech.fr.domain.in.EditSpecialStatusIn;
 import cn.staitech.fr.domain.in.SpecialAddIn;
@@ -19,6 +20,7 @@ import cn.staitech.fr.domain.out.SpecialListQueryOut;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
+import cn.staitech.fr.mapper.SpecialMemberMapper;
 import cn.staitech.fr.mapper.WaxBlockInfoMapper;
 import cn.staitech.fr.service.GroupService;
 import cn.staitech.fr.service.SlideService;
@@ -67,8 +69,12 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 
     @Autowired
     private GroupService groupService;
+
     @Resource
     private WaxBlockInfoMapper waxBlockInfoMapper;
+
+    @Resource
+    private SpecialMemberMapper specialMemberMapper;
 
     @Override
     public PageResponse<SpecialListQueryOut> getSpecialList(SpecialListQueryIn req) {
@@ -140,6 +146,14 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
             }
         }
         slideService.saveBatch(arrayList);
+        //专题成员
+        SpecialMember specialMember = new SpecialMember();
+        specialMember.setSpecialId(special.getSpecialId());
+        specialMember.setUserId(SecurityUtils.getUserId());
+        specialMember.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
+        specialMember.setCreateBy(SecurityUtils.getUserId());
+        specialMember.setCreateTime(new Date());
+        specialMemberMapper.insert(specialMember);
         return R.ok();
     }
 
