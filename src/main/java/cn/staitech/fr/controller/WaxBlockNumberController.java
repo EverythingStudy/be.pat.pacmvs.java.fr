@@ -25,7 +25,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 
@@ -37,6 +40,7 @@ import java.util.List;
 @Api(value = "蜡块编号表", tags = "蜡块编号表")
 @RestController
 @RequestMapping("/wax")
+@Validated
 public class WaxBlockNumberController {
     @Autowired
     private WaxBlockNumberService waxBlockNumberService;
@@ -88,7 +92,10 @@ public class WaxBlockNumberController {
 
     @ApiOperation(value = "蜡块编号信息预览列表")
     @GetMapping("/waxPreview")
-    public R<List<WaxBlockInfo>> waxPreview(@RequestParam("numberId") @ApiParam(name="numberId",value = "蜡块编号信息id") Long numberId)  {
+
+    public R<List<WaxBlockInfo>> waxPreview( @RequestParam(value = "numberId",required = false)
+                                                 @NotNull(message = "不能为空")
+                                                 @ApiParam(name="numberId",value = "蜡块编号信息id",required = true) Long numberId)  {
         return waxBlockInfoService.waxPreview(numberId);
     }
 
