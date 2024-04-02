@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.impl;
 
 import cn.staitech.common.security.utils.SecurityUtils;
+import cn.staitech.fr.config.AsyncTask;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.netty.websocket.NioWebSocketHandler;
@@ -16,10 +17,10 @@ import cn.staitech.fr.vo.geojson.Properties;
 import cn.staitech.fr.vo.geojson.in.UpdateOperationIn;
 import cn.staitech.fr.vo.geojson.in.ViewAddIn;
 import cn.staitech.fr.vo.measure.BroadcastVO;
-import cn.staitech.system.api.domain.SysUser;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import cn.staitech.fr.service.AnnotationService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -65,6 +66,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     @Resource
     private UserMapper userMapper;
 
+    @Resource
+    private AsyncTask asyncTask;
+
 
     public List<Features> getFeaturesList(List<Annotation> annotations) {
         List<Features> featuresList = new ArrayList<>();
@@ -87,7 +91,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         properties.setPerimeter(annotation.getPerimeter());
         properties.setAnnotation_type(annotation.getAnnotationType());
         properties.setCategory_id(annotation.getCategoryId());
-//        properties.setLabel_code(annotation.getStructureId());
         properties.setDescription(annotation.getDescription());
         properties.setLocation_type(annotation.getLocationType());
         properties.setCreate_by(annotation.getCreateBy());
@@ -103,8 +106,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                 }
             }
             if (category != null) {
-//                properties.setLabel_color(category.getRgb());
-//                properties.setLabel_code(category.getNumber());
+                properties.setLabel_color(category.getChromaticValue());
                 properties.setLabel_name(category.getCategoryFullName());
             }
         }
@@ -188,24 +190,33 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Features features = socketData(annotation.getId(), JSON.parseObject(annotationBy.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(ADD_STATUS, features);
         NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
-
-
-        // 生成缩略图
-
-
-
-
+        Slide slide = slideMapper.selectById(req.getSlide_id());
+        Image image = imageMapper.selectById(slide.getImageId());
+        List<JSONObject> contourList = test111111(annotation.getSlideId(),req.getCategory_id());
+        asyncTask.asyncSave(annotation.getSlideId(),req.getCategory_id(),image.getImageUrl(),contourList,1);
         return annotation.getAnnotationId();
     }
+
+    public List<JSONObject> test111111(Long slideId,Long categoryId){
+        QueryWrapper<Annotation> annotationQueryWrapper = new QueryWrapper<>();
+        annotationQueryWrapper.eq("slide_id",slideId).eq("category_id",categoryId);
+        List<Annotation> annotations = annotationMapper.selectList(annotationQueryWrapper);
+        List<JSONObject> contourList = new ArrayList<>();
+        for(Annotation annotation1:annotations){
+            contourList.add(JSON.parseObject(annotation1.getContour()));
+        }
+        return contourList;
+    }
+
 
     @Override
     public void delete(AnnotationById req) throws Exception {
         if (!Optional.ofNullable(req.getMarking_id()).isPresent()) {
             throw new Exception(MessageSource.M("ARGUMENT_INVALID"));
         }
-        Annotation annotations = new Annotation();
-        annotations.setAnnotationId(req.getMarking_id());
-        Annotation annotationBy = annotationMapper.selectById(annotations);
+        Annotation annotation = new Annotation();
+        annotation.setAnnotationId(req.getMarking_id());
+        Annotation annotationBy = annotationMapper.selectById(annotation);
         if (!Optional.ofNullable(annotationBy).isPresent()) {
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }
@@ -213,7 +224,17 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Features features = socketData(annotationBy.getId(), JSON.parseObject(annotationBy.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(DELETE_STATUS, features);
         NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
-        int res = annotationMapper.deleteById(annotations);
+        annotationMapper.deleteById(annotation);
+        Slide slide = slideMapper.selectById(annotation.getSlideId());
+        Image image = imageMapper.selectById(slide.getImageId());
+        List<JSONObject> contourList = test111111(annotation.getSlideId(),annotation.getCategoryId());
+        int type;
+        if(contourList.size() > 0){
+            type = 1;
+        }else{
+            type = 2;
+        }
+        asyncTask.asyncSave(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(),contourList,type);
     }
 
 
@@ -228,9 +249,13 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }
         Slide slide = slideMapper.selectById(slideId);
-//        if (!Optional.ofNullable(slide).isPresent()) {
-//            throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
-//        }
+        if (!Optional.ofNullable(slide).isPresent()) {
+            throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
+        }
+        Image image = imageMapper.selectById(slide.getImageId());
+        if (!Optional.ofNullable(image).isPresent()) {
+            throw new Exception(MessageSource.M("NODATA"));
+        }
         Annotation annotation = new Annotation();
         if (req.getCategory_id() == null && req.getDescription() == null) {
             if (req.getGeometry() != null) {
@@ -264,6 +289,18 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Features features = AnnotationDataEncapsulation.socketData(annotation.getId(), req.getGeometry(), properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
         NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
+
+        List<JSONObject> contourList = test111111(annotation.getSlideId(),annotation.getCategoryId());
+        int type;
+        if(contourList.size() > 0){
+            type = 1;
+        }else{
+            type = 2;
+        }
+        asyncTask.asyncSave(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(),contourList,type);
+        // 改之后数据
+        List<JSONObject> contourListAfter = test111111(annotation.getSlideId(),annotation.getCategoryId());
+        asyncTask.asyncSave(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(),contourListAfter,1);
         return annotation.getAnnotationId();
     }
 
@@ -282,10 +319,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
 
         Long slideId = annotationBy.getSlideId();
-//        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
-//        Long loginUserId = sysUser.getUserId();
-//        String loginUserName = sysUser.getUserName();
-
         JSONObject geometryJson = MarkingUtils.padding(JSON.parseObject(annotationBy.getContour()));
         Annotation annotation = new Annotation();
         annotation.setAnnotationId(req.getMarking_id());
@@ -373,7 +406,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     @Override
     public JSONObject updateOperation(UpdateOperationIn req, String traceId, Boolean isBatch) throws Exception {
         Annotation annotations = new Annotation();
-        annotations.setAnnotationId(Long.valueOf(req.getMarking_id()));
+        annotations.setAnnotationId(req.getMarking_id());
         Annotation annotation = annotationMapper.selectById(annotations);
         // 查询数据是否存在
         if (!Optional.ofNullable(annotation).isPresent()) {
@@ -384,7 +417,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             throw new Exception(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
         }
         Annotation annotationBys = new Annotation();
-        annotationBys.setAnnotationId(Long.valueOf(req.getMarking_id()));
+        annotationBys.setAnnotationId(req.getMarking_id());
         annotationBys.setContour(String.valueOf(req.getGeometry()));
         annotationBys.setUpdateBy(req.getUpdate_by());
         annotationBys.setOperation(req.getOperation());
@@ -409,7 +442,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), JSON.parseObject(annotation1.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
         NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
-        annotationSet.remove(req.getMarking_id());
+        List<JSONObject> contourList = test111111(annotation.getSlideId(),annotation.getCategoryId());
+        asyncTask.asyncSave(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(),contourList,1);
         return JSON.parseObject(annotation1.getContour());
     }
 

@@ -5,7 +5,9 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
-import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -19,41 +21,50 @@ public class Category implements Serializable {
      * 主键id
      */
     @TableId(type = IdType.AUTO)
+    @ApiModelProperty(name = "categoryId" , value = "主键id")
     private Long categoryId;
 
     /**
      * 种属
      */
+    @ApiModelProperty(name = "species" , value = "种属")
     private String species;
 
     /**
      * 脏器名称
      */
+    @ApiModelProperty(name = "organName" , value = "脏器名称")
     private String organName;
 
     /**
      * 标签全称
      */
+    @ApiModelProperty(name = "categoryFullName" , value = "标签全称")
     private String categoryFullName;
 
     /**
      * 标签简称
      */
+    @ApiModelProperty(name = "categoryAbbreviation" , value = "标签简称")
     private String categoryAbbreviation;
 
     /**
      * 色值
      */
+    @ApiModelProperty(name = "chromaticValue" , value = "色值")
     private String chromaticValue;
 
     /**
      * 创建时间
      */
-    private Date createTime;
+    @ApiModelProperty(name = "createTime" , value = "创建时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private String createTime;
 
     /**
      * 创建者
      */
+    @ApiModelProperty(name = "createBy" , value = "创建者")
     private Long createBy;
 
     @TableField(exist = false)
