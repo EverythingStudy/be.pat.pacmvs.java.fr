@@ -11,25 +11,31 @@
         ss.slide_id,
         ss.image_url,
         ss.category_id,
-        fc.organ_name,
+        fc.organ_en,
+        fc.category_full_name as organ_name,
         fs.group_code,
         fs.wax_code,
         fs.animal_code,
         fs.gender_flag,
         fs.initiate_by,
+        su.user_name,
         fs.initiate_time
         FROM
         fr_single_slide ss
         LEFT JOIN fr_slide fs ON ss.slide_id = fs.slide_id
         LEFT JOIN fr_category fc ON ss.category_id = fc.category_id
         left join tb_image ti on fs.image_id = ti.image_id
+        left join sys_user su on fs.initiate_by=su.user_id
         <where>
             fs.special_id = #{specialId} and fs.process_flag = '2'
             <if test="fileName != null and fileName != ''">
                 and ti.file_name like concat('%',#{fileName},'%')
             </if>
-            <if test="initiateBy != null and initiateBy != ''">
-                and fs.initiate_by = #{initiateBy}
+            <if test="initiateName != null and initiateName != ''">
+                and su.user_name like concat('%',#{initiateName},'%')
+            </if>
+            <if test="categoryId != null and categoryId != ''">
+                and ss.category_id =#{categoryId}
             </if>
             <if test="initiateTimeParams!=null and initiateTimeParams.size() > 0">
                 <if test="initiateTimeParams.beginTime != null and initiateTimeParams.beginTime != ''">

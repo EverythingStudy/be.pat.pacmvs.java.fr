@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -25,11 +24,11 @@ public class OrganDisassemblyQueryIn extends PageRequest {
 
     @ApiModelProperty(value = "启动者")
     // 启动者
-    private Long initiateBy;
+    private String initiateName;
 
     @ApiModelProperty(value = "启动时间")
     // 启动时间
-    private Map<String, Date> initiateTimeParams;
+    private Map<String, String> initiateTimeParams;
 
     @ApiModelProperty(value = "脏器类型")
     private Long categoryId;

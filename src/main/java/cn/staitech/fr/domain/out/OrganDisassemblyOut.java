@@ -38,7 +38,9 @@ public class OrganDisassemblyOut {
     private String genderFlag;
 
     @ApiModelProperty(value = "启动者")
-    private String initiateBy;
+    private Long initiateBy;
+    @ApiModelProperty(value = "启动者")
+    private String userName;
 
     @ApiModelProperty(value = "启动时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -47,6 +49,8 @@ public class OrganDisassemblyOut {
     private Long categoryId;
     @ApiModelProperty(value = "单脏器类型")
     private String organName;
+    @ApiModelProperty(value = "单脏器类型-英文")
+    private String organEn;
     @ApiModelProperty(value = "脏器数量")
     private Long organNumber;
 }
