@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class UploadWaxBlockIn {
 
-    @ApiModelProperty("文件数据")
+    @ApiModelProperty(value = "文件数据",hidden = true)
     private MultipartFile file;
 
     @ApiModelProperty("机构id")

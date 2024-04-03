@@ -64,7 +64,7 @@
                 and fs.process_flag = #{processFlag}
             </if>
             <if test="createBy != null and createBy != ''">
-                and fs.create_by = #{createBy}
+                and su.user_name like concat('%',#{createBy},'%')
             </if>
             <if test="createTimeParams!=null and createTimeParams.size() > 0">
                 <if test="createTimeParams.beginTime != null and createTimeParams.beginTime != ''"><!-- 开始时间检索 -->
@@ -110,6 +110,7 @@
                  left join fr_special fsl on fs.special_id = fsl.special_id
         where fsl.topic_id= #{topicId}
           and fsl.species_id= #{speciesId}
+          and fsl.del_flag='0'
     </select>
     
      <select id="getVerificationSlideListQuery" parameterType="cn.staitech.fr.domain.in.SplitVerificationQueryIn"   resultType="cn.staitech.fr.domain.out.SplitVerificationOut">
