@@ -102,4 +102,12 @@
 		</where>
 		ORDER BY	t1.create_time ASC
     </select>
+
+    <select id="selectListByWax" resultType="cn.staitech.fr.domain.Slide">
+        select fs.slide_id,fs.wax_code
+        from fr_slide fs
+                 left join fr_special fsl on fs.special_id = fsl.special_id
+        where fsl.topic_id= #{topicId}
+          and fsl.species_id= #{speciesId}
+    </select>
 </mapper>
