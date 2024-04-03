@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
 
 /**
@@ -95,6 +97,9 @@ public class Annotation implements Serializable {
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+    
+    @TableField(exist = false)
+    private List<Long> slideIdList;
 
     @Override
     public boolean equals(Object that) {

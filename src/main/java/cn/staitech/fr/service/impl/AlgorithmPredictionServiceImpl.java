@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.impl;
 
 import java.text.NumberFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -102,16 +103,17 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		//启动切片方式 0：全部启动 1：部分启动
 		int type = req.getType();
 		List<Long> slideIdList = req.getSlideIdList();
-		Map<Long, String> slideMap =  new HashMap<>();
+		List<AlgorithmImageOut> list = new ArrayList<>();
+		//Map<Long, String> slideMap =  new HashMap<>();
 		if(type == 0){
 			//待切图的所有切片
 			Map<String,Object> queryMap = new HashMap<>();
 			queryMap.put("specialId", specialId);
 			queryMap.put("processFlag", 0);
-			List<AlgorithmImageOut> list = slideMapper.getAlgorithmImage(queryMap);
-			if(CollectionUtils.isNotEmpty(list)){
+			list = slideMapper.getAlgorithmImage(queryMap);
+			/*if(CollectionUtils.isNotEmpty(list)){
 				slideMap = list.stream().collect(Collectors.toMap(AlgorithmImageOut::getSlideId, AlgorithmImageOut::getImageUrl));
-			}
+			}*/
 		}else{
 			if(CollectionUtils.isEmpty(slideIdList)) {
 				return R.ok();
@@ -121,22 +123,24 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			queryMap.put("specialId", specialId);
 			queryMap.put("processFlag", 0);
 			queryMap.put("list", slideIdList);
-			List<AlgorithmImageOut> list = slideMapper.getAlgorithmImage(queryMap);
-			if(CollectionUtils.isNotEmpty(list)){
+			list = slideMapper.getAlgorithmImage(queryMap);
+			/*if(CollectionUtils.isNotEmpty(list)){
 				slideMap = list.stream().collect(Collectors.toMap(AlgorithmImageOut::getSlideId, AlgorithmImageOut::getImageUrl));
-			}
+			}*/
 		}
 		//请求算法处理
-		if(null != slideMap && !slideMap.isEmpty()){
-			for(Map.Entry<Long, String> entry:slideMap.entrySet()){  
-				Long slideId = entry.getKey();
-				String imageUrl = entry.getValue();
+		if(CollectionUtils.isNotEmpty(list)){
+			for(AlgorithmImageOut algorithmImageOut:list){  
+				Long slideId = algorithmImageOut.getSlideId();
+				String imageUrl = algorithmImageOut.getImageUrl();
+				Long imageId = algorithmImageOut.getImageId();
 				if(null != slideId && StringUtils.isNotEmpty(imageUrl)){
 					//				{"slideId":10,"modelName":"脏器识别算法","imageUrl":"C:/Users/86153/Desktop/医疗PD/0320/2_shaowei/ST20Rf-AO-HE-LU-320-1-000020.svs"}
 					Map<String,Object> dataMap = new HashMap<>();
+					dataMap.put("imageId", imageId);
 					dataMap.put("slideId", slideId);
 					dataMap.put("imageUrl", imageUrl);
-					dataMap.put("modelName", CommonConstant.RECOGNITION_MODEL_NAME);
+					dataMap.put("algorithm_name", CommonConstant.RECOGNITION_MODEL_NAME);
 					//请求算法接口
 					try {
 						ResponseEntity<String> resp = restTemplate.postForEntity(algorithmPredictionPath, JSONUtil.toJsonStr(dataMap), String.class);

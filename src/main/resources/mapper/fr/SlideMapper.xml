@@ -80,6 +80,7 @@
     
     <select id="getAlgorithmImage" parameterType="map" resultType="cn.staitech.fr.domain.out.AlgorithmImageOut">
 		SELECT
+			t1.slide_id,
 			t1.image_id,
 			t2.image_url,
 			t2.image_path 
@@ -110,4 +111,39 @@
         where fsl.topic_id= #{topicId}
           and fsl.species_id= #{speciesId}
     </select>
+    
+     <select id="getVerificationSlideListQuery" parameterType="cn.staitech.fr.domain.in.SplitVerificationQueryIn"   resultType="cn.staitech.fr.domain.out.SplitVerificationOut">
+     	SELECT
+     	    t2.file_name, 
+			t1.*
+		FROM
+			fr_slide t1 
+			LEFT JOIN tb_image t2 on t1.image_id = t2.image_id
+		<where>
+			<if test="specialId != null">
+                AND t1.special_id = #{specialId}
+            </if>
+            <if test="animalCode != null">
+                AND t1.animal_code = #{animalCode}
+            </if>
+            <if test="fileName != null">
+                AND t2.file_name = #{fileName}
+            </if>
+            <if test="checkType != null and checkType == 1">
+                AND t1.check_status = 3
+          	 </if>
+          	 <if test="categoryName != null and categoryName != ''">
+                AND t1.organs like concat('%', #{categoryName}, '%')
+            </if>
+            <if test="slideIdList != null and slideIdList.size() >0 ">
+	            AND t1.slide_id in
+	            <foreach item="slideIdList" collection="item" separator="," open="(" close=")" index="">
+	                #{item}
+	            </foreach>
+        	</if>
+		</where>
+				AND t1.process_flag = 2
+				AND t1.check_status > 0 
+		ORDER BY	t1.animal_code asc,t1.check_status desc
+     </select>     
 </mapper>

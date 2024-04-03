@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 /**
 * @author admin
 * @description 针对表【fr_annotation】的数据库操作Mapper
@@ -44,6 +46,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     List<Annotation> selectCategoryList(Annotation annotation);
     
     List<AnnotationCountByCategory> getCategoryCount(Long slideId);
+    
+    List<Annotation> getAnnoListByParm(List<Long> slideIdList);
 
 }
 

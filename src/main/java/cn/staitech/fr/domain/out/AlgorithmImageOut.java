@@ -16,6 +16,8 @@ import lombok.Data;
 public class AlgorithmImageOut {
     @ApiModelProperty(value = "切片ID")
     private Long slideId;
+    @ApiModelProperty(value = "imageId")
+    private Long imageId;
     @ApiModelProperty(value = "图像url地址")
     private String imageUrl;
 //    @ApiModelProperty(value = "图片绝对路径")

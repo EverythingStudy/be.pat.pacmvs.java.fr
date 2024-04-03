@@ -144,10 +144,14 @@
         id,
         ST_AsGeoJSON(contour) as contour
         from fr_annotation
-        where slide_id = #{slideId}
-        <if test="categoryId != null">
-            AND category_id = #{categoryId}
-        </if>
+        <where>
+	        <if test="slideId != null">
+	            AND slide_id = #{slideId}
+	        </if>
+	        <if test="categoryId != null">
+	            AND category_id = #{categoryId}
+	        </if>
+        </where>
     </select>
 
     <select id="mergeContour" parameterType="cn.staitech.fr.domain.Annotation"
@@ -217,5 +221,29 @@
         from fr_annotation t 
         where t.slide_id = #{slideId} 
         GROUP BY t.category_id
+    </select>
+    
+    <select id="getAnnoListByParm"  resultType="cn.staitech.fr.domain.Annotation">
+        SELECT 
+        annotation_id,
+        area,
+        perimeter,
+        description,
+        category_id,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        project_id,
+        slide_id,
+        id
+        <!-- ,contour -->
+        FROM fr_annotation
+        WHERE slide_id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+         </foreach>
     </select>
 </mapper>
