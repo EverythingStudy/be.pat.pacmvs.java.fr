@@ -25,7 +25,7 @@ public class SlideListQueryIn extends PageRequest {
     private String processFlag;
 
     @ApiModelProperty(value = "添加人")
-    private Long createBy;
+    private String createBy;
 
     @ApiModelProperty(value = "添加时间")
     private Map<String, Date> createTimeParams;

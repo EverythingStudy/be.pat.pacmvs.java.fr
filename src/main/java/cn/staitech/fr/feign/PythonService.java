@@ -1,19 +1,22 @@
 package cn.staitech.fr.feign;
 
-import com.alibaba.fastjson2.JSONObject;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @FeignClient(name = "phtyon",url = "${forward.phyonUrl}")
 public interface PythonService {
 
-
-    @PostMapping(value = "/get_label",consumes= MediaType.APPLICATION_JSON_VALUE)
-    JSONObject getLabel(JSONObject labelEntity);
-
-
-
+    @PostMapping(value = "/Generate_thumbnail")
+    void generateThumbnail(
+            @RequestParam("slideId") Long slideId,
+            @RequestParam("categoryId") Long categoryId,
+            @RequestParam("svsPath") String svsPath,
+            @RequestParam("slideRoiPolygon")List<JSONObject> slideRoiPolygon,
+            @RequestParam("types")int types);
 
 
 }

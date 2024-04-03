@@ -69,21 +69,9 @@ public class WaxBlockNumberController {
 
 
     @ApiOperation(value = "蜡块编号表上传")
-    @GetMapping("/upload")
-    public R upload(@RequestParam("file") MultipartFile file,
-                    @RequestParam(value = "organizationId", required = false) @NotNull(message = "机构id不能为空") @ApiParam(name = "organizationId", value = "机构id", required = true) Long organizationId,
-                    @RequestParam(value = "topicId", required = false) @NotNull(message = "专题id不能为空") @ApiParam(name = "topicId", value = "专题id", required = true) Long topicId,
-                    @RequestParam(value = "topicName", required = false) @ApiParam(name = "topicName", value = "专题名称") String topicName,
-                    @RequestParam(value = "speciesId", required = false)  @ApiParam(name = "speciesId", value = "种属id", required = true) String speciesId,
-                    @RequestParam(value = "speciesName", required = false)  @ApiParam(name = "speciesName", value = "种属名称", required = true) String speciesName
-                    ) throws IOException {
-        UploadWaxBlockIn req = new UploadWaxBlockIn();
+    @PostMapping("/upload")
+    public R upload(@RequestParam("file") MultipartFile file,UploadWaxBlockIn req) throws IOException {
         req.setFile(file);
-        req.setOrganizationId(organizationId);
-        req.setTopicId(topicId);
-        req.setTopicName(topicName);
-        req.setSpeciesId(speciesId);
-        req.setSpeciesName(speciesName);
         return waxBlockNumberService.upload(req);
     }
 

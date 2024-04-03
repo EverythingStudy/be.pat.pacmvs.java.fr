@@ -186,6 +186,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         if (special == null) {
             return R.fail("专题不存在，请刷新后重试！");
         }
+        //todo 校验切片
         special.setDelFlag(CommonConstant.NUMBER_1);
         special.setUpdateBy(SecurityUtils.getUserId());
         special.setUpdateTime(new Date());
