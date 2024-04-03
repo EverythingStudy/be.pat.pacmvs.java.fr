@@ -207,8 +207,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (!Optional.ofNullable(image).isPresent()) {
             throw new Exception(MessageSource.M("NODATA"));
         }
-        List<JSONObject> contourList = test111111(annotation.getSlideId(), req.getCategory_id());
-        asyncTask.asyncSave(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1);
+        List<JSONObject> contourList = selectContourList(annotation.getSlideId(), req.getCategory_id());
+        asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1);
         {
             String traceId = req.getTraceId();
             // 撤消,恢复历史记录 用HistoryService会引起循环依赖！ -> 后续在线程池中处理 判断是批处理，还是单独处理
@@ -239,7 +239,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         return annotation.getAnnotationId();
     }
 
-    public List<JSONObject> test111111(Long slideId, Long categoryId) {
+    public List<JSONObject> selectContourList(Long slideId, Long categoryId) {
         QueryWrapper<Annotation> annotationQueryWrapper = new QueryWrapper<>();
         annotationQueryWrapper.eq("slide_id", slideId).eq("category_id", categoryId);
         List<Annotation> annotations = annotationMapper.selectList(annotationQueryWrapper);
@@ -272,14 +272,14 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (!Optional.ofNullable(image).isPresent()) {
             throw new Exception(MessageSource.M("NODATA"));
         }
-        List<JSONObject> contourList = test111111(annotation.getSlideId(), annotation.getCategoryId());
+        List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
         int type;
         if (contourList.size() > 0) {
             type = 1;
         } else {
             type = 2;
         }
-        asyncTask.asyncSave(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type);
+        asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type);
 
         String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
         Boolean isBatch = false;
@@ -392,17 +392,17 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
         NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
 
-        List<JSONObject> contourList = test111111(annotation.getSlideId(), annotation.getCategoryId());
+        List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
         int type;
         if (contourList.size() > 0) {
             type = 1;
         } else {
             type = 2;
         }
-        asyncTask.asyncSave(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type);
+        asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type);
         // 改之后数据
-        List<JSONObject> contourListAfter = test111111(annotation.getSlideId(), annotation.getCategoryId());
-        asyncTask.asyncSave(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourListAfter, 1);
+        List<JSONObject> contourListAfter = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
+        asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourListAfter, 1);
         return annotation.getAnnotationId();
     }
 
@@ -570,8 +570,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), JSON.parseObject(annotation1.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
         NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
-        List<JSONObject> contourList = test111111(annotation.getSlideId(), annotation.getCategoryId());
-        asyncTask.asyncSave(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, 1);
+        List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
+        asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, 1);
 
 
         {
