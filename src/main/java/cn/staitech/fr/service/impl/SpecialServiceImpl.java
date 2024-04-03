@@ -26,6 +26,7 @@ import cn.staitech.fr.service.GroupService;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.SpecialRecyclingService;
 import cn.staitech.fr.service.SpecialService;
+import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.system.api.domain.SysUser;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -203,6 +204,14 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     @Override
     public R editSpecialStatus(EditSpecialStatusIn req) {
         log.info("专题状态按钮接口开始：");
+        //启动条件判断
+        LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Slide::getSpecialId,req.getSpecialId());
+        wrapper.ne(Slide::getCheckStatus,1);
+        List<Slide> slideList = slideService.list(wrapper);
+        if(CollectionUtils.isNotEmpty(slideList)){
+            return R.fail(MessageSource.M("REMOVE_SPECIAL_ERROR"));
+        }
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         Special special = new Special();
         special.setSpecialId(req.getSpecialId());
