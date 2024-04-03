@@ -76,6 +76,16 @@ public class Slide implements Serializable {
      */
     private Date checkTime;
     
+    /**
+     * 启动者
+     */
+    private Long initiateBy;
+
+    /**
+     * 启动时间
+     */
+    private Date initiateTime;
+    
     
     /**
      * 创建者
@@ -124,6 +134,11 @@ public class Slide implements Serializable {
             && (this.getCreateBy() == null ? other.getCreateBy() == null : this.getCreateBy().equals(other.getCreateBy()))
             && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
             && (this.getUpdateBy() == null ? other.getUpdateBy() == null : this.getUpdateBy().equals(other.getUpdateBy()))
+            && (this.getCheckStatus() == null ? other.getCheckStatus() == null : this.getCheckStatus().equals(other.getCheckStatus()))
+            && (this.getCheckBy() == null ? other.getCheckBy() == null : this.getCheckBy().equals(other.getCheckBy()))
+            && (this.getCheckTime() == null ? other.getCheckTime() == null : this.getCheckTime().equals(other.getCheckTime()))
+            && (this.getInitiateBy() == null ? other.getInitiateBy() == null : this.getInitiateBy().equals(other.getInitiateBy()))
+            && (this.getInitiateTime() == null ? other.getInitiateTime() == null : this.getInitiateTime().equals(other.getInitiateTime()))
             && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()));
     }
 
@@ -144,6 +159,11 @@ public class Slide implements Serializable {
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
         result = prime * result + ((getUpdateBy() == null) ? 0 : getUpdateBy().hashCode());
         result = prime * result + ((getUpdateTime() == null) ? 0 : getUpdateTime().hashCode());
+        result = prime * result + ((getCheckStatus() == null) ? 0 : getCheckStatus().hashCode());
+        result = prime * result + ((getCheckBy() == null) ? 0 : getCheckBy().hashCode());
+        result = prime * result + ((getCheckTime() == null) ? 0 : getCheckTime().hashCode());
+        result = prime * result + ((getInitiateBy() == null) ? 0 : getInitiateBy().hashCode());
+        result = prime * result + ((getInitiateTime() == null) ? 0 : getInitiateTime().hashCode());
         return result;
     }
 
@@ -166,8 +186,14 @@ public class Slide implements Serializable {
         sb.append(", createTime=").append(createTime);
         sb.append(", updateBy=").append(updateBy);
         sb.append(", updateTime=").append(updateTime);
+        sb.append(", checkStatus=").append(checkStatus);
+        sb.append(", checkBy=").append(checkBy);
+        sb.append(", checkStatus=").append(checkStatus);
+        sb.append(", initiateBy=").append(initiateBy);
+        sb.append(", initiateTime=").append(initiateTime);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
     }
+
 }

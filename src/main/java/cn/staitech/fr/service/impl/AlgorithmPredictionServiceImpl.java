@@ -27,6 +27,7 @@ import cn.hutool.core.thread.ExecutorBuilder;
 import cn.hutool.json.JSONUtil;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.redis.service.RedisService;
+import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Slide;
@@ -149,6 +150,8 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 							slide.setSlideId(slideId);
 							//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
 							slide.setProcessFlag(1);
+							slide.setInitiateBy(SecurityUtils.getLoginUser().getSysUser().getUserId());
+							slide.setInitiateTime(new Date());
 							slideService.updateById(slide);
 						}
 					} catch (Exception e) {
