@@ -1,5 +1,8 @@
 package cn.staitech.fr.controller;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+
 import javax.annotation.Resource;
 
 import org.springframework.validation.annotation.Validated;
@@ -8,11 +11,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cn.hutool.core.thread.ExecutorBuilder;
 import cn.hutool.json.JSONUtil;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.domain.in.AlgorithmAnnIn;
 import cn.staitech.fr.domain.in.DefinitionIn;
+import cn.staitech.fr.service.AlgorithmPredictionService;
 import cn.staitech.fr.service.ImageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -32,15 +37,19 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/algorithmCallBack")
 public class AlgorithmCallBackController {
 
+    private static final ExecutorService EXECUTOR = ExecutorBuilder.create().setCorePoolSize(Runtime.getRuntime().availableProcessors()).setMaxPoolSize(Runtime.getRuntime().availableProcessors() * 2).setKeepAliveTime(0).setWorkQueue(new LinkedBlockingQueue<Runnable>(4096)).build();
 
     @Resource
     private ImageService imageService;
+    
+    @Resource
+    private AlgorithmPredictionService algorithmPredictionService;
 
     @ApiOperation(value = "清晰度回调")
     @PostMapping("/verification")
     public R verification(@Validated @RequestBody DefinitionIn req) {
     	if (null != req) {
-    		log.info("清晰度算法回调,result：{},完整数据是：{}",JSONUtil.toJsonStr(req));
+    		log.info("清晰度算法回调,完整数据是：{}",JSONUtil.toJsonStr(req));
     		Long imageId = req.getImageId();
     		//AI分析状态：0:待分析（初始状态）、1:AI分析中、2:AI分析成功、3:AI分析失败 4：部分分析成功
     		int aiAnalyzed = req.getAiAnalyzed();
@@ -63,11 +72,10 @@ public class AlgorithmCallBackController {
 	@ApiOperation(value = "脏器识别回调")
 	@PostMapping("/recognition")
 	public R recognition(@Validated @RequestBody AlgorithmAnnIn  algorithmAnnIn) throws Exception {
-		log.info("脏器识别算法回调专题id:{},specialImageId：{},完整数据是：{}",algorithmAnnIn.getSpecialId(),algorithmAnnIn.getSpecialImageId(),JSONUtil.toJsonStr(algorithmAnnIn));
-		//specialImageAnnoService.callBackAnnoResult(algorithmAnnIn);
+		log.info("脏器识别算法回调专题,完整数据是：{}",JSONUtil.toJsonStr(algorithmAnnIn));
+		// 多线程处理
+        algorithmPredictionService.recognition(algorithmAnnIn);
 		return R.ok();
 	}
-
-
-
+    
 }

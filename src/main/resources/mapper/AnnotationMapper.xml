@@ -211,4 +211,11 @@
           AND category_id != 0
         GROUP BY category_id
     </select>
+    
+     <select id="getCategoryCount" parameterType="java.lang.Long" resultType="cn.staitech.fr.vo.annotation.AnnotationCountByCategory">
+        select t.category_id,count(1) total_count 
+        from fr_annotation t 
+        where t.slide_id = #{slideId} 
+        GROUP BY t.category_id
+    </select>
 </mapper>

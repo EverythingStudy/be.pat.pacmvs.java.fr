@@ -10,6 +10,7 @@ import cn.staitech.fr.utils.MarkingUtils;
 import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.fr.utils.WktUtil;
 import cn.staitech.fr.vo.annotation.AnnotationById;
+import cn.staitech.fr.vo.annotation.AnnotationCountByCategory;
 import cn.staitech.fr.vo.annotation.AnnotationSelectList;
 import cn.staitech.fr.vo.annotation.MarkingMerge;
 import cn.staitech.fr.vo.geojson.Features;
@@ -446,6 +447,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         asyncTask.asyncSave(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(),contourList,1);
         return JSON.parseObject(annotation1.getContour());
     }
+
+	@Override
+	public List<AnnotationCountByCategory> getCategoryCount(Long slideId) {
+		List<AnnotationCountByCategory> list = annotationMapper.getCategoryCount(slideId);
+		return list;
+	}
 
 }
 

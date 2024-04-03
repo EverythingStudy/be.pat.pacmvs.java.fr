@@ -1,6 +1,9 @@
 package cn.staitech.fr.service;
 
 import cn.staitech.fr.domain.Category;
+
+import java.util.Map;
+
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -9,5 +12,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 * @createDate 2024-03-29 10:08:34
 */
 public interface CategoryService extends IService<Category> {
-
+	 Map<Long, String> getCategory();
 }

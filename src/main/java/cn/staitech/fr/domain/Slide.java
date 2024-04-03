@@ -62,6 +62,22 @@ public class Slide implements Serializable {
     private Integer processFlag;
 
     /**
+     * 核对状态 0：初始 1：正确 2：错误 3：修正正常
+     */
+    private Integer checkStatus;
+    
+    /**
+     * 核对者
+     */
+    private Long checkBy;
+    
+    /**
+     * 核对时间
+     */
+    private Date checkTime;
+    
+    
+    /**
      * 创建者
      */
     private Long createBy;

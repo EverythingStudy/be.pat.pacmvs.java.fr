@@ -1,6 +1,7 @@
 package cn.staitech.fr.mapper;
 
 import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.vo.annotation.AnnotationCountByCategory;
 import cn.staitech.fr.vo.annotation.MarkingMerge;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -41,6 +42,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     int updateById(Annotation annotation);
 
     List<Annotation> selectCategoryList(Annotation annotation);
+    
+    List<AnnotationCountByCategory> getCategoryCount(Long slideId);
 
 }
 

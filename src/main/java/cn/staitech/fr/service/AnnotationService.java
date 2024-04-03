@@ -2,6 +2,7 @@ package cn.staitech.fr.service;
 
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.vo.annotation.AnnotationById;
+import cn.staitech.fr.vo.annotation.AnnotationCountByCategory;
 import cn.staitech.fr.vo.annotation.AnnotationSelectList;
 import cn.staitech.fr.vo.annotation.MarkingMerge;
 import cn.staitech.fr.vo.geojson.Features;
@@ -30,8 +31,8 @@ public interface AnnotationService extends IService<Annotation> {
     int stickup(AnnotationById req) throws Exception;
     JSONObject markingMerge(MarkingMerge req) throws Exception;
 
-
-
     JSONObject updateOperation(UpdateOperationIn req, String traceId, Boolean isBatch) throws Exception;
+    
+    List<AnnotationCountByCategory> getCategoryCount(Long slideId);
 
 }

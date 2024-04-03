@@ -1,6 +1,7 @@
 package cn.staitech.fr.service;
 
 import cn.staitech.common.core.domain.R;
+import cn.staitech.fr.domain.in.AlgorithmAnnIn;
 import cn.staitech.fr.domain.in.StartPredictionIn;
 
 /**
@@ -13,5 +14,5 @@ import cn.staitech.fr.domain.in.StartPredictionIn;
 public interface AlgorithmPredictionService {
 
     R startPrediction(StartPredictionIn req);
-
+    void recognition(AlgorithmAnnIn  algorithmAnnIn);
 }

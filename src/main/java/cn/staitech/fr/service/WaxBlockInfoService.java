@@ -17,4 +17,6 @@ import java.util.List;
 public interface WaxBlockInfoService extends IService<WaxBlockInfo> {
 
     R<List<WaxBlockInfo>> waxPreview(Long id);
+    
+    List<WaxBlockInfo> getWaxBlockInfoList (Long slideId,String waxCode);
 }

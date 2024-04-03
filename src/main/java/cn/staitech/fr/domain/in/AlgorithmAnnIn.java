@@ -9,7 +9,7 @@ import lombok.Data;
 
 @Data
 public class AlgorithmAnnIn{
-	@ApiModelProperty(name = "specialId" , value = "专题ID")
+	/*@ApiModelProperty(name = "specialId" , value = "专题ID")
 	@NotNull(message = "专题id不能为空")
 	private Long specialId;
     
@@ -22,6 +22,8 @@ public class AlgorithmAnnIn{
 	private Long imageId;
 	
 	@ApiModelProperty(name = "geometryList" , value = "标注信息")
-	private List<AlgorithmGeometry> geometryList;
+	private List<AlgorithmGeometry> geometryList;*/
+	@ApiModelProperty(name = "slideIdList" , value = "切片id")
+	private List<Long> slideIdList;
 }
 

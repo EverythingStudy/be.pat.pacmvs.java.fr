@@ -1,9 +1,13 @@
 package cn.staitech.fr.service.impl;
 
 import java.text.NumberFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -17,15 +21,27 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
+import cn.hutool.core.thread.ExecutorBuilder;
 import cn.hutool.json.JSONUtil;
 import cn.staitech.common.core.domain.R;
+import cn.staitech.common.redis.service.RedisService;
+import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.WaxBlockInfo;
+import cn.staitech.fr.domain.in.AlgorithmAnnIn;
 import cn.staitech.fr.domain.in.StartPredictionIn;
 import cn.staitech.fr.domain.out.AlgorithmImageOut;
+import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.service.AlgorithmPredictionService;
+import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.service.SlideService;
+import cn.staitech.fr.service.WaxBlockInfoService;
+import cn.staitech.fr.service.WaxBlockNumberService;
+import cn.staitech.fr.vo.annotation.AnnotationCountByCategory;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -39,6 +55,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionService {
 
+	private static final ExecutorService EXECUTOR = ExecutorBuilder.create().setCorePoolSize(Runtime.getRuntime().availableProcessors()).setMaxPoolSize(Runtime.getRuntime().availableProcessors() * 2).setKeepAliveTime(0).setWorkQueue(new LinkedBlockingQueue<Runnable>(4096)).build();
+
+
 	@Resource
 	private SlideService slideService;
 
@@ -48,7 +67,23 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	@Autowired
 	private RestTemplate restTemplate;
 
-	@Value("${algorithmPredictionPath}")
+	@Resource
+	private AnnotationMapper annotationMapper;
+
+	@Resource
+	private AnnotationService annotationService;
+
+	@Resource
+	private WaxBlockInfoService waxBlockInfoService;
+
+	@Resource
+	private WaxBlockNumberService waxBlockNumberService;
+
+	@Resource
+	private RedisService redisService;
+
+
+	@Value("${frinspection.algorithmPredictionPath}")
 	private String algorithmPredictionPath;
 
 	public static String geNumber(Long organizationId) {
@@ -74,7 +109,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			queryMap.put("processFlag", 0);
 			List<AlgorithmImageOut> list = slideMapper.getAlgorithmImage(queryMap);
 			if(CollectionUtils.isNotEmpty(list)){
-				 slideMap = list.stream().collect(Collectors.toMap(AlgorithmImageOut::getSlideId, AlgorithmImageOut::getImageUrl));
+				slideMap = list.stream().collect(Collectors.toMap(AlgorithmImageOut::getSlideId, AlgorithmImageOut::getImageUrl));
 			}
 		}else{
 			if(CollectionUtils.isEmpty(slideIdList)) {
@@ -87,7 +122,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			queryMap.put("list", slideIdList);
 			List<AlgorithmImageOut> list = slideMapper.getAlgorithmImage(queryMap);
 			if(CollectionUtils.isNotEmpty(list)){
-				 slideMap = list.stream().collect(Collectors.toMap(AlgorithmImageOut::getSlideId, AlgorithmImageOut::getImageUrl));
+				slideMap = list.stream().collect(Collectors.toMap(AlgorithmImageOut::getSlideId, AlgorithmImageOut::getImageUrl));
 			}
 		}
 		//请求算法处理
@@ -120,11 +155,159 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 						e.printStackTrace();
 						log.error("AI算法请求失败,切片id是{}",slideId);
 					}finally {
-						
+
 					}
 				}
 			}
 		}
 		return R.ok();
 	}
+
+
+	@Override
+	public void recognition(AlgorithmAnnIn algorithmAnnIn) {
+		EXECUTOR.submit(new RecognitionThread(algorithmAnnIn));
+	}
+
+
+	class RecognitionThread implements Runnable {
+		// type 1:标注保存  2：标注修改
+		private final AlgorithmAnnIn  algorithmAnnIn;
+
+		public RecognitionThread(AlgorithmAnnIn  algorithmAnnIn) {
+			this.algorithmAnnIn = algorithmAnnIn;
+		}
+
+		@Override
+		public void run() {
+			try {
+				process(this.algorithmAnnIn);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+
+	public void process(AlgorithmAnnIn  algorithmAnnIn) throws Exception {
+		Long startTime = System.currentTimeMillis();
+		List<Long> slideIdList = algorithmAnnIn.getSlideIdList();
+		if(CollectionUtils.isNotEmpty(slideIdList)){
+			// 查询切片列表  
+			QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
+			queryWrapper.in("slide_id", slideIdList);
+			List<Slide> slideList = slideMapper.selectList(queryWrapper);
+			//			List<Slide> slideList = slideService.list(queryWrapper);
+			//1、拆分核对操作
+			if(CollectionUtils.isNotEmpty(slideList)){
+				//直接遍历fileList即可
+				for (Slide slide : slideList) {
+					checkSlide(slide);
+				}
+			}
+			log.info("AsyncSave-Time-Consuming : {} ms", System.currentTimeMillis() - startTime);
+		}
+	}
+
+
+	public void checkSlide(Slide slide) {
+		//专题id
+		Long specialId = slide.getSpecialId();
+		Long slideId = slide.getSlideId();
+		//蜡块编号
+		String waxCode = slide.getWaxCode();
+
+		Map<String,Integer> waxDataMap = new HashMap<String, Integer>();
+		int waxDataMapSize = 0;
+		String cacheKey = CommonConstant.WAX_BLOCK_INFO+specialId+"_"+waxCode;
+		waxDataMap = redisService.getCacheObject(cacheKey);
+
+		if (null == waxDataMap || waxDataMap.isEmpty()) {
+			//查询所属蜡块完整信息
+			List<WaxBlockInfo> waxinfoList = waxBlockInfoService.getWaxBlockInfoList(slideId, waxCode);
+			//处理蜡块信息
+			if(CollectionUtils.isNotEmpty(waxinfoList)){
+				for(WaxBlockInfo info:waxinfoList){
+					String organName = info.getOrganName();
+					Integer organNumber = info.getOrganNumber();
+					waxDataMap.put(organName, organNumber);
+				}
+				waxDataMapSize = waxDataMap.size();
+				redisService.setCacheObject(cacheKey,waxDataMap, 24L, TimeUnit.HOURS);
+			}
+		}
+
+		if(null != waxDataMap && !waxDataMap.isEmpty()){
+			//查询所属切片AI脏器信息
+			Map<String,Integer> slideCountMap = new HashMap<String, Integer>();
+			int slideCountSize = 0;
+
+			List<AnnotationCountByCategory>  countList = annotationMapper.getCategoryCount(slideId);
+			if(CollectionUtils.isNotEmpty(countList)){
+				for(AnnotationCountByCategory annotationCount:countList){
+					Long categoryId = annotationCount.getCategoryId();
+					int categoryCount = annotationCount.getTotalCount();
+					//标签id转为名称
+					String categoryFullName = MapConstant.getCategory(categoryId);
+					if(StringUtils.isNotEmpty(categoryFullName)){
+						slideCountMap.put(categoryFullName, categoryCount);
+					}
+				}
+				slideCountSize = slideCountMap.size();
+
+
+				//对比处理 
+				//核对状态 0：初始 1：正确 2：错误 3：修正正常
+				int checkStatus = 0;
+				if(waxDataMapSize != slideCountSize){
+					checkStatus = 2;
+				}else{
+					//遍历蜡块==》
+					boolean slideTag = true;
+					for(Map.Entry<String, Integer> entry:waxDataMap.entrySet()){
+						String organName = entry.getKey();
+						Integer organNumber = entry.getValue();
+						boolean tag = containsOrgan(organName, organNumber, slideCountMap);
+						if(!tag){
+							slideTag = false;
+							checkStatus = 2;
+							break;
+						}
+					}
+					//全部匹配成功
+					if(slideTag){
+						checkStatus = 1;
+					}
+					//更新checkStatus
+					Slide updateSlide = new Slide();
+					updateSlide.setSlideId(slideId);
+					updateSlide.setCheckStatus(checkStatus);
+					updateSlide.setCheckBy(0l);
+					updateSlide.setCheckTime(new Date());
+					//					annotationMapper.updateById(updateSlide);
+					slideMapper.updateById(updateSlide);
+				}
+			}
+		}
+	}
+
+	//模糊匹配，判断是否包括该脏器
+	private boolean containsOrgan(String organName,int organNumber,Map<String,Integer> slideCountMap){
+		boolean containsValue  = false;
+		for(Map.Entry<String, Integer> entry:slideCountMap.entrySet()){
+			String slideOrganName = entry.getKey();
+			int slideOrganNumber = entry.getValue();
+			//模糊匹配
+			if (organName.contains(slideOrganName)) {
+				//数量相等
+				if (organNumber == slideOrganNumber) {
+					containsValue = true;
+					break;
+				}
+			}
+		}
+		return containsValue ;
+	}
+
+
 }
