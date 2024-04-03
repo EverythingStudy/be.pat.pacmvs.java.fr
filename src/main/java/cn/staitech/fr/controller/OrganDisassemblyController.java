@@ -8,12 +8,10 @@ import cn.staitech.fr.service.OrganDisassemblyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author wmy
@@ -33,6 +31,12 @@ public class OrganDisassemblyController {
     public R<PageResponse<OrganDisassemblyOut>> list(@Validated @RequestBody OrganDisassemblyQueryIn req) {
         PageResponse<OrganDisassemblyOut> page = organDisassemblyService.getList(req);
         return R.ok(page);
+    }
+
+    @ApiOperation(value = "原始切片-导出按钮")
+    @GetMapping("/export")
+    public void export(@RequestParam(value = "imageIds") List<Long> imageIds) throws Exception {
+        organDisassemblyService.export(imageIds);
     }
 
 }
