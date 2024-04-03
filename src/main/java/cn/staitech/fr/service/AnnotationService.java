@@ -1,6 +1,7 @@
 package cn.staitech.fr.service;
 
 import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.history.HistoryDTO;
 import cn.staitech.fr.vo.annotation.AnnotationById;
 import cn.staitech.fr.vo.annotation.AnnotationCountByCategory;
 import cn.staitech.fr.vo.annotation.AnnotationSelectList;
@@ -34,5 +35,15 @@ public interface AnnotationService extends IService<Annotation> {
     JSONObject updateOperation(UpdateOperationIn req, String traceId, Boolean isBatch) throws Exception;
     
     List<AnnotationCountByCategory> getCategoryCount(Long slideId);
+
+    Boolean undo(HistoryDTO dto);
+
+    Boolean redo(HistoryDTO dto);
+
+    Annotation deleteByHistory(Long annotationId) throws Exception;
+
+    Annotation insertByHistory(Annotation annotation);
+
+    Annotation updateOperationByHistory(Annotation annotation);
 
 }
