@@ -7,6 +7,7 @@ import cn.staitech.fr.domain.out.AlgorithmImageOut;
 import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 
 /**
@@ -29,6 +30,8 @@ public interface SlideMapper extends BaseMapper<Slide> {
     List<AlgorithmImageOut> getAlgorithmImage(Map<String,Object> queryMap);
 
     List<SlideListQueryOut> slideListQuery(SlideListQueryIn req);
+
+    List<Slide> selectListByWax(@Param("topicId") Long topicId, @Param("speciesId")String speciesId);
 }
 
 

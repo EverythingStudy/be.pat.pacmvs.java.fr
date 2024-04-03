@@ -6,6 +6,7 @@ import cn.staitech.common.core.utils.bean.BeanUtils;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Organ;
+import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Species;
 import cn.staitech.fr.domain.Topic;
 import cn.staitech.fr.domain.WaxBlockInfo;
@@ -14,6 +15,7 @@ import cn.staitech.fr.domain.in.UploadWaxBlockIn;
 import cn.staitech.fr.domain.in.WaxBlockNumberEditIn;
 import cn.staitech.fr.domain.in.WaxBlockNumberListIn;
 import cn.staitech.fr.domain.out.WaxBlockNumberListOut;
+import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.WaxBlockNumberMapper;
 import cn.staitech.fr.service.OrganService;
 import cn.staitech.fr.service.SpeciesService;
@@ -26,7 +28,6 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -35,12 +36,12 @@ import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -48,7 +49,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -72,6 +72,11 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
     private OrganService organService;
     @Autowired
     private WaxBlockInfoService waxBlockInfoService;
+    @Resource
+    private SlideMapper slideMapper;
+
+    @Value("${waxPath}")
+    private  String waxPath;
 
     @Override
     public PageResponse<WaxBlockNumberListOut> getWaxList(WaxBlockNumberListIn req) {
@@ -127,7 +132,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         if (waxList.size() > 0) {
             return R.fail("该专题下已经存在蜡块编号信息，请勿重复导入");
         }
-        File file1 = new File("D:/words");
+        File file1 = new File(waxPath);
         FileUtils.copyInputStreamToFile(req.getFile().getInputStream(), file1);
         FileInputStream fis = new FileInputStream(file1);
         XWPFDocument document = new XWPFDocument(fis);
@@ -233,7 +238,22 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         }
         fis.close();
         waxBlockInfoService.saveBatch(insertList);
-        return R.ok();
+        //判断切片回写
+        List<Slide> slideList=slideMapper.selectListByWax(req.getTopicId(),req.getSpeciesId());
+        if(CollectionUtils.isNotEmpty(slideList)&&CollectionUtils.isNotEmpty(insertList)){
+            Map<String, List<WaxBlockInfo>> collect = insertList.stream().collect(Collectors.groupingBy(WaxBlockInfo::getWaxCode));
+            for (Slide slide : slideList) {
+                if(!collect.containsKey(slide.getWaxCode())){
+                    continue;
+                }
+                List<WaxBlockInfo> waxBlockInfoList = collect.get(slide.getWaxCode());
+                String collect1 = waxBlockInfoList.stream().map(e -> e.getOrganName()).collect(Collectors.joining(","));
+                log.info("脏器名称：{}",collect1);
+                slide.setOrgans(collect1);
+                slideMapper.updateById(slide);
+            }
+        }
+             return R.ok();
     }
 
     private void extracted(WaxBlockInfo waxBlockInfo1, Map<String, String> organList, List<WaxBlockInfo> insertList, String s2, String genderFlag) {

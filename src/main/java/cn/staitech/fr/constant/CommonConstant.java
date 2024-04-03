@@ -138,6 +138,7 @@ public class CommonConstant {
      */
     public static final Integer PROJECT_NUMBER_LIMIT = 10;
     public static final Integer TABLE_RECORD_LIMIT = 10000000;
+    public static final String ANNO_TYPE_DRAW = "Draw";
 
     private CommonConstant() {
         throw new IllegalStateException("CommonConstant class");
