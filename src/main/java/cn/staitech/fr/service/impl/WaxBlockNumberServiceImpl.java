@@ -22,6 +22,7 @@ import cn.staitech.fr.service.SpeciesService;
 import cn.staitech.fr.service.TopicService;
 import cn.staitech.fr.service.WaxBlockInfoService;
 import cn.staitech.fr.service.WaxBlockNumberService;
+import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.system.api.domain.SysUser;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -76,7 +77,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
     private SlideMapper slideMapper;
 
     @Value("${waxPath}")
-    private  String waxPath;
+    private String waxPath;
 
     @Override
     public PageResponse<WaxBlockNumberListOut> getWaxList(WaxBlockNumberListIn req) {
@@ -130,9 +131,12 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         queryWrapper.eq(WaxBlockNumber::getOrganizationId, SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
         List<WaxBlockNumber> waxList = list(queryWrapper);
         if (waxList.size() > 0) {
-            return R.fail("该专题下已经存在蜡块编号信息，请勿重复导入");
+            return R.fail(MessageSource.M("TOPIC_EXIST_WAX"));
         }
         File file1 = new File(waxPath);
+        if (!file1.exists()) {
+            file1.mkdirs();
+        }
         FileUtils.copyInputStreamToFile(req.getFile().getInputStream(), file1);
         FileInputStream fis = new FileInputStream(file1);
         XWPFDocument document = new XWPFDocument(fis);
@@ -148,7 +152,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         log.info("专题号：{}", topicName);
         Topic topic = getTopic(topicName);
         if (ObjectUtils.isEmpty(topic)) {
-            return R.fail("上传文件专题不存在！");
+            return R.fail(MessageSource.M("UPLOAD_FILE_NOT_EXIST_TOPIC"));
         }
 
         //种属
@@ -157,7 +161,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         log.info("种属：{}", speciesName);
         Species species = getSpecies(speciesName);
         if (ObjectUtils.isEmpty(species)) {
-            return R.fail("上传文件种属不存在！");
+            return R.fail(MessageSource.M("UPLOAD_FILE_NOT_EXIST_SPECIES"));
         }
         WaxBlockNumber waxBlockNumber = getWaxBlockNumber(req, topic, species);
         this.baseMapper.insert(waxBlockNumber);
@@ -170,7 +174,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         List<String> sexList = new ArrayList<>();
 
         if (CollectionUtils.isEmpty(rows)) {
-            return R.fail("文件内容为空！");
+            return R.fail(MessageSource.M("UPLOAD_FILE_IS_NULL"));
         }
         //查询所有脏器
         Map<String, String> organList = extracted(species.getSpeciesId());
@@ -189,7 +193,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
             }
             String[] split = s1.split("\\|");
             if (split.length == 0) {
-                return R.fail("文件内容格式错误！");
+                return R.fail(MessageSource.M("FILE_FORMART_ERROR"));
             } else if (split.length == 2) {
                 if (s1.contains(CommonConstant.MALE_FLAG)) {
                     if (CommonConstant.MALE.equals(split[0].trim())) {
@@ -215,7 +219,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
                 }
             } else {
                 if (split.length != 4) {
-                    return R.fail("文件内容格式错误！");
+                    return R.fail(MessageSource.M("FILE_FORMART_ERROR"));
                 }
                 String[] split1 = split[1].trim().split(CommonConstant.SEMICOLON_FLAG);
                 for (String s2 : split1) {
@@ -239,21 +243,21 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         fis.close();
         waxBlockInfoService.saveBatch(insertList);
         //判断切片回写
-        List<Slide> slideList=slideMapper.selectListByWax(req.getTopicId(),req.getSpeciesId());
-        if(CollectionUtils.isNotEmpty(slideList)&&CollectionUtils.isNotEmpty(insertList)){
+        List<Slide> slideList = slideMapper.selectListByWax(req.getTopicId(), req.getSpeciesId());
+        if (CollectionUtils.isNotEmpty(slideList) && CollectionUtils.isNotEmpty(insertList)) {
             Map<String, List<WaxBlockInfo>> collect = insertList.stream().collect(Collectors.groupingBy(WaxBlockInfo::getWaxCode));
             for (Slide slide : slideList) {
-                if(!collect.containsKey(slide.getWaxCode())){
+                if (!collect.containsKey(slide.getWaxCode())) {
                     continue;
                 }
                 List<WaxBlockInfo> waxBlockInfoList = collect.get(slide.getWaxCode());
                 String collect1 = waxBlockInfoList.stream().map(e -> e.getOrganName()).collect(Collectors.joining(","));
-                log.info("脏器名称：{}",collect1);
+                log.info("脏器名称：{}", collect1);
                 slide.setOrgans(collect1);
                 slideMapper.updateById(slide);
             }
         }
-             return R.ok();
+        return R.ok();
     }
 
     private void extracted(WaxBlockInfo waxBlockInfo1, Map<String, String> organList, List<WaxBlockInfo> insertList, String s2, String genderFlag) {
@@ -268,6 +272,9 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         log.info("脏器数量+):{}", s4);
         String s5 = StringUtils.substringBeforeLast(s4, CommonConstant.CODE_END);
         log.info("脏器数量:{}", s5);
+        if (!s5.matches("^[0-9]+$")) {
+            throw new RuntimeException(MessageSource.M("FILE_ORGAN_NUMBER_ERROR"));
+        }
         String s6 = StringUtils.substringAfterLast(s2, part);
         log.info("脏器英文+数量:{}", s6);
         String s7 = StringUtils.substringBeforeLast(s6, CommonConstant.CODE_START);

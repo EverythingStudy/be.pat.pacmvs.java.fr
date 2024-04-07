@@ -211,7 +211,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         wrapper.ne(Slide::getCheckStatus,1);
         List<Slide> slideList = slideService.list(wrapper);
         if(CollectionUtils.isNotEmpty(slideList)){
-            return R.fail(MessageSource.M("REMOVE_SPECIAL_ERROR"));
+            return R.fail(MessageSource.M("START_SPECIAL_ERROR"));
         }
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         Special special = new Special();
