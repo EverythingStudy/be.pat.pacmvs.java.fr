@@ -85,7 +85,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         List<Features> featuresList = new ArrayList<>();
         for (Annotation annotation : annotations) {
             Features features = new Features();
-            features.setGeometry(JSON.parseObject(annotation.getContour()));
+            features.setGeometry(JSONObject.parseObject(annotation.getContour()));
             features.setId(null);
             features.setType("Feature");
             JSONObject jsonObject = (JSONObject) JSON.toJSON(getProperties(annotation));
@@ -198,7 +198,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotationMapper.insert(annotation);
         Annotation annotationBy = annotationMapper.selectById(annotation);
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBy);
-        Features features = socketData(annotation.getId(), JSON.parseObject(annotationBy.getContour()), properties);
+        Features features = socketData(annotation.getId(), JSONObject.parseObject(annotationBy.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(ADD_STATUS, features);
         NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
         Slide slide = slideMapper.selectById(req.getSlide_id());
@@ -240,11 +240,11 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     public List<JSONObject> selectContourList(Long slideId, Long categoryId) {
         QueryWrapper<Annotation> annotationQueryWrapper = new QueryWrapper<>();
-        annotationQueryWrapper.eq("slide_id", slideId).eq("category_id", categoryId);
+        annotationQueryWrapper.select("ST_AsGeoJSON(contour) AS contour").eq("slide_id", slideId).eq("category_id", categoryId);
         List<Annotation> annotations = annotationMapper.selectList(annotationQueryWrapper);
         List<JSONObject> contourList = new ArrayList<>();
         for (Annotation annotation1 : annotations) {
-            contourList.add(JSON.parseObject(annotation1.getContour()));
+            contourList.add(JSONObject.parseObject(annotation1.getContour()));
         }
         return contourList;
     }
@@ -262,7 +262,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBy);
-        Features features = socketData(annotationBy.getId(), JSON.parseObject(annotationBy.getContour()), properties);
+        Features features = socketData(annotationBy.getId(), JSONObject.parseObject(annotationBy.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(DELETE_STATUS, features);
         NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
         annotationMapper.deleteById(annotation);
@@ -448,11 +448,11 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             rocksdbService.submitTask(traceId, String.valueOf(annotationBy.getAnnotationId()), annotationBy);
         }
 
-        JSONObject geometryJson = MarkingUtils.padding(JSON.parseObject(annotationBy.getContour()));
+        JSONObject geometryJson = MarkingUtils.padding(JSONObject.parseObject(annotationBy.getContour()));
         Annotation annotation = new Annotation();
         annotation.setAnnotationId(req.getMarking_id());
         annotation.setContour(String.valueOf(geometryJson));
-        Geometry geometry = WKT_READER.read(MarkingUtils.jsonToWkt(JSON.parseObject(annotation.getContour())));
+        Geometry geometry = WKT_READER.read(MarkingUtils.jsonToWkt(JSONObject.parseObject(annotation.getContour())));
         Slide slide = slideMapper.selectById(slideId);
         Image image = imageMapper.selectById(slide.getImageId());
         if (!Optional.ofNullable(image).isPresent()) {
@@ -487,7 +487,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         int res = annotationMapper.insert(annotation);
         Annotation annotationBys = annotationMapper.selectById(annotations);
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBys);
-        Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), JSON.parseObject(annotation.getContour()), properties);
+        Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), JSONObject.parseObject(annotation.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(ADD_STATUS, features);
         NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
         return res;
@@ -498,12 +498,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         List<Annotation> annotationList = annotationMapper.selectInList(req);
         List<Geometry> geometryList = new ArrayList<>();
         for (Annotation annotation : annotationList) {
-            Geometry geometry = WKT_READER.read(MarkingUtils.jsonToWkt(JSON.parseObject(annotation.getContour())));
+            Geometry geometry = WKT_READER.read(MarkingUtils.jsonToWkt(JSONObject.parseObject(annotation.getContour())));
             geometryList.add(geometry);
         }
         if (geometryList.size() > 0) {
             if (geometryList.size() == 1) {
-                return JSON.parseObject(annotationList.get(0).getContour());
+                return JSONObject.parseObject(annotationList.get(0).getContour());
             }
             Geometry geometry = null;
             for (int i = 0; i < geometryList.size(); i++) {
@@ -535,7 +535,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (!Optional.ofNullable(annotation).isPresent()) {
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }
-        boolean res = MarkingUtils.updateVerify(JSON.parseObject(annotation.getContour()), req.getGeometry(), req.getOperation(), req.getCheck(), req.getResolution());
+        boolean res = MarkingUtils.updateVerify(JSONObject.parseObject(annotation.getContour()), req.getGeometry(), req.getOperation(), req.getCheck(), req.getResolution());
         if (!res) {
             throw new Exception(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
         }
@@ -563,7 +563,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         // 更新后查询数据并返回
         Annotation annotationById = annotationMapper.selectById(annotations);
         Properties properties = getProperties(annotationById);
-        Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), JSON.parseObject(annotation1.getContour()), properties);
+        Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), JSONObject.parseObject(annotation1.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
         NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
         List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
@@ -606,7 +606,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 //            RocksDBUtil.put(traceId, markingId, json);
             rocksdbService.submitTask(traceId, annotationId, annotation);
         }
-        return JSON.parseObject(annotation1.getContour());
+        return JSONObject.parseObject(annotation1.getContour());
     }
 
     @Override
@@ -629,7 +629,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotationMapper.insert(annotation);
         Annotation annotationById = annotationMapper.selectById(annotation.getAnnotationId());
         Properties properties = getProperties(annotationById);
-        Features features = MarkingUtils.socketData(String.valueOf(annotation.getAnnotationId()), JSON.parseObject(annotation.getContour()), properties);
+        Features features = MarkingUtils.socketData(String.valueOf(annotation.getAnnotationId()), JSONObject.parseObject(annotation.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendListMessages(CommonConstant.ANNO_TYPE_DRAW, ADD_STATUS, features, null);
         NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
         return annotationById;
@@ -653,7 +653,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotationMapper.updateById(annotation);
         Annotation annotationById = annotationMapper.selectById(annotation.getAnnotationId());
         Properties properties = getProperties(annotationById);
-        Features features = AnnotationDataEncapsulation.socketData(String.valueOf(annotationBy.getAnnotationId()), JSON.parseObject(req.getContour()), properties);
+        Features features = AnnotationDataEncapsulation.socketData(String.valueOf(annotationBy.getAnnotationId()), JSONObject.parseObject(req.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_DRAW, UPDATE_STATUS, features);
         NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
         return annotationBy;
@@ -665,7 +665,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Annotation annotation = annotationMapper.selectById(annotationId);
         Annotation annotationById = annotationMapper.selectById(annotationId);
         Properties properties = getProperties(annotationById);
-        Features features = AnnotationDataEncapsulation.socketData(String.valueOf(annotationId), JSON.parseObject(annotationById.getContour()), properties);
+        Features features = AnnotationDataEncapsulation.socketData(String.valueOf(annotationId), JSONObject.parseObject(annotationById.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendListMessages(CommonConstant.ANNO_TYPE_DRAW, DELETE_STATUS, features, null);
         NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
         return annotation;
