@@ -41,7 +41,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import static cn.staitech.fr.constant.CommonConstant.*;
 import static cn.staitech.fr.utils.MarkingUtils.socketData;
@@ -282,7 +281,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type);
 
         String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
-        Boolean isBatch = false;
+        boolean isBatch = false;
         {
             Long userId = SecurityUtils.getLoginUser().getSysUser().getUserId();
             // 删除操作RocksDB存删除前的数据
@@ -333,7 +332,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             throw new Exception(MessageSource.M("NODATA"));
         }
         String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
-        Boolean isBatch = false;
+        boolean isBatch = false;
         {
             // 删除操作RocksDB存删除前的数据
             // 撤消,恢复历史记录 用HistoryService会引起循环依赖！ -> 后续在线程池中处理 判断是批处理，还是单独处理
@@ -423,9 +422,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Long slideId = annotationBy.getSlideId();
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         Long loginUserId = sysUser.getUserId();
-        String loginUserName = sysUser.getUserName();
-
-
         {
             String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
 
@@ -615,8 +611,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     @Override
     public List<AnnotationCountByCategory> getCategoryCount(Long slideId) {
-        List<AnnotationCountByCategory> list = annotationMapper.getCategoryCount(slideId);
-        return list;
+        return annotationMapper.getCategoryCount(slideId);
     }
 
 

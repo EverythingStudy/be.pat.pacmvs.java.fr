@@ -6,6 +6,7 @@ import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.in.ChoiceSaveInVo;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
 import cn.staitech.fr.domain.out.SlideListQueryOut;
+import cn.staitech.fr.domain.out.SlideSelectBy;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -18,4 +19,12 @@ public interface SlideService extends IService<Slide> {
     R choiceSave(ChoiceSaveInVo choiceSaveInVo);
 
     PageResponse<SlideListQueryOut> slideListQuery(SlideListQueryIn req);
+
+    /**
+     * 查询切片、图片信息接口
+     *
+     * @param slideId 切片id
+     * @return
+     */
+    SlideSelectBy pageImageCsvListVOBy(Long slideId);
 }

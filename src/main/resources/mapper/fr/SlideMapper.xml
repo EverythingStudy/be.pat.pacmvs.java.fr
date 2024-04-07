@@ -146,5 +146,56 @@
 				AND t1.process_flag = 2
 				AND t1.check_status > 0 
 		ORDER BY	t1.animal_code asc,t1.check_status desc
-     </select>     
+     </select>
+
+    <select id="pageImageCsvListVOBy" parameterType="long"
+            resultType="cn.staitech.fr.domain.out.SlideSelectBy">
+        select s.slide_id,
+        s.review_round_id,
+        s.description,
+        s.ai_analyzed,
+        s.remark,
+        s.status,
+        s.ai_check,
+        s.group_name,
+        s.gender,
+        s.species,
+        s.product_series,
+        s.dosage,
+        s.animal_source,
+        s.receiving_week,
+        s.dosing_cycle,
+        s.recovery_cycle,
+        s.date_of_death,
+        s.remove_reason,
+        s.organ,
+        s.lesion_type1,
+        s.lesion_degree1,
+        s.lesion_type2,
+        s.lesion_degree2,
+        s.topic_name,
+        s.delete_flag,
+        s.organization_id,
+        s.host_id,
+        s.create_time,
+        m.image_id,
+        m.thumb_url,
+        m.image_path,
+        m.format,
+        m.width,
+        m.height,
+        m.resolution_x,
+        m.resolution_y,
+        m.source_lens,
+        m.image_path,
+        m.thumb_url,
+        m.image_name
+        from fr_slide s
+        left join tb_image m on m.image_id = s.image_id
+        <where>
+            <if test="slideId != null">
+                s.slide_id = #{slideId, jdbcType=NUMERIC}
+            </if>
+        </where>
+    </select>
 </mapper>
