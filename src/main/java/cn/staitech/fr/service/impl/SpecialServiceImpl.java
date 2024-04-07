@@ -186,7 +186,6 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         if (special == null) {
             return R.fail("专题不存在，请刷新后重试！");
         }
-        //todo 校验切片
         special.setDelFlag(CommonConstant.NUMBER_1);
         special.setUpdateBy(SecurityUtils.getUserId());
         special.setUpdateTime(new Date());
@@ -199,6 +198,13 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         specialRecycling.setCreateBy(SecurityUtils.getUserId());
         specialRecycling.setCreateTime(new Date());
         specialRecyclingService.save(specialRecycling);
+        //删除切片
+        Slide slide = new Slide();
+        slide.setDelFlag(CommonConstant.NUMBER_1);
+        LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Slide::getDelFlag,CommonConstant.NUMBER_0);
+        wrapper.eq(Slide::getSpecialId,specialId);
+        slideService.update(slide,wrapper);
         return R.ok();
     }
 

@@ -25,7 +25,7 @@
 
     <select id="getWaxList" parameterType="cn.staitech.fr.domain.in.WaxBlockNumberListIn"
                   resultType="cn.staitech.fr.domain.out.WaxBlockNumberListOut">
-        select fwbn.number_id,tt.topic_name,fwbn.species_name,fwbn.file_name,so.organization_name,fwbn.create_time
+        select fwbn.number_id,tt.topic_name,fwbn.species_name,fwbn.file_name,so.organization_name,fwbn.organization_id,fwbn.create_time
         from fr_wax_block_number fwbn
                  left join sys_organization so on fwbn.organization_id = so.organization_id
                  left join tb_topic tt on fwbn.topic_id=tt.topic_id

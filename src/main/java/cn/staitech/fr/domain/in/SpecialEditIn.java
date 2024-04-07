@@ -3,6 +3,8 @@ package cn.staitech.fr.domain.in;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * @Author wudi
  * @Date 2024/3/29 16:00
@@ -11,6 +13,7 @@ import lombok.Data;
 @Data
 public class SpecialEditIn {
     @ApiModelProperty("专题id")
+    @NotNull(message = "")
     private Long specialId;
 
     @ApiModelProperty("专题名称")

@@ -102,6 +102,8 @@ public class Slide implements Serializable {
      */
     private Long updateBy;
 
+    private String delFlag;
+
     /**
      * 更新时间
      */

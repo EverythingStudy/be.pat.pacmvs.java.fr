@@ -61,7 +61,7 @@ public class WaxBlockNumberController {
     }
 
     @ApiOperation(value = "蜡块编号表删除")
-    @DeleteMapping("{/numberId}")
+    @DeleteMapping("{numberId}")
     public R remove(@PathVariable("numberId") Long numberId) {
 
         return waxBlockNumberService.delete(numberId);

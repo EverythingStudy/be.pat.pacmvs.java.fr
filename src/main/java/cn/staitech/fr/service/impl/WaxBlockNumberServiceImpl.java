@@ -128,9 +128,9 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         LambdaQueryWrapper<WaxBlockNumber> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(WaxBlockNumber::getTopicId, req.getTopicId());
         queryWrapper.eq(WaxBlockNumber::getDelFlag, CommonConstant.NUMBER_0);
-        queryWrapper.eq(WaxBlockNumber::getOrganizationId, SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
-        List<WaxBlockNumber> waxList = list(queryWrapper);
-        if (waxList.size() > 0) {
+        queryWrapper.eq(WaxBlockNumber::getOrganizationId, req.getOrganizationId());
+        int count = count(queryWrapper);
+        if (count > 0) {
             return R.fail(MessageSource.M("TOPIC_EXIST_WAX"));
         }
         File file1 = new File(waxPath);
@@ -154,6 +154,10 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         if (ObjectUtils.isEmpty(topic)) {
             return R.fail(MessageSource.M("UPLOAD_FILE_NOT_EXIST_TOPIC"));
         }
+        //校验专题是否一致
+        if(!topic.getTopicId().equals(req.getTopicId())){
+            return R.fail(MessageSource.M("UPLOAD_FILE_TOPIC_NAME_ERROR"));
+        }
 
         //种属
         String speciesName = StringUtils.substringAfterLast(text, "：").trim();
@@ -162,6 +166,10 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         Species species = getSpecies(speciesName);
         if (ObjectUtils.isEmpty(species)) {
             return R.fail(MessageSource.M("UPLOAD_FILE_NOT_EXIST_SPECIES"));
+        }
+        //校验种属
+        if(!species.getSpeciesId().equals(req.getSpeciesId())){
+            return R.fail(MessageSource.M("UPLOAD_FILE_SPECIES_ERROR"));
         }
         WaxBlockNumber waxBlockNumber = getWaxBlockNumber(req, topic, species);
         this.baseMapper.insert(waxBlockNumber);
