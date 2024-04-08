@@ -194,7 +194,9 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         SpecialRecycling specialRecycling = new SpecialRecycling();
         specialRecycling.setSpecialId(specialId);
         specialRecycling.setExpireTime(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000 * 30L));
-        specialRecycling.setDelFlag(CommonConstant.NUMBER_1);
+        int slideNum=getSlideNum(specialId);
+        specialRecycling.setSlideNum(slideNum);
+        specialRecycling.setDelFlag(CommonConstant.NUMBER_0);
         specialRecycling.setCreateBy(SecurityUtils.getUserId());
         specialRecycling.setCreateTime(new Date());
         specialRecyclingService.save(specialRecycling);
@@ -206,6 +208,13 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         wrapper.eq(Slide::getSpecialId, specialId);
         slideService.update(slide, wrapper);
         return R.ok();
+    }
+
+    private int getSlideNum(Long specialId) {
+        LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
+        wrapper.eq(Slide::getSpecialId, specialId);
+        return slideService.count(wrapper);
     }
 
     @Override

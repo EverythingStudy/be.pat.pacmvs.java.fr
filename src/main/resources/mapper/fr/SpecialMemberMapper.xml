@@ -25,7 +25,7 @@
             resultType="cn.staitech.fr.domain.out.SpecialMemberSelectOut">
         select sm.member_id,sm.user_id,su.user_name,su.nick_name, su.sex, su.phonenumber
         from fr_special_member sm
-        left join sys_user su on sm.create_by = su.user_id
+        left join sys_user su on sm.user_id = su.user_id
         left join sys_user_role sur on su.user_id = sur.user_id
         <where>
             sm.del_flag ='0'

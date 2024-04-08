@@ -29,7 +29,7 @@
         fs.special_name,
         ts.name speciesName,
         ts.name_en speciesNameEn,
-        fs.trial_type,
+        fs.trial_id,
         fs.color_type,
         fsr.slide_num,
         su.user_name createName,

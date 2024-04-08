@@ -28,7 +28,7 @@ public class SpecialRecyclingListQueryOut {
     private String speciesNameEn;
 
     @ApiModelProperty(value = "试验类型")
-    private String trialType;
+    private String trialId;
 
     @ApiModelProperty(value = "染色类型id")
     private String colorType;
