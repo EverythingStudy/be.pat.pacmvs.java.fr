@@ -1,5 +1,7 @@
 package cn.staitech.fr.service;
 
+import cn.hutool.core.collection.ConcurrentHashSet;
+import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.utils.RocksDBUtil;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,8 @@ import java.util.concurrent.*;
 @Slf4j
 @Service
 public class RocksdbService {
+
+    public static final ConcurrentMap<Long, ConcurrentHashSet<String>> USER_ROCKS_MAP = new ConcurrentHashMap<>();
 
     public static final ExecutorService rocksdbExecutorService = new ThreadPoolExecutor(
             Runtime.getRuntime().availableProcessors(),
@@ -53,6 +57,13 @@ public class RocksdbService {
                 Gson gson = new Gson();
                 // 将对象转换成JSON字符串
                 String json = gson.toJson(obj);
+                if (USER_ROCKS_MAP.containsKey(SecurityUtils.getUserId())) {
+                    USER_ROCKS_MAP.get(SecurityUtils.getUserId()).add(cfName);
+                } else {
+                    ConcurrentHashSet<String> set = new ConcurrentHashSet<String>();
+                    set.add(cfName);
+                    USER_ROCKS_MAP.put(SecurityUtils.getUserId(), set);
+                }
                 RocksDBUtil.put(cfName, key, json);
             } catch (Exception e) {
                 log.info("saveRocksDB:{}", e);
