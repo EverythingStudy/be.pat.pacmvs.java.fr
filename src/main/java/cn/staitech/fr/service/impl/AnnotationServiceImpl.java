@@ -118,7 +118,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             }
             if (category != null) {
                 properties.setLabel_color(category.getChromaticValue());
-                properties.setLabel_name(category.getCategoryFullName());
+                properties.setLabel_name(category.getOrganName());
             }
         }
         if (annotation.getCreateBy() != null) {
@@ -180,7 +180,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (req.getCategory_id() != null) {
             Category category = categoryMapper.selectById(req.getCategory_id());
             if (category != null) {
-                id = MarkingUtils.getSdId(category.getCategoryFullName());
+                id = MarkingUtils.getSdId(category.getOrganName());
             }
         } else {
             id = MarkingUtils.getSdId(null);
