@@ -7,17 +7,16 @@ import cn.staitech.fr.domain.in.ChoiceSaveInVo;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
 import cn.staitech.fr.domain.out.ImageListOutVO;
 import cn.staitech.fr.domain.out.SlideListQueryOut;
+import cn.staitech.fr.domain.out.SlideSelectBy;
 import cn.staitech.fr.service.ImageService;
 import cn.staitech.fr.service.SlideService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @Author wudi
@@ -55,5 +54,12 @@ public class SlideController {
     public R<PageResponse<SlideListQueryOut>> list(@Validated @RequestBody SlideListQueryIn req) {
         PageResponse<SlideListQueryOut> page = slideService.slideListQuery(req);
         return R.ok(page);
+    }
+
+
+    @ApiOperation(value = "查询切片、图片详情接口")
+    @GetMapping("/slideInfo")
+    public R<SlideSelectBy> slideInfo(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "标注id", required = true) Long slideId) {
+        return R.ok(slideService.pageImageCsvListVOBy(slideId));
     }
 }

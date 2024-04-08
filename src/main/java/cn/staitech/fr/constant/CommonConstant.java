@@ -14,6 +14,7 @@ public class CommonConstant {
     public static final String NUMBER_0 = "0";
 
     public static final String NUMBER_1 = "1";
+    public static final Integer INT_1 = 1;
     public static final String NUMBER_4 = "4";
     public static final String GLIDE_LINE = "_";
     public static final String FILE_SUFFIX = ".";
@@ -159,7 +160,7 @@ public class CommonConstant {
      * 识别算法
      */
     
-    public static final String RECOGNITION_MODEL_NAME  = "图像识别算法";
+    public static final String RECOGNITION_MODEL_NAME  = "全脏器识别";
     
     public static final String WAX_BLOCK_INFO  = "WAX_BLOCK_INFO_";
 }

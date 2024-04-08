@@ -1,10 +1,5 @@
 package cn.staitech.fr.domain.in;
 
-import java.util.List;
-
-import javax.validation.constraints.NotNull;
-
-import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
@@ -23,7 +18,8 @@ public class AlgorithmAnnIn{
 	
 	@ApiModelProperty(name = "geometryList" , value = "标注信息")
 	private List<AlgorithmGeometry> geometryList;*/
-	@ApiModelProperty(name = "slideIdList" , value = "切片id")
-	private List<Long> slideIdList;
+//	@ApiModelProperty(name = "slideIdList" , value = "切片id")
+//	private List<Long> slideIdList;
+	private Long slideId;
 }
 

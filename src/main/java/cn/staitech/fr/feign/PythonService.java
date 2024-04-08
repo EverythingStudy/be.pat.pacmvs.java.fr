@@ -1,22 +1,20 @@
 package cn.staitech.fr.feign;
 
-import com.alibaba.fastjson.JSONObject;
+import cn.staitech.fr.vo.annotation.GenerateThumbnail;
+import cn.staitech.fr.vo.annotation.StartRecognition;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
-
-@FeignClient(name = "phtyon",url = "${forward.phyonUrl}")
+@FeignClient(name = "python",url = "${forward.pythonUrl}")
 public interface PythonService {
 
-    @PostMapping(value = "/Generate_thumbnail")
-    void generateThumbnail(
-            @RequestParam("slideId") Long slideId,
-            @RequestParam("categoryId") Long categoryId,
-            @RequestParam("svsPath") String svsPath,
-            @RequestParam("slideRoiPolygon")List<JSONObject> slideRoiPolygon,
-            @RequestParam("types")int types);
+    @PostMapping(value = "Generate_thumbnail/")
+    void generateThumbnail(@RequestBody GenerateThumbnail generateThumbnail);
+    
+    @PostMapping(value = "CreateGPUAIPepost/")
+    String startPrediction(@RequestBody StartRecognition startRecognition);
 
 
 }

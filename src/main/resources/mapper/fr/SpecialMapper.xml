@@ -31,7 +31,7 @@
         speciesNameEn, fs.status, fs.create_time,su.user_name createName
         from fr_special fs
         left join tb_topic tt on fs.topic_id = tt.topic_id
-        left join sys_user su on fs.create_by = su.user_name
+        left join sys_user su on fs.create_by = su.user_id
         left join tb_species ts on fs.species_id = ts.species_id
         and ts.organization_id = #{organizationId}
         where fs.del_flag = '0'

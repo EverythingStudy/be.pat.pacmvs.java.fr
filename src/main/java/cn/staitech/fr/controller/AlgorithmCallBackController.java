@@ -55,14 +55,14 @@ public class AlgorithmCallBackController {
     		int aiAnalyzed = req.getAiAnalyzed();
     		//文件状态:0上传中、1上传失败、2解析中、3解析失败、4可用 5:不可用
     		int userStatus = 5;
-    		/*if (aiAnalyzed == 2 || aiAnalyzed == 4) {
+    		if (aiAnalyzed == 2 || aiAnalyzed == 4) {
     			userStatus = 4;
-    		}*/
+    		}
     		userStatus = 4;
     		Image image = new Image();
     		image.setImageId(imageId);
     		image.setStatus(userStatus);
-//    		imageService.updateById(image);
+    		imageService.updateById(image);
     	}
         return R.ok();
     }

@@ -132,7 +132,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         LambdaQueryWrapper<Image> qw = new LambdaQueryWrapper<>();
         qw.eq(Image::getOrganizationId, req.getOrganizationId());
         qw.eq(Image::getStatus, CommonConstant.NUMBER_4);
-        qw.eq(Image::getTopicId,req.getTopicId());
+        qw.eq(Image::getTopicId, req.getTopicId());
         List<Image> images = imageMapper.selectList(qw);
         List<Slide> arrayList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(images)) {
@@ -142,7 +142,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
                 slide.setCreateTime(new Date());
                 slide.setImageId(image.getImageId());
                 slide.setSpecialId(special.getSpecialId());
-                getExtInfo(image.getFileName(), slide, special.getSpecialId(),req);
+                getExtInfo(image.getFileName(), slide, special.getSpecialId(), req);
                 arrayList.add(slide);
             }
         }
@@ -179,14 +179,13 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class )
+    @Transactional(rollbackFor = Exception.class)
     public R removeSpecial(Long specialId) {
         log.info("专题删除接口开始：specialId={}", specialId);
         Special special = this.baseMapper.selectById(specialId);
         if (special == null) {
             return R.fail("专题不存在，请刷新后重试！");
         }
-        //todo 校验切片
         special.setDelFlag(CommonConstant.NUMBER_1);
         special.setUpdateBy(SecurityUtils.getUserId());
         special.setUpdateTime(new Date());
@@ -195,24 +194,43 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         SpecialRecycling specialRecycling = new SpecialRecycling();
         specialRecycling.setSpecialId(specialId);
         specialRecycling.setExpireTime(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000 * 30L));
-        specialRecycling.setDelFlag(CommonConstant.NUMBER_1);
+        int slideNum=getSlideNum(specialId);
+        specialRecycling.setSlideNum(slideNum);
+        specialRecycling.setDelFlag(CommonConstant.NUMBER_0);
         specialRecycling.setCreateBy(SecurityUtils.getUserId());
         specialRecycling.setCreateTime(new Date());
         specialRecyclingService.save(specialRecycling);
+        //删除切片
+        Slide slide = new Slide();
+        slide.setDelFlag(CommonConstant.NUMBER_1);
+        LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
+        wrapper.eq(Slide::getSpecialId, specialId);
+        slideService.update(slide, wrapper);
         return R.ok();
+    }
+
+    private int getSlideNum(Long specialId) {
+        LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
+        wrapper.eq(Slide::getSpecialId, specialId);
+        return slideService.count(wrapper);
     }
 
     @Override
     public R editSpecialStatus(EditSpecialStatusIn req) {
         log.info("专题状态按钮接口开始：");
         //启动条件判断
-        LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Slide::getSpecialId,req.getSpecialId());
-        wrapper.ne(Slide::getCheckStatus,1);
-        List<Slide> slideList = slideService.list(wrapper);
-        if(CollectionUtils.isNotEmpty(slideList)){
-            return R.fail(MessageSource.M("REMOVE_SPECIAL_ERROR"));
+        if (req.getStatus().equals(CommonConstant.INT_1)) {
+            LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(Slide::getSpecialId, req.getSpecialId());
+            wrapper.ne(Slide::getCheckStatus, 1);
+            List<Slide> slideList = slideService.list(wrapper);
+            if (CollectionUtils.isNotEmpty(slideList)) {
+                return R.fail(MessageSource.M("START_SPECIAL_ERROR"));
+            }
         }
+
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         Special special = new Special();
         special.setSpecialId(req.getSpecialId());
@@ -223,7 +241,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         return R.ok();
     }
 
-    private Slide getExtInfo(String fileName, Slide slide, Long specialId,SpecialAddIn req) {
+    private Slide getExtInfo(String fileName, Slide slide, Long specialId, SpecialAddIn req) {
         String[] s = fileName.split(" ");
         if (s.length != 3) {
             log.info("切片文件名格式错误：" + fileName);
@@ -251,7 +269,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         }
         slide.setGroupCode(s[2].substring(0, s[2].length() - 1));
 
-        slide.setOrgans(waxBlockInfoMapper.getOrganName(req.getTopicId(),req.getSpeciesId(),slide.getWaxCode()));
+        slide.setOrgans(waxBlockInfoMapper.getOrganName(req.getTopicId(), req.getSpeciesId(), slide.getWaxCode()));
 
         return slide;
     }

@@ -10,6 +10,7 @@ import cn.staitech.fr.domain.in.ChoiceSaveInVo;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
 import cn.staitech.fr.domain.out.ImageListOutVO;
 import cn.staitech.fr.domain.out.SlideListQueryOut;
+import cn.staitech.fr.domain.out.SlideSelectBy;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.mapper.WaxBlockInfoMapper;
 import cn.staitech.fr.service.GroupService;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -50,15 +52,17 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide>
     @Transactional(rollbackFor = Exception.class)
     public R choiceSave(ChoiceSaveInVo req) {
         log.info("切片选择保存接口开始：");
-
+        List<Slide> arrayList = new ArrayList<>();
         for (ImageListOutVO image : req.getImages()) {
             Slide slide = new Slide();
             slide.setCreateBy(SecurityUtils.getUserId());
             slide.setCreateTime(new Date());
             slide.setImageId(image.getImageId());
             slide.setSpecialId(req.getSpecialId());
-            getExtInfo(image.getFileName(), slide, req.getSpecialId());
+            Slide extInfo = getExtInfo(image.getFileName(), slide, req.getSpecialId());
+            arrayList.add(extInfo);
         }
+        saveBatch(arrayList);
         return R.ok();
     }
 
@@ -72,6 +76,11 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide>
         pageResponse.setList(resp);
         pageResponse.setPages(page.getPages());
         return pageResponse;
+    }
+
+    @Override
+    public SlideSelectBy pageImageCsvListVOBy(Long slideId) {
+        return this.baseMapper.pageImageCsvListVOBy(slideId);
     }
 
     private Slide getExtInfo(String fileName, Slide slide, Long specialId) {

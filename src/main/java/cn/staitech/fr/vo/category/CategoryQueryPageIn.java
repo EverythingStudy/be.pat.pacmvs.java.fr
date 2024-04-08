@@ -10,7 +10,7 @@ import java.util.Map;
 public class CategoryQueryPageIn extends PageRequest {
 
     @ApiModelProperty(value = "种属")
-    private String species;
+    private Long species;
 
     @ApiModelProperty(value = "脏器名称")
     private String organName;

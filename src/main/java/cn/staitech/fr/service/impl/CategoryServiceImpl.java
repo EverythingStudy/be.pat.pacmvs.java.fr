@@ -28,7 +28,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
 		Map<Long, String> map = new HashMap<Long, String>();
 		List<Category> list = list();
 		if (CollectionUtils.isNotEmpty(list)) {
-			map = list.stream().collect(Collectors.toMap(Category::getCategoryId, Category::getCategoryFullName));
+			map = list.stream().collect(Collectors.toMap(Category::getCategoryId, Category::getOrganName));
 		}
 		return map;
 	}

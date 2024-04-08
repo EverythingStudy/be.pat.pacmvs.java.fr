@@ -5,12 +5,14 @@ import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Container;
+import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.SpecialRecycling;
 import cn.staitech.fr.domain.in.SpecialRecyclingListQueryIn;
 import cn.staitech.fr.domain.in.SpecialRecyclingRecoverIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
 import cn.staitech.fr.domain.out.SpecialRecyclingListQueryOut;
+import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.mapper.SpecialRecyclingMapper;
 import cn.staitech.fr.service.SpecialRecyclingService;
@@ -42,6 +44,8 @@ import java.util.List;
 public class SpecialRecyclingServiceImpl extends ServiceImpl<SpecialRecyclingMapper, SpecialRecycling> implements SpecialRecyclingService {
     @Resource
     private SpecialMapper specialMapper;
+    @Resource
+    private SlideMapper slideMapper;
 
     @Override
     public PageResponse<SpecialRecyclingListQueryOut> getSpecialRecyclingList(SpecialRecyclingListQueryIn req) {
@@ -94,6 +98,13 @@ public class SpecialRecyclingServiceImpl extends ServiceImpl<SpecialRecyclingMap
             special.setSpecialId(specialRecycling.getSpecialId());
             special.setDelFlag(CommonConstant.NUMBER_0);
             specialMapper.updateById(special);
+            //恢复切片
+            Slide slide = new Slide();
+            slide.setDelFlag(CommonConstant.NUMBER_0);
+            LambdaQueryWrapper<Slide> wrapper2 = new LambdaQueryWrapper<>();
+            wrapper2.eq(Slide::getDelFlag,CommonConstant.NUMBER_1);
+            wrapper2.eq(Slide::getSpecialId,specialRecycling.getSpecialId());
+            slideMapper.update(slide,wrapper2);
         }
 
         SpecialRecycling specialRecycling1 = new SpecialRecycling();

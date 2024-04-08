@@ -4,6 +4,7 @@ import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
 import cn.staitech.fr.domain.in.SplitVerificationQueryIn;
 import cn.staitech.fr.domain.out.SlideListQueryOut;
+import cn.staitech.fr.domain.out.SlideSelectBy;
 import cn.staitech.fr.domain.out.SplitVerificationOut;
 import cn.staitech.fr.domain.out.AlgorithmImageOut;
 import java.util.List;
@@ -36,6 +37,8 @@ public interface SlideMapper extends BaseMapper<Slide> {
     List<Slide> selectListByWax(@Param("topicId") Long topicId, @Param("speciesId")String speciesId);
     
     List<SplitVerificationOut> getVerificationSlideListQuery(SplitVerificationQueryIn req);
+
+    SlideSelectBy pageImageCsvListVOBy(Long slideId);
 }
 
 
