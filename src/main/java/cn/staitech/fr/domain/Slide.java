@@ -1,11 +1,13 @@
 package cn.staitech.fr.domain;
 
+import java.io.Serializable;
+import java.util.Date;
+
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.util.Date;
+
 import lombok.Data;
 
 /**
@@ -61,6 +63,11 @@ public class Slide implements Serializable {
      */
     private Integer processFlag;
 
+    /**
+     * 核对状态 0：初始 1：正确 2：错误 3：修正正常
+     */
+    private Integer animalCheckStatus;
+    
     /**
      * 核对状态 0：初始 1：正确 2：错误 3：修正正常
      */
