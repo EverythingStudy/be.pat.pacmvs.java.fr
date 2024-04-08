@@ -1,6 +1,7 @@
 package cn.staitech.fr.controller;
 
 
+import cn.staitech.fr.utils.ExcludeEmptyQueryWrapper;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -12,7 +13,6 @@ import cn.staitech.fr.domain.Category;
 import cn.staitech.fr.service.CategoryService;
 import cn.staitech.fr.vo.category.CategoryQueryPageIn;
 import cn.staitech.system.api.domain.SysUser;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import io.swagger.annotations.Api;
@@ -46,7 +46,7 @@ public class CategoryController {
     public R<PageResponse<Category>> list(CategoryQueryPageIn req) throws ParseException {
         PageResponse<Category> resp = new PageResponse<>();
         Page<SysUser> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
-        QueryWrapper<Category> categoryQueryWrapper = new QueryWrapper<>();
+        ExcludeEmptyQueryWrapper<Category> categoryQueryWrapper = new ExcludeEmptyQueryWrapper<>();
         categoryQueryWrapper.eq("species",req.getSpecies()).eq("organ_name",req.getCategoryAbbreviation()).like("category_abbreviation",req.getCategoryAbbreviation());
         if(req.getCreateTime() != null){
             Object beginTime = req.getCreateTime().get("beginTime");

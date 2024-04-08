@@ -28,7 +28,7 @@ public class Category implements Serializable {
      * 种属
      */
     @ApiModelProperty(name = "species" , value = "种属")
-    private String species;
+    private Long species;
 
     /**
      * 脏器名称
@@ -49,6 +49,19 @@ public class Category implements Serializable {
     private String categoryAbbreviation;
 
     /**
+     * 标签简称
+     */
+    @ApiModelProperty(name = "organizationId" , value = "机构id")
+    private Long organizationId;
+
+
+    /**
+     * 标签简称
+     */
+    @ApiModelProperty(name = "rgb" , value = "rgb值")
+    private String rgb;
+
+    /**
      * 色值
      */
     @ApiModelProperty(name = "chromaticValue" , value = "色值")
@@ -66,6 +79,8 @@ public class Category implements Serializable {
      */
     @ApiModelProperty(name = "createBy" , value = "创建者")
     private Long createBy;
+
+
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
