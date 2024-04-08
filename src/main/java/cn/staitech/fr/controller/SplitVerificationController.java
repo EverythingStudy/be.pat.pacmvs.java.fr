@@ -44,7 +44,7 @@ public class SplitVerificationController {
     @ApiOperation(value = "专题管理-结果修正/取消修正")
     @PostMapping("/updateResult")
     public R updateResult(@Validated @RequestBody ResultCorrectionIn req) {
-        //PageResponse<SplitVerificationOut> page = splitVerificationService.getList(req);
+        splitVerificationService.updateResult(req);
         return R.ok();
     }
 

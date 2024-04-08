@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2023-11-02
  */
 
-@Api(value = "算法预测模块", tags = "算法预测模块")
+@Api(value = "算法启动", tags = "算法启动")
 @Slf4j
 @RestController
 @RequestMapping("/slideRecognition")
@@ -35,7 +35,7 @@ public class SlideRecognitionnController {
     private AlgorithmPredictionService algorithmPredictionService;
 
     @SuppressWarnings("rawtypes")
-    @ApiOperation(value = "启动算法/重算失败数据")
+    @ApiOperation(value = "启动识别算法")
 //    @RequiresPermissions(value = {"algorithmDetectionInfo:slice:startAlgorithm", "algorithmDetectionInfo:slice:reStartErrorData"}, logical = Logical.OR)
     @PostMapping("/start")
     public R start(@Validated @RequestBody StartPredictionIn req) {

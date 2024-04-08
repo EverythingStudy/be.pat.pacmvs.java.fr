@@ -2,6 +2,7 @@ package cn.staitech.fr.service.impl;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,13 +16,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 
 import cn.staitech.common.core.domain.PageResponse;
+import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.in.ResultCorrectionIn;
 import cn.staitech.fr.domain.in.SplitVerificationQueryIn;
 import cn.staitech.fr.domain.out.SplitVerificationOut;
 import cn.staitech.fr.mapper.AnnotationMapper;
@@ -234,12 +238,53 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		Page<SplitVerificationOut> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
 
 		List<SplitVerificationOut> slideList = slideMapper.getVerificationSlideListQuery(req);
-
 		pageResponse.setTotal(page.getTotal());
 		pageResponse.setList(slideList);
 		pageResponse.setPages(page.getPages());
 
 		return pageResponse;
+	}
+
+	@Override
+	public void updateResult(ResultCorrectionIn req) {
+		Long slideId = req.getSlideId();
+		Slide slide = new Slide();
+		slide.setSlideId(slideId);
+		//核对状态 0：初始 1：正确 2：修正正常 3：错误 
+		if(req.getCorrectionStatus() == 0){
+			slide.setCheckStatus(2);
+		}else{
+			slide.setCheckStatus(3);
+		}
+		slide.setCheckBy(SecurityUtils.getLoginUser().getSysUser().getUserId());
+		slide.setCheckTime(new Date());
+		slideService.updateById(slide);
+		//动物号处理
+		//检查当前动物号所属的所有切片是否正常
+		Slide oldSlide = slideService.getById(slideId);
+		//动物号
+		String animalCode = oldSlide.getAnimalCode();
+		Long specialId = oldSlide.getSpecialId();
+		
+		QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("animal_code", animalCode);
+		queryWrapper.eq("special_id", specialId);
+		List<Slide> queryList = slideService.list(queryWrapper);
+		// 按照checkStatus属性分组到Map<String, List<Slide>>
+		Map<Integer, List<Slide>> mapByCheckStatus = queryList.stream().collect(Collectors.groupingBy(Slide::getCheckStatus));
+		if(null !=mapByCheckStatus&& !mapByCheckStatus.isEmpty()){
+			UpdateWrapper<Slide> updateWrapper = new UpdateWrapper<>();
+			updateWrapper.eq("animal_code", animalCode);
+			updateWrapper.eq("special_id", specialId);
+			Slide sd = new Slide();
+			//核对状态 0：初始 1：正确 2：错误 3：修正正常
+			if(mapByCheckStatus.containsKey(2)){
+				sd.setAnimalCheckStatus(2);
+			}else{
+				sd.setAnimalCheckStatus(1);
+			}
+			slideService.update(sd, updateWrapper);
+		}
 	}
 
 

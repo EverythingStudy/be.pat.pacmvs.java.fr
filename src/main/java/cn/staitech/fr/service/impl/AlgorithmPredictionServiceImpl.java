@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 
 import cn.hutool.core.thread.ExecutorBuilder;
 import cn.hutool.json.JSONUtil;
@@ -296,6 +297,31 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 				}
 			}
 		}
+		//检查当前动物号所属的所有切片是否正常
+		Slide oldSlide = slideService.getById(slideId);
+		//动物号
+		String animalCode = oldSlide.getAnimalCode();
+
+		QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("animal_code", animalCode);
+		queryWrapper.eq("special_id", specialId);
+		List<Slide> queryList = slideService.list(queryWrapper);
+		// 按照checkStatus属性分组到Map<String, List<Slide>>
+		Map<Integer, List<Slide>> mapByCheckStatus = queryList.stream().collect(Collectors.groupingBy(Slide::getCheckStatus));
+		if(null !=mapByCheckStatus&& !mapByCheckStatus.isEmpty()){
+			UpdateWrapper<Slide> updateWrapper = new UpdateWrapper<>();
+			updateWrapper.eq("animal_code", animalCode);
+			updateWrapper.eq("special_id", specialId);
+			Slide sd = new Slide();
+			//核对状态 0：初始 1：正确 2：错误 3：修正正常
+			if(mapByCheckStatus.containsKey(2)){
+				sd.setAnimalCheckStatus(2);
+			}else{
+				sd.setAnimalCheckStatus(1);
+			}
+			slideService.update(sd, updateWrapper);
+		}
+
 	}
 
 	//模糊匹配，判断是否包括该脏器

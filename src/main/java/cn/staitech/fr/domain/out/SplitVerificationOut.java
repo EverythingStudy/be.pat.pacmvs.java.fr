@@ -21,7 +21,9 @@ public class SplitVerificationOut {
 	
     @ApiModelProperty(value = "切图结果（0：正确 1：错误）")
     private Integer processFlag;
-
+    
+    @ApiModelProperty(value = "修正标识（ 0：初始 1：正确 2：修正正常 3：错误 ）")
+    private Integer checkStatus;
 
     @ApiModelProperty(value = "蜡块表脏器信息")
     //private String waxOrgan;
