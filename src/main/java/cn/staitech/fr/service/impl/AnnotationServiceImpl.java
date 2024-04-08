@@ -202,6 +202,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         BroadcastVO broadcastVO = sendOneMessages(ADD_STATUS, features);
         NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
         Slide slide = slideMapper.selectById(req.getSlide_id());
+        if (!Optional.ofNullable(slide).isPresent()) {
+            throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
+        }
         Image image = imageMapper.selectById(slide.getImageId());
         if (!Optional.ofNullable(image).isPresent()) {
             throw new Exception(MessageSource.M("NODATA"));
@@ -227,7 +230,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                 trace.getNodeList().add(new TraceNode(String.valueOf(annotation.getAnnotationId()), "INSERT"));
                 session.drawListAdd(trace);
             }
-
 //            // 3、数据持久化写入RocksDB
 //            Gson gson = new Gson();
 //            // 将对象转换成JSON字符串
@@ -267,10 +269,14 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
         annotationMapper.deleteById(annotation);
         Slide slide = slideMapper.selectById(annotation.getSlideId());
+        if (!Optional.ofNullable(slide).isPresent()) {
+            throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
+        }
         Image image = imageMapper.selectById(slide.getImageId());
         if (!Optional.ofNullable(image).isPresent()) {
             throw new Exception(MessageSource.M("NODATA"));
         }
+
         List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
         int type;
         if (contourList.size() > 0) {
@@ -454,6 +460,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setContour(String.valueOf(geometryJson));
         Geometry geometry = WKT_READER.read(MarkingUtils.jsonToWkt(JSONObject.parseObject(annotation.getContour())));
         Slide slide = slideMapper.selectById(slideId);
+        if (!Optional.ofNullable(slide).isPresent()) {
+            throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
+        }
         Image image = imageMapper.selectById(slide.getImageId());
         if (!Optional.ofNullable(image).isPresent()) {
             throw new Exception(MessageSource.M("NODATA"));
@@ -547,6 +556,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Annotation annotation1 = annotationMapper.mergeContour(annotationBys);
         annotationBys.setContour(annotation1.getContour());
         Slide slide = slideMapper.selectById(annotation.getSlideId());
+        if (!Optional.ofNullable(slide).isPresent()) {
+            throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
+        }
         Image image = imageMapper.selectById(slide.getImageId());
         if (!Optional.ofNullable(image).isPresent()) {
             throw new Exception(MessageSource.M("NODATA"));
@@ -649,7 +661,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setArea(req.getArea());
         annotation.setPerimeter(req.getPerimeter());
         annotation.setUpdateBy(SecurityUtils.getUserId());
-        annotation.setUpdateTime(new Date());
+        annotation.setUpdateTime(String.valueOf(new Date()));
         annotationMapper.updateById(annotation);
         Annotation annotationById = annotationMapper.selectById(annotation.getAnnotationId());
         Properties properties = getProperties(annotationById);

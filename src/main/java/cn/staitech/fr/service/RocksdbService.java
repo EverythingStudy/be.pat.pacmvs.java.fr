@@ -53,7 +53,7 @@ public class RocksdbService {
                 Gson gson = new Gson();
                 // 将对象转换成JSON字符串
                 String json = gson.toJson(obj);
-                RocksDBUtil.put(cfName, Long.valueOf(key), json);
+                RocksDBUtil.put(cfName, key, json);
             } catch (Exception e) {
                 log.info("saveRocksDB:{}", e);
             }

@@ -154,9 +154,9 @@ public class RocksDBUtil {
     /**
      * 增
      */
-    public static void put(String cfName, Long key, String value) throws RocksDBException {
+    public static void put(String cfName, String key, String value) throws RocksDBException {
         ColumnFamilyHandle columnFamilyHandle = cfAddIfNotExist(cfName); //获取列族Handle
-        rocksDB.put(columnFamilyHandle, key.toString().getBytes(), value.getBytes());
+        rocksDB.put(columnFamilyHandle, key.getBytes(), value.getBytes());
     }
 
     /**

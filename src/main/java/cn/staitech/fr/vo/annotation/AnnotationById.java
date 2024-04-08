@@ -9,13 +9,12 @@ import javax.validation.constraints.NotNull;
 public class AnnotationById {
 
 
-    @NotNull(message = "{MarkingDelIn.slideId.notNull}")
+    @NotNull(message = "{ARGUMENT_INVALID}")
     @ApiModelProperty(value = "轮廓id", required = true)
     private Long marking_id;
 
 
 
-    @NotNull(message = "{MarkingDelIn.slideId.notNull}")
     @ApiModelProperty(value = "项目id", required = true)
     private Long project_id;
 
