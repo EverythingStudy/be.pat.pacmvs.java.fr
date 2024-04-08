@@ -54,7 +54,7 @@ public class Special implements Serializable {
     @ApiModelProperty(value = "病理指标id")
     private Integer indicatorId;
 
-    @ApiModelProperty(value = "状态(0待启动，1进行中，2暂停，3锁定，4已完成)")
+    @ApiModelProperty(value = "状态(0待启动，1进行中，2暂停，3已完成，4锁定)")
     private Integer status;
 
     @ApiModelProperty(value = "删除标志(0:正常，1:删除)")
