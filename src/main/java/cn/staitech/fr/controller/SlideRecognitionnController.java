@@ -39,8 +39,9 @@ public class SlideRecognitionnController {
 //    @RequiresPermissions(value = {"algorithmDetectionInfo:slice:startAlgorithm", "algorithmDetectionInfo:slice:reStartErrorData"}, logical = Logical.OR)
     @PostMapping("/start")
     public R start(@Validated @RequestBody StartPredictionIn req) {
-        R r = algorithmPredictionService.startPrediction(req);
-        return r;
+//        R r = algorithmPredictionService.startPrediction(req);
+//    	return r;
+        return R.ok();
     }
     
 }
