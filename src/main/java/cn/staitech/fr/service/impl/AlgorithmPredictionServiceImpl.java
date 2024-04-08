@@ -199,11 +199,11 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 
 	public void process(AlgorithmAnnIn  algorithmAnnIn) throws Exception {
 		Long startTime = System.currentTimeMillis();
-		List<Long> slideIdList = algorithmAnnIn.getSlideIdList();
-		if(CollectionUtils.isNotEmpty(slideIdList)){
+		Long slideId = algorithmAnnIn.getSlideId();
+		if(null != slideId){
 			// 查询切片列表  
 			QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
-			queryWrapper.in("slide_id", slideIdList);
+			queryWrapper.eq("slide_id", slideId);
 			List<Slide> slideList = slideMapper.selectList(queryWrapper);
 			//			List<Slide> slideList = slideService.list(queryWrapper);
 			//1、拆分核对操作
