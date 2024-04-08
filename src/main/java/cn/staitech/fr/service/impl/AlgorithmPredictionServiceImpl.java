@@ -18,7 +18,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -37,6 +41,7 @@ import cn.staitech.fr.domain.WaxBlockInfo;
 import cn.staitech.fr.domain.in.AlgorithmAnnIn;
 import cn.staitech.fr.domain.in.StartPredictionIn;
 import cn.staitech.fr.domain.out.AlgorithmImageOut;
+import cn.staitech.fr.feign.PythonService;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.service.AlgorithmPredictionService;
@@ -45,6 +50,7 @@ import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.WaxBlockInfoService;
 import cn.staitech.fr.service.WaxBlockNumberService;
 import cn.staitech.fr.vo.annotation.AnnotationCountByCategory;
+import cn.staitech.fr.vo.annotation.StartRecognition;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -88,6 +94,9 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 
 	@Value("${frinspection.algorithmPredictionPath}")
 	private String algorithmPredictionPath;
+	
+	@Resource
+	private PythonService pythonService;
 
 	public static String geNumber(Long organizationId) {
 		NumberFormat formatter = NumberFormat.getNumberInstance();
@@ -144,9 +153,17 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 					dataMap.put("algorithm_name", CommonConstant.RECOGNITION_MODEL_NAME);
 					//请求算法接口
 					try {
-						ResponseEntity<String> resp = restTemplate.postForEntity(algorithmPredictionPath, JSONUtil.toJsonStr(dataMap), String.class);
-						String body = resp.getBody();
-						log.info("AI算法请求返回数据{},内容是{}", JSONUtil.toJsonStr(resp), body);
+						log.info("AI算法请求内容是{}", JSONUtil.toJsonStr(dataMap));
+						
+//				        ResponseEntity<String> resp = restTemplate.postForEntity(algorithmPredictionPath,JSONUtil.toJsonStr(dataMap) , String.class);
+						StartRecognition startRecognition = new StartRecognition();
+						startRecognition.setImageId(imageId);
+						startRecognition.setSlideId(slideId);
+						startRecognition.setImageUrl(imageUrl);
+						startRecognition.setAlgorithm_name(CommonConstant.RECOGNITION_MODEL_NAME);
+						String body = pythonService.startPrediction(startRecognition);
+//						String body = resp.getBody();
+						log.info("AI算法请求返回数据{}", JSONUtil.toJsonStr(body));
 						JSONObject jsonObject = new JSONObject(body);
 						Integer code = jsonObject.getInt("code");
 						if (code.equals(200)) {

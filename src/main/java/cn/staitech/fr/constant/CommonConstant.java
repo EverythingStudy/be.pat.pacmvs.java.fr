@@ -160,7 +160,7 @@ public class CommonConstant {
      * 识别算法
      */
     
-    public static final String RECOGNITION_MODEL_NAME  = "图像识别算法";
+    public static final String RECOGNITION_MODEL_NAME  = "全脏器识别";
     
     public static final String WAX_BLOCK_INFO  = "WAX_BLOCK_INFO_";
 }
