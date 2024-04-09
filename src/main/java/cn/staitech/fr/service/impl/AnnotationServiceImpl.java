@@ -553,6 +553,10 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotationBys.setUpdateBy(req.getUpdate_by());
         annotationBys.setOperation(req.getOperation());
         Annotation annotation1 = annotationMapper.mergeContour(annotationBys);
+        String contourType = annotationMapper.selectContourType(annotation1).getLocationType();
+        if(!Objects.equals(contourType, "POLYGON")){
+            throw new Exception(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
+        }
         annotationBys.setContour(annotation1.getContour());
         Slide slide = slideMapper.selectById(annotation.getSlideId());
         if (!Optional.ofNullable(slide).isPresent()) {
