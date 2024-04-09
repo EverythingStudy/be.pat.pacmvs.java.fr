@@ -46,6 +46,7 @@ import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.service.AlgorithmPredictionService;
 import cn.staitech.fr.service.AnnotationService;
+import cn.staitech.fr.service.CategoryService;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.WaxBlockInfoService;
 import cn.staitech.fr.service.WaxBlockNumberService;
@@ -88,8 +89,11 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	@Resource
 	private RedisService redisService;
 
+	@Resource
+	private CategoryService categoryService;
 
-	
+
+
 	@Resource
 	private PythonService pythonService;
 
@@ -219,6 +223,14 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 
 
 	public void checkSlide(Slide slide) {
+				Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+//		Long organizationId = 1L;
+		Map<String, String> cMap = categoryService.getCategory();
+		if(null != cMap){
+		System.out.println(JSONUtil.toJsonStr(cMap));
+		}else{
+			System.out.println(111);
+		}
 		//专题id
 		Long specialId = slide.getSpecialId();
 		Long slideId = slide.getSlideId();
@@ -231,6 +243,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		waxDataMap = redisService.getCacheObject(cacheKey);
 
 		if (null == waxDataMap || waxDataMap.isEmpty()) {
+			waxDataMap = new HashMap<String, Integer>();
 			//查询所属蜡块完整信息
 			List<WaxBlockInfo> waxinfoList = waxBlockInfoService.getWaxBlockInfoList(slideId, waxCode);
 			//处理蜡块信息
@@ -256,8 +269,8 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 					Long categoryId = annotationCount.getCategoryId();
 					int categoryCount = annotationCount.getTotalCount();
 					//标签id转为名称
-					Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
-					String categoryFullName = MapConstant.getCategory(organizationId+categoryId);
+					String oCategory = organizationId.toString()+categoryId.toString();
+					String categoryFullName = MapConstant.getCategory(oCategory);
 					if(StringUtils.isNotEmpty(categoryFullName)){
 						slideCountMap.put(categoryFullName, categoryCount);
 					}

@@ -38,7 +38,7 @@ public class MapConstant {
      * @param getOrgan
      * @return
      */
-    public static String getCategory(Long organizationIdCategoryId) {
+    public static String getCategory(String organizationIdCategoryId) {
         if (CATEGORY_MAP.containsKey(organizationIdCategoryId)) {
             return CATEGORY_MAP.get(organizationIdCategoryId);
         }

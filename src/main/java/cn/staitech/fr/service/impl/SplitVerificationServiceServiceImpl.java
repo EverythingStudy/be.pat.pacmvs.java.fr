@@ -109,7 +109,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 				queryWrapper.in("slide_id",annoSlideIdList);
 			}
 			Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
-			String categoryName = MapConstant.getCategory(organizationId+reqCategoryId);
+			String categoryName = MapConstant.getCategory(organizationId+reqCategoryId+"");
 			queryWrapper.like("organs",categoryName);
 		}
 
@@ -161,7 +161,9 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 						for (Map.Entry<Long, Long> entry : categoryCountGroupedBycategory.entrySet()) {
 							Long categoryId = entry.getKey();
 							Long categoryCount = entry.getValue();
-							String categoryFullName = MapConstant.getCategory(categoryId);
+							Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+							String oCategory = organizationId.toString()+categoryId.toString();
+							String categoryFullName = MapConstant.getCategory(oCategory);
 							if(StringUtils.isNotEmpty(categoryFullName)){
 								annoCategoryMap.put(categoryFullName, categoryCount);
 							}
@@ -232,7 +234,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 				req.setSlideIdList(annoSlideIdList);
 			}
 			Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
-			String categoryName = MapConstant.getCategory(organizationId+categoryId);
+			String oCategory = organizationId.toString()+categoryId.toString();
+			String categoryName = MapConstant.getCategory(oCategory);
 			if(StringUtils.isNotEmpty(categoryName)){
 				req.setCategoryName(categoryName);
 			}
