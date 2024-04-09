@@ -97,6 +97,8 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	@SuppressWarnings("rawtypes")
 	@Override
 	public R startPrediction(StartPredictionIn req) {
+		Long organizationId  = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+		Long userId = SecurityUtils.getLoginUser().getSysUser().getUserId();
 		Long specialId = req.getSpecialId();
 		//启动切片方式 0：全部启动 1：部分启动
 		int type = req.getType();
@@ -131,17 +133,18 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 					Map<String,Object> dataMap = new HashMap<>();
 					dataMap.put("imageId", imageId);
 					dataMap.put("slideId", slideId);
+					dataMap.put("organizationId", organizationId);
 					dataMap.put("imageUrl", imageUrl);
 					dataMap.put("algorithm_name", CommonConstant.RECOGNITION_MODEL_NAME);
 					//请求算法接口
 					try {
-						log.info("AI算法请求内容是{}", JSONUtil.toJsonStr(dataMap));
-						
+						log.info("AI算法请求内容是imageId:{},slideId:{},organizationId:{},imageUrl:{},algorithm_name:{}", imageId,slideId,organizationId,imageUrl,CommonConstant.RECOGNITION_MODEL_NAME);
 						StartRecognition startRecognition = new StartRecognition();
 						startRecognition.setImageId(imageId);
 						startRecognition.setSlideId(slideId);
 						startRecognition.setImageUrl(imageUrl);
 						startRecognition.setAlgorithm_name(CommonConstant.RECOGNITION_MODEL_NAME);
+						startRecognition.setOrganizationId(organizationId);
 						String body = pythonService.startPrediction(startRecognition);
 						log.info("AI算法请求返回数据{}", JSONUtil.toJsonStr(body));
 						JSONObject jsonObject = new JSONObject(body);
@@ -152,7 +155,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 							slide.setSlideId(slideId);
 							//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
 							slide.setProcessFlag(1);
-							slide.setInitiateBy(SecurityUtils.getLoginUser().getSysUser().getUserId());
+							slide.setInitiateBy(userId);
 							slide.setInitiateTime(new Date());
 							slideService.updateById(slide);
 						}
