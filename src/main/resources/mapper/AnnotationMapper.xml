@@ -20,6 +20,7 @@
         <result property="slideId" column="slide_id" jdbcType="BIGINT"/>
         <result property="id" column="id" jdbcType="VARCHAR"/>
         <result property="contour" column="contour" jdbcType="OTHER"/>
+        <result property="contourType" column="contour_type" jdbcType="BIGINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -27,7 +28,7 @@
         description,category_id,location_type,
         annotation_type,create_by,create_time,
         update_by,update_time,project_id,
-        slide_id,id,contour
+        slide_id,id,contour,contour_type
     </sql>
 
     <insert id="insert" parameterType="cn.staitech.fr.domain.Annotation" useGeneratedKeys="true"
@@ -231,7 +232,8 @@
         select t.category_id, count(1) total_count
         from fr_annotation t
         where t.slide_id = #{slideId}
-        GROUP BY t.category_id
+        and t.getCategoryCount
+        GROUP BY t.contour_type = 2
     </select>
 
     <select id="getAnnoListByParm" resultType="cn.staitech.fr.domain.Annotation">
