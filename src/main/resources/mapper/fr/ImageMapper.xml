@@ -532,7 +532,7 @@
         left join sys_user u on i.create_by = u.user_id
         left join aipre_folder f on i.folder_id = f.folder_id
         <where>
-            i.fuzzy_level='1' or (definition_status='1' and i.fuzzy_level='2')
+            (i.fuzzy_level='1' or (definition_status='1' and i.fuzzy_level='2'))
             <if test="imageCode != null and imageCode != ''">
                 <!-- 切片（图像）编号 -->
                 and i.image_code like concat('%', #{imageCode}, '%')
