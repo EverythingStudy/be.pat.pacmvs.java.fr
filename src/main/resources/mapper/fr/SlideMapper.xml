@@ -22,6 +22,8 @@
         <result property="checkTime" column="check_time" jdbcType="TIMESTAMP"/>
         <result property="updateBy" column="update_by" jdbcType="BIGINT"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="initiateBy" column="initiate_by" jdbcType="BIGINT"/>
+        <result property="initiateTime" column="initiate_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -31,7 +33,7 @@
         gender_flag,organs,process_flag,
         create_by,create_time,update_by,
         update_time,check_status,check_by,
-        check_time,animalCheckStatus
+        check_time,animalCheckStatus,initiate_by,initiate_time
     </sql>
 
     <select id="selectBySpecialId" parameterType="java.lang.Long" resultType="java.lang.String">
