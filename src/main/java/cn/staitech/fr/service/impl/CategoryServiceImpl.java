@@ -24,11 +24,11 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     private CategoryMapper categoryMapper;
 
 	@Override
-	public Map<Long, String> getCategory() {
-		Map<Long, String> map = new HashMap<Long, String>();
+	public Map<String, String> getCategory() {
+		Map<String, String> map = new HashMap<String, String>();
 		List<Category> list = list();
 		if (CollectionUtils.isNotEmpty(list)) {
-			map = list.stream().collect(Collectors.toMap(Category::getCategoryId, Category::getOrganName));
+			map = list.stream().collect(Collectors.toMap(item -> item.getOrganizationId().toString() + item.getCategoryId(), Category::getOrganName));
 		}
 		return map;
 	}

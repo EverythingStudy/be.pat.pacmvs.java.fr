@@ -105,7 +105,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 				req.setSlideIdList(annoSlideIdList);
 				queryWrapper.in("slide_id",annoSlideIdList);
 			}
-			String categoryName = MapConstant.getCategory(reqCategoryId);
+			Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+			String categoryName = MapConstant.getCategory(organizationId+reqCategoryId);
 			queryWrapper.like("organs",categoryName);
 		}
 
@@ -227,8 +228,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			if(CollectionUtils.isNotEmpty(annoSlideIdList)){
 				req.setSlideIdList(annoSlideIdList);
 			}
-
-			String categoryName = MapConstant.getCategory(categoryId);
+			Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+			String categoryName = MapConstant.getCategory(organizationId+categoryId);
 			if(StringUtils.isNotEmpty(categoryName)){
 				req.setCategoryName(categoryName);
 			}

@@ -20,7 +20,7 @@ public class MapConstant {
     /**
      * 脏器
      */
-    public static Map<Long, String> CATEGORY_MAP;
+    public static Map<String, String> CATEGORY_MAP;
     /**
      * 机构
      */
@@ -38,9 +38,9 @@ public class MapConstant {
      * @param getOrgan
      * @return
      */
-    public static String getCategory(Long categoryId) {
-        if (CATEGORY_MAP.containsKey(categoryId)) {
-            return CATEGORY_MAP.get(categoryId);
+    public static String getCategory(Long organizationIdCategoryId) {
+        if (CATEGORY_MAP.containsKey(organizationIdCategoryId)) {
+            return CATEGORY_MAP.get(organizationIdCategoryId);
         }
         return "";
     }

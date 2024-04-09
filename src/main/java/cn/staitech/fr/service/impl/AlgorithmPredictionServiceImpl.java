@@ -89,18 +89,9 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	private RedisService redisService;
 
 
-	@Value("${frinspection.algorithmPredictionPath}")
-	private String algorithmPredictionPath;
 	
 	@Resource
 	private PythonService pythonService;
-
-	public static String geNumber(Long organizationId) {
-		NumberFormat formatter = NumberFormat.getNumberInstance();
-		formatter.setMinimumIntegerDigits(3);
-		formatter.setGroupingUsed(false);
-		return "C" + formatter.format(organizationId);
-	}
 
 
 	@SuppressWarnings("rawtypes")
@@ -262,7 +253,8 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 					Long categoryId = annotationCount.getCategoryId();
 					int categoryCount = annotationCount.getTotalCount();
 					//标签id转为名称
-					String categoryFullName = MapConstant.getCategory(categoryId);
+					Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+					String categoryFullName = MapConstant.getCategory(organizationId+categoryId);
 					if(StringUtils.isNotEmpty(categoryFullName)){
 						slideCountMap.put(categoryFullName, categoryCount);
 					}
