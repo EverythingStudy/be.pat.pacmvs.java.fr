@@ -2,6 +2,7 @@ package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
+import cn.staitech.common.core.web.controller.BaseController;
 import cn.staitech.fr.domain.in.SpecialListQueryIn;
 import cn.staitech.fr.domain.in.SpecialRecyclingListQueryIn;
 import cn.staitech.fr.domain.in.SpecialRecyclingRecoverIn;
@@ -26,7 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(value = "专题回收站", tags = "专题回收站")
 @RestController
 @RequestMapping("/specialRecycling")
-public class SpecialRecyclingController {
+public class SpecialRecyclingController  extends BaseController {
 
     @Autowired
     private SpecialRecyclingService specialRecyclingService;

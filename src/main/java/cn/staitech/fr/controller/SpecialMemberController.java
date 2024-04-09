@@ -2,6 +2,7 @@ package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
+import cn.staitech.common.core.web.controller.BaseController;
 import cn.staitech.common.log.annotation.Log;
 import cn.staitech.common.log.enums.BusinessType;
 import cn.staitech.fr.domain.in.AddMemberIn;
@@ -30,7 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(tags = "专题成员配置")
 @RestController
 @RequestMapping("/specialMember")
-public class SpecialMemberController {
+public class SpecialMemberController  extends BaseController {
     @Autowired
     private SpecialMemberService specialMemberService;
 

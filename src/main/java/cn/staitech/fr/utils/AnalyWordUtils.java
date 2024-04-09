@@ -23,7 +23,7 @@ public class AnalyWordUtils {
 
 
     public static void main(String[] args) throws Exception {
-        FileInputStream fis = new FileInputStream(new File("D:\\word/大鼠蜡块编号表 .docx"));
+        FileInputStream fis = new FileInputStream(new File("D:\\文档\\2.0机构版\\测试文件/大鼠致癌试验蜡块编号表.docx"));
         XWPFDocument document = new XWPFDocument(fis);
         List<XWPFParagraph> paragraphs = document.getParagraphs();
         String text = paragraphs.get(1).getText().trim();

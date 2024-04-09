@@ -42,6 +42,9 @@
         <if test="specialName != null and specialName != ''">
             and fs.special_name like concat('%', #{specialName}, '%')
         </if>
+        <if test="trialId != null ">
+            and fs.trial_id = #{trialId}
+        </if>
         <if test="speciesId != null and speciesId != ''">
             and fs.species_id = #{speciesId}
         </if>
@@ -52,13 +55,13 @@
             and fs.color_type = #{colorType}
         </if>
         <if test="createName != null and createName != ''">
-            and su.userName like concat('%', #{userName}, '%')
+            and su.user_name like concat('%', #{createName}, '%')
         </if>
         <if test="createTimeParams!=null and createTimeParams.size() > 0">
-            <if test="createTimeParams.beginTime != null and createTimeParams.beginTime != ''"><!-- 开始时间检索 -->
+            <if test="createTimeParams.beginTime != null "><!-- 开始时间检索 -->
                 AND date_format(fs.create_time,'%Y%m%d') &gt;= date_format(#{createTimeParams.beginTime},'%Y%m%d')
             </if>
-            <if test="createTimeParams.endTime != null and createTimeParams.endTime != ''"><!-- 结束时间检索 -->
+            <if test="createTimeParams.endTime != null "><!-- 结束时间检索 -->
                 AND date_format(fs.create_time,'%Y%m%d') &lt;= date_format(#{createTimeParams.endTime},'%Y%m%d')
             </if>
         </if>
