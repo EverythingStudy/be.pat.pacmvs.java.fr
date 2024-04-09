@@ -73,7 +73,10 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		PageResponse<SplitVerificationOut> pageResponse = new PageResponse<>();
 		String reqAnimalCode = req.getAnimalCode();
 		//只看核对异常数据  0：全部  1：只看异常数据
-		int reqCheckType = req.getCheckType();
+		int reqCheckType = 0;
+		if(null != req.getCheckType()){
+			reqCheckType = req.getCheckType();
+		}
 		int pageSize = req.getPageSize(); // 每页显示的条目数量
 		int currentPage = req.getPageNum(); // 当前页码
 
