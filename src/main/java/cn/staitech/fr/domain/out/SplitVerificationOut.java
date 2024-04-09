@@ -19,6 +19,9 @@ public class SplitVerificationOut {
 	@ApiModelProperty(value = "动物编号")
 	private String animalCode;
 	
+	@ApiModelProperty(value = "切片编号")
+	private Long slideId;
+	
     @ApiModelProperty(value = "切图结果（0：正确 1：错误）")
     private Integer processFlag;
     

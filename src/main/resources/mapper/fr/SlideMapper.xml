@@ -147,7 +147,7 @@
 		</where>
 				AND t1.process_flag = 2
 				AND t1.check_status > 0 
-		ORDER BY	t1.animal_check_status desc,t1.check_status desc,t1.file_name
+		ORDER BY	t1.animal_check_status desc,t1.check_status desc,t2.file_name
      </select>
 
     <select id="pageImageCsvListVOBy" parameterType="long"
