@@ -215,10 +215,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             String traceId = req.getTraceId();
             // 撤消,恢复历史记录 用HistoryService会引起循环依赖！ -> 后续在线程池中处理 判断是批处理，还是单独处理
             // 1、创建Session,并存入ConcurrentHashMap<Long, Session>
-            Long userId = req.getUpdate_by();
+            Long userId = req.getCreate_by();
             Long slideId = req.getSlide_id();
             Session session = HistoryServiceImpl.refreshSession(userId, slideId);
-
             // 2、创建Trace,并存入Session.list,LinkedList<Trace>
             if (req.getIsBatch()) {
                 // 批量操作：若trace已经存在，不用再add
@@ -554,6 +553,10 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotationBys.setUpdateBy(req.getUpdate_by());
         annotationBys.setOperation(req.getOperation());
         Annotation annotation1 = annotationMapper.mergeContour(annotationBys);
+        String contourType = annotationMapper.selectContourType(annotation1).getLocationType();
+        if(!Objects.equals(contourType, "POLYGON")){
+            throw new Exception(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
+        }
         annotationBys.setContour(annotation1.getContour());
         Slide slide = slideMapper.selectById(annotation.getSlideId());
         if (!Optional.ofNullable(slide).isPresent()) {

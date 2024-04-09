@@ -8,4 +8,5 @@ public class StartRecognition {
     private Long slideId;
     private String imageUrl;
     private String algorithm_name;
+    private Long organizationId;
 }

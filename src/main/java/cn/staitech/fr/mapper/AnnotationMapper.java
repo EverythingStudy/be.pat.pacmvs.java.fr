@@ -25,6 +25,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     Annotation mergeContour(Annotation annotation);
 
+    Annotation selectContourType(Annotation annotation);
+
     Integer selectTableRecordCount(Annotation annotation);
 
     Integer selectExistTable(Annotation annotation);

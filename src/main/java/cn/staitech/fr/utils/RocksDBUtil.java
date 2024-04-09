@@ -81,6 +81,13 @@ public class RocksDBUtil {
         }
     }
 
+    private RocksDBUtil() {
+    }
+
+    public static void init() {
+        new RocksDBUtil();
+    }
+
     public static boolean deleteFolder(File folder) {
         // 检查文件夹是否存在，如果不存在，说明删除成功；如果存在，继续删除子文件夹和文件
         if (!folder.exists()) {
@@ -111,12 +118,6 @@ public class RocksDBUtil {
         return result;
     }
 
-    private RocksDBUtil() {
-    }
-
-    public static void init() {
-        new RocksDBUtil();
-    }
 
     /**
      * 列族，创建（如果不存在）
