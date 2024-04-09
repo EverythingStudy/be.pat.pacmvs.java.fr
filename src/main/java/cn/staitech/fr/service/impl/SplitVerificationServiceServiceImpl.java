@@ -225,6 +225,9 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			// 提取指定范围内的元素作为当前页的结果集合
 			List<SplitVerificationOut> result = sortedList.subList(startIndex, endIndex);
 
+			if(CollectionUtils.isEmpty(result)){
+				result = new ArrayList<>();
+			}
 
 			pageResponse.setTotal(total);
 			pageResponse.setPages(totalPages);
@@ -311,6 +314,9 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			}
 		}
 		pageResponse.setTotal(page.getTotal());
+		if(CollectionUtils.isEmpty(slideList)){
+			slideList = new ArrayList<>();
+		}
 		pageResponse.setList(slideList);
 		pageResponse.setPageNum(req.getPageNum());
 		pageResponse.setPageSize(req.getPageSize());
@@ -324,8 +330,10 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		Long slideId = req.getSlideId();
 		Slide slide = new Slide();
 		slide.setSlideId(slideId);
-		//核对状态 0：初始 1：正确 2：修正正常 3：错误 
+		
+		//修正状态  0：修正  1：取消修正
 		if(req.getCorrectionStatus() == 0){
+			//核对状态 0：初始 1：正确 2：修正正常 3：错误 
 			slide.setCheckStatus(2);
 		}else{
 			slide.setCheckStatus(3);
