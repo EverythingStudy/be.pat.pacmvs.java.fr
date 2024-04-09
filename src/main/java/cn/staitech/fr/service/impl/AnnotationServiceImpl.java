@@ -373,7 +373,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             }
         }
         if (req.getCategory_id() != null) {
-            if (req.getCategory_id() != 0 && !req.getCategory_id().equals(annotation.getCategoryId())) {
+            if (!req.getCategory_id().equals(annotation.getCategoryId())) {
                 annotation.setCategoryId(req.getCategory_id());
             }
         }
@@ -394,7 +394,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBys);
         Features features = AnnotationDataEncapsulation.socketData(annotation.getId(), req.getGeometry(), properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
-        NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
+        NioWebSocketHandler.sendAll(req.getSlide_id(), broadcastVO);
 
         List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
         int type;
