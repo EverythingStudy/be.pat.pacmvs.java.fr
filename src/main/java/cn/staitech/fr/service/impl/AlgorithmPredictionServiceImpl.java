@@ -230,7 +230,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		Long slideId = slide.getSlideId();
 		//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
 		int processFlag = slide.getProcessFlag();
-		if(processFlag == 2){
+		if(processFlag == 3){
 			//更新checkStatus
 			Slide updateSlide = new Slide();
 			updateSlide.setSlideId(slideId);
