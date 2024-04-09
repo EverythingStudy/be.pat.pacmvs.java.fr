@@ -388,6 +388,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             annotation.setUpdateBy(SecurityUtils.getLoginUser().getSysUser().getUserId());
         }
         annotation.setId(id);
+        annotation.setSlideId(req.getSlide_id());
         annotation.setAnnotationId(Long.valueOf(req.getMarking_id()));
         annotation.setContour(null);
         annotationMapper.updateById(annotation);
