@@ -299,9 +299,6 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 				Map<String, Long> waxCategoryMap = new HashMap<String, Long>();
 					//切图结果==》按照动物编号统计汇总
 					List<WaxBlockInfo> waxinfoList = waxBlockInfoService.getWaxBlockInfoList(slideId, slide.getWaxCode(),genderFlag);
-					if(CollectionUtils.isEmpty(waxinfoList)){
-						waxinfoList = waxBlockInfoService.getWaxBlockInfoList(slideId, slide.getWaxCode(),"");
-					}
 					//处理蜡块信息
 					if(CollectionUtils.isNotEmpty(waxinfoList)){
 						for(WaxBlockInfo info:waxinfoList){

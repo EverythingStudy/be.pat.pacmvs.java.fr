@@ -53,7 +53,7 @@
 			) 
 			AND t3.wax_code = #{waxCode}
 			<if test="genderFlag != null and genderFlag != ''">
-			AND t3.gender_flag = #{genderFlag}
+			AND (t3.gender_flag = #{genderFlag} or t3.gender_flag is Null)
 			</if>
     </select>
 </mapper>

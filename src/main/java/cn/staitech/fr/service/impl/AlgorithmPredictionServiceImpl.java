@@ -261,9 +261,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			waxDataMap = new HashMap<String, Integer>();
 			//查询所属蜡块完整信息
 			List<WaxBlockInfo> waxinfoList = waxBlockInfoService.getWaxBlockInfoList(slideId, waxCode,genderFlag);
-			if(CollectionUtils.isEmpty(waxinfoList)){
-				 waxinfoList = waxBlockInfoService.getWaxBlockInfoList(slideId, waxCode,"");
-			}
 			//处理蜡块信息
 			if(CollectionUtils.isNotEmpty(waxinfoList)){
 				for(WaxBlockInfo info:waxinfoList){
