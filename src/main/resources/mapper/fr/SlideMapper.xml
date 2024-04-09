@@ -140,7 +140,7 @@
             </if>
             <if test="slideIdList != null and slideIdList.size() >0 ">
 	            AND t1.slide_id in
-	            <foreach item="slideIdList" collection="item" separator="," open="(" close=")" index="">
+	            <foreach item="item" collection="slideIdList" separator="," open="(" close=")" index="">
 	                #{item}
 	            </foreach>
         	</if>

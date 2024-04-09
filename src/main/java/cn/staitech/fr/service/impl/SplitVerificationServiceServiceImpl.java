@@ -62,20 +62,22 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 
 	@Override
 	public PageResponse<SplitVerificationOut>  getList(SplitVerificationQueryIn req) {
+//		Long organizationId = 1L;
+		Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
 		PageResponse<SplitVerificationOut> pageResponse = new PageResponse<>();
 		//查看切片明细  0：否  1：是
 		int detailType = req.getDetailType();
 		if(detailType == 0){
-			pageResponse = SplitVerificationCount(req);
+			pageResponse = SplitVerificationCount(req,organizationId);
 		}else{
-			pageResponse =  SplitVerificationDetailCount(req);
+			pageResponse =  SplitVerificationDetailCount(req,organizationId);
 		}
 
 		return pageResponse;
 	}
 
 	//非明细统计
-	private  PageResponse<SplitVerificationOut> SplitVerificationCount(SplitVerificationQueryIn req){
+	private  PageResponse<SplitVerificationOut> SplitVerificationCount(SplitVerificationQueryIn req,Long organizationId){
 		PageResponse<SplitVerificationOut> pageResponse = new PageResponse<>();
 		String reqAnimalCode = req.getAnimalCode();
 		//只看核对异常数据  0：全部  1：只看异常数据
@@ -114,8 +116,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 				req.setSlideIdList(annoSlideIdList);
 				queryWrapper.in("slide_id",annoSlideIdList);
 			}
-			Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
-			String categoryName = MapConstant.getCategory(organizationId+reqCategoryId+"");
+			String oCategory = organizationId.toString()+reqCategoryId.toString();
+			String categoryName = MapConstant.getCategory(oCategory);
 			queryWrapper.like("organs",categoryName);
 		}
 
@@ -167,8 +169,6 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 						for (Map.Entry<Long, Long> entry : categoryCountGroupedBycategory.entrySet()) {
 							Long categoryId = entry.getKey();
 							Long categoryCount = entry.getValue();
-//							Long organizationId = 1L;
-														Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
 							String oCategory = organizationId.toString()+categoryId.toString();
 							String categoryFullName = MapConstant.getCategory(oCategory);
 							if(StringUtils.isNotEmpty(categoryFullName)){
@@ -238,7 +238,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 
 
 	//明细统计
-	private  PageResponse<SplitVerificationOut> SplitVerificationDetailCount(SplitVerificationQueryIn req){
+	private  PageResponse<SplitVerificationOut> SplitVerificationDetailCount(SplitVerificationQueryIn req,Long organizationId){
 		//查找符合条件的AI
 		Long categoryId = req.getCategoryId();
 		if(null != categoryId){
@@ -249,7 +249,6 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			if(CollectionUtils.isNotEmpty(annoSlideIdList)){
 				req.setSlideIdList(annoSlideIdList);
 			}
-			Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
 			String oCategory = organizationId.toString()+categoryId.toString();
 			String categoryName = MapConstant.getCategory(oCategory);
 			if(StringUtils.isNotEmpty(categoryName)){
@@ -285,8 +284,6 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 					for (Map.Entry<Long, Long> entry : categoryCountGroupedBycategory.entrySet()) {
 						Long categoryIdP = entry.getKey();
 						Long categoryCount = entry.getValue();
-//						Long organizationId = 1L;
-												Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
 						String oCategory = organizationId.toString()+categoryIdP.toString();
 						String categoryFullName = MapConstant.getCategory(oCategory);
 						if(StringUtils.isNotEmpty(categoryFullName)){
