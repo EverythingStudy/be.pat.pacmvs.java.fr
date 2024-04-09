@@ -482,4 +482,94 @@
         </where>
         order by i.image_id desc
     </select>
+    <!-- 切片管理 - 模糊切片 -->
+    <select id="selectSlideList" parameterType="cn.staitech.fr.domain.in.ImageVagueQueryIn" resultMap="BaseResultMap">
+        select i.image_id,
+        i.file_name,
+        i.image_name,
+        i.image_path,
+        i.image_url,
+        i.thumb_url,
+        i.macro_url,
+        i.label_url,
+        i.cache_url,
+        i.multiple,
+        i.format,
+        i.width,
+        i.height,
+        i.`depth`,
+        i.`size`,
+        i.global_size,
+        i.resolving_power,
+        i.tile_count_list,
+        i.level_count,
+        i.chunk_total,
+        i.md5,
+        i.resolution_x,
+        i.resolution_y,
+        i.source_lens,
+        i.create_by,
+        i.create_time,
+        i.update_by,
+        i.update_time,
+        i.image_code,
+        i.topic_id,
+        i.topic_name,
+        i.`status`,
+        i.host_id,
+        i.organization_id,
+        i.round_id,
+        i.biz_type,
+        i.`source`,
+        i.folder_id,
+        i.strip_fuzzy,
+        i.definition_status,
+        i.fuzzy_level,
+        i.multiple_fuzzy,
+        u.nick_name,
+        f.folder_name
+        from tb_image i
+        left join sys_user u on i.create_by = u.user_id
+        left join aipre_folder f on i.folder_id = f.folder_id
+        <where>
+            i.fuzzy_level='1' or (definition_status='1' and i.fuzzy_level='2')
+            <if test="imageCode != null and imageCode != ''">
+                <!-- 切片（图像）编号 -->
+                and i.image_code like concat('%', #{imageCode}, '%')
+            </if>
+            <if test="topicName != null and topicName != ''">
+                <!-- 专题名称 -->
+                and i.topic_name like concat('%', #{topicName}, '%')
+            </if>
+            <if test="organizationId != null">
+                <!-- 组织机构编号 -->
+                and i.organization_id = #{organizationId}
+            </if>
+            <if test="createTimeParams != null">
+                <if test="createTimeParams.beginTime != null and createTimeParams.beginTime != ''">
+                    <!-- 开始时间检索 -->
+                    and date_format(i.create_time,'%y%m%d') &gt;= date_format(#{createTimeParams.beginTime},'%y%m%d')
+                </if>
+                <if test="createTimeParams.endTime != null and createTimeParams.endTime != ''">
+                    <!-- 结束时间检索 -->
+                    and date_format(i.create_time,'%y%m%d') &lt;= date_format(#{createTimeParams.endTime},'%y%m%d')
+                </if>
+            </if>
+            <if test="stripFuzzy != null">
+                <!-- 是否条状模糊，0：初始值 1：是 2：不是 -->
+                and i.strip_fuzzy = #{stripFuzzy}
+            </if>
+            <if test="multipleFuzzy != null">
+                <!-- 切片是否多次模糊，0：初始值 1：是 2：不是 -->
+                and i.multiple_fuzzy = #{multipleFuzzy}
+            </if>
+            <if test="definitionStatus != null">
+                <!-- 是否手动修正，0：初始值 1：更正 2：还原 -->
+                and i.definition_status = #{definitionStatus}
+            </if>
+
+        </where>
+        order by i.image_id desc
+    </select>
+
 </mapper>

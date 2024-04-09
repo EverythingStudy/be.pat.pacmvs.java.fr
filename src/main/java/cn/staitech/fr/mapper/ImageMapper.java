@@ -3,6 +3,7 @@ package cn.staitech.fr.mapper;
 import java.util.List;
 
 import cn.staitech.fr.domain.in.ChoiceImageListInVo;
+import cn.staitech.fr.domain.in.ImageVagueQueryIn;
 import cn.staitech.fr.domain.out.ImageListOutVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -22,6 +23,14 @@ public interface ImageMapper extends BaseMapper<Image> {
      * @return
      */
     List<Image> selectListSlfe(Image image);
+
+    /**
+     * 查询模糊切片列表
+     *
+     * @param image
+     * @return
+     */
+    List<Image> selectSlideList(ImageVagueQueryIn image);
 
     /**
      * 查询未添加切片列表
