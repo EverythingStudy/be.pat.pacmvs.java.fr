@@ -142,7 +142,10 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 				int allCheckStatus = 0;
 				if(CollectionUtils.isNotEmpty(animalSlideList)){
 					//切图结果==》按照动物编号统计汇总
-					Map<Integer, Integer> checkMap = animalSlideList.stream().collect(Collectors.toMap(Slide::getCheckStatus,Slide::getCheckStatus ));
+//					Map<Integer, Integer> checkMap = animalSlideList.stream().collect(Collectors.toMap(Slide::getCheckStatus,Slide::getCheckStatus ));
+					
+					Map<Integer, List<Slide>> checkMap = animalSlideList.stream().collect(Collectors.groupingBy(Slide::getCheckStatus));
+					
 					if(null != checkMap && checkMap.containsKey(3)){
 						allCheckStatus = 1;
 					}
