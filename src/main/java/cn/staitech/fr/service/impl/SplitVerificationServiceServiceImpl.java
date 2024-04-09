@@ -265,6 +265,14 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			for(SplitVerificationOut out:slideList){
 				Long slideId = out.getSlideId();
 				Slide slide = slideMapper.selectById(slideId);
+				//修正标识（ 0：初始 1：正确 2：修正正常 3：错误 ）
+				int checkStatus = out.getCheckStatus();
+				//切图结果（0：正确 1：错误）
+				int processFlag = 1;
+				if(checkStatus == 1 || checkStatus == 2){
+					processFlag = 2;
+				}
+				out.setProcessFlag(processFlag);
 				//查询anno统计信息
 				Annotation queryAnno = new Annotation();
 				queryAnno.setSlideId(slideId);
