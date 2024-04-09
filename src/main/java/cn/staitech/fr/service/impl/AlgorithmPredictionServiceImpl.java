@@ -230,16 +230,26 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		Long slideId = slide.getSlideId();
 		//蜡块编号
 		String waxCode = slide.getWaxCode();
+		// 性别（M:雄；F:雌）
+		String genderFlag = slide.getGenderFlag();
 
 		Map<String,Integer> waxDataMap = new HashMap<String, Integer>();
 		int waxDataMapSize = 0;
-		String cacheKey = CommonConstant.WAX_BLOCK_INFO+specialId+"_"+waxCode;
+		String cacheKey = "";
+		if(StringUtils.isNotEmpty(genderFlag)){
+			cacheKey = CommonConstant.WAX_BLOCK_INFO+specialId+"_"+waxCode+"_"+genderFlag;
+		}else{
+			cacheKey = CommonConstant.WAX_BLOCK_INFO+specialId+"_"+waxCode;
+		}
 		waxDataMap = redisService.getCacheObject(cacheKey);
 
 		if (null == waxDataMap || waxDataMap.isEmpty()) {
 			waxDataMap = new HashMap<String, Integer>();
 			//查询所属蜡块完整信息
-			List<WaxBlockInfo> waxinfoList = waxBlockInfoService.getWaxBlockInfoList(slideId, waxCode);
+			List<WaxBlockInfo> waxinfoList = waxBlockInfoService.getWaxBlockInfoList(slideId, waxCode,genderFlag);
+			if(CollectionUtils.isEmpty(waxinfoList)){
+				 waxinfoList = waxBlockInfoService.getWaxBlockInfoList(slideId, waxCode,"");
+			}
 			//处理蜡块信息
 			if(CollectionUtils.isNotEmpty(waxinfoList)){
 				for(WaxBlockInfo info:waxinfoList){

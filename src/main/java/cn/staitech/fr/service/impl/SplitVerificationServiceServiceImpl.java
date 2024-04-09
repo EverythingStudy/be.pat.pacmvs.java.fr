@@ -62,8 +62,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 
 	@Override
 	public PageResponse<SplitVerificationOut>  getList(SplitVerificationQueryIn req) {
-		Long organizationId = 1L;
-//		Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+//		Long organizationId = 1L;
+		Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
 		PageResponse<SplitVerificationOut> pageResponse = new PageResponse<>();
 		//查看切片明细  0：否  1：是
 		int detailType = req.getDetailType();
@@ -295,11 +295,13 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 
 				//切片蜡片信息汇总
 				//查询当前专题下当前动物编号的所有切片
-				Slide slideInfo = slideService.getById(slideId);
+				String genderFlag = slide.getGenderFlag();
 				Map<String, Long> waxCategoryMap = new HashMap<String, Long>();
-				if(null != slideInfo){
 					//切图结果==》按照动物编号统计汇总
-					List<WaxBlockInfo> waxinfoList = waxBlockInfoService.getWaxBlockInfoList(slideId, slide.getWaxCode());
+					List<WaxBlockInfo> waxinfoList = waxBlockInfoService.getWaxBlockInfoList(slideId, slide.getWaxCode(),genderFlag);
+					if(CollectionUtils.isEmpty(waxinfoList)){
+						waxinfoList = waxBlockInfoService.getWaxBlockInfoList(slideId, slide.getWaxCode(),"");
+					}
 					//处理蜡块信息
 					if(CollectionUtils.isNotEmpty(waxinfoList)){
 						for(WaxBlockInfo info:waxinfoList){
@@ -309,7 +311,6 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 						}
 					}
 					out.setWaxOrgan(waxCategoryMap);
-				}
 			}
 		}
 		pageResponse.setTotal(page.getTotal());

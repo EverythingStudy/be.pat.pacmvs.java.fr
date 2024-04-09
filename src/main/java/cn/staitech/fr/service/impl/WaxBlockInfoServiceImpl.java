@@ -8,6 +8,8 @@ import cn.staitech.fr.service.WaxBlockInfoService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -41,10 +43,13 @@ public class WaxBlockInfoServiceImpl extends ServiceImpl<WaxBlockInfoMapper, Wax
     }
 
 	@Override
-	public List<WaxBlockInfo> getWaxBlockInfoList(Long slideId,String waxCode) {
+	public List<WaxBlockInfo> getWaxBlockInfoList(Long slideId,String waxCode,String genderFlag) {
 		Map<String,Object> parm = new HashMap<>();
 		parm.put("slideId", slideId);
 		parm.put("waxCode", waxCode);
+		if(StringUtils.isNotEmpty(genderFlag)){
+			parm.put("genderFlag", genderFlag);
+		}
 		List<WaxBlockInfo> list = waxBlockInfoMapper.getWaxBlockInfoList(parm);
 		return list;
 	}
