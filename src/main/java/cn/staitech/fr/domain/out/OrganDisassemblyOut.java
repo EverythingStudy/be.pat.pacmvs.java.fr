@@ -20,7 +20,7 @@ public class OrganDisassemblyOut {
     private Long slideId;
 
     @ApiModelProperty(value = "单脏器缩略图url地址")
-    private String imageUrl;
+    private String thumbUrl;
 
     @ApiModelProperty(value = "切片编号")
     private String fileName;

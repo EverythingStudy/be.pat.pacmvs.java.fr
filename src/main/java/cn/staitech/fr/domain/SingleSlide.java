@@ -22,7 +22,7 @@ public class SingleSlide implements Serializable {
 
     private Long slideId;
 
-    private String imageUrl;
+    private String thumbUrl;
 
     private Long categoryId;
 

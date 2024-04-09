@@ -9,7 +9,7 @@
         ti.file_name,
         ss.single_id,
         ss.slide_id,
-        ss.image_url,
+        ss.thumb_url,
         ss.category_id,
         fc.organ_en,
         fc.organ_name,
