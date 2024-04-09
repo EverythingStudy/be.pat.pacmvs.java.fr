@@ -225,12 +225,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	public void checkSlide(Slide slide) {
 				Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
 //		Long organizationId = 1L;
-		Map<String, String> cMap = categoryService.getCategory();
-		if(null != cMap){
-		System.out.println(JSONUtil.toJsonStr(cMap));
-		}else{
-			System.out.println(111);
-		}
 		//专题id
 		Long specialId = slide.getSpecialId();
 		Long slideId = slide.getSlideId();
@@ -322,14 +316,15 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		List<Slide> queryList = slideService.list(queryWrapper);
 		// 按照checkStatus属性分组到Map<String, List<Slide>>
 		Map<Integer, List<Slide>> mapByCheckStatus = queryList.stream().collect(Collectors.groupingBy(Slide::getCheckStatus));
+		System.out.println(JSONUtil.toJsonStr(mapByCheckStatus));
 		if(null !=mapByCheckStatus&& !mapByCheckStatus.isEmpty()){
 			UpdateWrapper<Slide> updateWrapper = new UpdateWrapper<>();
 			updateWrapper.eq("animal_code", animalCode);
 			updateWrapper.eq("special_id", specialId);
 			Slide sd = new Slide();
-			//核对状态 0：初始 1：正确 2：错误 3：修正正常
-			if(mapByCheckStatus.containsKey(2)){
-				sd.setAnimalCheckStatus(2);
+			//当前动物号检查状态 核对状态 0：初始 1：正确 2：修正正常 3：错误
+			if(mapByCheckStatus.containsKey(3)){
+				sd.setAnimalCheckStatus(3);
 			}else{
 				sd.setAnimalCheckStatus(1);
 			}

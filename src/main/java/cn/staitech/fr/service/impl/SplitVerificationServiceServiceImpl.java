@@ -167,8 +167,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 						for (Map.Entry<Long, Long> entry : categoryCountGroupedBycategory.entrySet()) {
 							Long categoryId = entry.getKey();
 							Long categoryCount = entry.getValue();
-							Long organizationId = 1L;
-							//							Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+//							Long organizationId = 1L;
+														Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
 							String oCategory = organizationId.toString()+categoryId.toString();
 							String categoryFullName = MapConstant.getCategory(oCategory);
 							if(StringUtils.isNotEmpty(categoryFullName)){
@@ -277,8 +277,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 					for (Map.Entry<Long, Long> entry : categoryCountGroupedBycategory.entrySet()) {
 						Long categoryIdP = entry.getKey();
 						Long categoryCount = entry.getValue();
-						Long organizationId = 1L;
-						//						Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+//						Long organizationId = 1L;
+												Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
 						String oCategory = organizationId.toString()+categoryIdP.toString();
 						String categoryFullName = MapConstant.getCategory(oCategory);
 						if(StringUtils.isNotEmpty(categoryFullName)){
