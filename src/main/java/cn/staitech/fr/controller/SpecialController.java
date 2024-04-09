@@ -2,6 +2,7 @@ package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
+import cn.staitech.common.core.web.controller.BaseController;
 import cn.staitech.fr.constant.Container;
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.in.EditSpecialStatusIn;
@@ -33,7 +34,7 @@ import java.util.Map;
 @Api(value = "专题", tags = "专题")
 @RestController
 @RequestMapping("/special")
-public class SpecialController {
+public class SpecialController  extends BaseController {
 
     @Autowired
     private SpecialService specialService;

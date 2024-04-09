@@ -315,15 +315,14 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 					if(slideTag){
 						checkStatus = 1;
 					}
-					//更新checkStatus
-					Slide updateSlide = new Slide();
-					updateSlide.setSlideId(slideId);
-					updateSlide.setCheckStatus(checkStatus);
-					updateSlide.setCheckBy(0l);
-					updateSlide.setCheckTime(new Date());
-					//					annotationMapper.updateById(updateSlide);
-					slideMapper.updateById(updateSlide);
 				}
+				//更新checkStatus
+				Slide updateSlide = new Slide();
+				updateSlide.setSlideId(slideId);
+				updateSlide.setCheckStatus(checkStatus);
+				updateSlide.setCheckBy(0l);
+				updateSlide.setCheckTime(new Date());
+				slideMapper.updateById(updateSlide);
 			}
 		}
 		//检查当前动物号所属的所有切片是否正常

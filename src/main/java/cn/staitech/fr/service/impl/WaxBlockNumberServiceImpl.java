@@ -194,16 +194,19 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
                     .map(cell -> cell.getText().trim())
                     .reduce((cell1, cell2) -> cell1 + " | " + cell2)
                     .orElse("");
-
+            s1=s1.replace(" ","");
+            if(s1.contains("Male")){
+                System.out.println(s1);
+            }
             log.info("详情信息：{}", s1);
-            if (s1.contains(CommonConstant.END_FLAG)) {
+            if (s1.contains(CommonConstant.END_FLAG) || (!s1.contains(CommonConstant.MALE_FLAG) && !s1.contains(CommonConstant.CODE_END))) {
                 continue;
             }
             String[] split = s1.split("\\|");
             if (split.length == 0) {
                 return R.fail(MessageSource.M("FILE_FORMART_ERROR"));
             } else if (split.length == 2) {
-                if (s1.contains(CommonConstant.MALE_FLAG)) {
+                if (s1.contains(CommonConstant.MALE_FLAG)&&s1.contains(CommonConstant.MALE_FLAG_CN)) {
                     if (CommonConstant.MALE.equals(split[0].trim())) {
                         sexList.add(CommonConstant.MALE);
                         sexList.add(CommonConstant.FEMALE);
@@ -269,18 +272,19 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
     }
 
     private void extracted(WaxBlockInfo waxBlockInfo1, Map<String, String> organList, List<WaxBlockInfo> insertList, String s2, String genderFlag) {
-        Pattern pattern = Pattern.compile(CommonConstant.EN_FLAG);
-        log.info("错误" + s2);
+        Pattern pattern = Pattern.compile(CommonConstant.EN_FLAG_NEW);
+        log.info("脏器数据" + s2);
         String[] parts = pattern.split(s2);
         String part = parts[0];
         log.info("脏器中文+数量:{}", part);
         String s3 = StringUtils.substringBeforeLast(part, CommonConstant.CODE_START).trim();
         log.info("脏器中文:{}", s3);
         String s4 = StringUtils.substringAfterLast(part, CommonConstant.CODE_START);
-        log.info("脏器数量+):{}", s4);
+        log.info("脏器数量:{}", s4);
+        /*log.info("脏器数量+):{}", s4);
         String s5 = StringUtils.substringBeforeLast(s4, CommonConstant.CODE_END);
-        log.info("脏器数量:{}", s5);
-        if (!s5.matches("^[0-9]+$")) {
+        log.info("脏器数量:{}", s5);*/
+        if (!s4.matches("^[0-9]+$")) {
             throw new RuntimeException(MessageSource.M("FILE_ORGAN_NUMBER_ERROR"));
         }
         String s6 = StringUtils.substringAfterLast(s2, part);
@@ -297,7 +301,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
                 BeanUtils.copyProperties(waxBlockInfo1, waxBlockInfo);
                 waxBlockInfo.setOrganId(organList.get(s3));
                 waxBlockInfo.setOrganName(split[i]);
-                waxBlockInfo.setOrganNumber(Integer.valueOf(s5));
+                waxBlockInfo.setOrganNumber(Integer.valueOf(s4));
                 waxBlockInfo.setOrganNameEn(split1[i]);
                 waxBlockInfo.setGenderFlag(genderFlag);
                 waxBlockInfo.setCreateBy(SecurityUtils.getUserId());
@@ -309,7 +313,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
             BeanUtils.copyProperties(waxBlockInfo1, waxBlockInfo);
             waxBlockInfo.setOrganId(organList.get(s3));
             waxBlockInfo.setOrganName(s3);
-            waxBlockInfo.setOrganNumber(Integer.valueOf(s5));
+            waxBlockInfo.setOrganNumber(Integer.valueOf(s4));
             waxBlockInfo.setOrganNameEn(s7);
             waxBlockInfo.setGenderFlag(genderFlag);
             waxBlockInfo.setCreateBy(SecurityUtils.getUserId());

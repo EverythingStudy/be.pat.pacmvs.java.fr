@@ -53,6 +53,7 @@ public class SpecialMemberServiceImpl extends ServiceImpl<SpecialMemberMapper, S
     @Override
     public R removeMember(Long memberId) {
         log.info("专题成员删除接口开始：");
+        //todo 校验用户操作信息
         SpecialMember specialMember = new SpecialMember();
         specialMember.setMemberId(memberId);
         specialMember.setDelFlag(CommonConstant.NUMBER_1);

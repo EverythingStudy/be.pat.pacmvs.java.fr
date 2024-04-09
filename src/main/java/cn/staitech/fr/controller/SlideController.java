@@ -2,6 +2,7 @@ package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
+import cn.staitech.common.core.web.controller.BaseController;
 import cn.staitech.fr.domain.in.ChoiceImageListInVo;
 import cn.staitech.fr.domain.in.ChoiceSaveInVo;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
@@ -27,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(value = "专题切片", tags = "专题切片")
 @RestController
 @RequestMapping("/slide")
-public class SlideController {
+public class SlideController  extends BaseController {
 
     @Autowired
     private ImageService imageService;

@@ -71,10 +71,10 @@
                 and su.user_name like concat('%',#{createBy},'%')
             </if>
             <if test="createTimeParams!=null and createTimeParams.size() > 0">
-                <if test="createTimeParams.beginTime != null and createTimeParams.beginTime != ''"><!-- 开始时间检索 -->
+                <if test="createTimeParams.beginTime != null "><!-- 开始时间检索 -->
                     AND date_format(fs.create_time,'%Y%m%d') &gt;= date_format(#{createTimeParams.beginTime},'%Y%m%d')
                 </if>
-                <if test="createTimeParams.endTime != null and createTimeParams.endTime != ''"><!-- 结束时间检索 -->
+                <if test="createTimeParams.endTime != null "><!-- 结束时间检索 -->
                     AND date_format(fs.create_time,'%Y%m%d') &lt;= date_format(#{createTimeParams.endTime},'%Y%m%d')
                 </if>
             </if>
