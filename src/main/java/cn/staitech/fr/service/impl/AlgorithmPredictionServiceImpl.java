@@ -228,6 +228,20 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		//专题id
 		Long specialId = slide.getSpecialId();
 		Long slideId = slide.getSlideId();
+		//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
+		int processFlag = slide.getProcessFlag();
+		if(processFlag == 2){
+			//更新checkStatus
+			Slide updateSlide = new Slide();
+			updateSlide.setSlideId(slideId);
+			//核对状态 0：初始 1：正确 2：修正正常 3：错误
+			updateSlide.setCheckStatus(3);
+			updateSlide.setCheckBy(0l);
+			updateSlide.setCheckTime(new Date());
+			updateSlide.setAnimalCheckStatus(3);
+			slideMapper.updateById(updateSlide);
+			return ;
+		}
 		//蜡块编号
 		String waxCode = slide.getWaxCode();
 		// 性别（M:雄；F:雌）
