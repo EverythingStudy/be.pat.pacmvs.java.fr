@@ -73,9 +73,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	@Resource
 	private SlideMapper slideMapper;
 
-	@Autowired
-	private RestTemplate restTemplate;
-
 	@Resource
 	private AnnotationMapper annotationMapper;
 
@@ -121,9 +118,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			queryMap.put("specialId", specialId);
 			queryMap.put("processFlag", 0);
 			list = slideMapper.getAlgorithmImage(queryMap);
-			/*if(CollectionUtils.isNotEmpty(list)){
-				slideMap = list.stream().collect(Collectors.toMap(AlgorithmImageOut::getSlideId, AlgorithmImageOut::getImageUrl));
-			}*/
 		}else{
 			if(CollectionUtils.isEmpty(slideIdList)) {
 				return R.ok();
@@ -134,9 +128,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			queryMap.put("processFlag", 0);
 			queryMap.put("list", slideIdList);
 			list = slideMapper.getAlgorithmImage(queryMap);
-			/*if(CollectionUtils.isNotEmpty(list)){
-				slideMap = list.stream().collect(Collectors.toMap(AlgorithmImageOut::getSlideId, AlgorithmImageOut::getImageUrl));
-			}*/
 		}
 		//请求算法处理
 		if(CollectionUtils.isNotEmpty(list)){
@@ -145,7 +136,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 				String imageUrl = algorithmImageOut.getImageUrl();
 				Long imageId = algorithmImageOut.getImageId();
 				if(null != slideId && StringUtils.isNotEmpty(imageUrl)){
-					//				{"slideId":10,"modelName":"脏器识别算法","imageUrl":"C:/Users/86153/Desktop/医疗PD/0320/2_shaowei/ST20Rf-AO-HE-LU-320-1-000020.svs"}
+					//{"slideId":10,"modelName":"脏器识别算法","imageUrl":"C:/Users/86153/Desktop/医疗PD/0320/2_shaowei/ST20Rf-AO-HE-LU-320-1-000020.svs"}
 					Map<String,Object> dataMap = new HashMap<>();
 					dataMap.put("imageId", imageId);
 					dataMap.put("slideId", slideId);
@@ -155,14 +146,12 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 					try {
 						log.info("AI算法请求内容是{}", JSONUtil.toJsonStr(dataMap));
 						
-//				        ResponseEntity<String> resp = restTemplate.postForEntity(algorithmPredictionPath,JSONUtil.toJsonStr(dataMap) , String.class);
 						StartRecognition startRecognition = new StartRecognition();
 						startRecognition.setImageId(imageId);
 						startRecognition.setSlideId(slideId);
 						startRecognition.setImageUrl(imageUrl);
 						startRecognition.setAlgorithm_name(CommonConstant.RECOGNITION_MODEL_NAME);
 						String body = pythonService.startPrediction(startRecognition);
-//						String body = resp.getBody();
 						log.info("AI算法请求返回数据{}", JSONUtil.toJsonStr(body));
 						JSONObject jsonObject = new JSONObject(body);
 						Integer code = jsonObject.getInt("code");
