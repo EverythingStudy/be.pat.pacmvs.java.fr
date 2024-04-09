@@ -45,6 +45,7 @@
         <if test="updateBy != null and updateBy != ''">update_by,</if>
         <if test="slideId != null and slideId != ''">slide_id,</if>
         <if test="id != null and id != ''">id,</if>
+        <if test="contourType != null and contourType != ''">contour_type,</if>
         create_time,
         update_time
         )values(
@@ -59,6 +60,7 @@
         <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
         <if test="slideId != null and slideId != ''">#{slideId},</if>
         <if test="id != null and id != ''">#{id},</if>
+        <if test="contourType != null and contourType != ''">#{contourType},</if>
         now(),
         now()
         )
