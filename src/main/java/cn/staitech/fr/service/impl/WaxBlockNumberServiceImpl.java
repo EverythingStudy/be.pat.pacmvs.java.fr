@@ -135,6 +135,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         }
         File file1 = new File(waxPath);
         if (!file1.exists()) {
+            // 文件夹不存在，创建文件夹
             file1.mkdirs();
         }
         FileUtils.copyInputStreamToFile(req.getFile().getInputStream(), file1);
