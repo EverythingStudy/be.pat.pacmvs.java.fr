@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -24,31 +26,37 @@ public class AiForecast implements Serializable {
     /**
      * 单脏器切片id
      */
+    @ApiModelProperty(name = "singleSlideId" , value = "单脏器切片id")
     private Integer singleSlideId;
 
     /**
      * 定量指标
      */
+    @ApiModelProperty(name = "quantitativeIndicators" , value = "定量指标")
     private String quantitativeIndicators;
 
     /**
      * 预测结果
      */
+    @ApiModelProperty(name = "results" , value = "预测结果")
     private String results;
 
     /**
      * 范围
      */
+    @ApiModelProperty(name = "range" , value = "范围")
     private String range;
 
     /**
      * 创建者
      */
+    @ApiModelProperty(name = "createBy" , value = "创建者")
     private Long createBy;
 
     /**
      * 创建时间
      */
+    @ApiModelProperty(name = "createTime" , value = "创建时间")
     private Date createTime;
 
     @TableField(exist = false)

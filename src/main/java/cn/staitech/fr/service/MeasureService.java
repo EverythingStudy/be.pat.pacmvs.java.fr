@@ -8,6 +8,7 @@ import cn.staitech.fr.vo.geojson.in.ViewAddIn;
 import cn.staitech.fr.vo.measure.MarkingSelectListVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -24,6 +25,8 @@ public interface MeasureService extends IService<Measure> {
     Long insert(ViewAddIn req) throws Exception;
 
     int delete(Long markingId) throws Exception;
+
+    void execlExport(Long slideId, HttpServletResponse response) throws Exception;
 
 
 }

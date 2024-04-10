@@ -12,10 +12,7 @@ import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.UserMapper;
 import cn.staitech.fr.netty.websocket.NioWebSocketHandler;
 import cn.staitech.fr.service.SlideService;
-import cn.staitech.fr.utils.ExcludeEmptyQueryWrapper;
-import cn.staitech.fr.utils.MarkingUtils;
-import cn.staitech.fr.utils.MessageSource;
-import cn.staitech.fr.utils.SendMessage;
+import cn.staitech.fr.utils.*;
 import cn.staitech.fr.vo.annotation.AnnotationById;
 import cn.staitech.fr.vo.geojson.Features;
 import cn.staitech.fr.vo.geojson.Properties;
@@ -29,16 +26,20 @@ import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.staitech.fr.service.MeasureService;
 import cn.staitech.fr.mapper.MeasureMapper;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -85,35 +86,34 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
     @Override
     public PageResponse<MarkingSelectListVO> list(Long slideId, Integer pageNum, Integer pageSize, String measureFullName) throws Exception {
         Slide slideBy = slideMapper.selectById(slideId);
-        if (!Optional.ofNullable(slideBy).isPresent()) {
-            throw new Exception(MessageSource.M("SLIDE_ABNORMAL_NO_INFORMATION"));
-        }
+//        if (!Optional.ofNullable(slideBy).isPresent()) {
+//            throw new Exception(MessageSource.M("SLIDE_ABNORMAL_NO_INFORMATION"));
+//        }
         Integer resPageNum = pageNum;
         if (pageNum > 0) {
             pageNum = pageNum - 1;
         } else {
             pageNum = 0;
         }
-        Map<String, Object> map = new HashMap<>(16);
-        map.put("slideId", slideId);
-        map.put("measureFullName", measureFullName);
-        map.put("pageSize", pageSize);
-        map.put("pageNum", pageNum * pageSize);
+        PageResponse<MarkingSelectListVO> resp = new PageResponse<>();
         ExcludeEmptyQueryWrapper<Measure> measureQueryWrapper = new ExcludeEmptyQueryWrapper<>();
         measureQueryWrapper.eq("slide_id", slideId).ne("location_type", "Point").like("measure_full_name", measureFullName);
         Integer markingCount = measureMapper.selectCount(measureQueryWrapper);
         ExcludeEmptyQueryWrapper<Measure> measurePointCount = new ExcludeEmptyQueryWrapper<>();
         measurePointCount.eq("slide_id", slideId).eq("location_type", "Point").like("measure_full_name", measureFullName);
         Integer measurePointCounts = measureMapper.selectCount(measurePointCount);
+        measureQueryWrapper.last("limit " + pageNum * pageSize + "," + pageSize);
         List<Measure> measureList = measureMapper.selectList(measureQueryWrapper);
         markingCount = markingCount + 1;
         int pageShow = (markingCount / pageSize) + 1;
-        PageResponse<MarkingSelectListVO> resp = new PageResponse<>();
-        if (measureList.size() < pageSize) {
-            Measure measure = new Measure();
-            measure.setMeasureFullName("P");
-            measure.setPointCount(measurePointCounts);
-            measureList.add(measure);
+
+        if(measurePointCounts > 0){
+            if (measureList.size() < pageSize) {
+                Measure measure = new Measure();
+                measure.setMeasureFullName("P");
+                measure.setPointCount(measurePointCounts);
+                measureList.add(measure);
+            }
         }
         List<MarkingSelectListVO> markingSelectList = new ArrayList<>();
         for(Measure measure:measureList){
@@ -128,7 +128,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
             markingSelectListVO.setMin_distance(measure.getMinDistance());
             markingSelectListVO.setMean_distance(measure.getMeanDistance());
             markingSelectListVO.setMeasure_full_name(measure.getMeasureFullName());
-            markingSelectListVO.setPoint_count(Long.valueOf(measure.getPointCount()));
+            markingSelectListVO.setPoint_count(measure.getPointCount());
             markingSelectList.add(markingSelectListVO);
         }
         resp.setTotal(markingCount);
@@ -143,9 +143,9 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
     @Override
     public List<Features> selectListBy(Long slideId) throws Exception {
         Slide slideBy = slideMapper.selectById(slideId);
-        if (!Optional.ofNullable(slideBy).isPresent()) {
-            throw new Exception(MessageSource.M("SLIDE_ABNORMAL_NO_INFORMATION"));
-        }
+//        if (!Optional.ofNullable(slideBy).isPresent()) {
+//            throw new Exception(MessageSource.M("SLIDE_ABNORMAL_NO_INFORMATION"));
+//        }
         QueryWrapper<Measure> measureQueryWrapper = new QueryWrapper<>();
         measureQueryWrapper.eq("slide_id", slideId);
         List<Measure> measures = measureMapper.selectList(measureQueryWrapper);
@@ -166,7 +166,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         measure.setArea(req.getArea());
         measure.setCreateBy(req.getCreate_by());
         measure.setAnnotationType("Measure");
-        measure.setCreateTime(new Date());
+        measure.setCreateTime(String.valueOf(new Date()));
         long number = 1L;
         QueryWrapper<Measure> markingQueryWrapper = new QueryWrapper<>();
         // 根据切片和测量轮廓名称查询最大值
@@ -206,6 +206,43 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         BroadcastVO broadcastVO = SendMessage.sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_MEASURE, DELETE_STATUS, features);
         NioWebSocketHandler.sendAll(measure.getSlideId(), broadcastVO);
         return measureMapper.deleteById(markingId);
+    }
+
+    @Override
+    public void execlExport(Long slideId, HttpServletResponse response) throws Exception {
+        List<Map<String, String>> titleList = getTitleList(CommonConstant.MEASURE_COLHEAD_KEY, CommonConstant.MEASURE_COLHEAD_VALUE);
+        ExcludeEmptyQueryWrapper<Measure> measureQueryWrapper = new ExcludeEmptyQueryWrapper<>();
+        measureQueryWrapper.eq("slide_id", slideId).ne("location_type", "Point");
+        List<Measure> measureList = measureMapper.selectList(measureQueryWrapper);
+        List<Properties> propertiesList = new ArrayList<>();
+        for(Measure measure:measureList){
+            propertiesList.add(getProperties(measure));
+        }
+        System.out.println(propertiesList + ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        ExcludeEmptyQueryWrapper<Measure> measurePointCount = new ExcludeEmptyQueryWrapper<>();
+        measurePointCount.eq("slide_id", slideId).eq("location_type", "Point");
+        Integer measurePointCounts = measureMapper.selectCount(measurePointCount);
+        Properties properties = new Properties();
+        properties.setPoint_count(measurePointCounts);
+        properties.setMeasure_full_name("P");
+        propertiesList.add(properties);
+        ExcelTool excelTool = new ExcelTool(MessageSource.M("EXCEL_TITLE"), 20, 20);
+        List<Column> titleData = excelTool.columnTransformer(titleList);
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        excelTool.exportExcel(titleData, propertiesList, response.getOutputStream(), true, false);
+    }
+
+    public List<Map<String, String>> getTitleList(String[] colHeadKey, String[] colHeadValue) {
+        // 定义表头
+        List<Map<String, String>> list = new ArrayList<>();
+
+        for (int i = 0; i < colHeadKey.length; i++) {
+            Map<String, String> map = new HashMap<String, String>(1);
+            map.put(colHeadKey[i], colHeadValue[i]);
+            list.add(map);
+        }
+        return list;
     }
 
 
@@ -267,6 +304,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
 
     public cn.staitech.fr.vo.geojson.Properties getProperties(Measure measure) {
         cn.staitech.fr.vo.geojson.Properties properties = new cn.staitech.fr.vo.geojson.Properties();
+        properties.setMarking_id(String.valueOf(measure.getMeasureId()));
         properties.setArea(measure.getArea());
         properties.setPerimeter(measure.getPerimeter());
         properties.setAnnotation_type(measure.getAnnotationType());
@@ -274,6 +312,19 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         properties.setCreate_by(measure.getCreateBy());
         properties.setUpdate_by(measure.getUpdateBy());
         properties.setCreate_time(String.valueOf(measure.getCreateTime()));
+        properties.setMeasure_name(measure.getMeasureName());
+        properties.setMeasure_type(measure.getMeasureType());
+        properties.setNumber(measure.getNumber());
+        properties.setMeasure_relation(measure.getMeasureRelation());
+        properties.setMeasure_number(measure.getMeasureNumber());
+        properties.setMean_distance(measure.getMeanDistance());
+        properties.setMin_distance(measure.getMinDistance());
+        properties.setMax_distance(measure.getMaxDistance());
+        properties.setInner_angle(measure.getInnerAngle());
+        properties.setExterior_angle(measure.getExteriorAngle());
+        properties.setCenter_point(measure.getCenterPoint());
+        properties.setRadius(measure.getRadius());
+        properties.setMeasure_full_name(measure.getMeasureFullName());
         if (measure.getCreateBy() != null) {
             User createUser = userMap.get(measure.getCreateBy());
             if (createUser == null) {

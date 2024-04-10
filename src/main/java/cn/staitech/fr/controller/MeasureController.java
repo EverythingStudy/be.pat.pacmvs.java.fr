@@ -7,14 +7,9 @@ import cn.staitech.common.log.enums.BusinessType;
 import cn.staitech.fr.service.MeasureService;
 import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.fr.vo.geojson.Features;
-import cn.staitech.fr.vo.geojson.in.MarkingUpdateIn;
-import cn.staitech.fr.vo.geojson.in.UpdateOperationIn;
 import cn.staitech.fr.vo.geojson.in.ViewAddIn;
 import cn.staitech.fr.vo.measure.MarkingSelectListVO;
-import cn.staitech.fr.vo.measure.MeasureSelectPageVo;
-import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.*;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -46,6 +41,7 @@ public class MeasureController {
         if (!Optional.ofNullable(slideId).isPresent()) {
             return R.fail(MessageSource.M("ARGUMENT_INVALID"));
         }
+
         return R.ok(measureService.list(slideId, pageNum, pageSize, measureFullName));
     }
 
@@ -53,9 +49,9 @@ public class MeasureController {
     @ApiOperation(value = "获取GeoJson数据")
     @GetMapping("/getDataList")
     public R<List<Features>> getDataList(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "切片ID", required = true) Long slideId) throws Exception {
-        if (!Optional.ofNullable(slideId).isPresent()) {
-            return R.fail(MessageSource.M("ARGUMENT_INVALID"));
-        }
+//        if (!Optional.ofNullable(slideId).isPresent()) {
+//            return R.fail(MessageSource.M("ARGUMENT_INVALID"));
+//        }
         return R.ok(measureService.selectListBy(slideId));
     }
 
@@ -77,12 +73,12 @@ public class MeasureController {
     }
 
 
-//    @Log(title = "标注测量excel导出", businessType = BusinessType.EXPORT)
-//    @ApiOperation(value = "标注测量excel导出")
-//    @GetMapping("/export")
-//    public void export(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "切片ID", required = true) Long slideId, HttpServletResponse response) throws Exception {
-//        measureService.execlExport(slideId, response);
-//    }
+    @Log(title = "标注测量excel导出", businessType = BusinessType.EXPORT)
+    @ApiOperation(value = "标注测量excel导出")
+    @GetMapping("/export")
+    public void export(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "切片ID", required = true) Long slideId, HttpServletResponse response) throws Exception {
+        measureService.execlExport(slideId, response);
+    }
 
 
 

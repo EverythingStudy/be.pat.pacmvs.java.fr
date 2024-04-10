@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 /**
@@ -18,7 +20,7 @@ public class Measure implements Serializable {
     /**
      * 主键id
      */
-    @TableId
+    @TableId(value = "measure_id", type = IdType.AUTO)
     private Long measureId;
 
     /**
@@ -119,7 +121,8 @@ public class Measure implements Serializable {
     /**
      * 创建时间
      */
-    private Date createTime;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private String createTime;
 
     /**
      * 更新者
