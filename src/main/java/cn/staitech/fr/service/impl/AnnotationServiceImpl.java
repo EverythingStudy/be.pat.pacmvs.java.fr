@@ -175,7 +175,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (req.getGeometry() != null && !req.getGeometry().isEmpty()) {
             MarkingUtils.addVerify(req.getGeometry());
         } else {
-            throw new Exception("更新失败，轮廓数据不能为空");
+            throw new Exception(MessageSource.M("ARGUMENT_INVALID"));
         }
         String id = null;
         if (req.getCategory_id() != null) {
@@ -269,7 +269,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         BroadcastVO broadcastVO = sendOneMessages(DELETE_STATUS, features);
         NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
         annotationMapper.deleteById(annotation);
-        Slide slide = slideMapper.selectById(annotation.getSlideId());
+        Slide slide = slideMapper.selectById(annotationBy.getSlideId());
         if (!Optional.ofNullable(slide).isPresent()) {
             throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
         }
@@ -278,14 +278,14 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             throw new Exception(MessageSource.M("NODATA"));
         }
 
-        List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
+        List<JSONObject> contourList = selectContourList(annotationBy.getSlideId(), annotationBy.getCategoryId());
         int type;
         if (contourList.size() > 0) {
             type = 1;
         } else {
             type = 2;
         }
-        asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type);
+        asyncTask.generateThumbnail(annotationBy.getSlideId(), annotationBy.getCategoryId(), image.getImageUrl(), contourList, type);
 
         String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
         boolean isBatch = false;
