@@ -1,39 +1,22 @@
 package cn.staitech.fr.service.impl;
 
 import cn.staitech.common.core.domain.PageResponse;
-import cn.staitech.common.core.utils.uuid.IdUtils;
-import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.*;
-import cn.staitech.fr.domain.history.Session;
-import cn.staitech.fr.domain.history.Trace;
-import cn.staitech.fr.domain.history.TraceNode;
-import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.UserMapper;
 import cn.staitech.fr.netty.websocket.NioWebSocketHandler;
-import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.*;
-import cn.staitech.fr.vo.annotation.AnnotationById;
 import cn.staitech.fr.vo.geojson.Features;
 import cn.staitech.fr.vo.geojson.Properties;
 import cn.staitech.fr.vo.geojson.in.ViewAddIn;
 import cn.staitech.fr.vo.measure.BroadcastVO;
 import cn.staitech.fr.vo.measure.MarkingSelectListVO;
-import cn.staitech.fr.vo.measure.PointCount;
-import cn.staitech.system.api.domain.SysUser;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.staitech.fr.service.MeasureService;
 import cn.staitech.fr.mapper.MeasureMapper;
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-import io.swagger.annotations.ApiModelProperty;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,12 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import static cn.staitech.fr.constant.CommonConstant.ADD_STATUS;
 import static cn.staitech.fr.constant.CommonConstant.DELETE_STATUS;
-import static cn.staitech.fr.utils.MarkingUtils.socketData;
-import static cn.staitech.fr.utils.SendMessage.sendOneMessages;
 
 /**
  * @author admin
@@ -56,9 +36,6 @@ import static cn.staitech.fr.utils.SendMessage.sendOneMessages;
 @Service
 public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         implements MeasureService {
-
-    @Resource
-    private SlideMapper slideMapper;
 
     @Resource
     private MeasureMapper measureMapper;
@@ -84,11 +61,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
 
 
     @Override
-    public PageResponse<MarkingSelectListVO> list(Long slideId, Integer pageNum, Integer pageSize, String measureFullName) throws Exception {
-        Slide slideBy = slideMapper.selectById(slideId);
-//        if (!Optional.ofNullable(slideBy).isPresent()) {
-//            throw new Exception(MessageSource.M("SLIDE_ABNORMAL_NO_INFORMATION"));
-//        }
+    public PageResponse<MarkingSelectListVO> list(Long singleSlideId, Integer pageNum, Integer pageSize, String measureFullName) throws Exception {
         Integer resPageNum = pageNum;
         if (pageNum > 0) {
             pageNum = pageNum - 1;
@@ -97,10 +70,10 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         }
         PageResponse<MarkingSelectListVO> resp = new PageResponse<>();
         ExcludeEmptyQueryWrapper<Measure> measureQueryWrapper = new ExcludeEmptyQueryWrapper<>();
-        measureQueryWrapper.eq("slide_id", slideId).ne("location_type", "Point").like("measure_full_name", measureFullName);
+        measureQueryWrapper.eq("single_slide_id", singleSlideId).ne("location_type", "Point").like("measure_full_name", measureFullName);
         Integer markingCount = measureMapper.selectCount(measureQueryWrapper);
         ExcludeEmptyQueryWrapper<Measure> measurePointCount = new ExcludeEmptyQueryWrapper<>();
-        measurePointCount.eq("slide_id", slideId).eq("location_type", "Point").like("measure_full_name", measureFullName);
+        measurePointCount.eq("single_slide_id", singleSlideId).eq("location_type", "Point").like("measure_full_name", measureFullName);
         Integer measurePointCounts = measureMapper.selectCount(measurePointCount);
         measureQueryWrapper.last("limit " + pageNum * pageSize + "," + pageSize);
         List<Measure> measureList = measureMapper.selectList(measureQueryWrapper);
@@ -141,13 +114,9 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
 
 
     @Override
-    public List<Features> selectListBy(Long slideId) throws Exception {
-        Slide slideBy = slideMapper.selectById(slideId);
-//        if (!Optional.ofNullable(slideBy).isPresent()) {
-//            throw new Exception(MessageSource.M("SLIDE_ABNORMAL_NO_INFORMATION"));
-//        }
+    public List<Features> selectListBy(Long singleSlideId) throws Exception {
         QueryWrapper<Measure> measureQueryWrapper = new QueryWrapper<>();
-        measureQueryWrapper.eq("slide_id", slideId);
+        measureQueryWrapper.eq("single_slide_id", singleSlideId);
         List<Measure> measures = measureMapper.selectList(measureQueryWrapper);
         return getFeaturesList(measures);
     }
@@ -170,7 +139,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         long number = 1L;
         QueryWrapper<Measure> markingQueryWrapper = new QueryWrapper<>();
         // 根据切片和测量轮廓名称查询最大值
-        markingQueryWrapper.eq("slide_id", req.getSlide_id()).eq("measure_name", req.getMeasure_name()).orderByDesc("create_time").last("limit 1");
+        markingQueryWrapper.eq("single_slide_id", req.getSingleSlideId()).eq("measure_name", req.getMeasure_name()).orderByDesc("create_time").last("limit 1");
         Measure markingBy = measureMapper.selectOne(markingQueryWrapper);
         if (markingBy != null) {
             if (markingBy.getNumber() != null) {
@@ -209,18 +178,17 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
     }
 
     @Override
-    public void execlExport(Long slideId, HttpServletResponse response) throws Exception {
+    public void execlExport(Long singleSlideId, HttpServletResponse response) throws Exception {
         List<Map<String, String>> titleList = getTitleList(CommonConstant.MEASURE_COLHEAD_KEY, CommonConstant.MEASURE_COLHEAD_VALUE);
         ExcludeEmptyQueryWrapper<Measure> measureQueryWrapper = new ExcludeEmptyQueryWrapper<>();
-        measureQueryWrapper.eq("slide_id", slideId).ne("location_type", "Point");
+        measureQueryWrapper.eq("single_slide_id", singleSlideId).ne("location_type", "Point");
         List<Measure> measureList = measureMapper.selectList(measureQueryWrapper);
         List<Properties> propertiesList = new ArrayList<>();
         for(Measure measure:measureList){
             propertiesList.add(getProperties(measure));
         }
-        System.out.println(propertiesList + ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         ExcludeEmptyQueryWrapper<Measure> measurePointCount = new ExcludeEmptyQueryWrapper<>();
-        measurePointCount.eq("slide_id", slideId).eq("location_type", "Point");
+        measurePointCount.eq("single_slide_id", singleSlideId).eq("location_type", "Point");
         Integer measurePointCounts = measureMapper.selectCount(measurePointCount);
         Properties properties = new Properties();
         properties.setPoint_count(measurePointCounts);

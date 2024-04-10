@@ -2,7 +2,6 @@ package cn.staitech.fr.service;
 
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.fr.domain.Measure;
-import cn.staitech.fr.vo.annotation.AnnotationById;
 import cn.staitech.fr.vo.geojson.Features;
 import cn.staitech.fr.vo.geojson.in.ViewAddIn;
 import cn.staitech.fr.vo.measure.MarkingSelectListVO;
@@ -18,15 +17,15 @@ import java.util.List;
 */
 public interface MeasureService extends IService<Measure> {
 
-    PageResponse<MarkingSelectListVO> list(Long slideId, Integer pageNum, Integer pageSize, String measureFullName) throws Exception;
+    PageResponse<MarkingSelectListVO> list(Long singleSlideId, Integer pageNum, Integer pageSize, String measureFullName) throws Exception;
 
-    List<Features> selectListBy(Long slideId) throws Exception;
+    List<Features> selectListBy(Long singleSlideId) throws Exception;
 
     Long insert(ViewAddIn req) throws Exception;
 
     int delete(Long markingId) throws Exception;
 
-    void execlExport(Long slideId, HttpServletResponse response) throws Exception;
+    void execlExport(Long singleSlideId, HttpServletResponse response) throws Exception;
 
 
 }

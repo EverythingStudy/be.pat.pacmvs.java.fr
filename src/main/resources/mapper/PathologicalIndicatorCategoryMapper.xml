@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper">
+
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.PathologicalIndicatorCategory">
+            <id property="categoryId" column="category_id" jdbcType="BIGINT"/>
+            <result property="indicatorId" column="indicator_id" jdbcType="BIGINT"/>
+            <result property="categoryName" column="category_name" jdbcType="VARCHAR"/>
+            <result property="structureId" column="structure_id" jdbcType="VARCHAR"/>
+            <result property="rgb" column="rgb" jdbcType="VARCHAR"/>
+            <result property="hex" column="hex" jdbcType="VARCHAR"/>
+            <result property="color" column="color" jdbcType="VARCHAR"/>
+            <result property="number" column="number" jdbcType="VARCHAR"/>
+            <result property="orderNumber" column="order_number" jdbcType="INTEGER"/>
+            <result property="organizationId" column="organization_id" jdbcType="BIGINT"/>
+            <result property="annoType" column="anno_type" jdbcType="INTEGER"/>
+            <result property="delFlag" column="del_flag" jdbcType="INTEGER"/>
+            <result property="createBy" column="create_by" jdbcType="BIGINT"/>
+            <result property="updateBy" column="update_by" jdbcType="BIGINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="categoryCode" column="category_code" jdbcType="VARCHAR"/>
+            <result property="groupNumber" column="group_number" jdbcType="INTEGER"/>
+            <result property="categoryType" column="category_type" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        category_id,indicator_id,category_name,
+        structure_id,rgb,hex,
+        color,number,order_number,
+        organization_id,anno_type,del_flag,
+        create_by,update_by,create_time,
+        update_time,category_code,group_number,
+        category_type
+    </sql>
+</mapper>

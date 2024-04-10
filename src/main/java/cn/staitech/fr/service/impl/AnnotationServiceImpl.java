@@ -60,6 +60,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     private static final WKTReader WKT_READER = new WKTReader(GEOMETRY_FACTORY);
     HashMap<Long, Category> categoryHashMap = new HashMap<>();
+    HashMap<Long, PathologicalIndicatorCategory> pathologicalIndicatorCategoryHashMap = new HashMap<>();
     HashMap<Long, User> userMap = new HashMap<>();
     @Resource
     private AnnotationMapper annotationMapper;
@@ -79,6 +80,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     @Resource
     private RocksdbService rocksdbService;
+
+    @Resource
+    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
 
 
     public List<Features> getFeaturesList(List<Annotation> annotations) {
@@ -108,17 +112,33 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         properties.setUpdate_by(annotation.getUpdateBy());
         properties.setCreate_time(String.valueOf(annotation.getCreateTime()));
         properties.setProject_id(annotation.getProjectId());
-        if (annotation.getCategoryId() != null) {
-            Category category = categoryHashMap.get(annotation.getCategoryId());
-            if (category == null) {
-                category = categoryMapper.selectById(annotation.getCategoryId());
-                if (category != null) {
-                    categoryHashMap.put(category.getCategoryId(), category);
+        if (annotation.getSingle() == 1) {
+            if (annotation.getCategoryId() != null) {
+                PathologicalIndicatorCategory pathologicalIndicatorCategory = pathologicalIndicatorCategoryHashMap.get(annotation.getCategoryId());
+                if (pathologicalIndicatorCategory == null) {
+                    pathologicalIndicatorCategory = pathologicalIndicatorCategoryMapper.selectById(annotation.getCategoryId());
+                    if (pathologicalIndicatorCategory != null) {
+                        pathologicalIndicatorCategoryHashMap.put(pathologicalIndicatorCategory.getCategoryId(), pathologicalIndicatorCategory);
+                    }
+                }
+                if (pathologicalIndicatorCategory != null) {
+                    properties.setLabel_color(pathologicalIndicatorCategory.getRgb());
+                    properties.setLabel_name(pathologicalIndicatorCategory.getNumber());
                 }
             }
-            if (category != null) {
-                properties.setLabel_color(category.getChromaticValue());
-                properties.setLabel_name(category.getOrganName());
+        } else {
+            if (annotation.getCategoryId() != null) {
+                Category category = categoryHashMap.get(annotation.getCategoryId());
+                if (category == null) {
+                    category = categoryMapper.selectById(annotation.getCategoryId());
+                    if (category != null) {
+                        categoryHashMap.put(category.getCategoryId(), category);
+                    }
+                }
+                if (category != null) {
+                    properties.setLabel_color(category.getChromaticValue());
+                    properties.setLabel_name(category.getOrganName());
+                }
             }
         }
         if (annotation.getCreateBy() != null) {
@@ -178,15 +198,26 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             throw new Exception(MessageSource.M("ARGUMENT_INVALID"));
         }
         String id = null;
+        Annotation annotation = new Annotation();
         if (req.getCategory_id() != null) {
-            Category category = categoryMapper.selectById(req.getCategory_id());
-            if (category != null) {
-                id = MarkingUtils.getSdId(category.getOrganName());
+            if (req.getSingleSlideId() != null) {
+                PathologicalIndicatorCategory pathologicalIndicatorCategory = pathologicalIndicatorCategoryMapper.selectById(req.getCategory_id());
+                if (pathologicalIndicatorCategory != null) {
+                    id = MarkingUtils.getSdId(pathologicalIndicatorCategory.getCategoryName());
+                }
+            } else {
+                Category category = categoryMapper.selectById(req.getCategory_id());
+                if (category != null) {
+                    id = MarkingUtils.getSdId(category.getOrganName());
+                }
             }
         } else {
             id = MarkingUtils.getSdId(null);
         }
-        Annotation annotation = new Annotation();
+        if (req.getSingleSlideId() != null) {
+            annotation.setSingleSlideId(req.getSingleSlideId());
+            annotation.setSingle(1);
+        }
         annotation.setSlideId(req.getSlide_id());
         annotation.setArea(req.getArea());
         annotation.setCategoryId(req.getCategory_id());
@@ -215,27 +246,17 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1);
         {
             String traceId = req.getTraceId();
-            // 撤消,恢复历史记录 用HistoryService会引起循环依赖！ -> 后续在线程池中处理 判断是批处理，还是单独处理
-            // 1、创建Session,并存入ConcurrentHashMap<Long, Session>
             Long userId = req.getCreate_by();
             Long slideId = req.getSlide_id();
             Session session = HistoryServiceImpl.refreshSession(userId, slideId);
-            // 2、创建Trace,并存入Session.list,LinkedList<Trace>
             if (req.getIsBatch()) {
-                // 批量操作：若trace已经存在，不用再add
                 Trace trace = session.getTraceById(traceId);
                 trace.getNodeList().add(new TraceNode(String.valueOf(annotation.getAnnotationId()), "INSERT"));
             } else {
-                // 单条记录
                 Trace trace = new Trace(userId, traceId, false);
                 trace.getNodeList().add(new TraceNode(String.valueOf(annotation.getAnnotationId()), "INSERT"));
                 session.drawListAdd(trace);
             }
-//            // 3、数据持久化写入RocksDB
-//            Gson gson = new Gson();
-//            // 将对象转换成JSON字符串
-//            String json = gson.toJson(marking);
-//            RocksDBUtil.put(traceId, marking.getMarking_id(), json);
             rocksdbService.submitTask(traceId, String.valueOf(annotation.getAnnotationId()), annotation);
         }
         return annotation.getAnnotationId();
@@ -557,7 +578,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotationBys.setOperation(req.getOperation());
         Annotation annotation1 = annotationMapper.mergeContour(annotationBys);
         String contourType = annotationMapper.selectContourType(annotation1).getLocationType();
-        if(!Objects.equals(contourType, "POLYGON")){
+        if (!Objects.equals(contourType, "POLYGON")) {
             throw new Exception(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
         }
         annotationBys.setContour(annotation1.getContour());
@@ -633,7 +654,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
 
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Annotation insertByHistory(Annotation annotation) {
@@ -688,7 +708,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
         return annotation;
     }
-
 
 
     @Override
@@ -796,7 +815,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
             }
             // Index: -1, Size: 0
-            if(drawList.size()>0){
+            if (drawList.size() > 0) {
                 drawList.remove(drawList.size() - 1);
             }
         }
@@ -865,7 +884,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
                 newTrace.setTraceId(traceId);
                 drawList.add(newTrace);
-                if(undoList.size() >0) {
+                if (undoList.size() > 0) {
                     undoList.remove(undoList.size() - 1);
                 }
             } else {
@@ -902,7 +921,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 //                    json = gson.toJson(newMarking);
 //                    RocksDBUtil.put(traceId, newMarking.getMarking_id(), json);
                     rocksdbService.submitTask(traceId, String.valueOf(newAnnotation.getAnnotationId()), newAnnotation);
-                    if(undoList.size()>0){
+                    if (undoList.size() > 0) {
                         undoList.remove(undoList.size() - 1);
                     }
                 } catch (Exception e) {
@@ -912,7 +931,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
         return true;
     }
-
 
 
     public void refresh(LinkedList<Trace> list, String oldId, Long newId) {
@@ -942,9 +960,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             }
         }
     }
-
-
-
 
 
 }
