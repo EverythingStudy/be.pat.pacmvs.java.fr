@@ -7,6 +7,7 @@ import cn.staitech.fr.domain.in.EditSpecialStatusIn;
 import cn.staitech.fr.domain.in.SpecialAddIn;
 import cn.staitech.fr.domain.in.SpecialEditIn;
 import cn.staitech.fr.domain.in.SpecialListQueryIn;
+import cn.staitech.fr.domain.in.SpecialsQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -29,4 +30,6 @@ public interface SpecialService extends IService<Special> {
     R removeSpecial(Long specialId);
 
     R editSpecialStatus(EditSpecialStatusIn req);
+
+    PageResponse<SpecialListQueryOut> getSpecials(SpecialsQueryIn req);
 }

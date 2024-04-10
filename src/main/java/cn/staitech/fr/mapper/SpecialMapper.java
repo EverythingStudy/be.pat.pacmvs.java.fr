@@ -2,6 +2,7 @@ package cn.staitech.fr.mapper;
 
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.in.SpecialListQueryIn;
+import cn.staitech.fr.domain.in.SpecialsQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -18,4 +19,6 @@ import java.util.List;
 public interface SpecialMapper extends BaseMapper<Special> {
 
     List<SpecialListQueryOut> getSpecialList(SpecialListQueryIn req);
+
+    List<SpecialListQueryOut> getSpecials(SpecialsQueryIn req);
 }
