@@ -158,6 +158,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         List<Features> list = new ArrayList<>();
         Annotation annotation = new Annotation();
         annotation.setSlideId(req.getSlideId());
+        annotation.setCategoryId(req.getCategoryId());
         List<Annotation> selfAnnoList = annotationMapper.selectListBy(annotation);
         List<Features> annoList1 = getFeaturesList(selfAnnoList);
         if (CollectionUtils.isNotEmpty(annoList1)) {
@@ -174,7 +175,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (req.getGeometry() != null && !req.getGeometry().isEmpty()) {
             MarkingUtils.addVerify(req.getGeometry());
         } else {
-            throw new Exception("更新失败，轮廓数据不能为空");
+            throw new Exception(MessageSource.M("ARGUMENT_INVALID"));
         }
         String id = null;
         if (req.getCategory_id() != null) {
@@ -194,6 +195,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setPerimeter(req.getPerimeter());
         annotation.setCreateBy(req.getCreate_by());
         annotation.setId(id);
+        annotation.setContourType(2L);
         annotation.setAnnotationType("Draw");
         annotationMapper.insert(annotation);
         Annotation annotationBy = annotationMapper.selectById(annotation);
@@ -267,7 +269,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         BroadcastVO broadcastVO = sendOneMessages(DELETE_STATUS, features);
         NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
         annotationMapper.deleteById(annotation);
-        Slide slide = slideMapper.selectById(annotation.getSlideId());
+        Slide slide = slideMapper.selectById(annotationBy.getSlideId());
         if (!Optional.ofNullable(slide).isPresent()) {
             throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
         }
@@ -276,14 +278,14 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             throw new Exception(MessageSource.M("NODATA"));
         }
 
-        List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
+        List<JSONObject> contourList = selectContourList(annotationBy.getSlideId(), annotationBy.getCategoryId());
         int type;
         if (contourList.size() > 0) {
             type = 1;
         } else {
             type = 2;
         }
-        asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type);
+        asyncTask.generateThumbnail(annotationBy.getSlideId(), annotationBy.getCategoryId(), image.getImageUrl(), contourList, type);
 
         String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
         boolean isBatch = false;
@@ -373,7 +375,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             }
         }
         if (req.getCategory_id() != null) {
-            if (req.getCategory_id() != 0 && !req.getCategory_id().equals(annotation.getCategoryId())) {
+            if (!req.getCategory_id().equals(annotation.getCategoryId())) {
                 annotation.setCategoryId(req.getCategory_id());
             }
         }
@@ -387,6 +389,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             annotation.setUpdateBy(SecurityUtils.getLoginUser().getSysUser().getUserId());
         }
         annotation.setId(id);
+        annotation.setSlideId(req.getSlide_id());
         annotation.setAnnotationId(Long.valueOf(req.getMarking_id()));
         annotation.setContour(null);
         annotationMapper.updateById(annotation);
@@ -394,7 +397,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBys);
         Features features = AnnotationDataEncapsulation.socketData(annotation.getId(), req.getGeometry(), properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
-        NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
+        NioWebSocketHandler.sendAll(req.getSlide_id(), broadcastVO);
 
         List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
         int type;

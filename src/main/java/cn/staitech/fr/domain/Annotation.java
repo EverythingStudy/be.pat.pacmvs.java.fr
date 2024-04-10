@@ -94,6 +94,11 @@ public class Annotation implements Serializable {
      * 轮廓坐标
      */
     private String contour;
+    
+    /**
+     * 轮廓类型 1：矩形 2：标注轮廓
+     */
+    private Long contourType;
 
     @TableField(exist = false)
     private String  operation;
@@ -130,6 +135,7 @@ public class Annotation implements Serializable {
             && (this.getProjectId() == null ? other.getProjectId() == null : this.getProjectId().equals(other.getProjectId()))
             && (this.getSlideId() == null ? other.getSlideId() == null : this.getSlideId().equals(other.getSlideId()))
             && (this.getId() == null ? other.getId() == null : this.getId().equals(other.getId()))
+            && (this.getContourType() == null ? other.getContourType() == null : this.getContourType().equals(other.getContourType()))
             && (this.getContour() == null ? other.getContour() == null : this.getContour().equals(other.getContour()));
     }
 
@@ -151,6 +157,7 @@ public class Annotation implements Serializable {
         result = prime * result + ((getProjectId() == null) ? 0 : getProjectId().hashCode());
         result = prime * result + ((getSlideId() == null) ? 0 : getSlideId().hashCode());
         result = prime * result + ((getId() == null) ? 0 : getId().hashCode());
+        result = prime * result + ((getContourType() == null) ? 0 : getContourType().hashCode());
         result = prime * result + ((getContour() == null) ? 0 : getContour().hashCode());
         return result;
     }
@@ -174,6 +181,7 @@ public class Annotation implements Serializable {
         sb.append(", updateTime=").append(updateTime);
         sb.append(", projectId=").append(projectId);
         sb.append(", slideId=").append(slideId);
+        sb.append(", contourType=").append(contourType);
         sb.append(", id=").append(id);
         sb.append(", contour=").append(contour);
         sb.append(", serialVersionUID=").append(serialVersionUID);

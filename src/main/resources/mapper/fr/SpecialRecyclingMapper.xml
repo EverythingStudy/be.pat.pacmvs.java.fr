@@ -50,26 +50,26 @@
             and fs.special_name like concat('%', #{specialName}, '%')
         </if>
         <if test="createTimeParams!=null and createTimeParams.size() > 0">
-            <if test="createTimeParams.beginTime != null and createTimeParams.beginTime != ''"><!-- 开始时间检索 -->
+            <if test="createTimeParams.beginTime != null  "><!-- 开始时间检索 -->
                 AND date_format(fs.create_time,'%Y%m%d') &gt;= date_format(#{createTimeParams.beginTime},'%Y%m%d')
             </if>
-            <if test="createTimeParams.endTime != null and createTimeParams.endTime != ''"><!-- 结束时间检索 -->
+            <if test="createTimeParams.endTime != null   "><!-- 结束时间检索 -->
                 AND date_format(fs.create_time,'%Y%m%d') &lt;= date_format(#{createTimeParams.endTime},'%Y%m%d')
             </if>
         </if>
         <if test="recoveryTimeParams!=null and recoveryTimeParams.size() > 0">
-            <if test="recoveryTimeParams.beginTime != null and recoveryTimeParams.beginTime != ''"><!-- 开始时间检索 -->
+            <if test="recoveryTimeParams.beginTime != null "><!-- 开始时间检索 -->
                 AND date_format(fsr.create_time,'%Y%m%d') &gt;= date_format(#{recoveryTimeParams.beginTime},'%Y%m%d')
             </if>
-            <if test="recoveryTimeParams.endTime != null and recoveryTimeParams.endTime != ''"><!-- 结束时间检索 -->
+            <if test="recoveryTimeParams.endTime != null "><!-- 结束时间检索 -->
                 AND date_format(fsr.create_time,'%Y%m%d') &lt;= date_format(#{recoveryTimeParams.endTime},'%Y%m%d')
             </if>
         </if>
         <if test="expireTimeParams!=null and expireTimeParams.size() > 0">
-            <if test="expireTimeParams.beginTime != null and expireTimeParams.beginTime != ''"><!-- 开始时间检索 -->
+            <if test="expireTimeParams.beginTime != null "><!-- 开始时间检索 -->
                 AND date_format(fsr.expire_time,'%Y%m%d') &gt;= date_format(#{expireTimeParams.beginTime},'%Y%m%d')
             </if>
-            <if test="expireTimeParams.endTime != null and expireTimeParams.endTime != ''"><!-- 结束时间检索 -->
+            <if test="expireTimeParams.endTime != null "><!-- 结束时间检索 -->
                 AND date_format(fsr.expire_time,'%Y%m%d') &lt;= date_format(#{expireTimeParams.endTime},'%Y%m%d')
             </if>
         </if>

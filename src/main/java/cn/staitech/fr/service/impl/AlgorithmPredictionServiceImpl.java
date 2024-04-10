@@ -225,27 +225,42 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	public void checkSlide(Slide slide) {
 				Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
 //		Long organizationId = 1L;
-		Map<String, String> cMap = categoryService.getCategory();
-		if(null != cMap){
-		System.out.println(JSONUtil.toJsonStr(cMap));
-		}else{
-			System.out.println(111);
-		}
 		//专题id
 		Long specialId = slide.getSpecialId();
 		Long slideId = slide.getSlideId();
+		//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
+		int processFlag = slide.getProcessFlag();
+		if(processFlag == 3){
+			//更新checkStatus
+			Slide updateSlide = new Slide();
+			updateSlide.setSlideId(slideId);
+			//核对状态 0：初始 1：正确 2：修正正常 3：错误
+			updateSlide.setCheckStatus(3);
+			updateSlide.setCheckBy(0l);
+			updateSlide.setCheckTime(new Date());
+			updateSlide.setAnimalCheckStatus(3);
+			slideMapper.updateById(updateSlide);
+			return ;
+		}
 		//蜡块编号
 		String waxCode = slide.getWaxCode();
+		// 性别（M:雄；F:雌）
+		String genderFlag = slide.getGenderFlag();
 
 		Map<String,Integer> waxDataMap = new HashMap<String, Integer>();
 		int waxDataMapSize = 0;
-		String cacheKey = CommonConstant.WAX_BLOCK_INFO+specialId+"_"+waxCode;
+		String cacheKey = "";
+		if(StringUtils.isNotEmpty(genderFlag)){
+			cacheKey = CommonConstant.WAX_BLOCK_INFO+specialId+"_"+waxCode+"_"+genderFlag;
+		}else{
+			cacheKey = CommonConstant.WAX_BLOCK_INFO+specialId+"_"+waxCode;
+		}
 		waxDataMap = redisService.getCacheObject(cacheKey);
 
 		if (null == waxDataMap || waxDataMap.isEmpty()) {
 			waxDataMap = new HashMap<String, Integer>();
 			//查询所属蜡块完整信息
-			List<WaxBlockInfo> waxinfoList = waxBlockInfoService.getWaxBlockInfoList(slideId, waxCode);
+			List<WaxBlockInfo> waxinfoList = waxBlockInfoService.getWaxBlockInfoList(slideId, waxCode,genderFlag);
 			//处理蜡块信息
 			if(CollectionUtils.isNotEmpty(waxinfoList)){
 				for(WaxBlockInfo info:waxinfoList){
@@ -300,15 +315,14 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 					if(slideTag){
 						checkStatus = 1;
 					}
-					//更新checkStatus
-					Slide updateSlide = new Slide();
-					updateSlide.setSlideId(slideId);
-					updateSlide.setCheckStatus(checkStatus);
-					updateSlide.setCheckBy(0l);
-					updateSlide.setCheckTime(new Date());
-					//					annotationMapper.updateById(updateSlide);
-					slideMapper.updateById(updateSlide);
 				}
+				//更新checkStatus
+				Slide updateSlide = new Slide();
+				updateSlide.setSlideId(slideId);
+				updateSlide.setCheckStatus(checkStatus);
+				updateSlide.setCheckBy(0l);
+				updateSlide.setCheckTime(new Date());
+				slideMapper.updateById(updateSlide);
 			}
 		}
 		//检查当前动物号所属的所有切片是否正常
@@ -322,14 +336,15 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		List<Slide> queryList = slideService.list(queryWrapper);
 		// 按照checkStatus属性分组到Map<String, List<Slide>>
 		Map<Integer, List<Slide>> mapByCheckStatus = queryList.stream().collect(Collectors.groupingBy(Slide::getCheckStatus));
+		System.out.println(JSONUtil.toJsonStr(mapByCheckStatus));
 		if(null !=mapByCheckStatus&& !mapByCheckStatus.isEmpty()){
 			UpdateWrapper<Slide> updateWrapper = new UpdateWrapper<>();
 			updateWrapper.eq("animal_code", animalCode);
 			updateWrapper.eq("special_id", specialId);
 			Slide sd = new Slide();
-			//核对状态 0：初始 1：正确 2：错误 3：修正正常
-			if(mapByCheckStatus.containsKey(2)){
-				sd.setAnimalCheckStatus(2);
+			//当前动物号检查状态 核对状态 0：初始 1：正确 2：修正正常 3：错误
+			if(mapByCheckStatus.containsKey(3)){
+				sd.setAnimalCheckStatus(3);
 			}else{
 				sd.setAnimalCheckStatus(1);
 			}

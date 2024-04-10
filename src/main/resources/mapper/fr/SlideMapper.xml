@@ -22,6 +22,8 @@
         <result property="checkTime" column="check_time" jdbcType="TIMESTAMP"/>
         <result property="updateBy" column="update_by" jdbcType="BIGINT"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="initiateBy" column="initiate_by" jdbcType="BIGINT"/>
+        <result property="initiateTime" column="initiate_time" jdbcType="TIMESTAMP"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -31,7 +33,7 @@
         gender_flag,organs,process_flag,
         create_by,create_time,update_by,
         update_time,check_status,check_by,
-        check_time,animalCheckStatus
+        check_time,animalCheckStatus,initiate_by,initiate_time
     </sql>
 
     <select id="selectBySpecialId" parameterType="java.lang.Long" resultType="java.lang.String">
@@ -69,10 +71,10 @@
                 and su.user_name like concat('%',#{createBy},'%')
             </if>
             <if test="createTimeParams!=null and createTimeParams.size() > 0">
-                <if test="createTimeParams.beginTime != null and createTimeParams.beginTime != ''"><!-- 开始时间检索 -->
+                <if test="createTimeParams.beginTime != null "><!-- 开始时间检索 -->
                     AND date_format(fs.create_time,'%Y%m%d') &gt;= date_format(#{createTimeParams.beginTime},'%Y%m%d')
                 </if>
-                <if test="createTimeParams.endTime != null and createTimeParams.endTime != ''"><!-- 结束时间检索 -->
+                <if test="createTimeParams.endTime != null "><!-- 结束时间检索 -->
                     AND date_format(fs.create_time,'%Y%m%d') &lt;= date_format(#{createTimeParams.endTime},'%Y%m%d')
                 </if>
             </if>
@@ -140,14 +142,14 @@
             </if>
             <if test="slideIdList != null and slideIdList.size() >0 ">
 	            AND t1.slide_id in
-	            <foreach item="slideIdList" collection="item" separator="," open="(" close=")" index="">
+	            <foreach item="item" collection="slideIdList" separator="," open="(" close=")" index="">
 	                #{item}
 	            </foreach>
         	</if>
 		</where>
 				AND t1.process_flag = 2
 				AND t1.check_status > 0 
-		ORDER BY	t1.animal_check_status desc,t1.check_status desc,t1.file_name
+		ORDER BY	t1.animal_check_status desc,t1.check_status desc,t2.file_name
      </select>
 
     <select id="pageImageCsvListVOBy" parameterType="long"

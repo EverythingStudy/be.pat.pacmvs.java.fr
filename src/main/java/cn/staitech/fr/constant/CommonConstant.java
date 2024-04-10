@@ -1,5 +1,7 @@
 package cn.staitech.fr.constant;
 
+import java.util.regex.Pattern;
+
 /**
  * .
  *
@@ -145,7 +147,8 @@ public class CommonConstant {
         throw new IllegalStateException("CommonConstant class");
     }
 
-    public static final String MALE_FLAG = "雄性Male";
+    public static final String MALE_FLAG = "Male";
+    public static final String MALE_FLAG_CN = "雄性";
 
     public static final String MALE = "M";
 
@@ -153,6 +156,7 @@ public class CommonConstant {
     public static final String END_FLAG = "大体损伤";
     public static final String SEMICOLON_FLAG =";";
     public static final String EN_FLAG  = "[a-zA-Z]";
+    public static final String EN_FLAG_NEW="\\)[a-zA-Z]";
     public static final String CODE_START  = "(";
     public static final String CODE_END  = ")";
     
@@ -163,4 +167,14 @@ public class CommonConstant {
     public static final String RECOGNITION_MODEL_NAME  = "全脏器识别";
     
     public static final String WAX_BLOCK_INFO  = "WAX_BLOCK_INFO_";
+
+    public static void main(String[] args) {
+        Pattern pattern = Pattern.compile(CommonConstant.EN_FLAG_NEW);
+        String s2="肾脏(2)Kidneys(2)";
+        String[] parts = pattern.split(s2);
+        for (String part : parts) {
+
+            System.out.println(part);
+        }
+    }
 }
