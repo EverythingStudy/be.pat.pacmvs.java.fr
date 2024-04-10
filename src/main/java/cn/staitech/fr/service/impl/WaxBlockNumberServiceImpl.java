@@ -125,6 +125,9 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
     public R upload(UploadWaxBlockIn req) throws IOException {
         log.info("导入文件接口开始：");
         //校验专题是否已经存在
+        if(new File(waxPath).exists()){
+            new File(waxPath).delete();
+        }
         LambdaQueryWrapper<WaxBlockNumber> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(WaxBlockNumber::getTopicId, req.getTopicId());
         queryWrapper.eq(WaxBlockNumber::getDelFlag, CommonConstant.NUMBER_0);
@@ -133,11 +136,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         if (count > 0) {
             return R.fail(MessageSource.M("TOPIC_EXIST_WAX"));
         }
-        File file1 = new File(waxPath);
-        if (!file1.exists()) {
-            // 文件夹不存在，创建文件夹
-            file1.mkdirs();
-        }
+        File file1 = new File(waxPath+req.getFile().getOriginalFilename());
         FileUtils.copyInputStreamToFile(req.getFile().getInputStream(), file1);
         FileInputStream fis = new FileInputStream(file1);
         XWPFDocument document = new XWPFDocument(fis);
@@ -253,6 +252,9 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
             }
         }
         fis.close();
+        if(file1.exists()){
+            FileUtils.delete(file1);
+        }
         waxBlockInfoService.saveBatch(insertList);
         //判断切片回写
         List<Slide> slideList = slideMapper.selectListByWax(req.getTopicId(), req.getSpeciesId());
