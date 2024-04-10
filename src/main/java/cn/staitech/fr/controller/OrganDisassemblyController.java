@@ -2,9 +2,7 @@ package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
-import cn.staitech.fr.domain.in.ImageVagueQueryIn;
 import cn.staitech.fr.domain.in.OrganDisassemblyQueryIn;
-import cn.staitech.fr.domain.out.ImageVagueListOutVO;
 import cn.staitech.fr.domain.out.OrganDisassemblyOut;
 import cn.staitech.fr.service.OrganDisassemblyService;
 import io.swagger.annotations.Api;
@@ -14,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * @author wmy
@@ -42,11 +39,5 @@ public class OrganDisassemblyController {
         organDisassemblyService.export(imageIds);
     }
 
-    @ApiOperation(value = "切片管理-模糊切片")
-    @PostMapping("/slideList")
-    public R<PageResponse<ImageVagueListOutVO>> slideList(@Validated @RequestBody ImageVagueQueryIn req) throws ExecutionException, InterruptedException {
-        PageResponse<ImageVagueListOutVO> page = organDisassemblyService.getSlideList(req);
-        return R.ok(page);
-    }
 
 }

@@ -87,31 +87,4 @@ public class OrganDisassemblyServiceImpl implements OrganDisassemblyService {
 
     }
 
-    @Override
-    public PageResponse<ImageVagueListOutVO> getSlideList(ImageVagueQueryIn req) throws ExecutionException, InterruptedException {
-        CompletableFuture<PageMaster<Image>> listFuture = CompletableFuture.supplyAsync(() -> {
-            PageHelper.startPage(req.getPageNum(), req.getPageSize()).setReasonable(true);
-            List<Image> list = mapper.selectSlideList(req);
-            PageMaster pageMaster = new PageMaster<>(list);
-            return pageMaster;
-        });
-        PageResponse pageResponse = new PageResponse<>();
-        PageMaster<Image> pageMaster = listFuture.get();
-        List<Image> list = pageMaster.getList();
-        if (CollectionUtil.isEmpty(list)) return pageResponse;
-        List<ImageVagueListOutVO> voList = list.stream().map(image -> {
-            ImageVagueListOutVO outVO = new ImageVagueListOutVO();
-            BeanUtils.copyProperties(image, outVO);
-            outVO.setOrganizationName(MapConstant.getOrganizationName(image.getOrganizationId()));
-            return outVO;
-        }).collect(Collectors.toList());
-        pageResponse.setList(voList);
-        pageResponse.setTotal(pageMaster.getTotal());
-        pageResponse.setPages(pageMaster.getPages());
-        pageResponse.setPageNum(pageMaster.getPageNum());
-        pageResponse.setPageSize(pageMaster.getPageSize());
-        PageHelper.clearPage();
-        return pageResponse;
-    }
-
 }

@@ -176,12 +176,5 @@ public class Image extends BaseEntity {
     @ApiModelProperty(value = "文件夹名称")
     @TableField(exist = false)
     private String folderName;
-    @ApiModelProperty(value = "是否条带状模糊（0：初始值 1：是 2：不是）")
-    private Integer stripFuzzy;
-    @ApiModelProperty(value = "清晰度状态（0：初始值 1：更正 2：还原）")
-    private Integer definitionStatus;
-    @ApiModelProperty(value = "模糊程度 （0：初始值 1：模糊 2：不模糊）")
-    private Integer fuzzyLevel;
-    @ApiModelProperty(value = "是否多次模糊（0：初始值 1：是 2：不是）")
-    private Integer multipleFuzzy;
+
 }

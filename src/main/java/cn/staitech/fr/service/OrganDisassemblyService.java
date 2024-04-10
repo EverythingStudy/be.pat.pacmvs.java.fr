@@ -15,5 +15,4 @@ public interface OrganDisassemblyService {
 
     void export(List<Long> imageIds) throws IOException;
 
-    PageResponse<ImageVagueListOutVO> getSlideList(ImageVagueQueryIn req) throws ExecutionException, InterruptedException;
 }

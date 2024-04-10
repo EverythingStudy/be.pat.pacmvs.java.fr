@@ -25,14 +25,6 @@ public interface ImageMapper extends BaseMapper<Image> {
     List<Image> selectListSlfe(Image image);
 
     /**
-     * 查询模糊切片列表
-     *
-     * @param image
-     * @return
-     */
-    List<Image> selectSlideList(ImageVagueQueryIn image);
-
-    /**
      * 查询未添加切片列表
      *
      * @param image
