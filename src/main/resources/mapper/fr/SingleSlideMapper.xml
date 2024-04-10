@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.SingleSlideMapper">
+
+    <select id="selectSingleOrgan" resultType="cn.staitech.fr.domain.out.OrganDisassemblyOut">
+        SELECT
+        ti.file_name,
+        ss.single_id,
+        ss.slide_id,
+        ss.thumb_url,
+        ss.category_id,
+        fc.organ_en,
+        fc.organ_name,
+        fs.group_code,
+        fs.wax_code,
+        fs.animal_code,
+        fs.gender_flag,
+        fs.initiate_by,
+        su.user_name,
+        fs.initiate_time
+        FROM
+        fr_single_slide ss
+        LEFT JOIN fr_slide fs ON ss.slide_id = fs.slide_id
+        LEFT JOIN fr_category fc ON ss.category_id = fc.category_id
+        left join tb_image ti on fs.image_id = ti.image_id
+        left join sys_user su on fs.initiate_by=su.user_id
+        <where>
+            fs.special_id = #{specialId} and fs.process_flag = '2'
+            <if test="fileName != null and fileName != ''">
+                and ti.file_name like concat('%',#{fileName},'%')
+            </if>
+            <if test="initiateName != null and initiateName != ''">
+                and su.user_name like concat('%',#{initiateName},'%')
+            </if>
+            <if test="categoryId != null and categoryId != ''">
+                and ss.category_id =#{categoryId}
+            </if>
+            <if test="initiateTimeParams!=null and initiateTimeParams.size() > 0">
+                <if test="initiateTimeParams.beginTime != null and initiateTimeParams.beginTime != ''">
+                    AND date_format(fs.initiate_time,'%Y%m%d') &gt;=
+                    date_format(#{initiateTimeParams.beginTime},'%Y%m%d')
+                </if>
+                <if test="initiateTimeParams.endTime != null and initiateTimeParams.endTime != ''">
+                    AND date_format(fs.initiate_time,'%Y%m%d') &lt;= date_format(#{initiateTimeParams.endTime},'%Y%m%d')
+                </if>
+            </if>
+        </where>
+        order by fs.initiate_time desc
+    </select>
+    <select id="selectNumber" resultType="cn.staitech.fr.domain.SingleOrganNumber">
+        select count(*) as organ_number, category_id, slide_id
+        from fr_annotation
+        <where>
+            <if test="slideIds != null and slideIds.size>0">
+                AND slide_id in
+                <foreach collection="slideIds" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="categoryId!= null and categoryId!= ''">
+                AND category_id = #{categoryId}
+            </if>
+        </where>
+        group by slide_id, category_id
+    </select>
+
+</mapper>

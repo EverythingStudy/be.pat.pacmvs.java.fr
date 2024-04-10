@@ -1,5 +1,7 @@
 package cn.staitech.fr.constant;
 
+import java.util.regex.Pattern;
+
 /**
  * .
  *
@@ -7,20 +9,15 @@ package cn.staitech.fr.constant;
  */
 public class CommonConstant {
 
-	 /**
-     * system
-     */
-	
-	public static final String SYS_USER = "SYS_USER_";
-	public static final Long SYS_USER_CACHE_HOURS = 7L;
+
     /**
      * cache key
      */
-    public static final String IMAGE_CACHE_KEY = "image_cache_key";
-    public static final String INDICATOR_CACHE_KEY = "indicator_cache_key";
-    public static final String PROJECT_CACHE_KEY = "project_cache_key";
     public static final String NUMBER_0 = "0";
+
     public static final String NUMBER_1 = "1";
+    public static final Integer INT_1 = 1;
+    public static final String NUMBER_4 = "4";
     public static final String GLIDE_LINE = "_";
     public static final String FILE_SUFFIX = ".";
     public static final String FILE_SUFFIX_DOCX = ".docx";
@@ -51,6 +48,7 @@ public class CommonConstant {
     public static final String CHILDREN_CNTS = "children_cnts";
     public static final String VIA_IMG_METADATA = "_via_img_metadata";
     public static final String LOGIN_TOKEN_KEY = "login_tokens:";
+    public static final String ANNO_TYPE_MEASURE = "Measure";
     /**
      * Annotation
      */
@@ -71,25 +69,25 @@ public class CommonConstant {
     public static final String PROJECT_ANNOTATION_REL = "PROJECT_ANNOTATION_REL_";
     public static final Long PROJECT_ANNOTATION_REL_CACHE_DAYS = 365L;
 	public static final String MATCHING_FAILED = "匹配失败";
-    
+
     /**
      * 上传下载限制
      */
     public static final double UPLOAD_FILE_LIMIT = 300;
     public static final double DOWN_FILE_LIMIT = 300;
-    
+
     /**
      * Viewer
      */
     public static final Double MICRON = 0.26;
-    
+
     /**
      * structure
      */
     public static final String STRUCTURE_RO = "RO";
     public static final String STRUCTURE_ROA = "ROA";
     public static final String STRUCTURE_ROE = "ROE";
-    
+
     /**
      * Statistic
      */
@@ -137,20 +135,46 @@ public class CommonConstant {
     public static final String ANNOTATION_CATEGORY = "标注类别";
     public static final String USER = "成员";
     public static final String SLIDE = "图像";
-    
+
     /**
      * 分表限制
      */
     public static final Integer PROJECT_NUMBER_LIMIT = 10;
     public static final Integer TABLE_RECORD_LIMIT = 10000000;
+    public static final String ANNO_TYPE_DRAW = "Draw";
 
     private CommonConstant() {
         throw new IllegalStateException("CommonConstant class");
     }
+
+    public static final String MALE_FLAG = "Male";
+    public static final String MALE_FLAG_CN = "雄性";
+
+    public static final String MALE = "M";
+
+    public static final String FEMALE = "F";
+    public static final String END_FLAG = "大体损伤";
+    public static final String SEMICOLON_FLAG =";";
+    public static final String EN_FLAG  = "[a-zA-Z]";
+    public static final String EN_FLAG_NEW="\\)[a-zA-Z]";
+    public static final String CODE_START  = "(";
+    public static final String CODE_END  = ")";
+    
     /**
-     * review
+     * 识别算法
      */
+    
+    public static final String RECOGNITION_MODEL_NAME  = "全脏器识别";
+    
+    public static final String WAX_BLOCK_INFO  = "WAX_BLOCK_INFO_";
 
-    public static final String NOT_EVALUATING = "不予评价";
+    public static void main(String[] args) {
+        Pattern pattern = Pattern.compile(CommonConstant.EN_FLAG_NEW);
+        String s2="肾脏(2)Kidneys(2)";
+        String[] parts = pattern.split(s2);
+        for (String part : parts) {
 
+            System.out.println(part);
+        }
+    }
 }

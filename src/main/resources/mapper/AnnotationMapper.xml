@@ -1,0 +1,264 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.AnnotationMapper">
+
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.Annotation">
+        <id property="annotationId" column="annotation_id" jdbcType="BIGINT"/>
+        <result property="area" column="area" jdbcType="VARCHAR"/>
+        <result property="perimeter" column="perimeter" jdbcType="VARCHAR"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="categoryId" column="category_id" jdbcType="BIGINT"/>
+        <result property="locationType" column="location_type" jdbcType="VARCHAR"/>
+        <result property="annotationType" column="annotation_type" jdbcType="VARCHAR"/>
+        <result property="createBy" column="create_by" jdbcType="BIGINT"/>
+        <result property="createTime" column="create_time" jdbcType="DATE"/>
+        <result property="updateBy" column="update_by" jdbcType="BIGINT"/>
+        <result property="updateTime" column="update_time" jdbcType="DATE"/>
+        <result property="projectId" column="project_id" jdbcType="BIGINT"/>
+        <result property="slideId" column="slide_id" jdbcType="BIGINT"/>
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="contour" column="contour" jdbcType="OTHER"/>
+        <result property="contourType" column="contour_type" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        annotation_id,area,perimeter,
+        description,category_id,location_type,
+        annotation_type,create_by,create_time,
+        update_by,update_time,project_id,
+        slide_id,id,contour,contour_type
+    </sql>
+
+    <insert id="insert" parameterType="cn.staitech.fr.domain.Annotation" useGeneratedKeys="true"
+            keyProperty="annotationId">
+        insert into fr_annotation (
+        <if test="area != null and area != '' ">area,</if>
+        <if test="perimeter != null and perimeter != '' ">perimeter,</if>
+        <if test="categoryId != null">category_id,</if>
+        <if test="description != null and description != '' ">description,</if>
+        <if test="locationType != null and locationType != '' ">location_type,</if>
+        <if test="annotationType != null and annotationType != '' ">annotation_type,</if>
+        <if test="contour != null">contour,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        <if test="updateBy != null and updateBy != ''">update_by,</if>
+        <if test="slideId != null and slideId != ''">slide_id,</if>
+        <if test="id != null and id != ''">id,</if>
+        <if test="contourType != null and contourType != ''">contour_type,</if>
+        create_time,
+        update_time
+        )values(
+        <if test="area != null and area != ''">#{area},</if>
+        <if test="perimeter != null and perimeter != ''">#{perimeter},</if>
+        <if test="categoryId != null">#{categoryId},</if>
+        <if test="description != null">#{description},</if>
+        <if test="locationType != null and locationType != ''">#{locationType},</if>
+        <if test="annotationType != null and annotationType != ''">#{annotationType},</if>
+        <if test="contour != null">st_geomfromgeojson(#{contour}),</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+        <if test="slideId != null and slideId != ''">#{slideId},</if>
+        <if test="id != null and id != ''">#{id},</if>
+        <if test="contourType != null and contourType != ''">#{contourType},</if>
+        now(),
+        now()
+        )
+    </insert>
+
+    <update id="updateById" parameterType="cn.staitech.fr.domain.Annotation" useGeneratedKeys="true"
+            keyProperty="annotationId">
+        update fr_annotation
+        <set>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="locationType != null and locationType != ''">location_type = #{locationType},</if>
+            <if test="annotationType != null and annotationType != ''">annotation_type = #{annotationType},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="contour != null and contour != ''">contour = st_geomfromgeojson(#{contour}),</if>
+            <if test="id != null and id != ''">id = #{id},</if>
+            update_time = now()
+        </set>
+        where annotation_id = #{annotationId}
+    </update>
+
+
+    <!--查询表下记录总数-->
+    <select id="selectTableRecordCount" parameterType="cn.staitech.fr.domain.Annotation" resultType="int">
+        SELECT n_live_tup
+        FROM pg_stat_user_tables
+        where schemaname = 'public'
+          and relname = 'fr_annotation'
+    </select>
+
+    <!--查询是放存在表-->
+    <select id="selectExistTable" parameterType="cn.staitech.fr.domain.Annotation" resultType="int">
+        select count(*)
+        from pg_class
+        where relname = 'fr_annotation'
+    </select>
+
+    <insert id="createTableSequence" parameterType="cn.staitech.fr.domain.Annotation">
+        DROP
+        SEQUENCE IF EXISTS fr_annotation_annotation_id_seq;
+	    CREATE
+        SEQUENCE fr_annotation_annotation_id_seq START
+        1;
+    </insert>
+
+    <select id="getArea" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        select ST_LengthSpheroid(st_geomfromgeojson(#{contour}),
+                                 'SPHEROID["WGS 84",6378137,298.257223563]') as perimeter,
+               ST_Area(st_geomfromgeojson(#{contour}))                       as area
+    </select>
+
+
+    <select id="selectById" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        select annotation_id,
+               area,
+               perimeter,
+               description,
+               category_id,
+               location_type,
+               annotation_type,
+               create_by,
+               create_time,
+               update_by,
+               update_time,
+               slide_id,
+               id,
+               ST_AsGeoJSON(contour) AS contour
+        from fr_annotation
+        where annotation_id = #{annotationId}
+    </select>
+
+    <select id="selectListBy" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        select
+        annotation_id,
+        area,
+        perimeter,
+        description,
+        category_id,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        project_id,
+        slide_id,
+        id,
+        ST_AsGeoJSON(contour) as contour
+        from fr_annotation
+        <where>
+            <if test="slideId != null">
+                AND slide_id = #{slideId}
+            </if>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+        </where>
+    </select>
+
+    <select id="mergeContour" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        <if test="operation != null and operation == 'UNION'">
+            select
+            ST_AsGeoJSON(ST_Union((select contour from fr_annotation where annotation_id =
+            #{annotationId}),st_geomfromgeojson(#{contour}))) as contour
+        </if>
+        <if test="operation != null and operation == 'DIFFERENCE'">
+            select
+            ST_AsGeoJSON(ST_Difference((select contour from fr_annotation where annotation_id =
+            #{annotationId}),st_geomfromgeojson(#{contour}))) as contour
+        </if>
+    </select>
+
+    <select id="selectContourType" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT GeometryType(st_geomfromgeojson(#{contour})) as location_type
+    </select>
+
+
+    <delete id="deleteById" parameterType="cn.staitech.fr.domain.Annotation">
+        delete
+        from fr_annotation
+        where annotation_id = #{annotationId}
+    </delete>
+
+
+    <select id="selectInList" parameterType="cn.staitech.fr.vo.annotation.MarkingMerge"
+            resultMap="BaseResultMap">
+        select
+        annotation_id,
+        area,
+        perimeter,
+        description,
+        category_id,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        project_id,
+        slide_id,
+        structure_id,
+        structure_size,
+        review_round_id,
+        id,
+        ST_AsGeoJSON(LOCATION) AS LOCATION
+        from fr_annotation
+        <where>
+            annotation_id in
+            <foreach collection="markingIdList" item="annotationId" index="index" open="(" separator="," close=")">
+                #{annotationId,jdbcType=BIGINT}
+            </foreach>
+        </where>
+    </select>
+
+
+    <select id="selectCategoryList" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT category_id
+        FROM fr_annotation
+        WHERE slide_id = #{slideId}
+          AND category_id != 0
+        GROUP BY category_id
+    </select>
+
+    <select id="getCategoryCount" parameterType="java.lang.Long"
+            resultType="cn.staitech.fr.vo.annotation.AnnotationCountByCategory">
+        select t.category_id, count(1) total_count
+        from fr_annotation t
+        where t.slide_id = #{slideId}
+        and t.getCategoryCount
+        GROUP BY t.contour_type = 2
+    </select>
+
+    <select id="getAnnoListByParm" resultType="cn.staitech.fr.domain.Annotation">
+        SELECT
+        annotation_id,
+        area,
+        perimeter,
+        description,
+        category_id,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        project_id,
+        slide_id,
+        id
+        <!-- ,contour -->
+        FROM fr_annotation
+        WHERE slide_id in
+        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

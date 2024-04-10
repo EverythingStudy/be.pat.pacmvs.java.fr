@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.SpecialRecyclingMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.SpecialRecycling">
+        <id column="recycling_id" property="recyclingId"/>
+        <result column="special_id" property="specialId"/>
+        <result column="slide_num" property="slideNum"/>
+        <result column="expire_time" property="expireTime"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        recycling_id
+        , special_id, slide_num, expire_time, del_flag, create_by, create_time, update_by, update_time
+    </sql>
+
+    <select id="getSpecialRecyclingList" parameterType="cn.staitech.fr.domain.in.SpecialRecyclingListQueryIn"
+            resultType="cn.staitech.fr.domain.out.SpecialRecyclingListQueryOut">
+        select
+        fsr.recycling_id,
+        tt.topic_name,
+        fs.special_name,
+        ts.name speciesName,
+        ts.name_en speciesNameEn,
+        fs.trial_id,
+        fs.color_type,
+        fsr.slide_num,
+        su.user_name createName,
+        fs.create_time createTime,
+        fsr.create_time recoveryTime,
+        fsr.expire_time
+        from fr_special_recycling fsr
+        left join fr_special fs on fsr.special_id = fs.special_id
+        left join tb_topic tt on fs.topic_id = tt.topic_id
+        left join tb_species ts on fs.species_id = ts.species_id
+        left join sys_user su on fs.create_by = su.user_id
+        and fs.organization_id = #{organizationId}
+        where fsr.del_flag = '0'
+        <if test="topicName!= null and topicName != ''">
+            and tt.topic_name like concat('%', #{topicName}, '%')
+        </if>
+        <if test="specialName!= null and specialName != ''">
+            and fs.special_name like concat('%', #{specialName}, '%')
+        </if>
+        <if test="createTimeParams!=null and createTimeParams.size() > 0">
+            <if test="createTimeParams.beginTime != null  "><!-- 开始时间检索 -->
+                AND date_format(fs.create_time,'%Y%m%d') &gt;= date_format(#{createTimeParams.beginTime},'%Y%m%d')
+            </if>
+            <if test="createTimeParams.endTime != null   "><!-- 结束时间检索 -->
+                AND date_format(fs.create_time,'%Y%m%d') &lt;= date_format(#{createTimeParams.endTime},'%Y%m%d')
+            </if>
+        </if>
+        <if test="recoveryTimeParams!=null and recoveryTimeParams.size() > 0">
+            <if test="recoveryTimeParams.beginTime != null "><!-- 开始时间检索 -->
+                AND date_format(fsr.create_time,'%Y%m%d') &gt;= date_format(#{recoveryTimeParams.beginTime},'%Y%m%d')
+            </if>
+            <if test="recoveryTimeParams.endTime != null "><!-- 结束时间检索 -->
+                AND date_format(fsr.create_time,'%Y%m%d') &lt;= date_format(#{recoveryTimeParams.endTime},'%Y%m%d')
+            </if>
+        </if>
+        <if test="expireTimeParams!=null and expireTimeParams.size() > 0">
+            <if test="expireTimeParams.beginTime != null "><!-- 开始时间检索 -->
+                AND date_format(fsr.expire_time,'%Y%m%d') &gt;= date_format(#{expireTimeParams.beginTime},'%Y%m%d')
+            </if>
+            <if test="expireTimeParams.endTime != null "><!-- 结束时间检索 -->
+                AND date_format(fsr.expire_time,'%Y%m%d') &lt;= date_format(#{expireTimeParams.endTime},'%Y%m%d')
+            </if>
+        </if>
+        order by fsr.create_time desc
+    </select>
+</mapper>

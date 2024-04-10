@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.IndicatorMapper">
+    <resultMap type="cn.staitech.fr.domain.Indicator" id="IndicatorResult">
+        <result property="indicatorId" column="indicator_id"/>
+        <result property="indicatorName" column="indicator_name"/>
+        <result property="indicatorNameEn" column="indicator_name_en"/>
+        <result property="projectTotal" column="project_total"/>
+        <result property="annotationCategoryTotal" column="annotation_category_total"/>
+        <result property="speciesId" column="species_id"/>
+        <result property="organId" column="organ_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userName" column="user_name"/>
+        <result property="number" column="number"/>
+        <result property="organizationId" column="organization_id"/>
+        <result property="delFlag" column="del_flag"/>
+        <result property="indicatorType" column="indicator_type"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <sql id="selectIndicatorVo">
+        select i.indicator_id,
+               i.indicator_name,
+               i.indicator_name_en,
+               i.create_time,
+               i.project_total,
+               i.annotation_category_total,
+               i.species_id,
+               i.organ_id,
+               i.create_by,
+               i.update_by,
+               i.update_time,
+               i.number,
+               i.organization_id,
+               i.indicator_type,
+               u.user_id,
+               u.user_name
+        from tb_pathological_indicator i
+                 left join sys_user u on i.create_by = u.user_id
+    </sql>
+
+    <insert id="insertIndicator" parameterType="cn.staitech.fr.domain.Indicator" useGeneratedKeys="true"
+            keyProperty="indicatorId">
+        insert into tb_pathological_indicator(
+        <if test="indicatorName != null and indicatorName != '' ">
+            indicator_name,
+        </if><!-- 指标名称：暂未使用-->
+        <if test="indicatorNameEn != null and indicatorNameEn != '' ">
+            indicator_name_en,
+        </if><!-- 指标名称英文：暂未使用-->
+        <if test="speciesId != null">
+            species_id,
+        </if><!-- 种属编号 -->
+        <if test="organId != null">
+            organ_id,
+        </if><!-- 脏器编号-->
+        <if test="createBy != null and createBy != ''">
+            create_by,
+        </if>
+        <if test="organizationId != null">
+            organization_id,
+        </if><!-- 机构编号-->
+        <if test="number != null">
+            number,
+        </if><!-- 指标编号：暂未使用-->
+        <if test="indicatorType != null">
+            indicator_type,
+        </if>
+        create_time,
+        project_total,
+        annotation_category_total
+        )values (
+        <if test="indicatorName != null and indicatorName != ''">
+            #{indicatorName},
+        </if><!-- 指标名称：暂未使用-->
+        <if test="indicatorNameEn != null and indicatorNameEn != ''">
+            #{indicatorNameEn},
+        </if><!-- 指标名称：暂未使用-->
+        <if test="speciesId != null">
+            #{speciesId},
+        </if><!-- 种属编号 -->
+        <if test="organId != null">
+            #{organId},
+        </if><!-- 脏器编号-->
+        <if test="createBy != null and createBy != ''">
+            #{createBy},
+        </if>
+        <if test="organizationId != null">
+            #{organizationId},
+        </if><!-- 机构编号-->
+        <if test="number != null">
+            #{number},
+        </if><!-- 指标编号：暂未使用-->
+        <if test="indicatorType != null">
+            #{indicatorType},
+        </if>
+        sysdate(),
+        0,
+        0
+        )
+    </insert>
+
+
+    <select id="selectIndicatorList" parameterType="cn.staitech.fr.domain.Indicator" resultMap="IndicatorResult">
+        <include refid="selectIndicatorVo"/>
+        <where>
+            <if test="indicatorName != null and indicatorName != ''">
+                AND i.indicator_name like concat('%', #{indicatorName}, '%')
+            </if>
+            <if test="indicatorNameEn != null and indicatorNameEn != ''">
+                AND i.indicator_name_en like concat('%', #{indicatorNameEn}, '%')
+            </if>
+            <if test="speciesId != null and speciesId != ''">
+                <!-- 种属编码 -->
+                AND i.species_id like concat('%', #{speciesId}, '%')
+            </if>
+            <if test="organId != null and organId != ''">
+                <!-- 脏器编码 -->
+                <!-- AND i.organ_id like concat('%', #{organId}, '%') -->
+                AND i.organ_id = #{organId}
+            </if>
+            <if test="organizationId != null and organizationId != ''">
+                <!-- 机构ID -->
+                AND i.organization_id = #{organizationId}
+            </if>
+            <if test="createBy != null and createBy != ''">
+                AND i.create_by like concat('%', #{createBy}, '%')
+            </if>
+            <if test="userName != null and userName != ''">
+                AND u.user_name like concat('%', #{userName}, '%')
+            </if>
+            <if test="createTimeParams != null">
+                <if test="createTimeParams.beginTime != null and createTimeParams.beginTime != ''">
+                    <!-- 开始时间检索 -->
+                    AND date_format(i.create_time,'%y%m%d') &gt;= date_format(#{createTimeParams.beginTime},'%y%m%d')
+                </if>
+                <if test="createTimeParams.endTime != null and createTimeParams.endTime != ''">
+                    <!-- 结束时间检索 -->
+                    AND date_format(i.create_time,'%y%m%d') &lt;= date_format(#{createTimeParams.endTime},'%y%m%d')
+                </if>
+            </if>
+            and i.del_flag=0
+        </where>
+        order by i.indicator_id desc
+    </select>
+
+    <!--根据病理指标查询病理信息1-->
+    <select id="selectIndicatorById" parameterType="java.lang.Long" resultMap="IndicatorResult">
+        select pa.indicator_id,
+               pa.indicator_name,
+               pa.indicator_name_en,
+               pa.project_total,
+               pa.annotation_category_total,
+               pa.species_id,
+               pa.organ_id,
+               pa.organization_id,
+               pa.number,
+               pa.create_by,
+               pa.update_by,
+               pa.create_time,
+               pa.update_time,
+               pa.indicator_type,
+               u.user_id,
+               u.user_name
+        from tb_pathological_indicator pa
+                 left join sys_user u on pa.create_by = u.user_id
+        where pa.indicator_id = #{indicatorId}
+    </select>
+
+    <update id="delIndicator" parameterType="java.lang.Long">
+        update tb_pathological_indicator
+        set del_flag=1
+        where indicator_id = #{indicatorId}
+    </update>
+
+    <select id="selectIndicatorInformation" parameterType="cn.staitech.fr.domain.Indicator"
+            resultMap="IndicatorResult">
+        select *
+        from tb_pathological_indicator
+        <where>
+            del_flag = 0
+            <if test="speciesId !=null">
+                and species_id = #{speciesId}
+            </if>
+            <if test="organizationId !=null and organizationId !=0">
+                and organization_id = #{organizationId}
+            </if>
+        </where>
+        order by indicator_id desc
+    </select>
+
+    <select id="selectIndicator" parameterType="cn.staitech.fr.domain.Indicator" resultMap="IndicatorResult">
+        select *
+        from tb_pathological_indicator
+        <where>
+            del_flag = 0
+            <if test="speciesId !=null">
+                and species_id = #{speciesId}
+            </if>
+            <if test="organId !=null">
+                and organ_id = #{organId}
+            </if>
+            <if test="organizationId !=null and organizationId !=0">
+                and organization_id = #{organizationId}
+            </if>
+            <if test="delFlag !=null">
+                and del_flag = #{delFlag}
+            </if>
+            <if test="indicatorId !=null"> 
+                and indicator_id = #{indicatorId}
+            </if>
+        </where>
+    </select>
+
+
+    <!--查询病理总数-->
+    <select id="selectIndicatorNum" resultType="java.lang.Integer">
+        select count(*)
+        from tb_pathological_indicator
+    </select>
+
+    <!--查询指标在项目表中的记录数量-->
+    <select id="selectIndicatorCountInProject" parameterType="java.lang.Long" resultType="java.lang.Integer">
+        select count(*)
+        from tb_project
+        where del_flag!=1 and indicator_id=#{indicatorId}
+    </select>
+    
+    <select id="selectIndicatorCountByIndicator" parameterType="cn.staitech.fr.domain.Indicator" resultType="java.lang.Integer">
+        select count(*)
+        from tb_project
+        where del_flag!=1 
+        and indicator_id=#{indicatorId}
+        and organization_id = #{organizationId}
+    </select>
+</mapper>

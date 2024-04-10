@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.StructureMapper">
+    <resultMap type="cn.staitech.fr.domain.Structure" id="StructureResult">
+        <result property="structureId" column="structure_id"/>
+        <result property="name" column="name"/>
+        <result property="nameEn" column="name_en"/>
+        <result property="organId" column="organ_id"/>
+        <result property="speciesId" column="species_id"/>
+        <result property="type" column="type"/>
+        <result property="organizationId" column="organization_id"/>
+    </resultMap>
+
+    <select id="selectList" parameterType="cn.staitech.fr.domain.Structure"
+            resultType="cn.staitech.fr.domain.Structure">
+        SELECT organ_id,`name`, `name_en`, species_id, structure_id,organization_id,type FROM tb_structure
+        <where>
+            <if test="structureId != null">
+                AND structure_id = #{structureId}
+            </if>
+            <if test="speciesId != null">
+                AND species_id = #{speciesId}
+            </if>
+            <if test="organId != null">
+                AND organ_id = #{organId}
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="organizationId != null">
+                AND organization_id = #{organizationId}
+            </if>
+        </where>
+    </select>
+</mapper>
