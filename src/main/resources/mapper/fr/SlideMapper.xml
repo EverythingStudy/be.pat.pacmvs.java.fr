@@ -45,7 +45,7 @@
     <select id="slideListQuery" parameterType="cn.staitech.fr.domain.in.SlideListQueryIn"
             resultType="cn.staitech.fr.domain.out.SlideListQueryOut">
         select ti.thumb_url,
-        ti.file_name,
+        ti.image_name fileName,
         fs.group_code,
         fs.wax_code,
         fs.animal_code,

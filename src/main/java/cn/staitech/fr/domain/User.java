@@ -117,13 +117,6 @@ public class User implements Serializable {
     @TableField(value = "login_date")
     private LocalDateTime loginDate;
 
-    /**
-     * 用户来源
-0：原系统
-1：ladp
-     */
-    @TableField(value = "user_source")
-    private String userSource;
 
     /**
      * 创建者ID
@@ -181,7 +174,6 @@ public class User implements Serializable {
             && (this.getLoginStatus() == null ? other.getLoginStatus() == null : this.getLoginStatus().equals(other.getLoginStatus()))
             && (this.getLoginIp() == null ? other.getLoginIp() == null : this.getLoginIp().equals(other.getLoginIp()))
             && (this.getLoginDate() == null ? other.getLoginDate() == null : this.getLoginDate().equals(other.getLoginDate()))
-            && (this.getUserSource() == null ? other.getUserSource() == null : this.getUserSource().equals(other.getUserSource()))
             && (this.getCreateBy() == null ? other.getCreateBy() == null : this.getCreateBy().equals(other.getCreateBy()))
             && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
             && (this.getUpdateBy() == null ? other.getUpdateBy() == null : this.getUpdateBy().equals(other.getUpdateBy()))
@@ -209,7 +201,6 @@ public class User implements Serializable {
         result = prime * result + ((getLoginStatus() == null) ? 0 : getLoginStatus().hashCode());
         result = prime * result + ((getLoginIp() == null) ? 0 : getLoginIp().hashCode());
         result = prime * result + ((getLoginDate() == null) ? 0 : getLoginDate().hashCode());
-        result = prime * result + ((getUserSource() == null) ? 0 : getUserSource().hashCode());
         result = prime * result + ((getCreateBy() == null) ? 0 : getCreateBy().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
         result = prime * result + ((getUpdateBy() == null) ? 0 : getUpdateBy().hashCode());
@@ -240,7 +231,6 @@ public class User implements Serializable {
         sb.append(", loginStatus=").append(loginStatus);
         sb.append(", loginIp=").append(loginIp);
         sb.append(", loginDate=").append(loginDate);
-        sb.append(", userSource=").append(userSource);
         sb.append(", createBy=").append(createBy);
         sb.append(", createTime=").append(createTime);
         sb.append(", updateBy=").append(updateBy);
