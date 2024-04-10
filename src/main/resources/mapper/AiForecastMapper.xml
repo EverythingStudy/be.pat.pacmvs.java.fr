@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.AiForecastMapper">
+
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.AiForecast">
+            <id property="forecastId" column="forecast_id" jdbcType="INTEGER"/>
+            <result property="quantitativeIndicators" column="quantitative_indicators" jdbcType="VARCHAR"/>
+            <result property="results" column="results" jdbcType="VARCHAR"/>
+            <result property="range" column="range" jdbcType="VARCHAR"/>
+            <result property="createBy" column="create_by" jdbcType="BIGINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        forecast_id,quantitative_indicators,results,
+        range,create_by,create_time
+    </sql>
+</mapper>

@@ -1,6 +1,6 @@
 package cn.staitech.fr.domain;
 
-import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -22,11 +22,6 @@ public class Measure implements Serializable {
     private Long measureId;
 
     /**
-     * 标注id
-     */
-    private String annotationId;
-
-    /**
      * 切片id
      */
     private Long slideId;
@@ -45,16 +40,6 @@ public class Measure implements Serializable {
      * 周长
      */
     private String perimeter;
-
-    /**
-     * 描述
-     */
-    private String description;
-
-    /**
-     * 标签id
-     */
-    private Long categoryId;
 
     /**
      * 标注名称
@@ -117,11 +102,6 @@ public class Measure implements Serializable {
     private String locationType;
 
     /**
-     * 不同标签点的总数
-     */
-    private Integer pointCount;
-
-    /**
      * 周长（圆）
      */
     private String radius;
@@ -129,7 +109,7 @@ public class Measure implements Serializable {
     /**
      * 标注数据
      */
-    private JSONObject contour;
+    private String contour;
 
     /**
      * 创建者
@@ -151,15 +131,10 @@ public class Measure implements Serializable {
      */
     private Date updateTime;
 
-    /**
-     * 更新时间
-     */
-    private String exception;
+    private String measureFullName;
 
-    /**
-     * 更新时间
-     */
-    private String data;
+    @TableField(exist = false)
+    private Integer PointCount;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
@@ -177,13 +152,10 @@ public class Measure implements Serializable {
         }
         Measure other = (Measure) that;
         return (this.getMeasureId() == null ? other.getMeasureId() == null : this.getMeasureId().equals(other.getMeasureId()))
-            && (this.getAnnotationId() == null ? other.getAnnotationId() == null : this.getAnnotationId().equals(other.getAnnotationId()))
             && (this.getSlideId() == null ? other.getSlideId() == null : this.getSlideId().equals(other.getSlideId()))
             && (this.getAnnotationType() == null ? other.getAnnotationType() == null : this.getAnnotationType().equals(other.getAnnotationType()))
             && (this.getArea() == null ? other.getArea() == null : this.getArea().equals(other.getArea()))
             && (this.getPerimeter() == null ? other.getPerimeter() == null : this.getPerimeter().equals(other.getPerimeter()))
-            && (this.getDescription() == null ? other.getDescription() == null : this.getDescription().equals(other.getDescription()))
-            && (this.getCategoryId() == null ? other.getCategoryId() == null : this.getCategoryId().equals(other.getCategoryId()))
             && (this.getNumber() == null ? other.getNumber() == null : this.getNumber().equals(other.getNumber()))
             && (this.getMeasureType() == null ? other.getMeasureType() == null : this.getMeasureType().equals(other.getMeasureType()))
             && (this.getMeasureRelation() == null ? other.getMeasureRelation() == null : this.getMeasureRelation().equals(other.getMeasureRelation()))
@@ -196,7 +168,6 @@ public class Measure implements Serializable {
             && (this.getExteriorAngle() == null ? other.getExteriorAngle() == null : this.getExteriorAngle().equals(other.getExteriorAngle()))
             && (this.getCenterPoint() == null ? other.getCenterPoint() == null : this.getCenterPoint().equals(other.getCenterPoint()))
             && (this.getLocationType() == null ? other.getLocationType() == null : this.getLocationType().equals(other.getLocationType()))
-            && (this.getPointCount() == null ? other.getPointCount() == null : this.getPointCount().equals(other.getPointCount()))
             && (this.getRadius() == null ? other.getRadius() == null : this.getRadius().equals(other.getRadius()))
             && (this.getContour() == null ? other.getContour() == null : this.getContour().equals(other.getContour()))
             && (this.getCreateBy() == null ? other.getCreateBy() == null : this.getCreateBy().equals(other.getCreateBy()))
@@ -210,13 +181,10 @@ public class Measure implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getMeasureId() == null) ? 0 : getMeasureId().hashCode());
-        result = prime * result + ((getAnnotationId() == null) ? 0 : getAnnotationId().hashCode());
         result = prime * result + ((getSlideId() == null) ? 0 : getSlideId().hashCode());
         result = prime * result + ((getAnnotationType() == null) ? 0 : getAnnotationType().hashCode());
         result = prime * result + ((getArea() == null) ? 0 : getArea().hashCode());
         result = prime * result + ((getPerimeter() == null) ? 0 : getPerimeter().hashCode());
-        result = prime * result + ((getDescription() == null) ? 0 : getDescription().hashCode());
-        result = prime * result + ((getCategoryId() == null) ? 0 : getCategoryId().hashCode());
         result = prime * result + ((getNumber() == null) ? 0 : getNumber().hashCode());
         result = prime * result + ((getMeasureType() == null) ? 0 : getMeasureType().hashCode());
         result = prime * result + ((getMeasureRelation() == null) ? 0 : getMeasureRelation().hashCode());
@@ -229,7 +197,6 @@ public class Measure implements Serializable {
         result = prime * result + ((getExteriorAngle() == null) ? 0 : getExteriorAngle().hashCode());
         result = prime * result + ((getCenterPoint() == null) ? 0 : getCenterPoint().hashCode());
         result = prime * result + ((getLocationType() == null) ? 0 : getLocationType().hashCode());
-        result = prime * result + ((getPointCount() == null) ? 0 : getPointCount().hashCode());
         result = prime * result + ((getRadius() == null) ? 0 : getRadius().hashCode());
         result = prime * result + ((getContour() == null) ? 0 : getContour().hashCode());
         result = prime * result + ((getCreateBy() == null) ? 0 : getCreateBy().hashCode());
@@ -246,13 +213,10 @@ public class Measure implements Serializable {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", measureId=").append(measureId);
-        sb.append(", annotationId=").append(annotationId);
         sb.append(", slideId=").append(slideId);
         sb.append(", annotationType=").append(annotationType);
         sb.append(", area=").append(area);
         sb.append(", perimeter=").append(perimeter);
-        sb.append(", description=").append(description);
-        sb.append(", categoryId=").append(categoryId);
         sb.append(", number=").append(number);
         sb.append(", measureType=").append(measureType);
         sb.append(", measureRelation=").append(measureRelation);
@@ -265,7 +229,6 @@ public class Measure implements Serializable {
         sb.append(", exteriorAngle=").append(exteriorAngle);
         sb.append(", centerPoint=").append(centerPoint);
         sb.append(", locationType=").append(locationType);
-        sb.append(", pointCount=").append(pointCount);
         sb.append(", radius=").append(radius);
         sb.append(", contour=").append(contour);
         sb.append(", createBy=").append(createBy);
