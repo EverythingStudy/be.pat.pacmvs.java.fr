@@ -5,6 +5,7 @@ import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
 import cn.staitech.fr.domain.in.SplitVerificationQueryIn;
 import cn.staitech.fr.domain.out.MatrixReviewListOut;
+import cn.staitech.fr.domain.out.OrgansData;
 import cn.staitech.fr.domain.out.SlideListQueryOut;
 import cn.staitech.fr.domain.out.SlideSelectBy;
 import cn.staitech.fr.domain.out.SplitVerificationOut;
@@ -44,6 +45,7 @@ public interface SlideMapper extends BaseMapper<Slide> {
 
     List<MatrixReviewListOut> getMatrixReview(MatrixReviewListIn req);
 
+    List<OrgansData> selectRespData(Long slideId);
 }
 
 

@@ -5,14 +5,17 @@ import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.SingleOrganNumber;
+import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
+import cn.staitech.fr.domain.out.AnimalDimensionData;
 import cn.staitech.fr.domain.out.AnimalDimensionOut;
 import cn.staitech.fr.domain.out.MatrixReviewListOut;
 import cn.staitech.fr.domain.out.MatrixReviewOut;
 import cn.staitech.fr.domain.out.OrganDisassemblyOut;
+import cn.staitech.fr.domain.out.OrgansData;
 import cn.staitech.fr.domain.out.WaxBlockNumberListOut;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SlideMapper;
@@ -121,9 +124,34 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     @Override
     public PageResponse<AnimalDimensionOut> animalList(MatrixReviewListIn req) {
         log.info("阅片列表单动物维度接口查询开始：");
-        PageResponse<AnimalDimensionOut> resp = new PageResponse<>();
-        Page<AnimalDimensionOut> page = new Page<>(req.getPageNum(), req.getPageSize());
 
-        return null;
+        PageResponse<AnimalDimensionOut> resp = new PageResponse<>();
+        List<AnimalDimensionOut> ret = new ArrayList<>();
+        //查询基础数据
+        LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
+        wrapper.eq(Slide::getSpecialId, req.getSpecialId());
+        wrapper.isNotNull(Slide::getAnimalCode);
+        Page<AnimalDimensionOut> page = new Page<>(req.getPageNum(), req.getPageSize());
+        List<Slide> slideList = slideMapper.selectList(wrapper);
+        if (CollectionUtils.isEmpty(slideList)) {
+            resp.setTotal(page.getTotal());
+            resp.setList(ret);
+            resp.setPages(page.getPages());
+        }
+        List<AnimalDimensionData> retData = new ArrayList<>();
+        for (Slide slide : slideList) {
+            AnimalDimensionData out = new AnimalDimensionData();
+            out.setGroupCode(slide.getGroupCode());
+            out.setAnimalCode(slide.getAnimalCode());
+            out.setGenderFlag(slide.getGenderFlag());
+            List<OrgansData> organsData= slideMapper.selectRespData(slide.getSlideId());
+            out.setOrgans(organsData);
+            retData.add(out);
+        }
+        resp.setTotal(page.getTotal());
+
+        resp.setPages(page.getPages());
+        return resp;
     }
 }
