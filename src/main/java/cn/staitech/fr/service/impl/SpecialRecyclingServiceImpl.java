@@ -53,8 +53,9 @@ public class SpecialRecyclingServiceImpl extends ServiceImpl<SpecialRecyclingMap
         //创建响应
         PageResponse resp = new PageResponse();
         req.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
+        req.setUserId(SecurityUtils.getUserId());
         //分页查询
-        Page<SysUser> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
+        Page<SpecialRecyclingListQueryOut> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
         List<SpecialRecyclingListQueryOut> specialList = this.baseMapper.getSpecialRecyclingList(req);
         if (CollectionUtils.isNotEmpty(specialList)) {
             specialList.forEach(e -> {
