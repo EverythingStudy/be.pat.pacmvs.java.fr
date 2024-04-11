@@ -234,8 +234,8 @@
         select t.category_id, count(1) total_count
         from fr_annotation t
         where t.slide_id = #{slideId}
-        and t.getCategoryCount
-        GROUP BY t.contour_type = 2
+        and t.contour_type = 2
+        GROUP BY t.category_id
     </select>
 
     <select id="getAnnoListByParm" resultType="cn.staitech.fr.domain.Annotation">
