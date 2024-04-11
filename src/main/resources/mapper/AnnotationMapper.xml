@@ -129,6 +129,7 @@
                update_time,
                slide_id,
                id,
+               contour_type,
                ST_AsGeoJSON(contour) AS contour
         from fr_annotation
         where annotation_id = #{annotationId}
@@ -151,6 +152,7 @@
         project_id,
         slide_id,
         id,
+        contour_type,
         ST_AsGeoJSON(contour) as contour
         from fr_annotation
         <where>
