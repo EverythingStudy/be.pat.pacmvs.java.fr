@@ -294,10 +294,10 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 
 
 				//对比处理 
-				//核对状态 0：初始 1：正确 2：错误 3：修正正常
+				//核对状态 0：初始 1：正确 2：修正正常 3：错误
 				int checkStatus = 0;
 				if(waxDataMapSize != slideCountSize){
-					checkStatus = 2;
+					checkStatus = 3;
 				}else{
 					//遍历蜡块==》
 					boolean slideTag = true;
@@ -307,7 +307,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 						boolean tag = containsOrgan(organName, organNumber, slideCountMap);
 						if(!tag){
 							slideTag = false;
-							checkStatus = 2;
+							checkStatus = 3;
 							break;
 						}
 					}
