@@ -1,7 +1,10 @@
 package cn.staitech.fr.domain.in;
 
+import cn.staitech.common.core.domain.PageRequest;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Map;
 
@@ -11,7 +14,12 @@ import java.util.Map;
  * @desc
  */
 @Data
-public class MatrixReviewListIn {
+public class MatrixReviewListIn extends PageRequest {
+
+    @ApiModelProperty(value = "专题id")
+    @NotNull(message = "[专题id]不能为空")
+    private Long specialId;
+
     @ApiModelProperty(value = "动物编号")
     private String animalCode;
 

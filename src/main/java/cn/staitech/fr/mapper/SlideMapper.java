@@ -1,8 +1,10 @@
 package cn.staitech.fr.mapper;
 
 import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
 import cn.staitech.fr.domain.in.SplitVerificationQueryIn;
+import cn.staitech.fr.domain.out.MatrixReviewListOut;
 import cn.staitech.fr.domain.out.SlideListQueryOut;
 import cn.staitech.fr.domain.out.SlideSelectBy;
 import cn.staitech.fr.domain.out.SplitVerificationOut;
@@ -39,6 +41,9 @@ public interface SlideMapper extends BaseMapper<Slide> {
     List<SplitVerificationOut> getVerificationSlideListQuery(SplitVerificationQueryIn req);
 
     SlideSelectBy pageImageCsvListVOBy(Long slideId);
+
+    List<MatrixReviewListOut> getMatrixReview(MatrixReviewListIn req);
+
 }
 
 

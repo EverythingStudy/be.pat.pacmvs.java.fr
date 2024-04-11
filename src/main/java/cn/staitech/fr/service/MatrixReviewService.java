@@ -4,6 +4,7 @@ import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
+import cn.staitech.fr.domain.out.AnimalDimensionOut;
 import cn.staitech.fr.domain.out.MatrixReviewListOut;
 import cn.staitech.fr.domain.out.MatrixReviewOut;
 
@@ -20,4 +21,6 @@ public interface MatrixReviewService {
     R edit(MatrixReviewEditIn req);
 
     PageResponse<MatrixReviewListOut> getMatrixReview(MatrixReviewListIn req);
+
+    PageResponse<AnimalDimensionOut> animalList(MatrixReviewListIn req);
 }

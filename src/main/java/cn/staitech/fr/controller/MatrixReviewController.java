@@ -2,12 +2,15 @@ package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
+import cn.staitech.fr.constant.Container;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
+import cn.staitech.fr.domain.out.AnimalDimensionOut;
 import cn.staitech.fr.domain.out.MatrixReviewListOut;
 import cn.staitech.fr.domain.out.MatrixReviewOut;
 import cn.staitech.fr.service.MatrixReviewService;
 import cn.staitech.fr.service.SpecialService;
+import cn.staitech.fr.utils.LanguageUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author wudi
@@ -51,10 +55,16 @@ public class MatrixReviewController {
     }
 
     @ApiOperation(value = "矩阵阅片-切片维度")
-    @PostMapping("/list")
+    @PostMapping("/slideList")
     public R<PageResponse<MatrixReviewListOut>> list(@RequestBody @Validated MatrixReviewListIn req) {
         PageResponse<MatrixReviewListOut> resp = matrixReviewService.getMatrixReview(req);
         return R.ok(resp);
     }
 
+    @ApiOperation(value = "矩阵阅片-动物编号维度")
+    @PostMapping("/animalList")
+    public R<PageResponse<AnimalDimensionOut>> animalList(@RequestBody @Validated MatrixReviewListIn req) {
+        PageResponse<AnimalDimensionOut> resp = matrixReviewService.animalList(req);
+        return R.ok(resp);
+    }
 }

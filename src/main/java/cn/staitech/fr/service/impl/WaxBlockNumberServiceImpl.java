@@ -85,7 +85,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         //创建响应
         PageResponse resp = new PageResponse();
         //分页查询
-        Page<SysUser> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
+        Page<WaxBlockNumberListOut> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
         List<WaxBlockNumberListOut> waxList = this.baseMapper.getWaxList(req);
         resp.setTotal(page.getTotal());
         resp.setList(waxList);
