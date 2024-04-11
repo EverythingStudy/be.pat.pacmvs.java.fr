@@ -269,7 +269,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         }*/
         slide.setGroupCode(s[2].substring(0, s[2].length() - 1));
 
-        slide.setOrgans(waxBlockInfoMapper.getOrganName(req.getTopicId(), req.getSpeciesId(), slide.getWaxCode()));
+        slide.setOrgans(waxBlockInfoMapper.getOrganName(req.getTopicId(), req.getSpeciesId(), slide.getWaxCode(),s[2].substring(s[2].length() - 1)));
 
         return slide;
     }
