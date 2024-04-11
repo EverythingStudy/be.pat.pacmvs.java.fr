@@ -77,32 +77,4 @@ public class MeasureController {
         measureService.execlExport(singleSlideId, response);
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
