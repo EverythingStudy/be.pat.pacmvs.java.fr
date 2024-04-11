@@ -40,4 +40,10 @@ public class MatrixReviewListIn extends PageRequest {
 
     @ApiModelProperty(value = "时间范围")
     private Map<String, Date> createTimeParams;
+
+    @ApiModelProperty(value = "排序字段：动物编号-animal_code；脏器-category_id")
+    private String sortField;
+
+    @ApiModelProperty(value = "排序方式：asc-升序；desc-降序")
+    private String sortType;
 }

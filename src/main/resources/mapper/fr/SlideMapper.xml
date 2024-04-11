@@ -253,6 +253,12 @@
                 </if>
             </if>
         </where>
-        order by ss.create_time desc
+        <if test="sortField != null and sortField!=''">
+            order by #{sortField} #{sortOrder}
+        </if>
+        <if test="sortField == null and sortField==''">
+            order by ss.create_time desc
+        </if>
+
     </select>
 </mapper>

@@ -121,6 +121,9 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     @Override
     public PageResponse<AnimalDimensionOut> animalList(MatrixReviewListIn req) {
         log.info("阅片列表单动物维度接口查询开始：");
+        PageResponse<AnimalDimensionOut> resp = new PageResponse<>();
+        Page<AnimalDimensionOut> page = new Page<>(req.getPageNum(), req.getPageSize());
+
         return null;
     }
 }
