@@ -17,26 +17,24 @@ import lombok.NoArgsConstructor;
 * @date 2023年6月28日
 * @version V1.0
  */
-@Api(value = "人工诊断添加", tags = "人工诊断添加")
+@Api(value = "人工诊断删除", tags = "人工诊断删除")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class SpecialDiagnosisDeleteVo {
 	
-	@ApiModelProperty(name = "specialDiagnosisId" , value = "诊断ID")
-	private Long specialDiagnosisId;
+	@ApiModelProperty(name = "diagnosisId" , value = "诊断ID")
+	private Long diagnosisId;
     
-	@ApiModelProperty(name = "specialId" , value = "专题id")
-	private Long specialId;
+//	@ApiModelProperty(name = "specialId" , value = "专题id")
+//	private Long specialId;
     
-	@ApiModelProperty(name = "projectId" , value = "项目ID")
-	private Long projectId;
     
-	@ApiModelProperty(name = "subImageId" , value = "新切片ID（切好的单脏器）")
-	private Long subImageId;
+//	@ApiModelProperty(name = "singleId" , value = "新切片ID（切好的单脏器）")
+//	private Long singleId;
 	
-	@ApiModelProperty(name = "groupId" , value = "分组id")
-	private Long groupId;
+//	@ApiModelProperty(name = "groupId" , value = "分组id")
+//	private Long groupId;
     
 	
     

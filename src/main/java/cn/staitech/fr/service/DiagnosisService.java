@@ -22,7 +22,7 @@ import cn.staitech.fr.vo.diagnosis.VisceraVo;
 public interface DiagnosisService extends IService<Diagnosis> {
 	
 	//查询诊断数据列表
-	public List<SpecialDiagnosisVo> getSpecialDiagnosisVo(Long singleId,Long specialId,Long groupId);
+	public List<SpecialDiagnosisVo> getSpecialDiagnosisVo(Long singleId,Long specialId);
 	//保存/修改诊断数据
 	public int saveOrUpdateSpecialDiagnosisVo(SpecialDiagnosisAddVo addVoList);
 	

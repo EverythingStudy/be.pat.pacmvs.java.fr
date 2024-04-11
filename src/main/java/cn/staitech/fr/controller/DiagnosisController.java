@@ -89,7 +89,7 @@ public class DiagnosisController {
 	@PostMapping("/delete")
 	public R delete(@Validated @RequestBody SpecialDiagnosisDeleteVo specialDiagnosisDeleteVo) throws Exception {
 		if (null != specialDiagnosisDeleteVo) {
-			Diagnosis sid = diagnosisService.getSpecialDiagnosis(specialDiagnosisDeleteVo.getSpecialDiagnosisId());
+			Diagnosis sid = diagnosisService.getSpecialDiagnosis(specialDiagnosisDeleteVo.getDiagnosisId());
 			if(null == sid){
 				return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
 			}
@@ -98,7 +98,7 @@ public class DiagnosisController {
 			if(!currentUserId.equals(sid.getCreateBy())){
 				return R.fail(MessageSource.M("DATA_CANNOT_DELETED"));
 			}
-			diagnosisService.deleteSpecialDiagnosisVo(specialDiagnosisDeleteVo.getSpecialDiagnosisId());
+			diagnosisService.deleteSpecialDiagnosisVo(specialDiagnosisDeleteVo.getDiagnosisId());
 			//刷新列表数据返回
 //			List<SpecialDiagnosisVo> list = diagnosisService.getSpecialDiagnosisVo(sid.getSubImageId()+"",sid.getProjectId()+"",sid.getSpecialId()+"",sid.getGroupId()+"");
 //			return R.ok(list);
@@ -126,10 +126,10 @@ public class DiagnosisController {
 	@GetMapping("/info")
 	public R info( 
 			@RequestParam @ApiParam(name = "subImageId", value = "切片id", required = true) Long singleId,
-			@RequestParam @ApiParam(name = "groupId", value = "分组id", required = false) Long groupId,
+			//@RequestParam @ApiParam(name = "groupId", value = "分组id", required = false) Long groupId,
 			@RequestParam @ApiParam(name = "specialId", value = "专题id", required = true) Long specialId) {
 		//通过项目ID 专题id 切片id 查询所有的诊断结果，返回列表（添加是否可以修改）
-		List<SpecialDiagnosisVo> list = diagnosisService.getSpecialDiagnosisVo(singleId,specialId,groupId);
+		List<SpecialDiagnosisVo> list = diagnosisService.getSpecialDiagnosisVo(singleId,specialId);
 		return R.ok(list);
 	}
 

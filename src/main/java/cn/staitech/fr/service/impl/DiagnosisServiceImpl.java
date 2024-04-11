@@ -86,7 +86,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 
 
 	@Override
-	public List<SpecialDiagnosisVo> getSpecialDiagnosisVo(Long singleId, Long specialId,Long groupId) {
+	public List<SpecialDiagnosisVo> getSpecialDiagnosisVo(Long singleId, Long specialId) {
 
 		List<SpecialDiagnosisVo> voList = new ArrayList<SpecialDiagnosisVo>();
 
@@ -94,23 +94,22 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		queryWrapper.eq("special_id",specialId);
 		queryWrapper.eq("single_id",singleId);
 		queryWrapper.gt("delete_flag",1);
-		if(null != groupId){
-			queryWrapper.eq("group_id",groupId);
-		}
+		queryWrapper.orderByAsc("create_by");
 
 		List<Diagnosis> list = list(queryWrapper);
-		int index = 0;
 
 		if (CollectionUtils.isNotEmpty(list)) {
 			for (Diagnosis diagn : list) {
 				SpecialDiagnosisVo vo = new SpecialDiagnosisVo();
 				BeanUtils.copyProperties(diagn, vo);
+
 				Long diagnosisId = diagn.getDiagnosisId();
 				Long createBy = diagn.getCreateBy();
 				//根据创建人查询名称
 				SysUser loginUser = diagnosisMapper.selectUserById(createBy);
 				vo.setCreateUser(loginUser.getNickName());
-				vo.setIndex(index);
+
+				//				vo.setIndex(index);
 
 				QueryWrapper<DiagnosisDetail> queryDetailWrapper = new QueryWrapper<>();
 				queryDetailWrapper.eq("diagnosis_id",diagnosisId);
@@ -120,49 +119,33 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 				for (DiagnosisDetail detail : detailList) {
 					String dictType = detail.getDictType();
 					String tags = detail.getTags();
-					String tagName = detail.getTagName();
+					//String tagName = detail.getTagName();
 					//根据不同的标签去查询value值
 					if (StringUtils.isNotEmpty(tags)) {
 						if (dictType.equals(SysDictTypeEnum.organization.label())) {
-							vo.setViscera(Long.valueOf(tags));
-							visceraTag = tags;
+							vo.setViscera(tags);
 						}else if (dictType.equals(SysDictTypeEnum.lesion.label())) {
-							vo.setLesion(Long.valueOf(tags));
-							vo.setLesionName(tagName);
+							vo.setLesion(tags);
 						}else if (dictType.equals(SysDictTypeEnum.grade.label())) {
-							vo.setGrade(Long.valueOf(tags));
-						}
-						if (dictType.equals(SysDictTypeEnum.position.label())) {
-							List<Object> labelList = transArray(tags);
-							vo.setPositionList(labelList);
-							List<Object> positionNameList =  transArray2(tagName);
-							vo.setPositionNameList(positionNameList);
+							vo.setGrade(tags);
+						}else if (dictType.equals(SysDictTypeEnum.position.label())) {
+							vo.setPosition(tags);
 						}else if (dictType.equals(SysDictTypeEnum.ddefinition.label())) {
-							List<Object> labelList = transArray(tags);
-							vo.setDdefinitionList(labelList);
+							vo.setDdefinition(tags);
 						}
 					}
 				}
 
 				//根据脏器标签查询他对应的部位和dde的列表
-				List<VisceraVo> relationshipList =  new ArrayList<>();
-				relationshipList = getSelectRelationship(SysDictTypeEnum.organization.label(),visceraTag);
-				vo.setVisceraList(relationshipList);
+				//				List<VisceraVo> relationshipList =  new ArrayList<>();
+				//				relationshipList = getSelectRelationship(SysDictTypeEnum.organization.label(),visceraTag);
+				//				vo.setVisceraList(relationshipList);
 
 				if (createBy.equals(SecurityUtils.getLoginUser().getSysUser().getUserId())) {
 					vo.setEditStatus(1);
-					//0：  1：
-					vo.setDisable(true);
-				}else{
-					vo.setDisable(false);
 				}
-				/*String diagnosisResult = visceraStr+":"+positionStr+";"+lesionStr+";"+ddefinitionStr+";"+gradeStr+"  ";
-				if(StringUtils.isNotEmpty(vo.getRemark())){
-					diagnosisResult = diagnosisResult +"( 备注："+vo.getRemark()+")";
-				}
-				vo.setDiagnosticResults(diagnosisResult);*/
 				voList.add(vo);
-				index++;
+				//				index++;
 			}
 
 		}
@@ -212,19 +195,17 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 			diagnosisMapper.updateById(record);
 		}
 		specialDiagnosisId = record.getDiagnosisId();
-		int addStatus = saveOrUpdateDetail(addVo, specialDiagnosisId, operType);
+		saveOrUpdateDetail(addVo, specialDiagnosisId, operType);
 		long endTime = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
 		log.info("人工诊断单条处理运行时间：{},毫秒 ",totalTime);
-		if(addStatus == 1){
-			//修改诊断状态
-			Diagnosis diagnosis = getById(specialDiagnosisId);
-			SingleSlide singleSlide = new SingleSlide();
-			singleSlide.setSingleId(diagnosis.getSingleId());
-			//人工诊断状态 0：未诊断；1：已诊断
-			singleSlide.setDiagnosisStatus(CommonConstant.DIAGNOSIS_YES);
-			singleSlideMapper.updateById(singleSlide);
-		}
+		//修改诊断状态
+		Diagnosis diagnosis = getById(specialDiagnosisId);
+		SingleSlide singleSlide = new SingleSlide();
+		singleSlide.setSingleId(diagnosis.getSingleId());
+		//人工诊断状态 0：未诊断；1：已诊断
+		singleSlide.setDiagnosisStatus(CommonConstant.DIAGNOSIS_YES);
+		singleSlideMapper.updateById(singleSlide);
 		//是否需要刷新初始化字典的判断
 		//		updateInitDictCache(addVoList);
 		return checkFlage;
@@ -457,29 +438,23 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 	 * @return void
 	 * @throws
 	 */
-	public int saveOrUpdateDetail(SpecialDiagnosisAddVo addVo, long specialDiagnosisId, int operType) {
+	public void saveOrUpdateDetail(SpecialDiagnosisAddVo addVo, long specialDiagnosisId, int operType) {
 		long startTime = System.currentTimeMillis();
-		int addStatus = -1;
 
-		/*if (operType == 1) {
-			DiagnosisDetail sdd = saveDetailInfo(addVo.getViscera(), specialDiagnosisId, SysDictTypeEnum.organization.label(), "");
-			saveDetailInfo(addVo.getPosition(), specialDiagnosisId, SysDictTypeEnum.position.label(),String.valueOf(addVo.getViscera()));
-			saveDetailInfo(addVo.getLesion(), specialDiagnosisId, SysDictTypeEnum.lesion.label(),String.valueOf(addVo.getViscera()));
-			saveDetailInfo(addVo.getDdefinition(), specialDiagnosisId, SysDictTypeEnum.ddefinition.label(),"");
-			saveDetailInfo(addVo.getGrade(), specialDiagnosisId, SysDictTypeEnum.grade.label(),"");
-			addStatus = 1;
-		} else {
-			DiagnosisDetail sdd = updateDetail(visceraList, null, specialDiagnosisId, SysDictTypeEnum.organization.label(),"","");
-			updateDetail(positionList, null, specialDiagnosisId, SysDictTypeEnum.position.label(),sdd.getTags(),String.valueOf(viscera));
-			updateDetail(lesionList, null, specialDiagnosisId, SysDictTypeEnum.lesion.label(),sdd.getTags(),String.valueOf(viscera));
-			updateDetail(ddefinitionList, null, specialDiagnosisId, SysDictTypeEnum.ddefinition.label(), "","");
-			updateDetail(gradeList, null, specialDiagnosisId, SysDictTypeEnum.grade.label(), "","");
-		}*/
+		if (operType == 2) {
+			//先删除所有明细数据
+			diagnosisDetailService.removeById(specialDiagnosisId);
+		}
+
+		saveDetailInfo(addVo.getViscera(), specialDiagnosisId, SysDictTypeEnum.organization.label(), "");
+		saveDetailInfo(addVo.getPosition(), specialDiagnosisId, SysDictTypeEnum.position.label(),String.valueOf(addVo.getViscera()));
+		saveDetailInfo(addVo.getLesion(), specialDiagnosisId, SysDictTypeEnum.lesion.label(),String.valueOf(addVo.getViscera()));
+		saveDetailInfo(addVo.getDdefinition(), specialDiagnosisId, SysDictTypeEnum.ddefinition.label(),"");
+		saveDetailInfo(addVo.getGrade(), specialDiagnosisId, SysDictTypeEnum.grade.label(),"");
 
 		long endTime = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
 		log.info("人工诊断明细程序运行时间： " + totalTime + " 毫秒");
-		return addStatus;
 	}
 
 	/**
@@ -511,7 +486,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 			diagnosisDetailService.save(detail);
 		return detail;
 	}*/
-	
+
 	public DiagnosisDetail saveDetailInfo(Long labelId,  Long specialDiagnosisId,String dictType, String filter) {
 		DiagnosisDetail detail = new DiagnosisDetail();
 		detail.setDiagnosisId(specialDiagnosisId);
@@ -525,7 +500,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		diagnosisDetailService.save(detail);
 		return detail;
 	}
-	
+
 	public DiagnosisDetail updateDetailInfo(Long labelId,Long specialDiagnosisId,String dictType, String filter) {
 		DiagnosisDetail detail = new DiagnosisDetail();
 		detail.setDiagnosisId(specialDiagnosisId);
@@ -554,7 +529,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		}
 		return detail;
 	}
-	
+
 	public String getLabelNameByParm(String dictType,Long labelId,String filter){
 		String labelName = "";
 		SysDictTagVo sysDictTagVo = new SysDictTagVo();
@@ -572,8 +547,8 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		}*/
 		return labelName;
 	}
-	
-	
+
+
 
 
 	/**
@@ -589,7 +564,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 	 * @return SpecialDiagnosisDetail
 	 * @throws
 	 */
-/*	public DiagnosisDetail updateDetail(List<Object> labelList, String labelWord, Long specialDiagnosisId,
+	/*	public DiagnosisDetail updateDetail(List<Object> labelList, String labelWord, Long specialDiagnosisId,
 			String dictType, String filter,String viscera) {
 		DiagnosisDetail detail = new DiagnosisDetail();
 		detail.setDiagnosisId(specialDiagnosisId);
@@ -628,6 +603,6 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		return detail;
 	}*/
 
-	
+
 
 }
