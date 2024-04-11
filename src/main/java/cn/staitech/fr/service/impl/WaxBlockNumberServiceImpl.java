@@ -128,6 +128,11 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
      /*   if(new File(waxPath).exists()){
             new File(waxPath).delete();
         }*/
+        //校验文件名称
+        String originalFilename = req.getFile().getOriginalFilename();
+        if(!originalFilename.endsWith(".doc")||!originalFilename.endsWith(".docx")){
+            return R.fail(MessageSource.M("FILE_TYPE_ERROR"));
+        }
         LambdaQueryWrapper<WaxBlockNumber> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(WaxBlockNumber::getTopicId, req.getTopicId());
         queryWrapper.eq(WaxBlockNumber::getDelFlag, CommonConstant.NUMBER_0);
