@@ -130,7 +130,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         }*/
         //校验文件名称
         String originalFilename = req.getFile().getOriginalFilename();
-        if(!originalFilename.endsWith(".doc")||!originalFilename.endsWith(".docx")){
+        if(!originalFilename.endsWith(".doc")&&!originalFilename.endsWith(".docx")){
             return R.fail(MessageSource.M("FILE_TYPE_ERROR"));
         }
         LambdaQueryWrapper<WaxBlockNumber> queryWrapper = new LambdaQueryWrapper<>();
@@ -219,7 +219,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
                     .map(cell -> cell.getText().trim())
                     .reduce((cell1, cell2) -> cell1 + " | " + cell2)
                     .orElse("");
-            s1=s1.replace(" ","");
+            s1=s1.replace(") ",")");
             if(s1.contains("Male")){
                 System.out.println(s1);
             }
@@ -232,7 +232,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
                 return R.fail(MessageSource.M("FILE_FORMART_ERROR"));
             } else if (split.length == 2) {
                 if (s1.contains(CommonConstant.MALE_FLAG)&&s1.contains(CommonConstant.MALE_FLAG_CN)) {
-                    if (CommonConstant.MALE.equals(split[0].trim())) {
+                    if (split[0].trim().contains(CommonConstant.MALE)) {
                         sexList.add(CommonConstant.MALE);
                         sexList.add(CommonConstant.FEMALE);
                         continue;
@@ -315,7 +315,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         if (!s4.matches("^[0-9]+$")) {
             throw new RuntimeException(MessageSource.M("FILE_ORGAN_NUMBER_ERROR"));
         }
-        String s6 = StringUtils.substringAfterLast(s2, part);
+        String s6 = StringUtils.substringAfterLast(s2, part+CommonConstant.CODE_END);
         log.info("脏器英文+数量:{}", s6);
         String s7 = StringUtils.substringBeforeLast(s6, CommonConstant.CODE_START);
         log.info("脏器英文:{}", s7);
