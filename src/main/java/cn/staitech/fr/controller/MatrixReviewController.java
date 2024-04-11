@@ -3,10 +3,9 @@ package cn.staitech.fr.controller;
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
-import cn.staitech.fr.domain.in.SpecialListQueryIn;
+import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.out.MatrixReviewListOut;
 import cn.staitech.fr.domain.out.MatrixReviewOut;
-import cn.staitech.fr.domain.out.SpecialListQueryOut;
 import cn.staitech.fr.service.MatrixReviewService;
 import cn.staitech.fr.service.SpecialService;
 import io.swagger.annotations.Api;
@@ -53,8 +52,8 @@ public class MatrixReviewController {
 
     @ApiOperation(value = "矩阵阅片-切片维度")
     @PostMapping("/list")
-    public R<PageResponse<MatrixReviewListOut>> list(@RequestBody @Validated SpecialListQueryIn req) {
-        PageResponse<SpecialListQueryOut> resp = specialService.getSpecialList(req);
+    public R<PageResponse<MatrixReviewListOut>> list(@RequestBody @Validated MatrixReviewListIn req) {
+        PageResponse<MatrixReviewListOut> resp = matrixReviewService.getMatrixReview(req);
         return R.ok();
     }
 

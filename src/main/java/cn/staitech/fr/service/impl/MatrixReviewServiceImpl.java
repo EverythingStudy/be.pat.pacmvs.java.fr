@@ -1,10 +1,13 @@
 package cn.staitech.fr.service.impl;
 
+import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
+import cn.staitech.fr.domain.in.MatrixReviewListIn;
+import cn.staitech.fr.domain.out.MatrixReviewListOut;
 import cn.staitech.fr.domain.out.MatrixReviewOut;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
@@ -63,5 +66,12 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         special.setControlGroup(req.getGroupId());
         specialMapper.updateById(special);
         return R.ok();
+    }
+
+    @Override
+    public PageResponse<MatrixReviewListOut> getMatrixReview(MatrixReviewListIn req) {
+        log.info("阅片列表单切片维度接口查询开始：");
+
+        return null;
     }
 }
