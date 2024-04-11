@@ -18,7 +18,7 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface WaxBlockInfoMapper extends BaseMapper<WaxBlockInfo> {
 
-    String getOrganName(@Param("topicId") Long topicId, @Param("speciesId") String speciesId,@Param("waxCode") String waxCode);
+    String getOrganName(@Param("topicId") Long topicId, @Param("speciesId") String speciesId,@Param("waxCode") String waxCode,@Param("genderFlag")String genderFlag);
 
 	List<WaxBlockInfo> getWaxBlockInfoList(Map<String,Object> parm);
 }

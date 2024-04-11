@@ -3,6 +3,7 @@ import lombok.Data;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * @Author wudi
@@ -18,6 +19,7 @@ public class SpecialAddIn {
 
     @ApiModelProperty(value = "专题名称")
     @NotBlank(message = "{SpecialInsertVo.specialName.isnull}")
+    @Size(max = 100,message = "{SpecialInsertVo.specialNumber.length}")
     private String specialName;
 
     @ApiModelProperty(value = "种属id")

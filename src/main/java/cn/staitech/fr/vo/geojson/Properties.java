@@ -101,4 +101,7 @@ public class Properties {
 
     @ApiModelProperty(value = "图像url")
     private String image_url;
+
+    @ApiModelProperty(value = "标注类型")
+    private Long contour_type;
 }

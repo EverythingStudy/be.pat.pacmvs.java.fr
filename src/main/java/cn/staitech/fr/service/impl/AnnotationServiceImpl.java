@@ -108,6 +108,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         properties.setUpdate_by(annotation.getUpdateBy());
         properties.setCreate_time(String.valueOf(annotation.getCreateTime()));
         properties.setProject_id(annotation.getProjectId());
+        properties.setContour_type(annotation.getContourType());
         if (annotation.getCategoryId() != null) {
             Category category = categoryHashMap.get(annotation.getCategoryId());
             if (category == null) {

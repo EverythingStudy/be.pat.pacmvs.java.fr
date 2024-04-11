@@ -111,7 +111,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide>
         }
         slide.setGroupCode(s[2].substring(0, s[2].length() - 1));
         Special special = specialMapper.selectById(specialId);
-        slide.setOrgans(waxBlockInfoMapper.getOrganName(special.getTopicId(),special.getSpeciesId(),slide.getWaxCode()));
+        slide.setOrgans(waxBlockInfoMapper.getOrganName(special.getTopicId(),special.getSpeciesId(),slide.getWaxCode(),s[2].substring(s[2].length() - 1)));
         return slide;
     }
 

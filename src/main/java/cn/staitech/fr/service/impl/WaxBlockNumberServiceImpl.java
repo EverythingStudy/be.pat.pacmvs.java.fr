@@ -125,8 +125,13 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
     public R upload(UploadWaxBlockIn req) throws IOException {
         log.info("导入文件接口开始：");
         //校验专题是否已经存在
-        if(new File(waxPath).exists()){
+     /*   if(new File(waxPath).exists()){
             new File(waxPath).delete();
+        }*/
+        //校验文件名称
+        String originalFilename = req.getFile().getOriginalFilename();
+        if(!originalFilename.endsWith(".doc")&&!originalFilename.endsWith(".docx")){
+            return R.fail(MessageSource.M("FILE_TYPE_ERROR"));
         }
         LambdaQueryWrapper<WaxBlockNumber> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(WaxBlockNumber::getTopicId, req.getTopicId());
@@ -152,10 +157,18 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         log.info("专题号：{}", topicName);
         Topic topic = getTopic(topicName);
         if (ObjectUtils.isEmpty(topic)) {
+            fis.close();
+            if(file1.exists()){
+                FileUtils.delete(file1);
+            }
             return R.fail(MessageSource.M("UPLOAD_FILE_NOT_EXIST_TOPIC"));
         }
         //校验专题是否一致
         if(!topic.getTopicId().equals(req.getTopicId())){
+            fis.close();
+            if(file1.exists()){
+                FileUtils.delete(file1);
+            }
             return R.fail(MessageSource.M("UPLOAD_FILE_TOPIC_NAME_ERROR"));
         }
 
@@ -165,10 +178,18 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         log.info("种属：{}", speciesName);
         Species species = getSpecies(speciesName);
         if (ObjectUtils.isEmpty(species)) {
+            fis.close();
+            if(file1.exists()){
+                FileUtils.delete(file1);
+            }
             return R.fail(MessageSource.M("UPLOAD_FILE_NOT_EXIST_SPECIES"));
         }
         //校验种属
         if(!species.getSpeciesId().equals(req.getSpeciesId())){
+            fis.close();
+            if(file1.exists()){
+                FileUtils.delete(file1);
+            }
             return R.fail(MessageSource.M("UPLOAD_FILE_SPECIES_ERROR"));
         }
         WaxBlockNumber waxBlockNumber = getWaxBlockNumber(req, topic, species);
@@ -182,6 +203,10 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         List<String> sexList = new ArrayList<>();
 
         if (CollectionUtils.isEmpty(rows)) {
+            fis.close();
+            if(file1.exists()){
+                FileUtils.delete(file1);
+            }
             return R.fail(MessageSource.M("UPLOAD_FILE_IS_NULL"));
         }
         //查询所有脏器
@@ -194,7 +219,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
                     .map(cell -> cell.getText().trim())
                     .reduce((cell1, cell2) -> cell1 + " | " + cell2)
                     .orElse("");
-            s1=s1.replace(" ","");
+            s1=s1.replace(") ",")");
             if(s1.contains("Male")){
                 System.out.println(s1);
             }
@@ -207,7 +232,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
                 return R.fail(MessageSource.M("FILE_FORMART_ERROR"));
             } else if (split.length == 2) {
                 if (s1.contains(CommonConstant.MALE_FLAG)&&s1.contains(CommonConstant.MALE_FLAG_CN)) {
-                    if (CommonConstant.MALE.equals(split[0].trim())) {
+                    if (split[0].trim().contains(CommonConstant.MALE)) {
                         sexList.add(CommonConstant.MALE);
                         sexList.add(CommonConstant.FEMALE);
                         continue;
@@ -290,7 +315,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         if (!s4.matches("^[0-9]+$")) {
             throw new RuntimeException(MessageSource.M("FILE_ORGAN_NUMBER_ERROR"));
         }
-        String s6 = StringUtils.substringAfterLast(s2, part);
+        String s6 = StringUtils.substringAfterLast(s2, part+CommonConstant.CODE_END);
         log.info("脏器英文+数量:{}", s6);
         String s7 = StringUtils.substringBeforeLast(s6, CommonConstant.CODE_START);
         log.info("脏器英文:{}", s7);

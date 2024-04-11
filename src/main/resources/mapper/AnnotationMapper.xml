@@ -129,6 +129,7 @@
                update_time,
                slide_id,
                id,
+               contour_type,
                ST_AsGeoJSON(contour) AS contour
         from fr_annotation
         where annotation_id = #{annotationId}
@@ -151,6 +152,7 @@
         project_id,
         slide_id,
         id,
+        contour_type,
         ST_AsGeoJSON(contour) as contour
         from fr_annotation
         <where>
@@ -234,8 +236,8 @@
         select t.category_id, count(1) total_count
         from fr_annotation t
         where t.slide_id = #{slideId}
-        and t.getCategoryCount
-        GROUP BY t.contour_type = 2
+        and t.contour_type = 2
+        GROUP BY t.category_id
     </select>
 
     <select id="getAnnoListByParm" resultType="cn.staitech.fr.domain.Annotation">
