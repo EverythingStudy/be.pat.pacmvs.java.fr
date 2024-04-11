@@ -129,6 +129,9 @@
                update_time,
                slide_id,
                id,
+               contour_type,
+               single_slide_id,
+               single,
                ST_AsGeoJSON(contour) AS contour
         from fr_annotation
         where annotation_id = #{annotationId}
