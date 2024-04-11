@@ -31,6 +31,7 @@
         select group_concat(organ_name)
         from fr_wax_block_info
         where topic_id = #{topicId}
+          and (gender_flag is null or gender_flag = #{genderFlag})
           and species_id = #{speciesId}
           and wax_code = #{waxCode}
           and del_flag = '0'

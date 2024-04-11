@@ -262,14 +262,14 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         }
         slide.setGenderFlag(s[2].substring(s[2].length() - 1));
         //判断组别
-        Group byId = groupService.getById(s[2].substring(0, s[2].length() - 1));
+        /*Group byId = groupService.getById(s[2].substring(0, s[2].length() - 1));
         if (ObjectUtils.isEmpty(byId)) {
             log.info("切片文件名格式错误：" + fileName);
             return slide;
-        }
+        }*/
         slide.setGroupCode(s[2].substring(0, s[2].length() - 1));
 
-        slide.setOrgans(waxBlockInfoMapper.getOrganName(req.getTopicId(), req.getSpeciesId(), slide.getWaxCode()));
+        slide.setOrgans(waxBlockInfoMapper.getOrganName(req.getTopicId(), req.getSpeciesId(), slide.getWaxCode(),s[2].substring(s[2].length() - 1)));
 
         return slide;
     }
