@@ -163,6 +163,9 @@
             <if test="categoryId != null">
                 AND category_id = #{categoryId}
             </if>
+            <if test="singleSlideId != null">
+                AND single_slide_id = #{singleSlideId}
+            </if>
         </where>
     </select>
 

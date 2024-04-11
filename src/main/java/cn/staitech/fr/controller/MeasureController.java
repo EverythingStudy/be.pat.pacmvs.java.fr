@@ -48,8 +48,8 @@ public class MeasureController {
 
     @ApiOperation(value = "获取GeoJson数据")
     @GetMapping("/getDataList")
-    public R<List<Features>> getDataList(@RequestParam(value = "singleSlideId") @ApiParam(name = "singleSlideId", value = "切片ID", required = true) Long singleSlideId) throws Exception {
-        return R.ok(measureService.selectListBy(singleSlideId));
+    public R<List<Features>> getDataList(@RequestParam(value = "single_slide_id") @ApiParam(name = "single_slide_id", value = "切片ID", required = true) Long single_slide_id) throws Exception {
+        return R.ok(measureService.selectListBy(single_slide_id));
     }
 
 

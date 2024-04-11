@@ -10,6 +10,7 @@ import cn.staitech.fr.vo.annotation.AnnotationById;
 import cn.staitech.fr.vo.annotation.AnnotationSelectList;
 import cn.staitech.fr.vo.annotation.MarkingMerge;
 import cn.staitech.fr.vo.geojson.Features;
+import cn.staitech.fr.vo.geojson.in.RoiIn;
 import cn.staitech.fr.vo.geojson.in.UpdateOperationIn;
 import cn.staitech.fr.vo.geojson.in.ViewAddIn;
 import com.alibaba.fastjson.JSONObject;
@@ -17,6 +18,7 @@ import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,8 +35,6 @@ public class AnnotationController {
 
     @Resource
     private SlideService slideService;
-
-
 
     @ApiOperation(value = "添加标注")
     @PostMapping("/insert")
@@ -86,6 +86,19 @@ public class AnnotationController {
         } else {
             return R.fail(null, MessageSource.M("OPERATE_ERROR"));
         }
+    }
+
+    @ApiOperationSupport(author = "zmj")
+    @ApiOperation(value = "添加ROI轮廓")
+    @PostMapping("/intelligentAnno/insertROI")
+    public R<String> addList(@Validated @RequestBody RoiIn req) throws Exception {
+        if (CollectionUtils.isEmpty(req.getGeometryList())) {
+            return R.fail(MessageSource.M("NO_DATA_TRANSFERRED"));
+        }
+        if (!req.getRoiStatus().equals(1) && !req.getRoiStatus().equals(0)) {
+            return R.fail(MessageSource.M("ARGUMENT_INVALID"));
+        }
+        return annotationService.roiContDel(req);
     }
 
     @ApiOperationSupport(author = "gjt")

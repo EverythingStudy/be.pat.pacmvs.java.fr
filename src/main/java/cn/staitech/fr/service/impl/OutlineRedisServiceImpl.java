@@ -48,8 +48,8 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
     @Resource
     private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
 
-    public static final String REDIS_OUTLINE_ROOT = "OUTLINE_ROOT:";
-    public static final String REDIS_OUTLINE_LIST = "OUTLINE_LIST:";
+    public static final String REDIS_OUTLINE_ROOT = "SINGLE_OUTLINE_ROOT:";
+    public static final String REDIS_OUTLINE_LIST = "SINGLE_OUTLINE_LIST:";
 
     /**
      * 列表查询
@@ -289,6 +289,7 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
                 annotation.setContour(String.valueOf(outline.getGeometry()));
                 annotation.setSingleSlideId(outline.getSlideId());
                 annotation.setArea(outline.getArea().toString());
+                annotation.setSingleSlideId(selectVO.getSingleSlideId());
                 annotation.setPerimeter(outline.getPerimeter().toString());
                 annotation.setCreateBy(outline.getCreateBy());
                 annotation.setAnnotationType("Draw");

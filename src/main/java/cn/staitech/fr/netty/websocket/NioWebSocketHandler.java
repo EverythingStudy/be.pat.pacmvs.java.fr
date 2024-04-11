@@ -52,6 +52,16 @@ public class NioWebSocketHandler extends SimpleChannelInboundHandler<Object> {
         }
     }
 
+    public static void sendSingle(Long singleSlideId, BroadcastVO message) {
+        String jsonStr = JSONObject.toJSONString(message, SerializerFeature.WriteMapNullValue);
+        for (Map.Entry<Channel, Long> vo : ChannelSupervise.SINGLE_CHANNEL_MAP.entrySet()) {
+            if (vo.getValue().equals(singleSlideId)) {
+                TextWebSocketFrame tws = new TextWebSocketFrame(jsonStr);
+                vo.getKey().writeAndFlush(tws);
+            }
+        }
+    }
+
 
 
     /**
@@ -173,10 +183,10 @@ public class NioWebSocketHandler extends SimpleChannelInboundHandler<Object> {
         if (Objects.equals(type, "slide")) {
             long slideId = Long.parseLong(req.getUri().split("/")[req.getUri().split("/").length - 1]);
             ChannelSupervise.addChannelTest(ctx.channel(), slideId);
-        } else if (Objects.equals(type, "questionProject")) {
+        } else if (Objects.equals(type, "singleSlide")) {
 
-            String questionProjectId = req.getUri().split("/")[req.getUri().split("/").length - 1];
-            ChannelSupervise.addQuestionChannel(ctx.channel(), questionProjectId);
+            long questionProjectId = Long.parseLong(req.getUri().split("/")[req.getUri().split("/").length - 1]);
+            ChannelSupervise.addSingleChannel(ctx.channel(), questionProjectId);
         }
 
         handshaker = wsFactory.newHandshaker(req);

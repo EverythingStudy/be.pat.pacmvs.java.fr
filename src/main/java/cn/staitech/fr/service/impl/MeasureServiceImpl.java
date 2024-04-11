@@ -139,7 +139,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         long number = 1L;
         QueryWrapper<Measure> markingQueryWrapper = new QueryWrapper<>();
         // 根据切片和测量轮廓名称查询最大值
-        markingQueryWrapper.eq("single_slide_id", req.getSingleSlideId()).eq("measure_name", req.getMeasure_name()).orderByDesc("create_time").last("limit 1");
+        markingQueryWrapper.eq("single_slide_id", req.getSingle_slide_id()).eq("measure_name", req.getMeasure_name()).orderByDesc("create_time").last("limit 1");
         Measure markingBy = measureMapper.selectOne(markingQueryWrapper);
         if (markingBy != null) {
             if (markingBy.getNumber() != null) {

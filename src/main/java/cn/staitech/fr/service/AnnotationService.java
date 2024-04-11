@@ -1,5 +1,6 @@
 package cn.staitech.fr.service;
 
+import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.history.HistoryDTO;
 import cn.staitech.fr.vo.annotation.AnnotationById;
@@ -7,6 +8,7 @@ import cn.staitech.fr.vo.annotation.AnnotationCountByCategory;
 import cn.staitech.fr.vo.annotation.AnnotationSelectList;
 import cn.staitech.fr.vo.annotation.MarkingMerge;
 import cn.staitech.fr.vo.geojson.Features;
+import cn.staitech.fr.vo.geojson.in.RoiIn;
 import cn.staitech.fr.vo.geojson.in.UpdateOperationIn;
 import cn.staitech.fr.vo.geojson.in.ViewAddIn;
 import com.alibaba.fastjson.JSONObject;
@@ -26,6 +28,8 @@ public interface AnnotationService extends IService<Annotation> {
     Long insert(ViewAddIn req) throws Exception;
 
     void delete(AnnotationById req) throws Exception;
+    R<String> roiContDel(RoiIn viewAddIns) throws Exception;
+
 
     Long update(ViewAddIn marking) throws Exception;
     int padding(AnnotationById req) throws Exception;
