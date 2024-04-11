@@ -37,6 +37,7 @@ import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.WaxBlockInfo;
 import cn.staitech.fr.domain.in.AlgorithmAnnIn;
 import cn.staitech.fr.domain.in.StartPredictionIn;
@@ -44,6 +45,7 @@ import cn.staitech.fr.domain.out.AlgorithmImageOut;
 import cn.staitech.fr.feign.PythonService;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SlideMapper;
+import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.service.AlgorithmPredictionService;
 import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.service.CategoryService;
@@ -92,7 +94,9 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	@Resource
 	private CategoryService categoryService;
 
-
+	
+	@Resource
+	private SpecialMapper specialMapper;
 
 	@Resource
 	private PythonService pythonService;
@@ -223,13 +227,16 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 
 
 	public void checkSlide(Slide slide) {
-				Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
-//		Long organizationId = 1L;
+//		Long organizationId = 6L;
 		//专题id
 		Long specialId = slide.getSpecialId();
 		Long slideId = slide.getSlideId();
+		Slide slideInfo = slideMapper.selectById(slideId);
+		Special special = specialMapper.selectById(slideInfo.getSpecialId());
+		Long organizationId = special.getOrganizationId();
 		//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
 		int processFlag = slide.getProcessFlag();
+		System.out.println("processFlag:"+processFlag);
 		if(processFlag == 3){
 			//更新checkStatus
 			Slide updateSlide = new Slide();
@@ -240,6 +247,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			updateSlide.setCheckTime(new Date());
 			updateSlide.setAnimalCheckStatus(3);
 			slideMapper.updateById(updateSlide);
+			System.out.println("processFlag-0:"+processFlag);
 			return ;
 		}
 		//蜡块编号
@@ -252,8 +260,10 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		String cacheKey = "";
 		if(StringUtils.isNotEmpty(genderFlag)){
 			cacheKey = CommonConstant.WAX_BLOCK_INFO+specialId+"_"+waxCode+"_"+genderFlag;
+			System.out.println("processFlag-1:"+processFlag);
 		}else{
 			cacheKey = CommonConstant.WAX_BLOCK_INFO+specialId+"_"+waxCode;
+			System.out.println("processFlag-2:"+processFlag);
 		}
 		waxDataMap = redisService.getCacheObject(cacheKey);
 
@@ -270,6 +280,8 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 				}
 				waxDataMapSize = waxDataMap.size();
 				redisService.setCacheObject(cacheKey,waxDataMap, 24L, TimeUnit.HOURS);
+			}else{
+				System.out.println("processFlag-3:"+processFlag);
 			}
 		}
 
@@ -324,6 +336,8 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 				updateSlide.setCheckTime(new Date());
 				slideMapper.updateById(updateSlide);
 			}
+		}else{
+			System.out.println("processFlag-4:"+processFlag);
 		}
 		//检查当前动物号所属的所有切片是否正常
 		Slide oldSlide = slideService.getById(slideId);
@@ -349,6 +363,8 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 				sd.setAnimalCheckStatus(1);
 			}
 			slideService.update(sd, updateWrapper);
+		}else{
+			System.out.println("processFlag-5:"+processFlag);
 		}
 
 	}
