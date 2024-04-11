@@ -125,9 +125,9 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
     public R upload(UploadWaxBlockIn req) throws IOException {
         log.info("导入文件接口开始：");
         //校验专题是否已经存在
-        if(new File(waxPath).exists()){
+     /*   if(new File(waxPath).exists()){
             new File(waxPath).delete();
-        }
+        }*/
         LambdaQueryWrapper<WaxBlockNumber> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(WaxBlockNumber::getTopicId, req.getTopicId());
         queryWrapper.eq(WaxBlockNumber::getDelFlag, CommonConstant.NUMBER_0);
@@ -152,10 +152,18 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         log.info("专题号：{}", topicName);
         Topic topic = getTopic(topicName);
         if (ObjectUtils.isEmpty(topic)) {
+            fis.close();
+            if(file1.exists()){
+                FileUtils.delete(file1);
+            }
             return R.fail(MessageSource.M("UPLOAD_FILE_NOT_EXIST_TOPIC"));
         }
         //校验专题是否一致
         if(!topic.getTopicId().equals(req.getTopicId())){
+            fis.close();
+            if(file1.exists()){
+                FileUtils.delete(file1);
+            }
             return R.fail(MessageSource.M("UPLOAD_FILE_TOPIC_NAME_ERROR"));
         }
 
@@ -165,10 +173,18 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         log.info("种属：{}", speciesName);
         Species species = getSpecies(speciesName);
         if (ObjectUtils.isEmpty(species)) {
+            fis.close();
+            if(file1.exists()){
+                FileUtils.delete(file1);
+            }
             return R.fail(MessageSource.M("UPLOAD_FILE_NOT_EXIST_SPECIES"));
         }
         //校验种属
         if(!species.getSpeciesId().equals(req.getSpeciesId())){
+            fis.close();
+            if(file1.exists()){
+                FileUtils.delete(file1);
+            }
             return R.fail(MessageSource.M("UPLOAD_FILE_SPECIES_ERROR"));
         }
         WaxBlockNumber waxBlockNumber = getWaxBlockNumber(req, topic, species);
@@ -182,6 +198,10 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         List<String> sexList = new ArrayList<>();
 
         if (CollectionUtils.isEmpty(rows)) {
+            fis.close();
+            if(file1.exists()){
+                FileUtils.delete(file1);
+            }
             return R.fail(MessageSource.M("UPLOAD_FILE_IS_NULL"));
         }
         //查询所有脏器
