@@ -18,7 +18,7 @@
         fs.animal_code,
         fs.gender_flag,
         fs.initiate_by,
-        su.user_name,
+        su.user_name as initiate_name,
         fs.initiate_time
         FROM
         fr_single_slide ss

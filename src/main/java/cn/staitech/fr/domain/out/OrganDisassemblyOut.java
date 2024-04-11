@@ -40,7 +40,7 @@ public class OrganDisassemblyOut {
     @ApiModelProperty(value = "启动者")
     private Long initiateBy;
     @ApiModelProperty(value = "启动者")
-    private String userName;
+    private String initiateName;
 
     @ApiModelProperty(value = "启动时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
