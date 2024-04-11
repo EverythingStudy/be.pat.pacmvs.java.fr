@@ -7,6 +7,7 @@ import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Organ;
 import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.Species;
 import cn.staitech.fr.domain.Topic;
 import cn.staitech.fr.domain.WaxBlockInfo;
@@ -16,6 +17,7 @@ import cn.staitech.fr.domain.in.WaxBlockNumberEditIn;
 import cn.staitech.fr.domain.in.WaxBlockNumberListIn;
 import cn.staitech.fr.domain.out.WaxBlockNumberListOut;
 import cn.staitech.fr.mapper.SlideMapper;
+import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.mapper.WaxBlockNumberMapper;
 import cn.staitech.fr.service.OrganService;
 import cn.staitech.fr.service.SpeciesService;
@@ -75,6 +77,8 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
     private WaxBlockInfoService waxBlockInfoService;
     @Resource
     private SlideMapper slideMapper;
+    @Resource
+    private SpecialMapper specialMapper;
 
     @Value("${waxPath}")
     private String waxPath;
@@ -106,6 +110,15 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
     @Override
     public R delete(Long id) {
         log.info("蜡块编号删除接口开始：");
+        //校验是否生成专题
+        WaxBlockNumber byId = getById(id);
+        LambdaQueryWrapper<Special> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Special::getTopicId,byId);
+        queryWrapper.eq(Special::getDelFlag,CommonConstant.NUMBER_0);
+        Integer integer = specialMapper.selectCount(queryWrapper);
+        if(integer>0){
+            return R.fail(MessageSource.M("SPECIAL_EXIST_DELETE_FAILURE"));
+        }
         WaxBlockNumber waxBlockNumber = new WaxBlockNumber();
         waxBlockNumber.setDelFlag(CommonConstant.NUMBER_1);
         waxBlockNumber.setNumberId(id);

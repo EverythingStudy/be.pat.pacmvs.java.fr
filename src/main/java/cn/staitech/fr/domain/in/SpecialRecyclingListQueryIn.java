@@ -31,4 +31,7 @@ public class SpecialRecyclingListQueryIn extends PageRequest {
 
     @ApiModelProperty(value = "到期时间")
     private Map<String, Date> expireTimeParams;
+
+    @ApiModelProperty(value = "用户",hidden = true)
+    private Long userId;
 }
