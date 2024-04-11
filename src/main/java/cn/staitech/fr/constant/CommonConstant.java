@@ -179,4 +179,10 @@ public class CommonConstant {
             System.out.println(part);
         }
     }
+    
+    /**
+     * 人工诊断
+     */
+	public static final String DIAGNOSIS_YES = "1";
+	public static final String DIAGNOSIS_NO = "0";
 }
