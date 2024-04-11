@@ -54,7 +54,7 @@ public class MatrixReviewController {
     @PostMapping("/list")
     public R<PageResponse<MatrixReviewListOut>> list(@RequestBody @Validated MatrixReviewListIn req) {
         PageResponse<MatrixReviewListOut> resp = matrixReviewService.getMatrixReview(req);
-        return R.ok();
+        return R.ok(resp);
     }
 
 }
