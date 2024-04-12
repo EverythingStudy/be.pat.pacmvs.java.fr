@@ -121,7 +121,7 @@ public class DiagnosisController {
 	@ApiOperation(value = "查询人工诊断列表")
 //	@Log(title = "查询人工诊断列表", menu = "专题阅片", subMenu = "项目列表", businessType = BusinessType.QUERY)
 	@GetMapping("/info")
-	public R info( 
+	public R<List<SpecialDiagnosisVo>> info( 
 			@RequestParam @ApiParam(name = "singleId", value = "切片id", required = true) Long singleId
 			//@RequestParam @ApiParam(name = "groupId", value = "分组id", required = false) Long groupId,
 //			@RequestParam @ApiParam(name = "specialId", value = "专题id", required = true) Long specialId
