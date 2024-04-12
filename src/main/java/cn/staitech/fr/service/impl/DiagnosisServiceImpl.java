@@ -94,7 +94,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 				String ddefinition = diagn.getDdefinition();
 				List<String> ddefinitionList = new ArrayList<>();
 				if(StringUtils.isNotEmpty(ddefinition)){
-					ddefinitionList.addAll(Arrays.asList(ddefinition.split("|")));
+					ddefinitionList.addAll(Arrays.asList(ddefinition.split("\\|")));
 				}
 				vo.setDdefinition(ddefinitionList);
 				Long createBy = diagn.getCreateBy();
@@ -102,7 +102,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 				SysUser loginUser = diagnosisMapper.selectUserById(createBy);
 				vo.setCreateUser(loginUser.getNickName());
 				if (createBy.equals(SecurityUtils.getLoginUser().getSysUser().getUserId())) {
-					//				if (createBy.equals(1L)) {
+//									if (createBy.equals(1L)) {
 					vo.setEditStatus(1);
 				}
 				voList.add(vo);
@@ -119,7 +119,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		int checkFlage = 0;
 		Long specialDiagnosisId = addVo.getDiagnosisId();
 		Long currentUserId = SecurityUtils.getLoginUser().getSysUser().getUserId();
-		//				Long currentUserId = 1L;
+//						Long currentUserId = 10L;
 		if(null != specialDiagnosisId){
 			//判断当前人和编辑人是否是同一个人
 			//查下当前数据创建人是谁
