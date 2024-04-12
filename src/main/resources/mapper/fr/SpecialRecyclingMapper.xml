@@ -40,9 +40,11 @@
         left join fr_special fs on fsr.special_id = fs.special_id
         left join tb_topic tt on fs.topic_id = tt.topic_id
         left join tb_species ts on fs.species_id = ts.species_id
+            and ts.organization_id = #{organizationId}
         left join sys_user su on fs.create_by = su.user_id
         and fs.organization_id = #{organizationId}
         where fsr.del_flag = '0'
+        and fsr.create_by= #{userId}
         <if test="topicName!= null and topicName != ''">
             and tt.topic_name like concat('%', #{topicName}, '%')
         </if>

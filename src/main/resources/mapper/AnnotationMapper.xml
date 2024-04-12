@@ -154,6 +154,7 @@
         project_id,
         slide_id,
         id,
+        contour_type,
         ST_AsGeoJSON(contour) as contour
         from fr_annotation
         <where>

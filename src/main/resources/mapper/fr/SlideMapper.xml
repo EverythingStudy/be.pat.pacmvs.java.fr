@@ -62,7 +62,7 @@
             fs.special_id = #{specialId}
 
             <if test="fileName != null and fileName != ''">
-                and ti.file_name like concat('%',#{fileName},'%')
+                and ti.image_name like concat('%',#{fileName},'%')
             </if>
             <if test="processFlag!= null and processFlag != ''">
                 and fs.process_flag = #{processFlag}
