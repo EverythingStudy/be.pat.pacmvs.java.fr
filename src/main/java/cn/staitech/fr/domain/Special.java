@@ -63,6 +63,9 @@ public class Special implements Serializable {
     @ApiModelProperty(value = "机构id")
     private Long organizationId;
 
+    @ApiModelProperty(value = "对照组")
+    private String controlGroup;
+
     @ApiModelProperty(value = "创建者")
     private Long createBy;
 

@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentMap;
 public class ChannelSupervise {
 
     public static final ConcurrentMap<Channel, Long> CHANNEL_MAP = new ConcurrentHashMap<>(16);
-    public static final ConcurrentMap<Channel, String> QUESTION_CHANNEL_MAP = new ConcurrentHashMap<>(16);
+    public static final ConcurrentMap<Channel, Long> SINGLE_CHANNEL_MAP = new ConcurrentHashMap<>(16);
     private static final ChannelGroup CHANNEL_GROUP = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     private static final ConcurrentMap<String, ChannelId> CHANNEL_ID_MAP = new ConcurrentHashMap();
 
@@ -39,8 +39,8 @@ public class ChannelSupervise {
         CHANNEL_MAP.put(channel, slideId);
     }
 
-    public static void addQuestionChannel(Channel channel, String questionProjectId) {
-        QUESTION_CHANNEL_MAP.put(channel, questionProjectId);
+    public static void addSingleChannel(Channel channel, Long singleSlideId) {
+        SINGLE_CHANNEL_MAP.put(channel, singleSlideId);
     }
 
     public static void removeChannelTest(Channel channel) {

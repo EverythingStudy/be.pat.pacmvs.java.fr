@@ -130,6 +130,8 @@
                slide_id,
                id,
                contour_type,
+               single_slide_id,
+               single,
                ST_AsGeoJSON(contour) AS contour
         from fr_annotation
         where annotation_id = #{annotationId}
@@ -161,6 +163,9 @@
             </if>
             <if test="categoryId != null">
                 AND category_id = #{categoryId}
+            </if>
+            <if test="singleSlideId != null">
+                AND single_slide_id = #{singleSlideId}
             </if>
         </where>
     </select>

@@ -477,9 +477,10 @@
                 and (fs.slide_id is null  or fs.special_id != #{specialId})
             </if>
             <if test="choiceState != null and choiceState==1">
-                and fs.special_id != #{specialId}
+                and fs.special_id = #{specialId}
             </if>
         </where>
         order by i.image_id desc
     </select>
+
 </mapper>

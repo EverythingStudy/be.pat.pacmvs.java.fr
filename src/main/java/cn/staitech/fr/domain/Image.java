@@ -176,4 +176,5 @@ public class Image extends BaseEntity {
     @ApiModelProperty(value = "文件夹名称")
     @TableField(exist = false)
     private String folderName;
+
 }

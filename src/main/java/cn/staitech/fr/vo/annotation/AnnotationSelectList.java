@@ -24,5 +24,10 @@ public class AnnotationSelectList {
     @ApiModelProperty(value = "标签id")
     private Long categoryId;
 
+    @ApiModelProperty(value = "单脏器id")
+    private Long singleSlideId;
+
+
+
 
 }
