@@ -1,5 +1,6 @@
 package cn.staitech.fr.mapper;
 
+import cn.staitech.fr.domain.Category;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
@@ -46,6 +47,8 @@ public interface SlideMapper extends BaseMapper<Slide> {
     List<MatrixReviewListOut> getMatrixReview(MatrixReviewListIn req);
 
     List<OrgansData> selectRespData(Long slideId);
+
+    List<Category> selectHeadList(Long specialId);
 }
 
 

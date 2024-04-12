@@ -4,6 +4,8 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.domain.Category;
+import cn.staitech.fr.domain.PageDataResponse;
 import cn.staitech.fr.domain.SingleOrganNumber;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.Slide;
@@ -122,11 +124,11 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     }
 
     @Override
-    public PageResponse<AnimalDimensionOut> animalList(MatrixReviewListIn req) {
+    public PageDataResponse<AnimalDimensionOut> animalList(MatrixReviewListIn req) {
         log.info("阅片列表单动物维度接口查询开始：");
 
-        PageResponse<AnimalDimensionOut> resp = new PageResponse<>();
-        List<AnimalDimensionOut> ret = new ArrayList<>();
+        PageDataResponse<AnimalDimensionOut> resp = new PageDataResponse<>();
+        AnimalDimensionOut ret = new AnimalDimensionOut();
         //查询基础数据
         LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
@@ -136,21 +138,26 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         List<Slide> slideList = slideMapper.selectList(wrapper);
         if (CollectionUtils.isEmpty(slideList)) {
             resp.setTotal(page.getTotal());
-            resp.setList(ret);
+            resp.setData(ret);
             resp.setPages(page.getPages());
         }
         List<AnimalDimensionData> retData = new ArrayList<>();
         for (Slide slide : slideList) {
+            //数据
             AnimalDimensionData out = new AnimalDimensionData();
             out.setGroupCode(slide.getGroupCode());
             out.setAnimalCode(slide.getAnimalCode());
             out.setGenderFlag(slide.getGenderFlag());
-            List<OrgansData> organsData= slideMapper.selectRespData(slide.getSlideId());
+            List<OrgansData> organsData = slideMapper.selectRespData(slide.getSlideId());
             out.setOrgans(organsData);
             retData.add(out);
         }
+        //表头
+        List<Category> headList = slideMapper.selectHeadList(req.getSpecialId());
+        ret.setDataList(retData);
+        ret.setCategoryList(headList);
         resp.setTotal(page.getTotal());
-
+        resp.setData(ret);
         resp.setPages(page.getPages());
         return resp;
     }

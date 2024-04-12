@@ -36,6 +36,9 @@ public class Category implements Serializable {
     @ApiModelProperty(name = "organName" , value = "脏器名称")
     private String organName;
 
+    @ApiModelProperty( value = "脏器名称")
+    private String organEn;
+
     /**
      * 标签全称
      */

@@ -269,4 +269,14 @@
         where fss.slide_id =#{slideId}
 
     </select>
+
+    <select id="selectHeadList" resultType="cn.staitech.fr.domain.Category">
+        select fss.category_id, fc.organ_name, fc.organ_en
+        from fr_single_slide fss
+                 left join fr_category fc on fss.category_id = fc.category_id
+                 left join fr_slide fs on fs.slide_id = fss.slide_id
+        where fs.special_id = #{specialId}
+          and fc.category_id is not null
+        group by fss.category_id, fc.organ_name, fc.organ_en
+    </select>
 </mapper>

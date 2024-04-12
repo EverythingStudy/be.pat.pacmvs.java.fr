@@ -1,6 +1,5 @@
 package cn.staitech.fr.domain.out;
 
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 

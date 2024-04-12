@@ -2,6 +2,7 @@ package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
+import cn.staitech.fr.domain.PageDataResponse;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.out.AnimalDimensionOut;
@@ -60,8 +61,8 @@ public class MatrixReviewController {
 
     @ApiOperation(value = "矩阵阅片-动物编号维度")
     @PostMapping("/animalList")
-    public R<PageResponse<AnimalDimensionOut>> animalList(@RequestBody @Validated MatrixReviewListIn req) {
-        PageResponse<AnimalDimensionOut> resp = matrixReviewService.animalList(req);
+    public R<PageDataResponse<AnimalDimensionOut>> animalList(@RequestBody @Validated MatrixReviewListIn req) {
+        PageDataResponse<AnimalDimensionOut> resp = matrixReviewService.animalList(req);
         return R.ok(resp);
     }
 }
