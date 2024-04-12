@@ -6,8 +6,18 @@
     <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.Diagnosis">
         <id column="diagnosis_id" property="diagnosisId" />
         <result column="special_id" property="specialId" />
+        <result column="group_id" property="groupId" />
         <result column="single_id" property="singleId" />
-        <result column="group_id" jdbcType="BIGINT" property="groupId" />
+        <result column="viscera" property="viscera" />
+        <result column="viscrea_name" property="viscreaName" />
+        <result column="position" property="position" />
+        <result column="position_name" property="positionName" />
+        <result column="lesion" property="lesion" />
+        <result column="lesion_name" property="lesionName" />
+        <result column="ddefinition" property="ddefinition" />
+        <result column="ddefinition_name" property="ddefinitionName" />
+        <result column="grade" property="grade" />
+        <result column="grade_name" property="gradeName" />
         <result column="remark" property="remark" />
         <result column="delete_flag" property="deleteFlag" />
         <result column="create_by" property="createBy" />
@@ -18,10 +28,10 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        diagnosis_id, special_id, single_id, remark, delete_flag, create_by, create_time, update_by, update_time,group_id
+        diagnosis_id, special_id, group_id, single_id, viscera, viscrea_name, position, position_name, lesion, lesion_name, ddefinition, ddefinition_name, grade, grade_name, remark, delete_flag, create_by, create_time, update_by, update_time
     </sql>
     
-    <select id="selectUserById" parameterType="Long" resultType="cn.staitech.system.api.domain.SysUser">
+     <select id="selectUserById" parameterType="Long" resultType="cn.staitech.system.api.domain.SysUser">
         select * from sys_user
         where user_id = #{userId}
     </select>

@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
  * </p>
  *
  * @author wanglibei
- * @since 2024-04-11
+ * @since 2024-04-12
  */
 @Data
 @EqualsAndHashCode(callSuper = false)
@@ -33,11 +33,41 @@ public class Diagnosis implements Serializable {
     @ApiModelProperty(value = "专题id")
     private Long specialId;
 
+    @ApiModelProperty(value = "分组id")
+    private Long groupId;
+
     @ApiModelProperty(value = "专题选片ID")
     private Long singleId;
-    
-    @ApiModelProperty(name = "groupId" , value = "分组id")
-	private Long groupId;
+
+    @ApiModelProperty(value = "诊断脏器")
+    private String viscera;
+
+    @ApiModelProperty(value = "诊断脏器名称")
+    private String viscreaName;
+
+    @ApiModelProperty(value = "部位")
+    private String position;
+
+    @ApiModelProperty(value = "部位名称")
+    private String positionName;
+
+    @ApiModelProperty(value = "病理改变")
+    private String lesion;
+
+    @ApiModelProperty(value = "病理病变名称")
+    private String lesionName;
+
+    @ApiModelProperty(value = "修饰")
+    private String ddefinition;
+
+    @ApiModelProperty(value = "修饰名称")
+    private String ddefinitionName;
+
+    @ApiModelProperty(value = "病变级别")
+    private String grade;
+
+    @ApiModelProperty(value = "病变级别名称")
+    private String gradeName;
 
     @ApiModelProperty(value = "备注")
     private String remark;
