@@ -99,9 +99,6 @@ public class DiagnosisController {
 				return R.fail(MessageSource.M("DATA_CANNOT_DELETED"));
 			}
 			diagnosisService.deleteSpecialDiagnosisVo(specialDiagnosisDeleteVo.getDiagnosisId());
-			//刷新列表数据返回
-//			List<SpecialDiagnosisVo> list = diagnosisService.getSpecialDiagnosisVo(sid.getSubImageId()+"",sid.getProjectId()+"",sid.getSpecialId()+"",sid.getGroupId()+"");
-//			return R.ok(list);
 			return R.ok();
 		} else {
 			return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));

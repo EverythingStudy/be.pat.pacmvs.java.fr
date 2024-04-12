@@ -34,23 +34,23 @@ public class SpecialDiagnosisAddVo {
     
 	@NotNull(message = "{PARAMETER_ABNORMALITY}")
 	@ApiModelProperty(name = "viscera" , value = "脏器或组织")
-	private Long viscera;
+	private String viscera;
     
 	@NotNull(message = "{PARAMETER_ABNORMALITY}")
 	@ApiModelProperty(name = "position" , value = "部位")
-	private Long position;
+	private String position;
 	
 	@NotNull(message = "{PARAMETER_ABNORMALITY}")
 	@ApiModelProperty(name = "lesion" , value = "病理改变")
-	private Long lesion;
+	private String lesion;
 	
 	@NotNull(message = "{PARAMETER_ABNORMALITY}")
 	@ApiModelProperty(name = "ddefinition" , value = "修饰")
-	private Long ddefinition;
+	private String ddefinition;
 	
 	@NotNull(message = "{PARAMETER_ABNORMALITY}")
 	@ApiModelProperty(name = "grade" , value = "病变级别")
-	private Long grade;
+	private String grade;
 	
     
 	@ApiModelProperty(name = "remark" , value = "备注")

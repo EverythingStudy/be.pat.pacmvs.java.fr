@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -54,16 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis> implements DiagnosisService {
 
-	//	@Resource
-	//	private ProjectExtMapper projectExtMapper;
-	//
-	//	@Resource
-	//	private SpecialDiagnosisMapper specialDiagnosisMapper;
-	//
-	//	@Resource
-	//	private SpecialDiagnosisDetailMapper specialDiagnosisDetailMapper;
-	//
-
+	
 	@Resource
 	private SysDictDataMapper sysDictDataMapper;
 
@@ -82,7 +72,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 
 	@Override
 	public List<SpecialDiagnosisVo> getSpecialDiagnosisVo(Long singleId) {
-		
+
 		SingleSlide singleSlide = singleSlideMapper.selectById(singleId);
 		Slide slide = slideMapper.selectById(singleSlide.getSlideId());
 		List<SpecialDiagnosisVo> voList = new ArrayList<SpecialDiagnosisVo>();
@@ -90,7 +80,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		QueryWrapper<Diagnosis> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("special_id",slide.getSpecialId());
 		queryWrapper.eq("single_id",singleId);
-		queryWrapper.gt("delete_flag",1);
+		queryWrapper.eq("delete_flag",1);
 		queryWrapper.orderByAsc("create_by");
 
 		List<Diagnosis> list = list(queryWrapper);
@@ -100,49 +90,15 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 				SpecialDiagnosisVo vo = new SpecialDiagnosisVo();
 				BeanUtils.copyProperties(diagn, vo);
 
-				//Long diagnosisId = diagn.getDiagnosisId();
 				Long createBy = diagn.getCreateBy();
 				//根据创建人查询名称
 				SysUser loginUser = diagnosisMapper.selectUserById(createBy);
 				vo.setCreateUser(loginUser.getNickName());
-
-				//				vo.setIndex(index);
-
-//				QueryWrapper<DiagnosisDetail> queryDetailWrapper = new QueryWrapper<>();
-//				queryDetailWrapper.eq("diagnosis_id",diagnosisId);
-//				// 查询所有的明细
-//				List<DiagnosisDetail> detailList = diagnosisDetailService.list(queryDetailWrapper);
-//				String visceraTag = "";
-//				for (DiagnosisDetail detail : detailList) {
-//					String dictType = detail.getDictType();
-//					String tags = detail.getTags();
-//					//String tagName = detail.getTagName();
-//					//根据不同的标签去查询value值
-//					if (StringUtils.isNotEmpty(tags)) {
-//						if (dictType.equals(SysDictTypeEnum.organization.label())) {
-//							vo.setViscera(tags);
-//						}else if (dictType.equals(SysDictTypeEnum.lesion.label())) {
-//							vo.setLesion(tags);
-//						}else if (dictType.equals(SysDictTypeEnum.grade.label())) {
-//							vo.setGrade(tags);
-//						}else if (dictType.equals(SysDictTypeEnum.position.label())) {
-//							vo.setPosition(tags);
-//						}else if (dictType.equals(SysDictTypeEnum.ddefinition.label())) {
-//							vo.setDdefinition(tags);
-//						}
-//					}
-//				}
-
-				//根据脏器标签查询他对应的部位和dde的列表
-				//				List<VisceraVo> relationshipList =  new ArrayList<>();
-				//				relationshipList = getSelectRelationship(SysDictTypeEnum.organization.label(),visceraTag);
-				//				vo.setVisceraList(relationshipList);
-
 				if (createBy.equals(SecurityUtils.getLoginUser().getSysUser().getUserId())) {
+//				if (createBy.equals(1L)) {
 					vo.setEditStatus(1);
 				}
 				voList.add(vo);
-				//				index++;
 			}
 
 		}
@@ -155,7 +111,8 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 	public int saveOrUpdateSpecialDiagnosisVo(SpecialDiagnosisAddVo addVo) {
 		int checkFlage = 0;
 		Long specialDiagnosisId = addVo.getDiagnosisId();
-		Long currentUserId = SecurityUtils.getLoginUser().getSysUser().getUserId();
+				Long currentUserId = SecurityUtils.getLoginUser().getSysUser().getUserId();
+//				Long currentUserId = 1L;
 		if(null != specialDiagnosisId){
 			//判断当前人和编辑人是否是同一个人
 			//查下当前数据创建人是谁
@@ -173,32 +130,32 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		Diagnosis record = new Diagnosis();
 		//copy
 		BeanUtils.copyProperties(addVo, record);
-		Long viscera =  addVo.getViscera();
+		String viscera =  addVo.getViscera();
 		if(null != viscera){
-			String visceraName = getLabelNameByParm(SysDictTypeEnum.organization.label(), viscera,"");
+			String visceraName = getLabelNameByParm(SysDictTypeEnum.organization.label(), Long.valueOf(viscera),"");
 			record.setViscreaName(visceraName);
 		}
-		Long position =  addVo.getPosition();
+		String position =  addVo.getPosition();
 		if(null != position){
-			String positionName = getLabelNameByParm(SysDictTypeEnum.position.label(), viscera,"");
+			String positionName = getLabelNameByParm(SysDictTypeEnum.position.label(), Long.valueOf(position),"");
 			record.setPositionName(positionName);
 		}
-		Long lesion =  addVo.getLesion();
+		String lesion =  addVo.getLesion();
 		if(null != lesion){
-			String lesionName = getLabelNameByParm(SysDictTypeEnum.lesion.label(), lesion,"");
+			String lesionName = getLabelNameByParm(SysDictTypeEnum.lesion.label(), Long.valueOf(lesion),"");
 			record.setLesionName(lesionName);
 		}
-		Long ddefinition =  addVo.getDdefinition();
+		String ddefinition =  addVo.getDdefinition();
 		if(null != ddefinition){
-			String ddefinitionName = getLabelNameByParm(SysDictTypeEnum.ddefinition.label(), viscera,"");
+			String ddefinitionName = getLabelNameByParm(SysDictTypeEnum.ddefinition.label(), Long.valueOf(ddefinition),"");
 			record.setDdefinitionName(ddefinitionName);
 		}
-		Long grade =  addVo.getGrade();
+		String grade =  addVo.getGrade();
 		if(null != grade){
-			String gradeName = getLabelNameByParm(SysDictTypeEnum.grade.label(), viscera,"");
+			String gradeName = getLabelNameByParm(SysDictTypeEnum.grade.label(), Long.valueOf(grade),"");
 			record.setGradeName(gradeName);
 		}
-		
+
 		if (null == addVo.getDiagnosisId()) {
 			//获取分组id
 			SingleSlide singleSlide = singleSlideMapper.selectById(record.getSingleId());
@@ -208,7 +165,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 			record.setGroupId(Long.valueOf(groupCode));
 			record.setCreateBy(currentUserId);
 			record.setCreateTime(DateUtil.date());
-			
+
 			diagnosisMapper.insert(record);
 		} else {
 			record.setUpdateBy(currentUserId);
@@ -221,7 +178,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		long totalTime = endTime - startTime;
 		log.info("人工诊断单条处理运行时间：{},毫秒 ",totalTime);
 		//修改诊断状态
-		Diagnosis diagnosis = getById(specialDiagnosisId);
+		Diagnosis diagnosis = getById(record.getDiagnosisId());
 		SingleSlide singleSlide = new SingleSlide();
 		singleSlide.setSingleId(diagnosis.getSingleId());
 		//人工诊断状态 0：未诊断；1：已诊断
@@ -301,10 +258,10 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		record.setDeleteFlag(0);
 		diagnosisMapper.updateById(record);
 
-//		DiagnosisDetail detail = new DiagnosisDetail();
-//		detail.setDiagnosisId(specialDiagnosisId);
-//		detail.setDeleteFlag(0);
-//		diagnosisDetailService.updateById(detail);
+		//		DiagnosisDetail detail = new DiagnosisDetail();
+		//		detail.setDiagnosisId(specialDiagnosisId);
+		//		detail.setDeleteFlag(0);
+		//		diagnosisDetailService.updateById(detail);
 		//查询下当前数据下是否还有数据，如果没有数据了，修改为未诊断
 		QueryWrapper<Diagnosis> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("special_id",diagnosis.getSpecialId());
@@ -449,80 +406,6 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		return retList;
 	}
 
-
-	/**
-	 * 
-	 * @Title: saveDetail
-	 * @Description:  明细save到数据库
-	 * @param @param labelList
-	 * @param @param labelWord
-	 * @param @param specialDiagnosisId
-	 * @param @param dictType
-	 * @param @param filter
-	 * @param @return
-	 * @return SpecialDiagnosisDetail
-	 * @throws
-	 */
-	/*public DiagnosisDetail saveDetail(Long labelId,  Long specialDiagnosisId,String dictType, String filter,String viscera) {
-		DiagnosisDetail detail = new DiagnosisDetail();
-		detail.setDiagnosisId(specialDiagnosisId);
-		detail.setDictType(dictType);
-		detail.setTags(labelId+"");
-		String labelName = getLabelNameByParm(dictType, labelIds,viscera);
-		if(StringUtils.isNotEmpty(labelName) && labelName.contains("其它（自定义）")){
-			labelName = labelName.replaceAll("其它（自定义）", labelWord);
-		}
-		if(StringUtils.isNotEmpty(labelName)){
-			detail.setTagName(labelName);
-		}
-		detail.setCreateTime(DateUtil.date());
-			diagnosisDetailService.save(detail);
-		return detail;
-	}*/
-
-	/*public DiagnosisDetail saveDetailInfo(Long labelId,  Long specialDiagnosisId,String dictType, String filter) {
-		DiagnosisDetail detail = new DiagnosisDetail();
-		detail.setDiagnosisId(specialDiagnosisId);
-		detail.setDictType(dictType);
-		detail.setTags(labelId+"");
-		String labelName = getLabelNameByParm(dictType, labelId,filter);
-		if(StringUtils.isNotEmpty(labelName)){
-			detail.setTagName(labelName);
-		}
-		detail.setCreateTime(DateUtil.date());
-		diagnosisDetailService.save(detail);
-		return detail;
-	}
-
-	public DiagnosisDetail updateDetailInfo(Long labelId,Long specialDiagnosisId,String dictType, String filter) {
-		DiagnosisDetail detail = new DiagnosisDetail();
-		detail.setDiagnosisId(specialDiagnosisId);
-		detail.setDictType(dictType);
-
-		detail.setTags(labelId+"");
-		String labelName = getLabelNameByParm(dictType, labelId,filter);
-		if(StringUtils.isNotEmpty(labelName)){
-			detail.setTagName(labelName);
-		}
-		// 先查询当前切片之前的数据，有就修改、没有就添加
-		QueryWrapper<DiagnosisDetail> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("dict_type",dictType);
-		queryWrapper.eq("diagnosis_id",specialDiagnosisId);
-
-		List<DiagnosisDetail> detailList = diagnosisDetailService.list(queryWrapper);
-
-		if (CollectionUtils.isNotEmpty(detailList)) {
-			DiagnosisDetail ail = detailList.get(0);
-			DiagnosisDetail upAil = new DiagnosisDetail();
-			upAil.setTags(null);
-			upAil.setDiagnosisDetailId(ail.getDiagnosisDetailId());
-			diagnosisDetailService.updateById(upAil);
-		} else {
-			diagnosisDetailService.save(detail);
-		}
-		return detail;
-	}*/
-
 	public String getLabelNameByParm(String dictType,Long labelId,String filter){
 		String labelName = "";
 		SysDictTagVo sysDictTagVo = new SysDictTagVo();
@@ -544,57 +427,6 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 
 
 
-	/**
-	 * 
-	 * @Title: updateDetail
-	 * @Description: 明细update到数据库
-	 * @param @param labelList
-	 * @param @param labelWord
-	 * @param @param specialDiagnosisId
-	 * @param @param dictType
-	 * @param @param filter
-	 * @param @return
-	 * @return SpecialDiagnosisDetail
-	 * @throws
-	 */
-	/*	public DiagnosisDetail updateDetail(List<Object> labelList, String labelWord, Long specialDiagnosisId,
-			String dictType, String filter,String viscera) {
-		DiagnosisDetail detail = new DiagnosisDetail();
-		detail.setDiagnosisId(specialDiagnosisId);
-		detail.setDictType(dictType);
-		String labelIds = "";
-
-		if (CollectionUtils.isNotEmpty(labelList)) {
-			labelIds = labelList.stream().map(String::valueOf).collect(Collectors.joining(","));
-		}
-
-		detail.setTags(labelIds);
-		String labelName = getLabelNameByParm(dictType, labelIds,viscera);
-		if(StringUtils.isNotEmpty(labelName) && labelName.contains("其它（自定义）")){
-			labelName = labelName.replaceAll("其它（自定义）", labelWord);
-		}
-		if(StringUtils.isNotEmpty(labelName)){
-			detail.setTagName(labelName);
-		}
-		detail.setCreateTime(DateUtil.date());
-		// 先查询当前切片之前的数据，有就修改、没有就添加
-		QueryWrapper<DiagnosisDetail> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("dict_type",dictType);
-		queryWrapper.eq("diagnosis_id",specialDiagnosisId);
-
-		List<DiagnosisDetail> detailList = diagnosisDetailService.list(queryWrapper);
-
-		if (CollectionUtils.isNotEmpty(detailList)) {
-			DiagnosisDetail ail = detailList.get(0);
-			DiagnosisDetail upAil = new DiagnosisDetail();
-			upAil.setTags(labelIds);
-			upAil.setDiagnosisDetailId(ail.getDiagnosisDetailId());
-			diagnosisDetailService.updateById(upAil);
-		} else {
-			diagnosisDetailService.save(detail);
-		}
-		return detail;
-	}*/
 
 
 
