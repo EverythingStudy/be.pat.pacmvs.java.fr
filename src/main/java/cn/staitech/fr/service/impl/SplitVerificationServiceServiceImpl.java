@@ -306,6 +306,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 				//查询anno统计信息
 				Annotation queryAnno = new Annotation();
 				queryAnno.setSlideId(slideId);
+				queryAnno.setContourType(2L);
 				List<Annotation>  annoList = annotationMapper.selectListBy(queryAnno);
 				Map<Long, Long> categoryCountGroupedBycategory = annoList.stream().collect(Collectors.groupingBy(Annotation::getCategoryId, Collectors.counting()));
 				//AI 切图数据处理

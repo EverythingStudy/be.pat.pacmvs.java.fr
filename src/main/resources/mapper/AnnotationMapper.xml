@@ -167,6 +167,9 @@
             <if test="singleSlideId != null">
                 AND single_slide_id = #{singleSlideId}
             </if>
+            <if test="contourType != null">
+                AND contour_type = #{contourType}
+            </if>
         </where>
     </select>
 
