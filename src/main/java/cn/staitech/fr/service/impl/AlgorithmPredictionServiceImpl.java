@@ -247,7 +247,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			updateSlide.setCheckTime(new Date());
 			updateSlide.setAnimalCheckStatus(3);
 			slideMapper.updateById(updateSlide);
-			System.out.println("processFlag-0:"+processFlag);
 			return ;
 		}
 		//蜡块编号
@@ -260,10 +259,8 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		String cacheKey = "";
 		if(StringUtils.isNotEmpty(genderFlag)){
 			cacheKey = CommonConstant.WAX_BLOCK_INFO+specialId+"_"+waxCode+"_"+genderFlag;
-			System.out.println("processFlag-1:"+processFlag);
 		}else{
 			cacheKey = CommonConstant.WAX_BLOCK_INFO+specialId+"_"+waxCode;
-			System.out.println("processFlag-2:"+processFlag);
 		}
 		waxDataMap = redisService.getCacheObject(cacheKey);
 
@@ -280,8 +277,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 				}
 				waxDataMapSize = waxDataMap.size();
 				redisService.setCacheObject(cacheKey,waxDataMap, 24L, TimeUnit.HOURS);
-			}else{
-				System.out.println("processFlag-3:"+processFlag);
 			}
 		}
 
@@ -336,8 +331,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 				updateSlide.setCheckTime(new Date());
 				slideMapper.updateById(updateSlide);
 			}
-		}else{
-			System.out.println("processFlag-4:"+processFlag);
 		}
 		//检查当前动物号所属的所有切片是否正常
 		Slide oldSlide = slideService.getById(slideId);
@@ -363,8 +356,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 				sd.setAnimalCheckStatus(1);
 			}
 			slideService.update(sd, updateWrapper);
-		}else{
-			System.out.println("processFlag-5:"+processFlag);
 		}
 
 	}
