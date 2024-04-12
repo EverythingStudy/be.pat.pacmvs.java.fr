@@ -106,79 +106,83 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
     public cn.staitech.fr.vo.geojson.Properties getProperties(Annotation annotation) {
-        cn.staitech.fr.vo.geojson.Properties properties = new cn.staitech.fr.vo.geojson.Properties();
-        properties.setMarking_id(String.valueOf(annotation.getAnnotationId()));
-        properties.setArea(annotation.getArea());
-        properties.setPerimeter(annotation.getPerimeter());
-        properties.setAnnotation_type(annotation.getAnnotationType());
-        properties.setCategory_id(annotation.getCategoryId());
-        properties.setDescription(annotation.getDescription());
-        properties.setLocation_type(annotation.getLocationType());
-        properties.setCreate_by(annotation.getCreateBy());
-        properties.setUpdate_by(annotation.getUpdateBy());
-        properties.setCreate_time(String.valueOf(annotation.getCreateTime()));
-        properties.setProject_id(annotation.getProjectId());
-        properties.setContour_type(annotation.getContourType());
-        if (annotation.getCategoryId() != null) {
-            Category category = categoryHashMap.get(annotation.getCategoryId());
-            if (category == null) {
-                category = categoryMapper.selectById(annotation.getCategoryId());
-                if (category != null) {
-                    categoryHashMap.put(category.getCategoryId(), category);
-        if (annotation.getSingle() == 1) {
-            if (annotation.getCategoryId() != null) {
-                PathologicalIndicatorCategory pathologicalIndicatorCategory = pathologicalIndicatorCategoryHashMap.get(annotation.getCategoryId());
-                if (pathologicalIndicatorCategory == null) {
-                    pathologicalIndicatorCategory = pathologicalIndicatorCategoryMapper.selectById(annotation.getCategoryId());
-                    if (pathologicalIndicatorCategory != null) {
-                        pathologicalIndicatorCategoryHashMap.put(pathologicalIndicatorCategory.getCategoryId(), pathologicalIndicatorCategory);
-                    }
-                }
-                if (pathologicalIndicatorCategory != null) {
-                    properties.setLabel_color(pathologicalIndicatorCategory.getRgb());
-                    properties.setLabel_name(pathologicalIndicatorCategory.getNumber());
-                }
-            }
-        } else {
-            if (annotation.getCategoryId() != null) {
-                Category category = categoryHashMap.get(annotation.getCategoryId());
-                if (category == null) {
-                    category = categoryMapper.selectById(annotation.getCategoryId());
-                    if (category != null) {
-                        categoryHashMap.put(category.getCategoryId(), category);
-                    }
-                }
-                if (category != null) {
-                    properties.setLabel_color(category.getChromaticValue());
-                    properties.setLabel_name(category.getOrganName());
-                }
-            }
-        }
-        if (annotation.getCreateBy() != null) {
-            User createUser = userMap.get(annotation.getCreateBy());
-            if (createUser == null) {
-                createUser = userMapper.selectById(annotation.getCreateBy());
-                if (createUser != null) {
-                    userMap.put(createUser.getUserId(), createUser);
-                }
-            }
-            if (createUser != null) {
-                properties.setAnnotation_owner(createUser.getUserName());
-            }
-        }
-        if (annotation.getUpdateBy() != null) {
-            User updateUser = userMap.get(annotation.getUpdateBy());
-            if (updateUser == null) {
-                updateUser = userMapper.selectById(annotation.getUpdateBy());
-                if (updateUser != null) {
-                    userMap.put(updateUser.getUserId(), updateUser);
-                }
-            }
-            if (updateUser != null) {
-                properties.setAnnotation_owner(updateUser.getUserName());
-            }
-        }
-        return properties;
+    	cn.staitech.fr.vo.geojson.Properties properties = new cn.staitech.fr.vo.geojson.Properties();
+    	properties.setMarking_id(String.valueOf(annotation.getAnnotationId()));
+    	properties.setArea(annotation.getArea());
+    	properties.setPerimeter(annotation.getPerimeter());
+    	properties.setAnnotation_type(annotation.getAnnotationType());
+    	properties.setCategory_id(annotation.getCategoryId());
+    	properties.setDescription(annotation.getDescription());
+    	properties.setLocation_type(annotation.getLocationType());
+    	properties.setCreate_by(annotation.getCreateBy());
+    	properties.setUpdate_by(annotation.getUpdateBy());
+    	properties.setCreate_time(String.valueOf(annotation.getCreateTime()));
+    	properties.setProject_id(annotation.getProjectId());
+    	properties.setContour_type(annotation.getContourType());
+    	if (annotation.getCategoryId() != null) {
+    		Category category = categoryHashMap.get(annotation.getCategoryId());
+    		if (category == null) {
+    			category = categoryMapper.selectById(annotation.getCategoryId());
+    			if (category != null) {
+    				categoryHashMap.put(category.getCategoryId(), category);
+    				if (annotation.getSingle() == 1) {
+    					if (annotation.getCategoryId() != null) {
+    						PathologicalIndicatorCategory pathologicalIndicatorCategory = pathologicalIndicatorCategoryHashMap.get(annotation.getCategoryId());
+    						if (pathologicalIndicatorCategory == null) {
+    							pathologicalIndicatorCategory = pathologicalIndicatorCategoryMapper.selectById(annotation.getCategoryId());
+    							if (pathologicalIndicatorCategory != null) {
+    								pathologicalIndicatorCategoryHashMap.put(pathologicalIndicatorCategory.getCategoryId(), pathologicalIndicatorCategory);
+    							}
+    						}
+    						if (pathologicalIndicatorCategory != null) {
+    							properties.setLabel_color(pathologicalIndicatorCategory.getRgb());
+    							properties.setLabel_name(pathologicalIndicatorCategory.getNumber());
+    						}
+    					}
+    				} else {
+    					if (annotation.getCategoryId() != null) {
+    						Category category2 = categoryHashMap.get(annotation.getCategoryId());
+    						//TODO 报错
+    						if (category2 == null) {
+    							category2 = categoryMapper.selectById(annotation.getCategoryId());
+    							if (category2 != null) {
+    								categoryHashMap.put(category2.getCategoryId(), category2);
+    							}
+    						}
+    						if (category2 != null) {
+    							properties.setLabel_color(category2.getChromaticValue());
+    							properties.setLabel_name(category2.getOrganName());
+    						}
+    					}
+    				}
+    				if (annotation.getCreateBy() != null) {
+    					User createUser = userMap.get(annotation.getCreateBy());
+    					if (createUser == null) {
+    						createUser = userMapper.selectById(annotation.getCreateBy());
+    						if (createUser != null) {
+    							userMap.put(createUser.getUserId(), createUser);
+    						}
+    					}
+    					if (createUser != null) {
+    						properties.setAnnotation_owner(createUser.getUserName());
+    					}
+    				}
+    				if (annotation.getUpdateBy() != null) {
+    					User updateUser = userMap.get(annotation.getUpdateBy());
+    					if (updateUser == null) {
+    						updateUser = userMapper.selectById(annotation.getUpdateBy());
+    						if (updateUser != null) {
+    							userMap.put(updateUser.getUserId(), updateUser);
+    						}
+    					}
+    					if (updateUser != null) {
+    						properties.setAnnotation_owner(updateUser.getUserName());
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return properties;
     }
 
 
