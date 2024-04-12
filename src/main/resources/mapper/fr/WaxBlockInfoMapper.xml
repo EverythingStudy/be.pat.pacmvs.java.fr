@@ -55,5 +55,6 @@
 			<if test="genderFlag != null and genderFlag != ''">
 			AND (t3.gender_flag = #{genderFlag} or t3.gender_flag is Null)
 			</if>
+			and t3.del_flag = '0'
     </select>
 </mapper>
