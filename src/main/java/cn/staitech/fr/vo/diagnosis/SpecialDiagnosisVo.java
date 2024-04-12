@@ -66,7 +66,7 @@ public class SpecialDiagnosisVo {
 	private String lesion;
 	
 	@ApiModelProperty(name = "ddefinition" , value = "修饰")
-	private String ddefinition;
+	private List<String> ddefinition;
 	
 	@ApiModelProperty(name = "grade" , value = "病变级别")
 	private String grade;

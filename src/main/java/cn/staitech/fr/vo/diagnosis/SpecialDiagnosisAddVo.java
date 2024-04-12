@@ -1,5 +1,7 @@
 package cn.staitech.fr.vo.diagnosis;
 
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
 
 import io.swagger.annotations.Api;
@@ -46,7 +48,7 @@ public class SpecialDiagnosisAddVo {
 	
 	@NotNull(message = "{PARAMETER_ABNORMALITY}")
 	@ApiModelProperty(name = "ddefinition" , value = "修饰")
-	private String ddefinition;
+	private List<String> ddefinition;
 	
 	@NotNull(message = "{PARAMETER_ABNORMALITY}")
 	@ApiModelProperty(name = "grade" , value = "病变级别")

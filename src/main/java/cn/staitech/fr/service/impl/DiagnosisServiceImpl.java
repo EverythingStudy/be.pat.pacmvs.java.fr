@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -53,7 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis> implements DiagnosisService {
 
-	
+
 	@Resource
 	private SysDictDataMapper sysDictDataMapper;
 
@@ -89,13 +90,19 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 			for (Diagnosis diagn : list) {
 				SpecialDiagnosisVo vo = new SpecialDiagnosisVo();
 				BeanUtils.copyProperties(diagn, vo);
-
+				//修饰
+				String ddefinition = diagn.getDdefinition();
+				List<String> ddefinitionList = new ArrayList<>();
+				if(StringUtils.isNotEmpty(ddefinition)){
+					ddefinitionList.addAll(Arrays.asList(ddefinition.split("|")));
+				}
+				vo.setDdefinition(ddefinitionList);
 				Long createBy = diagn.getCreateBy();
 				//根据创建人查询名称
 				SysUser loginUser = diagnosisMapper.selectUserById(createBy);
 				vo.setCreateUser(loginUser.getNickName());
 				if (createBy.equals(SecurityUtils.getLoginUser().getSysUser().getUserId())) {
-//				if (createBy.equals(1L)) {
+					//				if (createBy.equals(1L)) {
 					vo.setEditStatus(1);
 				}
 				voList.add(vo);
@@ -111,8 +118,8 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 	public int saveOrUpdateSpecialDiagnosisVo(SpecialDiagnosisAddVo addVo) {
 		int checkFlage = 0;
 		Long specialDiagnosisId = addVo.getDiagnosisId();
-				Long currentUserId = SecurityUtils.getLoginUser().getSysUser().getUserId();
-//				Long currentUserId = 1L;
+		Long currentUserId = SecurityUtils.getLoginUser().getSysUser().getUserId();
+		//				Long currentUserId = 1L;
 		if(null != specialDiagnosisId){
 			//判断当前人和编辑人是否是同一个人
 			//查下当前数据创建人是谁
@@ -145,10 +152,21 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 			String lesionName = getLabelNameByParm(SysDictTypeEnum.lesion.label(), Long.valueOf(lesion),"");
 			record.setLesionName(lesionName);
 		}
-		String ddefinition =  addVo.getDdefinition();
-		if(null != ddefinition){
-			String ddefinitionName = getLabelNameByParm(SysDictTypeEnum.ddefinition.label(), Long.valueOf(ddefinition),"");
-			record.setDdefinitionName(ddefinitionName);
+		List<String> ddefinitionList =  addVo.getDdefinition();
+		if(CollectionUtils.isNotEmpty(ddefinitionList)){
+			List<String> nameList = new ArrayList<>();
+			for(String ddfinitionId :ddefinitionList){
+				String ddefinitionName = getLabelNameByParm(SysDictTypeEnum.ddefinition.label(), Long.valueOf(ddfinitionId),"");
+				if(StringUtils.isNotEmpty(ddefinitionName)){
+					nameList.add(ddefinitionName);
+				}
+			}
+			if(CollectionUtils.isNotEmpty(nameList)){
+				String ddefinitionFullName =  String.join("|", nameList);
+				record.setDdefinitionName(ddefinitionFullName);
+			}
+			String ddefinitionIdStr =  String.join("|", ddefinitionList);
+			record.setDdefinition(ddefinitionIdStr);
 		}
 		String grade =  addVo.getGrade();
 		if(null != grade){
