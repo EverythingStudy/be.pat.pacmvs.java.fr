@@ -28,7 +28,7 @@ public class SpecialDiagnosisVo {
 
 	
 	@ApiModelProperty(name = "specialDiagnosisId" , value = "诊断ID")
-	private Long specialDiagnosisId;
+	private Long diagnosisId;
     
 	@ApiModelProperty(name = "specialId" , value = "专题id")
 	private Long specialId;
