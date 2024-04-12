@@ -197,8 +197,8 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             List<ExportListVO> collect = diagnosisMapper.getExportListVO(id);
             exportVO.setList(collect);
             exportVO.setTable(collect);
-            exportVO.setImg(new PictureRenderData(800, 200, "D:/image/liangz.png"));
-            //exportVO.setImg(new PictureRenderData(800, 200, exportVO.getThumbUrl()));
+            //exportVO.setImg(new PictureRenderData(800, 200, "D:/image/liangz.png"));
+            exportVO.setImg(new PictureRenderData(800, 200, exportVO.getThumbUrl().replace("/file/statics","/home/pat_saas")));
             String s = waxPath + exportVO.getFileName() + "+" + exportVO.getOrganName() +CommonConstant.WROD_FILE;
             //生成word
             ExportPdfUtils.exportFile(s, exportVO);
@@ -208,12 +208,14 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             topicName = exportVO.getTopicName();
         }
         if (ids.size() > 1) {
+            log.info("走的压缩包");
             ExportPdfUtils.writePdfZip(pdfName, response, topicName +
                     DateUtils.getCurrentHHmmssString("yyyy-MM-dd HH:mm:ss") + CommonConstant.ZIP_FILE);
-            log.info("走的压缩包");
+
         } else {
+
             ExportPdfUtils.downloadLocal(pdfName.get(0), response);
-            log.info("走的单个文件");
+
         }
         for (String s1 : pdfName) {
             if (new File(s1).exists()) {

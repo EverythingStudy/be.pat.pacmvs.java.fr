@@ -1,5 +1,6 @@
 package cn.staitech.fr.utils;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.out.ExportListVO;
 import cn.staitech.fr.domain.out.ExportVO;
 import com.deepoove.poi.XWPFTemplate;
@@ -14,6 +15,7 @@ import org.docx4j.fonts.IdentityPlusMapper;
 import org.docx4j.fonts.Mapper;
 import org.docx4j.fonts.PhysicalFonts;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -174,6 +176,7 @@ public class ExportPdfUtils {
      * @throws Exception
      */
     public static void writePdfZip( List<String> fileName,HttpServletResponse response,String zipName) throws Exception {
+
         response.setContentType("application/OCTET-STREAM;charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename="
                 + new String(zipName.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
@@ -211,7 +214,7 @@ public class ExportPdfUtils {
         response.reset();
         response.setContentType("application/octet-stream");
         String filename = new File(path).getName();
-        response.addHeader("Content-Disposition", "attachment; filename=" +  new String(path.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+        response.addHeader("Content-Disposition", "attachment; filename=" +  new String(filename.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
         ServletOutputStream outputStream = response.getOutputStream();
         byte[] b = new byte[1024];
         int len;
