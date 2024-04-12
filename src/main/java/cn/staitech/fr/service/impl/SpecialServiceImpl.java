@@ -16,6 +16,7 @@ import cn.staitech.fr.domain.in.EditSpecialStatusIn;
 import cn.staitech.fr.domain.in.SpecialAddIn;
 import cn.staitech.fr.domain.in.SpecialEditIn;
 import cn.staitech.fr.domain.in.SpecialListQueryIn;
+import cn.staitech.fr.domain.in.SpecialsQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SlideMapper;
@@ -239,6 +240,30 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         special.setStatus(req.getStatus());
         this.baseMapper.updateById(special);
         return R.ok();
+    }
+
+    @Override
+    public PageResponse<SpecialListQueryOut> getSpecials(SpecialsQueryIn req) {
+        log.info("智能阅片专题列表接口开始：");
+        //创建响应
+        PageResponse resp = new PageResponse();
+        //分页查询
+        req.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
+        req.setLoginUserId(SecurityUtils.getUserId());
+        Page<SysUser> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
+        List<SpecialListQueryOut> specialList = this.baseMapper.getSpecials(req);
+        if (CollectionUtils.isNotEmpty(specialList)) {
+            specialList.forEach(e -> {
+                e.setColorName(Container.COLOR_TYPE.get(Integer.valueOf(e.getColorType())));
+                e.setColorNameEn(Container.COLOR_TYPE_EN.get(Integer.valueOf(e.getColorType())));
+                e.setTrialType(Container.TRIAL_TYPE.get(e.getTrialId()));
+                e.setTrialTypeEn(Container.TRIAL_TYPE_EN.get(e.getTrialId()));
+            });
+        }
+        resp.setTotal(page.getTotal());
+        resp.setList(specialList);
+        resp.setPages(page.getPages());
+        return resp;
     }
 
     private Slide getExtInfo(String fileName, Slide slide, Long specialId, SpecialAddIn req) {

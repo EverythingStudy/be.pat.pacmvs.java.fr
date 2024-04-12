@@ -1,0 +1,59 @@
+package cn.staitech.fr.vo.diagnosis;
+
+import javax.validation.constraints.NotNull;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+/**
+ * 
+* @ClassName: TbSpecialDiagnosis
+* @Description:
+* @author wanglibei
+* @date 2023年6月28日
+* @version V1.0
+ */
+@Api(value = "人工诊断添加", tags = "人工诊断添加")
+@Data
+public class SpecialDiagnosisAddVo {
+	
+	@ApiModelProperty(name = "specialDiagnosisId" , value = "诊断ID")
+	private Long diagnosisId;
+    
+	@NotNull(message = "{PARAMETER_ABNORMALITY}")
+	@ApiModelProperty(name = "specialId" , value = "专题id")
+	private Long specialId;
+    
+	@NotNull(message = "{PARAMETER_ABNORMALITY}")
+	@ApiModelProperty(name = "singleId" , value = "新切片ID（切好的单脏器）")
+	private Long singleId;
+	
+//	@ApiModelProperty(name = "groupId" , value = "分组id")
+//	private Long groupId;
+    
+	@NotNull(message = "{PARAMETER_ABNORMALITY}")
+	@ApiModelProperty(name = "viscera" , value = "脏器或组织")
+	private Long viscera;
+    
+	@NotNull(message = "{PARAMETER_ABNORMALITY}")
+	@ApiModelProperty(name = "position" , value = "部位")
+	private Long position;
+	
+	@NotNull(message = "{PARAMETER_ABNORMALITY}")
+	@ApiModelProperty(name = "lesion" , value = "病理改变")
+	private Long lesion;
+	
+	@NotNull(message = "{PARAMETER_ABNORMALITY}")
+	@ApiModelProperty(name = "ddefinition" , value = "修饰")
+	private Long ddefinition;
+	
+	@NotNull(message = "{PARAMETER_ABNORMALITY}")
+	@ApiModelProperty(name = "grade" , value = "病变级别")
+	private Long grade;
+	
+    
+	@ApiModelProperty(name = "remark" , value = "备注")
+	private String remark;
+    
+}

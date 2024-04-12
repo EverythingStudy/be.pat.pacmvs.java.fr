@@ -28,6 +28,11 @@ public class RoiIn {
     @NotNull(message = "{SlidePredictionIn.slideId.isnull}")
     private Long slideId;
 
+    @ApiModelProperty(value = "单切片ID", required = true)
+    @NotNull(message = "{SlidePredictionIn.slideId.isnull}")
+    private Long singleSlideId;
+
+
     @ApiModelProperty(value = "标签id列表")
     private List<Long> categoryIds;
 

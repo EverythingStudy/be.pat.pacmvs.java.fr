@@ -100,6 +100,10 @@ public class Annotation implements Serializable {
      */
     private Long contourType;
 
+    private Long singleSlideId;
+
+    private int single;
+
     @TableField(exist = false)
     private String  operation;
 

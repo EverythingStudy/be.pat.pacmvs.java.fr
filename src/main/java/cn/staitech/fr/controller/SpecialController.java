@@ -9,6 +9,7 @@ import cn.staitech.fr.domain.in.EditSpecialStatusIn;
 import cn.staitech.fr.domain.in.SpecialAddIn;
 import cn.staitech.fr.domain.in.SpecialEditIn;
 import cn.staitech.fr.domain.in.SpecialListQueryIn;
+import cn.staitech.fr.domain.in.SpecialsQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
 import cn.staitech.fr.service.SpecialService;
 import cn.staitech.fr.utils.LanguageUtils;
@@ -113,6 +114,14 @@ public class SpecialController  extends BaseController {
             map = Container.SPECIAL_STATUS;
         }
         return R.ok(map);
+    }
+
+
+    @ApiOperation(value = "智能阅片-专题阅片列表")
+    @PostMapping("/specialList")
+    public R<PageResponse<SpecialListQueryOut>> specialList(@RequestBody @Validated SpecialsQueryIn req) {
+        PageResponse<SpecialListQueryOut> resp = specialService.getSpecials(req);
+        return R.ok(resp);
     }
 
 }

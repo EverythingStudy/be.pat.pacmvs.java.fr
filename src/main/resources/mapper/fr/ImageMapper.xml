@@ -482,4 +482,5 @@
         </where>
         order by i.image_id desc
     </select>
+
 </mapper>
