@@ -185,4 +185,8 @@ public class CommonConstant {
      */
 	public static final String DIAGNOSIS_YES = "1";
 	public static final String DIAGNOSIS_NO = "0";
+
+    public static final String WROD_FILE = ".docx";
+    public static final String PDF_FILE = ".pdf";
+    public static final String ZIP_FILE = ".zip";
 }

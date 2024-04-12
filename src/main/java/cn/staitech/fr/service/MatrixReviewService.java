@@ -3,12 +3,14 @@ package cn.staitech.fr.service;
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.PageDataResponse;
+import cn.staitech.fr.domain.in.AiDownloadIn;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.out.AnimalDimensionOut;
 import cn.staitech.fr.domain.out.MatrixReviewListOut;
 import cn.staitech.fr.domain.out.MatrixReviewOut;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -24,4 +26,8 @@ public interface MatrixReviewService {
     PageResponse<MatrixReviewListOut> getMatrixReview(MatrixReviewListIn req);
 
     PageDataResponse<AnimalDimensionOut> animalList(MatrixReviewListIn req);
+
+     void diagnosisDownload(AiDownloadIn req) throws Exception;
+
+    R<String> getControlGroup(Long specialId);
 }

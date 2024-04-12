@@ -36,4 +36,19 @@
         where user_id = #{userId}
     </select>
 
+    <select id="getExportListVO" resultType="cn.staitech.fr.domain.out.ExportListVO">
+
+        select fd.position_name,
+               fd.lesion_name,
+               fd.grade_name,
+               fd.ddefinition_name,
+               fd.remark,
+               su.user_name                                     create_by,
+               DATE_FORMAT(fd.create_time, '%Y-%m-%d %H:%i:%s') create_time
+        from fr_diagnosis fd
+                 left join sys_user su on fd.create_by = su.user_id
+        where fd.single_id = #{singleId}
+          and fd.delete_flag = 1
+
+    </select>
 </mapper>

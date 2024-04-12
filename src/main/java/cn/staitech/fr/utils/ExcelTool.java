@@ -1,7 +1,6 @@
 package cn.staitech.fr.utils;
 
 
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFRichTextString;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
@@ -167,44 +166,6 @@ public class ExcelTool<T> {
         }
     }
 
-    /**
-     * 根据HSSFCell类型设置数据
-     *
-     * @param cell 单元格
-     * @return
-     */
-    public static String getCellFormatValue(Cell cell) {
-        String cellvalue = "";
-        if (cell != null) {
-            // 判断当前Cell的Type
-            switch (cell.getCellType()) {
-                // 如果当前Cell的Type为NUMERIC
-                case NUMERIC:
-                case FORMULA: {
-                    // 判断当前的cell是否为Date
-                    if (HSSFDateUtil.isCellDateFormatted(cell)) {
-                        Date date = cell.getDateCellValue();
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                        cellvalue = sdf.format(date);
-                    } else {
-                        // 如果是纯数字
-                        cellvalue = String.valueOf(cell.getNumericCellValue());
-                    }
-                    break;
-                }
-                // 如果当前Cell的Type为STRIN
-                case STRING:
-                    // 取得当前的Cell字符串
-                    cellvalue = cell.getRichStringCellValue().getString();
-                    break;
-                default:  // 默认的Cell值
-                    cellvalue = "";
-            }
-        } else {
-            cellvalue = "";
-        }
-        return cellvalue;
-    }
 
     /**
      * 描述：根据文件后缀，自适应上传文件的版本

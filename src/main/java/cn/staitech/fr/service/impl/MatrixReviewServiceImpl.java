@@ -3,36 +3,50 @@ package cn.staitech.fr.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
+import cn.staitech.common.core.utils.bean.BeanUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Category;
+import cn.staitech.fr.domain.Diagnosis;
 import cn.staitech.fr.domain.PageDataResponse;
 import cn.staitech.fr.domain.SingleOrganNumber;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
+import cn.staitech.fr.domain.in.AiDownloadIn;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.out.AnimalDimensionData;
 import cn.staitech.fr.domain.out.AnimalDimensionOut;
+import cn.staitech.fr.domain.out.ExportListVO;
+import cn.staitech.fr.domain.out.ExportVO;
 import cn.staitech.fr.domain.out.MatrixReviewListOut;
 import cn.staitech.fr.domain.out.MatrixReviewOut;
 import cn.staitech.fr.domain.out.OrganDisassemblyOut;
 import cn.staitech.fr.domain.out.OrgansData;
 import cn.staitech.fr.domain.out.WaxBlockNumberListOut;
+import cn.staitech.fr.mapper.DiagnosisMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.service.MatrixReviewService;
+import cn.staitech.fr.utils.DateUtils;
+import cn.staitech.fr.utils.ExportPdfUtils;
 import cn.staitech.system.api.domain.SysUser;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.deepoove.poi.data.PictureRenderData;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +67,16 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
     @Resource
     private SingleSlideMapper singleSlideMapper;
+
+    @Resource
+    private DiagnosisMapper diagnosisMapper;
+
+    @Resource
+    private HttpServletResponse response;
+
+
+    @Value("${waxPath}")
+    private String waxPath;
 
     @Override
     public R<List<MatrixReviewOut>> groupList(Long specialId) {
@@ -160,5 +184,50 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         resp.setData(ret);
         resp.setPages(page.getPages());
         return resp;
+    }
+
+    @Override
+    public void diagnosisDownload(AiDownloadIn req) throws Exception {
+        log.info("诊断报告下载接口开始：");
+        List<Long> ids = req.getIds();
+        List<String> pdfName = new ArrayList<>();
+        String topicName = "";
+        for (Long id : ids) {
+            ExportVO exportVO = singleSlideMapper.getExportVO(id);
+            List<ExportListVO> collect = diagnosisMapper.getExportListVO(id);
+            exportVO.setList(collect);
+            exportVO.setTable(collect);
+            exportVO.setImg(new PictureRenderData(800, 200, "D:/image/liangz.png"));
+            //exportVO.setImg(new PictureRenderData(800, 200, exportVO.getThumbUrl()));
+            String s = waxPath + exportVO.getFileName() + "+" + exportVO.getOrganName() +CommonConstant.WROD_FILE;
+            //生成word
+            ExportPdfUtils.exportFile(s, exportVO);
+            //生成pdf
+            ExportPdfUtils.convertDocx2Pdf(s, s.replace(CommonConstant.WROD_FILE, CommonConstant.PDF_FILE));
+            pdfName.add(s.replace(CommonConstant.WROD_FILE, CommonConstant.PDF_FILE));
+            topicName = exportVO.getTopicName();
+        }
+        if (ids.size() > 1) {
+            ExportPdfUtils.writePdfZip(pdfName, response, topicName +
+                    DateUtils.getCurrentHHmmssString("yyyy-MM-dd HH:mm:ss") + CommonConstant.ZIP_FILE);
+            log.info("走的压缩包");
+        } else {
+            ExportPdfUtils.downloadLocal(pdfName.get(0), response);
+            log.info("走的单个文件");
+        }
+        for (String s1 : pdfName) {
+            if (new File(s1).exists()) {
+                FileUtils.delete(new File(s1));
+            }
+
+        }
+        log.info("结束");
+    }
+
+    @Override
+    public R<String> getControlGroup(Long specialId) {
+        log.info("对照组获得接口开始：");
+        Special special = specialMapper.selectById(specialId);
+        return R.ok(special.getControlGroup());
     }
 }
