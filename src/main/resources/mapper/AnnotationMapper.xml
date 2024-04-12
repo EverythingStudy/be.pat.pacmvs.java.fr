@@ -267,6 +267,6 @@
         <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
             #{item}
         </foreach>
-        and contourType = 2
+        and contour_type = 2
     </select>
 </mapper>
