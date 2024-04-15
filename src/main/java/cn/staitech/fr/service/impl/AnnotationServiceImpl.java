@@ -159,6 +159,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         List<Features> list = new ArrayList<>();
         Annotation annotation = new Annotation();
         annotation.setSlideId(req.getSlideId());
+        annotation.setCategoryId(req.getCategoryId());
         List<Annotation> selfAnnoList = annotationMapper.selectListBy(annotation);
         List<Features> annoList1 = getFeaturesList(selfAnnoList);
         if (CollectionUtils.isNotEmpty(annoList1)) {
