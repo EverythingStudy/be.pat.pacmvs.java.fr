@@ -102,7 +102,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 				SysUser loginUser = diagnosisMapper.selectUserById(createBy);
 				vo.setCreateUser(loginUser.getNickName());
 				if (createBy.equals(SecurityUtils.getLoginUser().getSysUser().getUserId())) {
-//									if (createBy.equals(1L)) {
+					//									if (createBy.equals(1L)) {
 					vo.setEditStatus(1);
 				}
 				voList.add(vo);
@@ -118,8 +118,14 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 	public int saveOrUpdateSpecialDiagnosisVo(SpecialDiagnosisAddVo addVo) {
 		int checkFlage = 0;
 		Long specialDiagnosisId = addVo.getDiagnosisId();
-//		Long currentUserId = SecurityUtils.getLoginUser().getSysUser().getUserId();
-						Long currentUserId = 10L;
+		//根据singleId查询专题id
+		SingleSlide singleSlide = singleSlideMapper.selectById(addVo.getSingleId());
+		Slide slide = slideMapper.selectById(singleSlide.getSlideId());
+		Long specialId = slide.getSpecialId();
+		addVo.setSpecialId(specialId);
+
+				Long currentUserId = SecurityUtils.getLoginUser().getSysUser().getUserId();
+//		Long currentUserId = 10L;
 		if(null != specialDiagnosisId){
 			//判断当前人和编辑人是否是同一个人
 			//查下当前数据创建人是谁
@@ -173,11 +179,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 			String gradeName = getLabelNameByParm(SysDictTypeEnum.grade.label(), Long.valueOf(grade),"");
 			record.setGradeName(gradeName);
 		}
-		//根据singleId查询专题id
-		SingleSlide singleSlide = singleSlideMapper.selectById(addVo.getSingleId());
-		Slide slide = slideMapper.selectById(singleSlide.getSlideId());
-		Long specialId = slide.getSpecialId();
-		addVo.setSpecialId(specialId);
+
 		if (null == addVo.getDiagnosisId()) {
 			//获取分组id
 			Long slideId = singleSlide.getSlideId();
