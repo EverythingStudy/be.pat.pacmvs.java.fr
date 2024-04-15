@@ -41,5 +41,8 @@ public class SingleSlide implements Serializable {
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
+    @ApiModelProperty(value = "单切片描述")
+    private String description;
+
 
 }

@@ -12,4 +12,5 @@ public class GenerateThumbnail {
     private List<JSONObject> slideRoiPolygon;
     private int types;
     private String abbreviation;
+    private String topicName;
 }

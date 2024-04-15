@@ -173,7 +173,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(measureBy);
         Features features = MarkingUtils.socketData(null, JSONObject.parseObject(measure.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_MEASURE, DELETE_STATUS, features);
-        NioWebSocketHandler.sendAll(measure.getSlideId(), broadcastVO);
+        NioWebSocketHandler.sendAll(measure.getSingleSlideId(), broadcastVO);
         return measureMapper.deleteById(markingId);
     }
 
@@ -216,7 +216,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
 
     private Measure trans2Marking(ViewAddIn view) {
         Measure measure = new Measure();
-        measure.setSlideId(view.getSlide_id());
+        measure.setSingleSlideId(view.getSlide_id());
         if (null != view.getCreate_by()) {
             measure.setCreateBy(view.getCreate_by());
         }
