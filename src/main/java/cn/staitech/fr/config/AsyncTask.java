@@ -20,13 +20,14 @@ public class AsyncTask {
 
     @SneakyThrows
     @Async("getAsyncExecutor")
-    public void generateThumbnail(Long slideId, Long categoryId, String imageUrl, List<JSONObject> contourList,int type) {
+    public void generateThumbnail(Long slideId, Long categoryId, String imageUrl, List<JSONObject> contourList,int type,String abbreviation) {
         GenerateThumbnail generateThumbnail = new GenerateThumbnail();
         generateThumbnail.setSlideId(slideId);
         generateThumbnail.setCategoryId(categoryId);
         generateThumbnail.setSlideRoiPolygon(contourList);
         generateThumbnail.setSvsPath(imageUrl);
         generateThumbnail.setTypes(type);
+        generateThumbnail.setAbbreviation(abbreviation);
         pythonService.generateThumbnail(generateThumbnail);
 
     }

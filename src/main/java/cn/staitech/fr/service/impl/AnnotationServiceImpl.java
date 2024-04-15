@@ -119,6 +119,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     	properties.setCreate_time(String.valueOf(annotation.getCreateTime()));
     	properties.setProject_id(annotation.getProjectId());
     	properties.setContour_type(annotation.getContourType());
+        properties.setSingleSlideId(annotation.getSingleSlideId());
+        properties.setSingle(annotation.getSingle());
     	if (annotation.getCategoryId() != null) {
     		Category category = categoryHashMap.get(annotation.getCategoryId());
     		if (category == null) {
@@ -216,6 +218,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             throw new Exception(MessageSource.M("ARGUMENT_INVALID"));
         }
         String id = null;
+        Category category = null;
         Annotation annotation = new Annotation();
         if (req.getCategory_id() != null) {
             if (req.getSingle_slide_id() != null) {
@@ -224,7 +227,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                     id = MarkingUtils.getSdId(pathologicalIndicatorCategory.getCategoryName());
                 }
             } else {
-                Category category = categoryMapper.selectById(req.getCategory_id());
+                category = categoryMapper.selectById(req.getCategory_id());
                 if (category != null) {
                     id = MarkingUtils.getSdId(category.getOrganName());
                 }
@@ -266,7 +269,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                 throw new Exception(MessageSource.M("NODATA"));
             }
             List<JSONObject> contourList = selectContourList(annotation.getSlideId(), req.getCategory_id());
-            asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1);
+            asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1, category.getCategoryAbbreviation());
         }
         {
             String traceId = req.getTraceId();
@@ -426,6 +429,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             if (!Optional.ofNullable(image).isPresent()) {
                 throw new Exception(MessageSource.M("NODATA"));
             }
+            Category category = categoryMapper.selectById(annotationBy.getCategoryId());
+
             List<JSONObject> contourList = selectContourList(annotationBy.getSlideId(), annotationBy.getCategoryId());
             int type;
             if (contourList.size() > 0) {
@@ -433,7 +438,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             } else {
                 type = 2;
             }
-            asyncTask.generateThumbnail(annotationBy.getSlideId(), annotationBy.getCategoryId(), image.getImageUrl(), contourList, type);
+            asyncTask.generateThumbnail(annotationBy.getSlideId(), annotationBy.getCategoryId(), image.getImageUrl(), contourList, type,category.getCategoryAbbreviation());
         }
         String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
         boolean isBatch = false;
@@ -558,10 +563,21 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             } else {
                 type = 2;
             }
-            asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type);
+            Category categoryAfter = categoryMapper.selectById(req.getCategory_id());
+
+            asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type,categoryAfter.getCategoryAbbreviation());
             // 改之后数据
             List<JSONObject> contourListAfter = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
-            asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourListAfter, 1);
+
+            String categoryAbbreviation = null;
+            if(req.getCategory_id() != null){
+                Category categoryBy = categoryMapper.selectById(req.getCategory_id());
+                categoryAbbreviation = categoryBy.getCategoryAbbreviation();
+            }else{
+                categoryAbbreviation = categoryAfter.getCategoryAbbreviation();
+            }
+            asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourListAfter, 1,categoryAbbreviation);
+
         }
         return annotation.getAnnotationId();
     }
@@ -743,8 +759,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
 
         if(annotation.getSingleSlideId() == null){
+            Category category = categoryMapper.selectById(annotation.getCategoryId());
             List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
-            asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, 1);
+            asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, 1,category.getCategoryAbbreviation());
         }
         {
             Long userId = req.getUpdate_by();

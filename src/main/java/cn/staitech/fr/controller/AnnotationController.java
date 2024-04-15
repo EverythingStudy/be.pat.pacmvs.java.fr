@@ -109,13 +109,6 @@ public class AnnotationController {
         return R.ok(res);
     }
 
-
-
-
-
-
-
-
     @ApiOperation(value = "获取GeoJson数据")
     @PostMapping("/selectLists")
     public R<List<Features>> selectLists(@Validated @RequestBody AnnotationSelectList req) throws Exception {

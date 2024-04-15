@@ -11,4 +11,5 @@ public class GenerateThumbnail {
     private String svsPath;
     private List<JSONObject> slideRoiPolygon;
     private int types;
+    private String abbreviation;
 }
