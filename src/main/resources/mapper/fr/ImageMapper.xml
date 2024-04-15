@@ -448,6 +448,7 @@
         i.`status`,
         i.host_id,
         i.organization_id,
+        so.organization_name,
         i.round_id,
         i.biz_type,
         i.`source`,
@@ -459,6 +460,8 @@
             and fs.special_id=#{specialId}
         left join fr_special fsl
             on fsl.topic_id = i.topic_id
+        left join sys_organization so
+            on so.organization_id = i.organization_id
         <where>
             and fsl.special_id = #{specialId}
             and i.status = 4
