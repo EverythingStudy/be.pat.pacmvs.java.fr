@@ -21,4 +21,6 @@ public interface SpecialMapper extends BaseMapper<Special> {
     List<SpecialListQueryOut> getSpecialList(SpecialListQueryIn req);
 
     List<SpecialListQueryOut> getSpecials(SpecialsQueryIn req);
+
+    Integer countgetUserRole(Long userId);
 }

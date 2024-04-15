@@ -33,6 +33,8 @@
         left join tb_topic tt on fs.topic_id = tt.topic_id
         left join sys_user su on fs.create_by = su.user_id
         left join tb_species ts on fs.species_id = ts.species_id
+        left join fr_special_member fsm on fs.special_id = fsm.special_id
+        and  fsm.del_flag = '0'
         and ts.organization_id = #{organizationId}
         where fs.del_flag = '0'
         and  fs.organization_id = #{organizationId}
@@ -44,6 +46,9 @@
         </if>
         <if test="trialId != null ">
             and fs.trial_id = #{trialId}
+        </if>
+        <if test="userId != null ">
+            and fsm.user_id = #{userId}
         </if>
         <if test="speciesId != null and speciesId != ''">
             and fs.species_id = #{speciesId}
@@ -115,6 +120,19 @@
             </if>
         </if>
         order by fs.create_time desc
+    </select>
+
+    <select id="countgetUserRole" resultType="java.lang.Integer">
+        select count(0)
+        from sys_user su
+                 left join sys_user_role sur on su.user_id = sur.user_id
+                 left join sys_role sr on sur.role_id = sr.role_id
+        where su.del_flag = '0'
+          and sr.del_flag = '0'
+          and sr.role_level = 1
+          and su.user_id=#{userId}
+
+
     </select>
 
 </mapper>

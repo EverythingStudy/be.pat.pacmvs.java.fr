@@ -83,12 +83,15 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         PageResponse resp = new PageResponse();
         //分页查询
         req.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
-
+        //判断是不是管理员
+        Integer integer = this.baseMapper.countgetUserRole(SecurityUtils.getUserId());
+        if(integer==0){
+            req.setUserId(SecurityUtils.getUserId());
+        }
         Page<SysUser> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
         List<SpecialListQueryOut> specialList = this.baseMapper.getSpecialList(req);
         if (CollectionUtils.isNotEmpty(specialList)) {
             specialList.forEach(e -> {
-
                 e.setColorName(Container.COLOR_TYPE.get(Integer.valueOf(e.getColorType())));
                 e.setColorNameEn(Container.COLOR_TYPE_EN.get(Integer.valueOf(e.getColorType())));
                 e.setTrialType(Container.TRIAL_TYPE.get(e.getTrialId()));
