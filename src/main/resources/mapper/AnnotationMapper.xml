@@ -170,6 +170,12 @@
             <if test="contourType != null">
                 AND contour_type = #{contourType}
             </if>
+            <if test="slideIdList != null and slideIdList.size() > 0">
+	            AND slide_id in
+		        <foreach collection="slideIdList" item="item" index="index" open="(" separator="," close=")">
+		            #{item}
+		        </foreach>
+	         </if>
         </where>
     </select>
 
