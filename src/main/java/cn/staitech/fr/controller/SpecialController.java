@@ -3,7 +3,9 @@ package cn.staitech.fr.controller;
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.web.controller.BaseController;
+import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.Container;
+import cn.staitech.fr.domain.AccessProjectRecords;
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.in.EditSpecialStatusIn;
 import cn.staitech.fr.domain.in.SpecialAddIn;
@@ -11,6 +13,7 @@ import cn.staitech.fr.domain.in.SpecialEditIn;
 import cn.staitech.fr.domain.in.SpecialListQueryIn;
 import cn.staitech.fr.domain.in.SpecialsQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
+import cn.staitech.fr.service.AccessProjectRecordsService;
 import cn.staitech.fr.service.SpecialService;
 import cn.staitech.fr.utils.LanguageUtils;
 import io.swagger.annotations.Api;
@@ -39,6 +42,9 @@ public class SpecialController  extends BaseController {
 
     @Autowired
     private SpecialService specialService;
+    
+    @Autowired
+    private AccessProjectRecordsService accessProjectRecordsService;
 
     @ApiOperation(value = "专题列表分页查询")
     @PostMapping("/list")
@@ -57,6 +63,9 @@ public class SpecialController  extends BaseController {
     @ApiOperation(value = "专题详情")
     @GetMapping("/info")
     public R<Special> info(@RequestParam("specialId") @ApiParam(name = "specialId", value ="专题id" ) Long specialId){
+    	 //add访问记录
+        AccessProjectRecords record=AccessProjectRecords.builder().projectId(specialId).userId(SecurityUtils.getUserId()).build();
+        accessProjectRecordsService.save(record);
         return R.ok(specialService.getById(specialId));
 
     }
