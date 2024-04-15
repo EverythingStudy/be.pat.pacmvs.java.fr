@@ -23,7 +23,6 @@ public class SpecialDiagnosisAddVo {
 	@ApiModelProperty(name = "specialDiagnosisId" , value = "诊断ID")
 	private Long diagnosisId;
     
-	@NotNull(message = "{PARAMETER_ABNORMALITY}")
 	@ApiModelProperty(name = "specialId" , value = "专题id")
 	private Long specialId;
     

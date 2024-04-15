@@ -118,8 +118,8 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 	public int saveOrUpdateSpecialDiagnosisVo(SpecialDiagnosisAddVo addVo) {
 		int checkFlage = 0;
 		Long specialDiagnosisId = addVo.getDiagnosisId();
-		Long currentUserId = SecurityUtils.getLoginUser().getSysUser().getUserId();
-//						Long currentUserId = 10L;
+//		Long currentUserId = SecurityUtils.getLoginUser().getSysUser().getUserId();
+						Long currentUserId = 10L;
 		if(null != specialDiagnosisId){
 			//判断当前人和编辑人是否是同一个人
 			//查下当前数据创建人是谁
@@ -173,12 +173,14 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 			String gradeName = getLabelNameByParm(SysDictTypeEnum.grade.label(), Long.valueOf(grade),"");
 			record.setGradeName(gradeName);
 		}
-
+		//根据singleId查询专题id
+		SingleSlide singleSlide = singleSlideMapper.selectById(addVo.getSingleId());
+		Slide slide = slideMapper.selectById(singleSlide.getSlideId());
+		Long specialId = slide.getSpecialId();
+		addVo.setSpecialId(specialId);
 		if (null == addVo.getDiagnosisId()) {
 			//获取分组id
-			SingleSlide singleSlide = singleSlideMapper.selectById(record.getSingleId());
 			Long slideId = singleSlide.getSlideId();
-			Slide slide = slideMapper.selectById(slideId);
 			String groupCode = slide.getGroupCode();
 			record.setGroupId(Long.valueOf(groupCode));
 			record.setCreateBy(currentUserId);
@@ -197,11 +199,11 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		log.info("人工诊断单条处理运行时间：{},毫秒 ",totalTime);
 		//修改诊断状态
 		Diagnosis diagnosis = getById(record.getDiagnosisId());
-		SingleSlide singleSlide = new SingleSlide();
-		singleSlide.setSingleId(diagnosis.getSingleId());
+		SingleSlide singleSlideInfo = new SingleSlide();
+		singleSlideInfo.setSingleId(diagnosis.getSingleId());
 		//人工诊断状态 0：未诊断；1：已诊断
-		singleSlide.setDiagnosisStatus(CommonConstant.DIAGNOSIS_YES);
-		singleSlideMapper.updateById(singleSlide);
+		singleSlideInfo.setDiagnosisStatus(CommonConstant.DIAGNOSIS_YES);
+		singleSlideMapper.updateById(singleSlideInfo);
 		//是否需要刷新初始化字典的判断
 		//		updateInitDictCache(addVoList);
 		return checkFlage;
