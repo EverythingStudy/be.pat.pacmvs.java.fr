@@ -157,8 +157,8 @@
         contour_type,
         ST_AsGeoJSON(contour) as contour
         from fr_annotation
-        AND contour_type != 1
         <where>
+            contour_type != 1
             <if test="slideId != null">
                 AND slide_id = #{slideId}
             </if>
