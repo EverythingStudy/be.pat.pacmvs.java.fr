@@ -134,6 +134,8 @@ public class ExportPdfUtils {
             fontMapper.put("幼圆", PhysicalFonts.get("YouYuan"));
             fontMapper.put("华文宋体", PhysicalFonts.get("STSong"));
             fontMapper.put("华文中宋", PhysicalFonts.get("STZhongsong"));
+            PhysicalFonts.put("PMingLiU", PhysicalFonts.get("SimSun"));
+            PhysicalFonts.put("新細明體", PhysicalFonts.get("SimSun"));
             mlPackage.setFontMapper(fontMapper);
             os = new java.io.FileOutputStream(pdfPath);
             //docx4j  docx转pdf
