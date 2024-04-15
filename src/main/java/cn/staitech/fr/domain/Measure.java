@@ -26,7 +26,7 @@ public class Measure implements Serializable {
     /**
      * 切片id
      */
-    private Long slideId;
+    private Long singleSlideId;
 
     /**
      * 标注类型(AI表示AI算出的标注，Draw表示前端绘制的标注，Measure表示测量工具数据)
@@ -155,7 +155,6 @@ public class Measure implements Serializable {
         }
         Measure other = (Measure) that;
         return (this.getMeasureId() == null ? other.getMeasureId() == null : this.getMeasureId().equals(other.getMeasureId()))
-            && (this.getSlideId() == null ? other.getSlideId() == null : this.getSlideId().equals(other.getSlideId()))
             && (this.getAnnotationType() == null ? other.getAnnotationType() == null : this.getAnnotationType().equals(other.getAnnotationType()))
             && (this.getArea() == null ? other.getArea() == null : this.getArea().equals(other.getArea()))
             && (this.getPerimeter() == null ? other.getPerimeter() == null : this.getPerimeter().equals(other.getPerimeter()))
@@ -183,8 +182,6 @@ public class Measure implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((getMeasureId() == null) ? 0 : getMeasureId().hashCode());
-        result = prime * result + ((getSlideId() == null) ? 0 : getSlideId().hashCode());
         result = prime * result + ((getAnnotationType() == null) ? 0 : getAnnotationType().hashCode());
         result = prime * result + ((getArea() == null) ? 0 : getArea().hashCode());
         result = prime * result + ((getPerimeter() == null) ? 0 : getPerimeter().hashCode());
@@ -216,7 +213,6 @@ public class Measure implements Serializable {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", measureId=").append(measureId);
-        sb.append(", slideId=").append(slideId);
         sb.append(", annotationType=").append(annotationType);
         sb.append(", area=").append(area);
         sb.append(", perimeter=").append(perimeter);

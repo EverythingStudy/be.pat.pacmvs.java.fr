@@ -9,4 +9,5 @@ public class StartRecognition {
     private String imageUrl;
     private String algorithm_name;
     private Long organizationId;
+	private String organizationName;
 }

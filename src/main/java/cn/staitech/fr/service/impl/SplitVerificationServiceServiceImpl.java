@@ -97,7 +97,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		//:核对状态 0：初始 1：正确 2：修正正常 3：错误 
 		queryWrapper.gt("check_status",0);
 		if(StringUtils.isNotEmpty(reqAnimalCode)){
-			queryWrapper.eq("animal_code",reqAnimalCode);
+			queryWrapper.like("animal_code",reqAnimalCode);
 		}
 
 		//核对状态 0：初始 1：正确 2：修正正常 3：错误 
@@ -109,15 +109,34 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		if(null != reqCategoryId){
 			Annotation annotation = new Annotation();
 			annotation.setCategoryId(reqCategoryId);
+			//加专题所有id
+			//查下所属专题的所有切片id
+			List<Long> querySlideIdList = new ArrayList<>();
+			QueryWrapper<Slide> animalWrapper = new QueryWrapper<>();
+			animalWrapper.eq("special_id",req.getSpecialId());
+			List<Slide> slideDataList = slideMapper.selectList(animalWrapper);
+			if(CollectionUtils.isNotEmpty(slideDataList)){
+				for(Slide slide:slideDataList){
+					querySlideIdList.add(slide.getSlideId());
+				}
+				annotation.setSlideIdList(querySlideIdList);
+			}
+			
 			List<Annotation> annoList = annotationMapper.selectListBy(annotation);
 			List<Long> annoSlideIdList = annoList.stream().map(Annotation::getSlideId).collect(Collectors.toList());
 			if(CollectionUtils.isNotEmpty(annoSlideIdList)){
 				req.setSlideIdList(annoSlideIdList);
-				queryWrapper.in("slide_id",annoSlideIdList);
+				//queryWrapper.in("slide_id",annoSlideIdList);
 			}
 			String oCategory = organizationId.toString()+reqCategoryId.toString();
 			String categoryName = MapConstant.getCategory(oCategory);
-			queryWrapper.like("organs",categoryName);
+//			queryWrapper.like("organs",categoryName);
+			
+			queryWrapper.like("organs", categoryName);
+			if(CollectionUtils.isNotEmpty(annoSlideIdList)){
+				queryWrapper.or().in("slide_id", annoSlideIdList);
+			}
+			
 		}
 
 
@@ -275,6 +294,17 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		if(null != categoryId){
 			Annotation annotation = new Annotation();
 			annotation.setCategoryId(categoryId);
+			List<Long> slideIdList = new ArrayList<>();
+			//查下所属专题的所有切片id
+			QueryWrapper<Slide> animalWrapper = new QueryWrapper<>();
+			animalWrapper.eq("special_id",req.getSpecialId());
+			List<Slide> slideDataList = slideMapper.selectList(animalWrapper);
+			if(CollectionUtils.isNotEmpty(slideDataList)){
+				for(Slide slide:slideDataList){
+					slideIdList.add(slide.getSlideId());
+				}
+				annotation.setSlideIdList(slideIdList);
+			}
 			List<Annotation> annoList = annotationMapper.selectListBy(annotation);
 			List<Long> annoSlideIdList = annoList.stream().map(Annotation::getSlideId).collect(Collectors.toList());
 			if(CollectionUtils.isNotEmpty(annoSlideIdList)){

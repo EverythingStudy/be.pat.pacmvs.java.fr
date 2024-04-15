@@ -12,6 +12,7 @@ import cn.staitech.fr.domain.history.TraceNode;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.netty.websocket.NioWebSocketHandler;
 import cn.staitech.fr.service.RocksdbService;
+import cn.staitech.fr.service.SpecialService;
 import cn.staitech.fr.utils.*;
 import cn.staitech.fr.vo.annotation.AnnotationById;
 import cn.staitech.fr.vo.annotation.AnnotationCountByCategory;
@@ -86,6 +87,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     @Resource
     private RocksdbService rocksdbService;
+
+    @Resource
+    private SpecialService specialService;
 
     @Resource
     private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
@@ -268,8 +272,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             if (!Optional.ofNullable(image).isPresent()) {
                 throw new Exception(MessageSource.M("NODATA"));
             }
+            Special special = specialService.getById(slide.getSpecialId());
             List<JSONObject> contourList = selectContourList(annotation.getSlideId(), req.getCategory_id());
-            asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1, category.getCategoryAbbreviation());
+            asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1, category.getCategoryAbbreviation(),special.getTopicName());
         }
         {
             String traceId = req.getTraceId();
@@ -438,7 +443,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             } else {
                 type = 2;
             }
-            asyncTask.generateThumbnail(annotationBy.getSlideId(), annotationBy.getCategoryId(), image.getImageUrl(), contourList, type,category.getCategoryAbbreviation());
+            Special special = specialService.getById(slide.getSpecialId());
+            asyncTask.generateThumbnail(annotationBy.getSlideId(), annotationBy.getCategoryId(), image.getImageUrl(), contourList, type,category.getCategoryAbbreviation(),special.getTopicName());
         }
         String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
         boolean isBatch = false;
@@ -565,7 +571,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             }
             Category categoryAfter = categoryMapper.selectById(req.getCategory_id());
 
-            asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type,categoryAfter.getCategoryAbbreviation());
+            Special special = specialService.getById(slide.getSpecialId());
+
+            asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type,categoryAfter.getCategoryAbbreviation(),special.getTopicName());
             // 改之后数据
             List<JSONObject> contourListAfter = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
 
@@ -576,7 +584,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             }else{
                 categoryAbbreviation = categoryAfter.getCategoryAbbreviation();
             }
-            asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourListAfter, 1,categoryAbbreviation);
+            asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourListAfter, 1,categoryAbbreviation,special.getTopicName());
 
         }
         return annotation.getAnnotationId();
@@ -757,11 +765,11 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }else{
             NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
         }
-
         if(annotation.getSingleSlideId() == null){
             Category category = categoryMapper.selectById(annotation.getCategoryId());
             List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
-            asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, 1,category.getCategoryAbbreviation());
+            Special special = specialService.getById(slide.getSpecialId());
+            asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, 1,category.getCategoryAbbreviation(),special.getTopicName());
         }
         {
             Long userId = req.getUpdate_by();

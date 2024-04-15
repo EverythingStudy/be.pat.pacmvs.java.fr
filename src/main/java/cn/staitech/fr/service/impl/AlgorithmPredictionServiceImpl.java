@@ -136,12 +136,14 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 				Long slideId = algorithmImageOut.getSlideId();
 				String imageUrl = algorithmImageOut.getImageUrl();
 				Long imageId = algorithmImageOut.getImageId();
+				String organizatinName = geNumber(organizationId);
 				if(null != slideId && StringUtils.isNotEmpty(imageUrl)){
 					//{"slideId":10,"modelName":"脏器识别算法","imageUrl":"C:/Users/86153/Desktop/医疗PD/0320/2_shaowei/ST20Rf-AO-HE-LU-320-1-000020.svs"}
 					Map<String,Object> dataMap = new HashMap<>();
 					dataMap.put("imageId", imageId);
 					dataMap.put("slideId", slideId);
 					dataMap.put("organizationId", organizationId);
+					dataMap.put("organizationName", organizatinName);
 					dataMap.put("imageUrl", imageUrl);
 					dataMap.put("algorithm_name", CommonConstant.RECOGNITION_MODEL_NAME);
 					//请求算法接口
@@ -152,6 +154,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 						startRecognition.setSlideId(slideId);
 						startRecognition.setImageUrl(imageUrl);
 						startRecognition.setAlgorithm_name(CommonConstant.RECOGNITION_MODEL_NAME);
+						startRecognition.setOrganizationName(organizatinName);
 						startRecognition.setOrganizationId(organizationId);
 						String body = pythonService.startPrediction(startRecognition);
 						log.info("AI算法请求返回数据{}", JSONUtil.toJsonStr(body));
@@ -376,6 +379,13 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			}
 		}
 		return containsValue ;
+	}
+	
+	public  String geNumber(Long organizationId) {
+		NumberFormat formatter = NumberFormat.getNumberInstance();
+		formatter.setMinimumIntegerDigits(3);
+		formatter.setGroupingUsed(false);
+		return "C" + formatter.format(organizationId);
 	}
 
 

@@ -128,28 +128,38 @@
 			<if test="specialId != null">
                 AND t1.special_id = #{specialId}
             </if>
-            <if test="animalCode != null">
-                AND t1.animal_code = #{animalCode}
+            <if test="animalCode != null and animalCode != ''">
+                AND t1.animal_code like concat('%', #{animalCode}, '%')
             </if>
-            <if test="fileName != null">
-                AND t2.file_name = #{fileName}
+             <if test="fileName != null and fileName != ''">
+                AND t2.file_name like concat('%', #{fileName}, '%')
             </if>
             <if test="checkType != null and checkType == 1">
                 AND t1.check_status = 3
           	 </if>
-          	 <if test="categoryName != null and categoryName != ''">
+          	 <!-- <if test="categoryName != null and categoryName != ''">
                 AND t1.organs like concat('%', #{categoryName}, '%')
-            </if>
-            <if test="slideIdList != null and slideIdList.size() >0 ">
+            </if> -->
+            <!-- <if test="slideIdList != null and slideIdList.size() >0 ">
 	            AND t1.slide_id in
 	            <foreach item="item" collection="slideIdList" separator="," open="(" close=")" index="">
 	                #{item}
 	            </foreach>
-        	</if>
+        	</if> -->
+        	<if test="categoryName != null and categoryName != ''">
+                AND (t1.organs like concat('%', #{categoryName}, '%')
+                <if test="slideIdList != null and slideIdList.size() >0 ">
+	            	or  t1.slide_id in
+		            <foreach item="item" collection="slideIdList" separator="," open="(" close=")" index="">
+		                #{item}
+		            </foreach>
+        		</if>
+        		)
+            </if>
 		</where>
 				AND t1.process_flag = 2
 				AND t1.check_status > 0 
-		ORDER BY	t1.animal_check_status desc,t1.check_status desc,t2.file_name
+		ORDER BY	t1.animal_code,t1.animal_check_status desc,t1.check_status desc,t2.file_name
      </select>
 
     <select id="pageImageCsvListVOBy" parameterType="long"
@@ -157,8 +167,7 @@
         select s.slide_id,
         s.special_id,
         s.image_id,
-        s.group_code,
-        s.wax_code,
+        s.group_code,      s.wax_code,
         s.animal_code,
         s.gender_flag,
         s.organs,
