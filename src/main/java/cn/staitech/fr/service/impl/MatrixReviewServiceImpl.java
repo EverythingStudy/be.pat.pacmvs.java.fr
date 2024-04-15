@@ -232,4 +232,9 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         Special special = specialMapper.selectById(specialId);
         return R.ok(special.getControlGroup());
     }
+
+    @Override
+    public void algorithmDownload(AiDownloadIn req) {
+
+    }
 }

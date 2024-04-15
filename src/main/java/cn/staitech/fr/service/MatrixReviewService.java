@@ -30,4 +30,6 @@ public interface MatrixReviewService {
      void diagnosisDownload(AiDownloadIn req) throws Exception;
 
     R<String> getControlGroup(Long specialId);
+
+    void algorithmDownload(AiDownloadIn req);
 }

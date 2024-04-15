@@ -23,7 +23,7 @@ public class MatrixReviewListOut {
     private String thumbUrl;
 
     @ApiModelProperty(value = "切片编号")
-    private String fileName;
+    private String imageName;
 
     @ApiModelProperty(value = "组别号")
     private String groupCode;
@@ -63,5 +63,8 @@ public class MatrixReviewListOut {
 
     @ApiModelProperty(value = "人工诊断状态 0：未诊断；1：已诊断;字典标识符：diagnosis_status")
     private String diagnosisStatus;
+
+    @ApiModelProperty(value = "描述")
+    private String description;
 
 }

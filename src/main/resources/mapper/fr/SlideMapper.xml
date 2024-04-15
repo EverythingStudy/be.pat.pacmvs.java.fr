@@ -197,13 +197,14 @@
     <select id="getMatrixReview" parameterType="cn.staitech.fr.domain.in.MatrixReviewListIn"
             resultType="cn.staitech.fr.domain.out.MatrixReviewListOut">
         SELECT
-        ti.file_name,
+        ti.image_name,
         ss.single_id,
         ss.slide_id,
         ss.thumb_url,
         ss.category_id,
         ss.forecast_status,
         ss.diagnosis_status,
+        ss.description,
         fc.organ_en,
         fc.organ_name,
         fs.group_code,
