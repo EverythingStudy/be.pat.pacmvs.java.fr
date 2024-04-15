@@ -97,7 +97,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		//:核对状态 0：初始 1：正确 2：修正正常 3：错误 
 		queryWrapper.gt("check_status",0);
 		if(StringUtils.isNotEmpty(reqAnimalCode)){
-			queryWrapper.eq("animal_code",reqAnimalCode);
+			queryWrapper.like("animal_code",reqAnimalCode);
 		}
 
 		//核对状态 0：初始 1：正确 2：修正正常 3：错误 

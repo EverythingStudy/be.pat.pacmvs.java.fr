@@ -128,11 +128,11 @@
 			<if test="specialId != null">
                 AND t1.special_id = #{specialId}
             </if>
-            <if test="animalCode != null">
-                AND t1.animal_code = #{animalCode}
+            <if test="animalCode != null and animalCode != ''">
+                AND t1.animal_code like concat('%', #{animalCode}, '%')
             </if>
-            <if test="fileName != null">
-                AND t2.file_name = #{fileName}
+            <if test="fileName != null and fileName != ''">
+                AND t2.file_name like concat('%', #{fileName}, '%')
             </if>
             <if test="checkType != null and checkType == 1">
                 AND t1.check_status = 3
@@ -149,7 +149,7 @@
 		</where>
 				AND t1.process_flag = 2
 				AND t1.check_status > 0 
-		ORDER BY	t1.animal_check_status desc,t1.check_status desc,t2.file_name
+		ORDER BY	t1.animal_code,t1.animal_check_status desc,t1.check_status desc,t2.file_name
      </select>
 
     <select id="pageImageCsvListVOBy" parameterType="long"
