@@ -46,6 +46,8 @@
         <if test="slideId != null and slideId != ''">slide_id,</if>
         <if test="id != null and id != ''">id,</if>
         <if test="contourType != null and contourType != ''">contour_type,</if>
+        <if test="singleSlideId != null and singleSlideId != ''">single_slide_id,</if>
+        <if test="single != null and single != ''">single,</if>
         create_time,
         update_time
         )values(
@@ -61,6 +63,8 @@
         <if test="slideId != null and slideId != ''">#{slideId},</if>
         <if test="id != null and id != ''">#{id},</if>
         <if test="contourType != null and contourType != ''">#{contourType},</if>
+        <if test="singleSlideId != null and singleSlideId != ''">#{singleSlideId},</if>
+        <if test="single != null and single != ''">#{single},</if>
         now(),
         now()
         )
