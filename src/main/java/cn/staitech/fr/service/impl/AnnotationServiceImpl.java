@@ -195,6 +195,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setCreateBy(req.getCreate_by());
         annotation.setId(id);
         annotation.setAnnotationType("Draw");
+        annotation.setContourType(2L);
         annotationMapper.insert(annotation);
         Annotation annotationBy = annotationMapper.selectById(annotation);
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBy);
