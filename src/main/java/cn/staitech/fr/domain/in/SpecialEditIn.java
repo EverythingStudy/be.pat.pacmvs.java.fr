@@ -3,7 +3,9 @@ package cn.staitech.fr.domain.in;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * @Author wudi
@@ -17,6 +19,8 @@ public class SpecialEditIn {
     private Long specialId;
 
     @ApiModelProperty("专题名称")
+    @NotBlank(message = "{SpecialInsertVo.specialName.isnull}")
+    @Size(max = 100,message = "{SpecialInsertVo.specialNumber.length}")
     private String specialName;
 
     @ApiModelProperty(value = "种属id")

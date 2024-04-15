@@ -138,14 +138,21 @@
                 AND t1.check_status = 3
           	 </if>
           	 <if test="categoryName != null and categoryName != ''">
-                AND t1.organs like concat('%', #{categoryName}, '%')
+                AND (t1.organs like concat('%', #{categoryName}, '%')
+                <if test="slideIdList != null and slideIdList.size() >0 ">
+	            	or  t1.slide_id in
+		            <foreach item="item" collection="slideIdList" separator="," open="(" close=")" index="">
+		                #{item}
+		            </foreach>
+        		</if>
+        		)
             </if>
-            <if test="slideIdList != null and slideIdList.size() >0 ">
+            <!-- <if test="slideIdList != null and slideIdList.size() >0 ">
 	            AND t1.slide_id in
 	            <foreach item="item" collection="slideIdList" separator="," open="(" close=")" index="">
 	                #{item}
 	            </foreach>
-        	</if>
+        	</if> -->
 		</where>
 				AND t1.process_flag = 2
 				AND t1.check_status > 0 
