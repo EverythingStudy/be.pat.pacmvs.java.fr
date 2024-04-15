@@ -219,8 +219,8 @@
         left join tb_image ti on fs.image_id = ti.image_id
         <where>
             fs.special_id = #{specialId}
-            <if test="fileName != null and fileName != ''">
-                and ti.file_name like concat('%',#{fileName},'%')
+            <if test="imageName != null and imageName != ''">
+                and ti.image_name like concat('%',#{imageName},'%')
             </if>
             <if test="animalCode != null and animalCode != ''">
                 and fs.animal_code like concat('%',#{animalCode},'%')

@@ -6,7 +6,6 @@ import cn.staitech.common.core.utils.bean.BeanUtils;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Container;
-import cn.staitech.fr.domain.Group;
 import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
@@ -35,7 +34,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -169,7 +167,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         wrapper.ne(Special::getSpecialId, req.getSpecialId());
         List<Special> specials2 = this.baseMapper.selectList(wrapper);
         if (CollectionUtils.isNotEmpty(specials2)) {
-            return R.fail("专题名称已存在，请重新输入！");
+            return R.fail(MessageSource.M("EXISTS_SPECIAL_DATA"));
         }
         Special special = new Special();
         BeanUtils.copyProperties(req, special);
@@ -185,7 +183,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         log.info("专题删除接口开始：specialId={}", specialId);
         Special special = this.baseMapper.selectById(specialId);
         if (special == null) {
-            return R.fail("专题不存在，请刷新后重试！");
+            return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
         }
         special.setDelFlag(CommonConstant.NUMBER_1);
         special.setUpdateBy(SecurityUtils.getUserId());

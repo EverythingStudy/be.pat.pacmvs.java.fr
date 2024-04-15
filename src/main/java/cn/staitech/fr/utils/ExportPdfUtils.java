@@ -1,6 +1,5 @@
 package cn.staitech.fr.utils;
 
-import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.out.ExportListVO;
 import cn.staitech.fr.domain.out.ExportVO;
 import com.deepoove.poi.XWPFTemplate;
@@ -8,15 +7,12 @@ import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.config.ConfigureBuilder;
 import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
-import org.apache.poi.util.IOUtils;
 import org.docx4j.Docx4J;
 import org.docx4j.convert.out.FOSettings;
 import org.docx4j.fonts.IdentityPlusMapper;
 import org.docx4j.fonts.Mapper;
 import org.docx4j.fonts.PhysicalFonts;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
-import org.springframework.util.StringUtils;
-
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -25,7 +21,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
