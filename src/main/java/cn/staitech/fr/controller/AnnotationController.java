@@ -112,9 +112,6 @@ public class AnnotationController {
     @ApiOperation(value = "获取GeoJson数据")
     @PostMapping("/selectLists")
     public R<List<Features>> selectLists(@Validated @RequestBody AnnotationSelectList req) throws Exception {
-        if (!Optional.ofNullable(req.getSlideId()).isPresent()) {
-            return R.fail(MessageSource.M("ARGUMENT_INVALID"));
-        }
         return R.ok(annotationService.selectListBy(req));
     }
 

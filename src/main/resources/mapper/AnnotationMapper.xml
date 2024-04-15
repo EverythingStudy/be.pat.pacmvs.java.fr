@@ -157,7 +157,9 @@
         contour_type,
         ST_AsGeoJSON(contour) as contour
         from fr_annotation
+
         <where>
+            contour_type != 1
             <if test="slideId != null">
                 AND slide_id = #{slideId}
             </if>
@@ -166,9 +168,6 @@
             </if>
             <if test="singleSlideId != null">
                 AND single_slide_id = #{singleSlideId}
-            </if>
-            <if test="contourType != null">
-                AND contour_type = #{contourType}
             </if>
             <if test="slideIdList != null and slideIdList.size() > 0">
 	            AND slide_id in

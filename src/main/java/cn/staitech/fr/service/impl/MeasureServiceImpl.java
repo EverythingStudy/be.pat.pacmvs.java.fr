@@ -216,7 +216,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
 
     private Measure trans2Marking(ViewAddIn view) {
         Measure measure = new Measure();
-        measure.setSingleSlideId(view.getSlide_id());
+        measure.setSingleSlideId(view.getSingle_slide_id());
         if (null != view.getCreate_by()) {
             measure.setCreateBy(view.getCreate_by());
         }
