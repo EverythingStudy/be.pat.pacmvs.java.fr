@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -64,7 +65,7 @@ public class SpecialController  extends BaseController {
     @GetMapping("/info")
     public R<Special> info(@RequestParam("specialId") @ApiParam(name = "specialId", value ="专题id" ) Long specialId){
     	 //add访问记录
-        AccessProjectRecords record=AccessProjectRecords.builder().projectId(specialId).userId(SecurityUtils.getUserId()).build();
+        AccessProjectRecords record=AccessProjectRecords.builder().projectId(specialId).userId(SecurityUtils.getUserId()).accessTime(new Date()).build();
         accessProjectRecordsService.save(record);
         return R.ok(specialService.getById(specialId));
 
