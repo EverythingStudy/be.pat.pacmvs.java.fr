@@ -227,6 +227,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
             LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(Slide::getSpecialId, req.getSpecialId());
             wrapper.ne(Slide::getCheckStatus, 1);
+            wrapper.ne(Slide::getCheckStatus, 2);
             List<Slide> slideList = slideService.list(wrapper);
             if (CollectionUtils.isNotEmpty(slideList)) {
                 return R.fail(MessageSource.M("START_SPECIAL_ERROR"));

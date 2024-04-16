@@ -252,19 +252,26 @@
 
         </dependency>
         <!--pdf-->
-        <dependency>
+       <!-- <dependency>
             <groupId>org.docx4j</groupId>
             <artifactId>docx4j-export-fo</artifactId>
             <version>6.1.0</version>
-            <!--因为项目中slf4j版本冲突,忽悠这个依赖中的slf4j版本-->
+            &lt;!&ndash;因为项目中slf4j版本冲突,忽悠这个依赖中的slf4j版本&ndash;&gt;
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
                     <artifactId>slf4j-log4j12</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
+        </dependency>-->
         <!--导出报告end-->
+        <!-- https://mvnrepository.com/artifact/com.luhuiguo/aspose-words -->
+        <dependency>
+            <groupId>com.luhuiguo</groupId>
+            <artifactId>aspose-words</artifactId>
+            <version>23.1</version>
+
+        </dependency>
 
         <dependency>
             <groupId>com.alibaba</groupId>

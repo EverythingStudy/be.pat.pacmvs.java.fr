@@ -351,7 +351,7 @@
 
 
     <select id="selectRespData" resultType="cn.staitech.fr.domain.out.OrgansData">
-        select fss.thumb_url, fss.category_id, ti.image_name, fss.forecast_status, fss.diagnosis_status
+        select fss.thumb_url, fss.category_id, ti.file_name, fss.forecast_status, fss.diagnosis_status
         from fr_single_slide fss
                  left join fr_slide fs on fss.slide_id = fs.slide_id
                  left join tb_image ti on fs.image_id = ti.image_id

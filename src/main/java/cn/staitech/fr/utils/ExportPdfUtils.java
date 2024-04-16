@@ -2,17 +2,16 @@ package cn.staitech.fr.utils;
 
 import cn.staitech.fr.domain.out.ExportListVO;
 import cn.staitech.fr.domain.out.ExportVO;
+import com.aspose.words.Document;
+import com.aspose.words.FontSettings;
+import com.aspose.words.PdfSaveOptions;
 import com.deepoove.poi.XWPFTemplate;
 import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.config.ConfigureBuilder;
 import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
-import org.docx4j.Docx4J;
-import org.docx4j.convert.out.FOSettings;
-import org.docx4j.fonts.IdentityPlusMapper;
-import org.docx4j.fonts.Mapper;
-import org.docx4j.fonts.PhysicalFonts;
-import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.SystemUtils;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -99,7 +98,7 @@ public class ExportPdfUtils {
         //exportFile(createData());
         System.out.println("导出word结束");
         System.out.println("转pdf开始");
-        convertDocx2Pdf("D:/wordss/test555.docx","D:/wordss/test555.pdf");
+        //convertDocx2Pdf("D:/wordss/test555.docx","D:/wordss/test555.pdf");
         System.out.println("转pdf结束");
 
 
@@ -110,7 +109,7 @@ public class ExportPdfUtils {
      * @param wordPath
      * @param pdfPath
      */
-    public static void convertDocx2Pdf(String wordPath, String pdfPath) {
+    /*public static void convertDocx2Pdf(String wordPath, String pdfPath) {
         OutputStream os = null;
         InputStream is = null;
         if (pdfPath.endsWith("/")) {
@@ -163,7 +162,7 @@ public class ExportPdfUtils {
                 file.delete();
             }
         }
-    }
+    }*/
 
     /**
      * 下载压缩包
@@ -220,5 +219,21 @@ public class ExportPdfUtils {
         inputStream.close();
     }
 
+    public static void wordToPdf(String wordPath, String pdfPath) throws Exception {
+        FileInputStream inputStream = new FileInputStream(new File(wordPath));
+        //通过aspose-words.jar中的类转换文件
+        Document wordDoc = new Document(inputStream);
+        /*if(SystemUtils.IS_OS_LINUX){
+            //设置汉字字体，否则转换后的文档汉字会乱码。
+            FontSettings settings = new FontSettings();
+            settings.setFontsFolder("/mydata/fonts",false);
+            wordDoc.setFontSettings(settings);
+        }*/
+        FileOutputStream outputStream = new FileOutputStream(new File(pdfPath));
 
+        PdfSaveOptions pso = new PdfSaveOptions();
+        wordDoc.save(outputStream, pso);
+        inputStream.close();
+        outputStream.close();
+    }
 }

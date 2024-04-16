@@ -214,13 +214,15 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             List<ExportListVO> collect = diagnosisMapper.getExportListVO(id);
             exportVO.setList(collect);
             exportVO.setTable(collect);
-            //exportVO.setImg(new PictureRenderData(800, 200, "D:/image/liangz.png"));
-            exportVO.setImg(new PictureRenderData(800, 200, exportVO.getThumbUrl().replace("/file/statics","/home/pat_saas")));
+            exportVO.setImg(new PictureRenderData(800, 200, "D:/image/liangz.png"));
+            //exportVO.setImg(new PictureRenderData(800, 200, exportVO.getThumbUrl().replace("/file/statics","/home/pat_saas")));
             String s = waxPath + exportVO.getFileName() + "+" + exportVO.getOrganName() +CommonConstant.WROD_FILE;
             //生成word
             ExportPdfUtils.exportFile(s, exportVO);
             //生成pdf
-            ExportPdfUtils.convertDocx2Pdf(s, s.replace(CommonConstant.WROD_FILE, CommonConstant.PDF_FILE));
+            //ExportPdfUtils.convertDocx2Pdf(s, s.replace(CommonConstant.WROD_FILE, CommonConstant.PDF_FILE));
+            ExportPdfUtils.wordToPdf(s, s.replace(CommonConstant.WROD_FILE, CommonConstant.PDF_FILE));
+            FileUtils.delete(new File(s));
             pdfName.add(s.replace(CommonConstant.WROD_FILE, CommonConstant.PDF_FILE));
             topicName = exportVO.getTopicName();
         }
@@ -237,6 +239,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         for (String s1 : pdfName) {
             if (new File(s1).exists()) {
                 FileUtils.delete(new File(s1));
+                //FileUtils.delete(new File(s1.replace(CommonConstant.PDF_FILE, CommonConstant.WROD_FILE)));
             }
 
         }
