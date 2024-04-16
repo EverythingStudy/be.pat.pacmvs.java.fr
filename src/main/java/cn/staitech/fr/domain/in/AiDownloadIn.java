@@ -3,6 +3,7 @@ package cn.staitech.fr.domain.in;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -13,5 +14,6 @@ import java.util.List;
 @Data
 public class AiDownloadIn {
     @ApiModelProperty(value = "待导出报告数据id；")
+    @Size( max=10,message = "{MAX_10_DATA}")
     private List<Long> ids;
 }
