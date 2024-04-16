@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.impl;
 
+import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.config.AsyncTask;
 import cn.staitech.fr.constant.CommonConstant;
@@ -19,6 +20,7 @@ import cn.staitech.fr.vo.annotation.AnnotationSelectList;
 import cn.staitech.fr.vo.annotation.MarkingMerge;
 import cn.staitech.fr.vo.geojson.Features;
 import cn.staitech.fr.vo.geojson.Properties;
+import cn.staitech.fr.vo.geojson.in.RoiIn;
 import cn.staitech.fr.vo.geojson.in.UpdateOperationIn;
 import cn.staitech.fr.vo.geojson.in.ViewAddIn;
 import cn.staitech.fr.vo.measure.BroadcastVO;
@@ -32,6 +34,7 @@ import com.google.gson.Gson;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.PrecisionModel;
+import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.operation.overlay.OverlayOp;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +45,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static cn.staitech.fr.constant.CommonConstant.*;
 import static cn.staitech.fr.utils.MarkingUtils.socketData;
@@ -61,6 +67,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     private static final WKTReader WKT_READER = new WKTReader(GEOMETRY_FACTORY);
     HashMap<Long, Category> categoryHashMap = new HashMap<>();
+    HashMap<Long, PathologicalIndicatorCategory> pathologicalIndicatorCategoryHashMap = new HashMap<>();
     HashMap<Long, User> userMap = new HashMap<>();
     @Resource
     private AnnotationMapper annotationMapper;
@@ -132,9 +139,19 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                     properties.setLabel_name(pathologicalIndicatorCategory.getNumber());
                 }
             }
-            if (category != null) {
-                properties.setLabel_color(category.getChromaticValue());
-                properties.setLabel_name(category.getOrganName());
+        } else {
+            if (annotation.getCategoryId() != null) {
+                Category category = categoryHashMap.get(annotation.getCategoryId());
+                if (category == null) {
+                    category = categoryMapper.selectById(annotation.getCategoryId());
+                    if (category != null) {
+                        categoryHashMap.put(category.getCategoryId(), category);
+                    }
+                }
+                if (category != null) {
+                    properties.setLabel_color(category.getChromaticValue());
+                    properties.setLabel_name(category.getOrganName());
+                }
             }
         }
         if (annotation.getCreateBy() != null) {
@@ -171,6 +188,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Annotation annotation = new Annotation();
         annotation.setSlideId(req.getSlideId());
         annotation.setCategoryId(req.getCategoryId());
+        annotation.setSingleSlideId(req.getSingleSlideId());
         List<Annotation> selfAnnoList = annotationMapper.selectListBy(annotation);
         List<Features> annoList1 = getFeaturesList(selfAnnoList);
         if (CollectionUtils.isNotEmpty(annoList1)) {
@@ -187,7 +205,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (req.getGeometry() != null && !req.getGeometry().isEmpty()) {
             MarkingUtils.addVerify(req.getGeometry());
         } else {
-            throw new Exception("更新失败，轮廓数据不能为空");
+            throw new Exception(MessageSource.M("ARGUMENT_INVALID"));
         }
         String id = null;
         Category category = null;
@@ -207,7 +225,10 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         } else {
             id = MarkingUtils.getSdId(null);
         }
-        Annotation annotation = new Annotation();
+        if (req.getSingle_slide_id() != null) {
+            annotation.setSingleSlideId(req.getSingle_slide_id());
+            annotation.setSingle(1);
+        }
         annotation.setSlideId(req.getSlide_id());
         annotation.setArea(req.getArea());
         annotation.setCategoryId(req.getCategory_id());
@@ -218,7 +239,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setId(id);
         annotation.setContourType(2L);
         annotation.setAnnotationType("Draw");
-        annotation.setContourType(2L);
         annotationMapper.insert(annotation);
         Annotation annotationBy = annotationMapper.selectById(annotation);
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBy);
@@ -244,8 +264,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             List<JSONObject> contourList = selectContourList(annotation.getSlideId(), req.getCategory_id());
             asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1, category.getCategoryAbbreviation(),special.getTopicName());
         }
-        List<JSONObject> contourList = selectContourList(annotation.getSlideId(), req.getCategory_id());
-        asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1);
         {
             Long slideId;
             if(req.getSingle_slide_id() != null){
@@ -256,24 +274,14 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             String traceId = req.getTraceId();
             Long userId = req.getCreate_by();
             Session session = HistoryServiceImpl.refreshSession(userId, slideId);
-
-            // 2、创建Trace,并存入Session.list,LinkedList<Trace>
             if (req.getIsBatch()) {
-                // 批量操作：若trace已经存在，不用再add
                 Trace trace = session.getTraceById(traceId);
                 trace.getNodeList().add(new TraceNode(String.valueOf(annotation.getAnnotationId()), "INSERT"));
             } else {
-                // 单条记录
                 Trace trace = new Trace(userId, traceId, false);
                 trace.getNodeList().add(new TraceNode(String.valueOf(annotation.getAnnotationId()), "INSERT"));
                 session.drawListAdd(trace);
             }
-
-//            // 3、数据持久化写入RocksDB
-//            Gson gson = new Gson();
-//            // 将对象转换成JSON字符串
-//            String json = gson.toJson(marking);
-//            RocksDBUtil.put(traceId, marking.getMarking_id(), json);
             rocksdbService.submitTask(traceId, String.valueOf(annotation.getAnnotationId()), annotation);
         }
         return annotation.getAnnotationId();
@@ -291,6 +299,105 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
 
+
+    @Override
+    public R<String> roiContDel(RoiIn req) throws Exception {
+        QueryWrapper<Annotation> annotationQueryWrapper = new QueryWrapper<>();
+        req.getCategoryIds().add(null);
+        annotationQueryWrapper.select("annotation_id,category_id,create_by,ST_AsGeoJSON(contour) AS contour").eq("single_slide_id", req.getSingleSlideId()).eq("create_by",SecurityUtils.getUserId()).in("category_id",req.getCategoryIds());
+        List<Annotation> features = annotationMapper.selectList(annotationQueryWrapper);
+        List<Long> annotationIdList;
+        //roi包含
+        if (req.getRoiStatus() == 0) {
+            annotationIdList = roiCont(req, features);
+        } else {
+            annotationIdList = roiDel(req, features);
+        }
+        if (annotationIdList.isEmpty()) {
+            return R.ok(null, MessageSource.M("OPERATE_SUCCEED"));
+        }
+        //标注信息
+        Map<Long, Annotation> markingMap = features.stream().collect(Collectors.toMap(Annotation::getAnnotationId, Function.identity()));
+        //异步删除
+        CompletableFuture<Integer> cf1 = CompletableFuture.supplyAsync(() -> {
+            Set<Long> categoryIds = new HashSet<>();
+            categoryIds.add(0L);
+            Set<Long> createBys = new HashSet<>();
+            if (CollectionUtils.isNotEmpty(annotationIdList)) {
+                QueryWrapper<Annotation> wrapper = new QueryWrapper<>();
+                wrapper.in("annotation_id", annotationIdList);
+                //删除标注
+                annotationMapper.delete(wrapper);
+                //标注的createBy和categoryId
+                for (Long markingId : annotationIdList) {
+                    categoryIds.add(markingMap.get(markingId).getCategoryId());
+                    createBys.add(markingMap.get(markingId).getCategoryId());
+                }
+            }
+            BroadcastVO broadcastVO = SendMessage.sendListMessages(CommonConstant.ANNO_TYPE_DRAW, RELOAD_STATUS, null, null);
+            NioWebSocketHandler.sendSingle(req.getSingleSlideId(), broadcastVO);
+            return 1;
+        });
+        return R.ok(null, MessageSource.M("OPERATE_SUCCEED"));
+    }
+
+
+    public List<Long> roiCont(RoiIn viewAddIns, List<Annotation> features) throws ParseException {
+        //要删除的markingId集合
+        Set<Long> markingIdDel = new HashSet<>();
+        //包含的markingId集合
+        Set<Long> markingIdCont = new HashSet<>();
+        for (JSONObject viewAddIn : viewAddIns.getGeometryList()) {
+            String roiLocation = WktUtil.jsonToWkt(viewAddIn);
+            Geometry roiLocations = WKT_READER.read(roiLocation);
+            //roi包含
+            if (viewAddIns.getRoiStatus() == 0) {
+                for (Annotation features1 : features) {
+                    String oldLocation = WktUtil.jsonToWkt(JSONObject.parseObject(features1.getContour()));
+                    Geometry oldLocations = WKT_READER.read(oldLocation);
+                    //判断是否不包含和不相交
+                    if (!roiLocations.contains(oldLocations) && !roiLocations.intersects(oldLocations)) {
+                        markingIdDel.add(features1.getAnnotationId());
+                    } else {
+                        //有相交的部分
+                        markingIdCont.add(features1.getAnnotationId());
+                    }
+                }
+            }
+        }
+        //选出要删除的markingId
+        List<Long> listIds = markingIdDel.stream().filter(item -> !markingIdCont.contains(item)).collect(Collectors.toList());
+        return listIds;
+
+    }
+
+    /**
+     * ROI删除选出要删除的markingId
+     */
+    public List<Long> roiDel(RoiIn viewAddIns, List<Annotation> features) throws ParseException {
+        //要删除的markingId集合
+        Set<Long> markingIdDel = new HashSet<>();
+        //包含的markingId集合
+        for (JSONObject viewAddIn : viewAddIns.getGeometryList()) {
+            String roiLocation = WktUtil.jsonToWkt(viewAddIn);
+            Geometry roiLocations = WKT_READER.read(roiLocation);
+            //roi删除
+            if (viewAddIns.getRoiStatus() == 1) {
+                for (Annotation features1 : features) {
+                    String oldLocation = WktUtil.jsonToWkt(JSONObject.parseObject(features1.getContour()));
+                    Geometry oldLocations = WKT_READER.read(oldLocation);
+                    //判断是否包含和相交
+                    if (roiLocations.contains(oldLocations) || roiLocations.intersects(oldLocations)) {
+                        markingIdDel.add(features1.getAnnotationId());
+                    }
+                }
+            }
+        }
+        return new ArrayList<>(markingIdDel);
+    }
+
+
+
     @Override
     public void delete(AnnotationById req) throws Exception {
         if (!Optional.ofNullable(req.getMarking_id()).isPresent()) {
@@ -305,7 +412,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBy);
         Features features = socketData(annotationBy.getId(), JSONObject.parseObject(annotationBy.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(DELETE_STATUS, features);
-        NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
+
+        if(annotationBy.getSingleSlideId() != null){
+            NioWebSocketHandler.sendSingle(annotationBy.getSlideId(), broadcastVO);
+        }else{
+            NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
+        }
         annotationMapper.deleteById(annotation);
         if(annotationBy.getSingleSlideId() == null){
             Slide slide = slideMapper.selectById(annotationBy.getSlideId());
@@ -328,8 +440,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             Special special = specialService.getById(slide.getSpecialId());
             asyncTask.generateThumbnail(annotationBy.getSlideId(), annotationBy.getCategoryId(), image.getImageUrl(), contourList, type,category.getCategoryAbbreviation(),special.getTopicName());
         }
-        asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type);
-
         String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
         boolean isBatch = false;
         {
@@ -422,7 +532,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             }
         }
         if (req.getCategory_id() != null) {
-            if (req.getCategory_id() != 0 && !req.getCategory_id().equals(annotation.getCategoryId())) {
+            if (!req.getCategory_id().equals(annotation.getCategoryId())) {
                 annotation.setCategoryId(req.getCategory_id());
             }
         }
@@ -436,6 +546,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             annotation.setUpdateBy(SecurityUtils.getLoginUser().getSysUser().getUserId());
         }
         annotation.setId(id);
+        annotation.setSlideId(req.getSlide_id());
         annotation.setAnnotationId(Long.valueOf(req.getMarking_id()));
         if(req.getGeometry() != null){
             annotation.setContour(String.valueOf(req.getGeometry()));
@@ -484,10 +595,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourListAfter, 1,categoryAbbreviation,special.getTopicName());
 
         }
-        asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type);
-        // 改之后数据
-        List<JSONObject> contourListAfter = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
-        asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourListAfter, 1);
         return annotation.getAnnotationId();
     }
 
@@ -566,7 +673,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBys);
         Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), geometryJson, properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
-        NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
+        NioWebSocketHandler.sendSingle(annotation.getSingleSlideId(), broadcastVO);
         return res;
     }
 
@@ -584,7 +691,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBys);
         Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), JSONObject.parseObject(annotation.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(ADD_STATUS, features);
-        NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
+        NioWebSocketHandler.sendSingle(annotation.getSingleSlideId(), broadcastVO);
         return res;
     }
 
@@ -640,8 +747,15 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotationBys.setUpdateBy(req.getUpdate_by());
         annotationBys.setOperation(req.getOperation());
         Annotation annotation1 = annotationMapper.mergeContour(annotationBys);
+        String contourType = annotationMapper.selectContourType(annotation1).getLocationType();
+        if (!Objects.equals(contourType, "POLYGON")) {
+            throw new Exception(MessageSource.M("GRAPHICS_MARK_NOT_RULES"));
+        }
         annotationBys.setContour(annotation1.getContour());
         Slide slide = slideMapper.selectById(annotation.getSlideId());
+        if (!Optional.ofNullable(slide).isPresent()) {
+            throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
+        }
         Image image = imageMapper.selectById(slide.getImageId());
         if (!Optional.ofNullable(image).isPresent()) {
             throw new Exception(MessageSource.M("NODATA"));
@@ -721,7 +835,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
 
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Annotation insertByHistory(Annotation annotation) {
@@ -787,7 +900,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
         return annotationById;
     }
-
 
 
     @Override
@@ -899,7 +1011,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
             }
             // Index: -1, Size: 0
-            if(drawList.size()>0){
+            if (drawList.size() > 0) {
                 drawList.remove(drawList.size() - 1);
             }
         }
@@ -973,7 +1085,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
                 newTrace.setTraceId(traceId);
                 drawList.add(newTrace);
-                if(undoList.size() >0) {
+                if (undoList.size() > 0) {
                     undoList.remove(undoList.size() - 1);
                 }
             } else {
@@ -1010,7 +1122,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 //                    json = gson.toJson(newMarking);
 //                    RocksDBUtil.put(traceId, newMarking.getMarking_id(), json);
                     rocksdbService.submitTask(traceId, String.valueOf(newAnnotation.getAnnotationId()), newAnnotation);
-                    if(undoList.size()>0){
+                    if (undoList.size() > 0) {
                         undoList.remove(undoList.size() - 1);
                     }
                 } catch (Exception e) {
@@ -1020,7 +1132,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
         return true;
     }
-
 
 
     public void refresh(LinkedList<Trace> list, String oldId, Long newId) {
@@ -1049,9 +1160,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             }
         }
     }
-
-
-
 
 
 }

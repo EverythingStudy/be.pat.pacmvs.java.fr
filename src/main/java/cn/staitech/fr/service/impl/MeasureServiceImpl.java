@@ -17,6 +17,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.staitech.fr.service.MeasureService;
 import cn.staitech.fr.mapper.MeasureMapper;
+import com.ibm.icu.text.SimpleDateFormat;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -190,10 +191,12 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         ExcludeEmptyQueryWrapper<Measure> measurePointCount = new ExcludeEmptyQueryWrapper<>();
         measurePointCount.eq("single_slide_id", singleSlideId).eq("location_type", "Point");
         Integer measurePointCounts = measureMapper.selectCount(measurePointCount);
-        Properties properties = new Properties();
-        properties.setPoint_count(measurePointCounts);
-        properties.setMeasure_full_name("P");
-        propertiesList.add(properties);
+        if(measurePointCounts > 0){
+            Properties properties = new Properties();
+            properties.setPoint_count(measurePointCounts);
+            properties.setMeasure_full_name("P");
+            propertiesList.add(properties);
+        }
         ExcelTool excelTool = new ExcelTool(MessageSource.M("EXCEL_TITLE"), 20, 20);
         List<Column> titleData = excelTool.columnTransformer(titleList);
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
@@ -277,9 +280,8 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         properties.setPerimeter(measure.getPerimeter());
         properties.setAnnotation_type(measure.getAnnotationType());
         properties.setLocation_type(measure.getLocationType());
-        properties.setCreate_by(measure.getCreateBy());
-        properties.setUpdate_by(measure.getUpdateBy());
-        properties.setCreate_time(String.valueOf(measure.getCreateTime()));
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        properties.setCreate_time(sdf.format(measure.getCreateTime()));
         properties.setMeasure_name(measure.getMeasureName());
         properties.setMeasure_type(measure.getMeasureType());
         properties.setNumber(measure.getNumber());
