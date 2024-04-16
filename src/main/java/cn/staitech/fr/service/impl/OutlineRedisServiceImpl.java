@@ -79,6 +79,9 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
 
         AtomicLong outlineId = new AtomicLong(1);
         // 格式转换
+        if(selectVO.getSingleSlideId() != null){
+            selectVO.setSlideId(selectVO.getSingleSlideId());
+        }
         for (com.alibaba.fastjson2.JSONObject jsonObject : srcJsonList) {
             Outline outline = new Outline();
             outline.setOutlineId(outlineId.getAndIncrement());

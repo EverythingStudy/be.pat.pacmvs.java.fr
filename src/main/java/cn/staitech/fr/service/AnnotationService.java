@@ -29,6 +29,8 @@ public interface AnnotationService extends IService<Annotation> {
 
     void delete(AnnotationById req) throws Exception;
 
+    R<String> roiContDel(RoiIn viewAddIns) throws Exception;
+
 
     Long update(ViewAddIn marking) throws Exception;
     int padding(AnnotationById req) throws Exception;
