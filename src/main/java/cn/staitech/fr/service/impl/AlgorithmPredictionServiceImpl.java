@@ -94,7 +94,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	@Resource
 	private CategoryService categoryService;
 
-	
+
 	@Resource
 	private SpecialMapper specialMapper;
 
@@ -146,35 +146,39 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 					dataMap.put("organizationName", organizatinName);
 					dataMap.put("imageUrl", imageUrl);
 					dataMap.put("algorithm_name", CommonConstant.RECOGNITION_MODEL_NAME);
-					//请求算法接口
-					try {
-						log.info("AI算法请求内容是imageId:{},slideId:{},organizationId:{},imageUrl:{},algorithm_name:{}", imageId,slideId,organizationId,imageUrl,CommonConstant.RECOGNITION_MODEL_NAME);
-						StartRecognition startRecognition = new StartRecognition();
-						startRecognition.setImageId(imageId);
-						startRecognition.setSlideId(slideId);
-						startRecognition.setImageUrl(imageUrl);
-						startRecognition.setAlgorithm_name(CommonConstant.RECOGNITION_MODEL_NAME);
-						startRecognition.setOrganizationName(organizatinName);
-						startRecognition.setOrganizationId(organizationId);
-						String body = pythonService.startPrediction(startRecognition);
-						log.info("AI算法请求返回数据{}", JSONUtil.toJsonStr(body));
-						JSONObject jsonObject = new JSONObject(body);
-						Integer code = jsonObject.getInt("code");
-						if (code.equals(200)) {
-							//修改当前slide分析状态为进行中
-							Slide slide = new Slide();
-							slide.setSlideId(slideId);
-							//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
-							slide.setProcessFlag(1);
-							slide.setInitiateBy(userId);
-							slide.setInitiateTime(new Date());
-							slideService.updateById(slide);
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-						log.error("AI算法请求失败,切片id是{}",slideId);
-					}finally {
+					if(imageUrl.endsWith("svs")||imageUrl.endsWith("SVS")){
+						//请求算法接口
+						try {
+							log.info("AI算法请求内容是imageId:{},slideId:{},organizationId:{},imageUrl:{},algorithm_name:{}", imageId,slideId,organizationId,imageUrl,CommonConstant.RECOGNITION_MODEL_NAME);
+							StartRecognition startRecognition = new StartRecognition();
+							startRecognition.setImageId(imageId);
+							startRecognition.setSlideId(slideId);
+							startRecognition.setImageUrl(imageUrl);
+							startRecognition.setAlgorithm_name(CommonConstant.RECOGNITION_MODEL_NAME);
+							startRecognition.setOrganizationName(organizatinName);
+							startRecognition.setOrganizationId(organizationId);
+							String body = pythonService.startPrediction(startRecognition);
+							log.info("AI算法请求返回数据{}", JSONUtil.toJsonStr(body));
+							JSONObject jsonObject = new JSONObject(body);
+							Integer code = jsonObject.getInt("code");
+							if (code.equals(200)) {
+								//修改当前slide分析状态为进行中
+								Slide slide = new Slide();
+								slide.setSlideId(slideId);
+								//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
+								slide.setProcessFlag(1);
+								slide.setInitiateBy(userId);
+								slide.setInitiateTime(new Date());
+								slideService.updateById(slide);
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+							log.error("AI算法请求失败,切片id是{}",slideId);
+						}finally {
 
+						}
+					}else{
+						log.error("AI算法请求失败,切片id是{},图片非svs格式",slideId);
 					}
 				}
 			}
@@ -230,7 +234,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 
 
 	public void checkSlide(Slide slide) {
-//		Long organizationId = 6L;
+		//		Long organizationId = 6L;
 		//专题id
 		Long specialId = slide.getSpecialId();
 		Long slideId = slide.getSlideId();
@@ -239,7 +243,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		Long organizationId = special.getOrganizationId();
 		//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
 		int processFlag = slide.getProcessFlag();
-		System.out.println("processFlag:"+processFlag);
 		if(processFlag == 3){
 			//更新checkStatus
 			Slide updateSlide = new Slide();
@@ -334,6 +337,14 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 				updateSlide.setCheckTime(new Date());
 				slideMapper.updateById(updateSlide);
 			}
+		}else{
+			//蜡块查询不到信息
+			Slide updateSlide = new Slide();
+			updateSlide.setSlideId(slideId);
+			updateSlide.setCheckStatus(3);
+			updateSlide.setCheckBy(0l);
+			updateSlide.setCheckTime(new Date());
+			slideMapper.updateById(updateSlide);
 		}
 		//检查当前动物号所属的所有切片是否正常
 		Slide oldSlide = slideService.getById(slideId);
@@ -380,7 +391,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		}
 		return containsValue ;
 	}
-	
+
 	public  String geNumber(Long organizationId) {
 		NumberFormat formatter = NumberFormat.getNumberInstance();
 		formatter.setMinimumIntegerDigits(3);
