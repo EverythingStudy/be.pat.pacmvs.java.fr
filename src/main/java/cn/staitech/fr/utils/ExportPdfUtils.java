@@ -12,10 +12,12 @@ import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.SystemUtils;
+
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,8 +37,6 @@ import java.util.zip.ZipOutputStream;
 public class ExportPdfUtils {
 
     /**
-     *
-     *
      * @param data 导出数据
      * @throws IOException
      */
@@ -60,13 +60,12 @@ public class ExportPdfUtils {
         //组装数据
         //ExportVO data = createData();
         XWPFTemplate render = XWPFTemplate.compile(inputStream, builder.build()).render(data);
-        try{
+        try {
             //render.write(new FileOutputStream("D:/wordss/test555.docx"));
             render.write(new FileOutputStream(outFile));
-        }catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             System.out.println("小问题思密达");
         }
-
 
 
         inputStream.close();
@@ -166,10 +165,11 @@ public class ExportPdfUtils {
 
     /**
      * 下载压缩包
+     *
      * @param response
      * @throws Exception
      */
-    public static void writePdfZip( List<String> fileName,HttpServletResponse response,String zipName) throws Exception {
+    public static void writePdfZip(List<String> fileName, HttpServletResponse response, String zipName) throws Exception {
 
         response.setContentType("application/OCTET-STREAM;charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename="
@@ -198,6 +198,7 @@ public class ExportPdfUtils {
 
     /**
      * 下载单个
+     *
      * @param response
      * @throws Exception
      */
@@ -208,7 +209,7 @@ public class ExportPdfUtils {
         response.reset();
         response.setContentType("application/octet-stream");
         String filename = new File(path).getName();
-        response.addHeader("Content-Disposition", "attachment; filename=" +  new String(filename.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+        response.addHeader("Content-Disposition", "attachment; filename=" + new String(filename.getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
         ServletOutputStream outputStream = response.getOutputStream();
         byte[] b = new byte[1024];
         int len;
@@ -219,21 +220,44 @@ public class ExportPdfUtils {
         inputStream.close();
     }
 
-    public static void wordToPdf(String wordPath, String pdfPath) throws Exception {
-        FileInputStream inputStream = new FileInputStream(new File(wordPath));
-        //通过aspose-words.jar中的类转换文件
-        Document wordDoc = new Document(inputStream);
+    public static void wordToPdf(String wordPath, String pdfPath) {
+        FileOutputStream os = null;
+        FileInputStream is = null;
+        try {
+            is = new FileInputStream(new File(wordPath));
+
+            //通过aspose-words.jar中的类转换文件
+            Document wordDoc = new Document(is);
         /*if(SystemUtils.IS_OS_LINUX){
             //设置汉字字体，否则转换后的文档汉字会乱码。
             FontSettings settings = new FontSettings();
             settings.setFontsFolder("/mydata/fonts",false);
             wordDoc.setFontSettings(settings);
         }*/
-        FileOutputStream outputStream = new FileOutputStream(new File(pdfPath));
+            os = new FileOutputStream(new File(pdfPath));
 
-        PdfSaveOptions pso = new PdfSaveOptions();
-        wordDoc.save(outputStream, pso);
-        inputStream.close();
-        outputStream.close();
+            PdfSaveOptions pso = new PdfSaveOptions();
+            wordDoc.save(os, pso);
+            is.close();
+            os.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                if (is != null) {
+                    is.close();
+                }
+                if (os != null) {
+                    os.close();
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            // 删除word文档的地址
+            File file = new File(wordPath);
+            if (file != null && file.isFile() && file.exists()) {
+                file.delete();
+            }
+        }
     }
 }

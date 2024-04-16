@@ -5,6 +5,7 @@ import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.utils.bean.BeanUtils;
 import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.constant.Container;
 import cn.staitech.fr.domain.Category;
 import cn.staitech.fr.domain.Diagnosis;
 import cn.staitech.fr.domain.PageDataResponse;
@@ -33,6 +34,7 @@ import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.service.MatrixReviewService;
 import cn.staitech.fr.utils.DateUtils;
 import cn.staitech.fr.utils.ExportPdfUtils;
+import cn.staitech.fr.utils.LanguageUtils;
 import cn.staitech.system.api.domain.SysUser;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.deepoove.poi.data.PictureRenderData;
@@ -211,6 +213,11 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         String topicName = "";
         for (Long id : ids) {
             ExportVO exportVO = singleSlideMapper.getExportVO(id);
+            if (LanguageUtils.isEn()) {
+                exportVO.setColorType(Container.COLOR_TYPE_EN.get(Integer.valueOf(exportVO.getColorType())));
+            } else {
+                exportVO.setColorType(Container.COLOR_TYPE.get(Integer.valueOf(exportVO.getColorType())));
+            }
             List<ExportListVO> collect = diagnosisMapper.getExportListVO(id);
             exportVO.setList(collect);
             exportVO.setTable(collect);
@@ -223,7 +230,6 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             //生成pdf
             //ExportPdfUtils.convertDocx2Pdf(s, s.replace(CommonConstant.WROD_FILE, CommonConstant.PDF_FILE));
             ExportPdfUtils.wordToPdf(s, s.replace(CommonConstant.WROD_FILE, CommonConstant.PDF_FILE));
-            FileUtils.delete(new File(s));
             pdfName.add(s.replace(CommonConstant.WROD_FILE, CommonConstant.PDF_FILE));
             topicName = exportVO.getTopicName();
         }
