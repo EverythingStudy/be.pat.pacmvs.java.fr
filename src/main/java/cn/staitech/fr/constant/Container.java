@@ -26,6 +26,7 @@ public class Container {
             .put(2, "解析中")
             .put(3, "解析失败")
             .put(4, "可用")
+            .put(5, "不可用")
             .build();
 
     /**
@@ -37,6 +38,7 @@ public class Container {
             .put(2, "解析中en")
             .put(3, "Unavailable")
             .put(4, "Available")
+            .put(5, "NotAvailable")
             .build();
 
     /**
