@@ -265,9 +265,14 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1, category.getCategoryAbbreviation(),special.getTopicName());
         }
         {
+            Long slideId;
+            if(req.getSingle_slide_id() != null){
+                slideId = req.getSingle_slide_id();
+            } else {
+                slideId = req.getSlide_id();
+            }
             String traceId = req.getTraceId();
             Long userId = req.getCreate_by();
-            Long slideId = req.getSlide_id();
             Session session = HistoryServiceImpl.refreshSession(userId, slideId);
             if (req.getIsBatch()) {
                 Trace trace = session.getTraceById(traceId);
@@ -441,7 +446,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             // 删除操作RocksDB存删除前的数据
             // 撤消,恢复历史记录 用HistoryService会引起循环依赖！ -> 后续在线程池中处理 判断是批处理，还是单独处理
             // 1、创建Session,并存入ConcurrentHashMap<Long, Session>
-            Long slideId = annotationBy.getSlideId();
+            Long slideId;
+            if(annotationBy.getSingleSlideId() != null){
+                slideId = annotationBy.getSingleSlideId();
+            } else {
+                slideId = annotationBy.getSlideId();
+            }
             Session session = HistoryServiceImpl.refreshSession(userId, slideId);
 
             // 2、创建Trace,并存入Session.list,LinkedList<Trace>
@@ -471,7 +481,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Annotation annotations = new Annotation();
         annotations.setAnnotationId(Long.valueOf(req.getMarking_id()));
         Annotation annotationBy = annotationMapper.selectById(annotations);
-        Long slideId = req.getSlide_id();
         Long userId = req.getUpdate_by();
 
         if (!Optional.ofNullable(annotationBy).isPresent()) {
@@ -482,6 +491,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
         boolean isBatch = false;
         {
+            Long slideId;
+            if(annotationBy.getSingleSlideId() != null){
+                slideId = annotationBy.getSingleSlideId();
+            } else {
+                slideId = annotationBy.getSlideId();
+            }
             // 删除操作RocksDB存删除前的数据
             // 撤消,恢复历史记录 用HistoryService会引起循环依赖！ -> 后续在线程池中处理 判断是批处理，还是单独处理
             // 1、创建Session,并存入ConcurrentHashMap<Long, Session>
@@ -546,7 +561,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             NioWebSocketHandler.sendAll(req.getSlide_id(), broadcastVO);
         }
         if(annotationBy.getSingleSlideId() == null){
-            Slide slide = slideMapper.selectById(slideId);
+            Slide slide = slideMapper.selectById(annotationBy.getSlideId());
             if (!Optional.ofNullable(slide).isPresent()) {
                 throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
             }
@@ -596,10 +611,16 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }
 
-        Long slideId = annotationBy.getSlideId();
+
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         Long loginUserId = sysUser.getUserId();
         {
+            Long slideId;
+            if(annotationBy.getSingleSlideId() != null){
+                slideId = annotationBy.getSingleSlideId();
+            } else {
+                slideId = annotationBy.getSlideId();
+            }
             String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
 
             // 删除操作RocksDB存删除前的数据
@@ -630,7 +651,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setAnnotationId(req.getMarking_id());
         annotation.setContour(String.valueOf(geometryJson));
         Geometry geometry = WKT_READER.read(MarkingUtils.jsonToWkt(JSONObject.parseObject(annotation.getContour())));
-        Slide slide = slideMapper.selectById(slideId);
+        Slide slide = slideMapper.selectById(annotationBy.getSlideId());
         if (!Optional.ofNullable(slide).isPresent()) {
             throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
         }
@@ -765,7 +786,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
         {
             Long userId = req.getUpdate_by();
-            Long slideId = annotation.getSlideId();
+            Long slideId;
+            if(annotation.getSingleSlideId() != null){
+                slideId = annotation.getSingleSlideId();
+            } else {
+                slideId = annotation.getSlideId();
+            }
             String annotationId = String.valueOf(annotation.getAnnotationId());
 
             // 删除操作RocksDB存删除前的数据
@@ -869,8 +895,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         String traceId = UUID.randomUUID().toString();
         //Boolean isUndo = dto.getEnvType() == 1 ? true : false;
         Long userId = dto.getUserId();
-        Long slideId = dto.getSlideId();
-
+        Long slideId;
+        if(dto.getSingleSlideId() != null){
+            slideId = dto.getSingleSlideId();
+        }else {
+            slideId = dto.getSlideId();
+        }
         String key = userId + "_" + slideId;
         Session session = HistoryServiceImpl.USER_SESSION_MAP.get(key);
         LinkedList<Trace> drawList = session.getDrawList();
@@ -984,7 +1014,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         // Boolean isUndo = dto.getEnvType() == 1 ? true : false;
 
         Long userId = dto.getUserId();
-        Long slideId = dto.getSlideId();
+        Long slideId;
+        if(dto.getSingleSlideId() != null){
+            slideId = dto.getSingleSlideId();
+        }else {
+            slideId = dto.getSlideId();
+        }
 
         String key = userId + "_" + slideId;
         Session session = HistoryServiceImpl.USER_SESSION_MAP.get(key);
@@ -1089,7 +1124,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     public void refresh(LinkedList<Trace> list, String oldId, Long newId) {
         if (!list.isEmpty()) {
-
             for (Trace trace : list) {
                 List<TraceNode> traceNodeList = trace.getNodeList();
                 for (TraceNode traceNode : traceNodeList) {
