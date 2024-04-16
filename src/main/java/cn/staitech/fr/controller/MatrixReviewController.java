@@ -9,6 +9,7 @@ import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.out.AnimalDimensionOut;
 import cn.staitech.fr.domain.out.MatrixReviewListOut;
 import cn.staitech.fr.domain.out.MatrixReviewOut;
+import cn.staitech.fr.domain.out.SelectImageSlideOut;
 import cn.staitech.fr.service.MatrixReviewService;
 import cn.staitech.fr.service.SpecialService;
 import io.swagger.annotations.Api;
@@ -64,6 +65,13 @@ public class MatrixReviewController {
     @PostMapping("/slideList")
     public R<PageResponse<MatrixReviewListOut>> list(@RequestBody @Validated MatrixReviewListIn req) {
         PageResponse<MatrixReviewListOut> resp = matrixReviewService.getMatrixReview(req);
+        return R.ok(resp);
+    }
+
+    @ApiOperation(value = "矩阵阅片-切片维度(携带图片切片信息)")
+    @PostMapping("/selectSlideList")
+    public R<PageResponse<SelectImageSlideOut>> selectSlideList(@RequestBody @Validated MatrixReviewListIn req) {
+        PageResponse<SelectImageSlideOut> resp = matrixReviewService.selectSlideList(req);
         return R.ok(resp);
     }
 

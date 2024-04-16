@@ -225,11 +225,8 @@
         update_time,
         project_id,
         slide_id,
-        structure_id,
-        structure_size,
-        review_round_id,
         id,
-        ST_AsGeoJSON(LOCATION) AS LOCATION
+        ST_AsGeoJSON(contour) AS contour
         from fr_annotation
         <where>
             annotation_id in

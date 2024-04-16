@@ -40,8 +40,8 @@ public class PathologicalIndicatorCategoryController {
     private CategoryService categoryService;
 
 
-    @ApiOperation(value = "获取GeoJson数据")
-    @GetMapping("/getDataList")
+    @ApiOperation(value = "获取单脏器下所有标签")
+    @GetMapping("/selectCategoryList")
     public R<List<PathologicalIndicatorCategory>> getDataList(@RequestParam(value = "specialId") @ApiParam(name = "specialId", value = "专题id", required = true) Long specialId, @RequestParam(value = "categoryId") @ApiParam(name = "categoryId", value = "脏器标签id", required = true) Long categoryId) {
         String organId = categoryService.getById(categoryId).getOrganId();
         Long speciesId = Long.valueOf(specialService.getById(specialId).getSpeciesId());

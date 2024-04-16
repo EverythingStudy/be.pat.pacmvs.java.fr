@@ -9,6 +9,7 @@ import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.out.AnimalDimensionOut;
 import cn.staitech.fr.domain.out.MatrixReviewListOut;
 import cn.staitech.fr.domain.out.MatrixReviewOut;
+import cn.staitech.fr.domain.out.SelectImageSlideOut;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,6 +25,8 @@ public interface MatrixReviewService {
     R edit(MatrixReviewEditIn req);
 
     PageResponse<MatrixReviewListOut> getMatrixReview(MatrixReviewListIn req);
+
+    PageResponse<SelectImageSlideOut> selectSlideList(MatrixReviewListIn req);
 
     PageDataResponse<AnimalDimensionOut> animalList(MatrixReviewListIn req);
 

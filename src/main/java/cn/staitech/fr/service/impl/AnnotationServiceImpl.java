@@ -477,14 +477,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (!Optional.ofNullable(annotationBy).isPresent()) {
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }
-        Slide slide = slideMapper.selectById(slideId);
-        if (!Optional.ofNullable(slide).isPresent()) {
-            throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
-        }
-        Image image = imageMapper.selectById(slide.getImageId());
-        if (!Optional.ofNullable(image).isPresent()) {
-            throw new Exception(MessageSource.M("NODATA"));
-        }
+
+
         String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
         boolean isBatch = false;
         {
@@ -538,7 +532,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setId(id);
         annotation.setSlideId(req.getSlide_id());
         annotation.setAnnotationId(Long.valueOf(req.getMarking_id()));
-        annotation.setContour(null);
+        if(req.getGeometry() != null){
+            annotation.setContour(String.valueOf(req.getGeometry()));
+        }
         annotationMapper.updateById(annotation);
         Annotation annotationBys = annotationMapper.selectById(annotation);
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBys);
@@ -550,6 +546,14 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             NioWebSocketHandler.sendAll(req.getSlide_id(), broadcastVO);
         }
         if(annotationBy.getSingleSlideId() == null){
+            Slide slide = slideMapper.selectById(slideId);
+            if (!Optional.ofNullable(slide).isPresent()) {
+                throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
+            }
+            Image image = imageMapper.selectById(slide.getImageId());
+            if (!Optional.ofNullable(image).isPresent()) {
+                throw new Exception(MessageSource.M("NODATA"));
+            }
             List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
             int type;
             if (contourList.size() > 0) {

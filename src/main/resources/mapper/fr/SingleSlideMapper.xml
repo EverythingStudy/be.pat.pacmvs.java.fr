@@ -98,7 +98,8 @@
         select s.slide_id,
         s.special_id,
         s.image_id,
-        s.group_code,      s.wax_code,
+        s.group_code,
+        s.wax_code,
         s.animal_code,
         s.gender_flag,
         s.organs,
@@ -119,18 +120,20 @@
         m.format,
         m.width,
         m.height,
+        m.source_lens,
         m.resolution_x,
         m.resolution_y,
         m.source_lens,
         m.image_path,
         m.thumb_url,
         m.image_name,
+        ss.single_id,
+        ss.single_id as singleSlideId,
         ss.thumb_url as singleThumbUrl,
         ss.category_id,
         ss.description,
         ss.forecast_status,
-        ss.diagnosis_status,
-        ss.single_id
+        ss.diagnosis_status
         from fr_single_slide as ss
         left join fr_slide s on ss.slide_id = s.slide_id
         left join tb_image m on m.image_id = s.image_id

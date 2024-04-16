@@ -135,7 +135,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         measure.setArea(req.getArea());
         measure.setCreateBy(req.getCreate_by());
         measure.setAnnotationType("Measure");
-        measure.setCreateTime(String.valueOf(new Date()));
+        measure.setCreateTime(new Date());
         long number = 1L;
         QueryWrapper<Measure> markingQueryWrapper = new QueryWrapper<>();
         // 根据切片和测量轮廓名称查询最大值

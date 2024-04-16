@@ -5,12 +5,8 @@ import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
 import cn.staitech.fr.domain.in.SplitVerificationQueryIn;
-import cn.staitech.fr.domain.out.MatrixReviewListOut;
-import cn.staitech.fr.domain.out.OrgansData;
-import cn.staitech.fr.domain.out.SlideListQueryOut;
-import cn.staitech.fr.domain.out.SlideSelectBy;
-import cn.staitech.fr.domain.out.SplitVerificationOut;
-import cn.staitech.fr.domain.out.AlgorithmImageOut;
+import cn.staitech.fr.domain.out.*;
+
 import java.util.List;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -45,6 +41,7 @@ public interface SlideMapper extends BaseMapper<Slide> {
     SlideSelectBy pageImageCsvListVOBy(Long slideId);
 
     List<MatrixReviewListOut> getMatrixReview(MatrixReviewListIn req);
+    List<SelectImageSlideOut> selectSlideList(MatrixReviewListIn req);
 
     List<OrgansData> selectRespData(Long slideId);
 

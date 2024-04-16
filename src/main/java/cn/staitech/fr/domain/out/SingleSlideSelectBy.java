@@ -20,6 +20,12 @@ public class SingleSlideSelectBy {
     private Long id;
 
     /**
+     * 自增ID
+     */
+    @TableId(type = IdType.AUTO)
+    private Long specialId;
+
+    /**
      * 图像ID
      */
     @ApiModelProperty(value = "图像ID")
@@ -220,38 +226,38 @@ public class SingleSlideSelectBy {
      * 切片ID
      */
     @ApiModelProperty(value = "切片ID")
-    @TableField(exist = false, value = "slide_id")
+    @TableField(value = "slide_id")
     private Long slideId;
 
     /**
      * 缩略图url地址
      */
-    @TableField(exist = false, value = "thumb_url")
+    @TableField(value = "thumb_url")
     @ApiModelProperty(value = "缩略图url地址")
     private String thumbUrl;
 
     /**
      * reviewRoundId
      */
-    @TableField(exist = false, value = "review_round_id")
+    @TableField(value = "review_round_id")
     @ApiModelProperty(value = "reviewRoundId")
     private Long reviewRoundId;
-    @TableField(exist = false, value = "format")
+    @TableField(value = "format")
     @ApiModelProperty(value = "文件格式")
     private String format;
-    @TableField(exist = false, value = "width")
+    @TableField(value = "width")
     @ApiModelProperty(value = "宽度")
     private String width;
-    @TableField(exist = false, value = "height")
+    @TableField(value = "height")
     @ApiModelProperty(value = "高度")
     private String height;
-    @TableField(exist = false, value = "resolution_x")
+    @TableField(value = "resolution_x")
     @ApiModelProperty(value = "x轴分辨率")
     private String resolutionX;
-    @TableField(exist = false, value = "resolution_y")
+    @TableField(value = "resolution_y")
     @ApiModelProperty(value = "y轴分辨率")
     private String resolutionY;
-    @TableField(exist = false, value = "source_lens")
+    @TableField(value = "source_lens")
     @ApiModelProperty(value = "原放大倍数")
     private Integer sourceLens;
 
@@ -273,4 +279,8 @@ public class SingleSlideSelectBy {
 
     @ApiModelProperty(value = "单脏器切片id")
     private Long singleId;
+
+    @ApiModelProperty(value = "单脏器切片id")
+    private Long singleSlideId;
+
 }

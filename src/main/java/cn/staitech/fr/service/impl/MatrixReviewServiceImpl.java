@@ -15,6 +15,7 @@ import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.in.AiDownloadIn;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
+import cn.staitech.fr.domain.out.*;
 import cn.staitech.fr.domain.out.AnimalDimensionData;
 import cn.staitech.fr.domain.out.AnimalDimensionOut;
 import cn.staitech.fr.domain.out.ExportListVO;
@@ -142,6 +143,17 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
                 ));
         waxList = waxList.stream().peek(p -> p.setOrganNumber(map.get(p.getSlideId()).get(p.getCategoryId())))
                 .collect(Collectors.toList());
+        resp.setTotal(page.getTotal());
+        resp.setList(waxList);
+        resp.setPages(page.getPages());
+        return resp;
+    }
+
+    @Override
+    public PageResponse<SelectImageSlideOut> selectSlideList(MatrixReviewListIn req){
+        PageResponse resp = new PageResponse();
+        Page<SelectImageSlideOut> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
+        List<SelectImageSlideOut> waxList = slideMapper.selectSlideList(req);
         resp.setTotal(page.getTotal());
         resp.setList(waxList);
         resp.setPages(page.getPages());

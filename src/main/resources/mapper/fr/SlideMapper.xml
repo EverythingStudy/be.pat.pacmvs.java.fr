@@ -271,6 +271,85 @@
         </if>
 
     </select>
+
+
+    <select id="selectSlideList" parameterType="cn.staitech.fr.domain.in.MatrixReviewListIn"
+            resultType="cn.staitech.fr.domain.out.SelectImageSlideOut">
+        SELECT
+        ti.image_name,
+        ss.single_id,
+        ss.single_id as singleSlideId,
+        ss.slide_id,
+        ss.thumb_url,
+        ss.category_id,
+        ss.forecast_status,
+        ss.diagnosis_status,
+        ss.description,
+        fc.organ_en,
+        fc.organ_name,
+        fs.group_code,
+        fs.wax_code,
+        fs.animal_code,
+        fs.gender_flag,
+        fs.initiate_by,
+        ss.create_time,
+        ti.*,
+        ti.thumb_url as imageThumbUrl,
+        fs.special_id
+        FROM
+        fr_single_slide ss
+        LEFT JOIN fr_slide fs ON ss.slide_id = fs.slide_id
+        LEFT JOIN fr_category fc ON ss.category_id = fc.category_id
+        left join tb_image ti on fs.image_id = ti.image_id
+        <where>
+            fs.special_id = #{specialId}
+            <if test="imageName != null and imageName != ''">
+                and ti.image_name like concat('%',#{imageName},'%')
+            </if>
+            <if test="animalCode != null and animalCode != ''">
+                and fs.animal_code like concat('%',#{animalCode},'%')
+            </if>
+            <if test="categoryId != null and categoryId != ''">
+                and ss.category_id =#{categoryId}
+            </if>
+
+            <if test="groupCode != null and groupCode != ''">
+                and fs.group_code like concat('%',#{groupCode},'%')
+            </if>
+            <if test="categoryId != null and categoryId != ''">
+                and ss.category_id =#{categoryId}
+            </if>
+
+            <if test="forecastStatus != null and forecastStatus != ''">
+                and ss.forecast_status =#{forecastStatus}
+            </if>
+
+            <if test="diagnosisStatus != null and diagnosisStatus != ''">
+                and ss.diagnosis_status =#{diagnosisStatus}
+            </if>
+            <if test="createTimeParams!=null and createTimeParams.size() > 0">
+                <if test="createTimeParams.beginTime != null ">
+                    AND date_format( ss.create_time,'%Y%m%d') &gt;=
+                    date_format(#{createTimeParams.beginTime},'%Y%m%d')
+                </if>
+                <if test="createTimeParams.endTime != null ">
+                    AND date_format( ss.create_time,'%Y%m%d') &lt;= date_format(#{createTimeParams.endTime},'%Y%m%d')
+                </if>
+            </if>
+        </where>
+        <if test="sortField != null and sortField!=''">
+            order by #{sortField} #{sortOrder}
+        </if>
+        <if test="sortField == null and sortField==''">
+            order by ss.create_time desc
+        </if>
+    </select>
+
+
+
+
+
+
     <select id="selectRespData" resultType="cn.staitech.fr.domain.out.OrgansData">
         select fss.thumb_url, fss.category_id, ti.image_name, fss.forecast_status, fss.diagnosis_status
         from fr_single_slide fss
