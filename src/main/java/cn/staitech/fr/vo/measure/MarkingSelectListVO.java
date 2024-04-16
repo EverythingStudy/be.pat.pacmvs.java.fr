@@ -38,7 +38,7 @@ public class MarkingSelectListVO {
     @TableField(fill = FieldFill.INSERT)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "创建时间")
-    private String create_time;
+    private Date create_time;
 
     @ApiModelProperty(value = "不同标签点的总数")
     private Integer point_count;

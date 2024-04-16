@@ -314,6 +314,9 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
 
     private void extracted(WaxBlockInfo waxBlockInfo1, Map<String, String> organList, List<WaxBlockInfo> insertList, String s2, String genderFlag) {
         Pattern pattern = Pattern.compile(CommonConstant.EN_FLAG_NEW);
+        if(StringUtils.isEmpty(s2)){
+            return;
+        }
         log.info("脏器数据" + s2);
         String[] parts = pattern.split(s2);
         String part = parts[0];

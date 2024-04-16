@@ -6,7 +6,6 @@ import cn.staitech.common.core.utils.bean.BeanUtils;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Container;
-import cn.staitech.fr.domain.Group;
 import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
@@ -35,7 +34,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -85,12 +83,15 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         PageResponse resp = new PageResponse();
         //分页查询
         req.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
-
-        Page<SysUser> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
+        //判断是不是管理员
+        Integer integer = this.baseMapper.countgetUserRole(SecurityUtils.getUserId());
+        if(integer==0){
+            req.setUserId(SecurityUtils.getUserId());
+        }
+        Page<SpecialListQueryOut> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
         List<SpecialListQueryOut> specialList = this.baseMapper.getSpecialList(req);
         if (CollectionUtils.isNotEmpty(specialList)) {
             specialList.forEach(e -> {
-
                 e.setColorName(Container.COLOR_TYPE.get(Integer.valueOf(e.getColorType())));
                 e.setColorNameEn(Container.COLOR_TYPE_EN.get(Integer.valueOf(e.getColorType())));
                 e.setTrialType(Container.TRIAL_TYPE.get(e.getTrialId()));
@@ -169,7 +170,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         wrapper.ne(Special::getSpecialId, req.getSpecialId());
         List<Special> specials2 = this.baseMapper.selectList(wrapper);
         if (CollectionUtils.isNotEmpty(specials2)) {
-            return R.fail("专题名称已存在，请重新输入！");
+            return R.fail(MessageSource.M("EXISTS_SPECIAL_DATA"));
         }
         Special special = new Special();
         BeanUtils.copyProperties(req, special);
@@ -185,7 +186,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         log.info("专题删除接口开始：specialId={}", specialId);
         Special special = this.baseMapper.selectById(specialId);
         if (special == null) {
-            return R.fail("专题不存在，请刷新后重试！");
+            return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
         }
         special.setDelFlag(CommonConstant.NUMBER_1);
         special.setUpdateBy(SecurityUtils.getUserId());
@@ -226,6 +227,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
             LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(Slide::getSpecialId, req.getSpecialId());
             wrapper.ne(Slide::getCheckStatus, 1);
+            wrapper.ne(Slide::getCheckStatus, 2);
             List<Slide> slideList = slideService.list(wrapper);
             if (CollectionUtils.isNotEmpty(slideList)) {
                 return R.fail(MessageSource.M("START_SPECIAL_ERROR"));

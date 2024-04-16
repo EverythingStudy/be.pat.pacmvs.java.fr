@@ -48,8 +48,8 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
     @Resource
     private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
 
-    public static final String REDIS_OUTLINE_ROOT = "SINGLE_OUTLINE_ROOT:";
-    public static final String REDIS_OUTLINE_LIST = "SINGLE_OUTLINE_LIST:";
+    public static final String REDIS_OUTLINE_ROOT = "OUTLINE_ROOT:";
+    public static final String REDIS_OUTLINE_LIST = "OUTLINE_LIST:";
 
     /**
      * 列表查询
@@ -71,7 +71,6 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
 
         OutlineRoot outlineRoot = object.toJavaObject(OutlineRoot.class);
         List<com.alibaba.fastjson2.JSONObject> srcJsonList = redisService.getCacheList(listKey + outlineRoot.getToken());
-
         if (CollectionUtils.isEmpty(srcJsonList)) {
             return null;
         }

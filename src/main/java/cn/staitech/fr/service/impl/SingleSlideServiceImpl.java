@@ -11,6 +11,7 @@ import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.OrganDisassemblyQueryIn;
 import cn.staitech.fr.domain.out.ImageExportOut;
 import cn.staitech.fr.domain.out.OrganDisassemblyOut;
+import cn.staitech.fr.domain.out.SingleSlideSelectBy;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.SingleSlideService;
@@ -32,6 +33,9 @@ public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, Singl
 
     @Resource
     private ImageMapper mapper;
+
+    @Resource
+    private SingleSlideMapper singleSlideMapper;
 
     @Override
     public List<OrganDisassemblyOut> getSingleList(OrganDisassemblyQueryIn req) {
@@ -74,6 +78,11 @@ public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, Singl
             return exportOut;
         }).collect(Collectors.toList());
         return list;
+    }
+
+    @Override
+    public SingleSlideSelectBy singleSlideBy(Long singleId){
+        return singleSlideMapper.singleSlideBy(singleId);
     }
 
 

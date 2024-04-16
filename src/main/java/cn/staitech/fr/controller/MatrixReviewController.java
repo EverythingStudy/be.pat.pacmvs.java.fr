@@ -3,11 +3,13 @@ package cn.staitech.fr.controller;
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.PageDataResponse;
+import cn.staitech.fr.domain.in.AiDownloadIn;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.out.AnimalDimensionOut;
 import cn.staitech.fr.domain.out.MatrixReviewListOut;
 import cn.staitech.fr.domain.out.MatrixReviewOut;
+import cn.staitech.fr.domain.out.SelectImageSlideOut;
 import cn.staitech.fr.service.MatrixReviewService;
 import cn.staitech.fr.service.SpecialService;
 import io.swagger.annotations.Api;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 /**
@@ -52,10 +55,23 @@ public class MatrixReviewController {
         return matrixReviewService.edit(req);
     }
 
+    @ApiOperation(value = "矩阵阅片-设置对照组")
+    @PostMapping("/getControlGroup")
+    public R<String> getControlGroup(@RequestParam(value = "specialId") @ApiParam(name = "specialId", value = "专题id", required = true) Long specialId) {
+        return matrixReviewService.getControlGroup(specialId);
+    }
+
     @ApiOperation(value = "矩阵阅片-切片维度")
     @PostMapping("/slideList")
     public R<PageResponse<MatrixReviewListOut>> list(@RequestBody @Validated MatrixReviewListIn req) {
         PageResponse<MatrixReviewListOut> resp = matrixReviewService.getMatrixReview(req);
+        return R.ok(resp);
+    }
+
+    @ApiOperation(value = "矩阵阅片-切片维度(携带图片切片信息)")
+    @PostMapping("/selectSlideList")
+    public R<PageResponse<SelectImageSlideOut>> selectSlideList(@RequestBody @Validated MatrixReviewListIn req) {
+        PageResponse<SelectImageSlideOut> resp = matrixReviewService.selectSlideList(req);
         return R.ok(resp);
     }
 
@@ -64,5 +80,25 @@ public class MatrixReviewController {
     public R<PageDataResponse<AnimalDimensionOut>> animalList(@RequestBody @Validated MatrixReviewListIn req) {
         PageDataResponse<AnimalDimensionOut> resp = matrixReviewService.animalList(req);
         return R.ok(resp);
+    }
+
+
+    @ApiOperation(value = "人工诊断报告下载")
+    @PostMapping("/diagnosisDownload")
+    public void download(@Validated @RequestBody AiDownloadIn req) throws Exception {
+         matrixReviewService.diagnosisDownload(req);
+    }
+
+
+    @ApiOperation(value = "算法报告下载")
+    @PostMapping("/algorithmDownload")
+    public void algorithmDownload(@Validated @RequestBody AiDownloadIn req) throws Exception {
+        matrixReviewService.algorithmDownload(req);
+    }
+
+    @ApiOperation(value = "ai预测")
+    @PostMapping("/algorithm")
+    public void algorithm(@Validated @RequestBody AiDownloadIn req) throws Exception {
+        matrixReviewService.algorithmDownload(req);
     }
 }

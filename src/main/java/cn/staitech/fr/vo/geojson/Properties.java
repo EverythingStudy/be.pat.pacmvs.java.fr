@@ -104,4 +104,10 @@ public class Properties {
 
     @ApiModelProperty(value = "标注类型")
     private Long contour_type;
+
+    @ApiModelProperty(value = "单切片id")
+    private Long singleSlideId;
+
+    @ApiModelProperty(value = "区分单脏器还是多脏器")
+    private int single;
 }

@@ -91,7 +91,12 @@ public class HistoryServiceImpl implements HistoryService {
      */
     @Override
     public Cursor getCursor(HistoryDTO dto) {
-        String key = dto.getUserId() + "_" + dto.getSlideId();
+        String key;
+        if(dto.getSingleSlideId() != null){
+            key = dto.getUserId() + "_" + dto.getSingleSlideId();
+        }else {
+            key = dto.getUserId() + "_" + dto.getSlideId();
+        }
         Cursor cursor = new Cursor();
         if (USER_SESSION_MAP.containsKey(key)) {
             Session session = USER_SESSION_MAP.get(key);

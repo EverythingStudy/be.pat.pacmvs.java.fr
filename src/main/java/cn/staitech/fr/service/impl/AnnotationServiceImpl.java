@@ -11,6 +11,7 @@ import cn.staitech.fr.domain.history.TraceNode;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.netty.websocket.NioWebSocketHandler;
 import cn.staitech.fr.service.RocksdbService;
+import cn.staitech.fr.service.SpecialService;
 import cn.staitech.fr.utils.*;
 import cn.staitech.fr.vo.annotation.AnnotationById;
 import cn.staitech.fr.vo.annotation.AnnotationCountByCategory;
@@ -80,6 +81,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     @Resource
     private RocksdbService rocksdbService;
 
+    @Resource
+    private SpecialService specialService;
+
+    @Resource
+    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
+
 
     public List<Features> getFeaturesList(List<Annotation> annotations) {
         List<Features> featuresList = new ArrayList<>();
@@ -96,25 +103,33 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
     public cn.staitech.fr.vo.geojson.Properties getProperties(Annotation annotation) {
-        cn.staitech.fr.vo.geojson.Properties properties = new cn.staitech.fr.vo.geojson.Properties();
-        properties.setMarking_id(String.valueOf(annotation.getAnnotationId()));
-        properties.setArea(annotation.getArea());
-        properties.setPerimeter(annotation.getPerimeter());
-        properties.setAnnotation_type(annotation.getAnnotationType());
-        properties.setCategory_id(annotation.getCategoryId());
-        properties.setDescription(annotation.getDescription());
-        properties.setLocation_type(annotation.getLocationType());
-        properties.setCreate_by(annotation.getCreateBy());
-        properties.setUpdate_by(annotation.getUpdateBy());
-        properties.setCreate_time(String.valueOf(annotation.getCreateTime()));
-        properties.setProject_id(annotation.getProjectId());
-        properties.setContour_type(annotation.getContourType());
-        if (annotation.getCategoryId() != null) {
-            Category category = categoryHashMap.get(annotation.getCategoryId());
-            if (category == null) {
-                category = categoryMapper.selectById(annotation.getCategoryId());
-                if (category != null) {
-                    categoryHashMap.put(category.getCategoryId(), category);
+    	cn.staitech.fr.vo.geojson.Properties properties = new cn.staitech.fr.vo.geojson.Properties();
+    	properties.setMarking_id(String.valueOf(annotation.getAnnotationId()));
+    	properties.setArea(annotation.getArea());
+    	properties.setPerimeter(annotation.getPerimeter());
+    	properties.setAnnotation_type(annotation.getAnnotationType());
+    	properties.setCategory_id(annotation.getCategoryId());
+    	properties.setDescription(annotation.getDescription());
+    	properties.setLocation_type(annotation.getLocationType());
+    	properties.setCreate_by(annotation.getCreateBy());
+    	properties.setUpdate_by(annotation.getUpdateBy());
+    	properties.setCreate_time(String.valueOf(annotation.getCreateTime()));
+    	properties.setProject_id(annotation.getProjectId());
+    	properties.setContour_type(annotation.getContourType());
+        properties.setSingleSlideId(annotation.getSingleSlideId());
+        properties.setSingle(annotation.getSingle());
+        if (annotation.getSingle() == 1) {
+            if (annotation.getCategoryId() != null) {
+                PathologicalIndicatorCategory pathologicalIndicatorCategory = pathologicalIndicatorCategoryHashMap.get(annotation.getCategoryId());
+                if (pathologicalIndicatorCategory == null) {
+                    pathologicalIndicatorCategory = pathologicalIndicatorCategoryMapper.selectById(annotation.getCategoryId());
+                    if (pathologicalIndicatorCategory != null) {
+                        pathologicalIndicatorCategoryHashMap.put(pathologicalIndicatorCategory.getCategoryId(), pathologicalIndicatorCategory);
+                    }
+                }
+                if (pathologicalIndicatorCategory != null) {
+                    properties.setLabel_color(pathologicalIndicatorCategory.getRgb());
+                    properties.setLabel_name(pathologicalIndicatorCategory.getNumber());
                 }
             }
             if (category != null) {
@@ -146,16 +161,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                 properties.setAnnotation_owner(updateUser.getUserName());
             }
         }
-        return properties;
+    	return properties;
     }
 
 
     @Override
     public List<Features> selectListBy(AnnotationSelectList req) throws Exception {
-        Slide slideBy = slideMapper.selectById(req.getSlideId());
-        if (!Optional.ofNullable(slideBy).isPresent()) {
-            throw new Exception(MessageSource.M("SLIDE_ABNORMAL_NO_INFORMATION"));
-        }
         List<Features> list = new ArrayList<>();
         Annotation annotation = new Annotation();
         annotation.setSlideId(req.getSlideId());
@@ -179,10 +190,19 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             throw new Exception("更新失败，轮廓数据不能为空");
         }
         String id = null;
+        Category category = null;
+        Annotation annotation = new Annotation();
         if (req.getCategory_id() != null) {
-            Category category = categoryMapper.selectById(req.getCategory_id());
-            if (category != null) {
-                id = MarkingUtils.getSdId(category.getOrganName());
+            if (req.getSingle_slide_id() != null) {
+                PathologicalIndicatorCategory pathologicalIndicatorCategory = pathologicalIndicatorCategoryMapper.selectById(req.getCategory_id());
+                if (pathologicalIndicatorCategory != null) {
+                    id = MarkingUtils.getSdId(pathologicalIndicatorCategory.getCategoryName());
+                }
+            } else {
+                category = categoryMapper.selectById(req.getCategory_id());
+                if (category != null) {
+                    id = MarkingUtils.getSdId(category.getOrganName());
+                }
             }
         } else {
             id = MarkingUtils.getSdId(null);
@@ -196,6 +216,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setPerimeter(req.getPerimeter());
         annotation.setCreateBy(req.getCreate_by());
         annotation.setId(id);
+        annotation.setContourType(2L);
         annotation.setAnnotationType("Draw");
         annotation.setContourType(2L);
         annotationMapper.insert(annotation);
@@ -203,20 +224,37 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBy);
         Features features = socketData(annotation.getId(), JSONObject.parseObject(annotationBy.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(ADD_STATUS, features);
-        NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
-        Slide slide = slideMapper.selectById(req.getSlide_id());
-        Image image = imageMapper.selectById(slide.getImageId());
-        if (!Optional.ofNullable(image).isPresent()) {
-            throw new Exception(MessageSource.M("NODATA"));
+
+        if(req.getSingle_slide_id() != null){
+            NioWebSocketHandler.sendSingle(req.getSingle_slide_id(),broadcastVO);
+        }else{
+            NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
+        }
+
+        if (req.getSingle_slide_id() == null) {
+            Slide slide = slideMapper.selectById(req.getSlide_id());
+            if (!Optional.ofNullable(slide).isPresent()) {
+                throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
+            }
+            Image image = imageMapper.selectById(slide.getImageId());
+            if (!Optional.ofNullable(image).isPresent()) {
+                throw new Exception(MessageSource.M("NODATA"));
+            }
+            Special special = specialService.getById(slide.getSpecialId());
+            List<JSONObject> contourList = selectContourList(annotation.getSlideId(), req.getCategory_id());
+            asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1, category.getCategoryAbbreviation(),special.getTopicName());
         }
         List<JSONObject> contourList = selectContourList(annotation.getSlideId(), req.getCategory_id());
         asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1);
         {
+            Long slideId;
+            if(req.getSingle_slide_id() != null){
+                slideId = req.getSingle_slide_id();
+            } else {
+                slideId = req.getSlide_id();
+            }
             String traceId = req.getTraceId();
-            // 撤消,恢复历史记录 用HistoryService会引起循环依赖！ -> 后续在线程池中处理 判断是批处理，还是单独处理
-            // 1、创建Session,并存入ConcurrentHashMap<Long, Session>
-            Long userId = req.getUpdate_by();
-            Long slideId = req.getSlide_id();
+            Long userId = req.getCreate_by();
             Session session = HistoryServiceImpl.refreshSession(userId, slideId);
 
             // 2、创建Trace,并存入Session.list,LinkedList<Trace>
@@ -269,17 +307,26 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         BroadcastVO broadcastVO = sendOneMessages(DELETE_STATUS, features);
         NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
         annotationMapper.deleteById(annotation);
-        Slide slide = slideMapper.selectById(annotation.getSlideId());
-        Image image = imageMapper.selectById(slide.getImageId());
-        if (!Optional.ofNullable(image).isPresent()) {
-            throw new Exception(MessageSource.M("NODATA"));
-        }
-        List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
-        int type;
-        if (contourList.size() > 0) {
-            type = 1;
-        } else {
-            type = 2;
+        if(annotationBy.getSingleSlideId() == null){
+            Slide slide = slideMapper.selectById(annotationBy.getSlideId());
+            if (!Optional.ofNullable(slide).isPresent()) {
+                throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
+            }
+            Image image = imageMapper.selectById(slide.getImageId());
+            if (!Optional.ofNullable(image).isPresent()) {
+                throw new Exception(MessageSource.M("NODATA"));
+            }
+            Category category = categoryMapper.selectById(annotationBy.getCategoryId());
+
+            List<JSONObject> contourList = selectContourList(annotationBy.getSlideId(), annotationBy.getCategoryId());
+            int type;
+            if (contourList.size() > 0) {
+                type = 1;
+            } else {
+                type = 2;
+            }
+            Special special = specialService.getById(slide.getSpecialId());
+            asyncTask.generateThumbnail(annotationBy.getSlideId(), annotationBy.getCategoryId(), image.getImageUrl(), contourList, type,category.getCategoryAbbreviation(),special.getTopicName());
         }
         asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type);
 
@@ -290,7 +337,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             // 删除操作RocksDB存删除前的数据
             // 撤消,恢复历史记录 用HistoryService会引起循环依赖！ -> 后续在线程池中处理 判断是批处理，还是单独处理
             // 1、创建Session,并存入ConcurrentHashMap<Long, Session>
-            Long slideId = annotationBy.getSlideId();
+            Long slideId;
+            if(annotationBy.getSingleSlideId() != null){
+                slideId = annotationBy.getSingleSlideId();
+            } else {
+                slideId = annotationBy.getSlideId();
+            }
             Session session = HistoryServiceImpl.refreshSession(userId, slideId);
 
             // 2、创建Trace,并存入Session.list,LinkedList<Trace>
@@ -320,23 +372,22 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Annotation annotations = new Annotation();
         annotations.setAnnotationId(Long.valueOf(req.getMarking_id()));
         Annotation annotationBy = annotationMapper.selectById(annotations);
-        Long slideId = req.getSlide_id();
         Long userId = req.getUpdate_by();
 
         if (!Optional.ofNullable(annotationBy).isPresent()) {
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }
-        Slide slide = slideMapper.selectById(slideId);
-        if (!Optional.ofNullable(slide).isPresent()) {
-            throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
-        }
-        Image image = imageMapper.selectById(slide.getImageId());
-        if (!Optional.ofNullable(image).isPresent()) {
-            throw new Exception(MessageSource.M("NODATA"));
-        }
+
+
         String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
         boolean isBatch = false;
         {
+            Long slideId;
+            if(annotationBy.getSingleSlideId() != null){
+                slideId = annotationBy.getSingleSlideId();
+            } else {
+                slideId = annotationBy.getSlideId();
+            }
             // 删除操作RocksDB存删除前的数据
             // 撤消,恢复历史记录 用HistoryService会引起循环依赖！ -> 后续在线程池中处理 判断是批处理，还是单独处理
             // 1、创建Session,并存入ConcurrentHashMap<Long, Session>
@@ -386,20 +437,52 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
         annotation.setId(id);
         annotation.setAnnotationId(Long.valueOf(req.getMarking_id()));
-        annotation.setContour(null);
+        if(req.getGeometry() != null){
+            annotation.setContour(String.valueOf(req.getGeometry()));
+        }
         annotationMapper.updateById(annotation);
         Annotation annotationBys = annotationMapper.selectById(annotation);
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBys);
         Features features = AnnotationDataEncapsulation.socketData(annotation.getId(), req.getGeometry(), properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
-        NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
+        if(annotationBy.getSingleSlideId() != null){
+            NioWebSocketHandler.sendSingle(annotationBy.getSingleSlideId(),broadcastVO);
+        }else{
+            NioWebSocketHandler.sendAll(req.getSlide_id(), broadcastVO);
+        }
+        if(annotationBy.getSingleSlideId() == null){
+            Slide slide = slideMapper.selectById(annotationBy.getSlideId());
+            if (!Optional.ofNullable(slide).isPresent()) {
+                throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
+            }
+            Image image = imageMapper.selectById(slide.getImageId());
+            if (!Optional.ofNullable(image).isPresent()) {
+                throw new Exception(MessageSource.M("NODATA"));
+            }
+            List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
+            int type;
+            if (contourList.size() > 0) {
+                type = 1;
+            } else {
+                type = 2;
+            }
+            Category categoryAfter = categoryMapper.selectById(req.getCategory_id());
 
-        List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
-        int type;
-        if (contourList.size() > 0) {
-            type = 1;
-        } else {
-            type = 2;
+            Special special = specialService.getById(slide.getSpecialId());
+
+            asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type,categoryAfter.getCategoryAbbreviation(),special.getTopicName());
+            // 改之后数据
+            List<JSONObject> contourListAfter = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
+
+            String categoryAbbreviation = null;
+            if(req.getCategory_id() != null){
+                Category categoryBy = categoryMapper.selectById(req.getCategory_id());
+                categoryAbbreviation = categoryBy.getCategoryAbbreviation();
+            }else{
+                categoryAbbreviation = categoryAfter.getCategoryAbbreviation();
+            }
+            asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourListAfter, 1,categoryAbbreviation,special.getTopicName());
+
         }
         asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type);
         // 改之后数据
@@ -422,10 +505,16 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }
 
-        Long slideId = annotationBy.getSlideId();
+
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         Long loginUserId = sysUser.getUserId();
         {
+            Long slideId;
+            if(annotationBy.getSingleSlideId() != null){
+                slideId = annotationBy.getSingleSlideId();
+            } else {
+                slideId = annotationBy.getSlideId();
+            }
             String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
 
             // 删除操作RocksDB存删除前的数据
@@ -456,7 +545,10 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setAnnotationId(req.getMarking_id());
         annotation.setContour(String.valueOf(geometryJson));
         Geometry geometry = WKT_READER.read(MarkingUtils.jsonToWkt(JSONObject.parseObject(annotation.getContour())));
-        Slide slide = slideMapper.selectById(slideId);
+        Slide slide = slideMapper.selectById(annotationBy.getSlideId());
+        if (!Optional.ofNullable(slide).isPresent()) {
+            throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
+        }
         Image image = imageMapper.selectById(slide.getImageId());
         if (!Optional.ofNullable(image).isPresent()) {
             throw new Exception(MessageSource.M("NODATA"));
@@ -568,14 +660,25 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Properties properties = getProperties(annotationById);
         Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), JSONObject.parseObject(annotation1.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
-        NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
-        List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
-        asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, 1);
-
-
+        if(annotation.getSingleSlideId() != null){
+            NioWebSocketHandler.sendSingle(annotation.getSingleSlideId(),broadcastVO);
+        }else{
+            NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
+        }
+        if(annotation.getSingleSlideId() == null){
+            Category category = categoryMapper.selectById(annotation.getCategoryId());
+            List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
+            Special special = specialService.getById(slide.getSpecialId());
+            asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, 1,category.getCategoryAbbreviation(),special.getTopicName());
+        }
         {
             Long userId = req.getUpdate_by();
-            Long slideId = annotation.getSlideId();
+            Long slideId;
+            if(annotation.getSingleSlideId() != null){
+                slideId = annotation.getSingleSlideId();
+            } else {
+                slideId = annotation.getSlideId();
+            }
             String annotationId = String.valueOf(annotation.getAnnotationId());
 
             // 删除操作RocksDB存删除前的数据
@@ -634,7 +737,11 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Properties properties = getProperties(annotationById);
         Features features = MarkingUtils.socketData(String.valueOf(annotation.getAnnotationId()), JSONObject.parseObject(annotation.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendListMessages(CommonConstant.ANNO_TYPE_DRAW, ADD_STATUS, features, null);
-        NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
+        if(annotationById.getSingleSlideId() != null){
+            NioWebSocketHandler.sendSingle(annotationById.getSingleSlideId(), broadcastVO);
+        } else{
+            NioWebSocketHandler.sendAll(annotationById.getSlideId(), broadcastVO);
+        }
         return annotationById;
     }
 
@@ -654,24 +761,31 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setUpdateBy(SecurityUtils.getUserId());
         annotation.setUpdateTime(String.valueOf(new Date()));
         annotationMapper.updateById(annotation);
-        Annotation annotationById = annotationMapper.selectById(annotation.getAnnotationId());
-        Properties properties = getProperties(annotationById);
+        Properties properties = getProperties(annotationBy);
         Features features = AnnotationDataEncapsulation.socketData(String.valueOf(annotationBy.getAnnotationId()), JSONObject.parseObject(req.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_DRAW, UPDATE_STATUS, features);
-        NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
+        if(annotationBy.getSingleSlideId() != null){
+            NioWebSocketHandler.sendSingle(annotationBy.getSingleSlideId(), broadcastVO);
+        } else{
+            NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
+        }
         return annotationBy;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Annotation deleteByHistory(Long annotationId) throws Exception {
-        Annotation annotation = annotationMapper.selectById(annotationId);
+    public Annotation deleteByHistory(Long annotationId) {
         Annotation annotationById = annotationMapper.selectById(annotationId);
         Properties properties = getProperties(annotationById);
         Features features = AnnotationDataEncapsulation.socketData(String.valueOf(annotationId), JSONObject.parseObject(annotationById.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendListMessages(CommonConstant.ANNO_TYPE_DRAW, DELETE_STATUS, features, null);
-        NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
-        return annotation;
+        annotationMapper.deleteById(annotationById);
+        if(annotationById.getSingleSlideId() != null){
+            NioWebSocketHandler.sendSingle(annotationById.getSingleSlideId(), broadcastVO);
+        } else{
+            NioWebSocketHandler.sendAll(annotationById.getSlideId(), broadcastVO);
+        }
+        return annotationById;
     }
 
 
@@ -681,8 +795,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         String traceId = UUID.randomUUID().toString();
         //Boolean isUndo = dto.getEnvType() == 1 ? true : false;
         Long userId = dto.getUserId();
-        Long slideId = dto.getSlideId();
-
+        Long slideId;
+        if(dto.getSingleSlideId() != null){
+            slideId = dto.getSingleSlideId();
+        }else {
+            slideId = dto.getSlideId();
+        }
         String key = userId + "_" + slideId;
         Session session = HistoryServiceImpl.USER_SESSION_MAP.get(key);
         LinkedList<Trace> drawList = session.getDrawList();
@@ -796,7 +914,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         // Boolean isUndo = dto.getEnvType() == 1 ? true : false;
 
         Long userId = dto.getUserId();
-        Long slideId = dto.getSlideId();
+        Long slideId;
+        if(dto.getSingleSlideId() != null){
+            slideId = dto.getSingleSlideId();
+        }else {
+            slideId = dto.getSlideId();
+        }
 
         String key = userId + "_" + slideId;
         Session session = HistoryServiceImpl.USER_SESSION_MAP.get(key);
@@ -902,7 +1025,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     public void refresh(LinkedList<Trace> list, String oldId, Long newId) {
         if (!list.isEmpty()) {
-
             for (Trace trace : list) {
                 List<TraceNode> traceNodeList = trace.getNodeList();
                 for (TraceNode traceNode : traceNodeList) {

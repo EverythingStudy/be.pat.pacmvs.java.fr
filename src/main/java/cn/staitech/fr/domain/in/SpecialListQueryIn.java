@@ -39,6 +39,9 @@ public class SpecialListQueryIn extends PageRequest {
     @ApiModelProperty(value = "机构id",hidden = true)
     private Long organizationId;
 
+    @ApiModelProperty(value = "用户id",hidden = true)
+    private Long userId;
+
     @ApiModelProperty(value = "时间范围")
     private Map<String, Date> createTimeParams;
 }

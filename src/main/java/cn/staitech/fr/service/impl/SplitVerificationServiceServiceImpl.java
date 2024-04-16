@@ -282,6 +282,15 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			pageResponse.setPageNum(currentPage);
 			pageResponse.setPageSize(pageSize);
 
+		}else{
+			int total = 0;
+			int totalPages = 0;
+			List<SplitVerificationOut> result = new ArrayList<>();
+			pageResponse.setTotal(total);
+			pageResponse.setPages(totalPages);
+			pageResponse.setList(result);
+			pageResponse.setPageNum(currentPage);
+			pageResponse.setPageSize(pageSize);
 		}
 		return pageResponse;
 	}
@@ -418,7 +427,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			updateWrapper.eq("animal_code", animalCode);
 			updateWrapper.eq("special_id", specialId);
 			Slide sd = new Slide();
-			//核对状态 0：初始 1：正确 2：错误 3：修正正常
+			//当前动物号检查状态 核对状态 0：初始 1：正确 2：修正正常 3：错误
 			if(mapByCheckStatus.containsKey(2)){
 				sd.setAnimalCheckStatus(2);
 			}else{

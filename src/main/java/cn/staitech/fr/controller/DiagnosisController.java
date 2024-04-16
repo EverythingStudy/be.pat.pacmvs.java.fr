@@ -99,9 +99,6 @@ public class DiagnosisController {
 				return R.fail(MessageSource.M("DATA_CANNOT_DELETED"));
 			}
 			diagnosisService.deleteSpecialDiagnosisVo(specialDiagnosisDeleteVo.getDiagnosisId());
-			//刷新列表数据返回
-//			List<SpecialDiagnosisVo> list = diagnosisService.getSpecialDiagnosisVo(sid.getSubImageId()+"",sid.getProjectId()+"",sid.getSpecialId()+"",sid.getGroupId()+"");
-//			return R.ok(list);
 			return R.ok();
 		} else {
 			return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
@@ -124,12 +121,13 @@ public class DiagnosisController {
 	@ApiOperation(value = "查询人工诊断列表")
 //	@Log(title = "查询人工诊断列表", menu = "专题阅片", subMenu = "项目列表", businessType = BusinessType.QUERY)
 	@GetMapping("/info")
-	public R info( 
-			@RequestParam @ApiParam(name = "singleId", value = "切片id", required = true) Long singleId,
+	public R<List<SpecialDiagnosisVo>> info( 
+			@RequestParam @ApiParam(name = "singleId", value = "切片id", required = true) Long singleId
 			//@RequestParam @ApiParam(name = "groupId", value = "分组id", required = false) Long groupId,
-			@RequestParam @ApiParam(name = "specialId", value = "专题id", required = true) Long specialId) {
+//			@RequestParam @ApiParam(name = "specialId", value = "专题id", required = true) Long specialId
+			) {
 		//通过项目ID 专题id 切片id 查询所有的诊断结果，返回列表（添加是否可以修改）
-		List<SpecialDiagnosisVo> list = diagnosisService.getSpecialDiagnosisVo(singleId,specialId);
+		List<SpecialDiagnosisVo> list = diagnosisService.getSpecialDiagnosisVo(singleId);
 		return R.ok(list);
 	}
 

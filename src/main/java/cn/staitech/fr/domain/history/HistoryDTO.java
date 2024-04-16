@@ -21,4 +21,7 @@ public class HistoryDTO {
 
     @ApiModelProperty(value = "切片ID")
     private Long slideId;
+
+    @ApiModelProperty(value = "切片ID")
+    private Long singleSlideId;
 }
