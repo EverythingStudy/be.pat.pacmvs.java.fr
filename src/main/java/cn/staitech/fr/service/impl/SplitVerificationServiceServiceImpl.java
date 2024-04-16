@@ -282,6 +282,15 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			pageResponse.setPageNum(currentPage);
 			pageResponse.setPageSize(pageSize);
 
+		}else{
+			int total = 0;
+			int totalPages = 0;
+			List<SplitVerificationOut> result = new ArrayList<>();
+			pageResponse.setTotal(total);
+			pageResponse.setPages(totalPages);
+			pageResponse.setList(result);
+			pageResponse.setPageNum(currentPage);
+			pageResponse.setPageSize(pageSize);
 		}
 		return pageResponse;
 	}
