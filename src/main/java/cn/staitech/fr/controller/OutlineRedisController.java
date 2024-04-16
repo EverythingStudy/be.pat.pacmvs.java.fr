@@ -62,7 +62,6 @@ public class OutlineRedisController {
         if (selectVO.getMinVal() != null && selectVO.getMaxVal() != null && (selectVO.getMinVal() > selectVO.getMaxVal())) {
             return R.fail(MessageSource.M("OUTLINE.ARGUEMENT.ERROR"));
         }
-
         List<Outline> list = outlineService.selectList(selectVO);
 
         if (CollectionUtils.isEmpty(list)) {
@@ -70,8 +69,6 @@ public class OutlineRedisController {
         }
 
         return R.ok(outlineService.statistic(list, selectVO.getBizType()));
-
-
 
     }
 

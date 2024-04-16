@@ -71,7 +71,6 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
 
         OutlineRoot outlineRoot = object.toJavaObject(OutlineRoot.class);
         List<com.alibaba.fastjson2.JSONObject> srcJsonList = redisService.getCacheList(listKey + outlineRoot.getToken());
-
         if (CollectionUtils.isEmpty(srcJsonList)) {
             return null;
         }
