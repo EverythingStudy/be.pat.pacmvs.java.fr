@@ -264,7 +264,7 @@
             </if>
         </where>
         <if test="sortField != null and sortField!=''">
-            order by #{sortField} #{sortOrder}
+            order by #{sortField} #{sortType}
         </if>
         <if test="sortField == null and sortField==''">
             order by ss.create_time desc

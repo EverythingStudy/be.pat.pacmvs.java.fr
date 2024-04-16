@@ -18,6 +18,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -236,7 +239,7 @@ public class ExportPdfUtils {
             is.close();
             os.close();
         } catch (Exception e) {
-            e.printStackTrace();
+
             try {
                 if (is != null) {
                     is.close();
@@ -247,12 +250,11 @@ public class ExportPdfUtils {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
+            e.printStackTrace();
         } finally {
             // 删除word文档的地址
             File file = new File(wordPath);
-            if (file != null && file.isFile() && file.exists()) {
-                file.delete();
-            }
+            file.deleteOnExit();
         }
     }
 }
