@@ -125,79 +125,65 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     	properties.setContour_type(annotation.getContourType());
         properties.setSingleSlideId(annotation.getSingleSlideId());
         properties.setSingle(annotation.getSingle());
-    	if (annotation.getCategoryId() != null) {
-    		Category category = categoryHashMap.get(annotation.getCategoryId());
-    		if (category == null) {
-    			category = categoryMapper.selectById(annotation.getCategoryId());
-    			if (category != null) {
-    				categoryHashMap.put(category.getCategoryId(), category);
-    				if (annotation.getSingle() == 1) {
-    					if (annotation.getCategoryId() != null) {
-    						PathologicalIndicatorCategory pathologicalIndicatorCategory = pathologicalIndicatorCategoryHashMap.get(annotation.getCategoryId());
-    						if (pathologicalIndicatorCategory == null) {
-    							pathologicalIndicatorCategory = pathologicalIndicatorCategoryMapper.selectById(annotation.getCategoryId());
-    							if (pathologicalIndicatorCategory != null) {
-    								pathologicalIndicatorCategoryHashMap.put(pathologicalIndicatorCategory.getCategoryId(), pathologicalIndicatorCategory);
-    							}
-    						}
-    						if (pathologicalIndicatorCategory != null) {
-    							properties.setLabel_color(pathologicalIndicatorCategory.getRgb());
-    							properties.setLabel_name(pathologicalIndicatorCategory.getNumber());
-    						}
-    					}
-    				} else {
-    					if (annotation.getCategoryId() != null) {
-    						Category category2 = categoryHashMap.get(annotation.getCategoryId());
-    						//TODO 报错
-    						if (category2 == null) {
-    							category2 = categoryMapper.selectById(annotation.getCategoryId());
-    							if (category2 != null) {
-    								categoryHashMap.put(category2.getCategoryId(), category2);
-    							}
-    						}
-    						if (category2 != null) {
-    							properties.setLabel_color(category2.getChromaticValue());
-    							properties.setLabel_name(category2.getOrganName());
-    						}
-    					}
-    				}
-    				if (annotation.getCreateBy() != null) {
-    					User createUser = userMap.get(annotation.getCreateBy());
-    					if (createUser == null) {
-    						createUser = userMapper.selectById(annotation.getCreateBy());
-    						if (createUser != null) {
-    							userMap.put(createUser.getUserId(), createUser);
-    						}
-    					}
-    					if (createUser != null) {
-    						properties.setAnnotation_owner(createUser.getUserName());
-    					}
-    				}
-    				if (annotation.getUpdateBy() != null) {
-    					User updateUser = userMap.get(annotation.getUpdateBy());
-    					if (updateUser == null) {
-    						updateUser = userMapper.selectById(annotation.getUpdateBy());
-    						if (updateUser != null) {
-    							userMap.put(updateUser.getUserId(), updateUser);
-    						}
-    					}
-    					if (updateUser != null) {
-    						properties.setAnnotation_owner(updateUser.getUserName());
-    					}
-    				}
-    			}
-    		}
-    	}
+        if (annotation.getSingle() == 1) {
+            if (annotation.getCategoryId() != null) {
+                PathologicalIndicatorCategory pathologicalIndicatorCategory = pathologicalIndicatorCategoryHashMap.get(annotation.getCategoryId());
+                if (pathologicalIndicatorCategory == null) {
+                    pathologicalIndicatorCategory = pathologicalIndicatorCategoryMapper.selectById(annotation.getCategoryId());
+                    if (pathologicalIndicatorCategory != null) {
+                        pathologicalIndicatorCategoryHashMap.put(pathologicalIndicatorCategory.getCategoryId(), pathologicalIndicatorCategory);
+                    }
+                }
+                if (pathologicalIndicatorCategory != null) {
+                    properties.setLabel_color(pathologicalIndicatorCategory.getRgb());
+                    properties.setLabel_name(pathologicalIndicatorCategory.getNumber());
+                }
+            }
+        } else {
+            if (annotation.getCategoryId() != null) {
+                Category category = categoryHashMap.get(annotation.getCategoryId());
+                if (category == null) {
+                    category = categoryMapper.selectById(annotation.getCategoryId());
+                    if (category != null) {
+                        categoryHashMap.put(category.getCategoryId(), category);
+                    }
+                }
+                if (category != null) {
+                    properties.setLabel_color(category.getChromaticValue());
+                    properties.setLabel_name(category.getOrganName());
+                }
+            }
+        }
+        if (annotation.getCreateBy() != null) {
+            User createUser = userMap.get(annotation.getCreateBy());
+            if (createUser == null) {
+                createUser = userMapper.selectById(annotation.getCreateBy());
+                if (createUser != null) {
+                    userMap.put(createUser.getUserId(), createUser);
+                }
+            }
+            if (createUser != null) {
+                properties.setAnnotation_owner(createUser.getUserName());
+            }
+        }
+        if (annotation.getUpdateBy() != null) {
+            User updateUser = userMap.get(annotation.getUpdateBy());
+            if (updateUser == null) {
+                updateUser = userMapper.selectById(annotation.getUpdateBy());
+                if (updateUser != null) {
+                    userMap.put(updateUser.getUserId(), updateUser);
+                }
+            }
+            if (updateUser != null) {
+                properties.setAnnotation_owner(updateUser.getUserName());
+            }
+        }
     	return properties;
     }
 
 
     @Override
     public List<Features> selectListBy(AnnotationSelectList req) throws Exception {
-        Slide slideBy = slideMapper.selectById(req.getSlideId());
-        if (!Optional.ofNullable(slideBy).isPresent()) {
-            throw new Exception(MessageSource.M("SLIDE_ABNORMAL_NO_INFORMATION"));
-        }
         List<Features> list = new ArrayList<>();
         Annotation annotation = new Annotation();
         annotation.setSlideId(req.getSlideId());
@@ -251,7 +237,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setPerimeter(req.getPerimeter());
         annotation.setCreateBy(req.getCreate_by());
         annotation.setId(id);
-        annotation.setContourType(1L);
+        annotation.setContourType(2L);
         annotation.setAnnotationType("Draw");
         annotationMapper.insert(annotation);
         Annotation annotationBy = annotationMapper.selectById(annotation);
@@ -261,8 +247,10 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
         if(req.getSingle_slide_id() != null){
             NioWebSocketHandler.sendSingle(req.getSingle_slide_id(),broadcastVO);
+        }else{
+            NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
         }
-        NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
+
         if (req.getSingle_slide_id() == null) {
             Slide slide = slideMapper.selectById(req.getSlide_id());
             if (!Optional.ofNullable(slide).isPresent()) {

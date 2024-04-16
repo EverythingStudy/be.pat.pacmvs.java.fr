@@ -46,6 +46,8 @@
         <if test="slideId != null and slideId != ''">slide_id,</if>
         <if test="id != null and id != ''">id,</if>
         <if test="contourType != null and contourType != ''">contour_type,</if>
+        <if test="singleSlideId != null and singleSlideId != ''">single_slide_id,</if>
+        <if test="single != null and single != ''">single,</if>
         create_time,
         update_time
         )values(
@@ -61,6 +63,8 @@
         <if test="slideId != null and slideId != ''">#{slideId},</if>
         <if test="id != null and id != ''">#{id},</if>
         <if test="contourType != null and contourType != ''">#{contourType},</if>
+        <if test="singleSlideId != null and singleSlideId != ''">#{singleSlideId},</if>
+        <if test="single != null and single != ''">#{single},</if>
         now(),
         now()
         )
@@ -157,7 +161,9 @@
         contour_type,
         ST_AsGeoJSON(contour) as contour
         from fr_annotation
+
         <where>
+            contour_type != 1
             <if test="slideId != null">
                 AND slide_id = #{slideId}
             </if>
@@ -166,9 +172,6 @@
             </if>
             <if test="singleSlideId != null">
                 AND single_slide_id = #{singleSlideId}
-            </if>
-            <if test="contourType != null">
-                AND contour_type = #{contourType}
             </if>
             <if test="slideIdList != null and slideIdList.size() > 0">
 	            AND slide_id in

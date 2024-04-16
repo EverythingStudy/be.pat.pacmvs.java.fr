@@ -29,12 +29,7 @@ public class SingleSlideController {
 
     @ApiOperation(value = "更新单切片描述")
     @PostMapping("/updateDescription")
-    public R getDataList(
-            @RequestParam(value = "singleId") @ApiParam(name = "singleId", value = "专题id", required = true) Long singleId,
-            @RequestParam(value = "description") @ApiParam(name = "description", value = "描述", required = true) String description) {
-        SingleSlide singleSlide = new SingleSlide();
-        singleSlide.setSingleId(singleId);
-        singleSlide.setDescription(description);
+    public R getDataList(@RequestBody SingleSlide singleSlide) {
         boolean res = singleSlideService.updateById(singleSlide);
         if(res){
             return R.ok(MessageSource.M("OPERATE_SUCCEED"));

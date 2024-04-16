@@ -204,7 +204,7 @@ public class ExportPdfUtils {
      */
 
     public static void downloadLocal(String path, HttpServletResponse response) throws IOException {
-// 读到流中
+        // 读到流中
         InputStream inputStream = new FileInputStream(path);// 文件的存放路径
         response.reset();
         response.setContentType("application/octet-stream");
@@ -213,7 +213,7 @@ public class ExportPdfUtils {
         ServletOutputStream outputStream = response.getOutputStream();
         byte[] b = new byte[1024];
         int len;
-//从输入流中读取一定数量的字节，并将其存储在缓冲区字节数组中，读到末尾返回-1
+        //从输入流中读取一定数量的字节，并将其存储在缓冲区字节数组中，读到末尾返回-1
         while ((len = inputStream.read(b)) > 0) {
             outputStream.write(b, 0, len);
         }
