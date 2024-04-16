@@ -263,10 +263,6 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
     public void saveAll(List<Outline> list, OutlineSelectVO selectVO) {
         Long categoryId = selectVO.getCategoryId();
         Long createBy = selectVO.getCreateBy();
-        Long slideId = selectVO.getSlideId();
-
-        Slide slide = slideMapper.selectById(slideId);
-        User user = userMapper.selectById(createBy);
 
         // 逐一添加
         for (Outline outline : list) {
