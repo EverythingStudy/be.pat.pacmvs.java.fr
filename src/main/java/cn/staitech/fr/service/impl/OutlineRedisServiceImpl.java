@@ -48,8 +48,8 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
     @Resource
     private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
 
-    public static final String REDIS_OUTLINE_ROOT = "SINGLE_OUTLINE_ROOT:";
-    public static final String REDIS_OUTLINE_LIST = "SINGLE_OUTLINE_LIST:";
+    public static final String REDIS_OUTLINE_ROOT = "OUTLINE_ROOT:";
+    public static final String REDIS_OUTLINE_LIST = "OUTLINE_LIST:";
 
     /**
      * 列表查询
