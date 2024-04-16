@@ -57,13 +57,15 @@ public class OutlineRedisController {
     @PostMapping("/list")
     public R<OutlineStatistic> list(@Validated @RequestBody OutlineSelectVO selectVO) {
         // 删除当前用户、非当前slideId的记录
-        outlineService.removeBycreateBySlideId(selectVO.getCreateBy(), selectVO.getSingleSlideId());
+        if(selectVO.getSingleSlideId() != null){
+            selectVO.setSlideId(selectVO.getSingleSlideId());
+        }
+//        outlineService.removeBycreateBySlideId(selectVO.getCreateBy(), selectVO.getSlideId());
 
         if (selectVO.getMinVal() != null && selectVO.getMaxVal() != null && (selectVO.getMinVal() > selectVO.getMaxVal())) {
             return R.fail(MessageSource.M("OUTLINE.ARGUEMENT.ERROR"));
         }
         List<Outline> list = outlineService.selectList(selectVO);
-
         if (CollectionUtils.isEmpty(list)) {
             return R.fail(MessageSource.M("OUTLINE.NORESULT"));
         }
