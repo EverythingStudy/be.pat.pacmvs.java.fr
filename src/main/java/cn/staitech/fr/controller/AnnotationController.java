@@ -88,18 +88,6 @@ public class AnnotationController {
         }
     }
 
-    @ApiOperationSupport(author = "zmj")
-    @ApiOperation(value = "添加ROI轮廓")
-    @PostMapping("/intelligentAnno/insertROI")
-    public R<String> addList(@Validated @RequestBody RoiIn req) throws Exception {
-        if (CollectionUtils.isEmpty(req.getGeometryList())) {
-            return R.fail(MessageSource.M("NO_DATA_TRANSFERRED"));
-        }
-        if (!req.getRoiStatus().equals(1) && !req.getRoiStatus().equals(0)) {
-            return R.fail(MessageSource.M("ARGUMENT_INVALID"));
-        }
-        return annotationService.roiContDel(req);
-    }
 
     @ApiOperationSupport(author = "gjt")
     @ApiOperation(value = "合并轮廓预览")

@@ -113,7 +113,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         //校验是否生成专题
         WaxBlockNumber byId = getById(id);
         LambdaQueryWrapper<Special> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Special::getTopicId,byId);
+        queryWrapper.eq(Special::getTopicId,byId.getTopicId());
         queryWrapper.eq(Special::getDelFlag,CommonConstant.NUMBER_0);
         Integer integer = specialMapper.selectCount(queryWrapper);
         if(integer>0){

@@ -131,7 +131,7 @@
             <if test="animalCode != null and animalCode != ''">
                 AND t1.animal_code like concat('%', #{animalCode}, '%')
             </if>
-             <if test="fileName != null and fileName != ''">
+            <if test="fileName != null and fileName != ''">
                 AND t2.file_name like concat('%', #{fileName}, '%')
             </if>
             <if test="checkType != null and checkType == 1">
