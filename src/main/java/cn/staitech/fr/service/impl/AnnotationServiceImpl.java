@@ -849,7 +849,11 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Properties properties = getProperties(annotationById);
         Features features = MarkingUtils.socketData(String.valueOf(annotation.getAnnotationId()), JSONObject.parseObject(annotation.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendListMessages(CommonConstant.ANNO_TYPE_DRAW, ADD_STATUS, features, null);
-        NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
+        if(annotationById.getSingleSlideId() != null){
+            NioWebSocketHandler.sendSingle(annotationById.getSingleSlideId(), broadcastVO);
+        } else{
+            NioWebSocketHandler.sendAll(annotationById.getSlideId(), broadcastVO);
+        }
         return annotationById;
     }
 
@@ -869,24 +873,31 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setUpdateBy(SecurityUtils.getUserId());
         annotation.setUpdateTime(String.valueOf(new Date()));
         annotationMapper.updateById(annotation);
-        Annotation annotationById = annotationMapper.selectById(annotation.getAnnotationId());
-        Properties properties = getProperties(annotationById);
+        Properties properties = getProperties(annotationBy);
         Features features = AnnotationDataEncapsulation.socketData(String.valueOf(annotationBy.getAnnotationId()), JSONObject.parseObject(req.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_DRAW, UPDATE_STATUS, features);
-        NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
+        if(annotationBy.getSingleSlideId() != null){
+            NioWebSocketHandler.sendSingle(annotationBy.getSingleSlideId(), broadcastVO);
+        } else{
+            NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
+        }
         return annotationBy;
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Annotation deleteByHistory(Long annotationId) throws Exception {
-        Annotation annotation = annotationMapper.selectById(annotationId);
+    public Annotation deleteByHistory(Long annotationId) {
         Annotation annotationById = annotationMapper.selectById(annotationId);
         Properties properties = getProperties(annotationById);
         Features features = AnnotationDataEncapsulation.socketData(String.valueOf(annotationId), JSONObject.parseObject(annotationById.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendListMessages(CommonConstant.ANNO_TYPE_DRAW, DELETE_STATUS, features, null);
-        NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
-        return annotation;
+        annotationMapper.deleteById(annotationById);
+        if(annotationById.getSingleSlideId() != null){
+            NioWebSocketHandler.sendSingle(annotationById.getSingleSlideId(), broadcastVO);
+        } else{
+            NioWebSocketHandler.sendAll(annotationById.getSlideId(), broadcastVO);
+        }
+        return annotationById;
     }
 
 
