@@ -1,5 +1,6 @@
 package cn.staitech.fr.utils;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.out.ExportListVO;
 import cn.staitech.fr.domain.out.ExportVO;
 import com.aspose.words.Document;
@@ -18,9 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -39,8 +37,6 @@ public class ExportPdfUtils {
      * @throws IOException
      */
     public static void exportFile(String outFile, ExportVO data) throws IOException {
-        //模板地址，存放在resources目录下
-        String filePath = "templete/123.docx";
         //使用poi-tl进行模板处理
         ConfigureBuilder builder = Configure.builder();
         builder.useSpringEL(true);
@@ -50,7 +46,7 @@ public class ExportPdfUtils {
         builder.bind("list", strategy);
         builder.bind("table", strategy);
         //获取模板文件流
-        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(filePath);
+        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(CommonConstant.WROD_PATH);
         //ClassPathResource classPathResource = new ClassPathResource("templete/人工诊断报告.docx");
         //InputStream inputStream = classPathResource.getInputStream();
         assert inputStream != null;
