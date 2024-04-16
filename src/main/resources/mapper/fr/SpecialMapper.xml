@@ -27,7 +27,7 @@
     </sql>
     <select id="getSpecialList" parameterType="cn.staitech.fr.domain.in.SpecialListQueryIn"
             resultType="cn.staitech.fr.domain.out.SpecialListQueryOut">
-        select fs.special_id, tt.topic_name, fs.color_type,fs.special_name,fs.trial_id, ts.name speciesName, ts.name_en
+        select distinct fs.special_id, tt.topic_name, fs.color_type,fs.special_name,fs.trial_id, ts.name speciesName, ts.name_en
         speciesNameEn, fs.status, fs.create_time,su.user_name createName
         from fr_special fs
         left join tb_topic tt on fs.topic_id = tt.topic_id
@@ -75,7 +75,7 @@
 
     <select id="getSpecials" parameterType="cn.staitech.fr.domain.in.SpecialsQueryIn"
             resultType="cn.staitech.fr.domain.out.SpecialListQueryOut">
-        select fs.special_id, tt.topic_name, fs.color_type,fs.special_name,fs.trial_id, ts.name speciesName, ts.name_en
+        select  fs.special_id, tt.topic_name, fs.color_type,fs.special_name,fs.trial_id, ts.name speciesName, ts.name_en
         speciesNameEn, fs.status, fs.create_time,su.user_name createName
         from fr_special fs
         left join tb_topic tt on fs.topic_id = tt.topic_id

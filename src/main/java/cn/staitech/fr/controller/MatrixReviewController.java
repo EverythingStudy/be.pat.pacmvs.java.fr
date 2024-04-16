@@ -87,4 +87,10 @@ public class MatrixReviewController {
     public void algorithmDownload(@Validated @RequestBody AiDownloadIn req) throws Exception {
         matrixReviewService.algorithmDownload(req);
     }
+
+    @ApiOperation(value = "ai预测")
+    @PostMapping("/algorithm")
+    public void algorithm(@Validated @RequestBody AiDownloadIn req) throws Exception {
+        matrixReviewService.algorithmDownload(req);
+    }
 }

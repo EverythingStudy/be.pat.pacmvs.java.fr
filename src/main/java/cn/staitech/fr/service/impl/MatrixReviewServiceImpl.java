@@ -23,6 +23,7 @@ import cn.staitech.fr.domain.out.MatrixReviewListOut;
 import cn.staitech.fr.domain.out.MatrixReviewOut;
 import cn.staitech.fr.domain.out.OrganDisassemblyOut;
 import cn.staitech.fr.domain.out.OrgansData;
+import cn.staitech.fr.domain.out.SpecialListQueryOut;
 import cn.staitech.fr.domain.out.WaxBlockNumberListOut;
 import cn.staitech.fr.mapper.DiagnosisMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
@@ -158,10 +159,12 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         wrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
         wrapper.eq(Slide::getSpecialId, req.getSpecialId());
         wrapper.isNotNull(Slide::getAnimalCode);
-        Page<AnimalDimensionOut> page = new Page<>(req.getPageNum(), req.getPageSize());
+        Page<Slide> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
         List<Slide> slideList = slideMapper.selectList(wrapper);
         if (CollectionUtils.isEmpty(slideList)) {
             resp.setTotal(page.getTotal());
+            resp.setPageNum(req.getPageNum());
+            resp.setPageSize(req.getPageSize());
             resp.setData(ret);
             resp.setPages(page.getPages());
         }
@@ -182,6 +185,8 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         ret.setCategoryList(headList);
         resp.setTotal(page.getTotal());
         resp.setData(ret);
+        resp.setPageNum(req.getPageNum());
+        resp.setPageSize(req.getPageSize());
         resp.setPages(page.getPages());
         return resp;
     }

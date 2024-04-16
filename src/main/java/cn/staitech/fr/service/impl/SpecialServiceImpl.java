@@ -88,7 +88,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         if(integer==0){
             req.setUserId(SecurityUtils.getUserId());
         }
-        Page<SysUser> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
+        Page<SpecialListQueryOut> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
         List<SpecialListQueryOut> specialList = this.baseMapper.getSpecialList(req);
         if (CollectionUtils.isNotEmpty(specialList)) {
             specialList.forEach(e -> {
