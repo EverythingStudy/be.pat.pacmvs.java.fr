@@ -25,6 +25,9 @@ public class OutlineRoot implements Serializable {
     @ApiModelProperty(value = "切片ID")
     private Long slideId;
 
+    @ApiModelProperty(value = "单脏器切片ID")
+    private Long singleSlideId;
+
     @ApiModelProperty(value = "token")
     private String token;
 }
