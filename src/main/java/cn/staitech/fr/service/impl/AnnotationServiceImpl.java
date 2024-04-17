@@ -207,6 +207,10 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         } else {
             throw new Exception(MessageSource.M("ARGUMENT_INVALID"));
         }
+        Slide slide = slideMapper.selectById(req.getSlide_id());
+        if (!Optional.ofNullable(slide).isPresent()) {
+            throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
+        }
         String id = null;
         Category category = null;
         Annotation annotation = new Annotation();
@@ -244,7 +248,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBy);
         Features features = socketData(annotation.getId(), JSONObject.parseObject(annotationBy.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(ADD_STATUS, features);
-
         if(req.getSingle_slide_id() != null){
             NioWebSocketHandler.sendSingle(req.getSingle_slide_id(),broadcastVO);
         }else{
@@ -252,10 +255,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
 
         if (req.getSingle_slide_id() == null) {
-            Slide slide = slideMapper.selectById(req.getSlide_id());
-            if (!Optional.ofNullable(slide).isPresent()) {
-                throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
-            }
             Image image = imageMapper.selectById(slide.getImageId());
             if (!Optional.ofNullable(image).isPresent()) {
                 throw new Exception(MessageSource.M("NODATA"));
@@ -263,6 +262,11 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             Special special = specialService.getById(slide.getSpecialId());
             List<JSONObject> contourList = selectContourList(annotation.getSlideId(), req.getCategory_id());
             asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1, category.getCategoryAbbreviation(),special.getTopicName());
+            // 切图完成后更新切片状态
+            if(slide.getProcessFlag() != 2){
+                slide.setProcessFlag(2);
+                slideMapper.updateById(slide);
+            }
         }
         {
             Long slideId;
