@@ -9,8 +9,10 @@ import cn.staitech.fr.domain.history.HistoryDTO;
 import cn.staitech.fr.domain.history.Session;
 import cn.staitech.fr.domain.history.Trace;
 import cn.staitech.fr.domain.history.TraceNode;
+import cn.staitech.fr.domain.in.AlgorithmAnnIn;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.netty.websocket.NioWebSocketHandler;
+import cn.staitech.fr.service.AlgorithmPredictionService;
 import cn.staitech.fr.service.RocksdbService;
 import cn.staitech.fr.service.SpecialService;
 import cn.staitech.fr.utils.*;
@@ -90,6 +92,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     @Resource
     private SpecialService specialService;
+
+    @Resource
+    private AlgorithmPredictionService algorithmPredictionService;
 
     @Resource
     private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
@@ -262,6 +267,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             Special special = specialService.getById(slide.getSpecialId());
             List<JSONObject> contourList = selectContourList(annotation.getSlideId(), req.getCategory_id());
             asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1, category.getCategoryAbbreviation(),special.getTopicName());
+            AlgorithmAnnIn algorithmAnnIn = new AlgorithmAnnIn();
+            algorithmAnnIn.setSlideId(slide.getSlideId());
+            algorithmPredictionService.recognition(algorithmAnnIn);
             // 切图完成后更新切片状态
             if(slide.getProcessFlag() != 2){
                 slide.setProcessFlag(2);
@@ -443,6 +451,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             }
             Special special = specialService.getById(slide.getSpecialId());
             asyncTask.generateThumbnail(annotationBy.getSlideId(), annotationBy.getCategoryId(), image.getImageUrl(), contourList, type,category.getCategoryAbbreviation(),special.getTopicName());
+            AlgorithmAnnIn algorithmAnnIn = new AlgorithmAnnIn();
+            algorithmAnnIn.setSlideId(slide.getSlideId());
+            algorithmPredictionService.recognition(algorithmAnnIn);
         }
         String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
         boolean isBatch = false;
@@ -597,6 +608,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                 categoryAbbreviation = categoryAfter.getCategoryAbbreviation();
             }
             asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourListAfter, 1,categoryAbbreviation,special.getTopicName());
+            AlgorithmAnnIn algorithmAnnIn = new AlgorithmAnnIn();
+            algorithmAnnIn.setSlideId(slide.getSlideId());
+            algorithmPredictionService.recognition(algorithmAnnIn);
 
         }
         return annotation.getAnnotationId();
@@ -788,6 +802,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
             Special special = specialService.getById(slide.getSpecialId());
             asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, 1,category.getCategoryAbbreviation(),special.getTopicName());
+            AlgorithmAnnIn algorithmAnnIn = new AlgorithmAnnIn();
+            algorithmAnnIn.setSlideId(slide.getSlideId());
+            algorithmPredictionService.recognition(algorithmAnnIn);
         }
         {
             Long userId = req.getUpdate_by();
