@@ -21,12 +21,14 @@ public class ImageExportOut {
     @ExcelIgnore
     private Long imageId;
     @ExcelProperty(value = "专题号")
+    @ExcelIgnore
     private String topicName;
     @ExcelProperty(value = "切图编号")
     private String imageName;
     @ExcelProperty(value = "图像大小")
     private String size;
     @ExcelProperty(value = "切图编号")
+    @ExcelIgnore
     private String imageCode;
     @ExcelProperty(value = "状态")
     @ExcelIgnore
