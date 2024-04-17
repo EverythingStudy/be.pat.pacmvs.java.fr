@@ -280,10 +280,6 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		record.setDeleteFlag(0);
 		diagnosisMapper.updateById(record);
 
-		//		DiagnosisDetail detail = new DiagnosisDetail();
-		//		detail.setDiagnosisId(specialDiagnosisId);
-		//		detail.setDeleteFlag(0);
-		//		diagnosisDetailService.updateById(detail);
 		//查询下当前数据下是否还有数据，如果没有数据了，修改为未诊断
 		QueryWrapper<Diagnosis> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("special_id",diagnosis.getSpecialId());
@@ -440,9 +436,6 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		if(null != sysDictData){
 			labelName = sysDictData.getDictLabel();
 		}
-		/*if(StringUtils.isEmpty(labelName)){
-			log.info("dictType："+dictType+" labelIds:"+labelIds+" 未查询到相关信息");
-		}*/
 		return labelName;
 	}
 

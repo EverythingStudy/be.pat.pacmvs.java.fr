@@ -41,7 +41,6 @@ public class SlideRecognitionnController {
     public R start(@Validated @RequestBody StartPredictionIn req) {
         R r = algorithmPredictionService.startPrediction(req);
     	return r;
-//        return R.ok();
     }
     
 }

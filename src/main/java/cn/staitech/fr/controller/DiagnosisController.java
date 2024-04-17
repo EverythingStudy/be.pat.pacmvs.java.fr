@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,10 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.staitech.common.core.domain.R;
-import cn.staitech.common.log.annotation.Log;
-import cn.staitech.common.log.enums.BusinessType;
 import cn.staitech.common.security.utils.SecurityUtils;
-import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Diagnosis;
 import cn.staitech.fr.service.DiagnosisService;
 import cn.staitech.fr.utils.MessageSource;
@@ -123,8 +119,6 @@ public class DiagnosisController {
 	@GetMapping("/info")
 	public R<List<SpecialDiagnosisVo>> info( 
 			@RequestParam @ApiParam(name = "singleId", value = "切片id", required = true) Long singleId
-			//@RequestParam @ApiParam(name = "groupId", value = "分组id", required = false) Long groupId,
-//			@RequestParam @ApiParam(name = "specialId", value = "专题id", required = true) Long specialId
 			) {
 		//通过项目ID 专题id 切片id 查询所有的诊断结果，返回列表（添加是否可以修改）
 		List<SpecialDiagnosisVo> list = diagnosisService.getSpecialDiagnosisVo(singleId);

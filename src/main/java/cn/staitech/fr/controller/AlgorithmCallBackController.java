@@ -1,8 +1,5 @@
 package cn.staitech.fr.controller;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingQueue;
-
 import javax.annotation.Resource;
 
 import org.springframework.validation.annotation.Validated;
@@ -11,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cn.hutool.core.thread.ExecutorBuilder;
 import cn.hutool.json.JSONUtil;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Image;
@@ -36,8 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("/algorithmCallBack")
 public class AlgorithmCallBackController {
-
-    //private static final ExecutorService EXECUTOR = ExecutorBuilder.create().setCorePoolSize(Runtime.getRuntime().availableProcessors()).setMaxPoolSize(Runtime.getRuntime().availableProcessors() * 2).setKeepAliveTime(0).setWorkQueue(new LinkedBlockingQueue<Runnable>(4096)).build();
 
     @Resource
     private ImageService imageService;

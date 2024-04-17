@@ -16,15 +16,7 @@ import javax.annotation.Resource;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
@@ -112,7 +104,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		int type = req.getType();
 		List<Long> slideIdList = req.getSlideIdList();
 		List<AlgorithmImageOut> list = new ArrayList<>();
-		//Map<Long, String> slideMap =  new HashMap<>();
 		if(type == 0){
 			//待切图的所有切片
 			Map<String,Object> queryMap = new HashMap<>();
@@ -138,14 +129,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 				Long imageId = algorithmImageOut.getImageId();
 				String organizatinName = geNumber(organizationId);
 				if(null != slideId && StringUtils.isNotEmpty(imageUrl)){
-					//{"slideId":10,"modelName":"脏器识别算法","imageUrl":"C:/Users/86153/Desktop/医疗PD/0320/2_shaowei/ST20Rf-AO-HE-LU-320-1-000020.svs"}
-					Map<String,Object> dataMap = new HashMap<>();
-					dataMap.put("imageId", imageId);
-					dataMap.put("slideId", slideId);
-					dataMap.put("organizationId", organizationId);
-					dataMap.put("organizationName", organizatinName);
-					dataMap.put("imageUrl", imageUrl);
-					dataMap.put("algorithm_name", CommonConstant.RECOGNITION_MODEL_NAME);
 					if(imageUrl.endsWith("svs")||imageUrl.endsWith("SVS")){
 						//请求算法接口
 						try {
