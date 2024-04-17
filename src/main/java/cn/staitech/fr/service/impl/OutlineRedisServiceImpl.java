@@ -232,14 +232,12 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
 
         com.alibaba.fastjson2.JSONObject object = redisService.getCacheObject(rootKey);
         OutlineRoot outlineRoot = object.toJavaObject(OutlineRoot.class);
-
         // 当前用户所有数据的Key
         Collection<String> keyCollection = redisService.keys(listKey + "*");
         if (CollectionUtils.isEmpty(keyCollection)) {
             return;
         }
-
-        if (outlineRoot.getSlideId().equals(slideId)) {
+        if (outlineRoot.getSingleSlideId().equals(slideId)) {
             // 清空当前用户非当前token的数据
             for (String keyStr : keyCollection) {
                 if (!keyStr.equals(listKey + outlineRoot.getToken())) {

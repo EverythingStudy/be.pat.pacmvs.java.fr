@@ -10,6 +10,7 @@ import com.deepoove.poi.config.Configure;
 import com.deepoove.poi.config.ConfigureBuilder;
 import com.deepoove.poi.data.PictureRenderData;
 import com.deepoove.poi.plugin.table.LoopRowTableRenderPolicy;
+import org.apache.commons.io.FileUtils;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -47,6 +48,7 @@ public class ExportPdfUtils {
         builder.bind("table", strategy);
         //获取模板文件流
         InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(CommonConstant.WROD_PATH);
+        FileOutputStream os = new FileOutputStream(outFile);
         //ClassPathResource classPathResource = new ClassPathResource("templete/人工诊断报告.docx");
         //InputStream inputStream = classPathResource.getInputStream();
         assert inputStream != null;
@@ -56,13 +58,15 @@ public class ExportPdfUtils {
         XWPFTemplate render = XWPFTemplate.compile(inputStream, builder.build()).render(data);
         try {
             //render.write(new FileOutputStream("D:/wordss/test555.docx"));
-            render.write(new FileOutputStream(outFile));
+            render.write(os);
+
         } catch (IllegalArgumentException e) {
             System.out.println("小问题思密达");
+        } finally {
+            os.close();
+            inputStream.close();
+            render.close();
         }
-
-
-        inputStream.close();
 
 
     }
@@ -186,6 +190,7 @@ public class ExportPdfUtils {
         }
 
         // 关闭各种流
+        os.close();
         zipOutputStream.closeEntry();
         zipOutputStream.close();
     }
@@ -211,10 +216,11 @@ public class ExportPdfUtils {
         while ((len = inputStream.read(b)) > 0) {
             outputStream.write(b, 0, len);
         }
+        outputStream.close();
         inputStream.close();
     }
 
-    public static void wordToPdf(String wordPath, String pdfPath) {
+    public static void wordToPdf(String wordPath, String pdfPath) throws IOException {
         FileOutputStream os = null;
         FileInputStream is = null;
         try {
@@ -248,9 +254,9 @@ public class ExportPdfUtils {
             }
             e.printStackTrace();
         } finally {
-            // 删除word文档的地址
-            File file = new File(wordPath);
-            file.deleteOnExit();
+            if (new File(wordPath).exists()) {
+                FileUtils.delete(new File(wordPath));
+            }
         }
     }
 }

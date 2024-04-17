@@ -60,7 +60,7 @@ public class OutlineRedisController {
         if(selectVO.getSingleSlideId() != null){
             selectVO.setSlideId(selectVO.getSingleSlideId());
         }
-//        outlineService.removeBycreateBySlideId(selectVO.getCreateBy(), selectVO.getSlideId());
+        outlineService.removeBycreateBySlideId(selectVO.getCreateBy(), selectVO.getSlideId());
 
         if (selectVO.getMinVal() != null && selectVO.getMaxVal() != null && (selectVO.getMinVal() > selectVO.getMaxVal())) {
             return R.fail(MessageSource.M("OUTLINE.ARGUEMENT.ERROR"));
@@ -69,7 +69,6 @@ public class OutlineRedisController {
         if (CollectionUtils.isEmpty(list)) {
             return R.fail(MessageSource.M("OUTLINE.NORESULT"));
         }
-
         return R.ok(outlineService.statistic(list, selectVO.getBizType()));
 
     }

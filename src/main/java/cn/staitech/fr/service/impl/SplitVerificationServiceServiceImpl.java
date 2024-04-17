@@ -126,7 +126,6 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			List<Long> annoSlideIdList = annoList.stream().map(Annotation::getSlideId).collect(Collectors.toList());
 			if(CollectionUtils.isNotEmpty(annoSlideIdList)){
 				req.setSlideIdList(annoSlideIdList);
-				//queryWrapper.in("slide_id",annoSlideIdList);
 			}
 			String oCategory = organizationId.toString()+reqCategoryId.toString();
 			String categoryName = MapConstant.getCategory(oCategory);
@@ -160,8 +159,6 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 				int allCheckStatus = 0;
 				if(CollectionUtils.isNotEmpty(animalSlideList)){
 					//切图结果==》按照动物编号统计汇总
-					//					Map<Integer, Integer> checkMap = animalSlideList.stream().collect(Collectors.toMap(Slide::getCheckStatus,Slide::getCheckStatus ));
-
 					Map<Integer, List<Slide>> checkMap = animalSlideList.stream().collect(Collectors.groupingBy(Slide::getCheckStatus));
 
 					if(null != checkMap && checkMap.containsKey(3)){
@@ -192,7 +189,6 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 						}
 					}
 					//蜡块表脏器信息==》按照动物脏器统计汇总==>底层都是按照字典顺序进行排序(https://blog.csdn.net/Rcain_R/article/details/136692093)
-					//Map<String, Long> organCountGroupedByOrgan = animalSlideList.stream().collect(Collectors.groupingBy(Slide::getOrgans, Collectors.counting()));
 					waxCategoryMap = waxCategoryMap.entrySet().stream()
 							.sorted(Map.Entry.comparingByKey())
 							.collect(Collectors.toMap(
