@@ -159,9 +159,10 @@
         slide_id,
         id,
         contour_type,
-        ST_AsGeoJSON(contour) as contour
+        ST_AsGeoJSON(contour) as contour,
+        single_slide_id,
+        single
         from fr_annotation
-
         <where>
             contour_type != 1
             <if test="slideId != null">

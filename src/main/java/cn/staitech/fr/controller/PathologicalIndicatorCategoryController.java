@@ -2,6 +2,7 @@ package cn.staitech.fr.controller;
 
 
 import cn.staitech.common.core.domain.R;
+import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.domain.PathologicalIndicator;
 import cn.staitech.fr.domain.PathologicalIndicatorCategory;
 import cn.staitech.fr.service.CategoryService;
@@ -46,7 +47,7 @@ public class PathologicalIndicatorCategoryController {
         String organId = categoryService.getById(categoryId).getOrganId();
         Long speciesId = Long.valueOf(specialService.getById(specialId).getSpeciesId());
         QueryWrapper<PathologicalIndicator> pathologicalIndicatorQueryWrapper = new QueryWrapper<>();
-        pathologicalIndicatorQueryWrapper.eq("species_id", speciesId).eq("organ_id", organId);
+        pathologicalIndicatorQueryWrapper.eq("species_id", speciesId).eq("organ_id", organId).eq("organization_id",SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
         Long indicatorId = pathologicalIndicatorService.getOne(pathologicalIndicatorQueryWrapper).getIndicatorId();
         QueryWrapper<PathologicalIndicatorCategory> pathologicalIndicatorCategoryQueryWrapper = new QueryWrapper<>();
         pathologicalIndicatorCategoryQueryWrapper.eq("indicator_id", indicatorId);

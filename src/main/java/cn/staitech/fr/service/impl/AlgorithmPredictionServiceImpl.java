@@ -72,9 +72,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	private AnnotationMapper annotationMapper;
 
 	@Resource
-	private AnnotationService annotationService;
-
-	@Resource
 	private WaxBlockInfoService waxBlockInfoService;
 
 	@Resource
