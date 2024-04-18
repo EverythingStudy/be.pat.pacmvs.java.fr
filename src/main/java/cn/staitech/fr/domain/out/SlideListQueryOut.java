@@ -50,4 +50,8 @@ public class SlideListQueryOut {
 
     @ApiModelProperty(value = "脏器类型")
     private String organs;
+
+    @ApiModelProperty(value = "切片名称解析，0：成功；1：失败")
+    private String analyzeStatus;
+
 }

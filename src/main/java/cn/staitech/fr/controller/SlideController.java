@@ -63,4 +63,11 @@ public class SlideController  extends BaseController {
     public R<SlideSelectBy> slideInfo(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "标注id", required = true) Long slideId) {
         return R.ok(slideService.pageImageCsvListVOBy(slideId));
     }
+
+    @ApiOperation(value = "选片列表-选后-删除")
+    @GetMapping("/delete")
+    public R deleteById(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "标注id", required = true) Long slideId) {
+        return slideService.deleteById(slideId);
+
+    }
 }

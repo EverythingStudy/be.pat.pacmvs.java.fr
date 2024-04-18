@@ -34,6 +34,7 @@ import cn.staitech.fr.domain.WaxBlockInfo;
 import cn.staitech.fr.domain.in.AlgorithmAnnIn;
 import cn.staitech.fr.domain.in.StartPredictionIn;
 import cn.staitech.fr.domain.out.AlgorithmImageOut;
+import cn.staitech.fr.feign.PythonOrganRecognitionService;
 import cn.staitech.fr.feign.PythonService;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SlideMapper;
@@ -88,7 +89,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	private SpecialMapper specialMapper;
 
 	@Resource
-	private PythonService pythonService;
+	private PythonOrganRecognitionService pythonService;
 
 
 	@SuppressWarnings("rawtypes")
@@ -106,6 +107,8 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			Map<String,Object> queryMap = new HashMap<>();
 			queryMap.put("specialId", specialId);
 			queryMap.put("processFlag", 0);
+			//切片名称解析，0：成功；1：失败
+			queryMap.put("analyzeStatus", 0);
 			list = slideMapper.getAlgorithmImage(queryMap);
 		}else{
 			if(CollectionUtils.isEmpty(slideIdList)) {
@@ -116,6 +119,8 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			queryMap.put("specialId", specialId);
 			queryMap.put("processFlag", 0);
 			queryMap.put("list", slideIdList);
+			//切片名称解析，0：成功；1：失败
+			queryMap.put("analyzeStatus", 0);
 			list = slideMapper.getAlgorithmImage(queryMap);
 		}
 		//请求算法处理
@@ -215,12 +220,26 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 
 	public void checkSlide(Slide slide) {
 		//		Long organizationId = 6L;
+		//切片名称解析，0：成功；1：失败
+		String analyzeStatus = slide.getAnalyzeStatus();
+		if(StringUtils.isNotEmpty(analyzeStatus) && analyzeStatus.equals("1")){
+			//核对的动物号为空，直接对比错误
+			Slide updateSlide = new Slide();
+			//核对状态 0：初始 1：正确 2：修正正常 3：错误
+			updateSlide.setCheckStatus(3);
+			updateSlide.setCheckBy(0l);
+			updateSlide.setCheckTime(new Date());
+			updateSlide.setAnimalCheckStatus(3);
+			slideMapper.updateById(updateSlide);
+			return ;
+		}
 		//专题id
 		Long specialId = slide.getSpecialId();
 		Long slideId = slide.getSlideId();
 		Slide slideInfo = slideMapper.selectById(slideId);
 		Special special = specialMapper.selectById(slideInfo.getSpecialId());
 		Long organizationId = special.getOrganizationId();
+		
 		//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
 		int processFlag = slide.getProcessFlag();
 		if(processFlag == 3){
@@ -327,10 +346,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			slideMapper.updateById(updateSlide);
 		}
 		//检查当前动物号所属的所有切片是否正常
-		Slide oldSlide = slideService.getById(slideId);
-		//动物号
-		String animalCode = oldSlide.getAnimalCode();
-
+		String animalCode = slide.getAnimalCode();
 		QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("animal_code", animalCode);
 		queryWrapper.eq("special_id", specialId);

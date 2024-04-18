@@ -5,15 +5,18 @@ import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Group;
+import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.in.ChoiceSaveInVo;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
 import cn.staitech.fr.domain.out.ImageListOutVO;
 import cn.staitech.fr.domain.out.SlideListQueryOut;
 import cn.staitech.fr.domain.out.SlideSelectBy;
+import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.mapper.WaxBlockInfoMapper;
 import cn.staitech.fr.service.GroupService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.service.SlideService;
@@ -47,6 +50,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide>
     private WaxBlockInfoMapper waxBlockInfoMapper;
     @Resource
     private SpecialMapper specialMapper;
+    @Resource
+    private SingleSlideMapper singleSlideMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -83,15 +88,36 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide>
         return this.baseMapper.pageImageCsvListVOBy(slideId);
     }
 
+    @Override
+    public R deleteById(Long slideId) {
+        log.info("删除切片接口开始：");
+        //校验是否存在数据
+        LambdaQueryWrapper<SingleSlide> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(SingleSlide::getSlideId, slideId);
+        List<SingleSlide> singleSlides = singleSlideMapper.selectList(queryWrapper);
+        if(singleSlides.size()>0){
+            return R.fail("EXISTS_SINGLESLIDE_DATA");
+        }
+        Slide slide = new Slide();
+        slide.setSlideId(slideId);
+        slide.setDelFlag(CommonConstant.NUMBER_1);
+        this.baseMapper.updateById(slide);
+        return R.ok();
+    }
+
     private Slide getExtInfo(String fileName, Slide slide, Long specialId) {
         String[] s = fileName.split(" ");
         if (s.length != 3) {
             log.info("切片文件名格式错误：" + fileName);
+            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
+            slide.setProcessFlag(4);
             return slide;
         }
         String s1 = this.baseMapper.selectBySpecialId(specialId);
         if (!s[0].equals(s1)) {
             log.info("切片文件名格式错误：" + fileName);
+            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
+            slide.setProcessFlag(4);
             return slide;
         }
         slide.setAnimalCode(StringUtils.substringBeforeLast(s[1], "-"));
@@ -100,15 +126,19 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide>
         if (!CommonConstant.MALE.equals(s[2].substring(s[2].length() - 1)) &&
                 !CommonConstant.FEMALE.equals(s[2].substring(s[2].length() - 1))) {
             log.info("切片文件名格式错误：" + fileName);
+            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
+            slide.setProcessFlag(4);
             return slide;
         }
         slide.setGenderFlag(s[2].substring(s[2].length() - 1));
         //判断组别
-        Group byId = groupService.getById(s[2].substring(0, s[2].length() - 1));
+        /*Group byId = groupService.getById(s[2].substring(0, s[2].length() - 1));
         if (ObjectUtils.isEmpty(byId)) {
             log.info("切片文件名格式错误：" + fileName);
+            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
+            slide.setProcessFlag(4);
             return slide;
-        }
+        }*/
         slide.setGroupCode(s[2].substring(0, s[2].length() - 1));
         Special special = specialMapper.selectById(specialId);
         slide.setOrgans(waxBlockInfoMapper.getOrganName(special.getTopicId(),special.getSpeciesId(),slide.getWaxCode(),s[2].substring(s[2].length() - 1)));

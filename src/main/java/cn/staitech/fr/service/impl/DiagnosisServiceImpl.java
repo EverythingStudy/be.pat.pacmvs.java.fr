@@ -182,13 +182,14 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 
 		if (null == addVo.getDiagnosisId()) {
 			//获取分组id
-			Long slideId = singleSlide.getSlideId();
-			String groupCode = slide.getGroupCode();
-			record.setGroupId(Long.valueOf(groupCode));
-			record.setCreateBy(currentUserId);
-			record.setCreateTime(DateUtil.date());
-
-			diagnosisMapper.insert(record);
+//			Long slideId = singleSlide.getSlideId();
+			if(null != slide.getGroupCode()){
+				String groupCode = slide.getGroupCode();
+				record.setGroupId(Long.valueOf(groupCode));
+				record.setCreateBy(currentUserId);
+				record.setCreateTime(DateUtil.date());
+				diagnosisMapper.insert(record);
+			}
 		} else {
 			record.setUpdateBy(currentUserId);
 			record.setUpdateTime(DateUtil.date());

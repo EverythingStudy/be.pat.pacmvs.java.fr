@@ -24,6 +24,9 @@ public class SlideListQueryIn extends PageRequest {
     @ApiModelProperty(value = "状态")
     private String processFlag;
 
+    @ApiModelProperty(value = "切片名称解析，0：成功；1：失败")
+    private String analyzeStatus;
+
     @ApiModelProperty(value = "添加人")
     private String createBy;
 

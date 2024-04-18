@@ -5,19 +5,15 @@ import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Container;
-import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.SpecialRecycling;
 import cn.staitech.fr.domain.in.SpecialRecyclingListQueryIn;
 import cn.staitech.fr.domain.in.SpecialRecyclingRecoverIn;
-import cn.staitech.fr.domain.out.SpecialListQueryOut;
 import cn.staitech.fr.domain.out.SpecialRecyclingListQueryOut;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.mapper.SpecialRecyclingMapper;
 import cn.staitech.fr.service.SpecialRecyclingService;
-import cn.staitech.fr.service.SpecialService;
-import cn.staitech.system.api.domain.SysUser;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -26,7 +22,6 @@ import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -100,12 +95,12 @@ public class SpecialRecyclingServiceImpl extends ServiceImpl<SpecialRecyclingMap
             special.setDelFlag(CommonConstant.NUMBER_0);
             specialMapper.updateById(special);
             //恢复切片
-            Slide slide = new Slide();
+            /*Slide slide = new Slide();
             slide.setDelFlag(CommonConstant.NUMBER_0);
             LambdaQueryWrapper<Slide> wrapper2 = new LambdaQueryWrapper<>();
             wrapper2.eq(Slide::getDelFlag,CommonConstant.NUMBER_1);
             wrapper2.eq(Slide::getSpecialId,specialRecycling.getSpecialId());
-            slideMapper.update(slide,wrapper2);
+            slideMapper.update(slide,wrapper2);*/
         }
 
         SpecialRecycling specialRecycling1 = new SpecialRecycling();

@@ -27,4 +27,6 @@ public interface SlideService extends IService<Slide> {
      * @return
      */
     SlideSelectBy pageImageCsvListVOBy(Long slideId);
+
+    R deleteById(Long slideId);
 }
