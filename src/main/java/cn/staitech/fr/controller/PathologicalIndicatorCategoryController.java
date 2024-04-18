@@ -47,7 +47,7 @@ public class PathologicalIndicatorCategoryController {
         String organId = categoryService.getById(categoryId).getOrganId();
         Long speciesId = Long.valueOf(specialService.getById(specialId).getSpeciesId());
         QueryWrapper<PathologicalIndicator> pathologicalIndicatorQueryWrapper = new QueryWrapper<>();
-        pathologicalIndicatorQueryWrapper.eq("species_id", speciesId).eq("organ_id", organId).eq("organization_id",SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
+        pathologicalIndicatorQueryWrapper.eq("species_id", speciesId).eq("organ_id", organId).eq("organization_id",SecurityUtils.getLoginUser().getSysUser().getOrganizationId()).eq("del_flag",0);
         Long indicatorId = pathologicalIndicatorService.getOne(pathologicalIndicatorQueryWrapper).getIndicatorId();
         QueryWrapper<PathologicalIndicatorCategory> pathologicalIndicatorCategoryQueryWrapper = new QueryWrapper<>();
         pathologicalIndicatorCategoryQueryWrapper.eq("indicator_id", indicatorId);
