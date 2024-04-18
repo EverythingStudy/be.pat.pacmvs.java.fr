@@ -35,7 +35,6 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     Annotation getArea(Annotation annotation);
 
-
     @DS("slave")
     Annotation selectById(Annotation annotation);
 
@@ -46,9 +45,9 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     int updateById(Annotation annotation);
 
     List<Annotation> selectCategoryList(Annotation annotation);
-    
+
     List<AnnotationCountByCategory> getCategoryCount(Long slideId);
-    
+
     List<Annotation> getAnnoListByParm(List<Long> slideIdList);
 
 }

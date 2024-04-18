@@ -25,6 +25,7 @@ import cn.staitech.fr.vo.geojson.Properties;
 import cn.staitech.fr.vo.geojson.in.RoiIn;
 import cn.staitech.fr.vo.geojson.in.UpdateOperationIn;
 import cn.staitech.fr.vo.geojson.in.ViewAddIn;
+import cn.staitech.fr.vo.geojson.out.BatchResult;
 import cn.staitech.fr.vo.measure.BroadcastVO;
 import cn.staitech.system.api.domain.SysUser;
 import com.alibaba.fastjson.JSON;
@@ -411,7 +412,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
 
     @Override
-    public void delete(AnnotationById req) throws Exception {
+    public int delete(AnnotationById req) throws Exception {
         if (!Optional.ofNullable(req.getMarking_id()).isPresent()) {
             throw new Exception(MessageSource.M("ARGUMENT_INVALID"));
         }
@@ -430,7 +431,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }else{
             NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
         }
-        annotationMapper.deleteById(annotation);
+        int res = annotationMapper.deleteById(annotation);
         if(annotationBy.getSingleSlideId() == null){
             Slide slide = slideMapper.selectById(annotationBy.getSlideId());
             if (!Optional.ofNullable(slide).isPresent()) {
@@ -455,8 +456,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             algorithmAnnIn.setSlideId(slide.getSlideId());
             algorithmPredictionService.recognition(algorithmAnnIn);
         }
-        String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
-        boolean isBatch = false;
+        String traceId = req.getTraceId();
+        boolean isBatch = req.getIsBatch();
         {
             Long userId = SecurityUtils.getLoginUser().getSysUser().getUserId();
             // 删除操作RocksDB存删除前的数据
@@ -489,6 +490,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 //            RocksDBUtil.put(traceId, markingId, json);
             rocksdbService.submitTask(traceId, String.valueOf(annotationBy.getAnnotationId()), annotationBy);
         }
+        return res;
     }
 
 
@@ -502,10 +504,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (!Optional.ofNullable(annotationBy).isPresent()) {
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }
-
-
-        String traceId = cn.staitech.common.core.utils.uuid.UUID.fastUUID().toString();
-        boolean isBatch = false;
+        String traceId = req.getTraceId();
+        boolean isBatch = req.getIsBatch();
         {
             Long slideId;
             if(annotationBy.getSingleSlideId() != null){
@@ -853,6 +853,67 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     @Override
     public List<AnnotationCountByCategory> getCategoryCount(Long slideId) {
         return annotationMapper.getCategoryCount(slideId);
+    }
+
+    @Override
+    public List<BatchResult> batch(List<ViewAddIn> list) throws Exception {
+        String traceId = UUID.randomUUID().toString();
+
+        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
+        Long userId = sysUser.getUserId();
+        Long slideId = list.get(0).getSingle_slide_id();
+
+        Session session = HistoryServiceImpl.refreshSession(userId, slideId);
+        // 2、创建Trace,并存入Session.list,LinkedList<Trace>
+        // 单条记录
+        Trace trace = new Trace(userId, traceId, true);
+        session.drawListAdd(trace);
+
+        List<BatchResult> result = new ArrayList<>(list.size());
+        for (ViewAddIn dto : list) {
+            BatchResult batchResult = new BatchResult();
+            batchResult.setFront_id(dto.getMarking_id());
+
+            dto.setUpdate_by(userId);
+            dto.setTraceId(traceId);
+            dto.setIsBatch(true);
+            try {
+                switch (dto.getOperation()) {
+                    case "INSERT":
+                        Long markingIdIns = insert(dto);
+                        if (markingIdIns != null) {
+                            batchResult.setData(String.valueOf(markingIdIns));
+                            break;
+                        }
+                    case "DELETE":
+                        AnnotationById annotationById = new AnnotationById();
+                        annotationById.setIsBatch(true);
+                        annotationById.setTraceId(traceId);
+                        annotationById.setMarking_id(Long.valueOf(dto.getMarking_id()));
+                        if (delete(annotationById) > 0) {
+                            batchResult.setData(dto.getMarking_id());
+                            break;
+                        }
+                    case "UPDATE":
+                        boolean res = Objects.equals(dto.getOperation(), "UPDATE");
+                        Long markingId = update(dto);
+                        if (markingId != null) {
+                            batchResult.setData(String.valueOf(markingId));
+                            break;
+                        }
+                    default:
+                }
+
+                batchResult.setStatus(true);
+                batchResult.setMessage(MessageSource.M("OPERATE_SUCCEED"));
+            } catch (Exception e) {
+                batchResult.setData(dto.getMarking_id());
+                batchResult.setMessage(e.getMessage());
+                batchResult.setStatus(false);
+            }
+            result.add(batchResult);
+        }
+        return result;
     }
 
 
