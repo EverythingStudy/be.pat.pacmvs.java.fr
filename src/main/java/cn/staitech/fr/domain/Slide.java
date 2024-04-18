@@ -72,7 +72,8 @@ public class Slide implements Serializable {
      * 核对状态 0：初始 1：正确 2：错误 3：修正正常
      */
     private Integer checkStatus;
-    
+
+    private String analyzeStatus;
     /**
      * 核对者
      */

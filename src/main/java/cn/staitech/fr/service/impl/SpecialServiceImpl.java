@@ -188,6 +188,15 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         if (special == null) {
             return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
         }
+        //判断专题下是否存在切片数据
+        LambdaQueryWrapper<Slide> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Slide::getSpecialId, specialId);
+        queryWrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
+        List<Slide> slides = slideService.list(queryWrapper);
+        if(slides.size()>0){
+            return R.fail(MessageSource.M("EXISTS_SLIDE_DATA"));
+        }
+
         special.setDelFlag(CommonConstant.NUMBER_1);
         special.setUpdateBy(SecurityUtils.getUserId());
         special.setUpdateTime(new Date());
@@ -203,12 +212,12 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         specialRecycling.setCreateTime(new Date());
         specialRecyclingService.save(specialRecycling);
         //删除切片
-        Slide slide = new Slide();
+        /*Slide slide = new Slide();
         slide.setDelFlag(CommonConstant.NUMBER_1);
         LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
         wrapper.eq(Slide::getSpecialId, specialId);
-        slideService.update(slide, wrapper);
+        slideService.update(slide, wrapper);*/
         return R.ok();
     }
 
@@ -272,11 +281,15 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         String[] s = fileName.split(" ");
         if (s.length != 3) {
             log.info("切片文件名格式错误：" + fileName);
+            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
+            slide.setProcessFlag(4);
             return slide;
         }
         String s1 = slideMapper.selectBySpecialId(specialId);
         if (!s[0].equals(s1)) {
             log.info("切片文件名格式错误：" + fileName);
+            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
+            slide.setProcessFlag(4);
             return slide;
         }
         slide.setAnimalCode(StringUtils.substringBeforeLast(s[1], "-"));
@@ -285,6 +298,8 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         if (!CommonConstant.MALE.equals(s[2].substring(s[2].length() - 1)) &&
                 !CommonConstant.FEMALE.equals(s[2].substring(s[2].length() - 1))) {
             log.info("切片文件名格式错误：" + fileName);
+            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
+            slide.setProcessFlag(4);
             return slide;
         }
         slide.setGenderFlag(s[2].substring(s[2].length() - 1));

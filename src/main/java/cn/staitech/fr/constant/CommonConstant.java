@@ -16,6 +16,7 @@ public class CommonConstant {
     public static final String NUMBER_0 = "0";
 
     public static final String NUMBER_1 = "1";
+    public static final String NUMBER_2 = "2";
     public static final Integer INT_1 = 1;
     public static final String NUMBER_4 = "4";
     public static final String GLIDE_LINE = "_";
