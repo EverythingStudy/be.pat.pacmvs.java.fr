@@ -322,8 +322,8 @@
 	
 	<select id="getLabelNameByParm"   resultMap="BaseResultMap">
 		SELECT
-			GROUP_CONCAT( t.dict_label SEPARATOR ';' ) dict_label
-			<!-- DISTINCT(t.dict_label) -->
+			<!-- GROUP_CONCAT( t.dict_label SEPARATOR ';' ) dict_label -->
+			GROUP_CONCAT( DISTINCT(t.dict_label) SEPARATOR ';' ) dict_label
 		FROM
 			sys_dict_data t
 		<where>

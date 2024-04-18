@@ -96,6 +96,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		queryWrapper.eq("process_flag",2);
 		//:核对状态 0：初始 1：正确 2：修正正常 3：错误 
 		queryWrapper.gt("check_status",0);
+		//切片名称解析，0：成功；1：失败
+		queryWrapper.eq("analyze_status","1");
 		if(StringUtils.isNotEmpty(reqAnimalCode)){
 			queryWrapper.like("animal_code",reqAnimalCode);
 		}
@@ -114,6 +116,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			List<Long> querySlideIdList = new ArrayList<>();
 			QueryWrapper<Slide> animalWrapper = new QueryWrapper<>();
 			animalWrapper.eq("special_id",req.getSpecialId());
+			//切片名称解析，0：成功；1：失败
+			animalWrapper.eq("analyze_status","1");
 			List<Slide> slideDataList = slideMapper.selectList(animalWrapper);
 			if(CollectionUtils.isNotEmpty(slideDataList)){
 				for(Slide slide:slideDataList){
@@ -303,6 +307,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			//查下所属专题的所有切片id
 			QueryWrapper<Slide> animalWrapper = new QueryWrapper<>();
 			animalWrapper.eq("special_id",req.getSpecialId());
+			//切片名称解析，0：成功；1：失败
+			animalWrapper.eq("analyze_status","1");
 			List<Slide> slideDataList = slideMapper.selectList(animalWrapper);
 			if(CollectionUtils.isNotEmpty(slideDataList)){
 				for(Slide slide:slideDataList){

@@ -64,9 +64,6 @@
             <if test="fileName != null and fileName != ''">
                 and ti.image_name like concat('%',#{fileName},'%')
             </if>
-            <if test="analyzeStatus != null and analyzeStatus != ''">
-                and fs.analyze_status =#{analyzeStatus}
-            </if>
             <if test="processFlag!= null and processFlag != ''">
                 and fs.process_flag = #{processFlag}
             </if>
@@ -100,6 +97,9 @@
             </if>
             <if test="processFlag != null">
                 AND t1.process_flag = #{processFlag}
+            </if>
+             <if test="analyzeStatus != null">
+                AND t1.analyze_status = #{analyzeStatus}
             </if>
 			 <if test="list != null and list.size() >0 ">
 	            AND t1.slide_id in
