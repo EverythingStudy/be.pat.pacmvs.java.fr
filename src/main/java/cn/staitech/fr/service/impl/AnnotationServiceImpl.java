@@ -266,7 +266,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             }
             Special special = specialService.getById(slide.getSpecialId());
             List<JSONObject> contourList = selectContourList(annotation.getSlideId(), req.getCategory_id());
-            asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1, category.getCategoryAbbreviation(),special.getTopicName());
+            asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1, category.getCategoryAbbreviation(),special.getSpecialName());
             AlgorithmAnnIn algorithmAnnIn = new AlgorithmAnnIn();
             algorithmAnnIn.setSlideId(slide.getSlideId());
             algorithmPredictionService.recognition(algorithmAnnIn);
