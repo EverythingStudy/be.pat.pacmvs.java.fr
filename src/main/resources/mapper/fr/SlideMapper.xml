@@ -161,6 +161,8 @@
             </if>
 		</where>
 				AND t1.process_flag = 2
+				<!-- 切片名称解析，0：成功；1：失败 -->
+				AND t1.analyze_status = '0'
 				AND t1.check_status > 0 
 		ORDER BY	t1.animal_code,t1.animal_check_status desc,t1.check_status desc,t2.file_name
      </select>
