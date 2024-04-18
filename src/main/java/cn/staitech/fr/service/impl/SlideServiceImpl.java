@@ -16,6 +16,7 @@ import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.mapper.WaxBlockInfoMapper;
 import cn.staitech.fr.service.GroupService;
+import cn.staitech.fr.utils.MessageSource;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.staitech.fr.domain.Slide;
@@ -96,7 +97,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide>
         queryWrapper.eq(SingleSlide::getSlideId, slideId);
         List<SingleSlide> singleSlides = singleSlideMapper.selectList(queryWrapper);
         if(singleSlides.size()>0){
-            return R.fail("EXISTS_SINGLESLIDE_DATA");
+            return R.fail(MessageSource.M("EXISTS_SINGLESLIDE_DATA"));
         }
         Slide slide = new Slide();
         slide.setSlideId(slideId);
