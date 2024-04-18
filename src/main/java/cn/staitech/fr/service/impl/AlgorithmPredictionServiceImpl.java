@@ -34,6 +34,7 @@ import cn.staitech.fr.domain.WaxBlockInfo;
 import cn.staitech.fr.domain.in.AlgorithmAnnIn;
 import cn.staitech.fr.domain.in.StartPredictionIn;
 import cn.staitech.fr.domain.out.AlgorithmImageOut;
+import cn.staitech.fr.feign.PythonOrganRecognitionService;
 import cn.staitech.fr.feign.PythonService;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SlideMapper;
@@ -88,7 +89,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	private SpecialMapper specialMapper;
 
 	@Resource
-	private PythonService pythonService;
+	private PythonOrganRecognitionService pythonService;
 
 
 	@SuppressWarnings("rawtypes")
