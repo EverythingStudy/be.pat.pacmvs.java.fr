@@ -219,7 +219,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 
 
 	public void checkSlide(Slide slide) {
-		//		Long organizationId = 6L;
+				Long organizationId = 6L;
 		//切片名称解析，0：成功；1：失败
 		String analyzeStatus = slide.getAnalyzeStatus();
 		if(StringUtils.isNotEmpty(analyzeStatus) && analyzeStatus.equals("1")){
@@ -238,7 +238,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		Long slideId = slide.getSlideId();
 		Slide slideInfo = slideMapper.selectById(slideId);
 		Special special = specialMapper.selectById(slideInfo.getSpecialId());
-		Long organizationId = special.getOrganizationId();
+//		Long organizationId = special.getOrganizationId();
 		
 		//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
 		int processFlag = slide.getProcessFlag();
@@ -283,6 +283,8 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 				waxDataMapSize = waxDataMap.size();
 				redisService.setCacheObject(cacheKey,waxDataMap, 24L, TimeUnit.HOURS);
 			}
+		}else{
+			waxDataMapSize = waxDataMap.size();
 		}
 
 		if(null != waxDataMap && !waxDataMap.isEmpty()){
