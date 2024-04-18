@@ -458,6 +458,7 @@
         left join fr_slide fs
             on i.image_id = fs.image_id
             and fs.special_id=#{specialId}
+            and fs.del_flag='0'
         left join fr_special fsl
             on fsl.topic_id = i.topic_id
         left join sys_organization so

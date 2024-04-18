@@ -54,15 +54,19 @@
         fs.process_flag,
         su.user_name createUser,
         fs.create_time,
-        fs.slide_id
+        fs.slide_id,
+        fs.analyze_status
         from fr_slide fs
         left join tb_image ti on fs.image_id = ti.image_id
         left join sys_user su on fs.create_by = su.user_id
         <where>
             fs.special_id = #{specialId}
-
+            and fs.del_flag='0'
             <if test="fileName != null and fileName != ''">
                 and ti.image_name like concat('%',#{fileName},'%')
+            </if>
+            <if test="analyzeStatus!= null and analyzeStatus != ''">
+                and fs.analyze_status = #{analyzeStatus}
             </if>
             <if test="processFlag!= null and processFlag != ''">
                 and fs.process_flag = #{processFlag}
