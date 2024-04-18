@@ -705,7 +705,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotations.setAnnotationId(req.getMarking_id());
         Annotation annotation = annotationMapper.selectById(annotations);
         int res = annotationMapper.insert(annotation);
-        Annotation annotationBys = annotationMapper.selectById(annotations);
+        Annotation annotationBys = annotationMapper.selectById(annotation.getAnnotationId());
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(annotationBys);
         Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), JSONObject.parseObject(annotation.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(ADD_STATUS, features);
