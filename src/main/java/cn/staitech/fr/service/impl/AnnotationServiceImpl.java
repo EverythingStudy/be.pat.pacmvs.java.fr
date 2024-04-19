@@ -578,7 +578,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
         if(annotationBy.getSingleSlideId() == null){
             // 更新标签后,修改原标签和新标签生成的缩略图
-            if (req.getCategory_id() != null) {
+            if (req.getCategory_id() != null && req.getCategory_id() != 0) {
                 Slide slide = slideMapper.selectById(annotationBy.getSlideId());
                 if (!Optional.ofNullable(slide).isPresent()) {
                     throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
