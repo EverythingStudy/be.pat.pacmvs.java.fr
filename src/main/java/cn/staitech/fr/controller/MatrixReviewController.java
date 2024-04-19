@@ -68,8 +68,8 @@ public class MatrixReviewController {
     }
 
 
-    @ApiOperation(value = "矩阵阅片-切片维度")
-    @PostMapping("/SingleSlideAdjacent")
+    @ApiOperation(value = "矩阵阅片-切片维度(相邻切片)")
+    @PostMapping("/singleSlideAdjacent")
     public R<HashMap<String, SingleSlideSelectBy>> SingleSlideAdjacent(@RequestBody @Validated SingleSlideAdjacent req) {
         HashMap<String, SingleSlideSelectBy> resp = matrixReviewService.SingleSlideAdjacent(req);
         return R.ok(resp);
