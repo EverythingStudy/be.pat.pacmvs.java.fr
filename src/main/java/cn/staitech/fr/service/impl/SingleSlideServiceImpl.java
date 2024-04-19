@@ -52,7 +52,7 @@ public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, Singl
                                 SingleOrganNumber::getCategoryId, SingleOrganNumber::getOrganNumber
                         )
                 ));
-        outList = outList.stream().peek(p -> p.setOrganNumber(map.get(p.getSlideId()).get(p.getCategoryId())))
+        outList = outList.stream().peek(p -> p.setOrganNumber(ObjectUtil.isEmpty(map.get(p.getSlideId())) ? 0L : map.get(p.getSlideId()).get(p.getCategoryId())))
                 .collect(Collectors.toList());
         return outList;
     }
@@ -81,7 +81,7 @@ public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, Singl
     }
 
     @Override
-    public SingleSlideSelectBy singleSlideBy(Long singleId){
+    public SingleSlideSelectBy singleSlideBy(Long singleId) {
         return singleSlideMapper.singleSlideBy(singleId);
     }
 
