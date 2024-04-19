@@ -155,7 +155,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(measureBy);
         Features features = MarkingUtils.socketData(null, JSONObject.parseObject(measure.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_MEASURE, ADD_STATUS, features);
-        NioWebSocketHandler.sendAll(req.getSlide_id(), broadcastVO);
+        NioWebSocketHandler.sendSingle(req.getSingle_slide_id(), broadcastVO);
         return measure.getMeasureId();
     }
 
@@ -174,7 +174,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         cn.staitech.fr.vo.geojson.Properties properties = getProperties(measureBy);
         Features features = MarkingUtils.socketData(null, JSONObject.parseObject(measure.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_MEASURE, DELETE_STATUS, features);
-        NioWebSocketHandler.sendAll(measure.getSingleSlideId(), broadcastVO);
+        NioWebSocketHandler.sendSingle(measure.getSingleSlideId(), broadcastVO);
         return measureMapper.deleteById(markingId);
     }
 
