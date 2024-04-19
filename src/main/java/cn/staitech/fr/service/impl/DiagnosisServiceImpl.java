@@ -186,10 +186,10 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 			if(null != slide.getGroupCode()){
 				String groupCode = slide.getGroupCode();
 				record.setGroupId(Long.valueOf(groupCode));
-				record.setCreateBy(currentUserId);
-				record.setCreateTime(DateUtil.date());
-				diagnosisMapper.insert(record);
 			}
+			record.setCreateBy(currentUserId);
+			record.setCreateTime(DateUtil.date());
+			diagnosisMapper.insert(record);
 		} else {
 			record.setUpdateBy(currentUserId);
 			record.setUpdateTime(DateUtil.date());

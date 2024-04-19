@@ -219,7 +219,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 
 
 	public void checkSlide(Slide slide) {
-		//		Long organizationId = 6L;
 		//切片名称解析，0：成功；1：失败
 		String analyzeStatus = slide.getAnalyzeStatus();
 		if(StringUtils.isNotEmpty(analyzeStatus) && analyzeStatus.equals("1")){
@@ -283,6 +282,8 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 				waxDataMapSize = waxDataMap.size();
 				redisService.setCacheObject(cacheKey,waxDataMap, 24L, TimeUnit.HOURS);
 			}
+		}else{
+			waxDataMapSize = waxDataMap.size();
 		}
 
 		if(null != waxDataMap && !waxDataMap.isEmpty()){

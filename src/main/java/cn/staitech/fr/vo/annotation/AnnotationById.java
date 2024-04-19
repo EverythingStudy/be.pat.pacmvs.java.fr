@@ -18,4 +18,8 @@ public class AnnotationById {
     @ApiModelProperty(value = "项目id", required = true)
     private Long project_id;
 
+    private Boolean isBatch;
+
+    private String traceId;
+
 }

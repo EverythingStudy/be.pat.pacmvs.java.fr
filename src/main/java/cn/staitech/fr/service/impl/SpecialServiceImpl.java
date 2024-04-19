@@ -237,6 +237,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
             wrapper.eq(Slide::getSpecialId, req.getSpecialId());
             wrapper.ne(Slide::getCheckStatus, 1);
             wrapper.ne(Slide::getCheckStatus, 2);
+            wrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
             List<Slide> slideList = slideService.list(wrapper);
             if (CollectionUtils.isNotEmpty(slideList)) {
                 return R.fail(MessageSource.M("START_SPECIAL_ERROR"));

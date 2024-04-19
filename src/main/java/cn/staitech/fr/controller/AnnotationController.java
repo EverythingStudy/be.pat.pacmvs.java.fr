@@ -13,6 +13,8 @@ import cn.staitech.fr.vo.geojson.Features;
 import cn.staitech.fr.vo.geojson.in.RoiIn;
 import cn.staitech.fr.vo.geojson.in.UpdateOperationIn;
 import cn.staitech.fr.vo.geojson.in.ViewAddIn;
+import cn.staitech.fr.vo.geojson.in.ViewAddInList;
+import cn.staitech.fr.vo.geojson.out.BatchResult;
 import com.alibaba.fastjson.JSONObject;
 import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.annotations.ApiImplicitParam;
@@ -49,6 +51,8 @@ public class AnnotationController {
     @ApiImplicitParams({@ApiImplicitParam(name = "annotationId", value = "标注id", required = true, dataType = "Long", paramType = "query")})
     @DeleteMapping("/delete")
     public R<String> del(@Validated @RequestBody AnnotationById req) throws Exception {
+        req.setTraceId(UUID.fastUUID().toString());
+        req.setIsBatch(false);
         annotationService.delete(req);
         return R.ok(null, MessageSource.M("OPERATE_SUCCEED"));
     }
@@ -131,6 +135,16 @@ public class AnnotationController {
         }
         JSONObject geoJson = annotationService.updateOperation(req, UUID.fastUUID().toString(), false);
         return R.ok(geoJson, MessageSource.M("OPERATE_SUCCEED"));
+    }
+
+    @ApiOperation(value = "批量操作")
+    @PostMapping("/batch")
+    public R<List<BatchResult>> batch(@Validated @RequestBody ViewAddInList list) throws Exception {
+        if (CollectionUtils.isEmpty(list.getList())) {
+            return R.fail(MessageSource.M("ARGUMENT_INVALID"));
+        }
+        List<BatchResult> result = annotationService.batch(list.getList());
+        return R.ok(result, MessageSource.M("OPERATE_SUCCEED"));
     }
 
 
