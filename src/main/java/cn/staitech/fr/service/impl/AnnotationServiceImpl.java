@@ -181,7 +181,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                 }
             }
             if (updateUser != null) {
-                properties.setAnnotation_owner(updateUser.getUserName());
+                properties.setAnnotation_update_owner(updateUser.getUserName());
             }
         }
     	return properties;
@@ -577,41 +577,43 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             NioWebSocketHandler.sendAll(req.getSlide_id(), broadcastVO);
         }
         if(annotationBy.getSingleSlideId() == null){
-            Slide slide = slideMapper.selectById(annotationBy.getSlideId());
-            if (!Optional.ofNullable(slide).isPresent()) {
-                throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
-            }
-            Image image = imageMapper.selectById(slide.getImageId());
-            if (!Optional.ofNullable(image).isPresent()) {
-                throw new Exception(MessageSource.M("NODATA"));
-            }
-            List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
-            int type;
-            if (contourList.size() > 0) {
-                type = 1;
-            } else {
-                type = 2;
-            }
-            Category categoryAfter = categoryMapper.selectById(req.getCategory_id());
+            // 更新标签后,修改原标签和新标签生成的缩略图
+            if (req.getCategory_id() != null && req.getCategory_id() != 0) {
+                Slide slide = slideMapper.selectById(annotationBy.getSlideId());
+                if (!Optional.ofNullable(slide).isPresent()) {
+                    throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
+                }
+                Image image = imageMapper.selectById(slide.getImageId());
+                if (!Optional.ofNullable(image).isPresent()) {
+                    throw new Exception(MessageSource.M("NODATA"));
+                }
+                List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
+                int type;
+                if (contourList.size() > 0) {
+                    type = 1;
+                } else {
+                    type = 2;
+                }
+                Category categoryAfter = categoryMapper.selectById(req.getCategory_id());
 
-            Special special = specialService.getById(slide.getSpecialId());
+                Special special = specialService.getById(slide.getSpecialId());
 
-            asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type,categoryAfter.getCategoryAbbreviation(),special.getSpecialName());
-            // 改之后数据
-            List<JSONObject> contourListAfter = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
+                asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type,categoryAfter.getCategoryAbbreviation(),special.getSpecialName());
+                // 改之后数据
+                List<JSONObject> contourListAfter = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
 
-            String categoryAbbreviation = null;
-            if(req.getCategory_id() != null){
-                Category categoryBy = categoryMapper.selectById(req.getCategory_id());
-                categoryAbbreviation = categoryBy.getCategoryAbbreviation();
-            }else{
-                categoryAbbreviation = categoryAfter.getCategoryAbbreviation();
+                String categoryAbbreviation = null;
+                if(req.getCategory_id() != null){
+                    Category categoryBy = categoryMapper.selectById(req.getCategory_id());
+                    categoryAbbreviation = categoryBy.getCategoryAbbreviation();
+                }else{
+                    categoryAbbreviation = categoryAfter.getCategoryAbbreviation();
+                }
+                asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourListAfter, 1,categoryAbbreviation,special.getSpecialName());
+                AlgorithmAnnIn algorithmAnnIn = new AlgorithmAnnIn();
+                algorithmAnnIn.setSlideId(slide.getSlideId());
+                algorithmPredictionService.recognition(algorithmAnnIn);
             }
-            asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourListAfter, 1,categoryAbbreviation,special.getSpecialName());
-            AlgorithmAnnIn algorithmAnnIn = new AlgorithmAnnIn();
-            algorithmAnnIn.setSlideId(slide.getSlideId());
-            algorithmPredictionService.recognition(algorithmAnnIn);
-
         }
         return annotation.getAnnotationId();
     }

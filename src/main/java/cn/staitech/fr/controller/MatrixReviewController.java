@@ -6,10 +6,8 @@ import cn.staitech.fr.domain.PageDataResponse;
 import cn.staitech.fr.domain.in.AiDownloadIn;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
-import cn.staitech.fr.domain.out.AnimalDimensionOut;
-import cn.staitech.fr.domain.out.MatrixReviewListOut;
-import cn.staitech.fr.domain.out.MatrixReviewOut;
-import cn.staitech.fr.domain.out.SelectImageSlideOut;
+import cn.staitech.fr.domain.in.SingleSlideAdjacent;
+import cn.staitech.fr.domain.out.*;
 import cn.staitech.fr.service.MatrixReviewService;
 import cn.staitech.fr.service.SpecialService;
 import io.swagger.annotations.Api;
@@ -25,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -65,6 +64,14 @@ public class MatrixReviewController {
     @PostMapping("/slideList")
     public R<PageResponse<MatrixReviewListOut>> list(@RequestBody @Validated MatrixReviewListIn req) {
         PageResponse<MatrixReviewListOut> resp = matrixReviewService.getMatrixReview(req);
+        return R.ok(resp);
+    }
+
+
+    @ApiOperation(value = "矩阵阅片-切片维度(相邻切片)")
+    @PostMapping("/singleSlideAdjacent")
+    public R<HashMap<String, SingleSlideSelectBy>> SingleSlideAdjacent(@RequestBody @Validated SingleSlideAdjacent req) {
+        HashMap<String, SingleSlideSelectBy> resp = matrixReviewService.SingleSlideAdjacent(req);
         return R.ok(resp);
     }
 

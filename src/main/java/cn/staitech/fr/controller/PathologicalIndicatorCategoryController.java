@@ -18,6 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -48,9 +49,12 @@ public class PathologicalIndicatorCategoryController {
         Long speciesId = Long.valueOf(specialService.getById(specialId).getSpeciesId());
         QueryWrapper<PathologicalIndicator> pathologicalIndicatorQueryWrapper = new QueryWrapper<>();
         pathologicalIndicatorQueryWrapper.eq("species_id", speciesId).eq("organ_id", organId).eq("organization_id",SecurityUtils.getLoginUser().getSysUser().getOrganizationId()).eq("del_flag",0);
-        Long indicatorId = pathologicalIndicatorService.getOne(pathologicalIndicatorQueryWrapper).getIndicatorId();
+        PathologicalIndicator indicator = pathologicalIndicatorService.getOne(pathologicalIndicatorQueryWrapper);
+        if(indicator == null){
+            return R.ok(new ArrayList<>());
+        }
         QueryWrapper<PathologicalIndicatorCategory> pathologicalIndicatorCategoryQueryWrapper = new QueryWrapper<>();
-        pathologicalIndicatorCategoryQueryWrapper.eq("indicator_id", indicatorId);
+        pathologicalIndicatorCategoryQueryWrapper.eq("indicator_id", indicator.getIndicatorId());
         return R.ok(pathologicalIndicatorCategoryService.list(pathologicalIndicatorCategoryQueryWrapper));
     }
 

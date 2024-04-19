@@ -13,6 +13,7 @@ import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.in.AiDownloadIn;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
+import cn.staitech.fr.domain.in.SingleSlideAdjacent;
 import cn.staitech.fr.domain.out.*;
 import cn.staitech.fr.domain.out.AnimalDimensionData;
 import cn.staitech.fr.domain.out.AnimalDimensionOut;
@@ -44,8 +45,10 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -128,23 +131,63 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             resp.setPages(page.getPages());
             return resp;
         }
-        Map<Long, Map<Long, Long>> map = singleOrganNumbers.stream()
-                .collect(Collectors.groupingBy(
-                        SingleOrganNumber::getSlideId,
-                        Collectors.toMap(
-                                SingleOrganNumber::getCategoryId, SingleOrganNumber::getOrganNumber
-                        )
-                ));
-        waxList = waxList.stream().peek(p -> p.setOrganNumber(map.get(p.getSlideId()).get(p.getCategoryId())))
-                .collect(Collectors.toList());
+        Map<Long, Map<Long, Long>> map = singleOrganNumbers.stream().collect(Collectors.groupingBy(SingleOrganNumber::getSlideId, Collectors.toMap(SingleOrganNumber::getCategoryId, SingleOrganNumber::getOrganNumber)));
+        waxList = waxList.stream().peek(p -> p.setOrganNumber(map.get(p.getSlideId()).get(p.getCategoryId()))).collect(Collectors.toList());
         resp.setTotal(page.getTotal());
         resp.setList(waxList);
         resp.setPages(page.getPages());
         return resp;
     }
 
+
     @Override
-    public PageResponse<SelectImageSlideOut> selectSlideList(MatrixReviewListIn req){
+    public HashMap<String, SingleSlideSelectBy> SingleSlideAdjacent(SingleSlideAdjacent req) {
+        List<MatrixReviewListOut> waxList = slideMapper.SingleSlideAdjacent(req);
+        // 根据下标查询出附近的数据
+        AtomicInteger index = new AtomicInteger(0);
+        waxList.stream()
+                //指定匹配逻辑
+                .filter(s -> {
+                    //每比对一个元素，数值加1
+                    index.getAndIncrement();
+                    return s.getSingleId().equals(req.getSingleSlideId());
+                }).findFirst();
+        HashMap<String, SingleSlideSelectBy> map = new HashMap<>();
+
+        int indexsx = index.get() - 1;
+        if (waxList.size() > 0) {
+            if (indexsx == 0) {
+                if (waxList.size() > 1) {
+                    map.put("prev", null);
+                    Long singleSlideId = waxList.get(indexsx + 1).getSingleId();
+                    SingleSlideSelectBy slideSelectBy = singleSlideMapper.singleSlideBy(singleSlideId);
+                    map.put("next", slideSelectBy);
+                } else {
+                    map.put("prev", null);
+                    map.put("next", null);
+                }
+            } else if (waxList.size() - 1 == indexsx) {
+                Long singleSlideId = waxList.get(indexsx - 1).getSingleId();
+                SingleSlideSelectBy slideSelectBy = singleSlideMapper.singleSlideBy(singleSlideId);
+                map.put("prev", slideSelectBy);
+                map.put("next", null);
+            } else {
+                Long singleSlideIdPrev = waxList.get(indexsx - 1).getSingleId();
+                SingleSlideSelectBy slideSelectByPrev = singleSlideMapper.singleSlideBy(singleSlideIdPrev);
+                map.put("prev", slideSelectByPrev);
+                Long singleSlideIdNext = waxList.get(indexsx + 1).getSingleId();
+                SingleSlideSelectBy slideSelectByNext = singleSlideMapper.singleSlideBy(singleSlideIdNext);
+                map.put("next", slideSelectByNext);
+            }
+        } else {
+            map.put("prev", null);
+            map.put("next", null);
+        }
+        return map;
+    }
+
+    @Override
+    public PageResponse<SelectImageSlideOut> selectSlideList(MatrixReviewListIn req) {
         PageResponse resp = new PageResponse();
         Page<SelectImageSlideOut> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
         List<SelectImageSlideOut> waxList = slideMapper.selectSlideList(req);
@@ -215,8 +258,8 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             exportVO.setTable(collect);
             //会报错{"msg":"TemplateRenderPolicy render error","code":500}
             //exportVO.setImg(new PictureRenderData(800, 200, "D:/image/liangz.png"));
-            exportVO.setImg(new PictureRenderData(800, 200, exportVO.getThumbUrl().replace("/file/statics","/home/pat_saas")));
-            String s = waxPath + exportVO.getFileName() + "+" + exportVO.getOrganName() +CommonConstant.WROD_FILE;
+            exportVO.setImg(new PictureRenderData(800, 200, exportVO.getThumbUrl().replace("/file/statics", "/home/pat_saas")));
+            String s = waxPath + exportVO.getFileName() + "+" + exportVO.getOrganName() + CommonConstant.WROD_FILE;
             //生成word
             ExportPdfUtils.exportFile(s, exportVO);
             //生成pdf
@@ -227,8 +270,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         }
         if (ids.size() > 1) {
             log.info("走的压缩包");
-            ExportPdfUtils.writePdfZip(pdfName, response, topicName +
-                    DateUtils.getCurrentHHmmssString("yyyy-MM-dd HH:mm:ss") + CommonConstant.ZIP_FILE);
+            ExportPdfUtils.writePdfZip(pdfName, response, topicName + DateUtils.getCurrentHHmmssString("yyyy-MM-dd HH:mm:ss") + CommonConstant.ZIP_FILE);
 
         } else {
 

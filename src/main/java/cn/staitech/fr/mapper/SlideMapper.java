@@ -3,6 +3,7 @@ package cn.staitech.fr.mapper;
 import cn.staitech.fr.domain.Category;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
+import cn.staitech.fr.domain.in.SingleSlideAdjacent;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
 import cn.staitech.fr.domain.in.SplitVerificationQueryIn;
 import cn.staitech.fr.domain.out.*;
@@ -41,6 +42,7 @@ public interface SlideMapper extends BaseMapper<Slide> {
     SlideSelectBy pageImageCsvListVOBy(Long slideId);
 
     List<MatrixReviewListOut> getMatrixReview(MatrixReviewListIn req);
+    List<MatrixReviewListOut> SingleSlideAdjacent(SingleSlideAdjacent req);
     List<SelectImageSlideOut> selectSlideList(MatrixReviewListIn req);
 
     List<OrgansData> selectRespData(Long slideId);
