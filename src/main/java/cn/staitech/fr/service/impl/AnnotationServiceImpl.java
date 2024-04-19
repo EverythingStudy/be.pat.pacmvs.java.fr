@@ -181,7 +181,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                 }
             }
             if (updateUser != null) {
-                properties.setAnnotation_owner(updateUser.getUserName());
+                properties.setAnnotation_update_owner(updateUser.getUserName());
             }
         }
     	return properties;
