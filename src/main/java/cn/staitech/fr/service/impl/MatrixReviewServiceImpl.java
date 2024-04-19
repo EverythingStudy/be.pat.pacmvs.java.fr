@@ -131,15 +131,8 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             resp.setPages(page.getPages());
             return resp;
         }
-        Map<Long, Map<Long, Long>> map = singleOrganNumbers.stream()
-                .collect(Collectors.groupingBy(
-                        SingleOrganNumber::getSlideId,
-                        Collectors.toMap(
-                                SingleOrganNumber::getCategoryId, SingleOrganNumber::getOrganNumber
-                        )
-                ));
-        waxList = waxList.stream().peek(p -> p.setOrganNumber(map.get(p.getSlideId()).get(p.getCategoryId())))
-                .collect(Collectors.toList());
+        Map<Long, Map<Long, Long>> map = singleOrganNumbers.stream().collect(Collectors.groupingBy(SingleOrganNumber::getSlideId, Collectors.toMap(SingleOrganNumber::getCategoryId, SingleOrganNumber::getOrganNumber)));
+        waxList = waxList.stream().peek(p -> p.setOrganNumber(map.get(p.getSlideId()).get(p.getCategoryId()))).collect(Collectors.toList());
         resp.setTotal(page.getTotal());
         resp.setList(waxList);
         resp.setPages(page.getPages());
@@ -159,25 +152,36 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
                     index.getAndIncrement();
                     return s.getSingleId().equals(req.getSingleSlideId());
                 }).findFirst();
-        List<MatrixReviewListOut> res = new ArrayList<>();
         HashMap<String, SingleSlideSelectBy> map = new HashMap<>();
-        if (index.get() == 1) {
-            map.put("prev", null);
-            Long singleSlideId = waxList.get(index.get()).getSingleId();
-            SingleSlideSelectBy slideSelectBy = singleSlideMapper.singleSlideBy(singleSlideId);
-            map.put("next", slideSelectBy);
-        } else if (index.get() == waxList.size()) {
-            Long singleSlideId = waxList.get(index.get() - 1).getSingleId();
-            SingleSlideSelectBy slideSelectBy = singleSlideMapper.singleSlideBy(singleSlideId);
-            map.put("prev", slideSelectBy);
-            map.put("next", null);
+
+        int indexsx = index.get() - 1;
+        if (waxList.size() > 0) {
+            if (indexsx == 0) {
+                if (waxList.size() > 1) {
+                    map.put("prev", null);
+                    Long singleSlideId = waxList.get(indexsx + 1).getSingleId();
+                    SingleSlideSelectBy slideSelectBy = singleSlideMapper.singleSlideBy(singleSlideId);
+                    map.put("next", slideSelectBy);
+                } else {
+                    map.put("prev", null);
+                    map.put("next", null);
+                }
+            } else if (waxList.size() - 1 == indexsx) {
+                Long singleSlideId = waxList.get(indexsx - 1).getSingleId();
+                SingleSlideSelectBy slideSelectBy = singleSlideMapper.singleSlideBy(singleSlideId);
+                map.put("prev", slideSelectBy);
+                map.put("next", null);
+            } else {
+                Long singleSlideIdPrev = waxList.get(indexsx - 1).getSingleId();
+                SingleSlideSelectBy slideSelectByPrev = singleSlideMapper.singleSlideBy(singleSlideIdPrev);
+                map.put("prev", slideSelectByPrev);
+                Long singleSlideIdNext = waxList.get(indexsx + 1).getSingleId();
+                SingleSlideSelectBy slideSelectByNext = singleSlideMapper.singleSlideBy(singleSlideIdNext);
+                map.put("next", slideSelectByNext);
+            }
         } else {
-            Long singleSlideIdPrev = waxList.get(index.get() - 2).getSingleId();
-            SingleSlideSelectBy slideSelectByPrev = singleSlideMapper.singleSlideBy(singleSlideIdPrev);
-            map.put("prev", slideSelectByPrev);
-            Long singleSlideIdNext = waxList.get(index.get()).getSingleId();
-            SingleSlideSelectBy slideSelectByNext = singleSlideMapper.singleSlideBy(singleSlideIdNext);
-            map.put("next", slideSelectByNext);
+            map.put("prev", null);
+            map.put("next", null);
         }
         return map;
     }
@@ -266,8 +270,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         }
         if (ids.size() > 1) {
             log.info("走的压缩包");
-            ExportPdfUtils.writePdfZip(pdfName, response, topicName +
-                    DateUtils.getCurrentHHmmssString("yyyy-MM-dd HH:mm:ss") + CommonConstant.ZIP_FILE);
+            ExportPdfUtils.writePdfZip(pdfName, response, topicName + DateUtils.getCurrentHHmmssString("yyyy-MM-dd HH:mm:ss") + CommonConstant.ZIP_FILE);
 
         } else {
 
