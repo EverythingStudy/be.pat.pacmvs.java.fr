@@ -190,9 +190,9 @@ public class ExportPdfUtils {
         }
 
         // 关闭各种流
-        os.close();
         zipOutputStream.closeEntry();
         zipOutputStream.close();
+        os.close();
     }
 
     /**

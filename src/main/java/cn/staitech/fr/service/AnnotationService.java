@@ -11,6 +11,7 @@ import cn.staitech.fr.vo.geojson.Features;
 import cn.staitech.fr.vo.geojson.in.RoiIn;
 import cn.staitech.fr.vo.geojson.in.UpdateOperationIn;
 import cn.staitech.fr.vo.geojson.in.ViewAddIn;
+import cn.staitech.fr.vo.geojson.out.BatchResult;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -27,7 +28,7 @@ public interface AnnotationService extends IService<Annotation> {
 
     Long insert(ViewAddIn req) throws Exception;
 
-    void delete(AnnotationById req) throws Exception;
+    int delete(AnnotationById req) throws Exception;
 
     R<String> roiContDel(RoiIn viewAddIns) throws Exception;
 
@@ -38,6 +39,8 @@ public interface AnnotationService extends IService<Annotation> {
     JSONObject markingMerge(MarkingMerge req) throws Exception;
 
     JSONObject updateOperation(UpdateOperationIn req, String traceId, Boolean isBatch) throws Exception;
+
+    List<BatchResult> batch(List<ViewAddIn> list) throws Exception;
     
     List<AnnotationCountByCategory> getCategoryCount(Long slideId);
 
