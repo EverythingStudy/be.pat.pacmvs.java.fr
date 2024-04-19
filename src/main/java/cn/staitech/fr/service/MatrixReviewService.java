@@ -6,12 +6,11 @@ import cn.staitech.fr.domain.PageDataResponse;
 import cn.staitech.fr.domain.in.AiDownloadIn;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
-import cn.staitech.fr.domain.out.AnimalDimensionOut;
-import cn.staitech.fr.domain.out.MatrixReviewListOut;
-import cn.staitech.fr.domain.out.MatrixReviewOut;
-import cn.staitech.fr.domain.out.SelectImageSlideOut;
+import cn.staitech.fr.domain.in.SingleSlideAdjacent;
+import cn.staitech.fr.domain.out.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -25,6 +24,8 @@ public interface MatrixReviewService {
     R edit(MatrixReviewEditIn req);
 
     PageResponse<MatrixReviewListOut> getMatrixReview(MatrixReviewListIn req);
+
+    HashMap<String, SingleSlideSelectBy> SingleSlideAdjacent(SingleSlideAdjacent req);
 
     PageResponse<SelectImageSlideOut> selectSlideList(MatrixReviewListIn req);
 
