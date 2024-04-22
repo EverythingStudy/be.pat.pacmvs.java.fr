@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ExecutorBuilder;
 import cn.hutool.json.JSONUtil;
 import cn.staitech.common.core.domain.R;
@@ -28,6 +30,7 @@ import cn.staitech.common.redis.service.RedisService;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.WaxBlockInfo;
@@ -37,6 +40,7 @@ import cn.staitech.fr.domain.out.AlgorithmImageOut;
 import cn.staitech.fr.feign.PythonOrganRecognitionService;
 import cn.staitech.fr.feign.PythonService;
 import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.service.AlgorithmPredictionService;
@@ -87,6 +91,9 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 
 	@Resource
 	private SpecialMapper specialMapper;
+	
+	@Resource
+	private ImageMapper imageMapper;
 
 	@Resource
 	private PythonOrganRecognitionService pythonService;
@@ -219,6 +226,21 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 
 
 	public void checkSlide(Slide slide) {
+		//启动时间
+		Date initiateTime =slide.getInitiateTime();
+		Date currentTime = DateUtil.date();
+		if(null != initiateTime){
+			Image image = imageMapper.selectById(slide.getImageId());
+			// Calculate the difference in milliseconds
+			Long diffInMilliseconds = currentTime.getTime() - initiateTime.getTime();
+			// Convert the difference to seconds
+			double diffInSeconds = diffInMilliseconds.doubleValue() / 1000L;
+			String imageSize = "";
+			if(StringUtils.isNotEmpty(image.getSize())){
+				imageSize = String.format("%.2f", Long.parseLong(image.getSize()) / (1024.0 * 1024.0)) + "MB";
+			}
+			log.info("AI统脏器识别算法耗时统计,slideId:{},imageId:{},切片名称：{},切片大小：{},开始时间：{},结束时间：{},总共历时：{}秒", slide.getSlideId(),slide.getImageId(),image.getImageName(),imageSize,DateUtil.format(slide.getInitiateTime(), "yyyy-MM-dd HH:mm:ss") ,DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss"),diffInSeconds);
+		}
 		//切片名称解析，0：成功；1：失败
 		String analyzeStatus = slide.getAnalyzeStatus();
 		if(StringUtils.isNotEmpty(analyzeStatus) && analyzeStatus.equals("1")){
@@ -238,7 +260,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		Slide slideInfo = slideMapper.selectById(slideId);
 		Special special = specialMapper.selectById(slideInfo.getSpecialId());
 		Long organizationId = special.getOrganizationId();
-		
+
 		//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
 		int processFlag = slide.getProcessFlag();
 		if(processFlag == 3){

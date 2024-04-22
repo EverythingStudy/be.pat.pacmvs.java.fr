@@ -21,6 +21,7 @@ import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.mapper.SpecialMemberMapper;
+import cn.staitech.fr.mapper.TopicMapper;
 import cn.staitech.fr.mapper.WaxBlockInfoMapper;
 import cn.staitech.fr.service.GroupService;
 import cn.staitech.fr.service.SlideService;
@@ -75,6 +76,9 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 
     @Resource
     private SpecialMemberMapper specialMemberMapper;
+
+    @Resource
+    private TopicMapper topicMapper;
 
     @Override
     public PageResponse<SpecialListQueryOut> getSpecialList(SpecialListQueryIn req) {
@@ -276,6 +280,14 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         resp.setList(specialList);
         resp.setPages(page.getPages());
         return resp;
+    }
+
+    @Override
+    public R<Special> getInfoById(Long specialId) {
+        log.info("智能阅片专题详情接口开始：");
+        Special special = this.baseMapper.selectById(specialId);
+        special.setTopicName(topicMapper.selectById(special.getTopicId()).getTopicName());
+        return R.ok(special);
     }
 
     private Slide getExtInfo(String fileName, Slide slide, Long specialId, SpecialAddIn req) {

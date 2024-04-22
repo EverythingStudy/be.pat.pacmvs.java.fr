@@ -32,4 +32,6 @@ public interface SpecialService extends IService<Special> {
     R editSpecialStatus(EditSpecialStatusIn req);
 
     PageResponse<SpecialListQueryOut> getSpecials(SpecialsQueryIn req);
+
+    R<Special> getInfoById(Long specialId);
 }

@@ -67,7 +67,7 @@ public class SpecialController  extends BaseController {
     	 //add访问记录
         AccessProjectRecords record=AccessProjectRecords.builder().projectId(specialId).userId(SecurityUtils.getUserId()).accessTime(new Date()).build();
         accessProjectRecordsService.save(record);
-        return R.ok(specialService.getById(specialId));
+        return specialService.getInfoById(specialId);
 
     }
 
