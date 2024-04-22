@@ -587,28 +587,20 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                 if (!Optional.ofNullable(image).isPresent()) {
                     throw new Exception(MessageSource.M("NODATA"));
                 }
-                List<JSONObject> contourList = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
+                List<JSONObject> contourList = selectContourList(annotationBy.getSlideId(), annotationBy.getCategoryId());
                 int type;
                 if (contourList.size() > 0) {
                     type = 1;
                 } else {
                     type = 2;
                 }
-                Category categoryAfter = categoryMapper.selectById(req.getCategory_id());
-
+                Category categoryAfter = categoryMapper.selectById(annotationBy.getCategoryId());
                 Special special = specialService.getById(slide.getSpecialId());
-
-                asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, type,categoryAfter.getCategoryAbbreviation(),special.getSpecialName());
+                asyncTask.generateThumbnail(annotationBy.getSlideId(), annotationBy.getCategoryId(), image.getImageUrl(), contourList, type,categoryAfter.getCategoryAbbreviation(),special.getSpecialName());
                 // 改之后数据
                 List<JSONObject> contourListAfter = selectContourList(annotation.getSlideId(), annotation.getCategoryId());
-
-                String categoryAbbreviation = null;
-                if(req.getCategory_id() != null){
-                    Category categoryBy = categoryMapper.selectById(req.getCategory_id());
-                    categoryAbbreviation = categoryBy.getCategoryAbbreviation();
-                }else{
-                    categoryAbbreviation = categoryAfter.getCategoryAbbreviation();
-                }
+                Category categoryBy = categoryMapper.selectById(req.getCategory_id());
+                String categoryAbbreviation = categoryBy.getCategoryAbbreviation();;
                 asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourListAfter, 1,categoryAbbreviation,special.getSpecialName());
                 AlgorithmAnnIn algorithmAnnIn = new AlgorithmAnnIn();
                 algorithmAnnIn.setSlideId(slide.getSlideId());
