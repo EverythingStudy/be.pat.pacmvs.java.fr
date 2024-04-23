@@ -14,6 +14,6 @@ import java.util.List;
 @Data
 public class AiDownloadIn {
     @ApiModelProperty(value = "待导出报告数据id；")
-    @Size( max=10,message = "{MAX_10_DATA}")
+    @Size( max=10,message = "{MAX_TEN_DATA}")
     private List<Long> ids;
 }
