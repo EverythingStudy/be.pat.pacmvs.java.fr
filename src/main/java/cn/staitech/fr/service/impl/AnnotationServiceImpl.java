@@ -302,7 +302,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     public List<JSONObject> selectContourList(Long slideId, Long categoryId) {
         QueryWrapper<Annotation> annotationQueryWrapper = new QueryWrapper<>();
-        annotationQueryWrapper.select("ST_AsGeoJSON(contour) AS contour").eq("slide_id", slideId).eq("category_id", categoryId);
+        annotationQueryWrapper.select("ST_AsGeoJSON(contour) AS contour").eq("slide_id", slideId).eq("category_id", categoryId).ne("contour",1);
         List<Annotation> annotations = annotationMapper.selectList(annotationQueryWrapper);
         List<JSONObject> contourList = new ArrayList<>();
         for (Annotation annotation1 : annotations) {
