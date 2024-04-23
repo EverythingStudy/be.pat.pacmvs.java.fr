@@ -1,5 +1,7 @@
 package cn.staitech.fr.domain.out;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -10,6 +12,13 @@ import lombok.Data;
  */
 @Data
 public class OrgansData {
+
+    @ApiModelProperty(value = "单脏器切片id")
+    private Long singleId;
+
+    @ApiModelProperty(value = "切片id")
+    private Long slideId;
+
     @ApiModelProperty(value = "单脏器图片缩略图地址")
     private String thumbUrl;
 
