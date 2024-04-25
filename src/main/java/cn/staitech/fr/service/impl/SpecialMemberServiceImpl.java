@@ -66,16 +66,18 @@ public class SpecialMemberServiceImpl extends ServiceImpl<SpecialMemberMapper, S
     public R removeMember(Long memberId) {
         log.info("专题成员删除接口开始：");
         //todo 校验用户操作信息
+        SpecialMember specialMember1 = baseMapper.selectById(memberId);
+
         //校验标注信息
         LambdaQueryWrapper<Annotation> labelWrapper = new LambdaQueryWrapper<>();
-        labelWrapper.eq(Annotation::getCreateBy, memberId);
+        labelWrapper.eq(Annotation::getCreateBy, specialMember1.getUserId());
         Integer integer1 = annotationMapper.selectCount(labelWrapper);
         if(integer1>0){
             return R.fail(MessageSource.M("DATA_CANNOT_EDITED_OR_DELETED"));
         }
         //校验诊断信息
         LambdaQueryWrapper<Diagnosis> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Diagnosis::getCreateBy, memberId);
+        wrapper.eq(Diagnosis::getCreateBy, specialMember1.getUserId());
         wrapper.eq(Diagnosis::getDeleteFlag,1);
         Integer integer = diagnosisMapper.selectCount(wrapper);
         if(integer>0){
