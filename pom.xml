@@ -566,6 +566,17 @@
                 <serverAddr>192.168.160.105:8848</serverAddr>
             </properties>
         </profile>
+        <profile>
+            <!-- 智能阅片机构版 -->
+            <id>pathmedics</id>
+            <properties>
+                <activatedProperties>pathmedics</activatedProperties>
+                <nacosNamespace>c042fd91-259c-4a45-b2df-743512aff477</nacosNamespace>
+                <nacosAddress>http://192.168.52.183:8848</nacosAddress>
+                <nacosGroup>DEFAULT_GROUP</nacosGroup>
+                <serverAddr>192.168.52.183:8848</serverAddr>
+            </properties>
+        </profile>
 
     </profiles>
 </project>
