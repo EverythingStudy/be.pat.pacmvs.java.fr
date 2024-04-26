@@ -37,6 +37,7 @@ import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -208,6 +209,8 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         wrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
         wrapper.eq(Slide::getSpecialId, req.getSpecialId());
         wrapper.isNotNull(Slide::getAnimalCode);
+        wrapper.like(StringUtils.isNotEmpty(req.getAnimalCode()),Slide::getAnimalCode,req.getAnimalCode());
+        wrapper.like(StringUtils.isNotEmpty(req.getGroupCode()),Slide::getGroupCode,req.getGroupCode());
         Page<Slide> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
         List<Slide> slideList = slideMapper.selectList(wrapper);
         if (CollectionUtils.isEmpty(slideList)) {
