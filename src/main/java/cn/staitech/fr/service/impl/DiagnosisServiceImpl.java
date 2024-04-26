@@ -285,7 +285,8 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		QueryWrapper<Diagnosis> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("special_id",diagnosis.getSpecialId());
 		queryWrapper.eq("single_id",diagnosis.getSingleId());
-		queryWrapper.gt("delete_flag",1);
+		//逻辑删除状态（0:删除 1:未删除）
+		queryWrapper.eq("delete_flag",1);
 		List<Diagnosis> list = list(queryWrapper);
 		if (CollectionUtils.isEmpty(list)) {
 			//修改未诊断的状态
