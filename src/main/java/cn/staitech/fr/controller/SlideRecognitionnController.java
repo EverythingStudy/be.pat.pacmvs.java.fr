@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cn.staitech.common.core.domain.R;
+import cn.staitech.common.security.annotation.Logical;
+import cn.staitech.common.security.annotation.RequiresPermissions;
 import cn.staitech.fr.domain.in.StartPredictionIn;
 import cn.staitech.fr.service.AlgorithmPredictionService;
 import io.swagger.annotations.Api;
@@ -36,7 +38,7 @@ public class SlideRecognitionnController {
 
     @SuppressWarnings("rawtypes")
     @ApiOperation(value = "启动识别算法")
-//    @RequiresPermissions(value = {"algorithmDetectionInfo:slice:startAlgorithm", "algorithmDetectionInfo:slice:reStartErrorData"}, logical = Logical.OR)
+    @RequiresPermissions(value = {"readFilmCreate:sliceConfig:start", "readFilmCreate:sliceConfig:allStart"}, logical = Logical.OR)
     @PostMapping("/start")
     public R start(@Validated @RequestBody StartPredictionIn req) {
         R r = algorithmPredictionService.startPrediction(req);
