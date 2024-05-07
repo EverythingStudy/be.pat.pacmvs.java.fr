@@ -27,6 +27,9 @@ public class AnnotationSelectList {
     @ApiModelProperty(value = "单脏器id")
     private Long singleSlideId;
 
+    @ApiModelProperty(value = "精细轮廓(true:之查看精细轮廓,false:将精细轮廓进行过滤)")
+    private Boolean filigreeContour;
+
 
 
 

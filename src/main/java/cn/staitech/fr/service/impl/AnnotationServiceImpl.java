@@ -192,9 +192,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     public List<Features> selectListBy(AnnotationSelectList req) throws Exception {
         List<Features> list = new ArrayList<>();
         Annotation annotation = new Annotation();
-        annotation.setSlideId(req.getSlideId());
-        annotation.setCategoryId(req.getCategoryId());
-        annotation.setSingleSlideId(req.getSingleSlideId());
+        BeanUtils.copyProperties(req, annotation);
         List<Annotation> selfAnnoList = annotationMapper.selectListBy(annotation);
         List<Features> annoList1 = getFeaturesList(selfAnnoList);
         if (CollectionUtils.isNotEmpty(annoList1)) {

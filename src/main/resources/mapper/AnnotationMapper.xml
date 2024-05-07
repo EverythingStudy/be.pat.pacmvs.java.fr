@@ -175,11 +175,17 @@
                 AND single_slide_id = #{singleSlideId}
             </if>
             <if test="slideIdList != null and slideIdList.size() > 0">
-	            AND slide_id in
-		        <foreach collection="slideIdList" item="item" index="index" open="(" separator="," close=")">
-		            #{item}
-		        </foreach>
-	        </if>
+                AND slide_id in
+                <foreach collection="slideIdList" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="filigreeContour != null and filigreeContour == true">
+                AND contour_type = 3
+            </if>
+            <if test="filigreeContour != null and filigreeContour == false">
+                AND contour_type != 3
+            </if>
         </where>
     </select>
 

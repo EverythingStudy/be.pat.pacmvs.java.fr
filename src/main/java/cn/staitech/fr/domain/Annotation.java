@@ -113,6 +113,9 @@ public class Annotation implements Serializable {
     @TableField(exist = false)
     private List<Long> slideIdList;
 
+    @TableField(exist = false)
+    private Boolean filigreeContour;
+
     @Override
     public boolean equals(Object that) {
         if (this == that) {
