@@ -66,5 +66,8 @@ public class MatrixReviewListOut {
 
     @ApiModelProperty(value = "描述")
     private String description;
+    
+    @ApiModelProperty(value = "图像路径")
+    private String imageUrl;
 
 }

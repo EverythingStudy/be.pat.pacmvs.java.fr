@@ -1,35 +1,37 @@
 package cn.staitech.fr.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.json.JSONUtil;
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
+import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Container;
 import cn.staitech.fr.domain.Category;
 import cn.staitech.fr.domain.PageDataResponse;
 import cn.staitech.fr.domain.SingleOrganNumber;
+import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.in.AiDownloadIn;
+import cn.staitech.fr.domain.in.AlgorithmIn;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.in.SingleSlideAdjacent;
 import cn.staitech.fr.domain.out.*;
-import cn.staitech.fr.domain.out.AnimalDimensionData;
-import cn.staitech.fr.domain.out.AnimalDimensionOut;
-import cn.staitech.fr.domain.out.ExportListVO;
-import cn.staitech.fr.domain.out.ExportVO;
-import cn.staitech.fr.domain.out.MatrixReviewListOut;
-import cn.staitech.fr.domain.out.MatrixReviewOut;
-import cn.staitech.fr.domain.out.OrgansData;
+import cn.staitech.fr.feign.PythonOrganRecognitionService;
 import cn.staitech.fr.mapper.DiagnosisMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.service.MatrixReviewService;
+import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.DateUtils;
 import cn.staitech.fr.utils.ExportPdfUtils;
 import cn.staitech.fr.utils.LanguageUtils;
+import cn.staitech.fr.vo.annotation.AiAlgorithm;
+import cn.staitech.fr.vo.annotation.StartRecognition;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.deepoove.poi.data.PictureRenderData;
 import com.github.pagehelper.Page;
@@ -38,6 +40,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,7 +49,9 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +79,12 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
     @Resource
     private HttpServletResponse response;
+    
+    @Resource
+	private SlideService slideService;
+    
+    @Resource
+	private PythonOrganRecognitionService pythonService;
 
 
     @Value("${waxPath}")
@@ -301,4 +313,68 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     public void algorithmDownload(AiDownloadIn req) {
 
     }
+
+	@Override
+	public R algorithm(AlgorithmIn req) {
+		Long organizationId  = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+		//Long userId = SecurityUtils.getLoginUser().getSysUser().getUserId();
+		Long specialId = req.getSpecialId();
+		MatrixReviewListIn mrl = new MatrixReviewListIn();
+		mrl.setSpecialId(specialId);
+		//0未预测、1预测成功、2预测失败、3预测中
+		mrl.setForecastStatus("0");
+		List<MatrixReviewListOut> singleSlideList = slideMapper.getMatrixReview(mrl);
+		if (CollectionUtils.isEmpty(singleSlideList)) {
+			return R.ok();
+		}
+
+		//请求算法处理
+		if(CollectionUtils.isNotEmpty(singleSlideList)){
+			for(MatrixReviewListOut matrixReviewListOut:singleSlideList){
+				Long singleId = matrixReviewListOut.getSingleId();
+				Long slideId = matrixReviewListOut.getSlideId();
+				String imageUrl = matrixReviewListOut.getImageUrl();
+				String organizatinName = geNumber(organizationId);
+				if(null != slideId && StringUtils.isNotEmpty(imageUrl)){
+					if(imageUrl.endsWith("svs")||imageUrl.endsWith("SVS")){
+						//请求算法接口
+						try {
+							log.info("AI算法请求内容是singleId:{},slideId:{},organizationId:{},imageUrl:{},algorithm_name:{}", singleId,slideId,organizationId,imageUrl,CommonConstant.ALGORITHM_MODEL_NAME);
+							AiAlgorithm aiAlgorithm = new AiAlgorithm();
+							aiAlgorithm.setAlgorithm_name(CommonConstant.ALGORITHM_MODEL_NAME);
+							aiAlgorithm.setOrganizationName(organizatinName);
+							aiAlgorithm.setOrganizationId(organizationId);
+							String body = pythonService.algorithm(aiAlgorithm);
+							log.info("AI算法请求返回数据{}", JSONUtil.toJsonStr(body));
+							JSONObject jsonObject = new JSONObject(body);
+							Integer code = jsonObject.getInt("code");
+							if (code.equals(200)) {
+								//修改当前slide分析状态为进行中
+								SingleSlide slide = new SingleSlide();
+								slide.setSingleId(singleId);
+								//0未预测、1预测成功、2预测失败、3预测中
+								slide.setForecastStatus("3");
+								singleSlideMapper.updateById(slide);
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+							log.error("AI算法请求失败,切片id是{}",slideId);
+						}finally {
+
+						}
+					}else{
+						log.error("AI算法请求失败,切片id是{},图片非svs格式",slideId);
+					}
+				}
+			}
+		}
+		return R.ok();
+	}
+	
+	public  String geNumber(Long organizationId) {
+		NumberFormat formatter = NumberFormat.getNumberInstance();
+		formatter.setMinimumIntegerDigits(3);
+		formatter.setGroupingUsed(false);
+		return "C" + formatter.format(organizationId);
+	}
 }

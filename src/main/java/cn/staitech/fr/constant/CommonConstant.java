@@ -169,6 +169,11 @@ public class CommonConstant {
     
     public static final String RECOGNITION_MODEL_NAME  = "全脏器识别";
     
+    /**
+     * AI预测算法
+     */
+    public static final String ALGORITHM_MODEL_NAME  = "全脏器精细轮廓";
+    
     public static final String WAX_BLOCK_INFO  = "WAX_BLOCK_INFO_";
 
     public static void main(String[] args) {

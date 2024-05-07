@@ -217,6 +217,7 @@
             resultType="cn.staitech.fr.domain.out.MatrixReviewListOut">
         SELECT
         ti.image_name,
+        ti.image_url,
         ss.single_id,
         ss.slide_id,
         ss.thumb_url,

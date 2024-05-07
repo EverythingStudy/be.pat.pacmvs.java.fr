@@ -4,6 +4,7 @@ import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.PageDataResponse;
 import cn.staitech.fr.domain.in.AiDownloadIn;
+import cn.staitech.fr.domain.in.AlgorithmIn;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.in.SingleSlideAdjacent;
@@ -105,7 +106,8 @@ public class MatrixReviewController {
 
     @ApiOperation(value = "ai预测")
     @PostMapping("/algorithm")
-    public R<String> algorithm(@Validated @RequestBody AiDownloadIn req) throws Exception {
-        return R.ok("success");
+    public R<String> algorithm(@Validated @RequestBody AlgorithmIn req){
+    	R r = matrixReviewService.algorithm(req);
+        return r;
     }
 }

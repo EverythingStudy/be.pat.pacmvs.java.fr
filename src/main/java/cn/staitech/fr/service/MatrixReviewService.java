@@ -4,9 +4,11 @@ import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.PageDataResponse;
 import cn.staitech.fr.domain.in.AiDownloadIn;
+import cn.staitech.fr.domain.in.AlgorithmIn;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.in.SingleSlideAdjacent;
+import cn.staitech.fr.domain.in.StartPredictionIn;
 import cn.staitech.fr.domain.out.*;
 
 import java.io.IOException;
@@ -36,4 +38,6 @@ public interface MatrixReviewService {
     R<String> getControlGroup(Long specialId);
 
     void algorithmDownload(AiDownloadIn req);
+    
+    R algorithm(AlgorithmIn req);
 }
