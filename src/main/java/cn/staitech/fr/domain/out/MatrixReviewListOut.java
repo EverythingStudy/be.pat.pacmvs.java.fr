@@ -2,7 +2,9 @@ package cn.staitech.fr.domain.out;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
@@ -12,6 +14,8 @@ import java.util.Date;
  * @desc
  */
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class MatrixReviewListOut {
     @ApiModelProperty(value = "单切片id")
     private Long singleId;
@@ -24,6 +28,9 @@ public class MatrixReviewListOut {
 
     @ApiModelProperty(value = "切片编号")
     private String imageName;
+    
+    @ApiModelProperty(value = "imageId")
+    private Long imageId;
 
     @ApiModelProperty(value = "组别号")
     private String groupCode;

@@ -218,6 +218,7 @@
         SELECT
         ti.image_name,
         ti.image_url,
+        ti.image_id,
         ss.single_id,
         ss.slide_id,
         ss.thumb_url,

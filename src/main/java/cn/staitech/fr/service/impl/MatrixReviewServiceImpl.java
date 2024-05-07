@@ -317,7 +317,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 	@Override
 	public R algorithm(AlgorithmIn req) {
 		Long organizationId  = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
-		//Long userId = SecurityUtils.getLoginUser().getSysUser().getUserId();
+//		Long organizationId  = 1L;
 		Long specialId = req.getSpecialId();
 		MatrixReviewListIn mrl = new MatrixReviewListIn();
 		mrl.setSpecialId(specialId);
@@ -334,16 +334,22 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 				Long singleId = matrixReviewListOut.getSingleId();
 				Long slideId = matrixReviewListOut.getSlideId();
 				String imageUrl = matrixReviewListOut.getImageUrl();
+				Long categoryId = matrixReviewListOut.getCategoryId();
+				String organName = matrixReviewListOut.getOrganName();
+				String aiImageUrl = matrixReviewListOut.getImageUrl();
+				Long imageId = matrixReviewListOut.getImageId();
 				String organizatinName = geNumber(organizationId);
 				if(null != slideId && StringUtils.isNotEmpty(imageUrl)){
-					if(imageUrl.endsWith("svs")||imageUrl.endsWith("SVS")){
+					if(imageUrl.endsWith("svs")||imageUrl.endsWith("SVS") && !organName.equals("盲肠-回肠-直肠-结肠")){
 						//请求算法接口
 						try {
 							log.info("AI算法请求内容是singleId:{},slideId:{},organizationId:{},imageUrl:{},algorithm_name:{}", singleId,slideId,organizationId,imageUrl,CommonConstant.ALGORITHM_MODEL_NAME);
-							AiAlgorithm aiAlgorithm = new AiAlgorithm();
+							AiAlgorithm aiAlgorithm = new AiAlgorithm(singleId, slideId, categoryId, aiImageUrl, imageId);
+							//BeanUtils.copyProperties(matrixReviewListOut, aiAlgorithm);
 							aiAlgorithm.setAlgorithm_name(CommonConstant.ALGORITHM_MODEL_NAME);
 							aiAlgorithm.setOrganizationName(organizatinName);
 							aiAlgorithm.setOrganizationId(organizationId);
+							log.info("AI算法请求完整数据{}", JSONUtil.toJsonStr(aiAlgorithm));
 							String body = pythonService.algorithm(aiAlgorithm);
 							log.info("AI算法请求返回数据{}", JSONUtil.toJsonStr(body));
 							JSONObject jsonObject = new JSONObject(body);
