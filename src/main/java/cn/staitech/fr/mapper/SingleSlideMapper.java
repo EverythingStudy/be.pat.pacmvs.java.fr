@@ -3,6 +3,7 @@ package cn.staitech.fr.mapper;
 import cn.staitech.fr.domain.SingleOrganNumber;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.OrganDisassemblyQueryIn;
+import cn.staitech.fr.domain.in.SingleSlideAdjacent;
 import cn.staitech.fr.domain.out.ExportVO;
 import cn.staitech.fr.domain.out.OrganDisassemblyOut;
 import cn.staitech.fr.domain.out.SingleSlideSelectBy;
@@ -23,6 +24,8 @@ public interface SingleSlideMapper extends BaseMapper<SingleSlide> {
     ExportVO getExportVO(Long id);
 
     SingleSlideSelectBy singleSlideBy(Long singleId);
+
+    List<SingleSlideSelectBy> singleSlideList(SingleSlideAdjacent singleSlideAdjacent);
 }
 
 

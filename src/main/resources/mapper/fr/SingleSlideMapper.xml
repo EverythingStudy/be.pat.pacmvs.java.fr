@@ -91,11 +91,8 @@
 
 
 
-
-
-    <select id="singleSlideBy" parameterType="long"
-            resultType="cn.staitech.fr.domain.out.SingleSlideSelectBy">
-        select s.slide_id,
+    <sql id="singleSlideBy">
+        s.slide_id,
         s.special_id,
         s.image_id,
         s.group_code,
@@ -134,12 +131,35 @@
         ss.description,
         ss.forecast_status,
         ss.diagnosis_status
+    </sql>
+
+
+
+    <select id="singleSlideBy" parameterType="long"
+            resultType="cn.staitech.fr.domain.out.SingleSlideSelectBy">
+        select <include refid="singleSlideBy"/>
         from fr_single_slide as ss
         left join fr_slide s on ss.slide_id = s.slide_id
         left join tb_image m on m.image_id = s.image_id
         <where>
             <if test="singleId != null">
                 ss.single_id = #{singleId, jdbcType=NUMERIC}
+            </if>
+        </where>
+    </select>
+
+    <select id="singleSlideList" parameterType="cn.staitech.fr.domain.in.SingleSlideAdjacent"
+            resultType="cn.staitech.fr.domain.out.SingleSlideSelectBy">
+        select  <include refid="singleSlideBy"/>
+        from fr_single_slide as ss
+        left join fr_slide s on ss.slide_id = s.slide_id
+        left join tb_image m on m.image_id = s.image_id
+        <where>
+            <if test="specialId != null">
+                s.special_id = #{specialId, jdbcType=NUMERIC}
+            </if>
+            <if test="categoryId != null">
+                AND ss.category_id = #{categoryId, jdbcType=NUMERIC}
             </if>
         </where>
     </select>

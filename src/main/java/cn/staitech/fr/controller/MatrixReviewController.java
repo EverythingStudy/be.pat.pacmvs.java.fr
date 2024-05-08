@@ -76,6 +76,13 @@ public class MatrixReviewController {
         return R.ok(resp);
     }
 
+    @ApiOperation(value = "矩阵阅片-专题维度(根据脏器查询专题内全部图片)")
+    @PostMapping("/specialSlideList")
+    public R<List<SingleSlideSelectBy>> specialSlideList(@RequestBody @Validated SingleSlideAdjacent req) {
+        List<SingleSlideSelectBy> resp = matrixReviewService.specialSlideList(req);
+        return R.ok(resp);
+    }
+
     @ApiOperation(value = "矩阵阅片-切片维度(携带图片切片信息)")
     @PostMapping("/selectSlideList")
     public R<PageResponse<SelectImageSlideOut>> selectSlideList(@RequestBody @Validated MatrixReviewListIn req) {

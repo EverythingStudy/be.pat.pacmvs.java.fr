@@ -29,6 +29,8 @@ public interface MatrixReviewService {
 
     HashMap<String, SingleSlideSelectBy> SingleSlideAdjacent(SingleSlideAdjacent req);
 
+    List<SingleSlideSelectBy> specialSlideList(SingleSlideAdjacent req);
+
     PageResponse<SelectImageSlideOut> selectSlideList(MatrixReviewListIn req);
 
     PageDataResponse<AnimalDimensionOut> animalList(MatrixReviewListIn req);

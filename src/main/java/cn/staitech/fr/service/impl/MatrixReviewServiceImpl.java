@@ -41,7 +41,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -51,7 +50,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,9 +77,6 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
     @Resource
     private HttpServletResponse response;
-    
-    @Resource
-	private SlideService slideService;
     
     @Resource
 	private PythonOrganRecognitionService pythonService;
@@ -197,6 +192,11 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             map.put("next", null);
         }
         return map;
+    }
+
+    @Override
+    public List<SingleSlideSelectBy> specialSlideList(SingleSlideAdjacent req){
+        return singleSlideMapper.singleSlideList(req);
     }
 
     @Override
