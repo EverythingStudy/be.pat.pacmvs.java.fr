@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.SpecialMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.Special">
+        <id column="special_id" property="specialId"/>
+        <result column="topci_id" property="topicId"/>
+        <result column="topci_name" property="topicName"/>
+        <result column="special_name" property="specialName"/>
+        <result column="species_id" property="speciesId"/>
+        <result column="trial_id" property="trialId"/>
+        <result column="color_type" property="colorType"/>
+        <result column="indicator_id" property="indicatorId"/>
+        <result column="status" property="status"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_by" property="createBy"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        special_id
+        , topci_id,topci_name, special_name, species_id, trial_id, color_type, indicator_id, status, del_flag, create_by, create_time, update_by, update_time
+    </sql>
+    <select id="getSpecialList" parameterType="cn.staitech.fr.domain.in.SpecialListQueryIn"
+            resultType="cn.staitech.fr.domain.out.SpecialListQueryOut">
+        select distinct fs.special_id, tt.topic_name, fs.color_type,fs.special_name,fs.trial_id, ts.name speciesName, ts.name_en
+        speciesNameEn, fs.status, fs.create_time,su.user_name createName
+        from fr_special fs
+        left join tb_topic tt on fs.topic_id = tt.topic_id
+        left join sys_user su on fs.create_by = su.user_id
+        left join tb_species ts on fs.species_id = ts.species_id
+        left join fr_special_member fsm on fs.special_id = fsm.special_id
+        and  fsm.del_flag = '0'
+        and ts.organization_id = #{organizationId}
+        where fs.del_flag = '0'
+        and  fs.organization_id = #{organizationId}
+        <if test="topicName != null and topicName != ''">
+            and tt.topic_name like concat('%', #{topicName}, '%')
+        </if>
+        <if test="specialName != null and specialName != ''">
+            and fs.special_name like concat('%', #{specialName}, '%')
+        </if>
+        <if test="trialId != null ">
+            and fs.trial_id = #{trialId}
+        </if>
+        <if test="userId != null ">
+            and fsm.user_id = #{userId}
+        </if>
+        <if test="speciesId != null and speciesId != ''">
+            and fs.species_id = #{speciesId}
+        </if>
+        <if test="status != null and status != ''">
+            and fs.status = #{status}
+        </if>
+        <if test="colorType!= null and colorType != ''">
+            and fs.color_type = #{colorType}
+        </if>
+        <if test="createName != null and createName != ''">
+            and su.user_name like concat('%', #{createName}, '%')
+        </if>
+        <if test="createTimeParams!=null and createTimeParams.size() > 0">
+            <if test="createTimeParams.beginTime != null "><!-- 开始时间检索 -->
+                AND date_format(fs.create_time,'%Y%m%d') &gt;= date_format(#{createTimeParams.beginTime},'%Y%m%d')
+            </if>
+            <if test="createTimeParams.endTime != null "><!-- 结束时间检索 -->
+                AND date_format(fs.create_time,'%Y%m%d') &lt;= date_format(#{createTimeParams.endTime},'%Y%m%d')
+            </if>
+        </if>
+        order by fs.create_time desc
+    </select>
+
+    <select id="getSpecials" parameterType="cn.staitech.fr.domain.in.SpecialsQueryIn"
+            resultType="cn.staitech.fr.domain.out.SpecialListQueryOut">
+        select  fs.special_id, tt.topic_name, fs.color_type,fs.special_name,fs.trial_id, ts.name speciesName, ts.name_en
+        speciesNameEn, fs.status, fs.create_time,su.user_name createName
+        from fr_special fs
+        left join tb_topic tt on fs.topic_id = tt.topic_id
+        left join sys_user su on fs.create_by = su.user_id
+        left join tb_species ts on fs.species_id = ts.species_id
+        and ts.organization_id = #{organizationId}
+        left join fr_special_member fsm on fs.special_id = fsm.special_id
+        and fsm.del_flag = '0'
+        where fs.del_flag = '0'
+        and fs.status>0
+        and fs.organization_id = #{organizationId}
+        <if test="topicName != null and topicName != ''">
+            and tt.topic_name like concat('%', #{topicName}, '%')
+        </if>
+        <if test="specialName != null and specialName != ''">
+            and fs.special_name like concat('%', #{specialName}, '%')
+        </if>
+        <if test="loginUserId != null ">
+            and fsm.user_id = #{loginUserId}
+        </if>
+        <if test="trialId != null ">
+            and fs.trial_id = #{trialId}
+        </if>
+        <if test="speciesId != null and speciesId != ''">
+            and fs.species_id = #{speciesId}
+        </if>
+        <if test="status != null and status != ''">
+            and fs.status = #{status}
+        </if>
+        <if test="colorType!= null and colorType != ''">
+            and fs.color_type = #{colorType}
+        </if>
+        <if test="createName != null and createName != ''">
+            and su.user_name like concat('%', #{createName}, '%')
+        </if>
+        <if test="createTimeParams!=null and createTimeParams.size() > 0">
+            <if test="createTimeParams.beginTime != null "><!-- 开始时间检索 -->
+                AND date_format(fs.create_time,'%Y%m%d') &gt;= date_format(#{createTimeParams.beginTime},'%Y%m%d')
+            </if>
+            <if test="createTimeParams.endTime != null "><!-- 结束时间检索 -->
+                AND date_format(fs.create_time,'%Y%m%d') &lt;= date_format(#{createTimeParams.endTime},'%Y%m%d')
+            </if>
+        </if>
+        order by fs.create_time desc
+    </select>
+
+    <select id="countgetUserRole" resultType="java.lang.Integer">
+        select count(0)
+        from sys_user su
+                 left join sys_user_role sur on su.user_id = sur.user_id
+                 left join sys_role sr on sur.role_id = sr.role_id
+        where su.del_flag = '0'
+          and sr.del_flag = '0'
+          and sr.role_level = 1
+          and su.user_id=#{userId}
+
+
+    </select>
+
+</mapper>

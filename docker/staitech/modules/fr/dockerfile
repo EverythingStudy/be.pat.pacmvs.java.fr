@@ -1,5 +1,6 @@
 # 基础镜像
 #FROM openjdk:17-oracle
+#FROM  openjdk-chinese:8-jre
 FROM  openjdk:8-jre
 # author
 MAINTAINER staitech
@@ -12,7 +13,7 @@ RUN mkdir -p /home/staitech
 # 指定路径
 WORKDIR /home/staitech
 # 复制jar文件到路径
-COPY ./jar/staitech-modules-mr.jar /home/staitech/staitech-modules-mr.jar
+COPY ./jar/staitech-modules-fr.jar /home/staitech/staitech-modules-fr.jar
 
 # 启动系统服务
-ENTRYPOINT ["java","-jar","staitech-modules-mr.jar"]
+ENTRYPOINT ["java","-jar","staitech-modules-fr.jar"]

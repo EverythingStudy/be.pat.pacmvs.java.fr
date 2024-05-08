@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.OrganizationMapper">
+
+    <resultMap type="cn.staitech.fr.domain.OrganizationIdName" id="organizationMap">
+        <result property="organizationId" column="organization_id"/>
+        <result property="organizationName" column="organization_name"/>
+    </resultMap>
+    <!--查询组织表IdNameList-->
+    <select id="selectIdNameList" resultMap="organizationMap">
+        select distinct organization_id, organization_name
+        from sys_organization
+        order by organization_id asc;
+    </select>
+
+</mapper>
