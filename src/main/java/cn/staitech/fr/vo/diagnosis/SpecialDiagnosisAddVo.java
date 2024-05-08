@@ -33,25 +33,37 @@ public class SpecialDiagnosisAddVo {
 //	@ApiModelProperty(name = "groupId" , value = "分组id")
 //	private Long groupId;
     
-	@NotNull(message = "{PARAMETER_ABNORMALITY}")
+//	@NotNull(message = "{PARAMETER_ABNORMALITY}")
 	@ApiModelProperty(name = "viscera" , value = "脏器或组织")
 	private String viscera;
     
-	@NotNull(message = "{PARAMETER_ABNORMALITY}")
+//	@NotNull(message = "{PARAMETER_ABNORMALITY}")
 	@ApiModelProperty(name = "position" , value = "部位")
 	private String position;
 	
-	@NotNull(message = "{PARAMETER_ABNORMALITY}")
+	@ApiModelProperty(name = "positionSource" , value = "部位来源 0：字典  1：自定义")
+	private String positionSource;
+	
+//	@NotNull(message = "{PARAMETER_ABNORMALITY}")
 	@ApiModelProperty(name = "lesion" , value = "病理改变")
 	private String lesion;
 	
-	@NotNull(message = "{PARAMETER_ABNORMALITY}")
+	@ApiModelProperty(name = "lesionSource" , value = "病理改变来源 0：字典  1：自定义")
+	private String lesionSource;
+	
+//	@NotNull(message = "{PARAMETER_ABNORMALITY}")
 	@ApiModelProperty(name = "ddefinition" , value = "修饰")
 	private List<String> ddefinition;
 	
-	@NotNull(message = "{PARAMETER_ABNORMALITY}")
+	@ApiModelProperty(name = "ddefinitionSource" , value = "修饰来源 0：字典  1：自定义")
+	private String ddefinitionSource;
+	
+//	@NotNull(message = "{PARAMETER_ABNORMALITY}")
 	@ApiModelProperty(name = "grade" , value = "病变级别")
 	private String grade;
+	
+	@ApiModelProperty(name = "gradeSource" , value = "病变级别来源  0：字典  1：自定义")
+	private String gradeSource;
 	
     
 	@ApiModelProperty(name = "remark" , value = "备注")

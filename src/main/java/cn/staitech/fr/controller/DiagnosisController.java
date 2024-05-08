@@ -15,8 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.domain.Diagnosis;
+import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.service.DiagnosisService;
+import cn.staitech.fr.service.SingleSlideService;
 import cn.staitech.fr.utils.MessageSource;
+import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisAbnormalVo;
 import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisAddVo;
 import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisDeleteVo;
 import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisVo;
@@ -43,6 +46,9 @@ public class DiagnosisController {
 
 	@Resource
 	private DiagnosisService diagnosisService;
+	
+	@Resource
+	private SingleSlideService singleSlideService;
 	
 	
 	/**
@@ -133,5 +139,20 @@ public class DiagnosisController {
 	public R getAllTag() {
 		SysDictResultVo vo = diagnosisService.getSysDictResultVo();
 		return R.ok(vo);
+	}
+	
+	@ApiOperation(value = "未见异常病理改变结果保存/取消")
+	@PostMapping("/abnormalOperation")
+	public R abnormalOperation(@Validated @RequestBody SpecialDiagnosisAbnormalVo specialDiagnosisAbnormalVo) throws Exception {
+		if (null != specialDiagnosisAbnormalVo) {
+			SingleSlide singleSlide = singleSlideService.getById(specialDiagnosisAbnormalVo.getSingleId());
+			if(null == singleSlide){
+				return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
+			}
+			diagnosisService.abnormalOperation(specialDiagnosisAbnormalVo);
+			return R.ok();
+		} else {
+			return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
+		}
 	}
 }

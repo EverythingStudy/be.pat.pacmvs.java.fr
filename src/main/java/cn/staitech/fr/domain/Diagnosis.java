@@ -50,24 +50,36 @@ public class Diagnosis implements Serializable {
 
     @ApiModelProperty(value = "部位名称")
     private String positionName;
+    
+    @ApiModelProperty(name = "positionSource" , value = "部位来源 0：字典  1：自定义")
+	private String positionSource;
 
     @ApiModelProperty(value = "病理改变")
     private String lesion;
 
     @ApiModelProperty(value = "病理病变名称")
     private String lesionName;
+    
+    @ApiModelProperty(name = "lesionSource" , value = "病理改变来源 0：字典  1：自定义")
+	private String lesionSource;
 
     @ApiModelProperty(value = "修饰")
     private String ddefinition;
 
     @ApiModelProperty(value = "修饰名称")
     private String ddefinitionName;
+    
+    @ApiModelProperty(name = "ddefinitionSource" , value = "修饰来源 0：字典  1：自定义")
+	private String ddefinitionSource;
 
     @ApiModelProperty(value = "病变级别")
     private String grade;
 
     @ApiModelProperty(value = "病变级别名称")
     private String gradeName;
+    
+    @ApiModelProperty(name = "gradeSource" , value = "病变级别来源 0：字典  1：自定义")
+	private String gradeSource;
 
     @ApiModelProperty(value = "备注")
     private String remark;

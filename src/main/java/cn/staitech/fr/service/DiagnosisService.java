@@ -5,6 +5,8 @@ import java.util.List;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import cn.staitech.fr.domain.Diagnosis;
+import cn.staitech.fr.domain.SingleSlide;
+import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisAbnormalVo;
 import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisAddVo;
 import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisVo;
 import cn.staitech.fr.vo.diagnosis.SysDictDataVo;
@@ -36,5 +38,7 @@ public interface DiagnosisService extends IService<Diagnosis> {
 	public Diagnosis getSpecialDiagnosis(Long specialDiagnosisId); 
 	
 	public SysDictResultVo getSysDictResultVo(); 
+	
+	public void abnormalOperation(SpecialDiagnosisAbnormalVo specialDiagnosisAbnormalVo);
 
 }

@@ -3,6 +3,7 @@ package cn.staitech.fr.service.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ import cn.staitech.fr.mapper.SysDictDataMapper;
 import cn.staitech.fr.service.DiagnosisService;
 import cn.staitech.fr.service.SysDictDataService;
 import cn.staitech.fr.utils.DictUtils;
+import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisAbnormalVo;
 import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisAddVo;
 import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisVo;
 import cn.staitech.fr.vo.diagnosis.SysDictDataVo;
@@ -149,35 +151,57 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 			record.setViscreaName(visceraName);
 		}
 		String position =  addVo.getPosition();
-		if(null != position){
-			String positionName = getLabelNameByParm(SysDictTypeEnum.position.label(), Long.valueOf(position),"");
-			record.setPositionName(positionName);
+		String positionSource =  addVo.getPositionSource();
+		if(StringUtils.isNotEmpty(position)) {
+			if(StringUtils.isNotEmpty(positionSource) && positionSource.equals("0")){
+				String positionName = getLabelNameByParm(SysDictTypeEnum.position.label(), Long.valueOf(position),"");
+				record.setPositionName(positionName);
+			}else{
+				record.setPositionName(position);
+			}
 		}
 		String lesion =  addVo.getLesion();
-		if(null != lesion){
-			String lesionName = getLabelNameByParm(SysDictTypeEnum.lesion.label(), Long.valueOf(lesion),"");
-			record.setLesionName(lesionName);
+		String lesionSource =  addVo.getLesionSource();
+		if(StringUtils.isNotEmpty(lesion)) {
+			if(StringUtils.isNotEmpty(lesionSource) && lesionSource.equals("0")){
+				String lesionName = getLabelNameByParm(SysDictTypeEnum.lesion.label(), Long.valueOf(lesion),"");
+				record.setLesionName(lesionName);
+			}else{
+				record.setLesionName(lesion);
+			}
 		}
 		List<String> ddefinitionList =  addVo.getDdefinition();
+		String ddefinitionSource =  addVo.getDdefinitionSource();
 		if(CollectionUtils.isNotEmpty(ddefinitionList)){
-			List<String> nameList = new ArrayList<>();
-			for(String ddfinitionId :ddefinitionList){
-				String ddefinitionName = getLabelNameByParm(SysDictTypeEnum.ddefinition.label(), Long.valueOf(ddfinitionId),"");
-				if(StringUtils.isNotEmpty(ddefinitionName)){
-					nameList.add(ddefinitionName);
+			if(StringUtils.isNotEmpty(ddefinitionSource) && ddefinitionSource.equals("0")){
+				List<String> nameList = new ArrayList<>();
+				for(String ddfinitionId :ddefinitionList){
+					String ddefinitionName = getLabelNameByParm(SysDictTypeEnum.ddefinition.label(), Long.valueOf(ddfinitionId),"");
+					if(StringUtils.isNotEmpty(ddefinitionName)){
+						nameList.add(ddefinitionName);
+					}
 				}
-			}
-			if(CollectionUtils.isNotEmpty(nameList)){
-				String ddefinitionFullName =  String.join("|", nameList);
+				if(CollectionUtils.isNotEmpty(nameList)){
+					String ddefinitionFullName =  String.join("|", nameList);
+					record.setDdefinitionName(ddefinitionFullName);
+				}
+				String ddefinitionIdStr =  String.join("|", ddefinitionList);
+				record.setDdefinition(ddefinitionIdStr);
+			}else{
+				String ddefinitionFullName =  String.join("|", ddefinitionList);
 				record.setDdefinitionName(ddefinitionFullName);
 			}
-			String ddefinitionIdStr =  String.join("|", ddefinitionList);
-			record.setDdefinition(ddefinitionIdStr);
 		}
+		
 		String grade =  addVo.getGrade();
-		if(null != grade){
-			String gradeName = getLabelNameByParm(SysDictTypeEnum.grade.label(), Long.valueOf(grade),"");
-			record.setGradeName(gradeName);
+		String gradeSource =  addVo.getGradeSource();
+		if(StringUtils.isNotEmpty(grade)) {
+			if(StringUtils.isNotEmpty(gradeSource) && gradeSource.equals("0")){
+				String gradeName = getLabelNameByParm(SysDictTypeEnum.grade.label(), Long.valueOf(grade),"");
+				record.setGradeName(gradeName);
+			}else{
+				record.setGradeName(grade);
+			}
 		}
 
 		if (null == addVo.getDiagnosisId()) {
@@ -439,6 +463,16 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 			labelName = sysDictData.getDictLabel();
 		}
 		return labelName;
+	}
+
+	@Override
+	public void abnormalOperation(SpecialDiagnosisAbnormalVo specialDiagnosisAbnormalVo) {
+		Long currentUserId = SecurityUtils.getLoginUser().getSysUser().getUserId();
+		SingleSlide singleSlide = new SingleSlide();
+		BeanUtils.copyProperties(specialDiagnosisAbnormalVo, singleSlide);
+		singleSlide.setAbnormalCreateBy(currentUserId);
+		singleSlide.setAbnormalCreateTime(new Date());
+		singleSlideMapper.updateById(singleSlide);
 	}
 
 

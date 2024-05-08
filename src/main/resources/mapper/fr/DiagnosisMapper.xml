@@ -24,11 +24,16 @@
         <result column="create_time" property="createTime" />
         <result column="update_by" property="updateBy" />
         <result column="update_time" property="updateTime" />
+        <result column="position_source" property="position_source" />
+        <result column="lesion_source" property="lesion_source" />
+        <result column="ddefinition_source" property="ddefinition_source" />
+        <result column="grade_source" property="grade_source" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        diagnosis_id, special_id, group_id, single_id, viscera, viscrea_name, position, position_name, lesion, lesion_name, ddefinition, ddefinition_name, grade, grade_name, remark, delete_flag, create_by, create_time, update_by, update_time
+        diagnosis_id, special_id, group_id, single_id, viscera, viscrea_name, position, position_name, lesion, lesion_name, ddefinition, ddefinition_name, grade, grade_name, 
+        remark, delete_flag, create_by, create_time, update_by, update_time,position_source,lesion_source,ddefinition_source,grade_source
     </sql>
 
      <select id="selectUserById" parameterType="Long" resultType="cn.staitech.system.api.domain.SysUser">

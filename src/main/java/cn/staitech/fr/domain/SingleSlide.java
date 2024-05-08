@@ -43,6 +43,15 @@ public class SingleSlide implements Serializable {
 
     @ApiModelProperty(value = "单切片描述")
     private String description;
+    
+    @ApiModelProperty(value = "异常状态 0：默认值 ；1：未见异常")
+    private String abnormalStatus;
+    
+    @ApiModelProperty(value = "未见异常创建人")
+    private Long abnormalCreateBy;
+    
+    @ApiModelProperty(value = "未见异常创建时间")
+    private Date abnormalCreateTime;
 
 
 }

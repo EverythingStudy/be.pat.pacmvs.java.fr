@@ -62,36 +62,31 @@ public class SpecialDiagnosisVo {
 	@ApiModelProperty(name = "viscera" , value = "部位")
 	private String position;
 	
+	@ApiModelProperty(name = "positionSource" , value = "部位来源 0：字典  1：自定义")
+	private String positionSource;
+	
 	@ApiModelProperty(name = "lesion" , value = "病理改变")
 	private String lesion;
+	
+	@ApiModelProperty(name = "lesionSource" , value = "病理改变来源 0：字典  1：自定义")
+	private String lesionSource;
 	
 	@ApiModelProperty(name = "ddefinition" , value = "修饰")
 	private List<String> ddefinition;
 	
+	@ApiModelProperty(name = "ddefinitionSource" , value = "修饰来源 0：字典  1：自定义")
+	private String ddefinitionSource;
+	
 	@ApiModelProperty(name = "grade" , value = "病变级别")
 	private String grade;
+	
+	@ApiModelProperty(name = "gradeSource" , value = "病变级别来源 0：字典  1：自定义")
+	private String gradeSource;
 	
 	@ApiModelProperty(name = "editStatus" , value = "是否可以编辑 0:不可以1:可以")
 	private Integer editStatus = 0;
 	
-//	@ApiModelProperty(name = "index" , value = "索引值")
-//	private Integer index;
 	
-//	@ApiModelProperty(name = "groupId" , value = "分组id")
-//	private Long groupId;
-	
-//	@ApiModelProperty(name = "projectId" , value = "项目ID")
-//	private Long projectId;
-	
-//	@ApiModelProperty(name = "diagnosisStatus" , value = "人工诊断状态：0未诊断，1已诊断")
-//	private Integer diagnosisStatus = 1;
-    
-//	@ApiModelProperty(name = "status" , value = "是否可用 0:不可用1:可用")
-//	private Integer status;
-    
-//	@ApiModelProperty(name = "deleteFlag" , value = "逻辑删除状态（0:删除 1:未删除）")
-//	private Integer deleteFlag;
-    
 	
     
 }
