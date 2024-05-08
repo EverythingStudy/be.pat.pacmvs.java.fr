@@ -121,8 +121,6 @@
         m.resolution_x,
         m.resolution_y,
         m.source_lens,
-        m.image_path,
-        m.thumb_url,
         m.image_name,
         ss.single_id,
         ss.single_id as singleSlideId,
@@ -160,6 +158,9 @@
             </if>
             <if test="categoryId != null">
                 AND ss.category_id = #{categoryId, jdbcType=NUMERIC}
+            </if>
+            <if test="imageName != null">
+                AND m.image_name like concat('%',#{imageName},'%')
             </if>
         </where>
     </select>
