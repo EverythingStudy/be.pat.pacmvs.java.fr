@@ -271,6 +271,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             List<ExportListVO> collect = diagnosisMapper.getExportListVO(id);
             exportVO.setList(collect);
             exportVO.setTable(collect);
+            exportVO.setOrganizationName(diagnosisMapper.getOrganizationName(SecurityUtils.getLoginUser().getSysUser().getOrganizationId()));
             //会报错{"msg":"TemplateRenderPolicy render error","code":500}
             //exportVO.setImg(new PictureRenderData(800, 200, "D:/image/liangz.png"));
             exportVO.setImg(new PictureRenderData(800, 200, exportVO.getThumbUrl().replace("/file/statics", "/home/pat_saas")));

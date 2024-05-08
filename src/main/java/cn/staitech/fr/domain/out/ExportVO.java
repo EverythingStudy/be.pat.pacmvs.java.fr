@@ -54,5 +54,7 @@ public class ExportVO {
     private PictureRenderData img;
 
     private String thumbUrl;
+
+    private String organizationName;
     
 }

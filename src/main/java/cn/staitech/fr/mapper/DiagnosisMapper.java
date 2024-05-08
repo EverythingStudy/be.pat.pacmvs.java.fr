@@ -20,4 +20,6 @@ public interface DiagnosisMapper extends BaseMapper<Diagnosis> {
 	SysUser selectUserById(Long userId);
 
 	List<ExportListVO>  getExportListVO(Long singleId);
+
+	String getOrganizationName(Long organizationId);
 }

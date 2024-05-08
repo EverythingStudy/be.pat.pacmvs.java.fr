@@ -30,7 +30,7 @@
     <sql id="Base_Column_List">
         diagnosis_id, special_id, group_id, single_id, viscera, viscrea_name, position, position_name, lesion, lesion_name, ddefinition, ddefinition_name, grade, grade_name, remark, delete_flag, create_by, create_time, update_by, update_time
     </sql>
-    
+
      <select id="selectUserById" parameterType="Long" resultType="cn.staitech.system.api.domain.SysUser">
         select * from sys_user
         where user_id = #{userId}
@@ -50,5 +50,10 @@
         where fd.single_id = #{singleId}
           and fd.delete_flag = 1
 
+    </select>
+    <select id="getOrganizationName" resultType="java.lang.String">
+        select organization_name
+        from sys_organization
+        where organization_id = #{organizationId}
     </select>
 </mapper>
