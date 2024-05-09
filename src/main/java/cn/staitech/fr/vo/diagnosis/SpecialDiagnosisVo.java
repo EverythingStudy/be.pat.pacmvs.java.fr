@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisAddVo.DdefinitionChild;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -63,25 +66,27 @@ public class SpecialDiagnosisVo {
 	private String position;
 	
 	@ApiModelProperty(name = "positionSource" , value = "部位来源 0：字典  1：自定义")
-	private String positionSource;
+	private int positionSource;
 	
 	@ApiModelProperty(name = "lesion" , value = "病理改变")
 	private String lesion;
 	
 	@ApiModelProperty(name = "lesionSource" , value = "病理改变来源 0：字典  1：自定义")
-	private String lesionSource;
+	private int lesionSource;
 	
 	@ApiModelProperty(name = "ddefinition" , value = "修饰")
-	private List<String> ddefinition;
+	@TableField(typeHandler = JacksonTypeHandler.class)
+//	private List<String> ddefinition;
+	private List<DdefinitionChild> ddefinition;
 	
-	@ApiModelProperty(name = "ddefinitionSource" , value = "修饰来源 0：字典  1：自定义")
-	private String ddefinitionSource;
+//	@ApiModelProperty(name = "ddefinitionSource" , value = "修饰来源 0：字典  1：自定义")
+//	private String ddefinitionSource;
 	
 	@ApiModelProperty(name = "grade" , value = "病变级别")
 	private String grade;
 	
 	@ApiModelProperty(name = "gradeSource" , value = "病变级别来源 0：字典  1：自定义")
-	private String gradeSource;
+	private int gradeSource;
 	
 	@ApiModelProperty(name = "editStatus" , value = "是否可以编辑 0:不可以1:可以")
 	private Integer editStatus = 0;

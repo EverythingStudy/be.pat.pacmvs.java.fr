@@ -14,7 +14,7 @@
         <result column="position_name" property="positionName" />
         <result column="lesion" property="lesion" />
         <result column="lesion_name" property="lesionName" />
-        <result column="ddefinition" property="ddefinition" />
+        <result column="ddefinition" property="ddefinition"  typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result column="ddefinition_name" property="ddefinitionName" />
         <result column="grade" property="grade" />
         <result column="grade_name" property="gradeName" />
@@ -24,10 +24,9 @@
         <result column="create_time" property="createTime" />
         <result column="update_by" property="updateBy" />
         <result column="update_time" property="updateTime" />
-        <result column="position_source" property="position_source" />
-        <result column="lesion_source" property="lesion_source" />
-        <result column="ddefinition_source" property="ddefinition_source" />
-        <result column="grade_source" property="grade_source" />
+        <result column="position_source" property="positionSource" />
+        <result column="lesion_source" property="lesionSource" />
+        <result column="grade_source" property="gradeSource" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
@@ -60,5 +59,24 @@
         select organization_name
         from sys_organization
         where organization_id = #{organizationId}
+    </select>
+    
+    <select id="selectListByParm" parameterType="cn.staitech.fr.domain.Diagnosis"
+            resultMap="BaseResultMap">
+        select
+        	*
+        from fr_diagnosis
+        <where>
+            <if test="specialId != null">
+                AND special_id = #{specialId}
+            </if>
+            <if test="singleId != null">
+                AND single_id = #{singleId}
+            </if>
+            <if test="deleteFlag != null">
+                AND delete_flag = #{deleteFlag}
+            </if>
+        </where>
+        order by create_by asc
     </select>
 </mapper>

@@ -16,6 +16,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
@@ -41,6 +42,7 @@ import cn.staitech.fr.vo.diagnosis.SysDictDataVo;
 import cn.staitech.fr.vo.diagnosis.SysDictResultVo;
 import cn.staitech.fr.vo.diagnosis.SysDictTagVo;
 import cn.staitech.fr.vo.diagnosis.VisceraVo;
+import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisAddVo.DdefinitionChild;
 import cn.staitech.system.api.domain.SysUser;
 import lombok.extern.slf4j.Slf4j;
 
@@ -80,31 +82,22 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		Slide slide = slideMapper.selectById(singleSlide.getSlideId());
 		List<SpecialDiagnosisVo> voList = new ArrayList<SpecialDiagnosisVo>();
 
-		QueryWrapper<Diagnosis> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("special_id",slide.getSpecialId());
-		queryWrapper.eq("single_id",singleId);
-		queryWrapper.eq("delete_flag",1);
-		queryWrapper.orderByAsc("create_by");
-
-		List<Diagnosis> list = list(queryWrapper);
+		Diagnosis diagnosisParm = new Diagnosis();
+		diagnosisParm.setSpecialId(slide.getSpecialId());
+		diagnosisParm.setSingleId(singleId);
+		diagnosisParm.setDeleteFlag(1);
+		List<Diagnosis> list = diagnosisMapper.selectListByParm(diagnosisParm);
 
 		if (CollectionUtils.isNotEmpty(list)) {
 			for (Diagnosis diagn : list) {
 				SpecialDiagnosisVo vo = new SpecialDiagnosisVo();
 				BeanUtils.copyProperties(diagn, vo);
-				//修饰
-				String ddefinition = diagn.getDdefinition();
-				List<String> ddefinitionList = new ArrayList<>();
-				if(StringUtils.isNotEmpty(ddefinition)){
-					ddefinitionList.addAll(Arrays.asList(ddefinition.split("\\|")));
-				}
-				vo.setDdefinition(ddefinitionList);
 				Long createBy = diagn.getCreateBy();
 				//根据创建人查询名称
 				SysUser loginUser = diagnosisMapper.selectUserById(createBy);
 				vo.setCreateUser(loginUser.getNickName());
 				if (createBy.equals(SecurityUtils.getLoginUser().getSysUser().getUserId())) {
-					//									if (createBy.equals(1L)) {
+//														if (createBy.equals(1L)) {
 					vo.setEditStatus(1);
 				}
 				voList.add(vo);
@@ -118,6 +111,9 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 	@Override
 	@Transactional(rollbackFor = Exception.class)
 	public int saveOrUpdateSpecialDiagnosisVo(SpecialDiagnosisAddVo addVo) {
+		Long currentUserId = SecurityUtils.getLoginUser().getSysUser().getUserId();
+//		Long currentUserId = 10L;
+		
 		int checkFlage = 0;
 		Long specialDiagnosisId = addVo.getDiagnosisId();
 		//根据singleId查询专题id
@@ -126,8 +122,6 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		Long specialId = slide.getSpecialId();
 		addVo.setSpecialId(specialId);
 
-				Long currentUserId = SecurityUtils.getLoginUser().getSysUser().getUserId();
-//		Long currentUserId = 10L;
 		if(null != specialDiagnosisId){
 			//判断当前人和编辑人是否是同一个人
 			//查下当前数据创建人是谁
@@ -145,15 +139,21 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		Diagnosis record = new Diagnosis();
 		//copy
 		BeanUtils.copyProperties(addVo, record);
+		
+//		List<DdefinitionChild> dcList = addVo.getDdefinition();
+//		JSONObject jsonObject = new JSONObject();
+//        jsonObject.put("ddefinition", dcList);
+//		record.setDdefinition(jsonObject);
+		
 		String viscera =  addVo.getViscera();
 		if(null != viscera){
 			String visceraName = getLabelNameByParm(SysDictTypeEnum.organization.label(), Long.valueOf(viscera),"");
 			record.setViscreaName(visceraName);
 		}
 		String position =  addVo.getPosition();
-		String positionSource =  addVo.getPositionSource();
+		int positionSource =  addVo.getPositionSource();
 		if(StringUtils.isNotEmpty(position)) {
-			if(StringUtils.isNotEmpty(positionSource) && positionSource.equals("0")){
+			if(positionSource == 0){
 				String positionName = getLabelNameByParm(SysDictTypeEnum.position.label(), Long.valueOf(position),"");
 				record.setPositionName(positionName);
 			}else{
@@ -161,42 +161,41 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 			}
 		}
 		String lesion =  addVo.getLesion();
-		String lesionSource =  addVo.getLesionSource();
+		int lesionSource =  addVo.getLesionSource();
 		if(StringUtils.isNotEmpty(lesion)) {
-			if(StringUtils.isNotEmpty(lesionSource) && lesionSource.equals("0")){
+			if(lesionSource == 0){
 				String lesionName = getLabelNameByParm(SysDictTypeEnum.lesion.label(), Long.valueOf(lesion),"");
 				record.setLesionName(lesionName);
 			}else{
 				record.setLesionName(lesion);
 			}
 		}
-		List<String> ddefinitionList =  addVo.getDdefinition();
-		String ddefinitionSource =  addVo.getDdefinitionSource();
+		List<DdefinitionChild> ddefinitionList =  addVo.getDdefinition();
+		List<String> nameList = new ArrayList<>();
 		if(CollectionUtils.isNotEmpty(ddefinitionList)){
-			if(StringUtils.isNotEmpty(ddefinitionSource) && ddefinitionSource.equals("0")){
-				List<String> nameList = new ArrayList<>();
-				for(String ddfinitionId :ddefinitionList){
-					String ddefinitionName = getLabelNameByParm(SysDictTypeEnum.ddefinition.label(), Long.valueOf(ddfinitionId),"");
+			for(DdefinitionChild child:ddefinitionList){
+				String ddefinition = child.getDdefinition();
+				int ddefinitionSource = child.getDdefinitionSource();
+				if(ddefinitionSource == 0){
+					String ddefinitionName = getLabelNameByParm(SysDictTypeEnum.ddefinition.label(), Long.valueOf(ddefinition),"");
 					if(StringUtils.isNotEmpty(ddefinitionName)){
 						nameList.add(ddefinitionName);
 					}
+				}else{
+					nameList.add(ddefinition);
 				}
-				if(CollectionUtils.isNotEmpty(nameList)){
-					String ddefinitionFullName =  String.join("|", nameList);
-					record.setDdefinitionName(ddefinitionFullName);
-				}
-				String ddefinitionIdStr =  String.join("|", ddefinitionList);
-				record.setDdefinition(ddefinitionIdStr);
-			}else{
-				String ddefinitionFullName =  String.join("|", ddefinitionList);
+			}
+			
+			if(CollectionUtils.isNotEmpty(nameList)){
+				String ddefinitionFullName =  String.join("|", nameList);
 				record.setDdefinitionName(ddefinitionFullName);
 			}
 		}
-		
+
 		String grade =  addVo.getGrade();
-		String gradeSource =  addVo.getGradeSource();
+		int gradeSource =  addVo.getGradeSource();
 		if(StringUtils.isNotEmpty(grade)) {
-			if(StringUtils.isNotEmpty(gradeSource) && gradeSource.equals("0")){
+			if(gradeSource == 0){
 				String gradeName = getLabelNameByParm(SysDictTypeEnum.grade.label(), Long.valueOf(grade),"");
 				record.setGradeName(gradeName);
 			}else{
@@ -206,7 +205,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 
 		if (null == addVo.getDiagnosisId()) {
 			//获取分组id
-//			Long slideId = singleSlide.getSlideId();
+			//			Long slideId = singleSlide.getSlideId();
 			if(null != slide.getGroupCode()){
 				String groupCode = slide.getGroupCode();
 				record.setGroupId(Long.valueOf(groupCode));
@@ -219,8 +218,6 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 			record.setUpdateTime(DateUtil.date());
 			diagnosisMapper.updateById(record);
 		}
-		//specialDiagnosisId = record.getDiagnosisId();
-		//saveOrUpdateDetail(addVo, specialDiagnosisId, operType);
 		long endTime = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
 		log.info("人工诊断单条处理运行时间：{},毫秒 ",totalTime);
@@ -231,8 +228,6 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		//人工诊断状态 0：未诊断；1：已诊断
 		singleSlideInfo.setDiagnosisStatus(CommonConstant.DIAGNOSIS_YES);
 		singleSlideMapper.updateById(singleSlideInfo);
-		//是否需要刷新初始化字典的判断
-		//		updateInitDictCache(addVoList);
 		return checkFlage;
 	}
 
