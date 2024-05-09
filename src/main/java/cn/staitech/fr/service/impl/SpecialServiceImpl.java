@@ -1,14 +1,25 @@
 package cn.staitech.fr.service.impl;
 
+import cn.staitech.common.core.constant.Constants;
+import cn.staitech.common.core.constant.SecurityConstants;
+import cn.staitech.common.core.constant.UserConstants;
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
+import cn.staitech.common.core.enums.UserStatus;
+import cn.staitech.common.core.exception.ServiceException;
+import cn.staitech.common.core.utils.DateUtils;
+import cn.staitech.common.core.utils.RSAUtils;
+import cn.staitech.common.core.utils.ServletUtils;
 import cn.staitech.common.core.utils.bean.BeanUtils;
+import cn.staitech.common.core.utils.ip.IpUtils;
+import cn.staitech.common.redis.service.RedisService;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Container;
 import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
+import cn.staitech.fr.domain.SpecialLockLog;
 import cn.staitech.fr.domain.SpecialMember;
 import cn.staitech.fr.domain.SpecialRecycling;
 import cn.staitech.fr.domain.in.EditSpecialStatusIn;
@@ -19,6 +30,7 @@ import cn.staitech.fr.domain.in.SpecialsQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SlideMapper;
+import cn.staitech.fr.mapper.SpecialLockLogMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.mapper.SpecialMemberMapper;
 import cn.staitech.fr.mapper.TopicMapper;
@@ -28,7 +40,12 @@ import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.SpecialRecyclingService;
 import cn.staitech.fr.service.SpecialService;
 import cn.staitech.fr.utils.MessageSource;
+import cn.staitech.system.api.RemoteUserService;
+import cn.staitech.system.api.domain.SysLogininfor;
 import cn.staitech.system.api.domain.SysUser;
+import cn.staitech.system.api.domain.document.SysLoginInfoDoc;
+import cn.staitech.system.api.model.LoginUser;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -41,9 +58,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+
+import static cn.staitech.common.core.constant.UserConstants.RSA_KEYS;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * <p>
@@ -79,6 +100,16 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 
     @Resource
     private TopicMapper topicMapper;
+    
+    @Resource
+	private RedisService redisService;
+    
+    @Autowired
+	private RemoteUserService remoteUserService;
+    
+    @Resource
+	private SpecialLockLogMapper specialLockLogMapper;
+    
 
     @Override
     public PageResponse<SpecialListQueryOut> getSpecialList(SpecialListQueryIn req) {
@@ -247,14 +278,45 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
                 return R.fail(MessageSource.M("START_SPECIAL_ERROR"));
             }
         }
-
+        
+        Integer unlock = 0;
+        //锁定传4,解锁 5 校验
+        if (req.getStatus().equals(CommonConstant.INT_4)||req.getStatus().equals(CommonConstant.INT_5)) {
+        	//校验用户名、密码
+        	 boolean res = userLoginVerify(req.getUserName(), req.getPwd());
+        	 if (!res) {
+                 return R.fail("校验失败");
+             }
+        	 
+        	 if(req.getStatus().equals(CommonConstant.INT_5)){
+        		 //解锁 赋值为1
+        		 req.setStatus(1);
+        		 unlock = 5;
+        	 }
+        }
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
+        Long currentUserId = sysUser.getUserId();
+        Long specialId = req.getSpecialId();
+        
         Special special = new Special();
-        special.setSpecialId(req.getSpecialId());
+        special.setSpecialId(specialId);
         special.setUpdateTime(new Date());
-        special.setUpdateBy(sysUser.getUserId());
+        special.setUpdateBy(currentUserId);
         special.setStatus(req.getStatus());
         this.baseMapper.updateById(special);
+        //锁定传4,解锁 5 增加日志
+        if (req.getStatus().equals(CommonConstant.INT_4)||unlock.equals(CommonConstant.INT_5)) {
+        	SpecialLockLog entity = new SpecialLockLog();
+        	entity.setSpecialId(specialId);
+        	if (req.getStatus().equals(CommonConstant.INT_4)) {
+        		entity.setType(CommonConstant.INT_4);
+        	}else{
+        		entity.setType(CommonConstant.INT_5);
+        	}
+        	entity.setCreateBy(currentUserId);
+        	entity.setCreateTime(new Date());
+        	specialLockLogMapper.insert(entity);
+        }
         return R.ok();
     }
 
@@ -328,4 +390,61 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 
         return slide;
     }
+    
+    
+    public Boolean userLoginVerify(String username, String pwd) {
+		// 获取密钥对解密密码
+		String cacheObject = redisService.getCacheObject(RSA_KEYS + username);
+		if (Objects.isNull(cacheObject)) {
+			throw new ServiceException("当前用户名和密码错误，请核对");
+		}
+		String password;
+		//解析
+		try {
+			password = RSAUtils.getStringByPrivateKey(cacheObject, pwd);
+		} catch (Exception e) {
+			throw new ServiceException("密码解密异常" + e);
+		}
+		//每次解析完删除密钥对
+		redisService.deleteObject(RSA_KEYS + username);
+		//
+		//log.info("解密后的密码" + password);
+		// 用户名或密码为空 错误
+		if (StringUtils.isAnyBlank(username, password)) {
+			throw new ServiceException("用户/密码必须填写");
+		}
+		// 密码如果不在指定范围内 错误
+		if (password.length() < UserConstants.PASSWORD_MIN_LENGTH
+				|| password.length() > UserConstants.PASSWORD_MAX_LENGTH) {
+			throw new ServiceException("用户密码不在指定范围");
+		}
+		// 用户名不在指定范围内 错误
+		if (username.length() < UserConstants.USERNAME_MIN_LENGTH
+				|| username.length() > UserConstants.USERNAME_MAX_LENGTH) {
+			throw new ServiceException("用户名不在指定范围");
+		}
+		// 查询用户信息
+		R<LoginUser> userResult = remoteUserService.getUserInfo(username, SecurityConstants.INNER);
+		//远程接口调用异常
+		if (R.FAIL == userResult.getCode()) {
+			throw new ServiceException(userResult.getMsg());
+		}
+		//用户数据为空
+		if (cn.staitech.common.core.utils.StringUtils.isNull(userResult) || cn.staitech.common.core.utils.StringUtils.isNull(userResult.getData())) {
+			throw new ServiceException("登录用户：" + username + " 不存在");
+		}
+
+		SysUser user = userResult.getData().getSysUser();
+		if (UserStatus.DISABLE.getCode().equals(user.getDelFlag())) {
+			throw new ServiceException("对不起，您的账号：" + username + " 已被删除");
+		}
+		if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+			throw new ServiceException("对不起，您的账号：" + username + " 已停用");
+		}
+		if (!SecurityUtils.matchesPassword(password, user.getPassword())) {
+			throw new ServiceException("用户不存在/密码错误");
+		}
+		return true;
+	}
+    
 }

@@ -77,7 +77,9 @@ public class SpecialDiagnosisAddVo {
 	// 内部类，代表子项
 	@Data
 	public static class DdefinitionChild {
+		@ApiModelProperty(name = "ddefinition" , value = "修饰")
 		private String ddefinition;
+		@ApiModelProperty(name = "ddefinitionSource" , value = "修饰来源 0：字典  1：自定义")
 		private int ddefinitionSource;
 
 	}

@@ -18,6 +18,8 @@ public class CommonConstant {
     public static final String NUMBER_1 = "1";
     public static final String NUMBER_2 = "2";
     public static final Integer INT_1 = 1;
+    public static final Integer INT_4 = 1;
+    public static final Integer INT_5 = 5;
     public static final String NUMBER_4 = "4";
     public static final String GLIDE_LINE = "_";
     public static final String FILE_SUFFIX = ".";
