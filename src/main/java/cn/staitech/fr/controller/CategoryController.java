@@ -2,6 +2,8 @@ package cn.staitech.fr.controller;
 
 
 import cn.staitech.fr.utils.ExcludeEmptyQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,9 +27,10 @@ import java.util.List;
 import java.util.Objects;
 
 import static cn.hutool.core.date.DateUtil.offsetDay;
+
 /**
  * <p>
- *  前端控制器
+ * 前端控制器
  * </p>
  *
  * @author wanglibei
@@ -47,15 +50,15 @@ public class CategoryController {
         PageResponse<Category> resp = new PageResponse<>();
         Page<SysUser> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
         ExcludeEmptyQueryWrapper<Category> categoryQueryWrapper = new ExcludeEmptyQueryWrapper<>();
-        categoryQueryWrapper.eq("species",req.getSpecies()).eq("organ_name",req.getOrganName()).like("category_abbreviation",req.getCategoryAbbreviation());
-        if(req.getCreateTime() != null){
+        categoryQueryWrapper.eq("species", req.getSpecies()).eq("organ_name", req.getOrganName()).like("category_abbreviation", req.getCategoryAbbreviation());
+        if (req.getCreateTime() != null) {
             Object beginTime = req.getCreateTime().get("beginTime");
             Object endTime = req.getCreateTime().get("endTime");
             if (beginTime != null && !Objects.equals(beginTime, "")) {
                 categoryQueryWrapper.ge("create_time", DateUtils.stringToDate((String) beginTime, "yyyy-MM-dd"));
             }
             if (endTime != null && !Objects.equals(endTime, "")) {
-                categoryQueryWrapper.lt("create_time", (offsetDay(DateUtils.stringToDate((String) endTime, "yyyy-MM-dd"),1)));
+                categoryQueryWrapper.lt("create_time", (offsetDay(DateUtils.stringToDate((String) endTime, "yyyy-MM-dd"), 1)));
             }
         }
         List<Category> categories = categoryService.list(categoryQueryWrapper);
@@ -68,8 +71,9 @@ public class CategoryController {
 
     @ApiOperation(value = "脏器标签表列表查询")
     @GetMapping("/selectList")
-    public R<List<Category>> list() {
-        return R.ok(categoryService.list());
+    public R<List<Category>> list(String organName) {
+        LambdaQueryWrapper<Category> categoryQueryWrapper = new LambdaQueryWrapper<Category>().like(organName != null, Category::getOrganName, organName);
+        return R.ok(categoryService.list(categoryQueryWrapper));
     }
 
 }
