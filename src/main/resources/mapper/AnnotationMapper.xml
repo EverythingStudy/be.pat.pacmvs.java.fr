@@ -46,9 +46,6 @@
         <if test="annotationType != null and annotationType != '' ">annotation_type,</if>
         <if test="contour != null">
             contour40000,
-            contour10000,
-            contour2500,
-            contour625,
         </if>
         <if test="createBy != null and createBy != ''">create_by,</if>
         <if test="updateBy != null and updateBy != ''">update_by,</if>
@@ -68,9 +65,6 @@
         <if test="annotationType != null and annotationType != ''">#{annotationType},</if>
         <if test="contour != null">
             st_geomfromgeojson(#{contour}),
-            ST_SimplifyPreserveTopology(st_geomfromgeojson(#{contour}),0.5),
-            ST_SimplifyPreserveTopology(st_geomfromgeojson(#{contour}),4),
-            ST_SimplifyPreserveTopology(st_geomfromgeojson(#{contour}),32),
         </if>
         <if test="createBy != null and createBy != ''">#{createBy},</if>
         <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
@@ -95,9 +89,9 @@
             <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
             <if test="contour != null">
             contour40000 = st_geomfromgeojson(#{contour}),
-            contour10000 = ST_SimplifyPreserveTopology(st_geomfromgeojson(#{contour}),0.5),
-            contour2500 = ST_SimplifyPreserveTopology(st_geomfromgeojson(#{contour}),4),
-            contour625 = ST_SimplifyPreserveTopology(st_geomfromgeojson(#{contour}),32),
+#             contour10000 = ST_SimplifyPreserveTopology(st_geomfromgeojson(#{contour}),0.5),
+#             contour2500 = ST_SimplifyPreserveTopology(st_geomfromgeojson(#{contour}),4),
+#             contour625 = ST_SimplifyPreserveTopology(st_geomfromgeojson(#{contour}),32),
             </if>
             <if test="id != null and id != ''">id = #{id},</if>
             update_time = now()
