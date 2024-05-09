@@ -1,9 +1,12 @@
 package cn.staitech.fr.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,8 +19,12 @@ import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.domain.Diagnosis;
 import cn.staitech.fr.domain.SingleSlide;
+import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.out.DiagnosisInfo;
+import cn.staitech.fr.mapper.DiagnosisMapper;
 import cn.staitech.fr.service.DiagnosisService;
 import cn.staitech.fr.service.SingleSlideService;
+import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisAbnormalVo;
 import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisAddVo;
@@ -49,6 +56,12 @@ public class DiagnosisController {
 	
 	@Resource
 	private SingleSlideService singleSlideService;
+	
+	@Resource
+	private SlideService slideService;
+	
+	@Resource
+	private DiagnosisMapper diagnosisMapper;
 	
 	
 	/**
@@ -123,12 +136,16 @@ public class DiagnosisController {
 	@ApiOperation(value = "查询人工诊断列表")
 //	@Log(title = "查询人工诊断列表", menu = "专题阅片", subMenu = "项目列表", businessType = BusinessType.QUERY)
 	@GetMapping("/info")
-	public R<List<SpecialDiagnosisVo>> info( 
+	public R<DiagnosisInfo> info( 
 			@RequestParam @ApiParam(name = "singleId", value = "切片id", required = true) Long singleId
 			) {
+		SingleSlide singleSlide = singleSlideService.getById(singleId);
 		//通过项目ID 专题id 切片id 查询所有的诊断结果，返回列表（添加是否可以修改）
 		List<SpecialDiagnosisVo> list = diagnosisService.getSpecialDiagnosisVo(singleId);
-		return R.ok(list);
+		DiagnosisInfo diagnosisInfo = new DiagnosisInfo();
+		diagnosisInfo.setList(list);
+		diagnosisInfo.setAbnormalStatus(singleSlide.getAbnormalStatus());
+		return R.ok(diagnosisInfo);
 	}
 
 	
@@ -144,10 +161,25 @@ public class DiagnosisController {
 	@ApiOperation(value = "未见异常病理改变结果保存/取消")
 	@PostMapping("/abnormalOperation")
 	public R abnormalOperation(@Validated @RequestBody SpecialDiagnosisAbnormalVo specialDiagnosisAbnormalVo) throws Exception {
+		Long singleId = specialDiagnosisAbnormalVo.getSingleId();
 		if (null != specialDiagnosisAbnormalVo) {
-			SingleSlide singleSlide = singleSlideService.getById(specialDiagnosisAbnormalVo.getSingleId());
+			SingleSlide singleSlide = singleSlideService.getById(singleId);
 			if(null == singleSlide){
 				return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
+			}
+			
+			Slide slide = slideService.getById(singleSlide.getSlideId());
+			Long specialId = slide.getSpecialId();
+			
+			Diagnosis diagnosisParm = new Diagnosis();
+			diagnosisParm.setSpecialId(specialId);
+			diagnosisParm.setSingleId(singleId);
+			diagnosisParm.setDeleteFlag(1);
+			List<Diagnosis> list = diagnosisMapper.selectListByParm(diagnosisParm);
+			//异常状态 0：取消 ；1：未见异常
+			if(CollectionUtils.isNotEmpty(list) && specialDiagnosisAbnormalVo.getAbnormalStatus().equals("1")){
+				//禁止设置
+				throw new Exception(MessageSource.M("EXISTS_DIAGNOSIS_DATA"));
 			}
 			diagnosisService.abnormalOperation(specialDiagnosisAbnormalVo);
 			return R.ok();

@@ -28,6 +28,7 @@ import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.WaxBlockInfo;
 import cn.staitech.fr.domain.in.ResultCorrectionIn;
 import cn.staitech.fr.domain.in.SplitVerificationQueryIn;
+import cn.staitech.fr.domain.out.CategoryChild;
 import cn.staitech.fr.domain.out.SplitVerificationOut;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SlideMapper;
@@ -126,7 +127,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 				}
 				annotation.setSlideIdList(querySlideIdList);
 			}
-			
+			//轮廓类型 1：矩形 ,2：标注轮廓 3:精细轮廓
+			annotation.setContourType(2L);
 			List<Annotation> annoList = annotationMapper.selectListBy(annotation);
 			List<Long> annoSlideIdList = annoList.stream().map(Annotation::getSlideId).collect(Collectors.toList());
 			if(CollectionUtils.isNotEmpty(annoSlideIdList)){
@@ -239,8 +241,11 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 					SplitVerificationOut svOut = new SplitVerificationOut();
 					svOut.setAnimalCode(animalCode);
 					svOut.setProcessFlag(allCheckStatus);
-					svOut.setWaxOrgan(waxCategoryMap);
-					svOut.setAnnoOrgan(annoCategoryMap);
+//					svOut.setWaxOrgan(waxCategoryMap);
+					svOut.setWaxOrgan(getCategoryNumber(waxCategoryMap, annoCategoryMap));
+					svOut.setAnnoOrgan(getCategoryNumber(annoCategoryMap, waxCategoryMap));
+					//TODO v0.27   标签颜色处理
+					
 					dataList.add(svOut);
 				}
 			}
@@ -294,6 +299,46 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			pageResponse.setPageSize(pageSize);
 		}
 		return pageResponse;
+	}
+	
+	//颜色处理
+	private List<CategoryChild> getCategoryNumber(Map<String, Long> frontCategoryMap,Map<String, Long> backCategoryMap){
+		List<CategoryChild> list = new ArrayList<>();
+		for (Map.Entry<String, Long> entry : frontCategoryMap.entrySet()) {
+			String categoryName = entry.getKey();
+			Long categoryNumber = entry.getValue();
+			//标签颜色 0：黑色 1：红色
+			int categoryColour = 0;
+			boolean containsTag = containsOrgan(categoryName, categoryNumber, backCategoryMap);
+			if(!containsTag){
+				categoryColour = 1;
+			}
+			CategoryChild child = new CategoryChild();
+			child.setCategoryName(categoryName);
+			child.setCategoryNumber(categoryNumber);
+			child.setCategoryColour(categoryColour);
+			list.add(child);
+		}
+		return list;
+	}
+	
+	
+	//模糊匹配，判断是否包括该脏器
+	private boolean containsOrgan(String categoryName,Long categoryNumber,Map<String, Long> backCategoryMap){
+		boolean containsValue  = false;
+		for(Map.Entry<String, Long> entry:backCategoryMap.entrySet()){
+			String slideOrganName = entry.getKey();
+			Long slideOrganNumber = entry.getValue();
+			//模糊匹配
+			if (categoryName.contains(slideOrganName)) {
+				//数量相等
+				if (categoryNumber.equals(slideOrganNumber)) {
+					containsValue = true;
+					break;
+				}
+			}
+		}
+		return containsValue ;
 	}
 
 
@@ -366,7 +411,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 						}
 					}
 				}
-				out.setAnnoOrgan(annoCategoryMap);
+				
 
 				//切片蜡片信息汇总
 				//查询当前专题下当前动物编号的所有切片
@@ -382,7 +427,12 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 						waxCategoryMap.put(organName, organNumber.longValue());
 					}
 				}
-				out.setWaxOrgan(waxCategoryMap);
+				
+//				out.setWaxOrgan(waxCategoryMap);
+//				out.setAnnoOrgan(annoCategoryMap);
+				
+				out.setWaxOrgan(getCategoryNumber(waxCategoryMap, annoCategoryMap));
+				out.setAnnoOrgan(getCategoryNumber(annoCategoryMap, waxCategoryMap));
 			}
 		}
 		pageResponse.setTotal(page.getTotal());
