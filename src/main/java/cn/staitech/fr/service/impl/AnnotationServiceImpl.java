@@ -41,6 +41,8 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.operation.overlay.OverlayOp;
 import lombok.extern.slf4j.Slf4j;
+import net.jodah.expiringmap.ExpirationPolicy;
+import net.jodah.expiringmap.ExpiringMap;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -49,6 +51,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -70,8 +73,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     private static final WKTReader WKT_READER = new WKTReader(GEOMETRY_FACTORY);
     HashMap<Long, Category> categoryHashMap = new HashMap<>();
-    HashMap<Long, PathologicalIndicatorCategory> pathologicalIndicatorCategoryHashMap = new HashMap<>();
-    HashMap<Long, User> userMap = new HashMap<>();
+    ExpiringMap<Long, PathologicalIndicatorCategory> pathologicalIndicatorCategoryHashMap = ExpiringMap.builder().maxSize(1000).expiration(12, TimeUnit.HOURS).variableExpiration().expirationPolicy(ExpirationPolicy.CREATED).build();
+    ExpiringMap<Long, User> userMap = ExpiringMap.builder().maxSize(1000).expiration(12, TimeUnit.HOURS).variableExpiration().expirationPolicy(ExpirationPolicy.CREATED).build();
+
     @Resource
     private AnnotationMapper annotationMapper;
     @Resource
@@ -131,7 +135,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     	properties.setContour_type(annotation.getContourType());
         properties.setSingleSlideId(annotation.getSingleSlideId());
         properties.setSingle(annotation.getSingle());
-        if (annotation.getSingle() == 1) {
+        if (annotation.getSingle() == 1 && annotation.getContourType() == 2) {
             if (annotation.getCategoryId() != null) {
                 PathologicalIndicatorCategory pathologicalIndicatorCategory = pathologicalIndicatorCategoryHashMap.get(annotation.getCategoryId());
                 if (pathologicalIndicatorCategory == null) {
