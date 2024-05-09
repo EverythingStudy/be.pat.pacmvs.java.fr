@@ -16,7 +16,6 @@ import cn.staitech.fr.vo.geojson.in.ViewAddIn;
 import cn.staitech.fr.vo.geojson.in.ViewAddInList;
 import cn.staitech.fr.vo.geojson.out.BatchResult;
 import com.alibaba.fastjson.JSONObject;
-import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/annotation")
@@ -34,9 +32,6 @@ public class AnnotationController {
 
     @Resource
     private AnnotationService annotationService;
-
-    @Resource
-    private SlideService slideService;
 
     @ApiOperation(value = "添加标注")
     @PostMapping("/insert")
@@ -92,7 +87,6 @@ public class AnnotationController {
         }
     }
 
-    @ApiOperationSupport(author = "zmj")
     @ApiOperation(value = "添加ROI轮廓")
     @PostMapping("/intelligentAnno/insertROI")
     public R<String> addList(@Validated @RequestBody RoiIn req) throws Exception {
@@ -105,7 +99,6 @@ public class AnnotationController {
         return annotationService.roiContDel(req);
     }
 
-    @ApiOperationSupport(author = "gjt")
     @ApiOperation(value = "合并轮廓预览")
     @PostMapping("/markingMerge")
     public R<JSONObject> markingMerge(@Validated @RequestBody MarkingMerge req) throws Exception {
