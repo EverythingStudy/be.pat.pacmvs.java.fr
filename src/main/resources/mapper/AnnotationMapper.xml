@@ -177,6 +177,7 @@
             contour_type != 1
             <if test="slideId != null">
                 AND slide_id = #{slideId}
+                AND single_slide_id is null
             </if>
             <if test="categoryId != null">
                 AND category_id = #{categoryId}

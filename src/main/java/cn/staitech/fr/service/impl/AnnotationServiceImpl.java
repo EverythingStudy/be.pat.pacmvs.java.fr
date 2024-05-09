@@ -196,10 +196,20 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if(req.getGeometry() != null){
             annotation.setContour(String.valueOf(req.getGeometry()));
         }
+        annotation.setFiligreeContour(true);
+        // 查询精细轮廓
         List<Annotation> selfAnnoList = annotationMapper.selectListBy(annotation);
         List<Features> annoList1 = getFeaturesList(selfAnnoList);
         if (CollectionUtils.isNotEmpty(annoList1)) {
             list.addAll(annoList1);
+        }
+        annotation.setFiligreeContour(false);
+        annotation.setMagnification(40000L);
+        // 查询普通轮廓
+        List<Annotation> annotationList = annotationMapper.selectListBy(annotation);
+        List<Features> annoList = getFeaturesList(annotationList);
+        if (CollectionUtils.isNotEmpty(annoList)) {
+            list.addAll(annoList);
         }
         return list;
     }
