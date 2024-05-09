@@ -89,9 +89,6 @@
             <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
             <if test="contour != null">
             contour40000 = st_geomfromgeojson(#{contour}),
-#             contour10000 = ST_SimplifyPreserveTopology(st_geomfromgeojson(#{contour}),0.5),
-#             contour2500 = ST_SimplifyPreserveTopology(st_geomfromgeojson(#{contour}),4),
-#             contour625 = ST_SimplifyPreserveTopology(st_geomfromgeojson(#{contour}),32),
             </if>
             <if test="id != null and id != ''">id = #{id},</if>
             update_time = now()
