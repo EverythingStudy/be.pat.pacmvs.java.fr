@@ -1,11 +1,13 @@
 package cn.staitech.fr.component;
 
+import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
@@ -20,13 +22,16 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class ParkDataConsumer {
 
+    @Resource
+    private JsonTaskParserService jsonTaskParserService;
+
     @RabbitListener(queues = "parkdata", ackMode = "MANUAL")
     public void consumeParkData(Message message, Channel channel) throws IOException {
         try {
             String receivedMessage = new String(message.getBody(), StandardCharsets.UTF_8);
             log.info("消费者收到消息: " + receivedMessage);
             // 处理消息逻辑...
-
+            processParkData(receivedMessage);
             // 成功处理后手动确认消息
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
         } catch (Exception e) {
@@ -37,6 +42,6 @@ public class ParkDataConsumer {
 
     // 示例方法，实际应用中根据业务逻辑处理数据
     private void processParkData(String data) {
-        // ...
+        jsonTaskParserService.input(data);
     }
 }
