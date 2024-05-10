@@ -18,4 +18,9 @@ public class TheMonkeyPytorchParserStrategyImpl implements ParserStrategy {
     public void submitTask(JsonTask jsonTask) {
 
     }
+
+    @Override
+    public void parseJson(String filePath) {
+
+    }
 }

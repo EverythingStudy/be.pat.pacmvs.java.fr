@@ -18,4 +18,9 @@ public class RunV6ParserStrategyImpl implements ParserStrategy {
     public void submitTask(JsonTask jsonTask) {
 
     }
+
+    @Override
+    public void parseJson(String filePath) {
+
+    }
 }
