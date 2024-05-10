@@ -109,7 +109,7 @@
     <select id="selectExistTable" parameterType="cn.staitech.fr.domain.Annotation" resultType="int">
         select count(*)
         from pg_class
-        where relname = 'fr_annotation'
+        where relname = 'fr_ai_annotation_${sequenceNumber}'
     </select>
 
     <insert id="createTableSequence" parameterType="cn.staitech.fr.domain.Annotation">
@@ -134,31 +134,32 @@
 
 
     <insert id="createTable" parameterType="cn.staitech.fr.domain.Annotation">
-        CREATE TABLE "public".fr_ai_annotation_${sequenceNumber} (
-                                                                  "annotation_id" int8 NOT NULL DEFAULT nextval('fr_ai_annotation_${sequenceNumber}_annotation_id_seq'::regclass),
-                                                                  "area" VARCHAR ( 50 ) COLLATE"pg_catalog"."default",
-                                                                  "perimeter" VARCHAR ( 50 ) COLLATE"pg_catalog"."default",
-                                                                  "description" VARCHAR ( 100 ) COLLATE"pg_catalog"."default",
-                                                                  "category_id" INT8,
-                                                                  "contour625" geometry ( GEOMETRY ),
-                                                                  "contour2500" geometry ( GEOMETRY ),
-                                                                  "contour10000" geometry ( GEOMETRY ),
-                                                                  "contour40000" geometry ( GEOMETRY ),
-                                                                  "location_type" VARCHAR ( 100 ) COLLATE"pg_catalog"."default",
-                                                                  "annotation_type" VARCHAR ( 50 ) COLLATE"pg_catalog"."default",
-                                                                  "create_by" INT8,
-                                                                  "create_time" DATE,
-                                                                  "update_by" INT8,
-                                                                  "update_time" DATE,
-                                                                  "slide_id" INT8,
-                                                                  "single_slide_id" INT8,
-                                                                  "single" INT2,
-                                                                  "id" VARCHAR ( 500 ) COLLATE"pg_catalog"."default",
-                                                                  CONSTRAINT "fr_ai_annotation_${sequenceNumber}_pkey" PRIMARY KEY ( "annotation_id" )
+        CREATE TABLE "public".fr_ai_annotation_${sequenceNumber}
+        (
+            "annotation_id"   int8 NOT NULL DEFAULT nextval('fr_ai_annotation_${sequenceNumber}_annotation_id_seq'::regclass),
+            "area"            VARCHAR(50) COLLATE "pg_catalog"."default",
+            "perimeter"       VARCHAR(50) COLLATE "pg_catalog"."default",
+            "description"     VARCHAR(100) COLLATE "pg_catalog"."default",
+            "category_id"     INT8,
+            "contour625"      geometry ( GEOMETRY ),
+            "contour2500"     geometry ( GEOMETRY ),
+            "contour10000"    geometry ( GEOMETRY ),
+            "contour40000"    geometry ( GEOMETRY ),
+            "location_type"   VARCHAR(100) COLLATE "pg_catalog"."default",
+            "annotation_type" VARCHAR(50) COLLATE "pg_catalog"."default",
+            "create_by"       INT8,
+            "create_time"     DATE,
+            "update_by"       INT8,
+            "update_time"     DATE,
+            "slide_id"        INT8,
+            "single_slide_id" INT8,
+            "single"          INT2          DEFAULT 1,
+            "id"              VARCHAR(500) COLLATE "pg_catalog"."default",
+            CONSTRAINT "fr_ai_annotation_${sequenceNumber}_pkey" PRIMARY KEY ("annotation_id")
         );
 
 
-        ALTER TABLE"fr_ai_annotation_${sequenceNumber}" OWNER TO "postgres";
+        ALTER TABLE "fr_ai_annotation_${sequenceNumber}" OWNER TO "postgres";
 
 
         CREATE INDEX "fr_ai_annotation_${sequenceNumber}_slide_id_idx" ON "public"."fr_ai_annotation_${sequenceNumber}" USING btree (
@@ -235,7 +236,8 @@
         create_by,
         create_time,
         slide_id,
-        ,id
+        single_slide_id,
+        id
         )
         values
         <foreach collection="list" item="item" separator=",">
@@ -252,6 +254,7 @@
             #{item.createBy},
             NOW(),
             #{item.slideId},
+            #{item.singleSlideId},
             #{item.id}
             )
         </foreach>
@@ -277,7 +280,10 @@
                contour_type,
                single_slide_id,
                single,
-               ST_AsGeoJSON(contour40000) AS contour
+               ST_AsGeoJSON(contour40000) AS contour40000,
+               ST_AsGeoJSON(contour10000) AS contour10000,
+               ST_AsGeoJSON(contour2500) AS contour2500,
+               ST_AsGeoJSON(contour625) AS contour625
         from fr_annotation
         where annotation_id = #{annotationId}
     </select>

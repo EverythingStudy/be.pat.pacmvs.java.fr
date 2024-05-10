@@ -137,7 +137,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
+//    @Transactional(rollbackFor = Exception.class)
     public R addSpecial(SpecialAddIn req) {
         log.info("添加专题接口开始：");
         //校验专题编号唯一性

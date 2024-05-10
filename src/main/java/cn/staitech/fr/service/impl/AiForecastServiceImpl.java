@@ -1,8 +1,9 @@
 package cn.staitech.fr.service.impl;
 
-import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.SingleSlideMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.service.AiForecastService;
@@ -10,7 +11,6 @@ import cn.staitech.fr.mapper.AiForecastMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Date;
 import java.util.Optional;
 
 /**
@@ -21,11 +21,12 @@ import java.util.Optional;
 @Service
 public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForecast> implements AiForecastService {
 
-    @Resource
-    private AiForecastMapper aiForecastMapper;
 
     @Resource
     private AnnotationMapper annotationMapper;
+
+    @Resource
+    private SingleSlideMapper singleSlideMapper;
 
 
     @Override
@@ -41,14 +42,15 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             if (annotationBy == null) {
                 return false;
             }
-            AiForecast aiForecast = new AiForecast();
-            aiForecast.setSingleSlideId(singleSlideId);
-            aiForecast.setResults(annotationBy.getArea());
-            aiForecast.setUnit("平方毫米");
-            aiForecast.setCreateBy(SecurityUtils.getUserId());
-            aiForecast.setCreateTime(String.valueOf(new Date()));
-            aiForecastMapper.insert(aiForecast);
-            return true;
+            SingleSlide singleSlide = new SingleSlide();
+            singleSlide.setSingleId(singleSlideId);
+            singleSlide.setArea(annotationBy.getArea());
+            int res = singleSlideMapper.updateById(singleSlide);
+            if(res > 0){
+                return true;
+            } else{
+                return false;
+            }
         } catch (Exception ex) {
             return false;
         }
