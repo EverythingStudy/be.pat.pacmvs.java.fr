@@ -1,10 +1,12 @@
 package cn.staitech.fr.component;
 
+import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -18,13 +20,19 @@ import java.nio.charset.StandardCharsets;
 @Component
 public class ParkDataConsumer {
 
-    @RabbitListener(queues = "parkdata")
-    public void consumeParkData(Message message) {
-        String receivedMessage = new String(message.getBody(), StandardCharsets.UTF_8);
-        log.info("消费者收到消息: " + receivedMessage);
+    @RabbitListener(queues = "parkdata", ackMode = "MANUAL")
+    public void consumeParkData(Message message, Channel channel) throws IOException {
+        try {
+            String receivedMessage = new String(message.getBody(), StandardCharsets.UTF_8);
+            log.info("消费者收到消息: " + receivedMessage);
+            // 处理消息逻辑...
 
-        // 这里处理接收到的消息，例如解析并保存数据到数据库
-        // processParkData(receivedMessage);
+            // 成功处理后手动确认消息
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+        } catch (Exception e) {
+            // 出现异常时可以选择拒绝消息，以便重试或死信队列处理
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
+        }
     }
 
     // 示例方法，实际应用中根据业务逻辑处理数据
