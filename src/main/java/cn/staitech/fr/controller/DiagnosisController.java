@@ -158,6 +158,7 @@ public class DiagnosisController {
 		return R.ok(vo);
 	}
 	
+	@SuppressWarnings("unused")
 	@ApiOperation(value = "未见异常病理改变结果保存/取消")
 	@PostMapping("/abnormalOperation")
 	public R abnormalOperation(@Validated @RequestBody SpecialDiagnosisAbnormalVo specialDiagnosisAbnormalVo) throws Exception {
@@ -177,7 +178,7 @@ public class DiagnosisController {
 			diagnosisParm.setDeleteFlag(1);
 			List<Diagnosis> list = diagnosisMapper.selectListByParm(diagnosisParm);
 			//异常状态 0：取消 ；1：未见异常
-			if(CollectionUtils.isNotEmpty(list) && specialDiagnosisAbnormalVo.getAbnormalStatus().equals("1")){
+			if(CollectionUtils.isNotEmpty(list)){
 				//禁止设置
 				throw new Exception(MessageSource.M("EXISTS_DIAGNOSIS_DATA"));
 			}
