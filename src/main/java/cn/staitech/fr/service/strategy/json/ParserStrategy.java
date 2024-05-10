@@ -11,4 +11,5 @@ import cn.staitech.fr.domain.JsonTask;
 public interface ParserStrategy {
 
     void submitTask(JsonTask jsonTask);
+    void parseJson(String filePath);
 }
