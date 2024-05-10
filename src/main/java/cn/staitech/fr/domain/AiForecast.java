@@ -60,6 +60,9 @@ public class AiForecast implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private String createTime;
 
+    @ApiModelProperty(name = "unit" , value = "单位")
+    private String unit;
+
 
 
     @TableField(exist = false)

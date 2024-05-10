@@ -10,4 +10,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 */
 public interface AiForecastService extends IService<AiForecast> {
 
+    Boolean forecastResults(Long singleSlideId);
+
 }

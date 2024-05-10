@@ -40,5 +40,12 @@ public class AiForecastController {
     }
 
 
+    @ApiOperation(value = "预测结果")
+    @GetMapping("/forecastResults")
+    public R<Boolean> forecastResults(@RequestParam(value = "singleSlideId") @ApiParam(name = "singleSlideId", value = "单切片ID", required = true) Long singleSlideId) {
+
+        return R.ok(aiForecastService.forecastResults(singleSlideId));
+    }
+
 
 }

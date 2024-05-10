@@ -127,6 +127,14 @@
                ST_Area(st_geomfromgeojson(#{contour}))                       as area
     </select>
 
+    <select id="getOrganArea" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT sum(ST_Area(contour40000)) AS area
+        from fr_annotation
+        where single_slide_id = #{singleSlideId}
+          and contour_type = 3
+    </select>
+
 
     <select id="selectById" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
