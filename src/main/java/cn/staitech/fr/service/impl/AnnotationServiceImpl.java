@@ -348,7 +348,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     public R<String> roiContDel(RoiIn req) throws Exception {
         QueryWrapper<Annotation> annotationQueryWrapper = new QueryWrapper<>();
         req.getCategoryIds().add(null);
-        annotationQueryWrapper.select("annotation_id,category_id,create_by,ST_AsGeoJSON(contour40000) AS contour").eq("single_slide_id", req.getSingleSlideId()).eq("create_by",SecurityUtils.getUserId()).in("category_id",req.getCategoryIds());
+        annotationQueryWrapper.select("annotation_id,category_id,create_by,ST_AsGeoJSON(contour40000) AS contour").eq("single_slide_id", req.getSingleSlideId()).eq("annotation_type","Draw").eq("contour_type", 2).eq("create_by",SecurityUtils.getUserId()).in("category_id",req.getCategoryIds());
         List<Annotation> features = annotationMapper.selectList(annotationQueryWrapper);
         List<Long> annotationIdList;
         //roi包含
