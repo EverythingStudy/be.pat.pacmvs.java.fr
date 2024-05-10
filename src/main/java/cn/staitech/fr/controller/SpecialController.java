@@ -149,6 +149,7 @@ public class SpecialController  extends BaseController {
     	//查询锁定记录
     	QueryWrapper<SpecialLockLog> queryWrapper = new QueryWrapper<>();
     	queryWrapper.eq("special_id", specialId);
+    	queryWrapper.orderByDesc("create_time");
     	List<SpecialLockLog> list = specialLockLogService.list(queryWrapper);
     	return R.ok(list);
     }

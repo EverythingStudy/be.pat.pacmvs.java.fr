@@ -315,6 +315,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         	}
         	entity.setCreateBy(currentUserId);
         	entity.setCreateTime(new Date());
+        	entity.setReason(req.getReason());
         	specialLockLogMapper.insert(entity);
         }
         return R.ok();
