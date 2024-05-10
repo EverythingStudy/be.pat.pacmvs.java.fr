@@ -78,6 +78,29 @@
                fs.group_code,
                ti.format,
                fc.organ_name,
+               if(fss.abnormal_status='1','未见异常病理变化','') abnormalStatus,
+               fss.thumb_url
+        from fr_single_slide fss
+                 left join fr_slide fs on fss.slide_id = fs.slide_id
+                 left join fr_special fsl on fs.special_id = fsl.special_id
+                 left join tb_topic tt on fsl.topic_id = tt.topic_id
+                 left join tb_image ti on fs.image_id = ti.image_id
+                 left join fr_category fc on fss.category_id = fc.category_id
+                 left join tb_species ts on fsl.species_id = ts.species_id and ts.organization_id = fsl.organization_id
+        where fss.single_id = #{id}
+    </select>
+
+    <select id="getExportAiVO" resultType="cn.staitech.fr.domain.out.ExportAiVO">
+        select fsl.special_name,
+               tt.topic_name,
+               ti.file_name,
+               ts.name trialType,
+               ts.name_en,
+               fs.gender_flag,
+               fsl.color_type,
+               fs.group_code,
+               ti.format,
+               fc.organ_name,
                fss.thumb_url
         from fr_single_slide fss
                  left join fr_slide fs on fss.slide_id = fs.slide_id

@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ExportVO {
+public class ExportAiVO {
 
 
 
@@ -43,20 +43,26 @@ public class ExportVO {
     @ApiModelProperty(value = "切片文件类型")
     private String format;
 
-    //@ApiModelProperty(value = "集合数据")
-    private List<ExportListVO> list;
- 
-   // @ApiModelProperty(value = "表格")
-    private List<ExportListVO> table;
-
- 
-   // @ApiModelProperty(value = "图片")
-    private PictureRenderData img;
+    /**
+     * ai导出
+     */
+    private List<ExportAiListVO> list;
+    private List<ExportAiListVO> table;
 
     private String thumbUrl;
 
     private String organizationName;
 
-    private String abnormalStatus;
+    @ApiModelProperty(value = "AI模型")
+    private String algorithmName;
+
+    @ApiModelProperty(value = "AI模型版本")
+    private String modelVersion;
+
+    @ApiModelProperty(value = "预测时间")
+    private String startTime;
+
+    @ApiModelProperty(value = "预测时长")
+    private String wasteTime;
     
 }

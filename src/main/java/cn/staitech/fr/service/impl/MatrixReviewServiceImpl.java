@@ -7,6 +7,7 @@ import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Container;
+import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Category;
 import cn.staitech.fr.domain.PageDataResponse;
 import cn.staitech.fr.domain.SingleOrganNumber;
@@ -20,6 +21,7 @@ import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.in.SingleSlideAdjacent;
 import cn.staitech.fr.domain.out.*;
 import cn.staitech.fr.feign.PythonOrganRecognitionService;
+import cn.staitech.fr.mapper.AiForecastMapper;
 import cn.staitech.fr.mapper.DiagnosisMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SlideMapper;
@@ -41,6 +43,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -48,6 +51,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -80,6 +84,9 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     
     @Resource
 	private PythonOrganRecognitionService pythonService;
+
+    @Resource
+    private AiForecastMapper aiForecastMapper;
 
 
     @Value("${waxPath}")
@@ -273,8 +280,8 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             exportVO.setTable(collect);
             exportVO.setOrganizationName(diagnosisMapper.getOrganizationName(SecurityUtils.getLoginUser().getSysUser().getOrganizationId()));
             //会报错{"msg":"TemplateRenderPolicy render error","code":500}
-            //exportVO.setImg(new PictureRenderData(800, 200, "D:/image/liangz.png"));
-            exportVO.setImg(new PictureRenderData(800, 200, exportVO.getThumbUrl().replace("/file/statics", "/home/pat_saas")));
+            exportVO.setImg(new PictureRenderData(800, 200, "D:/image/liangz.png"));
+            //exportVO.setImg(new PictureRenderData(800, 200, exportVO.getThumbUrl().replace("/file/statics", "/home/pat_saas")));
             String s = waxPath + exportVO.getFileName() + "+" + exportVO.getOrganName() + CommonConstant.WROD_FILE;
             //生成word
             ExportPdfUtils.exportFile(s, exportVO);
@@ -311,7 +318,63 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     }
 
     @Override
-    public void algorithmDownload(AiDownloadIn req) {
+    public void algorithmDownload(AiDownloadIn req) throws Exception {
+        log.info("ai预测报告导出接口开始：");
+        List<Long> ids = req.getIds();
+        List<String> pdfName = new ArrayList<>();
+        String topicName = "";
+        for (Long id : ids) {
+            ExportAiVO exportVO = singleSlideMapper.getExportAiVO(id);
+            if (LanguageUtils.isEn()) {
+                exportVO.setColorType(Container.COLOR_TYPE_EN.get(Integer.valueOf(exportVO.getColorType())));
+            } else {
+                exportVO.setColorType(Container.COLOR_TYPE.get(Integer.valueOf(exportVO.getColorType())));
+            }
+            //算法数据填充
+            LambdaQueryWrapper<AiForecast> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(AiForecast::getSingleSlideId, id);
+            List<AiForecast> aiForecasts = aiForecastMapper.selectList(wrapper);
+            List<ExportAiListVO> collect = new ArrayList<>();
+            if (CollectionUtils.isNotEmpty(aiForecasts)) {
+                collect = aiForecasts.stream().map(e -> {
+                    ExportAiListVO exportAiListVO = new ExportAiListVO();
+                    BeanUtils.copyProperties(e, exportAiListVO);
+                    return exportAiListVO;
+                }).collect(Collectors.toList());
+            }
+            exportVO.setList(collect);
+            exportVO.setTable(collect);
+            exportVO.setOrganizationName(diagnosisMapper.getOrganizationName(SecurityUtils.getLoginUser().getSysUser().getOrganizationId()));
+            String s = waxPath + "AI" + File.separator + exportVO.getFileName() + "+" + exportVO.getOrganName() + CommonConstant.WROD_FILE;
+            File file = new File(waxPath + "AI" + File.separator);
+            if(!file.exists()&&!file.isDirectory()){
+                file.mkdir();
+            }
+            //生成word
+            ExportPdfUtils.exportAiFile(s, exportVO);
+            //生成pdf
+            //ExportPdfUtils.convertDocx2Pdf(s, s.replace(CommonConstant.WROD_FILE, CommonConstant.PDF_FILE));
+            ExportPdfUtils.wordToPdf(s, s.replace(CommonConstant.WROD_FILE, CommonConstant.PDF_FILE));
+            pdfName.add(s.replace(CommonConstant.WROD_FILE, CommonConstant.PDF_FILE));
+            topicName = exportVO.getTopicName();
+        }
+        if (ids.size() > 1) {
+            log.info("走的压缩包");
+            ExportPdfUtils.writePdfZip(pdfName, response, topicName + DateUtils.getCurrentHHmmssString("yyyy-MM-dd HH:mm:ss") + CommonConstant.ZIP_FILE);
+
+        } else {
+
+            ExportPdfUtils.downloadLocal(pdfName.get(0), response);
+
+        }
+        for (String s1 : pdfName) {
+            if (new File(s1).exists()) {
+                FileUtils.delete(new File(s1));
+                //FileUtils.delete(new File(s1.replace(CommonConstant.PDF_FILE, CommonConstant.WROD_FILE)));
+            }
+
+        }
+        log.info("结束");
 
     }
 

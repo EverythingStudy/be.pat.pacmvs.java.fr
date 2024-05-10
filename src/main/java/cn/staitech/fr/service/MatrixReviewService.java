@@ -39,7 +39,7 @@ public interface MatrixReviewService {
 
     R<String> getControlGroup(Long specialId);
 
-    void algorithmDownload(AiDownloadIn req);
+    void algorithmDownload(AiDownloadIn req) throws Exception;
     
     R algorithm(AlgorithmIn req);
 }
