@@ -123,6 +123,9 @@ public class Annotation implements Serializable {
     private List<Long> slideIdList;
 
     @TableField(exist = false)
+    private Long sequenceNumber;
+
+    @TableField(exist = false)
     private Boolean filigreeContour;
 
     @TableField(exist = false)
@@ -130,6 +133,9 @@ public class Annotation implements Serializable {
 
     @TableField(exist = false)
     private Long magnification;
+
+    @TableField(exist = false)
+    private List<Annotation> list;
 
     @Override
     public boolean equals(Object that) {

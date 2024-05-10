@@ -37,6 +37,10 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     Annotation getOrganArea(Annotation annotation);
 
+    void createTable(Annotation annotation);
+
+    void batchSave(Annotation annotation);
+
     @DS("slave")
     Annotation selectById(Annotation annotation);
 

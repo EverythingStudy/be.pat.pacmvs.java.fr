@@ -69,8 +69,8 @@ public class CommonConstant {
     public static final Long IMAGE_CACHE_HOURS = 24L;
     public static final String ANNO_MARKING = "ANNO_MARKING_";
     public static final Long MARKING_CACHE_HOURS = 24L;
-    public static final String PROJECT_ANNOTATION_REL = "PROJECT_ANNOTATION_REL_";
-    public static final Long PROJECT_ANNOTATION_REL_CACHE_DAYS = 365L;
+    public static final String SPECIAL_ANNOTATION_REL = "SPECIAL_ANNOTATION_REL_";
+    public static final Long SPECIAL_ANNOTATION_REL_CACHE_DAYS = 365L;
 	public static final String MATCHING_FAILED = "匹配失败";
 
     /**

@@ -16,25 +16,14 @@ import cn.staitech.common.redis.service.RedisService;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Container;
-import cn.staitech.fr.domain.Image;
-import cn.staitech.fr.domain.Slide;
-import cn.staitech.fr.domain.Special;
-import cn.staitech.fr.domain.SpecialLockLog;
-import cn.staitech.fr.domain.SpecialMember;
-import cn.staitech.fr.domain.SpecialRecycling;
+import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.EditSpecialStatusIn;
 import cn.staitech.fr.domain.in.SpecialAddIn;
 import cn.staitech.fr.domain.in.SpecialEditIn;
 import cn.staitech.fr.domain.in.SpecialListQueryIn;
 import cn.staitech.fr.domain.in.SpecialsQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
-import cn.staitech.fr.mapper.ImageMapper;
-import cn.staitech.fr.mapper.SlideMapper;
-import cn.staitech.fr.mapper.SpecialLockLogMapper;
-import cn.staitech.fr.mapper.SpecialMapper;
-import cn.staitech.fr.mapper.SpecialMemberMapper;
-import cn.staitech.fr.mapper.TopicMapper;
-import cn.staitech.fr.mapper.WaxBlockInfoMapper;
+import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.GroupService;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.SpecialRecyclingService;
@@ -47,6 +36,7 @@ import cn.staitech.system.api.domain.document.SysLoginInfoDoc;
 import cn.staitech.system.api.model.LoginUser;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.pagehelper.Page;
@@ -65,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -100,16 +91,22 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 
     @Resource
     private TopicMapper topicMapper;
-    
+
     @Resource
-	private RedisService redisService;
-    
+    private RedisService redisService;
+
     @Autowired
-	private RemoteUserService remoteUserService;
-    
+    private RemoteUserService remoteUserService;
+
     @Resource
-	private SpecialLockLogMapper specialLockLogMapper;
-    
+    private SpecialLockLogMapper specialLockLogMapper;
+
+    @Resource
+    private SpecialAnnotationRelMapper specialAnnotationRelMapper;
+
+    @Resource
+    private AnnotationMapper annotationMapper;
+
 
     @Override
     public PageResponse<SpecialListQueryOut> getSpecialList(SpecialListQueryIn req) {
@@ -120,7 +117,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         req.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
         //判断是不是管理员
         Integer integer = this.baseMapper.countgetUserRole(SecurityUtils.getUserId());
-        if(integer==0){
+        if (integer == 0) {
             req.setUserId(SecurityUtils.getUserId());
         }
         Page<SpecialListQueryOut> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
@@ -192,7 +189,89 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         specialMember.setCreateBy(SecurityUtils.getUserId());
         specialMember.setCreateTime(new Date());
         specialMemberMapper.insert(specialMember);
+        // 创建专题轮廓关系
+        getSpecialAnnotationRel(special.getSpecialId(), SecurityUtils.getUserId());
         return R.ok();
+    }
+
+
+    public SpecialAnnotationRel getSpecialAnnotationRel(Long specialId, Long userId) {
+        //缓存获取
+        SpecialAnnotationRel cacheSpecialAnnotationRel = redisService.getCacheObject(CommonConstant.SPECIAL_ANNOTATION_REL + specialId);
+        if (null == cacheSpecialAnnotationRel) {
+            QueryWrapper<SpecialAnnotationRel> parQueryWrapperBy = new QueryWrapper<>();
+            parQueryWrapperBy.eq("special_id", specialId);
+            List<SpecialAnnotationRel> parList = specialAnnotationRelMapper.selectList(parQueryWrapperBy);
+            if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(parList)) {
+                redisService.setCacheObject(CommonConstant.SPECIAL_ANNOTATION_REL + specialId, parList.get(0), CommonConstant.SPECIAL_ANNOTATION_REL_CACHE_DAYS, TimeUnit.DAYS);
+                return parList.get(0);
+            } else {
+                cacheSpecialAnnotationRel = new SpecialAnnotationRel();
+                //查下可以使用的表
+                QueryWrapper<SpecialAnnotationRel> userQueryWrapperBy = new QueryWrapper<>();
+                userQueryWrapperBy.orderByDesc("sequence_number");
+                userQueryWrapperBy.last("LIMIT 1");
+                List<SpecialAnnotationRel> userPARList = specialAnnotationRelMapper.selectList(userQueryWrapperBy);
+                if (org.apache.commons.collections4.CollectionUtils.isEmpty(userPARList)) {
+                    //新建表-从1开始
+                    synchronized (this) {
+                        Long sequenceNumber = 1L;
+                        cacheSpecialAnnotationRel = generateTable(cacheSpecialAnnotationRel, specialId, userId, sequenceNumber);
+                        return cacheSpecialAnnotationRel;
+                    }
+                } else {
+                    SpecialAnnotationRel pAnnoRel = userPARList.get(0);
+                    Long currentSequenceNumber = pAnnoRel.getSequenceNumber();
+                    //查下当前表的项目个数和记录条数，如果可以用继续，如果不可以就新建表
+                    Annotation queryAnnotation = new Annotation();
+                    queryAnnotation.setSequenceNumber(currentSequenceNumber);
+
+                    Integer totalProjects = specialAnnotationRelMapper.selectTableSpecialCount(queryAnnotation);
+                    Integer totalRecords = annotationMapper.selectTableRecordCount(queryAnnotation);
+                    if (totalProjects >= CommonConstant.PROJECT_NUMBER_LIMIT || totalRecords >= CommonConstant.TABLE_RECORD_LIMIT) {
+                        //新建表
+                        Long sequenceNumber = currentSequenceNumber + 1;
+                        synchronized (this) {
+                            cacheSpecialAnnotationRel = generateTable(cacheSpecialAnnotationRel, specialId, userId, sequenceNumber);
+                            return cacheSpecialAnnotationRel;
+                        }
+                    } else {
+                        //3、insert 记录
+                        cacheSpecialAnnotationRel.setSpecialId(specialId);
+                        cacheSpecialAnnotationRel.setSequenceNumber(currentSequenceNumber);
+                        cacheSpecialAnnotationRel.setCreateBy(userId);
+                        cacheSpecialAnnotationRel.setCreateTime(new Date());
+                        specialAnnotationRelMapper.insert(cacheSpecialAnnotationRel);
+                        redisService.setCacheObject(CommonConstant.SPECIAL_ANNOTATION_REL + specialId, cacheSpecialAnnotationRel, CommonConstant.SPECIAL_ANNOTATION_REL_CACHE_DAYS, TimeUnit.DAYS);
+                        return cacheSpecialAnnotationRel;
+                    }
+                }
+            }
+        } else {
+            //已有表继续使用
+            return cacheSpecialAnnotationRel;
+        }
+    }
+
+    private SpecialAnnotationRel generateTable(SpecialAnnotationRel cacheSpecialAnnotationRel, Long specialId, Long userId, Long sequenceNumber) {
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(sequenceNumber);
+        //先确认是否存在这个表了，如果存在就不新建表了
+        Integer existTable = annotationMapper.selectExistTable(annotation);
+        if (existTable == 0) {
+            //1、Sequence
+            annotationMapper.createTableSequence(annotation);
+            //2、建表
+            annotationMapper.createTable(annotation);
+        }
+        //3、insert 记录
+        cacheSpecialAnnotationRel.setSpecialId(specialId);
+        cacheSpecialAnnotationRel.setSequenceNumber(sequenceNumber);
+        cacheSpecialAnnotationRel.setCreateBy(userId);
+        cacheSpecialAnnotationRel.setCreateTime(new Date());
+        specialAnnotationRelMapper.insert(cacheSpecialAnnotationRel);
+        redisService.setCacheObject(CommonConstant.SPECIAL_ANNOTATION_REL + specialId, cacheSpecialAnnotationRel, CommonConstant.SPECIAL_ANNOTATION_REL_CACHE_DAYS, TimeUnit.DAYS);
+        return cacheSpecialAnnotationRel;
     }
 
     @Override
@@ -228,7 +307,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         queryWrapper.eq(Slide::getSpecialId, specialId);
         queryWrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
         List<Slide> slides = slideService.list(queryWrapper);
-        if(slides.size()>0){
+        if (slides.size() > 0) {
             return R.fail(MessageSource.M("EXISTS_SLIDE_DATA"));
         }
 
@@ -240,7 +319,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         SpecialRecycling specialRecycling = new SpecialRecycling();
         specialRecycling.setSpecialId(specialId);
         specialRecycling.setExpireTime(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000 * 30L));
-        int slideNum=getSlideNum(specialId);
+        int slideNum = getSlideNum(specialId);
         specialRecycling.setSlideNum(slideNum);
         specialRecycling.setDelFlag(CommonConstant.NUMBER_0);
         specialRecycling.setCreateBy(SecurityUtils.getUserId());
@@ -278,26 +357,26 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
                 return R.fail(MessageSource.M("START_SPECIAL_ERROR"));
             }
         }
-        
+
         Integer unlock = 0;
         //锁定传4,解锁 5 校验
-        if (req.getStatus().equals(CommonConstant.INT_4)||req.getStatus().equals(CommonConstant.INT_5)) {
-        	//校验用户名、密码
-        	 boolean res = userLoginVerify(req.getUserName(), req.getPwd());
-        	 if (!res) {
-                 return R.fail("校验失败");
-             }
-        	 
-        	 if(req.getStatus().equals(CommonConstant.INT_5)){
-        		 //解锁 赋值为1
-        		 req.setStatus(1);
-        		 unlock = 5;
-        	 }
+        if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {
+            //校验用户名、密码
+            boolean res = userLoginVerify(req.getUserName(), req.getPwd());
+            if (!res) {
+                return R.fail("校验失败");
+            }
+
+            if (req.getStatus().equals(CommonConstant.INT_5)) {
+                //解锁 赋值为1
+                req.setStatus(1);
+                unlock = 5;
+            }
         }
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         Long currentUserId = sysUser.getUserId();
         Long specialId = req.getSpecialId();
-        
+
         Special special = new Special();
         special.setSpecialId(specialId);
         special.setUpdateTime(new Date());
@@ -305,18 +384,18 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         special.setStatus(req.getStatus());
         this.baseMapper.updateById(special);
         //锁定传4,解锁 5 增加日志
-        if (req.getStatus().equals(CommonConstant.INT_4)||unlock.equals(CommonConstant.INT_5)) {
-        	SpecialLockLog entity = new SpecialLockLog();
-        	entity.setSpecialId(specialId);
-        	if (req.getStatus().equals(CommonConstant.INT_4)) {
-        		entity.setType(CommonConstant.INT_4);
-        	}else{
-        		entity.setType(CommonConstant.INT_5);
-        	}
-        	entity.setCreateBy(currentUserId);
-        	entity.setCreateTime(new Date());
-        	entity.setReason(req.getReason());
-        	specialLockLogMapper.insert(entity);
+        if (req.getStatus().equals(CommonConstant.INT_4) || unlock.equals(CommonConstant.INT_5)) {
+            SpecialLockLog entity = new SpecialLockLog();
+            entity.setSpecialId(specialId);
+            if (req.getStatus().equals(CommonConstant.INT_4)) {
+                entity.setType(CommonConstant.INT_4);
+            } else {
+                entity.setType(CommonConstant.INT_5);
+            }
+            entity.setCreateBy(currentUserId);
+            entity.setCreateTime(new Date());
+            entity.setReason(req.getReason());
+            specialLockLogMapper.insert(entity);
         }
         return R.ok();
     }
@@ -387,65 +466,65 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         }*/
         slide.setGroupCode(s[2].substring(0, s[2].length() - 1));
 
-        slide.setOrgans(waxBlockInfoMapper.getOrganName(req.getTopicId(), req.getSpeciesId(), slide.getWaxCode(),s[2].substring(s[2].length() - 1)));
+        slide.setOrgans(waxBlockInfoMapper.getOrganName(req.getTopicId(), req.getSpeciesId(), slide.getWaxCode(), s[2].substring(s[2].length() - 1)));
 
         return slide;
     }
-    
-    
-    public Boolean userLoginVerify(String username, String pwd) {
-		// 获取密钥对解密密码
-		String cacheObject = redisService.getCacheObject(RSA_KEYS + username);
-		if (Objects.isNull(cacheObject)) {
-			throw new ServiceException("当前用户名和密码错误，请核对");
-		}
-		String password;
-		//解析
-		try {
-			password = RSAUtils.getStringByPrivateKey(cacheObject, pwd);
-		} catch (Exception e) {
-			throw new ServiceException("密码解密异常" + e);
-		}
-		//每次解析完删除密钥对
-		redisService.deleteObject(RSA_KEYS + username);
-		//
-		//log.info("解密后的密码" + password);
-		// 用户名或密码为空 错误
-		if (StringUtils.isAnyBlank(username, password)) {
-			throw new ServiceException("用户/密码必须填写");
-		}
-		// 密码如果不在指定范围内 错误
-		if (password.length() < UserConstants.PASSWORD_MIN_LENGTH
-				|| password.length() > UserConstants.PASSWORD_MAX_LENGTH) {
-			throw new ServiceException("用户密码不在指定范围");
-		}
-		// 用户名不在指定范围内 错误
-		if (username.length() < UserConstants.USERNAME_MIN_LENGTH
-				|| username.length() > UserConstants.USERNAME_MAX_LENGTH) {
-			throw new ServiceException("用户名不在指定范围");
-		}
-		// 查询用户信息
-		R<LoginUser> userResult = remoteUserService.getUserInfo(username, SecurityConstants.INNER);
-		//远程接口调用异常
-		if (R.FAIL == userResult.getCode()) {
-			throw new ServiceException(userResult.getMsg());
-		}
-		//用户数据为空
-		if (cn.staitech.common.core.utils.StringUtils.isNull(userResult) || cn.staitech.common.core.utils.StringUtils.isNull(userResult.getData())) {
-			throw new ServiceException("登录用户：" + username + " 不存在");
-		}
 
-		SysUser user = userResult.getData().getSysUser();
-		if (UserStatus.DISABLE.getCode().equals(user.getDelFlag())) {
-			throw new ServiceException("对不起，您的账号：" + username + " 已被删除");
-		}
-		if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
-			throw new ServiceException("对不起，您的账号：" + username + " 已停用");
-		}
-		if (!SecurityUtils.matchesPassword(password, user.getPassword())) {
-			throw new ServiceException("用户不存在/密码错误");
-		}
-		return true;
-	}
-    
+
+    public Boolean userLoginVerify(String username, String pwd) {
+        // 获取密钥对解密密码
+        String cacheObject = redisService.getCacheObject(RSA_KEYS + username);
+        if (Objects.isNull(cacheObject)) {
+            throw new ServiceException("当前用户名和密码错误，请核对");
+        }
+        String password;
+        //解析
+        try {
+            password = RSAUtils.getStringByPrivateKey(cacheObject, pwd);
+        } catch (Exception e) {
+            throw new ServiceException("密码解密异常" + e);
+        }
+        //每次解析完删除密钥对
+        redisService.deleteObject(RSA_KEYS + username);
+        //
+        //log.info("解密后的密码" + password);
+        // 用户名或密码为空 错误
+        if (StringUtils.isAnyBlank(username, password)) {
+            throw new ServiceException("用户/密码必须填写");
+        }
+        // 密码如果不在指定范围内 错误
+        if (password.length() < UserConstants.PASSWORD_MIN_LENGTH
+                || password.length() > UserConstants.PASSWORD_MAX_LENGTH) {
+            throw new ServiceException("用户密码不在指定范围");
+        }
+        // 用户名不在指定范围内 错误
+        if (username.length() < UserConstants.USERNAME_MIN_LENGTH
+                || username.length() > UserConstants.USERNAME_MAX_LENGTH) {
+            throw new ServiceException("用户名不在指定范围");
+        }
+        // 查询用户信息
+        R<LoginUser> userResult = remoteUserService.getUserInfo(username, SecurityConstants.INNER);
+        //远程接口调用异常
+        if (R.FAIL == userResult.getCode()) {
+            throw new ServiceException(userResult.getMsg());
+        }
+        //用户数据为空
+        if (cn.staitech.common.core.utils.StringUtils.isNull(userResult) || cn.staitech.common.core.utils.StringUtils.isNull(userResult.getData())) {
+            throw new ServiceException("登录用户：" + username + " 不存在");
+        }
+
+        SysUser user = userResult.getData().getSysUser();
+        if (UserStatus.DISABLE.getCode().equals(user.getDelFlag())) {
+            throw new ServiceException("对不起，您的账号：" + username + " 已被删除");
+        }
+        if (UserStatus.DISABLE.getCode().equals(user.getStatus())) {
+            throw new ServiceException("对不起，您的账号：" + username + " 已停用");
+        }
+        if (!SecurityUtils.matchesPassword(password, user.getPassword())) {
+            throw new ServiceException("用户不存在/密码错误");
+        }
+        return true;
+    }
+
 }
