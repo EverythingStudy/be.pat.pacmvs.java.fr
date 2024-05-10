@@ -154,6 +154,7 @@
             "slide_id"        INT8,
             "single_slide_id" INT8,
             "single"          INT2          DEFAULT 1,
+            "contour_type"    INT8          DEFAULT 4,
             "id"              VARCHAR(500) COLLATE "pg_catalog"."default",
             CONSTRAINT "fr_ai_annotation_${sequenceNumber}_pkey" PRIMARY KEY ("annotation_id")
         );
@@ -217,6 +218,8 @@
         COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."single_slide_id" IS '单切片id';
 
         COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."single" IS '单切片id标识';
+
+        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour_type" IS '轮廓类型标识';
 
         COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."id" IS 'geojson中数据id';
     </insert>
@@ -302,7 +305,6 @@
             create_time,
             update_by,
             update_time,
-            project_id,
             slide_id,
             id,
             contour_type,
@@ -333,6 +335,39 @@
             </if>
             <if test="filigreeContour != null and filigreeContour == false">
                 AND contour_type != 3
+            </if>
+            <if test="contour != null">
+                AND ST_Intersects(st_geomfromgeojson(#{contour}),contour${magnification})
+            </if>
+        </where>
+    </select>
+
+
+
+    <select id="aiSelectListBy" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        select
+        annotation_id,
+        area,
+        perimeter,
+        description,
+        category_id,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        slide_id,
+        id,
+        ST_AsGeoJSON(contour${magnification}) as contour,
+        single_slide_id,
+        contour_type,
+        single
+        from fr_ai_annotation_${sequenceNumber}
+        <where>
+            <if test="singleSlideId != null">
+                single_slide_id = #{singleSlideId}
             </if>
             <if test="contour != null">
                 AND ST_Intersects(st_geomfromgeojson(#{contour}),contour${magnification})

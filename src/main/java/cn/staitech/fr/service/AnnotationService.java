@@ -26,6 +26,8 @@ public interface AnnotationService extends IService<Annotation> {
 
     List<Features> selectListBy(AnnotationSelectList annotation) throws Exception;
 
+    List<Features> aiSelectListBy(AnnotationSelectList annotation) throws Exception;
+
     Long insert(ViewAddIn req) throws Exception;
 
     int delete(AnnotationById req) throws Exception;

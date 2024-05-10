@@ -135,7 +135,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     	properties.setContour_type(annotation.getContourType());
         properties.setSingleSlideId(annotation.getSingleSlideId());
         properties.setSingle(annotation.getSingle());
-        if (annotation.getSingle() == 1 && annotation.getContourType() == 2) {
+        if (annotation.getSingle() == 1 && (annotation.getContourType() == 2 || annotation.getContourType() == 4)) {
             if (annotation.getCategoryId() != null) {
                 PathologicalIndicatorCategory pathologicalIndicatorCategory = pathologicalIndicatorCategoryHashMap.get(annotation.getCategoryId());
                 if (pathologicalIndicatorCategory == null) {
@@ -211,6 +211,22 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setMagnification(40000L);
         // 查询普通轮廓
         List<Annotation> annotationList = annotationMapper.selectListBy(annotation);
+        List<Features> annoList = getFeaturesList(annotationList);
+        if (CollectionUtils.isNotEmpty(annoList)) {
+            list.addAll(annoList);
+        }
+        return list;
+    }
+    @Override
+    public List<Features> aiSelectListBy(AnnotationSelectList req) throws Exception{
+        List<Features> list = new ArrayList<>();
+        Annotation annotation = new Annotation();
+        BeanUtils.copyProperties(req, annotation);
+        if(req.getGeometry() != null){
+            annotation.setContour(String.valueOf(req.getGeometry()));
+        }
+        annotation.setSequenceNumber(1L);
+        List<Annotation> annotationList = annotationMapper.aiSelectListBy(annotation);
         List<Features> annoList = getFeaturesList(annotationList);
         if (CollectionUtils.isNotEmpty(annoList)) {
             list.addAll(annoList);

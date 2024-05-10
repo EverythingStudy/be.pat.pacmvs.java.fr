@@ -4,7 +4,6 @@ import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.utils.uuid.UUID;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.service.AnnotationService;
-import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.fr.vo.annotation.AnnotationById;
 import cn.staitech.fr.vo.annotation.AnnotationSelectList;
@@ -110,6 +109,12 @@ public class AnnotationController {
     @PostMapping("/selectLists")
     public R<List<Features>> selectLists(@Validated @RequestBody AnnotationSelectList req) throws Exception {
         return R.ok(annotationService.selectListBy(req));
+    }
+
+    @ApiOperation(value = "获取AIGeoJson数据")
+    @PostMapping("/aiSelectLists")
+    public R<List<Features>> aiSelectLists(@Validated @RequestBody AnnotationSelectList req) throws Exception {
+        return R.ok(annotationService.aiSelectListBy(req));
     }
 
     /**
