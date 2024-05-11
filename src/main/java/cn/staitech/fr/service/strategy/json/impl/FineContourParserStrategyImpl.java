@@ -211,9 +211,7 @@ public class FineContourParserStrategyImpl implements ParserStrategy {
                 }
             }
             List<Annotation> arrayList = new ArrayList<>();
-            AtomicInteger count = new AtomicInteger();
             elementsList.stream().forEach(element -> {
-                count.addAndGet(1);
                 Annotation annotation = processJsonElement(element, executorService, pathologicalMap);
                 if (!ObjectUtil.isEmpty(annotation)) {
                     arrayList.add(annotation);
