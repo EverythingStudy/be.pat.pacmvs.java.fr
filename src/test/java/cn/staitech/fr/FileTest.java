@@ -20,21 +20,81 @@ public class FileTest {
 
     @Test
     public void process() {
+//        String content = "{\n" +
+//                "  \"code\": \"200\",\n" +
+//                "  \"msg\": \"\",\n" +
+//                "  \"algorithmCode\": \"Fine_contour\",\n" +
+//                "  \"imageId\":10906,\n" +
+//                "  \"slideId\":1,\n" +
+//                "  \"singleId\":144,\n" +
+//                "  \"organizationId\":1,\n" +
+//                "  \"data\": [{\n" +
+//                "    \"fileurl1\": \"./save/10206D.json\",\n" +
+//                "    \"fileurl2\": \"./save/10206E.json\"\n" +
+//                "  }]\n" +
+//                "}";
+
+//
+//        String content = "{\n" +
+//                "  \"code\": \"200\",\n" +
+//                "  \"msg\": \"\",\n" +
+//                "  \"algorithmCode\": \"Lacrimal_gland\",\n" +
+//                "  \"imageId\":10906,\n" +
+//                "  \"slideId\":1,\n" +
+//                "  \"singleId\":144,\n" +
+//                "  \"organizationId\":1,\n" +
+//                "  \"data\": {\n" +
+//                "    \"cell\": {\n" +
+//                "      \"code\": 0,\n" +
+//                "      \"data\": {\n" +
+//                "        \"fileurl_list\": \"./result_new/16906E.json\"\n" +
+//                "      },\n" +
+//                "      \"msg\": \"运行成功\"\n" +
+//                "    },\n" +
+//                "    \"daoguan\": {\n" +
+//                "      \"code\": 0,\n" +
+//                "      \"data\": {\"fileurl_list\": \"./result_new/16906F.json\"},\n" +
+//                "      \"msg\": \"运行成功\"\n" +
+//                "    },\n" +
+//                "    \"jianzhi\": {\n" +
+//                "      \"code\": 0,\n" +
+//                "      \"data\": {\"fileurl_list\": \"./result_new/169027.json\"},\n" +
+//                "      \"msg\": \"运行成功\"\n" +
+//                "    },\n" +
+//                "    \"dingbubaozhi\": {\n" +
+//                "      \"code\": 0,\n" +
+//                "      \"data\": {\"fileurl_list\": \"./result_new/16906A.json\"},\n" +
+//                "      \"msg\": \"运行成功\"\n" +
+//                "    }\n" +
+//                "  }\n" +
+//                "}";
+
+
         String content = "{\n" +
-                "  \"code\": \"Fine_contour\",\n" +
+                "  \"code\": \"200\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"algorithmCode\": \"Harderian_gland\",\n" +
                 "  \"imageId\":10906,\n" +
                 "  \"slideId\":1,\n" +
                 "  \"singleId\":144,\n" +
                 "  \"organizationId\":1,\n" +
-                "  \"algorithmName\":\"全脏器精细轮廓\",\n" +
-                "  \"fileUrlList\":[\"D:/2.0-20240510/1/16906A.json\"]\n" +
-                "}";
-
-
-
-
-
-    jsonTaskParserService.input(content);
+                "  \"data\": [\n" +
+                "    {\n" +
+                "      \"structureName\": \"cell\",\n" +
+                "      \"fileUrl\": \"./result_new/16906E.json\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"structureName\": \"cell\",\n" +
+                "      \"fileUrl\": \"./result_new/16906E.json\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"structureName\": \"cell\",\n" +
+                "      \"fileUrl\": \"./result_new/16906E.json\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}\n" +
+                "\n";
+        jsonTaskParserService.input(content);
 
 
     }

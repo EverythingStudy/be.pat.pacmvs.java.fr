@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Component;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author: wangfeng
@@ -21,6 +24,20 @@ import java.io.IOException;
 @Slf4j
 @Component("Fine_contour")
 public class FineContourParserStrategyImpl implements ParserStrategy {
+
+    /**
+     * 解析文件路径，并存入MySQL
+     *
+     * @param jsonTask
+     * @return
+     */
+    @Override
+    public List<JsonFile> parseJsonFileList(JsonTask jsonTask) {
+        List<JsonFile> list = new ArrayList<>();
+
+        return list;
+    }
+
 
     @Override
     public void submitTask(JsonTask jsonTask) {

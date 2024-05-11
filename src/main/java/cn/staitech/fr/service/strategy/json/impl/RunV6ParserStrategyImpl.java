@@ -1,9 +1,13 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author: wangfeng
@@ -13,6 +17,20 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component("run_V6")
 public class RunV6ParserStrategyImpl implements ParserStrategy {
+
+    /**
+     * 解析文件路径，并存入MySQL
+     *
+     * @param jsonTask
+     * @return
+     */
+    @Override
+    public List<JsonFile> parseJsonFileList(JsonTask jsonTask) {
+        List<JsonFile> list = new ArrayList<>();
+
+        return list;
+    }
+
 
     @Override
     public void submitTask(JsonTask jsonTask) {

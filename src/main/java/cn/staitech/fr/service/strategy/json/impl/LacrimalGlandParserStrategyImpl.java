@@ -3,6 +3,8 @@ package cn.staitech.fr.service.strategy.json.impl;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -19,11 +21,11 @@ import java.util.List;
 /**
  * @author: wangfeng
  * @create: 2024-05-10 14:18:48
- * @Description: GLAMpoints_pytorch Json Parser
+ * @Description: Lacrimal_gland Json Parser
  */
 @Slf4j
-@Component("GLAMpoints_pytorch")
-public class GlamPointsPytorchParserStrategyImpl implements ParserStrategy {
+@Component("Lacrimal_gland")
+public class LacrimalGlandParserStrategyImpl implements ParserStrategy {
 
     private static void handleSingleJsonElement(JsonNode element) {
         if (element.isObject()) {
@@ -47,6 +49,11 @@ public class GlamPointsPytorchParserStrategyImpl implements ParserStrategy {
      */
     @Override
     public List<JsonFile> parseJsonFileList(JsonTask jsonTask) {
+        JSONObject jsonObject = JSON.parseObject(jsonTask.getData());
+        for (String key : jsonObject.keySet()) {
+
+        }
+
         List<JsonFile> list = new ArrayList<>();
 
         return list;

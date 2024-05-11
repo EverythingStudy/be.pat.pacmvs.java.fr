@@ -1,6 +1,9 @@
 package cn.staitech.fr.service.strategy.json;
 
+import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
+
+import java.util.List;
 
 /**
  * @author: wangfeng
@@ -9,7 +12,15 @@ import cn.staitech.fr.domain.JsonTask;
  */
 
 public interface ParserStrategy {
+    /**
+     * 解析文件路径，并存入MySQL
+     *
+     * @param jsonTask
+     * @return
+     */
+    List<JsonFile> parseJsonFileList(JsonTask jsonTask);
 
     void submitTask(JsonTask jsonTask);
+
     void parseJson(String filePath);
 }
