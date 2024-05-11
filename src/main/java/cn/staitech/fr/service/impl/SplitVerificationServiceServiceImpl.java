@@ -367,12 +367,15 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			Long categoryNumber = entry.getValue();
 			//标签颜色 0：黑色 1：红色  2:黄色
 			int categoryColour = 0;
-			boolean containsTag = containsOrgan(categoryName, categoryNumber, backCategoryMap);
-			if(!containsTag){
-				if(null != checkStatus && checkStatus == 2){
-					categoryColour = 2;
-				}else{
-					categoryColour = 1;
+			//checkStatus 核对状态 0：初始 1：正确 2：修正正常 3：错误
+			if(checkStatus != 1){
+				boolean containsTag = containsOrgan(categoryName, categoryNumber, backCategoryMap);
+				if(!containsTag){
+					if(null != checkStatus && checkStatus == 2){
+						categoryColour = 2;
+					}else{
+						categoryColour = 1;
+					}
 				}
 			}
 			CategoryChild child = new CategoryChild();
