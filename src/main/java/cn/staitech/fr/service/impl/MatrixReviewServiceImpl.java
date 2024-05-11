@@ -54,6 +54,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -380,13 +381,15 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
 	@Override
 	public R algorithm(AlgorithmIn req) {
-//		Long organizationId  = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
-		Long organizationId  = 1L;
+		Long organizationId  = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+//		Long organizationId  = 1L;
 		Long specialId = req.getSpecialId();
 		MatrixReviewListIn mrl = new MatrixReviewListIn();
 		mrl.setSpecialId(specialId);
 		//0未预测、1预测成功、2预测失败、3预测中
-		mrl.setForecastStatus("0");
+//		mrl.setForecastStatus("0");
+		List<String> forecastStatusList = new ArrayList<>(Arrays.asList("0", "2"));
+		mrl.setForecastStatusList(forecastStatusList);
 		List<MatrixReviewListOut> singleSlideList = slideMapper.getMatrixReview(mrl);
 		if (CollectionUtils.isEmpty(singleSlideList)) {
 			return R.ok();

@@ -6,6 +6,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +38,9 @@ public class MatrixReviewListIn extends PageRequest {
 
     @ApiModelProperty(value = "人工诊断状态 0：未诊断；1：已诊断;字典标识符：diagnosis_status")
     private String diagnosisStatus;
+    
+    @ApiModelProperty(value = "0未预测、1预测成功、2预测失败、3预测中")
+    private List<String> forecastStatusList;
 
     @ApiModelProperty(value = "时间范围")
     private Map<String, Date> createTimeParams;

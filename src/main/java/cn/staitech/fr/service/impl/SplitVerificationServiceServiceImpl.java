@@ -296,8 +296,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 					svOut.setAnimalCode(animalCode);
 					svOut.setProcessFlag(allCheckStatus);
 //					svOut.setWaxOrgan(waxCategoryMap);
-					svOut.setWaxOrgan(getCategoryNumber(waxCategoryMap, annoCategoryMap));
-					svOut.setAnnoOrgan(getCategoryNumber(annoCategoryMap, waxCategoryMap));
+					svOut.setWaxOrgan(getCategoryNumber(waxCategoryMap, annoCategoryMap,null));
+					svOut.setAnnoOrgan(getCategoryNumber(annoCategoryMap, waxCategoryMap,null));
 					//TODO v0.27   标签颜色处理
 					
 					dataList.add(svOut);
@@ -356,16 +356,20 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 	}
 	
 	//颜色处理
-	private List<CategoryChild> getCategoryNumber(Map<String, Long> frontCategoryMap,Map<String, Long> backCategoryMap){
+	private List<CategoryChild> getCategoryNumber(Map<String, Long> frontCategoryMap,Map<String, Long> backCategoryMap,Integer checkStatus){
 		List<CategoryChild> list = new ArrayList<>();
 		for (Map.Entry<String, Long> entry : frontCategoryMap.entrySet()) {
 			String categoryName = entry.getKey();
 			Long categoryNumber = entry.getValue();
-			//标签颜色 0：黑色 1：红色
+			//标签颜色 0：黑色 1：红色  2:黄色
 			int categoryColour = 0;
 			boolean containsTag = containsOrgan(categoryName, categoryNumber, backCategoryMap);
 			if(!containsTag){
-				categoryColour = 1;
+				if(null != checkStatus && checkStatus == 2){
+					categoryColour = 2;
+				}else{
+					categoryColour = 1;
+				}
 			}
 			CategoryChild child = new CategoryChild();
 			child.setCategoryName(categoryName);
@@ -486,8 +490,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 //				out.setWaxOrgan(waxCategoryMap);
 //				out.setAnnoOrgan(annoCategoryMap);
 				
-				out.setWaxOrgan(getCategoryNumber(waxCategoryMap, annoCategoryMap));
-				out.setAnnoOrgan(getCategoryNumber(annoCategoryMap, waxCategoryMap));
+				out.setWaxOrgan(getCategoryNumber(waxCategoryMap, annoCategoryMap,out.getCheckStatus()));
+				out.setAnnoOrgan(getCategoryNumber(annoCategoryMap, waxCategoryMap,out.getCheckStatus()));
 			}
 		}
 		pageResponse.setTotal(page.getTotal());
