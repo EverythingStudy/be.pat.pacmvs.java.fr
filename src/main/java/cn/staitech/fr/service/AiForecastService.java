@@ -12,4 +12,6 @@ public interface AiForecastService extends IService<AiForecast> {
 
     Boolean forecastResults(Long singleSlideId, Long imageId);
 
+    void indicatorCount(Long singleSlideId,Long categoryId,String jsonCode);
+
 }

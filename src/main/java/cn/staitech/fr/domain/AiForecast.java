@@ -36,6 +36,12 @@ public class AiForecast implements Serializable {
     private String quantitativeIndicators;
 
     /**
+     * 定量指标英文
+     */
+    @ApiModelProperty(name = "quantitativeIndicatorsEn" , value = "定量指标英文")
+    private String quantitativeIndicatorsEn;
+
+    /**
      * 预测结果
      */
     @ApiModelProperty(name = "results" , value = "预测结果")

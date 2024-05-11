@@ -3,6 +3,7 @@ package cn.staitech.fr.service.impl;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.domain.SingleSlide;
+import cn.staitech.fr.domain.out.SingleSlideSelectBy;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
@@ -13,7 +14,7 @@ import cn.staitech.fr.mapper.AiForecastMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author admin
@@ -72,6 +73,46 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             return false;
         }
 
+
+    }
+
+    @Override
+    public void indicatorCount(Long singleSlideId,Long categoryId,String jsonCode) {
+        List<AiForecast> aiForecasts = new ArrayList<>();
+
+        Map<String, String[]> indicatorResultsMap = new HashMap<>();
+
+        // 结构面积
+        /*Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(0L);
+        annotation.setSingleSlideId(singleSlideId);//单脏器切片id
+        annotation.setCategoryId(categoryId);// 标注类别ID
+        Annotation structureArea = annotationMapper.getStructureArea(annotation);*/
+        // 精细轮廓总面积
+        SingleSlide singleSlide = singleSlideMapper.selectById(singleSlideId);
+
+        /*indicatorResultsMap.put("导管占比", new String[]{"Duct area%","", ""});
+        indicatorResultsMap.put("腺泡细胞核密度", new String[]{"Nucleus density of acinus","", ""});
+        indicatorResultsMap.put("上皮顶部胞质占比", new String[]{"Epithelial apex cytoplasm area%","", ""});
+        indicatorResultsMap.put("间质占比", new String[]{"Mesenchyme area%","", ""});
+        indicatorResultsMap.put("腺泡占比", new String[]{"Acinus area%","", ""});
+        indicatorResultsMap.put("腺泡细胞核面积（单个）", new String[]{"Acinar nucleus area (per)","", ""});*/
+        indicatorResultsMap.put("泪腺面积", new String[]{"Lacrimal gland area",singleSlide.getArea(), "平方毫米"});
+
+        for (Map.Entry<String, String[]> entry : indicatorResultsMap.entrySet()) {
+            String indicatorCode = entry.getKey();
+            String englishName = entry.getValue()[0];
+            String result = entry.getValue()[1];
+            String unit = entry.getValue()[2];
+
+            AiForecast forecast = new AiForecast();
+            forecast.setSingleSlideId(singleSlideId);
+            forecast.setQuantitativeIndicators(indicatorCode);
+            forecast.setResults(result);
+            forecast.setUnit(unit);
+
+            aiForecasts.add(forecast);
+        }
 
     }
 
