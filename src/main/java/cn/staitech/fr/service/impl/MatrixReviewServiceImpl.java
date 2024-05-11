@@ -457,6 +457,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 							aiAlgorithm.setAlgorithm_name(CommonConstant.ALGORITHM_MODEL_NAME);
 							aiAlgorithm.setOrganizationName(organizatinName);
 							aiAlgorithm.setOrganizationId(organizationId);
+							aiAlgorithm.setSpecialId(specialId);
 							log.info("AI算法请求完整数据{}", JSONUtil.toJsonStr(aiAlgorithm));
 							String body = pythonService.algorithm(aiAlgorithm);
 							log.info("AI算法请求返回数据{}", JSONUtil.toJsonStr(body));

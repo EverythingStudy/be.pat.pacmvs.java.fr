@@ -14,4 +14,5 @@ public class AiAlgorithm extends  MatrixReviewListOut{
 	private String algorithm_name;
 	private Long organizationId;
 	private String organizationName;
+    private Long specialId;
 }
