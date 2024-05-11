@@ -83,6 +83,11 @@ public class Category implements Serializable {
     @ApiModelProperty(name = "createBy" , value = "创建者")
     private Long createBy;
 
+    /**
+     * 创建者
+     */
+    @ApiModelProperty(name = "delFlag" , value = "删除标志")
+    private String delFlag;
 
 
     @TableField(exist = false)

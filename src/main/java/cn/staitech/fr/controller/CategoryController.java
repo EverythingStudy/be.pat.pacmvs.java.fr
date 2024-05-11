@@ -50,7 +50,7 @@ public class CategoryController {
         PageResponse<Category> resp = new PageResponse<>();
         Page<SysUser> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
         ExcludeEmptyQueryWrapper<Category> categoryQueryWrapper = new ExcludeEmptyQueryWrapper<>();
-        categoryQueryWrapper.eq("species", req.getSpecies()).eq("organ_name", req.getOrganName()).like("category_abbreviation", req.getCategoryAbbreviation());
+        categoryQueryWrapper.eq("species", req.getSpecies()).eq("organ_name", req.getOrganName()).like("category_abbreviation", req.getCategoryAbbreviation()).eq("del_flag", "0");
         if (req.getCreateTime() != null) {
             Object beginTime = req.getCreateTime().get("beginTime");
             Object endTime = req.getCreateTime().get("endTime");
@@ -72,7 +72,7 @@ public class CategoryController {
     @ApiOperation(value = "脏器标签表列表查询")
     @GetMapping("/selectList")
     public R<List<Category>> list(String organName) {
-        LambdaQueryWrapper<Category> categoryQueryWrapper = new LambdaQueryWrapper<Category>().like(organName != null, Category::getOrganName, organName);
+        LambdaQueryWrapper<Category> categoryQueryWrapper = new LambdaQueryWrapper<Category>().like(organName != null, Category::getOrganName, organName).eq(Category::getDelFlag, "0");
         return R.ok(categoryService.list(categoryQueryWrapper));
     }
 
