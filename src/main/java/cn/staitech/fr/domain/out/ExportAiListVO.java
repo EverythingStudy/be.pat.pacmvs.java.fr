@@ -20,5 +20,8 @@ public class ExportAiListVO {
     @ApiModelProperty(value = "参考范围")
     private String forecastRange;
 
+    @ApiModelProperty(value = "单位")
+    private String unit;
+
  
 }

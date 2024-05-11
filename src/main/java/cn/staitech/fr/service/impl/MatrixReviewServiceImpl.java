@@ -41,6 +41,7 @@ import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.springframework.beans.BeanUtils;
@@ -281,8 +282,8 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             exportVO.setTable(collect);
             exportVO.setOrganizationName(diagnosisMapper.getOrganizationName(SecurityUtils.getLoginUser().getSysUser().getOrganizationId()));
             //会报错{"msg":"TemplateRenderPolicy render error","code":500}
-            exportVO.setImg(new PictureRenderData(800, 200, "D:/image/liangz.png"));
-            //exportVO.setImg(new PictureRenderData(800, 200, exportVO.getThumbUrl().replace("/file/statics", "/home/pat_saas")));
+            //exportVO.setImg(new PictureRenderData(800, 200, "D:/image/liangz.png"));
+            exportVO.setImg(new PictureRenderData(800, 200, exportVO.getThumbUrl().replace("/file/statics", "/home/pat_saas")));
             String s = waxPath + exportVO.getFileName() + "+" + exportVO.getOrganName() + CommonConstant.WROD_FILE;
             //生成word
             ExportPdfUtils.exportFile(s, exportVO);
@@ -324,6 +325,16 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         List<Long> ids = req.getIds();
         List<String> pdfName = new ArrayList<>();
         String topicName = "";
+        //存放单脏器切片id和脏器id
+        Map<Long,Long> categorys=new HashMap<>();
+        //判断是不是存在对照组
+        Special special = specialMapper.selectById(req.getSpecialId());
+        if(StringUtils.isNotEmpty(special.getControlGroup())){
+            LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
+            wrapper.in(SingleSlide::getSingleId,ids);
+            List<SingleSlide> singleSlides = singleSlideMapper.selectList(wrapper);
+            categorys=  singleSlides.stream().collect(Collectors.toMap(SingleSlide::getSingleId,SingleSlide::getCategoryId));
+        }
         for (Long id : ids) {
             ExportAiVO exportVO = singleSlideMapper.getExportAiVO(id);
             if (LanguageUtils.isEn()) {
@@ -331,20 +342,33 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             } else {
                 exportVO.setColorType(Container.COLOR_TYPE.get(Integer.valueOf(exportVO.getColorType())));
             }
-            //算法数据填充
+            //算法结果数据填充
             LambdaQueryWrapper<AiForecast> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(AiForecast::getSingleSlideId, id);
             List<AiForecast> aiForecasts = aiForecastMapper.selectList(wrapper);
             List<ExportAiListVO> collect = new ArrayList<>();
             if (CollectionUtils.isNotEmpty(aiForecasts)) {
-                collect = aiForecasts.stream().map(e -> {
+                for (AiForecast aiForecast : aiForecasts) {
                     ExportAiListVO exportAiListVO = new ExportAiListVO();
-                    BeanUtils.copyProperties(e, exportAiListVO);
-                    return exportAiListVO;
-                }).collect(Collectors.toList());
+                    BeanUtils.copyProperties(aiForecast, exportAiListVO);
+                    //范围数据
+                    if(StringUtils.isNotEmpty(special.getControlGroup())){
+                        setRang(special,id,exportAiListVO,categorys);
+                    }
+                    collect.add( exportAiListVO);
+                }
             }
             exportVO.setList(collect);
             exportVO.setTable(collect);
+            //算法详情
+            AipreAirepostOut aiForecastBySingle = aiForecastMapper.getAiForecastBySingle(id);
+            if(ObjectUtils.isNotEmpty(aiForecastBySingle)){
+                exportVO.setAlgorithmName(aiForecastBySingle.getAlgorithmName());
+                exportVO.setModelVersion(aiForecastBySingle.getModelVersion());
+                exportVO.setStartTime(aiForecastBySingle.getStartTime());
+                exportVO.setWasteTime(aiForecastBySingle.getWasteTime());
+            }
+
             exportVO.setOrganizationName(diagnosisMapper.getOrganizationName(SecurityUtils.getLoginUser().getSysUser().getOrganizationId()));
             String s = waxPath + "AI" + File.separator + exportVO.getFileName() + "+" + exportVO.getOrganName() + CommonConstant.WROD_FILE;
             File file = new File(waxPath + "AI" + File.separator);
@@ -379,7 +403,24 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
     }
 
-	@Override
+    /**
+     * 设置预测范围
+     * @param special
+     * @param singleId
+     * @param exportAiListVO
+     */
+    private void setRang(Special special, Long singleId, ExportAiListVO exportAiListVO, Map<Long, Long> categorys) {
+        if(ObjectUtils.isNotEmpty(categorys.get(singleId))){
+            String rangOut = singleSlideMapper.getRangOut(categorys.get(singleId), special.getSpecialId(), special.getControlGroup());
+            exportAiListVO.setForecastRange(rangOut);
+        }
+
+    }
+
+
+
+
+    @Override
 	public R algorithm(AlgorithmIn req) {
 		Long organizationId  = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
 //		Long organizationId  = 1L;

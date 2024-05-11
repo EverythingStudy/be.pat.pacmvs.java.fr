@@ -63,6 +63,6 @@ public class ExportAiVO {
     private String startTime;
 
     @ApiModelProperty(value = "预测时长")
-    private String wasteTime;
+    private Integer wasteTime;
     
 }
