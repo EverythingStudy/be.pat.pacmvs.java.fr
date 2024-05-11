@@ -248,6 +248,10 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 						}*/
 						String waxCodeGenderKey = fetchGroupKey(slidePer.getWaxCode(),slidePer.getGenderFlag());
 						waxCategoryMap = specialWaxCategoryCountMap.get(waxCodeGenderKey);
+						if(null == waxCategoryMap || waxCategoryMap.isEmpty()){
+							waxCodeGenderKey = fetchGroupKey(slidePer.getWaxCode(),null);
+							waxCategoryMap = specialWaxCategoryCountMap.get(waxCodeGenderKey);
+						}
 					}
 					//蜡块表脏器信息==》按照动物脏器统计汇总==>底层都是按照字典顺序进行排序(https://blog.csdn.net/Rcain_R/article/details/136692093)
 					waxCategoryMap = waxCategoryMap.entrySet().stream()
