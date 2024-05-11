@@ -66,6 +66,10 @@ public class JsonTaskParserService {
             // 调用策略提交任务
             parser.parseJson(jsonTask, jsonFile);
         }
+
+        // 指标计算
+        parser.alculationIndicators(jsonTask);
+
     }
 
     /**

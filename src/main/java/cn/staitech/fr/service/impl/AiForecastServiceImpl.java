@@ -1,17 +1,16 @@
 package cn.staitech.fr.service.impl;
 
-import cn.staitech.fr.domain.Annotation;
-import cn.staitech.fr.domain.Image;
-import cn.staitech.fr.domain.SingleSlide;
-import cn.staitech.fr.domain.out.SingleSlideSelectBy;
+import cn.staitech.fr.domain.*;
+import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.mapper.AiForecastMapper;
+import lombok.Data;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -33,7 +32,6 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
 
     @Resource
     private ImageMapper imageMapper;
-
 
     @Override
     public Boolean forecastResults(Long singleSlideId, Long imageId) {
@@ -77,45 +75,25 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
     }
 
     @Override
-    public void indicatorCount(Long singleSlideId,Long categoryId,String jsonCode) {
+    public void addAiForecast(Long singleSlideId, Map<String, IndicatorAddIn> indicatorResultsMap) {
         List<AiForecast> aiForecasts = new ArrayList<>();
-
-        Map<String, String[]> indicatorResultsMap = new HashMap<>();
-
-        // 结构面积
-        /*Annotation annotation = new Annotation();
-        annotation.setSequenceNumber(0L);
-        annotation.setSingleSlideId(singleSlideId);//单脏器切片id
-        annotation.setCategoryId(categoryId);// 标注类别ID
-        Annotation structureArea = annotationMapper.getStructureArea(annotation);*/
-        // 精细轮廓总面积
-        SingleSlide singleSlide = singleSlideMapper.selectById(singleSlideId);
-
-        /*indicatorResultsMap.put("导管占比", new String[]{"Duct area%","", ""});
-        indicatorResultsMap.put("腺泡细胞核密度", new String[]{"Nucleus density of acinus","", ""});
-        indicatorResultsMap.put("上皮顶部胞质占比", new String[]{"Epithelial apex cytoplasm area%","", ""});
-        indicatorResultsMap.put("间质占比", new String[]{"Mesenchyme area%","", ""});
-        indicatorResultsMap.put("腺泡占比", new String[]{"Acinus area%","", ""});
-        indicatorResultsMap.put("腺泡细胞核面积（单个）", new String[]{"Acinar nucleus area (per)","", ""});*/
-        indicatorResultsMap.put("泪腺面积", new String[]{"Lacrimal gland area",singleSlide.getArea(), "平方毫米"});
-
-        for (Map.Entry<String, String[]> entry : indicatorResultsMap.entrySet()) {
+        for (Map.Entry<String, IndicatorAddIn> entry : indicatorResultsMap.entrySet()) {
             String indicatorCode = entry.getKey();
-            String englishName = entry.getValue()[0];
-            String result = entry.getValue()[1];
-            String unit = entry.getValue()[2];
+            IndicatorAddIn indicatorInfo = entry.getValue();
 
             AiForecast forecast = new AiForecast();
             forecast.setSingleSlideId(singleSlideId);
             forecast.setQuantitativeIndicators(indicatorCode);
-            forecast.setResults(result);
-            forecast.setUnit(unit);
+            forecast.setResults(indicatorInfo.getResult());
+            forecast.setUnit(indicatorInfo.getUnit());
 
             aiForecasts.add(forecast);
         }
-
+        // 批量插入
+        if (!CollectionUtils.isEmpty(aiForecasts)) {
+            this.saveBatch(aiForecasts);
+        }
     }
-
 
 }
 

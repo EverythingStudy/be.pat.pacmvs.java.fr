@@ -19,4 +19,10 @@ public class RunV6ParserStrategyImpl implements ParserStrategy {
     public void parseJson(JsonTask jsonTask, JsonFile jsonFile) {
 
     }
+
+    @Override
+    public void alculationIndicators(JsonTask jsonTask) {
+
+    }
+
 }

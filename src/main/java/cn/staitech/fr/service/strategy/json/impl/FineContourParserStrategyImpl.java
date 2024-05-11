@@ -226,6 +226,11 @@ public class FineContourParserStrategyImpl implements ParserStrategy {
         batchProcessAndSave(anno, 1000, Runtime.getRuntime().availableProcessors());
     }
 
+    @Override
+    public void alculationIndicators(JsonTask jsonTask) {
+
+    }
+
     public void batchProcessAndSave(Annotation annotation, int batchSize, int threadCount) {
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         List<Annotation> annotations = annotation.getList();

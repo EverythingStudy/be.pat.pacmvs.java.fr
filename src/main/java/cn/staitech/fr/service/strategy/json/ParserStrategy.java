@@ -11,4 +11,6 @@ import cn.staitech.fr.domain.JsonTask;
 
 public interface ParserStrategy {
     void parseJson(JsonTask jsonTask, JsonFile jsonFile);
+
+    void alculationIndicators(JsonTask jsonTask);
 }

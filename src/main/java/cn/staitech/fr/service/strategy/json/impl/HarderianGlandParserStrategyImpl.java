@@ -2,9 +2,9 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.*;
-import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
-import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
+import cn.staitech.fr.domain.in.IndicatorAddIn;
+import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
@@ -48,6 +48,10 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
     private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
     @Resource
     private AnnotationMapper annotationMapper;
+    @Resource
+    private SingleSlideMapper singleSlideMapper;
+    @Resource
+    private AiForecastService aiForecastService;
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
         if (element.isObject()) {
@@ -225,6 +229,20 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
             executorService.shutdown();
         }
         batchProcessAndSave(anno, 1000, Runtime.getRuntime().availableProcessors());
+
+    }
+
+    @Override
+    public void alculationIndicators(JsonTask jsonTask) {
+        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        /*indicatorResultsMap.put("腺泡面积占比（全片）", new IndicatorAddIn("Duct area%", "", ""));
+        indicatorResultsMap.put("腺泡细胞核密度(单个)", new IndicatorAddIn("Nucleus density of acinus", "", ""));
+        indicatorResultsMap.put("色素面积占比", new IndicatorAddIn("Epithelial apex cytoplasm area%", "", ""));
+        indicatorResultsMap.put("腺泡细胞核密度（全片）", new IndicatorAddIn("Mesenchyme area%", "", ""));*/
+        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+        indicatorResultsMap.put("哈氏腺面积", new IndicatorAddIn("Acinus area%", singleSlide.getArea(), "平方毫米"));
+
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 
     public void batchProcessAndSave(Annotation annotation, int batchSize, int threadCount) {

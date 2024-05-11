@@ -18,4 +18,10 @@ public class OrganRecognitionParserStrategyImpl implements ParserStrategy {
     public void parseJson(JsonTask jsonTask, JsonFile jsonFile) {
 
     }
+
+    @Override
+    public void alculationIndicators(JsonTask jsonTask) {
+
+    }
+
 }
