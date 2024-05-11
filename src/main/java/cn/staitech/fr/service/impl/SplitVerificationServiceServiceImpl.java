@@ -368,7 +368,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			//标签颜色 0：黑色 1：红色  2:黄色
 			int categoryColour = 0;
 			//checkStatus 核对状态 0：初始 1：正确 2：修正正常 3：错误
-			if(checkStatus != 1){
+			if(null != checkStatus && checkStatus != 1){
 				boolean containsTag = containsOrgan(categoryName, categoryNumber, backCategoryMap);
 				if(!containsTag){
 					if(null != checkStatus && checkStatus == 2){
