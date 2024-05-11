@@ -132,6 +132,14 @@
           and contour_type = 3
     </select>
 
+    <select id="getStructureArea" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT sum(ST_Area(contour40000)) AS area
+        from fr_ai_annotation_${sequenceNumber}
+        where single_slide_id = #{singleSlideId}
+          and category_id = #{categoryId}
+    </select>
+
 
     <insert id="createTable" parameterType="cn.staitech.fr.domain.Annotation">
         CREATE TABLE "public".fr_ai_annotation_${sequenceNumber}
