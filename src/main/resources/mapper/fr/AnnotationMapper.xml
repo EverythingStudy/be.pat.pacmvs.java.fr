@@ -336,6 +336,9 @@
             <if test="filigreeContour != null and filigreeContour == false">
                 AND contour_type != 3
             </if>
+            <if test="contourType != null">
+                AND contour_type = #{contourType}
+            </if>
             <if test="contour != null">
                 AND ST_Intersects(st_geomfromgeojson(#{contour}),contour${magnification})
             </if>
