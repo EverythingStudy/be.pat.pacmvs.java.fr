@@ -4,7 +4,6 @@
 
     <resultMap type="cn.staitech.fr.domain.JsonTask" id="JsonTaskMap">
         <result property="taskId" column="task_id" jdbcType="INTEGER"/>
-        <result property="projectId" column="project_id" jdbcType="INTEGER"/>
         <result property="slideId" column="slide_id" jdbcType="INTEGER"/>
         <result property="specialId" column="special_id" jdbcType="INTEGER"/>
         <result property="imageId" column="image_id" jdbcType="INTEGER"/>
@@ -24,21 +23,21 @@
 
     <!-- 批量插入 -->
     <insert id="insertBatch" keyProperty="taskId" useGeneratedKeys="true">
-        insert into patsaas.fr_json_task(project_id, slide_id, special_id, image_id, single_id, organization_id, category_id, algorithm_uuid, code, json_path, status, times, start_time, end_time, create_time, update_time)
+        insert into patsaas.fr_json_task(slide_id, special_id, image_id, single_id, organization_id, category_id, algorithm_uuid, code, json_path, status, times, start_time, end_time, create_time, update_time)
         values
         <foreach collection="entities" item="entity" separator=",">
-        (#{entity.projectId}, #{entity.slideId}, #{entity.specialId}, #{entity.imageId}, #{entity.singleId}, #{entity.organizationId}, #{entity.categoryId}, #{entity.algorithmUuid}, #{entity.code}, #{entity.jsonPath}, #{entity.status}, #{entity.times}, #{entity.startTime}, #{entity.endTime}, #{entity.createTime}, #{entity.updateTime})
+        (#{entity.slideId}, #{entity.specialId}, #{entity.imageId}, #{entity.singleId}, #{entity.organizationId}, #{entity.categoryId}, #{entity.algorithmUuid}, #{entity.code}, #{entity.jsonPath}, #{entity.status}, #{entity.times}, #{entity.startTime}, #{entity.endTime}, #{entity.createTime}, #{entity.updateTime})
         </foreach>
     </insert>
     <!-- 批量插入或按主键更新 -->
     <insert id="insertOrUpdateBatch" keyProperty="taskId" useGeneratedKeys="true">
-        insert into patsaas.fr_json_task(project_id, slide_id, special_id, image_id, single_id, organization_id, category_id, algorithm_uuid, code, json_path, status, times, start_time, end_time, create_time, update_time)
+        insert into patsaas.fr_json_task(slide_id, special_id, image_id, single_id, organization_id, category_id, algorithm_uuid, code, json_path, status, times, start_time, end_time, create_time, update_time)
         values
         <foreach collection="entities" item="entity" separator=",">
-            (#{entity.projectId}, #{entity.slideId}, #{entity.specialId}, #{entity.imageId}, #{entity.singleId}, #{entity.organizationId}, #{entity.categoryId}, #{entity.algorithmUuid}, #{entity.code}, #{entity.jsonPath}, #{entity.status}, #{entity.times}, #{entity.startTime}, #{entity.endTime}, #{entity.createTime}, #{entity.updateTime})
+            (#{entity.slideId}, #{entity.specialId}, #{entity.imageId}, #{entity.singleId}, #{entity.organizationId}, #{entity.categoryId}, #{entity.algorithmUuid}, #{entity.code}, #{entity.jsonPath}, #{entity.status}, #{entity.times}, #{entity.startTime}, #{entity.endTime}, #{entity.createTime}, #{entity.updateTime})
         </foreach>
         on duplicate key update
-         project_id = values(project_id) , slide_id = values(slide_id) , special_id = values(special_id) , image_id = values(image_id) , single_id = values(single_id) , organization_id = values(organization_id) , category_id = values(category_id) , algorithm_uuid = values(algorithm_uuid) , code = values(code) , json_path = values(json_path) , status = values(status) , times = values(times) , start_time = values(start_time) , end_time = values(end_time) , create_time = values(create_time) , update_time = values(update_time)     </insert>
+         slide_id = values(slide_id) , special_id = values(special_id) , image_id = values(image_id) , single_id = values(single_id) , organization_id = values(organization_id) , category_id = values(category_id) , algorithm_uuid = values(algorithm_uuid) , code = values(code) , json_path = values(json_path) , status = values(status) , times = values(times) , start_time = values(start_time) , end_time = values(end_time) , create_time = values(create_time) , update_time = values(update_time)     </insert>
 
 </mapper>
 

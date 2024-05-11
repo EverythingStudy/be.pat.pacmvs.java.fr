@@ -30,10 +30,7 @@ public class JsonFile extends Model<JsonFile> {
     private String structureName;
     //文件路径
     private String fileUrl;
-    //算法返回状态
-    private String code;
-    //算法返回msg
-    private String msg;
+
     //状态(0未进行解析、1解析中、2解析成功、3解析失败)
     private Integer status;
     //执行次数（第几次）

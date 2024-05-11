@@ -96,9 +96,8 @@ public class FileTest {
                 "  ]\n" +
                 "}\n" +
                 "\n";
+
         jsonTaskParserService.input(content);
-
-
     }
 //
 //    @Test

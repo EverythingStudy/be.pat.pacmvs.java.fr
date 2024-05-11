@@ -27,8 +27,6 @@ public class JsonTask implements Serializable {
     @ApiModelProperty(value = "任务ID")
     @TableId(value = "task_id", type = IdType.AUTO)
     private Long taskId;
-    //项目ID
-    private Long projectId;
     //切片ID
     private Long slideId;
     //专题ID

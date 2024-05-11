@@ -38,13 +38,12 @@ public class JsonTaskParserService {
         JSONObject jsonObject = JSON.parseObject(input);
 
         // 空数据返回
-        if (jsonObject == null
-                || jsonObject.get("algorithmCode") == null
-                || "".equals(jsonObject.get("algorithmCode"))) {
+        if (jsonObject == null || !jsonObject.containsKey("algorithmCode")) {
             return;
         }
 
-        log.info("algorithmCode:{}", jsonObject.get("algorithmCode"));
+        String algorithmCode = jsonObject.get("algorithmCode").toString().trim();
+        log.info("algorithmCode:{}", algorithmCode);
 
         // 解析任务元数据,并存入MySQL
         JsonTask jsonTask = parseJasonTask(jsonObject);
@@ -60,7 +59,7 @@ public class JsonTaskParserService {
         log.info("jsonFileList:{}", jsonFileList);
 
         // 获取解析器
-        ParserStrategy parser = parserStrategyFactory.getParserStrategy(jsonTask.getAlgorithmCode());
+        ParserStrategy parser = parserStrategyFactory.getParserStrategy(algorithmCode);
 
         for (JsonFile jsonFile : jsonFileList) {
             // TODO:异步线程池
@@ -80,15 +79,15 @@ public class JsonTaskParserService {
             JsonTask jsonTask = new JsonTask();
             jsonTask.setAlgorithmCode(jsonObject.get("algorithmCode").toString());
 
-            jsonTask.setImageId(Long.parseLong(jsonObject.get("imageId").toString()));
-            jsonTask.setSlideId(Long.parseLong(jsonObject.get("slideId").toString()));
-            jsonTask.setSingleId(Long.parseLong(jsonObject.get("singleId").toString()));
-            jsonTask.setSpecialId(Long.parseLong(jsonObject.get("specialId").toString()));
-            jsonTask.setOrganizationId(Long.parseLong(jsonObject.get("organizationId").toString()));
+            jsonTask.setImageId(jsonObject.containsKey("imageId") ? Long.parseLong(jsonObject.get("imageId").toString()) : 0L);
+            jsonTask.setSlideId(jsonObject.containsKey("slideId") ? Long.parseLong(jsonObject.get("slideId").toString()) : 0L);
+            jsonTask.setSingleId(jsonObject.containsKey("singleId") ? Long.parseLong(jsonObject.get("singleId").toString()) : 0L);
+            jsonTask.setSpecialId(jsonObject.containsKey("specialId") ? Long.parseLong(jsonObject.get("specialId").toString()) : 0L);
+            jsonTask.setOrganizationId(jsonObject.containsKey("organizationId") ? Long.parseLong(jsonObject.get("organizationId").toString()) : 0L);
 
-            jsonTask.setCode(jsonObject.get("code").toString());
-            jsonTask.setMsg(jsonObject.get("msg").toString());
-            jsonTask.setData(jsonObject.get("data").toString());
+            jsonTask.setCode(jsonObject.containsKey("code") ? jsonObject.get("code").toString() : "");
+            jsonTask.setMsg(jsonObject.containsKey("msg") ? jsonObject.get("msg").toString() : "");
+            jsonTask.setData(jsonObject.containsKey("data") ? jsonObject.get("data").toString() : "");
 
             jsonTask.setCreateTime(new Date());
             jsonTask.setStartTime(new Date());
@@ -118,13 +117,15 @@ public class JsonTaskParserService {
         for (int i = 0; i < jsonArray.length(); i++) {
             org.json.JSONObject jsonObject = jsonArray.getJSONObject(i);
             JsonFile jsonFile = new JsonFile();
-            jsonFile.setStructureName(jsonObject.getString("structureName"));
-            jsonFile.setFileUrl(jsonObject.getString("fileUrl"));
+
+            jsonFile.setStructureName(jsonObject.has("structureName") ? jsonObject.getString("structureName") : "");
+            jsonFile.setFileUrl(jsonObject.has("fileUrl") ? jsonObject.getString("fileUrl") : "");
 
             jsonFile.setTaskId(task.getTaskId());
+            jsonFile.setStatus(0);
+
             jsonFile.setCreateTime(new Date());
             jsonFile.setStartTime(new Date());
-            jsonFile.setStatus(0);
 
             list.add(jsonFile);
         }
