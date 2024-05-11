@@ -130,6 +130,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			}
 			//轮廓类型 1：矩形 ,2：标注轮廓 3:精细轮廓
 			annotation.setContourType(2L);
+			annotation.setMagnification(40000L);
 			List<Annotation> annoList = annotationMapper.selectListBy(annotation);
 			List<Long> annoSlideIdList = annoList.stream().map(Annotation::getSlideId).collect(Collectors.toList());
 			if(CollectionUtils.isNotEmpty(annoSlideIdList)){
@@ -428,6 +429,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 				}
 				annotation.setSlideIdList(slideIdList);
 			}
+			annotation.setMagnification(40000L);
 			List<Annotation> annoList = annotationMapper.selectListBy(annotation);
 			List<Long> annoSlideIdList = annoList.stream().map(Annotation::getSlideId).collect(Collectors.toList());
 			if(CollectionUtils.isNotEmpty(annoSlideIdList)){
