@@ -1,6 +1,7 @@
 package cn.staitech.fr;
 
 import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
+import cn.staitech.fr.service.strategy.json.impl.FineContourParserStrategyImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,6 +17,8 @@ public class FileTest {
 
     @Resource
     JsonTaskParserService jsonTaskParserService;
+    @Resource
+    FineContourParserStrategyImpl parserStrategy;
 
 
     @Test
@@ -96,6 +99,13 @@ public class FileTest {
                 "\n";
         jsonTaskParserService.input(content);
 
+
+    }
+
+    @Test
+    public void process1231() {
+
+        parserStrategy.parseJson("C:\\Users\\Administrator\\Desktop\\ST16Rf-EY-HG-OE-282-1-000017-1F_10206D.json");
 
     }
 
