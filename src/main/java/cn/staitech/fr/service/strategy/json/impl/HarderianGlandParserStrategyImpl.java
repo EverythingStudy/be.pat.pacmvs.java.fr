@@ -49,7 +49,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
     @Resource
     private AnnotationMapper annotationMapper;
 
-    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap) {
+    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
         if (element.isObject()) {
             JsonNode node = element.get("id");
             // node 转换成String
@@ -115,8 +115,8 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
             annotation.setPerimeter(properties.getPerimeter());
             annotation.setCreateBy(0L);
             annotation.setCreateTime(String.valueOf(new Date()));
-            annotation.setProjectId(25L);
-            annotation.setSlideId(85L);
+            annotation.setProjectId(0L);
+
             if (null != geometry) {
                 annotation.setContour40000(geometry.toString());
             }
@@ -136,8 +136,8 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
                 log.info("categoryId解析失败");
                 return null;
             }
-            annotation.setSlideId(85L);
-            annotation.setSingleSlideId(131L);
+            annotation.setSlideId(jsonTask.getSlideId());
+            annotation.setSingleSlideId(jsonTask.getSingleId());
             annotation.setCategoryId(categoryId);
             annotation.setAnnotationType(annotationType.toUpperCase());
             return annotation;
@@ -164,10 +164,10 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         }
     }
 
-    private static Annotation processJsonElement(JsonNode element, ExecutorService executorService, Map<String, Long> pathologicalMap) {
+    private static Annotation processJsonElement(JsonNode element, ExecutorService executorService, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
 
         try {
-            Future<Annotation> future = executorService.submit(() -> HarderianGlandParserStrategyImpl.handleSingleJsonElement(element, pathologicalMap));
+            Future<Annotation> future = executorService.submit(() -> HarderianGlandParserStrategyImpl.handleSingleJsonElement(element, pathologicalMap, jsonTask));
             Annotation annotation = future.get();
             future.get(30, TimeUnit.SECONDS);  // 设定超时时间以避免无限等待
             return annotation;
@@ -184,7 +184,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
         ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
         QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
-        wrapper.eq("special_id", 25);
+        wrapper.eq("special_id", jsonTask.getSpecialId());
         SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
         Long sequenceNumber = annotationRel.getSequenceNumber();
         Annotation anno = new Annotation();
@@ -194,8 +194,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         File jsonFile = new File(filePath);
         QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
         // 查询所有未被删除且登录机构相同的数据
-        qw.eq("del_flag", 0)
-                .eq("organization_id", 1);
+        qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
         List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
         Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
 
@@ -214,7 +213,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
             AtomicInteger count = new AtomicInteger();
             elementsList.stream().forEach(element -> {
                 count.addAndGet(1);
-                Annotation annotation = processJsonElement(element, executorService, pathologicalMap);
+                Annotation annotation = processJsonElement(element, executorService, pathologicalMap, jsonTask);
                 if (!ObjectUtil.isEmpty(annotation)) {
                     arrayList.add(annotation);
                 }
@@ -232,7 +231,8 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         List<Annotation> annotations = annotation.getList();
         int listSize = annotations.size();
-//         分批处理
+
+        // 分批处理
         for (int i = 0; i < listSize; i += batchSize) {
             int endIndex = Math.min(i + batchSize, listSize);
             List<Annotation> batch = annotations.subList(i, endIndex);
@@ -250,7 +250,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
             });
         }
 
-//         等待所有任务完成
+        // 等待所有任务完成
         executor.shutdown();
         try {
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
@@ -258,6 +258,6 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
             // 处理中断异常
             Thread.currentThread().interrupt();
         }
-        System.out.println("集合总数：" + listSize);
+
     }
 }

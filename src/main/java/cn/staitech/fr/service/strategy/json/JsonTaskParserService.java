@@ -83,6 +83,7 @@ public class JsonTaskParserService {
             jsonTask.setImageId(Long.parseLong(jsonObject.get("imageId").toString()));
             jsonTask.setSlideId(Long.parseLong(jsonObject.get("slideId").toString()));
             jsonTask.setSingleId(Long.parseLong(jsonObject.get("singleId").toString()));
+            jsonTask.setSpecialId(Long.parseLong(jsonObject.get("specialId").toString()));
             jsonTask.setOrganizationId(Long.parseLong(jsonObject.get("organizationId").toString()));
 
             jsonTask.setCode(jsonObject.get("code").toString());

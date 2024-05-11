@@ -80,8 +80,9 @@ public class FileTest {
                 "  \"msg\": \"\",\n" +
                 "  \"algorithmCode\": \"Harderian_gland\",\n" +
                 "  \"imageId\":10906,\n" +
-                "  \"slideId\":1,\n" +
-                "  \"singleId\":144,\n" +
+                "  \"slideId\":85,\n" +
+                "  \"singleId\":130,\n" +
+                "  \"specialId\":25,\n" +
                 "  \"organizationId\":1,\n" +
                 "  \"data\": [\n" +
                 "    {\n" +
