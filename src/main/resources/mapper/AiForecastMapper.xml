@@ -17,4 +17,17 @@
         forecast_id,quantitative_indicators,results,
         range,create_by,create_time
     </sql>
+
+    <select id="getAiForecastBySingle" resultType="cn.staitech.fr.domain.out.AipreAirepostOut">
+        select DATE_FORMAT(aat.start_time, '%Y-%m-%d %H:%i') startTime,
+               aat.waste_time                                wasteTime,
+               am.algorithm_name,
+               am.model_version
+        from aipre_airepost aat
+                 left join aipre_algorithm am
+                           on aat.algorithm_id = am.algorithm_uuid
+        where aat.single_slide_id = #{singleId}
+        order by report_uuid desc limit 1
+
+    </select>
 </mapper>

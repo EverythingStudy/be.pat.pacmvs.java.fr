@@ -1,6 +1,7 @@
 package cn.staitech.fr.mapper;
 
 import cn.staitech.fr.domain.AiForecast;
+import cn.staitech.fr.domain.out.AipreAirepostOut;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -10,6 +11,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @Entity cn.staitech.fr.domain.AiForecast
 */
 public interface AiForecastMapper extends BaseMapper<AiForecast> {
+
+    AipreAirepostOut getAiForecastBySingle(Long singleId);
 
 }
 
