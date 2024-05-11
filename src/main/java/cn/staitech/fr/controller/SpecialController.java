@@ -173,7 +173,7 @@ public class SpecialController  extends BaseController {
     }
     
     @ApiOperation(value = "根据帐号查询昵称")
-    @GetMapping("/getLockLog")
+    @GetMapping("/getNickName")
     public R<String> getNickName(@RequestParam("userName") @ApiParam(name = "userName", value ="帐号名称" ) String userName){
     	//查询锁定记录
     	Map<String,Object> parm = new HashMap<>();
