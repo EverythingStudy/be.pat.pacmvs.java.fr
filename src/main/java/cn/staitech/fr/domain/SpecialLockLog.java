@@ -1,7 +1,10 @@
 package cn.staitech.fr.domain;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.util.Date;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
@@ -49,8 +52,12 @@ public class SpecialLockLog implements Serializable {
 
     @ApiModelProperty(value = "创建者")
     private Long createBy;
-
+    
+    @TableField(exist = false)
+    private String  nickName;
+    
     @ApiModelProperty(value = "创建时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
 

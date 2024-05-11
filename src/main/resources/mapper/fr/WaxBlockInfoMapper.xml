@@ -58,4 +58,18 @@
 			</if>
 			and t3.del_flag = '0'
     </select>
+    
+    <select id="getSpecialWaxBlockInfoList" parameterType="map" resultType="cn.staitech.fr.domain.WaxBlockInfo">
+	    SELECT
+			t3.* 
+		FROM
+			fr_special t1
+			LEFT JOIN fr_wax_block_number t2 ON t1.topic_id = t2.topic_id
+			LEFT JOIN fr_wax_block_info t3 ON t2.number_id = t3.number_id 
+		WHERE
+			t1.special_id = #{specialId}  
+			AND t3.del_flag = '0' 
+		ORDER BY
+			t3.wax_code
+    </select>
 </mapper>

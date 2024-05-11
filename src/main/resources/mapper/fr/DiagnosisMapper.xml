@@ -35,9 +35,16 @@
         remark, delete_flag, create_by, create_time, update_by, update_time,position_source,lesion_source,ddefinition_source,grade_source
     </sql>
 
-     <select id="selectUserById" parameterType="Long" resultType="cn.staitech.system.api.domain.SysUser">
+     <select id="selectUserById" parameterType="map" resultType="cn.staitech.system.api.domain.SysUser">
         select * from sys_user
-        where user_id = #{userId}
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="userName != null">
+                AND user_name = #{userName}
+            </if>
+        </where>
     </select>
 
     <select id="getExportListVO" resultType="cn.staitech.fr.domain.out.ExportListVO">

@@ -94,8 +94,10 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 				BeanUtils.copyProperties(diagn, vo);
 				Long createBy = diagn.getCreateBy();
 				//根据创建人查询名称
-				SysUser loginUser = diagnosisMapper.selectUserById(createBy);
-				vo.setCreateUser(loginUser.getNickName());
+				Map<String,Object> parm = new HashMap<>();
+				parm.put("userId", createBy);
+				List<SysUser> loginUserList = diagnosisMapper.selectUserById(parm);
+				vo.setCreateUser(loginUserList.get(0).getNickName());
 				if (createBy.equals(SecurityUtils.getLoginUser().getSysUser().getUserId())) {
 //														if (createBy.equals(1L)) {
 					vo.setEditStatus(1);

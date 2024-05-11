@@ -53,4 +53,12 @@ public class WaxBlockInfoServiceImpl extends ServiceImpl<WaxBlockInfoMapper, Wax
 		List<WaxBlockInfo> list = waxBlockInfoMapper.getWaxBlockInfoList(parm);
 		return list;
 	}
+
+	@Override
+	public List<WaxBlockInfo> getSpecialWaxBlockInfoList(Long specialId) {
+		Map<String,Object> parm = new HashMap<>();
+		parm.put("specialId", specialId);
+		List<WaxBlockInfo> list = waxBlockInfoMapper.getSpecialWaxBlockInfoList(parm);
+		return list;
+	}
 }
