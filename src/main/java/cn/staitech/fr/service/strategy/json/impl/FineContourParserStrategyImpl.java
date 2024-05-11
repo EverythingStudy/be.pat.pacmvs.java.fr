@@ -49,97 +49,6 @@ public class FineContourParserStrategyImpl implements ParserStrategy {
     @Resource
     private AnnotationMapper annotationMapper;
 
-    @Override
-    public List<JsonFile> parseJsonFileList(JsonTask jsonTask) {
-        return null;
-    }
-
-    @Override
-    public void submitTask(JsonTask jsonTask) {
-
-    }
-
-    @Override
-    public void parseJson(String filePath) {
-        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
-        QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
-        wrapper.eq("special_id", 25);
-        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
-        Long sequenceNumber = annotationRel.getSequenceNumber();
-        Annotation anno = new Annotation();
-        anno.setSequenceNumber(sequenceNumber);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonFactory jsonFactory = objectMapper.getFactory();
-        File jsonFile = new File(filePath);
-        QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
-        // 查询所有未被删除且登录机构相同的数据
-        qw.eq("del_flag", 0)
-                .eq("organization_id", 1);
-        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
-        Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
-
-        try (FileInputStream fis = new FileInputStream(jsonFile);
-             JsonParser jsonParser = jsonFactory.createParser(fis)) {
-
-            List<JsonNode> elementsList = new ArrayList<>();
-            while (!jsonParser.isClosed()) {
-                JsonToken token = jsonParser.nextToken();
-                if (token == null) break;
-                if (token == JsonToken.START_OBJECT) {
-                    processObjectNode(objectMapper, jsonParser, elementsList);
-                }
-            }
-            List<Annotation> arrayList = new ArrayList<>();
-            AtomicInteger count = new AtomicInteger();
-            elementsList.stream().forEach(element -> {
-                count.addAndGet(1);
-                Annotation annotation = processJsonElement(element, executorService, pathologicalMap);
-                if (!ObjectUtil.isEmpty(annotation)) {
-                    arrayList.add(annotation);
-                }
-            });
-            anno.setList(arrayList);
-        } catch (Exception e) {
-            log.error("Unexpected error occurred: " + e.getMessage(), e);
-        } finally {
-            executorService.shutdown();
-        }
-        batchProcessAndSave(anno, 1000, Runtime.getRuntime().availableProcessors());
-    }
-
-    public void batchProcessAndSave(Annotation annotation, int batchSize, int threadCount) {
-        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-        List<Annotation> annotations = annotation.getList();
-        int listSize = annotations.size();
-//         分批处理
-        for (int i = 0; i < listSize; i += batchSize) {
-            int endIndex = Math.min(i + batchSize, listSize);
-            List<Annotation> batch = annotations.subList(i, endIndex);
-            // 提交任务到线程池
-            executor.submit(() -> {
-                Annotation annotation1 = new Annotation();
-                annotation1.setSequenceNumber(annotation.getSequenceNumber());
-                annotation1.setList(batch);
-                try {
-                    annotationMapper.batchSave(annotation1);
-                } catch (Exception e) {
-                    // 处理异常，例如记录日志
-                    log.error("Error occurred while processing batch: " + e.getMessage(), e);
-                }
-            });
-        }
-
-//         等待所有任务完成
-        executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            // 处理中断异常
-            Thread.currentThread().interrupt();
-        }
-        System.out.println("集合总数：" + listSize);
-    }
-
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap) {
         if (element.isObject()) {
             JsonNode node = element.get("id");
@@ -266,5 +175,89 @@ public class FineContourParserStrategyImpl implements ParserStrategy {
             e.printStackTrace();
         }
         return null;
+    }
+
+
+    @Override
+    public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
+        String filePath = jsonFileS.getFileUrl();
+
+        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
+        QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
+        wrapper.eq("special_id", 25);
+        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
+        Long sequenceNumber = annotationRel.getSequenceNumber();
+        Annotation anno = new Annotation();
+        anno.setSequenceNumber(sequenceNumber);
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonFactory jsonFactory = objectMapper.getFactory();
+        File jsonFile = new File(filePath);
+        QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
+        // 查询所有未被删除且登录机构相同的数据
+        qw.eq("del_flag", 0)
+                .eq("organization_id", 1);
+        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
+        Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+
+        try (FileInputStream fis = new FileInputStream(jsonFile);
+             JsonParser jsonParser = jsonFactory.createParser(fis)) {
+
+            List<JsonNode> elementsList = new ArrayList<>();
+            while (!jsonParser.isClosed()) {
+                JsonToken token = jsonParser.nextToken();
+                if (token == null) break;
+                if (token == JsonToken.START_OBJECT) {
+                    processObjectNode(objectMapper, jsonParser, elementsList);
+                }
+            }
+            List<Annotation> arrayList = new ArrayList<>();
+            AtomicInteger count = new AtomicInteger();
+            elementsList.stream().forEach(element -> {
+                count.addAndGet(1);
+                Annotation annotation = processJsonElement(element, executorService, pathologicalMap);
+                if (!ObjectUtil.isEmpty(annotation)) {
+                    arrayList.add(annotation);
+                }
+            });
+            anno.setList(arrayList);
+        } catch (Exception e) {
+            log.error("Unexpected error occurred: " + e.getMessage(), e);
+        } finally {
+            executorService.shutdown();
+        }
+        batchProcessAndSave(anno, 1000, Runtime.getRuntime().availableProcessors());
+    }
+
+    public void batchProcessAndSave(Annotation annotation, int batchSize, int threadCount) {
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        List<Annotation> annotations = annotation.getList();
+        int listSize = annotations.size();
+//         分批处理
+        for (int i = 0; i < listSize; i += batchSize) {
+            int endIndex = Math.min(i + batchSize, listSize);
+            List<Annotation> batch = annotations.subList(i, endIndex);
+            // 提交任务到线程池
+            executor.submit(() -> {
+                Annotation annotation1 = new Annotation();
+                annotation1.setSequenceNumber(annotation.getSequenceNumber());
+                annotation1.setList(batch);
+                try {
+                    annotationMapper.batchSave(annotation1);
+                } catch (Exception e) {
+                    // 处理异常，例如记录日志
+                    log.error("Error occurred while processing batch: " + e.getMessage(), e);
+                }
+            });
+        }
+
+//         等待所有任务完成
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            // 处理中断异常
+            Thread.currentThread().interrupt();
+        }
+        System.out.println("集合总数：" + listSize);
     }
 }

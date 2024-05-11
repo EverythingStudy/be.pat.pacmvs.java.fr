@@ -1,7 +1,6 @@
 package cn.staitech.fr;
 
 import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
-import cn.staitech.fr.service.strategy.json.impl.FineContourParserStrategyImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -17,8 +16,9 @@ public class FileTest {
 
     @Resource
     JsonTaskParserService jsonTaskParserService;
-    @Resource
-    FineContourParserStrategyImpl parserStrategy;
+
+//    @Resource
+//    FineContourParserStrategyImpl parserStrategy;
 
 
     @Test
@@ -73,6 +73,8 @@ public class FileTest {
 //                "}";
 
 
+        // Harderian_gland   Lacrimal_gland
+
         String content = "{\n" +
                 "  \"code\": \"200\",\n" +
                 "  \"msg\": \"\",\n" +
@@ -84,15 +86,11 @@ public class FileTest {
                 "  \"data\": [\n" +
                 "    {\n" +
                 "      \"structureName\": \"cell\",\n" +
-                "      \"fileUrl\": \"./result_new/16906E.json\"\n" +
+                "      \"fileUrl\": \"D:/2.0-20240510/hsx/ST16Rf-EY-HG-OE-282-1-000017-1F_10206D.json\"\n" +
                 "    },\n" +
                 "    {\n" +
                 "      \"structureName\": \"cell\",\n" +
-                "      \"fileUrl\": \"./result_new/16906E.json\"\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"structureName\": \"cell\",\n" +
-                "      \"fileUrl\": \"./result_new/16906E.json\"\n" +
+                "      \"fileUrl\": \"D:/2.0-20240510/hsx/ST16Rf-EY-HG-OE-282-1-000017-1F_10206E.json\"\n" +
                 "    }\n" +
                 "  ]\n" +
                 "}\n" +
@@ -101,13 +99,13 @@ public class FileTest {
 
 
     }
-
-    @Test
-    public void process1231() {
-
-        parserStrategy.parseJson("C:\\Users\\Administrator\\Desktop\\ST16Rf-EY-HG-OE-282-1-000017-1F_10206D.json");
-
-    }
+//
+//    @Test
+//    public void process1231() {
+//
+//        parserStrategy.parseJson("C:\\Users\\Administrator\\Desktop\\ST16Rf-EY-HG-OE-282-1-000017-1F_10206D.json");
+//
+//    }
 
 
 }

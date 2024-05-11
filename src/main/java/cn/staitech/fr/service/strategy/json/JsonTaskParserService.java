@@ -35,7 +35,6 @@ public class JsonTaskParserService {
 
 
     public void input(String input) {
-
         JSONObject jsonObject = JSON.parseObject(input);
 
         // 空数据返回
@@ -58,19 +57,16 @@ public class JsonTaskParserService {
 
         // 解析文件路径，并存入MySQL
         List<JsonFile> jsonFileList = parseJsonFileList(jsonTask);
-
         log.info("jsonFileList:{}", jsonFileList);
-
 
         // 获取解析器
         ParserStrategy parser = parserStrategyFactory.getParserStrategy(jsonTask.getAlgorithmCode());
-        // 解析文件路径，并存入MySQL
-//        List<JsonFile> jsonFileList = parser.parseJsonFileList(jsonTask);
-//        log.info("jsonFileList:{}", jsonFileList);
 
-        // 调用策略提交任务
-        // parser.parseJson();
-
+        for (JsonFile jsonFile : jsonFileList) {
+            // TODO:异步线程池
+            // 调用策略提交任务
+            parser.parseJson(jsonTask, jsonFile);
+        }
     }
 
     /**
