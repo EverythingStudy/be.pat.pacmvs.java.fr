@@ -1,6 +1,7 @@
 package cn.staitech.fr.domain;
 
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -52,5 +53,12 @@ public class JsonTask implements Serializable {
     private Date createTime;
     //更新时间
     private Date updateTime;
+
+    @TableField(exist = false)
+    private String algorithmName;
+
+    @TableField(exist = false)
+    //private String fileUrlList;
+    private String[] fileUrlList;
 }
 

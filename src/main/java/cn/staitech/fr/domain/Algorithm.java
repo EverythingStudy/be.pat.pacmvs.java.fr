@@ -1,6 +1,7 @@
 package cn.staitech.fr.domain;
 
-
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -18,6 +19,7 @@ public class Algorithm implements Serializable {
 
     private static final long serialVersionUID = -64526478340427455L;
 
+    @TableId(type = IdType.AUTO)
     private Integer algorithmUuid;
 
     private String algorithmName;
