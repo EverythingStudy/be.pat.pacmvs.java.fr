@@ -14,25 +14,41 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.*;
 
 /**
  * @author: wangfeng
  * @create: 2024-05-10 15:52:39
  * @Description:
+ *
+ * https://www.cnblogs.com/hanzeng1993/p/15693336.html
+ * https://blog.csdn.net/qq_45871274/article/details/130223673
+ *
  */
 @Service
 @Slf4j
 public class JsonTaskParserService {
 
+    public static final ExecutorService jsonTaskExecutorService = new ThreadPoolExecutor(
+            Runtime.getRuntime().availableProcessors(),
+            Runtime.getRuntime().availableProcessors() * 2,
+            // 空闲线程等待工作的超时时间
+            10L,
+            TimeUnit.SECONDS,
+            new LinkedBlockingQueue<Runnable>(4096),
+            new ThreadFactory() {
+                public Thread newThread(Runnable r) {
+                    return new Thread(r, "json-task-service-thread-" + r.hashCode());
+                }
+            },
+            new ThreadPoolExecutor.DiscardOldestPolicy());
+
     @Resource
     JsonTaskService jsonTaskService;
-
     @Resource
     JsonFileService jsonFileService;
-
     @Resource
     ParserStrategyFactory parserStrategyFactory;
-
 
     public void input(String input) {
         JSONObject jsonObject = JSON.parseObject(input);

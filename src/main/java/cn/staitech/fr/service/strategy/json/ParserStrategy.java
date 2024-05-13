@@ -10,7 +10,19 @@ import cn.staitech.fr.domain.JsonTask;
  */
 
 public interface ParserStrategy {
+    
+    /**
+     * 单个Json文件解析
+     *
+     * @param jsonTask
+     * @param jsonFile
+     */
     void parseJson(JsonTask jsonTask, JsonFile jsonFile);
 
+    /**
+     * 指标计算
+     *
+     * @param jsonTask
+     */
     void alculationIndicators(JsonTask jsonTask);
 }

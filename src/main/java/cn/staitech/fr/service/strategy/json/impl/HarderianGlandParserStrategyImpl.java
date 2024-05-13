@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 /**
  * @author: wangfeng
  * @create: 2024-05-10 14:18:48
- * @Description: Harderian_gland Json Parser
+ * @Description: Harderian_gland Json Parser 哈氏腺
  */
 @Slf4j
 @Component("Harderian_gland")
@@ -276,6 +276,5 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
             // 处理中断异常
             Thread.currentThread().interrupt();
         }
-
     }
 }

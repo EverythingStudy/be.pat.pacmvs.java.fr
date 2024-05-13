@@ -22,8 +22,5 @@ public class GlamPointsPytorchParserStrategyImpl implements ParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-
     }
-
-
 }
