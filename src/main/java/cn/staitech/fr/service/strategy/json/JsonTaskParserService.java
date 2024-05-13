@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -156,26 +157,30 @@ public class JsonTaskParserService {
      * @return
      */
     private List<JsonFile> parseJsonFileList(JsonTask task) {
-        JSONArray jsonArray = new JSONArray(task.getData());
+    	JSONArray jsonArray;
+    	List<JsonFile> list = new ArrayList<>();
+    	try {
+    		jsonArray = new JSONArray(task.getData());
+    		for (int i = 0; i < jsonArray.length(); i++) {
+    			org.json.JSONObject jsonObject = jsonArray.getJSONObject(i);
+    			JsonFile jsonFile = new JsonFile();
 
-        List<JsonFile> list = new ArrayList<>();
+    			jsonFile.setStructureName(jsonObject.has("structureName") ? jsonObject.getString("structureName") : "");
+    			jsonFile.setFileUrl(jsonObject.has("fileUrl") ? jsonObject.getString("fileUrl") : "");
 
-        for (int i = 0; i < jsonArray.length(); i++) {
-            org.json.JSONObject jsonObject = jsonArray.getJSONObject(i);
-            JsonFile jsonFile = new JsonFile();
+    			jsonFile.setTaskId(task.getTaskId());
+    			jsonFile.setStatus(0);
 
-            jsonFile.setStructureName(jsonObject.has("structureName") ? jsonObject.getString("structureName") : "");
-            jsonFile.setFileUrl(jsonObject.has("fileUrl") ? jsonObject.getString("fileUrl") : "");
+    			jsonFile.setCreateTime(new Date());
+    			jsonFile.setStartTime(new Date());
 
-            jsonFile.setTaskId(task.getTaskId());
-            jsonFile.setStatus(0);
-
-            jsonFile.setCreateTime(new Date());
-            jsonFile.setStartTime(new Date());
-
-            list.add(jsonFile);
-        }
-        jsonFileService.saveBatch(list);
-        return list;
+    			list.add(jsonFile);
+    		}
+    		jsonFileService.saveBatch(list);
+    	} catch (JSONException e) {
+    		e.printStackTrace();
+    		log.error("解析文件处理失败:{},taskId是{},singleId是{}",e,task.getTaskId(),task.getSingleId());
+    	}
+    	return list;
     }
 }
