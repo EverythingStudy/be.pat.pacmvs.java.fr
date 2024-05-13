@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -15,12 +16,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author: wangfeng
  * @create: 2024-05-10 15:52:39
  * @Description:
- *
  */
 @Service
 @Slf4j
@@ -70,19 +71,48 @@ public class JsonTaskParserService {
         // 解析文件路径，并存入MySQL
         List<JsonFile> jsonFileList = parseJsonFileList(jsonTask);
         log.info("jsonFileList:{}", jsonFileList);
+        int count = jsonFileList.size();
+        if (count == 0) {
+            return;
+        }
 
         // 获取解析器
         ParserStrategy parser = parserStrategyFactory.getParserStrategy(algorithmCode);
 
+        CountDownLatch countDownLatch = new CountDownLatch(count);
+
+        AtomicInteger id = new AtomicInteger();
+        // 线程池 异步  调用策略提交任务
         for (JsonFile jsonFile : jsonFileList) {
-            // TODO:异步线程池
-            // 调用策略提交任务
-            parser.parseJson(jsonTask, jsonFile);
+            try {
+                jsonTaskExecutorService.submit(() -> {
+                            log.info("---> {} {}", id.getAndIncrement(), jsonFile.getFileUrl());
+                            parser.parseJson(jsonTask, jsonFile);
+                        }
+                );
+            } catch (Exception e) {
+
+            } finally {
+                countDownLatch.countDown();
+            }
         }
 
-        // 指标计算
-        parser.alculationIndicators(jsonTask);
+        // 避免主线程无法执行到
+        try {
+            countDownLatch.await(10000, TimeUnit.MICROSECONDS);
 
+            // 指标计算
+            parser.alculationIndicators(jsonTask);
+
+            // 修改任务状态
+            jsonTask.setStatus(1);
+            jsonTaskService.updateById(jsonTask);
+
+        } catch (InterruptedException e) {
+
+        } finally {
+
+        }
     }
 
     /**
@@ -127,26 +157,30 @@ public class JsonTaskParserService {
      * @return
      */
     private List<JsonFile> parseJsonFileList(JsonTask task) {
-        JSONArray jsonArray = new JSONArray(task.getData());
+    	JSONArray jsonArray;
+    	List<JsonFile> list = new ArrayList<>();
+    	try {
+    		jsonArray = new JSONArray(task.getData());
+    		for (int i = 0; i < jsonArray.length(); i++) {
+    			org.json.JSONObject jsonObject = jsonArray.getJSONObject(i);
+    			JsonFile jsonFile = new JsonFile();
 
-        List<JsonFile> list = new ArrayList<>();
+    			jsonFile.setStructureName(jsonObject.has("structureName") ? jsonObject.getString("structureName") : "");
+    			jsonFile.setFileUrl(jsonObject.has("fileUrl") ? jsonObject.getString("fileUrl") : "");
 
-        for (int i = 0; i < jsonArray.length(); i++) {
-            org.json.JSONObject jsonObject = jsonArray.getJSONObject(i);
-            JsonFile jsonFile = new JsonFile();
+    			jsonFile.setTaskId(task.getTaskId());
+    			jsonFile.setStatus(0);
 
-            jsonFile.setStructureName(jsonObject.has("structureName") ? jsonObject.getString("structureName") : "");
-            jsonFile.setFileUrl(jsonObject.has("fileUrl") ? jsonObject.getString("fileUrl") : "");
+    			jsonFile.setCreateTime(new Date());
+    			jsonFile.setStartTime(new Date());
 
-            jsonFile.setTaskId(task.getTaskId());
-            jsonFile.setStatus(0);
-
-            jsonFile.setCreateTime(new Date());
-            jsonFile.setStartTime(new Date());
-
-            list.add(jsonFile);
-        }
-        jsonFileService.saveBatch(list);
-        return list;
+    			list.add(jsonFile);
+    		}
+    		jsonFileService.saveBatch(list);
+    	} catch (JSONException e) {
+    		e.printStackTrace();
+    		log.error("解析文件处理失败:{},taskId是{},singleId是{}",e,task.getTaskId(),task.getSingleId());
+    	}
+    	return list;
     }
 }
