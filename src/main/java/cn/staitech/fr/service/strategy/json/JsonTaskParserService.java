@@ -47,6 +47,9 @@ public class JsonTaskParserService {
     JsonFileService jsonFileService;
     @Resource
     ParserStrategyFactory parserStrategyFactory;
+    @Resource
+    private List<CustomParserStrategy> customParserStrategies;
+
 
     public void input(String input) {
         JSONObject jsonObject = JSON.parseObject(input);
@@ -78,6 +81,13 @@ public class JsonTaskParserService {
 
         // 获取解析器
         ParserStrategy parser = parserStrategyFactory.getParserStrategy(algorithmCode);
+        if (parser == null){
+            for (CustomParserStrategy parserStrategy : customParserStrategies){
+                if (parserStrategy.getAlgorithmCode().equals(algorithmCode)){
+                    parser = parserStrategy;
+                }
+            }
+        }
 
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
@@ -85,9 +95,10 @@ public class JsonTaskParserService {
         // 线程池 异步  调用策略提交任务
         for (JsonFile jsonFile : jsonFileList) {
             try {
+                ParserStrategy finalParser = parser;
                 jsonTaskExecutorService.submit(() -> {
                             log.info("---> {} {}", id.getAndIncrement(), jsonFile.getFileUrl());
-                            parser.parseJson(jsonTask, jsonFile);
+                            finalParser.parseJson(jsonTask, jsonFile);
                         }
                 );
             } catch (Exception e) {
