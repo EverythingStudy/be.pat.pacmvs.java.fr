@@ -60,6 +60,10 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     List<Annotation> getAnnoListByParm(List<Long> slideIdList);
 
+    Annotation collectGeometry(Long singleSlideId);
+
+    Annotation intersectsGeometry(Annotation annotation);
+
 }
 
 

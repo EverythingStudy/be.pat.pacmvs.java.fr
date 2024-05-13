@@ -3,6 +3,8 @@ package cn.staitech.fr.controller;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.utils.uuid.UUID;
 import cn.staitech.common.security.utils.SecurityUtils;
+import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.fr.vo.annotation.AnnotationById;
@@ -31,6 +33,20 @@ public class AnnotationController {
 
     @Resource
     private AnnotationService annotationService;
+
+    @Resource
+    private AnnotationMapper annotationMapper;
+
+    @PostMapping("/intersects")
+    public R<String> intersects(@RequestBody ViewAddIn res)  {
+        Annotation annotation = annotationMapper.collectGeometry(133L);
+        annotation.setContour(String.valueOf(res.getGeometry()));
+        Annotation annotationBy = annotationMapper.intersectsGeometry(annotation);
+        // annotationBy.getIntersectsResults()=t代表true,f代表false
+        // 结果等于true表示当前ai轮廓在精细轮廓中(可插入数据库),反之相反
+        return R.ok(annotationBy.getIntersectsResults());
+    }
+
 
     @ApiOperation(value = "添加标注")
     @PostMapping("/insert")

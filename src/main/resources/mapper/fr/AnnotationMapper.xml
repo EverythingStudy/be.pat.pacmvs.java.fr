@@ -88,7 +88,7 @@
             <if test="annotationType != null and annotationType != ''">annotation_type = #{annotationType},</if>
             <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
             <if test="contour != null">
-            contour40000 = st_geomfromgeojson(#{contour}),
+                contour40000 = st_geomfromgeojson(#{contour}),
             </if>
             <if test="id != null and id != ''">id = #{id},</if>
             update_time = now()
@@ -113,8 +113,11 @@
     </select>
 
     <insert id="createTableSequence" parameterType="cn.staitech.fr.domain.Annotation">
-        DROP SEQUENCE IF EXISTS fr_ai_annotation_${sequenceNumber}_annotation_id_seq;
-	    CREATE SEQUENCE fr_ai_annotation_${sequenceNumber}_annotation_id_seq START 1;
+        DROP
+        SEQUENCE IF EXISTS fr_ai_annotation_${sequenceNumber}_annotation_id_seq;
+	    CREATE
+        SEQUENCE fr_ai_annotation_${sequenceNumber}_annotation_id_seq START
+        1;
     </insert>
 
     <select id="getArea" parameterType="cn.staitech.fr.domain.Annotation"
@@ -233,7 +236,7 @@
     </insert>
 
 
-    <insert id="batchSave"  parameterType="cn.staitech.fr.domain.Annotation">
+    <insert id="batchSave" parameterType="cn.staitech.fr.domain.Annotation">
         insert into fr_ai_annotation_${sequenceNumber} (
         area,
         perimeter,
@@ -272,7 +275,6 @@
     </insert>
 
 
-
     <select id="selectById" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
         select annotation_id,
@@ -293,8 +295,8 @@
                single,
                ST_AsGeoJSON(contour40000) AS contour40000,
                ST_AsGeoJSON(contour10000) AS contour10000,
-               ST_AsGeoJSON(contour2500) AS contour2500,
-               ST_AsGeoJSON(contour625) AS contour625
+               ST_AsGeoJSON(contour2500)  AS contour2500,
+               ST_AsGeoJSON(contour625)   AS contour625
         from fr_annotation
         where annotation_id = #{annotationId}
     </select>
@@ -302,23 +304,23 @@
     <select id="selectListBy" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
         select
-            annotation_id,
-            area,
-            perimeter,
-            description,
-            category_id,
-            location_type,
-            annotation_type,
-            create_by,
-            create_time,
-            update_by,
-            update_time,
-            slide_id,
-            id,
-            contour_type,
-            ST_AsGeoJSON(contour${magnification}) as contour,
-            single_slide_id,
-            single
+        annotation_id,
+        area,
+        perimeter,
+        description,
+        category_id,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        slide_id,
+        id,
+        contour_type,
+        ST_AsGeoJSON(contour${magnification}) as contour,
+        single_slide_id,
+        single
         from fr_annotation
         <where>
             contour_type != 1
@@ -352,7 +354,6 @@
             </if>
         </where>
     </select>
-
 
 
     <select id="aiSelectListBy" parameterType="cn.staitech.fr.domain.Annotation"
@@ -405,13 +406,11 @@
         SELECT GeometryType(st_geomfromgeojson(#{contour})) as location_type
     </select>
 
-
     <delete id="deleteById" parameterType="cn.staitech.fr.domain.Annotation">
         delete
         from fr_annotation
         where annotation_id = #{annotationId}
     </delete>
-
 
     <select id="selectInList" parameterType="cn.staitech.fr.vo.annotation.MarkingMerge"
             resultMap="BaseResultMap">
@@ -454,7 +453,7 @@
         select t.category_id, count(1) total_count
         from fr_annotation t
         where t.slide_id = #{slideId}
-        and t.contour_type = 2
+          and t.contour_type = 2
         GROUP BY t.category_id
     </select>
 
@@ -481,5 +480,16 @@
             #{item}
         </foreach>
         and contour_type = 2
+    </select>
+
+    <select id="collectGeometry" parameterType="long" resultMap="BaseResultMap">
+        SELECT st_asgeojson(ST_Collect(contour40000)) as collectContour
+        FROM fr_annotation
+        WHERE single_slide_id = #{singleSlideId}
+          AND contour_type = 3
+    </select>
+
+    <select id="intersectsGeometry" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT ST_Intersects(st_geomfromgeojson(#{collectContour}), st_geomfromgeojson(#{contour})) as intersectsResults
     </select>
 </mapper>

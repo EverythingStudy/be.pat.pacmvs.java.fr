@@ -135,7 +135,13 @@ public class Annotation implements Serializable {
     private Long magnification;
 
     @TableField(exist = false)
+    private String collectContour;
+
+    @TableField(exist = false)
     private List<Annotation> list;
+
+    @TableField(exist = false)
+    private String intersectsResults;
 
     @Override
     public boolean equals(Object that) {
