@@ -3,7 +3,10 @@ package cn.staitech.fr.service.strategy.json.impl;
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
+import cn.staitech.fr.mapper.SingleSlideMapper;
+import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import cn.staitech.fr.vo.geojson.Properties;
@@ -30,7 +33,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -214,12 +216,16 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
                 }
             }
             List<Annotation> arrayList = new ArrayList<>();
-            AtomicInteger count = new AtomicInteger();
+            // todo 可优化
+            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
             elementsList.stream().forEach(element -> {
-                count.addAndGet(1);
                 Annotation annotation = processJsonElement(element, executorService, pathologicalMap, jsonTask);
                 if (!ObjectUtil.isEmpty(annotation)) {
-                    arrayList.add(annotation);
+                    annotation1.setContour(annotation.getContour40000());
+                    Annotation annotationBy = annotationMapper.intersectsGeometry(annotation1);
+                    if (ObjectUtil.equals("t", annotationBy.getIntersectsResults())) {
+                        arrayList.add(annotation);
+                    }
                 }
             });
             anno.setList(arrayList);
@@ -228,6 +234,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         } finally {
             executorService.shutdown();
         }
+
         batchProcessAndSave(anno, 1000, Runtime.getRuntime().availableProcessors());
 
     }
