@@ -21,9 +21,6 @@ import java.util.concurrent.*;
  * @create: 2024-05-10 15:52:39
  * @Description:
  *
- * https://www.cnblogs.com/hanzeng1993/p/15693336.html
- * https://blog.csdn.net/qq_45871274/article/details/130223673
- *
  */
 @Service
 @Slf4j

@@ -21,8 +21,11 @@ public class FileTest {
 //    FineContourParserStrategyImpl parserStrategy;
 
 
+    /**
+     * Harderian_gland 哈氏腺
+     */
     @Test
-    public void process() {
+    public void processHarderian_gland() {
 //        String content = "{\n" +
 //                "  \"code\": \"200\",\n" +
 //                "  \"msg\": \"\",\n" +
@@ -99,6 +102,82 @@ public class FileTest {
 
         jsonTaskParserService.input(content);
     }
+
+
+    /**
+     * MouseThyroid 大鼠甲状腺
+     */
+    @Test
+    public void processMouseThyroid() {
+        String content = "{\n" +
+                "  \"code\": \"200\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"algorithmCode\": \"MouseThyroid\",\n" +
+                "  \"imageId\":10906,\n" +
+                "  \"slideId\":85,\n" +
+                "  \"singleId\":130,\n" +
+                "  \"specialId\":25,\n" +
+                "  \"organizationId\":1,\n" +
+                "  \"data\": [\n" +
+                "    {\n" +
+                "      \"structureName\": \"cell1\",\n" +
+                "      \"fileUrl\": \"D:/2.0-20240510/FeatureCollection/ST20Rf-PD-TG-320-1-000016/10708A.json\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"structureName\": \"cell2\",\n" +
+                "      \"fileUrl\": \"D:/2.0-20240510/FeatureCollection/ST20Rf-PD-TG-320-1-000016/10708D.json\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"structureName\": \"cell3\",\n" +
+                "      \"fileUrl\": \"D:/2.0-20240510/FeatureCollection/ST20Rf-PD-TG-320-1-000016/107003.json\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"structureName\": \"cell4\",\n" +
+                "      \"fileUrl\": \"D:/2.0-20240510/FeatureCollection/ST20Rf-PD-TG-320-1-000016/107004.json\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"structureName\": \"cell5\",\n" +
+                "      \"fileUrl\": \"D:/2.0-20240510/FeatureCollection/ST20Rf-PD-TG-320-1-000016/107088.json\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"structureName\": \"cell6\",\n" +
+                "      \"fileUrl\": \"D:/2.0-20240510/FeatureCollection/ST20Rf-PD-TG-320-1-000016/107089.json\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}\n" +
+                "\n";
+
+        jsonTaskParserService.input(content);
+    }
+
+
+    /**
+     * MouseEpencephalon 大鼠小脑
+     */
+    @Test
+    public void processMouseEepencephalon() {
+        String content = "{\n" +
+                "  \"code\": \"200\",\n" +
+                "  \"msg\": \"\",\n" +
+                "  \"algorithmCode\": \"MouseEpencephalon\",\n" +
+                "  \"imageId\":10906,\n" +
+                "  \"slideId\":85,\n" +
+                "  \"singleId\":130,\n" +
+                "  \"specialId\":25,\n" +
+                "  \"organizationId\":1,\n" +
+                "  \"data\": [\n" +
+                "    {\n" +
+                "      \"structureName\": \"cell7\",\n" +
+                "      \"fileUrl\": \"D:/2.0-20240510/ST20Rf-BR-SC-277-1-000016_CM_0/13E0A5.json\"\n" +
+                "    }\n" +
+                "  ]\n" +
+                "}\n" +
+                "\n";
+
+        jsonTaskParserService.input(content);
+    }
+
+
 //
 //    @Test
 //    public void process1231() {
@@ -106,6 +185,4 @@ public class FileTest {
 //        parserStrategy.parseJson("C:\\Users\\Administrator\\Desktop\\ST16Rf-EY-HG-OE-282-1-000017-1F_10206D.json");
 //
 //    }
-
-
 }
