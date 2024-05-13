@@ -43,10 +43,13 @@ public class JsonTaskParserService {
 
     @Resource
     JsonTaskService jsonTaskService;
+
     @Resource
     JsonFileService jsonFileService;
+
     @Resource
     ParserStrategyFactory parserStrategyFactory;
+
     @Resource
     private List<CustomParserStrategy> customParserStrategies;
 
@@ -81,13 +84,28 @@ public class JsonTaskParserService {
 
         // 获取解析器
         ParserStrategy parser = parserStrategyFactory.getParserStrategy(algorithmCode);
-        if (parser == null){
-            for (CustomParserStrategy parserStrategy : customParserStrategies){
-                if (parserStrategy.getAlgorithmCode().equals(algorithmCode)){
+        if (parser == null) {
+            for (CustomParserStrategy parserStrategy : customParserStrategies) {
+                if (parserStrategy.getAlgorithmCode().equals(algorithmCode)) {
                     parser = parserStrategy;
                 }
             }
         }
+
+
+//        // 线程池 异步  调用策略提交任务
+//        for (JsonFile jsonFile : jsonFileList) {
+//            ParserStrategy finalParser = parser;
+//            finalParser.parseJson(jsonTask, jsonFile);
+//        }
+//
+//        // 指标计算
+//        parser.alculationIndicators(jsonTask);
+//
+//        // 修改任务状态
+//        jsonTask.setStatus(1);
+//        jsonTaskService.updateById(jsonTask);
+
 
         CountDownLatch countDownLatch = new CountDownLatch(count);
 
@@ -108,22 +126,12 @@ public class JsonTaskParserService {
             }
         }
 
-        // 避免主线程无法执行到
-        try {
-            countDownLatch.await(10000, TimeUnit.MICROSECONDS);
+        // 指标计算
+        parser.alculationIndicators(jsonTask);
+        // 修改任务状态
+        jsonTask.setStatus(1);
+        jsonTaskService.updateById(jsonTask);
 
-            // 指标计算
-            parser.alculationIndicators(jsonTask);
-
-            // 修改任务状态
-            jsonTask.setStatus(1);
-            jsonTaskService.updateById(jsonTask);
-
-        } catch (InterruptedException e) {
-
-        } finally {
-
-        }
     }
 
     /**
@@ -168,30 +176,30 @@ public class JsonTaskParserService {
      * @return
      */
     private List<JsonFile> parseJsonFileList(JsonTask task) {
-    	JSONArray jsonArray;
-    	List<JsonFile> list = new ArrayList<>();
-    	try {
-    		jsonArray = new JSONArray(task.getData());
-    		for (int i = 0; i < jsonArray.length(); i++) {
-    			org.json.JSONObject jsonObject = jsonArray.getJSONObject(i);
-    			JsonFile jsonFile = new JsonFile();
+        JSONArray jsonArray;
+        List<JsonFile> list = new ArrayList<>();
+        try {
+            jsonArray = new JSONArray(task.getData());
+            for (int i = 0; i < jsonArray.length(); i++) {
+                org.json.JSONObject jsonObject = jsonArray.getJSONObject(i);
+                JsonFile jsonFile = new JsonFile();
 
-    			jsonFile.setStructureName(jsonObject.has("structureName") ? jsonObject.getString("structureName") : "");
-    			jsonFile.setFileUrl(jsonObject.has("fileUrl") ? jsonObject.getString("fileUrl") : "");
+                jsonFile.setStructureName(jsonObject.has("structureName") ? jsonObject.getString("structureName") : "");
+                jsonFile.setFileUrl(jsonObject.has("fileUrl") ? jsonObject.getString("fileUrl") : "");
 
-    			jsonFile.setTaskId(task.getTaskId());
-    			jsonFile.setStatus(0);
+                jsonFile.setTaskId(task.getTaskId());
+                jsonFile.setStatus(0);
 
-    			jsonFile.setCreateTime(new Date());
-    			jsonFile.setStartTime(new Date());
+                jsonFile.setCreateTime(new Date());
+                jsonFile.setStartTime(new Date());
 
-    			list.add(jsonFile);
-    		}
-    		jsonFileService.saveBatch(list);
-    	} catch (JSONException e) {
-    		e.printStackTrace();
-    		log.error("解析文件处理失败:{},taskId是{},singleId是{}",e,task.getTaskId(),task.getSingleId());
-    	}
-    	return list;
+                list.add(jsonFile);
+            }
+            jsonFileService.saveBatch(list);
+        } catch (JSONException e) {
+            e.printStackTrace();
+            log.error("解析文件处理失败:{},taskId是{},singleId是{}", e, task.getTaskId(), task.getSingleId());
+        }
+        return list;
     }
 }

@@ -217,15 +217,15 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
             }
             List<Annotation> arrayList = new ArrayList<>();
             // todo 可优化
-            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
+//            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
             elementsList.stream().forEach(element -> {
                 Annotation annotation = processJsonElement(element, executorService, pathologicalMap, jsonTask);
                 if (!ObjectUtil.isEmpty(annotation)) {
-                    annotation1.setContour(annotation.getContour40000());
-                    Annotation annotationBy = annotationMapper.intersectsGeometry(annotation1);
-                    if (ObjectUtil.equals("t", annotationBy.getIntersectsResults())) {
+//                    annotation1.setContour(annotation.getContour40000());
+//                    Annotation annotationBy = annotationMapper.intersectsGeometry(annotation1);
+//                    if (ObjectUtil.equals("t", annotationBy.getIntersectsResults())) {
                         arrayList.add(annotation);
-                    }
+//                    }
                 }
             });
             anno.setList(arrayList);
