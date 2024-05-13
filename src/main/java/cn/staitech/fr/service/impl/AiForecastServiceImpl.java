@@ -55,7 +55,7 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
                 return false;
             }
             double resolutions = Double.parseDouble(image.getResolutionX());
-            double areas = Double.parseDouble(annotationBy.getArea()) * resolutions * resolutions;
+            double areas = (Double.parseDouble(annotationBy.getArea()) * resolutions * resolutions) * 0.000001;
             String area = String.format("%.3f", areas);
             annotationBy.setArea(area);
             SingleSlide singleSlide = new SingleSlide();
