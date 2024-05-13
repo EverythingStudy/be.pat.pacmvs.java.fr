@@ -64,6 +64,7 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     Annotation intersectsGeometry(Annotation annotation);
 
+    Integer countDucts(Annotation annotation1);
 }
 
 

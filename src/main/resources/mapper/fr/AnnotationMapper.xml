@@ -492,4 +492,11 @@
     <select id="intersectsGeometry" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
         SELECT ST_Intersects(st_geomfromgeojson(#{collectContour}), st_geomfromgeojson(#{contour})) as intersectsResults
     </select>
+
+    <select id="countDucts" parameterType="cn.staitech.fr.domain.Annotation" resultType="java.lang.Integer">
+        SELECT count(0)
+        from fr_ai_annotation_${sequenceNumber}
+        where single_slide_id = #{singleSlideId}
+          and category_id = #{categoryId}
+    </select>
 </mapper>

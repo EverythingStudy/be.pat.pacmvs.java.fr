@@ -199,5 +199,11 @@
           and fs.group_code= #{groupCode}
         group by faf.unit;
     </select>
+    <select id="getImageId" resultType="java.lang.String">
+        select ti.resolution_x
+        from fr_slide fs
+                 left join tb_image ti on fs.image_id = ti.image_id
+        where fs.slide_id = #{slideId}
+    </select>
 
 </mapper>
