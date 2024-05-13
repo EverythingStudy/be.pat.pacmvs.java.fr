@@ -15,12 +15,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author: wangfeng
  * @create: 2024-05-10 15:52:39
  * @Description:
- *
  */
 @Service
 @Slf4j
@@ -70,19 +70,48 @@ public class JsonTaskParserService {
         // 解析文件路径，并存入MySQL
         List<JsonFile> jsonFileList = parseJsonFileList(jsonTask);
         log.info("jsonFileList:{}", jsonFileList);
+        int count = jsonFileList.size();
+        if (count == 0) {
+            return;
+        }
 
         // 获取解析器
         ParserStrategy parser = parserStrategyFactory.getParserStrategy(algorithmCode);
 
+        CountDownLatch countDownLatch = new CountDownLatch(count);
+
+        AtomicInteger id = new AtomicInteger();
+        // 线程池 异步  调用策略提交任务
         for (JsonFile jsonFile : jsonFileList) {
-            // TODO:异步线程池
-            // 调用策略提交任务
-            parser.parseJson(jsonTask, jsonFile);
+            try {
+                jsonTaskExecutorService.submit(() -> {
+                            log.info("---> {} {}", id.getAndIncrement(), jsonFile.getFileUrl());
+                            parser.parseJson(jsonTask, jsonFile);
+                        }
+                );
+            } catch (Exception e) {
+
+            } finally {
+                countDownLatch.countDown();
+            }
         }
 
-        // 指标计算
-        parser.alculationIndicators(jsonTask);
+        // 避免主线程无法执行到
+        try {
+            countDownLatch.await(10000, TimeUnit.MICROSECONDS);
 
+            // 指标计算
+            parser.alculationIndicators(jsonTask);
+
+            // 修改任务状态
+            jsonTask.setStatus(1);
+            jsonTaskService.updateById(jsonTask);
+
+        } catch (InterruptedException e) {
+
+        } finally {
+
+        }
     }
 
     /**
