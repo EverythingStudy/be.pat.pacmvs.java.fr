@@ -43,13 +43,10 @@ public class JsonTaskParserService {
 
     @Resource
     JsonTaskService jsonTaskService;
-
     @Resource
     JsonFileService jsonFileService;
-
     @Resource
     ParserStrategyFactory parserStrategyFactory;
-
     @Resource
     private List<CustomParserStrategy> customParserStrategies;
 
@@ -126,12 +123,19 @@ public class JsonTaskParserService {
             }
         }
 
-        // 指标计算
-        parser.alculationIndicators(jsonTask);
-        // 修改任务状态
-        jsonTask.setStatus(1);
-        jsonTaskService.updateById(jsonTask);
+        // 避免主线程无法执行到
+        try {
+            countDownLatch.await();
+            // 指标计算
+            parser.alculationIndicators(jsonTask);
+            // 修改任务状态
+            jsonTask.setStatus(1);
+            jsonTaskService.updateById(jsonTask);
+        } catch (InterruptedException e) {
 
+        } finally {
+
+        }
     }
 
     /**
