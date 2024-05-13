@@ -105,18 +105,18 @@ public class FileTest {
 
 
     /**
-     * MouseThyroid 大鼠甲状腺
+     * Thyroid_gland 大鼠甲状腺
      */
     @Test
-    public void processMouseThyroid() {
+    public void processThyroid_gland() {
         String content = "{\n" +
                 "  \"code\": \"200\",\n" +
                 "  \"msg\": \"\",\n" +
-                "  \"algorithmCode\": \"MouseThyroid\",\n" +
-                "  \"imageId\":10906,\n" +
-                "  \"slideId\":85,\n" +
-                "  \"singleId\":130,\n" +
-                "  \"specialId\":25,\n" +
+                "  \"algorithmCode\": \"Thyroid_gland\",\n" +
+                "  \"imageId\":110906,\n" +
+                "  \"slideId\":185,\n" +
+                "  \"singleId\":1130,\n" +
+                "  \"specialId\":125,\n" +
                 "  \"organizationId\":1,\n" +
                 "  \"data\": [\n" +
                 "    {\n" +
@@ -152,14 +152,14 @@ public class FileTest {
 
 
     /**
-     * MouseEpencephalon 大鼠小脑
+     * Cerebellum 大鼠小脑
      */
     @Test
-    public void processMouseEepencephalon() {
+    public void processCerebellum() {
         String content = "{\n" +
                 "  \"code\": \"200\",\n" +
                 "  \"msg\": \"\",\n" +
-                "  \"algorithmCode\": \"MouseEpencephalon\",\n" +
+                "  \"algorithmCode\": \"Cerebellum\",\n" +
                 "  \"imageId\":10906,\n" +
                 "  \"slideId\":85,\n" +
                 "  \"singleId\":130,\n" +

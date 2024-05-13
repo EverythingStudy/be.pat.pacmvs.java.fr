@@ -39,11 +39,11 @@ import java.util.stream.Collectors;
 /**
  * @author: wangfeng
  * @create: 2024-05-10 14:18:48
- * @Description: Json Parser 大鼠小脑
+ * @Description: Json Parser 大鼠甲状腺
  */
 @Slf4j
-@Component("MouseEpencephalon")
-public class MouseEpencephalonParserStrategyImpl implements ParserStrategy {
+@Component("Thyroid_gland")
+public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
 
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
@@ -174,7 +174,7 @@ public class MouseEpencephalonParserStrategyImpl implements ParserStrategy {
     private static Annotation processJsonElement(JsonNode element, ExecutorService executorService, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
 
         try {
-            Future<Annotation> future = executorService.submit(() -> MouseEpencephalonParserStrategyImpl.handleSingleJsonElement(element, pathologicalMap, jsonTask));
+            Future<Annotation> future = executorService.submit(() -> ThyroidGlandParserStrategyImpl.handleSingleJsonElement(element, pathologicalMap, jsonTask));
             Annotation annotation = future.get();
             future.get(30, TimeUnit.SECONDS);  // 设定超时时间以避免无限等待
             return annotation;
@@ -243,7 +243,7 @@ public class MouseEpencephalonParserStrategyImpl implements ParserStrategy {
         indicatorResultsMap.put("色素面积占比", new IndicatorAddIn("Epithelial apex cytoplasm area%", "", ""));
         indicatorResultsMap.put("腺泡细胞核密度（全片）", new IndicatorAddIn("Mesenchyme area%", "", ""));*/
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        indicatorResultsMap.put("哈氏腺面积", new IndicatorAddIn("Acinus area%", singleSlide.getArea(), "平方毫米"));
+        indicatorResultsMap.put("大鼠甲状腺面积", new IndicatorAddIn("Acinus area%", singleSlide.getArea(), "平方毫米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
