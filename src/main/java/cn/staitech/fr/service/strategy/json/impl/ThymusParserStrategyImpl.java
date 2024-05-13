@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -29,6 +30,8 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -218,12 +221,15 @@ public class ThymusParserStrategyImpl implements CustomParserStrategy {
                 }
             }
             List<Annotation> arrayList = new ArrayList<>();
-            AtomicInteger count = new AtomicInteger();
+            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
             elementsList.stream().forEach(element -> {
-                count.addAndGet(1);
                 Annotation annotation = processJsonElement(element, executorService, pathologicalMap, jsonTask);
                 if (!ObjectUtil.isEmpty(annotation)) {
-                    arrayList.add(annotation);
+                    annotation1.setContour(annotation.getContour40000());
+                    Annotation annotationBy = annotationMapper.intersectsGeometry(annotation1);
+                    if (ObjectUtil.equals("t", annotationBy.getIntersectsResults())) {
+                        arrayList.add(annotation);
+                    }
                 }
             });
             anno.setList(arrayList);
@@ -238,15 +244,35 @@ public class ThymusParserStrategyImpl implements CustomParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        /*indicatorResultsMap.put("腺泡面积占比（全片）", new IndicatorAddIn("Duct area%", "", ""));
-        indicatorResultsMap.put("腺泡细胞核密度(单个)", new IndicatorAddIn("Nucleus density of acinus", "", ""));
-        indicatorResultsMap.put("色素面积占比", new IndicatorAddIn("Epithelial apex cytoplasm area%", "", ""));
-        indicatorResultsMap.put("腺泡细胞核密度（全片）", new IndicatorAddIn("Mesenchyme area%", "", ""));*/
-        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        indicatorResultsMap.put("胸腺面积", new IndicatorAddIn("Thymus area%", singleSlide.getArea(), "平方毫米"));
+        QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
+        // 查询所有未被删除且登录机构相同的数据
+        qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
+        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
+        Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+        //定位表
+        QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
+        wrapper.eq("special_id", jsonTask.getSpecialId());
+        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
+        Long sequenceNumber = annotationRel.getSequenceNumber();
 
-        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        Annotation annotation = new Annotation();
+        annotation.setSingleSlideId(jsonTask.getSingleId());
+        annotation.setCategoryId(pathologicalMap.get("14403D"));
+        annotation.setSequenceNumber(sequenceNumber);
+        Annotation structureArea = annotationMapper.getStructureArea(annotation);
+        BigDecimal bigDecimalB = new BigDecimal(0);
+        if (StringUtils.isNotEmpty(structureArea.getArea())) {
+            BigDecimal bigDecimal = new BigDecimal(structureArea.getArea());
+            bigDecimalB = bigDecimal.multiply(new BigDecimal(0.000001)).setScale(3, RoundingMode.HALF_UP);
+        }
+        AiForecast aiForecast = new AiForecast();
+        aiForecast.setQuantitativeIndicators("胸腺面积");
+        aiForecast.setQuantitativeIndicatorsEn("Thymus area (all)");
+        aiForecast.setUnit("平方毫米");
+        aiForecast.setSingleSlideId(jsonTask.getSingleId());
+        aiForecast.setCreateTime(DateUtil.now());
+        aiForecast.setResults(bigDecimalB.toString());
+        aiForecastService.save(aiForecast);
     }
 
     public void batchProcessAndSave(Annotation annotation, int batchSize, int threadCount) {
