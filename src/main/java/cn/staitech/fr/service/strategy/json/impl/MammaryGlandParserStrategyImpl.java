@@ -190,6 +190,35 @@ public class MammaryGlandParserStrategyImpl implements ParserStrategy {
             aiForecast1.setResults(bigDecimal.toString());
         }
         insertEntity.add(aiForecast1);
+        AiForecast aiForecast2 = new AiForecast();
+        aiForecast2.setQuantitativeIndicators("皮肤面积");
+        aiForecast2.setQuantitativeIndicatorsEn("Skin area");
+        aiForecast2.setUnit("平方毫米");
+        aiForecast2.setSingleSlideId(jsonTask.getSingleId());
+        aiForecast2.setResults(bigDecimalB.toString());
+        insertEntity.add(aiForecast2);
+        AiForecast aiForecast3 = new AiForecast();
+        aiForecast3.setQuantitativeIndicators("皮脂腺密度");
+        aiForecast3.setQuantitativeIndicatorsEn("Density of Sebaceous glands");
+        aiForecast3.setUnit("个/平方毫米");
+        aiForecast3.setSingleSlideId(jsonTask.getSingleId());
+        // 获取皮脂腺的数量
+        annotation.setCategoryId(pathologicalMap.get("121099"));
+        Integer i = annotationMapper.countDucts(annotation);
+        BigDecimal decimal = new BigDecimal(i);
+        aiForecast3.setResults(decimal.divide(bigDecimalB, 3, RoundingMode.HALF_UP)+"");
+        insertEntity.add(aiForecast3);
+        AiForecast aiForecast4 = new AiForecast();
+        aiForecast4.setQuantitativeIndicators("毛囊密度");
+        aiForecast4.setQuantitativeIndicatorsEn("Density of hair follicles");
+        aiForecast4.setUnit("个/平方毫米");
+        aiForecast4.setSingleSlideId(jsonTask.getSingleId());
+        // 获取毛囊密度的数量
+        annotation.setCategoryId(pathologicalMap.get("121098"));
+        Integer i1 = annotationMapper.countDucts(annotation);
+        BigDecimal decimal1 = new BigDecimal(i1);
+        aiForecast4.setResults(decimal1.divide(bigDecimalB, 3, RoundingMode.HALF_UP)+"");
+        insertEntity.add(aiForecast4);
 
         aiForecastService.saveBatch(insertEntity);
     }
