@@ -137,7 +137,7 @@
 
     <select id="getStructureArea" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
-        SELECT sum(contour40000) AS area
+        SELECT sum(ST_Area(contour40000)) AS area
         from fr_ai_annotation_${sequenceNumber}
         where single_slide_id = #{singleSlideId}
           and category_id = #{categoryId}
