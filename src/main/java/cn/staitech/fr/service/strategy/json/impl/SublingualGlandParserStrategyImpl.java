@@ -217,12 +217,15 @@ public class SublingualGlandParserStrategyImpl implements CustomParserStrategy {
                 }
             }
             List<Annotation> arrayList = new ArrayList<>();
-            AtomicInteger count = new AtomicInteger();
+            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
             elementsList.stream().forEach(element -> {
-                count.addAndGet(1);
                 Annotation annotation = processJsonElement(element, executorService, pathologicalMap, jsonTask);
                 if (!ObjectUtil.isEmpty(annotation)) {
-                    arrayList.add(annotation);
+                    annotation1.setContour(annotation.getContour40000());
+                    Annotation annotationBy = annotationMapper.intersectsGeometry(annotation1);
+                    if (ObjectUtil.equals("t", annotationBy.getIntersectsResults())) {
+                        arrayList.add(annotation);
+                    }
                 }
             });
             anno.setList(arrayList);
