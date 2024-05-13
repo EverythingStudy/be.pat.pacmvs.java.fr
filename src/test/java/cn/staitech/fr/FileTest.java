@@ -113,10 +113,10 @@ public class FileTest {
                 "  \"code\": \"200\",\n" +
                 "  \"msg\": \"\",\n" +
                 "  \"algorithmCode\": \"Thyroid_gland\",\n" +
-                "  \"imageId\":110906,\n" +
-                "  \"slideId\":185,\n" +
+                "  \"imageId\":10906,\n" +
+                "  \"slideId\":85,\n" +
                 "  \"singleId\":130,\n" +
-                "  \"specialId\":125,\n" +
+                "  \"specialId\":25,\n" +
                 "  \"organizationId\":1,\n" +
                 "  \"data\": [\n" +
                 "    {\n" +
