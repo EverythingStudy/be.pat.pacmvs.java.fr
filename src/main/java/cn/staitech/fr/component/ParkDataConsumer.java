@@ -30,10 +30,11 @@ public class ParkDataConsumer {
         try {
             String receivedMessage = new String(message.getBody(), StandardCharsets.UTF_8);
             log.info("消费者收到消息: " + receivedMessage);
+            // 成功处理后手动确认消息
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             // 处理消息逻辑...
             processParkData(receivedMessage);
-            // 成功处理后手动确认消息
+
         } catch (Exception e) {
             // 出现异常时可以选择拒绝消息，以便重试或死信队列处理
             channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
