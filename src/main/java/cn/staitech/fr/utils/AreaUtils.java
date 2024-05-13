@@ -39,7 +39,7 @@ public class AreaUtils {
      *
      * @param jsonTask
      * @param structure_id 结构组织id
-     * @return
+     * @return 返回毫米
      */
     public String getArea(JsonTask jsonTask,String structure_id){
         QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
