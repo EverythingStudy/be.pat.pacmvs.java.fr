@@ -115,7 +115,7 @@ public class FileTest {
                 "  \"algorithmCode\": \"Thyroid_gland\",\n" +
                 "  \"imageId\":110906,\n" +
                 "  \"slideId\":185,\n" +
-                "  \"singleId\":1130,\n" +
+                "  \"singleId\":130,\n" +
                 "  \"specialId\":125,\n" +
                 "  \"organizationId\":1,\n" +
                 "  \"data\": [\n" +
