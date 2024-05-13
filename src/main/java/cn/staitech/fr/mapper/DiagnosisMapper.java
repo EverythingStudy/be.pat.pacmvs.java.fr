@@ -1,12 +1,13 @@
 package cn.staitech.fr.mapper;
 
-import cn.staitech.fr.domain.Diagnosis;
-import cn.staitech.fr.domain.out.ExportListVO;
-import cn.staitech.system.api.domain.SysUser;
+import java.util.List;
+import java.util.Map;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-import java.util.List;
+import cn.staitech.fr.domain.Diagnosis;
+import cn.staitech.fr.domain.out.ExportListVO;
+import cn.staitech.system.api.domain.SysUser;
 
 /**
  * <p>
@@ -17,7 +18,11 @@ import java.util.List;
  * @since 2024-04-11
  */
 public interface DiagnosisMapper extends BaseMapper<Diagnosis> {
-	SysUser selectUserById(Long userId);
+	List<SysUser>  selectUserById(Map<String,Object> parm);
 
 	List<ExportListVO>  getExportListVO(Long singleId);
+
+	String getOrganizationName(Long organizationId);
+	
+	List<Diagnosis> selectListByParm(Diagnosis diagnosis);
 }

@@ -93,7 +93,16 @@ public class Annotation implements Serializable {
     /**
      * 轮廓坐标
      */
+    @TableField(exist = false)
     private String contour;
+
+    private String contour40000;
+
+    private String contour10000;
+
+    private String contour2500;
+
+    private String contour625;
     
     /**
      * 轮廓类型 1：矩形 2：标注轮廓
@@ -112,6 +121,27 @@ public class Annotation implements Serializable {
     
     @TableField(exist = false)
     private List<Long> slideIdList;
+
+    @TableField(exist = false)
+    private Long sequenceNumber;
+
+    @TableField(exist = false)
+    private Boolean filigreeContour;
+
+    @TableField(exist = false)
+    private List<Long> structureSizeList;
+
+    @TableField(exist = false)
+    private Long magnification;
+
+    @TableField(exist = false)
+    private String collectContour;
+
+    @TableField(exist = false)
+    private List<Annotation> list;
+
+    @TableField(exist = false)
+    private String intersectsResults;
 
     @Override
     public boolean equals(Object that) {

@@ -217,6 +217,8 @@
             resultType="cn.staitech.fr.domain.out.MatrixReviewListOut">
         SELECT
         ti.image_name,
+        ti.image_url,
+        ti.image_id,
         ss.single_id,
         ss.slide_id,
         ss.thumb_url,
@@ -259,7 +261,12 @@
             <if test="forecastStatus != null and forecastStatus != ''">
                 and ss.forecast_status =#{forecastStatus}
             </if>
-
+            <if test="forecastStatusList != null and forecastStatusList.size>0">
+                AND ss.forecast_status in
+                <foreach collection="forecastStatusList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
             <if test="diagnosisStatus != null and diagnosisStatus != ''">
                 and ss.diagnosis_status =#{diagnosisStatus}
             </if>

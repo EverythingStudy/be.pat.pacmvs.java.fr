@@ -23,6 +23,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     List<Annotation> selectListBy(Annotation annotation);
 
+    List<Annotation> aiSelectListBy(Annotation annotation);
+
     Annotation mergeContour(Annotation annotation);
 
     Annotation selectContourType(Annotation annotation);
@@ -34,6 +36,14 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     void createTableSequence(Annotation annotation);
 
     Annotation getArea(Annotation annotation);
+
+    Annotation getOrganArea(Annotation annotation);
+
+    Annotation getStructureArea(Annotation annotation);
+
+    void createTable(Annotation annotation);
+
+    void batchSave(Annotation annotation);
 
     @DS("slave")
     Annotation selectById(Annotation annotation);
@@ -50,6 +60,11 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     List<Annotation> getAnnoListByParm(List<Long> slideIdList);
 
+    Annotation collectGeometry(Long singleSlideId);
+
+    Annotation intersectsGeometry(Annotation annotation);
+
+    Integer countDucts(Annotation annotation1);
 }
 
 

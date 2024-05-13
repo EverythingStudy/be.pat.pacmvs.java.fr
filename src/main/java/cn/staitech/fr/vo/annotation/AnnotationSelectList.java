@@ -19,7 +19,7 @@ public class AnnotationSelectList {
     private List<Long> structureSizeList;
 
     @ApiModelProperty(value = "分辨率")
-    private Long magnification;
+    private Long magnification = 40000L;
 
     @ApiModelProperty(value = "标签id")
     private Long categoryId;
@@ -27,7 +27,7 @@ public class AnnotationSelectList {
     @ApiModelProperty(value = "单脏器id")
     private Long singleSlideId;
 
-
-
+    @ApiModelProperty(value = "精细轮廓(true:之查看精细轮廓,false:将精细轮廓进行过滤)")
+    private Boolean filigreeContour;
 
 }

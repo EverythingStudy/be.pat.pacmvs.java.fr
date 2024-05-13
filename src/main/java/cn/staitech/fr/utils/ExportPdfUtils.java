@@ -1,6 +1,7 @@
 package cn.staitech.fr.utils;
 
 import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.domain.out.ExportAiVO;
 import cn.staitech.fr.domain.out.ExportListVO;
 import cn.staitech.fr.domain.out.ExportVO;
 import com.aspose.words.Document;
@@ -48,6 +49,44 @@ public class ExportPdfUtils {
         builder.bind("table", strategy);
         //获取模板文件流
         InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(CommonConstant.WROD_PATH);
+        FileOutputStream os = new FileOutputStream(outFile);
+        //ClassPathResource classPathResource = new ClassPathResource("templete/人工诊断报告.docx");
+        //InputStream inputStream = classPathResource.getInputStream();
+        assert inputStream != null;
+
+        //组装数据
+        //ExportVO data = createData();
+        XWPFTemplate render = XWPFTemplate.compile(inputStream, builder.build()).render(data);
+        try {
+            //render.write(new FileOutputStream("D:/wordss/test555.docx"));
+            render.write(os);
+
+        } catch (IllegalArgumentException e) {
+            System.out.println("小问题思密达");
+        } finally {
+            os.close();
+            inputStream.close();
+            render.close();
+        }
+
+
+    }
+
+    /**
+     * @param data 导出Ai报告
+     * @throws IOException
+     */
+    public static void exportAiFile(String outFile, ExportAiVO data) throws IOException {
+        //使用poi-tl进行模板处理
+        ConfigureBuilder builder = Configure.builder();
+        builder.useSpringEL(true);
+        //执行循环策略
+        LoopRowTableRenderPolicy strategy = new LoopRowTableRenderPolicy();
+        //绑定集合对象
+        builder.bind("list", strategy);
+        builder.bind("table", strategy);
+        //获取模板文件流
+        InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(CommonConstant.WROD_AI_PATH);
         FileOutputStream os = new FileOutputStream(outFile);
         //ClassPathResource classPathResource = new ClassPathResource("templete/人工诊断报告.docx");
         //InputStream inputStream = classPathResource.getInputStream();

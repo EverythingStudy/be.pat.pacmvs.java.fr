@@ -1,8 +1,17 @@
 package cn.staitech.fr.domain;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+
+import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisAddVo.DdefinitionChild;
+
+import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.util.Date;
+import java.util.List;
+
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import io.swagger.annotations.ApiModel;
@@ -50,24 +59,37 @@ public class Diagnosis implements Serializable {
 
     @ApiModelProperty(value = "部位名称")
     private String positionName;
+    
+    @ApiModelProperty(name = "positionSource" , value = "部位来源 0：字典  1：自定义")
+	private int positionSource;
 
     @ApiModelProperty(value = "病理改变")
     private String lesion;
 
     @ApiModelProperty(value = "病理病变名称")
     private String lesionName;
+    
+    @ApiModelProperty(name = "lesionSource" , value = "病理改变来源 0：字典  1：自定义")
+	private int lesionSource;
 
     @ApiModelProperty(value = "修饰")
-    private String ddefinition;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<DdefinitionChild> ddefinition;
 
     @ApiModelProperty(value = "修饰名称")
     private String ddefinitionName;
+    
+//    @ApiModelProperty(name = "ddefinitionSource" , value = "修饰来源 0：字典  1：自定义")
+//	private String ddefinitionSource;
 
     @ApiModelProperty(value = "病变级别")
     private String grade;
 
     @ApiModelProperty(value = "病变级别名称")
     private String gradeName;
+    
+    @ApiModelProperty(name = "gradeSource" , value = "病变级别来源 0：字典  1：自定义")
+	private int gradeSource;
 
     @ApiModelProperty(value = "备注")
     private String remark;

@@ -4,6 +4,7 @@ import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.PageDataResponse;
 import cn.staitech.fr.domain.in.AiDownloadIn;
+import cn.staitech.fr.domain.in.AlgorithmIn;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.in.SingleSlideAdjacent;
@@ -75,6 +76,13 @@ public class MatrixReviewController {
         return R.ok(resp);
     }
 
+    @ApiOperation(value = "矩阵阅片-专题维度(根据脏器查询专题内全部图片)")
+    @PostMapping("/specialSlideList")
+    public R<List<SingleSlideSelectBy>> specialSlideList(@RequestBody @Validated SingleSlideAdjacent req) {
+        List<SingleSlideSelectBy> resp = matrixReviewService.specialSlideList(req);
+        return R.ok(resp);
+    }
+
     @ApiOperation(value = "矩阵阅片-切片维度(携带图片切片信息)")
     @PostMapping("/selectSlideList")
     public R<PageResponse<SelectImageSlideOut>> selectSlideList(@RequestBody @Validated MatrixReviewListIn req) {
@@ -105,7 +113,8 @@ public class MatrixReviewController {
 
     @ApiOperation(value = "ai预测")
     @PostMapping("/algorithm")
-    public R<String> algorithm(@Validated @RequestBody AiDownloadIn req) throws Exception {
-        return R.ok("success");
+    public R<String> algorithm(@Validated @RequestBody AlgorithmIn req){
+    	R r = matrixReviewService.algorithm(req);
+        return r;
     }
 }

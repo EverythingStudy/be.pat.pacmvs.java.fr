@@ -18,6 +18,8 @@ public class CommonConstant {
     public static final String NUMBER_1 = "1";
     public static final String NUMBER_2 = "2";
     public static final Integer INT_1 = 1;
+    public static final Integer INT_4 = 4;
+    public static final Integer INT_5 = 5;
     public static final String NUMBER_4 = "4";
     public static final String GLIDE_LINE = "_";
     public static final String FILE_SUFFIX = ".";
@@ -67,8 +69,8 @@ public class CommonConstant {
     public static final Long IMAGE_CACHE_HOURS = 24L;
     public static final String ANNO_MARKING = "ANNO_MARKING_";
     public static final Long MARKING_CACHE_HOURS = 24L;
-    public static final String PROJECT_ANNOTATION_REL = "PROJECT_ANNOTATION_REL_";
-    public static final Long PROJECT_ANNOTATION_REL_CACHE_DAYS = 365L;
+    public static final String SPECIAL_ANNOTATION_REL = "SPECIAL_ANNOTATION_REL_";
+    public static final Long SPECIAL_ANNOTATION_REL_CACHE_DAYS = 365L;
 	public static final String MATCHING_FAILED = "匹配失败";
 
     /**
@@ -169,6 +171,11 @@ public class CommonConstant {
     
     public static final String RECOGNITION_MODEL_NAME  = "全脏器识别";
     
+    /**
+     * AI预测算法
+     */
+    public static final String ALGORITHM_MODEL_NAME  = "全脏器精细轮廓";
+    
     public static final String WAX_BLOCK_INFO  = "WAX_BLOCK_INFO_";
 
     public static void main(String[] args) {
@@ -191,4 +198,5 @@ public class CommonConstant {
     public static final String PDF_FILE = ".pdf";
     public static final String ZIP_FILE = ".zip";
     public static final String WROD_PATH ="templete/123.docx";
+    public static final String WROD_AI_PATH ="templete/234.docx";
 }

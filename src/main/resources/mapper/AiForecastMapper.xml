@@ -7,14 +7,30 @@
     <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.AiForecast">
             <id property="forecastId" column="forecast_id" jdbcType="INTEGER"/>
             <result property="quantitativeIndicators" column="quantitative_indicators" jdbcType="VARCHAR"/>
+            <result property="quantitativeIndicatorsEn" column="quantitative_indicators_en" jdbcType="VARCHAR"/>
             <result property="results" column="results" jdbcType="VARCHAR"/>
-            <result property="range" column="range" jdbcType="VARCHAR"/>
+            <result property="forecastRange" column="forecast_range" jdbcType="VARCHAR"/>
             <result property="createBy" column="create_by" jdbcType="BIGINT"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="singleSlideId" column="single_slide_id" jdbcType="BIGINT"/>
+            <result property="unit" column="unit" jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        forecast_id,quantitative_indicators,results,
-        range,create_by,create_time
+        forecast_id,quantitative_indicators,quantitative_indicators_en,results,
+        forecast_range,create_by,create_time,single_slide_id,unit
     </sql>
+
+    <select id="getAiForecastBySingle" resultType="cn.staitech.fr.domain.out.AipreAirepostOut">
+        select DATE_FORMAT(aat.start_time, '%Y-%m-%d %H:%i') startTime,
+               aat.waste_time                                wasteTime,
+               am.algorithm_name,
+               am.model_version
+        from aipre_airepost aat
+                 left join aipre_algorithm am
+                           on aat.algorithm_id = am.algorithm_uuid
+        where aat.single_slide_id = #{singleId}
+        order by report_uuid desc limit 1
+
+    </select>
 </mapper>

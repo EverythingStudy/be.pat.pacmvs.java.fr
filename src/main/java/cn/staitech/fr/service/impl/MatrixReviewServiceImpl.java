@@ -1,35 +1,39 @@
 package cn.staitech.fr.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.json.JSONUtil;
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
+import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Container;
+import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Category;
 import cn.staitech.fr.domain.PageDataResponse;
 import cn.staitech.fr.domain.SingleOrganNumber;
+import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.in.AiDownloadIn;
+import cn.staitech.fr.domain.in.AlgorithmIn;
 import cn.staitech.fr.domain.in.MatrixReviewEditIn;
 import cn.staitech.fr.domain.in.MatrixReviewListIn;
 import cn.staitech.fr.domain.in.SingleSlideAdjacent;
 import cn.staitech.fr.domain.out.*;
-import cn.staitech.fr.domain.out.AnimalDimensionData;
-import cn.staitech.fr.domain.out.AnimalDimensionOut;
-import cn.staitech.fr.domain.out.ExportListVO;
-import cn.staitech.fr.domain.out.ExportVO;
-import cn.staitech.fr.domain.out.MatrixReviewListOut;
-import cn.staitech.fr.domain.out.MatrixReviewOut;
-import cn.staitech.fr.domain.out.OrgansData;
+import cn.staitech.fr.feign.PythonOrganRecognitionService;
+import cn.staitech.fr.mapper.AiForecastMapper;
 import cn.staitech.fr.mapper.DiagnosisMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.service.MatrixReviewService;
+import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.DateUtils;
 import cn.staitech.fr.utils.ExportPdfUtils;
 import cn.staitech.fr.utils.LanguageUtils;
+import cn.staitech.fr.vo.annotation.AiAlgorithm;
+import cn.staitech.fr.vo.annotation.StartRecognition;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.deepoove.poi.data.PictureRenderData;
 import com.github.pagehelper.Page;
@@ -37,7 +41,10 @@ import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONObject;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,7 +52,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.IOException;
+import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +83,12 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
     @Resource
     private HttpServletResponse response;
+    
+    @Resource
+	private PythonOrganRecognitionService pythonService;
+
+    @Resource
+    private AiForecastMapper aiForecastMapper;
 
 
     @Value("${waxPath}")
@@ -188,6 +204,11 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     }
 
     @Override
+    public List<SingleSlideSelectBy> specialSlideList(SingleSlideAdjacent req){
+        return singleSlideMapper.singleSlideList(req);
+    }
+
+    @Override
     public PageResponse<SelectImageSlideOut> selectSlideList(MatrixReviewListIn req) {
         PageResponse resp = new PageResponse();
         Page<SelectImageSlideOut> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
@@ -259,6 +280,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             List<ExportListVO> collect = diagnosisMapper.getExportListVO(id);
             exportVO.setList(collect);
             exportVO.setTable(collect);
+            exportVO.setOrganizationName(diagnosisMapper.getOrganizationName(SecurityUtils.getLoginUser().getSysUser().getOrganizationId()));
             //会报错{"msg":"TemplateRenderPolicy render error","code":500}
             //exportVO.setImg(new PictureRenderData(800, 200, "D:/image/liangz.png"));
             exportVO.setImg(new PictureRenderData(800, 200, exportVO.getThumbUrl().replace("/file/statics", "/home/pat_saas")));
@@ -298,7 +320,176 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     }
 
     @Override
-    public void algorithmDownload(AiDownloadIn req) {
+    public void algorithmDownload(AiDownloadIn req) throws Exception {
+        log.info("ai预测报告导出接口开始：");
+        List<Long> ids = req.getIds();
+        List<String> pdfName = new ArrayList<>();
+        String topicName = "";
+        //存放单脏器切片id和脏器id
+        Map<Long,Long> categorys=new HashMap<>();
+        //判断是不是存在对照组
+        Special special = specialMapper.selectById(req.getSpecialId());
+        if(StringUtils.isNotEmpty(special.getControlGroup())){
+            LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
+            wrapper.in(SingleSlide::getSingleId,ids);
+            List<SingleSlide> singleSlides = singleSlideMapper.selectList(wrapper);
+            categorys=  singleSlides.stream().collect(Collectors.toMap(SingleSlide::getSingleId,SingleSlide::getCategoryId));
+        }
+        for (Long id : ids) {
+            ExportAiVO exportVO = singleSlideMapper.getExportAiVO(id);
+            if (LanguageUtils.isEn()) {
+                exportVO.setColorType(Container.COLOR_TYPE_EN.get(Integer.valueOf(exportVO.getColorType())));
+            } else {
+                exportVO.setColorType(Container.COLOR_TYPE.get(Integer.valueOf(exportVO.getColorType())));
+            }
+            //算法结果数据填充
+            LambdaQueryWrapper<AiForecast> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(AiForecast::getSingleSlideId, id);
+            List<AiForecast> aiForecasts = aiForecastMapper.selectList(wrapper);
+            List<ExportAiListVO> collect = new ArrayList<>();
+            if (CollectionUtils.isNotEmpty(aiForecasts)) {
+                for (AiForecast aiForecast : aiForecasts) {
+                    ExportAiListVO exportAiListVO = new ExportAiListVO();
+                    BeanUtils.copyProperties(aiForecast, exportAiListVO);
+                    //范围数据
+                    if(StringUtils.isNotEmpty(special.getControlGroup())){
+                        setRang(special,id,exportAiListVO,categorys);
+                    }
+                    collect.add( exportAiListVO);
+                }
+            }
+            exportVO.setList(collect);
+            exportVO.setTable(collect);
+            //算法详情
+            AipreAirepostOut aiForecastBySingle = aiForecastMapper.getAiForecastBySingle(id);
+            if(ObjectUtils.isNotEmpty(aiForecastBySingle)){
+                exportVO.setAlgorithmName(aiForecastBySingle.getAlgorithmName());
+                exportVO.setModelVersion(aiForecastBySingle.getModelVersion());
+                exportVO.setStartTime(aiForecastBySingle.getStartTime());
+                exportVO.setWasteTime(aiForecastBySingle.getWasteTime());
+            }
+
+            exportVO.setOrganizationName(diagnosisMapper.getOrganizationName(SecurityUtils.getLoginUser().getSysUser().getOrganizationId()));
+            String s = waxPath + "AI" + File.separator + exportVO.getFileName() + "+" + exportVO.getOrganName() + CommonConstant.WROD_FILE;
+            File file = new File(waxPath + "AI" + File.separator);
+            if(!file.exists()&&!file.isDirectory()){
+                file.mkdir();
+            }
+            //生成word
+            ExportPdfUtils.exportAiFile(s, exportVO);
+            //生成pdf
+            //ExportPdfUtils.convertDocx2Pdf(s, s.replace(CommonConstant.WROD_FILE, CommonConstant.PDF_FILE));
+            ExportPdfUtils.wordToPdf(s, s.replace(CommonConstant.WROD_FILE, CommonConstant.PDF_FILE));
+            pdfName.add(s.replace(CommonConstant.WROD_FILE, CommonConstant.PDF_FILE));
+            topicName = exportVO.getTopicName();
+        }
+        if (ids.size() > 1) {
+            log.info("走的压缩包");
+            ExportPdfUtils.writePdfZip(pdfName, response, topicName + DateUtils.getCurrentHHmmssString("yyyy-MM-dd HH:mm:ss") + CommonConstant.ZIP_FILE);
+
+        } else {
+
+            ExportPdfUtils.downloadLocal(pdfName.get(0), response);
+
+        }
+        for (String s1 : pdfName) {
+            if (new File(s1).exists()) {
+                FileUtils.delete(new File(s1));
+                //FileUtils.delete(new File(s1.replace(CommonConstant.PDF_FILE, CommonConstant.WROD_FILE)));
+            }
+
+        }
+        log.info("结束");
 
     }
+
+    /**
+     * 设置预测范围
+     * @param special
+     * @param singleId
+     * @param exportAiListVO
+     */
+    private void setRang(Special special, Long singleId, ExportAiListVO exportAiListVO, Map<Long, Long> categorys) {
+        if(ObjectUtils.isNotEmpty(categorys.get(singleId))){
+            String rangOut = singleSlideMapper.getRangOut(categorys.get(singleId), special.getSpecialId(), special.getControlGroup());
+            exportAiListVO.setForecastRange(rangOut);
+        }
+
+    }
+
+
+
+
+    @Override
+	public R algorithm(AlgorithmIn req) {
+		Long organizationId  = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+//		Long organizationId  = 1L;
+		Long specialId = req.getSpecialId();
+		MatrixReviewListIn mrl = new MatrixReviewListIn();
+		mrl.setSpecialId(specialId);
+		//0未预测、1预测成功、2预测失败、3预测中
+//		mrl.setForecastStatus("0");
+		List<String> forecastStatusList = new ArrayList<>(Arrays.asList("0", "2"));
+		mrl.setForecastStatusList(forecastStatusList);
+		List<MatrixReviewListOut> singleSlideList = slideMapper.getMatrixReview(mrl);
+		if (CollectionUtils.isEmpty(singleSlideList)) {
+			return R.ok();
+		}
+
+		//请求算法处理
+		if(CollectionUtils.isNotEmpty(singleSlideList)){
+			for(MatrixReviewListOut matrixReviewListOut:singleSlideList){
+				Long singleId = matrixReviewListOut.getSingleId();
+				Long slideId = matrixReviewListOut.getSlideId();
+				String imageUrl = matrixReviewListOut.getImageUrl();
+				Long categoryId = matrixReviewListOut.getCategoryId();
+				String organName = matrixReviewListOut.getOrganName();
+				String aiImageUrl = matrixReviewListOut.getImageUrl();
+				Long imageId = matrixReviewListOut.getImageId();
+				String organizatinName = geNumber(organizationId);
+				if(null != slideId && StringUtils.isNotEmpty(imageUrl)){
+					if(imageUrl.endsWith("svs")||imageUrl.endsWith("SVS") && !organName.equals("盲肠-回肠-直肠-结肠")){
+						//请求算法接口
+						try {
+							log.info("AI算法请求内容是singleId:{},slideId:{},organizationId:{},imageUrl:{},algorithm_name:{}", singleId,slideId,organizationId,imageUrl,CommonConstant.ALGORITHM_MODEL_NAME);
+							AiAlgorithm aiAlgorithm = new AiAlgorithm(singleId, slideId, categoryId, aiImageUrl, imageId);
+							//BeanUtils.copyProperties(matrixReviewListOut, aiAlgorithm);
+							aiAlgorithm.setAlgorithm_name(CommonConstant.ALGORITHM_MODEL_NAME);
+							aiAlgorithm.setOrganizationName(organizatinName);
+							aiAlgorithm.setOrganizationId(organizationId);
+							aiAlgorithm.setSpecialId(specialId);
+							log.info("AI算法请求完整数据{}", JSONUtil.toJsonStr(aiAlgorithm));
+							String body = pythonService.algorithm(aiAlgorithm);
+							log.info("AI算法请求返回数据{}", JSONUtil.toJsonStr(body));
+							JSONObject jsonObject = new JSONObject(body);
+							Integer code = jsonObject.getInt("code");
+							if (code.equals(200)) {
+								//修改当前slide分析状态为进行中
+								SingleSlide slide = new SingleSlide();
+								slide.setSingleId(singleId);
+								//0未预测、1预测成功、2预测失败、3预测中
+								slide.setForecastStatus("3");
+								singleSlideMapper.updateById(slide);
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+							log.error("AI算法请求失败,切片id是{}",slideId);
+						}finally {
+
+						}
+					}else{
+						log.error("AI算法请求失败,切片id是{},图片非svs格式",slideId);
+					}
+				}
+			}
+		}
+		return R.ok();
+	}
+	
+	public  String geNumber(Long organizationId) {
+		NumberFormat formatter = NumberFormat.getNumberInstance();
+		formatter.setMinimumIntegerDigits(3);
+		formatter.setGroupingUsed(false);
+		return "C" + formatter.format(organizationId);
+	}
 }

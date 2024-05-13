@@ -3,8 +3,11 @@ package cn.staitech.fr.mapper;
 import cn.staitech.fr.domain.SingleOrganNumber;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.OrganDisassemblyQueryIn;
+import cn.staitech.fr.domain.in.SingleSlideAdjacent;
+import cn.staitech.fr.domain.out.ExportAiVO;
 import cn.staitech.fr.domain.out.ExportVO;
 import cn.staitech.fr.domain.out.OrganDisassemblyOut;
+import cn.staitech.fr.domain.out.RangOut;
 import cn.staitech.fr.domain.out.SingleSlideSelectBy;
 import cn.staitech.fr.domain.out.SlideSelectBy;
 import com.baomidou.dynamic.datasource.annotation.DS;
@@ -22,7 +25,15 @@ public interface SingleSlideMapper extends BaseMapper<SingleSlide> {
 
     ExportVO getExportVO(Long id);
 
+    ExportAiVO getExportAiVO(Long id);
+
     SingleSlideSelectBy singleSlideBy(Long singleId);
+
+    List<SingleSlideSelectBy> singleSlideList(SingleSlideAdjacent singleSlideAdjacent);
+
+    String getRangOut(@Param("categoryId") Long categoryId,@Param("specialId") Long specialId,@Param("groupCode")String groupCode);
+
+    String getImageId(Long slideId);
 }
 
 

@@ -1,7 +1,6 @@
 package cn.staitech.fr.domain.out;
 
-import java.util.Map;
-
+import java.util.List;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -30,11 +29,13 @@ public class SplitVerificationOut {
 
     @ApiModelProperty(value = "蜡块表脏器信息")
     //private String waxOrgan;
-    private Map<String,Long> waxOrgan;
+//    private Map<String,Long> waxOrgan;
+    private List<CategoryChild> waxOrgan;
 
     @ApiModelProperty(value = "切图脏器信息")
     //private String annoOrgan;
-    private Map<String,Long> annoOrgan;
+//    private Map<String,Long> annoOrgan;
+    private List<CategoryChild> annoOrgan;
     
     @ApiModelProperty(value = "切片编号")
     private String fileName;

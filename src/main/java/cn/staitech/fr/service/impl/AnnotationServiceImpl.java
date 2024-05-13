@@ -41,6 +41,8 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.operation.overlay.OverlayOp;
 import lombok.extern.slf4j.Slf4j;
+import net.jodah.expiringmap.ExpirationPolicy;
+import net.jodah.expiringmap.ExpiringMap;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -49,6 +51,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -70,8 +73,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     private static final WKTReader WKT_READER = new WKTReader(GEOMETRY_FACTORY);
     HashMap<Long, Category> categoryHashMap = new HashMap<>();
-    HashMap<Long, PathologicalIndicatorCategory> pathologicalIndicatorCategoryHashMap = new HashMap<>();
-    HashMap<Long, User> userMap = new HashMap<>();
+    ExpiringMap<Long, PathologicalIndicatorCategory> pathologicalIndicatorCategoryHashMap = ExpiringMap.builder().maxSize(1000).expiration(12, TimeUnit.HOURS).variableExpiration().expirationPolicy(ExpirationPolicy.CREATED).build();
+    ExpiringMap<Long, User> userMap = ExpiringMap.builder().maxSize(1000).expiration(12, TimeUnit.HOURS).variableExpiration().expirationPolicy(ExpirationPolicy.CREATED).build();
+
     @Resource
     private AnnotationMapper annotationMapper;
     @Resource
@@ -131,7 +135,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     	properties.setContour_type(annotation.getContourType());
         properties.setSingleSlideId(annotation.getSingleSlideId());
         properties.setSingle(annotation.getSingle());
-        if (annotation.getSingle() == 1) {
+        if (annotation.getSingle() == 1 && (annotation.getContourType() == 2 || annotation.getContourType() == 4)) {
             if (annotation.getCategoryId() != null) {
                 PathologicalIndicatorCategory pathologicalIndicatorCategory = pathologicalIndicatorCategoryHashMap.get(annotation.getCategoryId());
                 if (pathologicalIndicatorCategory == null) {
@@ -192,13 +196,40 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     public List<Features> selectListBy(AnnotationSelectList req) throws Exception {
         List<Features> list = new ArrayList<>();
         Annotation annotation = new Annotation();
-        annotation.setSlideId(req.getSlideId());
-        annotation.setCategoryId(req.getCategoryId());
-        annotation.setSingleSlideId(req.getSingleSlideId());
+        BeanUtils.copyProperties(req, annotation);
+        if(req.getGeometry() != null){
+            annotation.setContour(String.valueOf(req.getGeometry()));
+        }
+        annotation.setFiligreeContour(true);
+        // 查询精细轮廓
         List<Annotation> selfAnnoList = annotationMapper.selectListBy(annotation);
         List<Features> annoList1 = getFeaturesList(selfAnnoList);
         if (CollectionUtils.isNotEmpty(annoList1)) {
             list.addAll(annoList1);
+        }
+        annotation.setFiligreeContour(false);
+        annotation.setMagnification(40000L);
+        // 查询普通轮廓
+        List<Annotation> annotationList = annotationMapper.selectListBy(annotation);
+        List<Features> annoList = getFeaturesList(annotationList);
+        if (CollectionUtils.isNotEmpty(annoList)) {
+            list.addAll(annoList);
+        }
+        return list;
+    }
+    @Override
+    public List<Features> aiSelectListBy(AnnotationSelectList req) throws Exception{
+        List<Features> list = new ArrayList<>();
+        Annotation annotation = new Annotation();
+        BeanUtils.copyProperties(req, annotation);
+        if(req.getGeometry() != null){
+            annotation.setContour(String.valueOf(req.getGeometry()));
+        }
+        annotation.setSequenceNumber(1L);
+        List<Annotation> annotationList = annotationMapper.aiSelectListBy(annotation);
+        List<Features> annoList = getFeaturesList(annotationList);
+        if (CollectionUtils.isNotEmpty(annoList)) {
+            list.addAll(annoList);
         }
         return list;
     }
@@ -302,7 +333,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     public List<JSONObject> selectContourList(Long slideId, Long categoryId) {
         QueryWrapper<Annotation> annotationQueryWrapper = new QueryWrapper<>();
-        annotationQueryWrapper.select("ST_AsGeoJSON(contour) AS contour").eq("slide_id", slideId).eq("category_id", categoryId).ne("contour_type",1);
+        annotationQueryWrapper.select("ST_AsGeoJSON(contour40000) AS contour").eq("slide_id", slideId).eq("category_id", categoryId).ne("contour_type",1);
         List<Annotation> annotations = annotationMapper.selectList(annotationQueryWrapper);
         List<JSONObject> contourList = new ArrayList<>();
         for (Annotation annotation1 : annotations) {
@@ -317,7 +348,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     public R<String> roiContDel(RoiIn req) throws Exception {
         QueryWrapper<Annotation> annotationQueryWrapper = new QueryWrapper<>();
         req.getCategoryIds().add(null);
-        annotationQueryWrapper.select("annotation_id,category_id,create_by,ST_AsGeoJSON(contour) AS contour").eq("single_slide_id", req.getSingleSlideId()).eq("create_by",SecurityUtils.getUserId()).in("category_id",req.getCategoryIds());
+        annotationQueryWrapper.select("annotation_id,category_id,create_by,ST_AsGeoJSON(contour40000) AS contour").eq("single_slide_id", req.getSingleSlideId()).eq("annotation_type","Draw").eq("contour_type", 2).eq("create_by",SecurityUtils.getUserId()).in("category_id",req.getCategoryIds());
         List<Annotation> features = annotationMapper.selectList(annotationQueryWrapper);
         List<Long> annotationIdList;
         //roi包含
