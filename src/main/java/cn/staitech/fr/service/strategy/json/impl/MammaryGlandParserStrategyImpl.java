@@ -138,6 +138,7 @@ public class MammaryGlandParserStrategyImpl implements ParserStrategy {
         Annotation annotation1 = new Annotation();
         annotation1.setSingleSlideId(jsonTask.getSingleId());
         annotation1.setCategoryId(pathologicalMap.get("12306C"));
+        annotation1.setSequenceNumber(sequenceNumber);
         Integer result = annotationMapper.countDucts(annotation1);
         List<AiForecast> insertEntity = new ArrayList<>();
         AiForecast aiForecast = new AiForecast();
