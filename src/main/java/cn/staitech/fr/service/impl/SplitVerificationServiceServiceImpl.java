@@ -63,8 +63,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 
 	@Override
 	public PageResponse<SplitVerificationOut>  getList(SplitVerificationQueryIn req) {
-//				Long organizationId = 1L;
-		Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+				Long organizationId = 1L;
+//		Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
 		PageResponse<SplitVerificationOut> pageResponse = new PageResponse<>();
 		//查看切片明细  0：否  1：是
 		int detailType = req.getDetailType();
@@ -255,17 +255,18 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 						}
 					}
 					//蜡块表脏器信息==》按照动物脏器统计汇总==>底层都是按照字典顺序进行排序(https://blog.csdn.net/Rcain_R/article/details/136692093)
-					waxCategoryMap = waxCategoryMap.entrySet().stream()
-							.sorted(Map.Entry.comparingByKey())
-							.collect(Collectors.toMap(
-									Map.Entry::getKey,
-									Map.Entry::getValue,
-									// 解决可能存在的键冲突问题，默认保留第一个值
-									(oldValue, newValue) -> oldValue,
-									// 提供一个新的TreeMap实例作为收集器，用于保持排序
-									() -> new TreeMap<>() 
-									));
-					
+					if(null != waxCategoryMap && !waxCategoryMap.isEmpty()){
+						waxCategoryMap = waxCategoryMap.entrySet().stream()
+								.sorted(Map.Entry.comparingByKey())
+								.collect(Collectors.toMap(
+										Map.Entry::getKey,
+										Map.Entry::getValue,
+										// 解决可能存在的键冲突问题，默认保留第一个值
+										(oldValue, newValue) -> oldValue,
+										// 提供一个新的TreeMap实例作为收集器，用于保持排序
+										() -> new TreeMap<>() 
+										));
+					}
 
 					//切图脏器信息==》按照切片脏器统计汇总
 					List<Long> annoSlideIdList = animalSlideList.stream().map(Slide::getSlideId).collect(Collectors.toList());
@@ -284,17 +285,20 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 								annoCategoryMap.put(categoryFullName, categoryCount);
 							}
 						}
-						annoCategoryMap = annoCategoryMap.entrySet().stream()
-								.sorted(Map.Entry.comparingByKey())
-								.collect(Collectors.toMap(
-										Map.Entry::getKey,
-										Map.Entry::getValue,
-										// 解决可能存在的键冲突问题，默认保留第一个值
-										(oldValue, newValue) -> oldValue,
-										// 提供一个新的TreeMap实例作为收集器，用于保持排序
-										() -> new TreeMap<>() 
-										));
+						
+						if(null != annoCategoryMap && !annoCategoryMap.isEmpty()){
+							annoCategoryMap = annoCategoryMap.entrySet().stream()
+									.sorted(Map.Entry.comparingByKey())
+									.collect(Collectors.toMap(
+											Map.Entry::getKey,
+											Map.Entry::getValue,
+											// 解决可能存在的键冲突问题，默认保留第一个值
+											(oldValue, newValue) -> oldValue,
+											// 提供一个新的TreeMap实例作为收集器，用于保持排序
+											() -> new TreeMap<>() 
+											));
 
+						}
 					}
 
 					SplitVerificationOut svOut = new SplitVerificationOut();
