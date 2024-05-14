@@ -139,8 +139,13 @@
             resultMap="BaseResultMap">
         SELECT sum(ST_Area(contour40000)) AS area
         from fr_ai_annotation_${sequenceNumber}
-        where single_slide_id = #{singleSlideId}
-          and category_id = #{categoryId}
+        where category_id = #{categoryId}
+        <if test="singleSlideId != null">
+            AND single_slide_id = #{singleSlideId}
+        </if>
+        <if test="slideId != null">
+            AND slide_id = #{slideId}
+        </if>
     </select>
 
 
