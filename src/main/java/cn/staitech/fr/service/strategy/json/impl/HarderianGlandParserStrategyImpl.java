@@ -1,15 +1,14 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.common.core.utils.SpringUtils;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
-import cn.staitech.fr.mapper.SingleSlideMapper;
-import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
+import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -29,11 +28,9 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -55,8 +52,10 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
     private SingleSlideMapper singleSlideMapper = SpringUtils.getBean(SingleSlideMapper.class);
     @Resource
     private AiForecastService aiForecastService = SpringUtils.getBean(AiForecastService.class);
+    @Resource
+    private ImageMapper imageMapper = SpringUtils.getBean(ImageMapper.class);
 
-    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
+    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX) {
         if (element.isObject()) {
             JsonNode node = element.get("id");
             // node 转换成String
@@ -118,7 +117,18 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
             }
             Annotation annotation = new Annotation();
             // 查询标签信息
-            annotation.setArea(properties.getArea());
+            Map<String, Indicator> dataIndicators = properties.getData_indicators();
+            if (!CollectionUtil.isEmpty(dataIndicators)) {
+                dataIndicators.forEach((k, v) -> {
+                    if (StringUtils.isNotEmpty(v.getUnit())) {
+                        double value = v.getValue();
+                        BigDecimal bigDecimal = new BigDecimal(resolutionX);
+                        BigDecimal bigDecimal1 = new BigDecimal(value);
+                        annotation.setArea(bigDecimal1.multiply(bigDecimal).multiply(bigDecimal).setScale(3, RoundingMode.HALF_UP) + "");
+                    }
+                });
+            }
+
             annotation.setPerimeter(properties.getPerimeter());
             annotation.setCreateBy(0L);
             annotation.setCreateTime(String.valueOf(new Date()));
@@ -171,25 +181,11 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         }
     }
 
-    private static Annotation processJsonElement(JsonNode element, ExecutorService executorService, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
-
-        try {
-            Future<Annotation> future = executorService.submit(() -> HarderianGlandParserStrategyImpl.handleSingleJsonElement(element, pathologicalMap, jsonTask));
-            Annotation annotation = future.get();
-            future.get(30, TimeUnit.SECONDS);  // 设定超时时间以避免无限等待
-            return annotation;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         String filePath = jsonFileS.getFileUrl();
 
-        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
         QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
         wrapper.eq("special_id", jsonTask.getSpecialId());
         SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
@@ -211,16 +207,23 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
             List<JsonNode> elementsList = new ArrayList<>();
             while (!jsonParser.isClosed()) {
                 JsonToken token = jsonParser.nextToken();
-                if (token == null) break;
+                if (token == null) {
+                    break;
+                }
                 if (token == JsonToken.START_OBJECT) {
                     processObjectNode(objectMapper, jsonParser, elementsList);
                 }
             }
             List<Annotation> arrayList = new ArrayList<>();
-            // todo 可优化
+            Image image = imageMapper.selectById(jsonTask.getImageId());
+            String resolutionX = image.getResolutionX();
+            if (StringUtils.isEmpty(resolutionX)) {
+                resolutionX = "0.262";
+            }
 //            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
+            String finalResolutionX = resolutionX;
             elementsList.stream().forEach(element -> {
-                Annotation annotation = processJsonElement(element, executorService, pathologicalMap, jsonTask);
+                Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, finalResolutionX);
                 if (!ObjectUtil.isEmpty(annotation)) {
 //                    annotation1.setContour(annotation.getContour40000());
 //                    Annotation annotationBy = annotationMapper.intersectsGeometry(annotation1);
@@ -230,15 +233,13 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
                 }
             });
             anno.setList(arrayList);
+            batchProcessAndSave(anno, 1000);
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
-        } finally {
-            executorService.shutdown();
         }
 
-        batchProcessAndSave(anno, 1000, Runtime.getRuntime().availableProcessors());
-
     }
+
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
@@ -253,36 +254,28 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 
-    public void batchProcessAndSave(Annotation annotation, int batchSize, int threadCount) {
-        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+    public void batchProcessAndSave(Annotation annotation, int batchSize) {
+
         List<Annotation> annotations = annotation.getList();
+        if (CollectionUtil.isEmpty(annotations)) {
+            return;
+        }
         int listSize = annotations.size();
 
         // 分批处理
         for (int i = 0; i < listSize; i += batchSize) {
             int endIndex = Math.min(i + batchSize, listSize);
             List<Annotation> batch = annotations.subList(i, endIndex);
-            // 提交任务到线程池
-            executor.submit(() -> {
-                Annotation annotation1 = new Annotation();
-                annotation1.setSequenceNumber(annotation.getSequenceNumber());
-                annotation1.setList(batch);
-                try {
-                    annotationMapper.batchSave(annotation1);
-                } catch (Exception e) {
-                    // 处理异常，例如记录日志
-                    log.error("Error occurred while processing batch: " + e.getMessage(), e);
-                }
-            });
-        }
-
-        // 等待所有任务完成
-        executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            // 处理中断异常
-            Thread.currentThread().interrupt();
+            Annotation annotation1 = new Annotation();
+            annotation1.setSequenceNumber(annotation.getSequenceNumber());
+            annotation1.setList(batch);
+            try {
+                annotationMapper.batchSave(annotation1);
+            } catch (Exception e) {
+                // 处理异常，例如记录日志
+                log.error("Error occurred while processing batch: " + e.getMessage(), e);
+            }
         }
     }
+
 }
