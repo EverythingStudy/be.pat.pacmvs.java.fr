@@ -90,52 +90,51 @@ public class JsonTaskParserService {
         }
 
 
-//        // 线程池 异步  调用策略提交任务
-//        for (JsonFile jsonFile : jsonFileList) {
-//            ParserStrategy finalParser = parser;
-//            finalParser.parseJson(jsonTask, jsonFile);
-//        }
-//
-//        // 指标计算
-//        parser.alculationIndicators(jsonTask);
-//
-//        // 修改任务状态
-//        jsonTask.setStatus(1);
-//        jsonTaskService.updateById(jsonTask);
-
-
-        CountDownLatch countDownLatch = new CountDownLatch(count);
-
-        AtomicInteger id = new AtomicInteger();
         // 线程池 异步  调用策略提交任务
         for (JsonFile jsonFile : jsonFileList) {
-            try {
-                ParserStrategy finalParser = parser;
-                jsonTaskExecutorService.submit(() -> {
-                            log.info("---> {} {}", id.getAndIncrement(), jsonFile.getFileUrl());
-                            finalParser.parseJson(jsonTask, jsonFile);
-                        }
-                );
-            } catch (Exception e) {
-
-            } finally {
-                countDownLatch.countDown();
-            }
+            ParserStrategy finalParser = parser;
+            finalParser.parseJson(jsonTask, jsonFile);
         }
 
-        // 避免主线程无法执行到
-        try {
-            countDownLatch.await();
-            // 指标计算
-            parser.alculationIndicators(jsonTask);
-            // 修改任务状态
-            jsonTask.setStatus(1);
-            jsonTaskService.updateById(jsonTask);
-        } catch (InterruptedException e) {
+        // 指标计算
+        parser.alculationIndicators(jsonTask);
 
-        } finally {
+        // 修改任务状态
+        jsonTask.setStatus(1);
+        jsonTaskService.updateById(jsonTask);
 
-        }
+
+//        CountDownLatch countDownLatch = new CountDownLatch(count);
+//
+//        AtomicInteger id = new AtomicInteger();
+//        // 线程池 异步  调用策略提交任务
+//        for (JsonFile jsonFile : jsonFileList) {
+//            try {
+//                ParserStrategy finalParser = parser;
+//                jsonTaskExecutorService.submit(() -> {
+//                            log.info("---> {} {}", id.getAndIncrement(), jsonFile.getFileUrl());
+//                            // finalParser.parseJson(jsonTask, jsonFile);
+//                            finalParser.parseJson(jsonTask, jsonFile, finalParser);
+//                        }
+//                );
+//            } catch (Exception e) {
+//
+//            } finally {
+//                countDownLatch.countDown();
+//            }
+//        }
+//
+//        // 避免主线程无法执行到
+//        try {
+//            countDownLatch.await();
+//            // 指标计算
+//            parser.alculationIndicators(jsonTask);
+//            // 修改任务状态
+//            jsonTask.setStatus(1);
+//            jsonTaskService.updateById(jsonTask);
+//        } catch (InterruptedException e) {
+//
+//        }
     }
 
     /**
