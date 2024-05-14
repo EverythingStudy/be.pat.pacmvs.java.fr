@@ -183,8 +183,11 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
+
 //        long startTime = System.currentTimeMillis();
         String filePath = jsonFileS.getFileUrl();
+        log.info("hashixian:{}", filePath);
+
         QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
         wrapper.eq("special_id", jsonTask.getSpecialId());
         SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
@@ -240,7 +243,9 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
                     }).filter(Objects::nonNull).collect(Collectors.toList());
 
             anno.setList(processedAnnotations);
+            log.info("hashixiandaxiao:{}", processedAnnotations.size());
             batchProcessAndSave(anno, 1000);
+            log.info("hashixianchenggong....." );
 //            long endTime = System.currentTimeMillis();
 //            long executionTime = endTime - startTime; // 执行时间，单位毫秒
 //            System.out.println("执行时间毫秒："+executionTime);
