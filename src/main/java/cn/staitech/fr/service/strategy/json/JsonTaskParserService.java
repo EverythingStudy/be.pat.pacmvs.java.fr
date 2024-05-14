@@ -92,7 +92,9 @@ public class JsonTaskParserService {
         // 线程池 异步  调用策略提交任务
         for (JsonFile jsonFile : jsonFileList) {
             ParserStrategy finalParser = parser;
-             log.info("++++parseJson:{} {}", jsonTask,jsonFile);
+            log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            log.info("++++parseJson:{} {} {}", jsonTask,jsonFile,finalParser);
+            log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
             finalParser.parseJson(jsonTask, jsonFile);
         }
 
