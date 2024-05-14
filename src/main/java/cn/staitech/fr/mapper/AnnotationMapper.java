@@ -5,17 +5,17 @@ import cn.staitech.fr.vo.annotation.AnnotationCountByCategory;
 import cn.staitech.fr.vo.annotation.MarkingMerge;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Param;
-
 /**
-* @author admin
-* @description 针对表【fr_annotation】的数据库操作Mapper
-* @createDate 2024-04-01 09:42:42
-* @Entity cn.staitech.fr.domain.Annotation
-*/
+ * @author admin
+ * @description 针对表【fr_annotation】的数据库操作Mapper
+ * @createDate 2024-04-01 09:42:42
+ * @Entity cn.staitech.fr.domain.Annotation
+ */
+@Mapper
 @DS("slave")
 public interface AnnotationMapper extends BaseMapper<Annotation> {
 
