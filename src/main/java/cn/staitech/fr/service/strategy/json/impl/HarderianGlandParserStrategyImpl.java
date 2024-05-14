@@ -2,7 +2,6 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.staitech.common.core.utils.SpringUtils;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.*;
@@ -43,17 +42,17 @@ import java.util.stream.Collectors;
 public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
     @Resource
-    public SpecialAnnotationRelMapper specialAnnotationRelMapper = SpringUtils.getBean(SpecialAnnotationRelMapper.class);
+    public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
-    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper = SpringUtils.getBean(PathologicalIndicatorCategoryMapper.class);
+    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
     @Resource
-    private AnnotationMapper annotationMapper = SpringUtils.getBean(AnnotationMapper.class);
+    private AnnotationMapper annotationMapper;
     @Resource
-    private SingleSlideMapper singleSlideMapper = SpringUtils.getBean(SingleSlideMapper.class);
+    private SingleSlideMapper singleSlideMapper;
     @Resource
-    private AiForecastService aiForecastService = SpringUtils.getBean(AiForecastService.class);
+    private AiForecastService aiForecastService;
     @Resource
-    private ImageMapper imageMapper = SpringUtils.getBean(ImageMapper.class);
+    private ImageMapper imageMapper;
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX) {
         if (element.isObject()) {
@@ -184,8 +183,8 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
+//        long startTime = System.currentTimeMillis();
         String filePath = jsonFileS.getFileUrl();
-
         QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
         wrapper.eq("special_id", jsonTask.getSpecialId());
         SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
@@ -214,26 +213,37 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
                     processObjectNode(objectMapper, jsonParser, elementsList);
                 }
             }
-            List<Annotation> arrayList = new ArrayList<>();
+
             Image image = imageMapper.selectById(jsonTask.getImageId());
             String resolutionX = image.getResolutionX();
             if (StringUtils.isEmpty(resolutionX)) {
                 resolutionX = "0.262";
             }
-//            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
+            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
             String finalResolutionX = resolutionX;
-            elementsList.stream().forEach(element -> {
-                Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, finalResolutionX);
-                if (!ObjectUtil.isEmpty(annotation)) {
-//                    annotation1.setContour(annotation.getContour40000());
-//                    Annotation annotationBy = annotationMapper.intersectsGeometry(annotation1);
-//                    if (ObjectUtil.equals("t", annotationBy.getIntersectsResults())) {
-                    arrayList.add(annotation);
-//                    }
-                }
-            });
-            anno.setList(arrayList);
+            List<Annotation> processedAnnotations;
+            processedAnnotations = elementsList.parallelStream()
+                    .map(element -> {
+                        Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, finalResolutionX);
+                        if (!ObjectUtil.isEmpty(annotation)) {
+                            if (ObjectUtil.isNotEmpty(annotation1)) {
+                                annotation1.setContour(annotation.getContour40000());
+                                Annotation annotationBy = annotationMapper.intersectsGeometry(annotation1);
+                                if (ObjectUtil.equals("t", annotationBy.getIntersectsResults())) {
+                                    return annotation;
+                                }
+                            } else {
+                                return annotation;
+                            }
+                        }
+                        return null;
+                    }).filter(Objects::nonNull).collect(Collectors.toList());
+
+            anno.setList(processedAnnotations);
             batchProcessAndSave(anno, 1000);
+//            long endTime = System.currentTimeMillis();
+//            long executionTime = endTime - startTime; // 执行时间，单位毫秒
+//            System.out.println("执行时间毫秒："+executionTime);
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
