@@ -34,7 +34,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author: wangfeng
+ * @author:
  * @create: 2024-05-10 14:18:48
  * @Description: Coagulating_glang Json Parser 大鼠凝固腺
  */
@@ -243,10 +243,25 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
+        QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
+        // 查询所有未被删除且登录机构相同的数据
+        qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
+        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
+        Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+        QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
+        wrapper.eq("special_id", jsonTask.getSpecialId());
+        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
+        Long sequenceNumber = annotationRel.getSequenceNumber();
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        indicatorResultsMap.put("哈氏腺面积", new IndicatorAddIn("Acinus area%", singleSlide.getArea(), "平方毫米"));
-
+        indicatorResultsMap.put("大鼠凝固腺面积", new IndicatorAddIn("Coagulating gland area", singleSlide.getArea(), "平方毫米"));
+        Annotation annotation = new Annotation();
+//        annotation.setSingleSlideId(jsonTask.getSingleId());
+        annotation.setSlideId(jsonTask.getSlideId());
+        annotation.setCategoryId(pathologicalMap.get("123005"));
+        annotation.setSequenceNumber(sequenceNumber);
+        Annotation structureArea = annotationMapper.getStructureArea(annotation);
+        indicatorResultsMap.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", structureArea.getArea(), "平方毫米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 
