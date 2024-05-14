@@ -63,8 +63,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 
 	@Override
 	public PageResponse<SplitVerificationOut>  getList(SplitVerificationQueryIn req) {
-				Long organizationId = 1L;
-//		Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+//				Long organizationId = 1L;
+		Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
 		PageResponse<SplitVerificationOut> pageResponse = new PageResponse<>();
 		//查看切片明细  0：否  1：是
 		int detailType = req.getDetailType();
@@ -367,6 +367,9 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 	//颜色处理
 	private List<CategoryChild> getCategoryNumber(Map<String, Long> frontCategoryMap,Map<String, Long> backCategoryMap,Integer checkStatus){
 		List<CategoryChild> list = new ArrayList<>();
+		if(null == frontCategoryMap || frontCategoryMap.isEmpty() ){
+			return new ArrayList<>();
+		}
 		for (Map.Entry<String, Long> entry : frontCategoryMap.entrySet()) {
 			String categoryName = entry.getKey();
 			Long categoryNumber = entry.getValue();
@@ -374,13 +377,17 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			int categoryColour = 0;
 			//checkStatus 核对状态 0：初始 1：正确 2：修正正常 3：错误
 			if(null != checkStatus && checkStatus != 1){
-				boolean containsTag = containsOrgan(categoryName, categoryNumber, backCategoryMap);
-				if(!containsTag){
-					if(null != checkStatus && checkStatus == 2){
-						categoryColour = 2;
-					}else{
-						categoryColour = 1;
+				if(null != backCategoryMap && !backCategoryMap.isEmpty()){
+					boolean containsTag = containsOrgan(categoryName, categoryNumber, backCategoryMap);
+					if(!containsTag){
+						if(null != checkStatus && checkStatus == 2){
+							categoryColour = 2;
+						}else{
+							categoryColour = 1;
+						}
 					}
+				}else{
+					categoryColour = 1;
 				}
 			}
 			CategoryChild child = new CategoryChild();
