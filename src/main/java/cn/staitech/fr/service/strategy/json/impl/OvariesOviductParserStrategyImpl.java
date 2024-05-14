@@ -1,14 +1,17 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.staitech.common.core.utils.SpringUtils;
 import cn.staitech.fr.domain.*;
-import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -51,17 +54,21 @@ import java.util.stream.Collectors;
 public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 
 	@Resource
-	public SpecialAnnotationRelMapper specialAnnotationRelMapper;
+	public SpecialAnnotationRelMapper specialAnnotationRelMapper = SpringUtils.getBean(SpecialAnnotationRelMapper.class);
 	@Resource
-	private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
+	private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper = SpringUtils.getBean(PathologicalIndicatorCategoryMapper.class);
 	@Resource
-	private AnnotationMapper annotationMapper;
+	private AnnotationMapper annotationMapper = SpringUtils.getBean(AnnotationMapper.class);
 	@Resource
-	private SingleSlideMapper singleSlideMapper;
+	private SingleSlideMapper singleSlideMapper = SpringUtils.getBean(SingleSlideMapper.class);
 	@Resource
-	private AiForecastService aiForecastService;
+	private AiForecastService aiForecastService = SpringUtils.getBean(AiForecastService.class);
+	@Resource
+	public ImageMapper imageMapper = SpringUtils.getBean(ImageMapper.class);
 
-	private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap) {
+
+
+	private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask,String resolutionX) {
 		if (element.isObject()) {
 			JsonNode node = element.get("id");
 			// node 转换成String
@@ -122,13 +129,25 @@ public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 				return null;
 			}
 			Annotation annotation = new Annotation();
+
 			// 查询标签信息
-			annotation.setArea(properties.getArea());
+			Map<String, Indicator> dataIndicators = properties.getData_indicators();
+			if (!CollectionUtil.isEmpty(dataIndicators)) {
+				dataIndicators.forEach((k, v) -> {
+					if (StringUtils.isNotEmpty(v.getUnit())) {
+						double value = v.getValue();
+						BigDecimal bigDecimal = new BigDecimal(resolutionX);
+						BigDecimal bigDecimal1 = new BigDecimal(value);
+						annotation.setArea(bigDecimal1.multiply(bigDecimal).multiply(bigDecimal).multiply(new BigDecimal(0.000001)).setScale(3, RoundingMode.HALF_UP) + "");
+					}
+				});
+			}
+			// 查询标签信息
 			annotation.setPerimeter(properties.getPerimeter());
 			annotation.setCreateBy(0L);
 			annotation.setCreateTime(String.valueOf(new Date()));
-			annotation.setProjectId(25L);
-			annotation.setSlideId(85L);
+			annotation.setProjectId(0L);
+			annotation.setSlideId(jsonTask.getSlideId());
 			if (null != geometry) {
 				annotation.setContour40000(geometry.toString());
 			}
@@ -148,8 +167,7 @@ public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 				log.info("categoryId解析失败");
 				return null;
 			}
-			annotation.setSlideId(85L);
-			annotation.setSingleSlideId(131L);
+			annotation.setSingleSlideId(jsonTask.getSingleId());
 			annotation.setCategoryId(categoryId);
 			annotation.setAnnotationType(annotationType.toUpperCase());
 			return annotation;
@@ -176,10 +194,10 @@ public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 		}
 	}
 
-	private static Annotation processJsonElement(JsonNode element, ExecutorService executorService, Map<String, Long> pathologicalMap) {
+	private static Annotation processJsonElement(JsonNode element, ExecutorService executorService, Map<String, Long> pathologicalMap, JsonTask jsonTask,String resolutionX) {
 
 		try {
-			Future<Annotation> future = executorService.submit(() -> OvariesOviductParserStrategyImpl.handleSingleJsonElement(element, pathologicalMap));
+			Future<Annotation> future = executorService.submit(() -> OvariesOviductParserStrategyImpl.handleSingleJsonElement(element, pathologicalMap,jsonTask,resolutionX));
 			Annotation annotation = future.get();
 			future.get(30, TimeUnit.SECONDS);  // 设定超时时间以避免无限等待
 			return annotation;
@@ -196,7 +214,7 @@ public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 
 		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
 		QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
-		wrapper.eq("special_id", 25);
+		wrapper.eq("special_id", jsonTask.getSpecialId());
 		SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
 		Long sequenceNumber = annotationRel.getSequenceNumber();
 		Annotation anno = new Annotation();
@@ -207,10 +225,16 @@ public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 		QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
 		// 查询所有未被删除且登录机构相同的数据
 		qw.eq("del_flag", 0)
-		.eq("organization_id", 1);
+		.eq("organization_id", jsonTask.getOrganizationId());
 		List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
 		Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
 
+		Image image = imageMapper.selectById(jsonTask.getImageId());
+        String resolutionX = image.getResolutionX();
+        if (StringUtils.isEmpty(resolutionX)) {
+            resolutionX = "0.262";
+        }
+        String finalResolutionX = resolutionX;
 		try (FileInputStream fis = new FileInputStream(jsonFile);
 				JsonParser jsonParser = jsonFactory.createParser(fis)) {
 
@@ -223,14 +247,17 @@ public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 				}
 			}
 			List<Annotation> arrayList = new ArrayList<>();
-			AtomicInteger count = new AtomicInteger();
-			elementsList.stream().forEach(element -> {
-				count.addAndGet(1);
-				Annotation annotation = processJsonElement(element, executorService, pathologicalMap);
-				if (!ObjectUtil.isEmpty(annotation)) {
-					arrayList.add(annotation);
-				}
-			});
+            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
+            elementsList.stream().forEach(element -> {
+                Annotation annotation = processJsonElement(element, executorService, pathologicalMap, jsonTask,finalResolutionX);
+                if (!ObjectUtil.isEmpty(annotation)) {
+                    annotation1.setContour(annotation.getContour40000());
+                    Annotation annotationBy = annotationMapper.intersectsGeometry(annotation1);
+                    if (ObjectUtil.equals("t", annotationBy.getIntersectsResults())) {
+                        arrayList.add(annotation);
+                    }
+                }
+            });
 			anno.setList(arrayList);
 		} catch (Exception e) {
 			log.error("Unexpected error occurred: " + e.getMessage(), e);
@@ -242,12 +269,6 @@ public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 
 	@Override
 	public void alculationIndicators(JsonTask jsonTask) {
-		/* Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        indicatorResultsMap.put("黄体面积（全片）", new IndicatorAddIn("Corpus luteum area(all)", singleSlide.getArea(), "平方毫米"));
-        indicatorResultsMap.put("黄体数量", new IndicatorAddIn("Corpus luteum numbers", "", "个"));
-        indicatorResultsMap.put("卵泡数量", new IndicatorAddIn("Follicle numbers", "", "个"));
-        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);*/
 		log.info("大鼠卵巢构指标计算开始");
 		QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
 		// 查询所有未被删除且登录机构相同的数据
@@ -281,24 +302,19 @@ public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 			annotation1.setSequenceNumber(sequenceNumber);
 			Annotation structureArea = annotationMapper.getStructureArea(annotation1);
 
-			SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+			//SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
 			//查询切片缩放
 			String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
 
-			BigDecimal bigDecimalB = new BigDecimal(0);
 			if (StringUtils.isNotEmpty(resolution) && StringUtils.isNotEmpty(structureArea.getArea())) {
-				BigDecimal bigDecimal = new BigDecimal(resolution);
 				BigDecimal bigDecimal1 = new BigDecimal(structureArea.getArea());
-				bigDecimalB = bigDecimal1.multiply(bigDecimal).multiply(bigDecimal).multiply(new BigDecimal(0.000001));
 
 				AiForecast aiForecast1 = new AiForecast();
 				aiForecast1.setQuantitativeIndicators("黄体面积（全片）");
 				aiForecast1.setQuantitativeIndicatorsEn("Corpus luteum area(all)");
 				aiForecast1.setUnit("平方毫米");
 				aiForecast1.setSingleSlideId(jsonTask.getSingleId());
-				if (StringUtils.isNotEmpty(singleSlide.getArea())) {
-					aiForecast1.setResults(bigDecimalB.toString());
-				}
+				aiForecast1.setResults(bigDecimal1.toString());
 				insertEntity.add(aiForecast1);
 			}
 		}

@@ -114,6 +114,7 @@ public class SeminalVesicleGlandParserStrategyImpl implements ParserStrategy {
                         arrayList.add(annotation);
                     }
                 }
+                arrayList.add(annotation);
             });
             anno.setList(arrayList);
         } catch (Exception e) {
@@ -153,7 +154,7 @@ public class SeminalVesicleGlandParserStrategyImpl implements ParserStrategy {
         //腺上皮面积（全片）
         //查询切片缩放
         String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
-
+        BigDecimal bigDecimal = new BigDecimal("0.262");
         //计算结构面积
         Annotation annotation = new Annotation();
         annotation.setSingleSlideId(jsonTask.getSingleId());
@@ -166,8 +167,10 @@ public class SeminalVesicleGlandParserStrategyImpl implements ParserStrategy {
         aiForecast1.setQuantitativeIndicatorsEn("Acinar epithelial area (all)");
         aiForecast1.setUnit("平方毫米");
         aiForecast1.setSingleSlideId(jsonTask.getSingleId());
-        if (StringUtils.isNotEmpty(resolution) && StringUtils.isNotEmpty(structureArea.getArea())) {
-            BigDecimal bigDecimal = new BigDecimal(resolution);
+        if(StringUtils.isNotEmpty(resolution)){
+            bigDecimal = new BigDecimal(resolution);
+        }
+        if (StringUtils.isNotEmpty(structureArea.getArea())) {
             BigDecimal bigDecimal1 = new BigDecimal(structureArea.getArea());
             BigDecimal multiply = bigDecimal1.multiply(bigDecimal).multiply(bigDecimal).multiply(new BigDecimal(0.000001)).setScale(3, RoundingMode.HALF_UP);
             aiForecast1.setResults(multiply.toString());

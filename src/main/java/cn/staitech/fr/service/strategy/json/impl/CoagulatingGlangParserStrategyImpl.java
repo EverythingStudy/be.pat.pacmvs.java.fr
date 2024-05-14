@@ -1,15 +1,14 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.common.core.utils.SpringUtils;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
-import cn.staitech.fr.mapper.SingleSlideMapper;
-import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
+import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -23,36 +22,40 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * @author: wangfeng
+ * @author:
  * @create: 2024-05-10 14:18:48
- * @Description: Json Parser 大鼠甲状腺
+ * @Description: Coagulating_glang Json Parser 大鼠凝固腺
  */
 @Slf4j
-@Component("Thyroid_gland")
-public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
+@Component("Coagulating_glang")
+public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
 
-    @Autowired
+    @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper = SpringUtils.getBean(SpecialAnnotationRelMapper.class);
-    @Autowired
+    @Resource
     private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper = SpringUtils.getBean(PathologicalIndicatorCategoryMapper.class);
-    @Autowired
+    @Resource
     private AnnotationMapper annotationMapper = SpringUtils.getBean(AnnotationMapper.class);
-    @Autowired
+    @Resource
     private SingleSlideMapper singleSlideMapper = SpringUtils.getBean(SingleSlideMapper.class);
-    @Autowired
+    @Resource
     private AiForecastService aiForecastService = SpringUtils.getBean(AiForecastService.class);
+    @Resource
+    private ImageMapper imageMapper = SpringUtils.getBean(ImageMapper.class);
 
-    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
+    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX) {
         if (element.isObject()) {
             JsonNode node = element.get("id");
             // node 转换成String
@@ -114,7 +117,18 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
             }
             Annotation annotation = new Annotation();
             // 查询标签信息
-            annotation.setArea(properties.getArea());
+            Map<String, Indicator> dataIndicators = properties.getData_indicators();
+            if (!CollectionUtil.isEmpty(dataIndicators)) {
+                dataIndicators.forEach((k, v) -> {
+                    if (StringUtils.isNotEmpty(v.getUnit())) {
+                        double value = v.getValue();
+                        BigDecimal bigDecimal = new BigDecimal(resolutionX);
+                        BigDecimal bigDecimal1 = new BigDecimal(value);
+                        annotation.setArea(bigDecimal1.multiply(bigDecimal).multiply(bigDecimal).setScale(3, RoundingMode.HALF_UP) + "");
+                    }
+                });
+            }
+
             annotation.setPerimeter(properties.getPerimeter());
             annotation.setCreateBy(0L);
             annotation.setCreateTime(String.valueOf(new Date()));
@@ -167,6 +181,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         }
     }
 
+
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         String filePath = jsonFileS.getFileUrl();
@@ -200,10 +215,21 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
                 }
             }
             List<Annotation> arrayList = new ArrayList<>();
+            Image image = imageMapper.selectById(jsonTask.getImageId());
+            String resolutionX = image.getResolutionX();
+            if (StringUtils.isEmpty(resolutionX)) {
+                resolutionX = "0.262";
+            }
+//            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
+            String finalResolutionX = resolutionX;
             elementsList.stream().forEach(element -> {
-                Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask);
+                Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, finalResolutionX);
                 if (!ObjectUtil.isEmpty(annotation)) {
+//                    annotation1.setContour(annotation.getContour40000());
+//                    Annotation annotationBy = annotationMapper.intersectsGeometry(annotation1);
+//                    if (ObjectUtil.equals("t", annotationBy.getIntersectsResults())) {
                     arrayList.add(annotation);
+//                    }
                 }
             });
             anno.setList(arrayList);
@@ -211,24 +237,40 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
+
     }
+
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
+        QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
+        // 查询所有未被删除且登录机构相同的数据
+        qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
+        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
+        Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+        QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
+        wrapper.eq("special_id", jsonTask.getSpecialId());
+        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
+        Long sequenceNumber = annotationRel.getSequenceNumber();
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        /*indicatorResultsMap.put("腺泡面积占比（全片）", new IndicatorAddIn("Duct area%", "", ""));
-        indicatorResultsMap.put("腺泡细胞核密度(单个)", new IndicatorAddIn("Nucleus density of acinus", "", ""));
-        indicatorResultsMap.put("色素面积占比", new IndicatorAddIn("Epithelial apex cytoplasm area%", "", ""));
-        indicatorResultsMap.put("腺泡细胞核密度（全片）", new IndicatorAddIn("Mesenchyme area%", "", ""));*/
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        indicatorResultsMap.put("大鼠甲状腺面积", new IndicatorAddIn("Acinus area%", singleSlide.getArea(), "平方毫米"));
-
+        indicatorResultsMap.put("大鼠凝固腺面积", new IndicatorAddIn("Coagulating gland area", singleSlide.getArea(), "平方毫米"));
+        Annotation annotation = new Annotation();
+//        annotation.setSingleSlideId(jsonTask.getSingleId());
+        annotation.setSlideId(jsonTask.getSlideId());
+        annotation.setCategoryId(pathologicalMap.get("123005"));
+        annotation.setSequenceNumber(sequenceNumber);
+        Annotation structureArea = annotationMapper.getStructureArea(annotation);
+        indicatorResultsMap.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", structureArea.getArea(), "平方毫米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 
     public void batchProcessAndSave(Annotation annotation, int batchSize) {
 
         List<Annotation> annotations = annotation.getList();
+        if (CollectionUtil.isEmpty(annotations)) {
+            return;
+        }
         int listSize = annotations.size();
 
         // 分批处理
@@ -246,4 +288,5 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
             }
         }
     }
+
 }
