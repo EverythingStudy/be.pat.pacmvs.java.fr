@@ -197,7 +197,7 @@ public class MammaryGlandParserStrategyImpl implements ParserStrategy {
         aiForecast2.setQuantitativeIndicatorsEn("Skin area");
         aiForecast2.setUnit("平方毫米");
         aiForecast2.setSingleSlideId(jsonTask.getSingleId());
-        aiForecast2.setResults(bigDecimalB.toString());
+        aiForecast2.setResults(bigDecimalB.setScale(3, RoundingMode.HALF_UP).toString());
         insertEntity.add(aiForecast2);
         AiForecast aiForecast3 = new AiForecast();
         aiForecast3.setQuantitativeIndicators("皮脂腺密度");
