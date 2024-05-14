@@ -191,8 +191,9 @@ public class JsonTaskParserService {
                     String fileUrl = jsonObject.getString("fileUrl");
                     if (fileUrl.toLowerCase().endsWith(".json")) {
                         jsonFile.setFileUrl(fileUrl);
+                    } else {
+                        continue;
                     }
-                    continue;
                 }
 
                 jsonFile.setTaskId(task.getTaskId());
