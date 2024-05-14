@@ -37,7 +37,7 @@ public class SplitVerificationController {
     private SplitVerificationService splitVerificationService;
 
     @ApiOperation(value = "专题管理-拆分核对")
-    @RequiresPermissions("readFilmCreate:visceraSplitCheck")
+    //@RequiresPermissions("readFilmCreate:visceraSplitCheck")
     @PostMapping("/list")
     public R<PageResponse<SplitVerificationOut>> list(@Validated @RequestBody SplitVerificationQueryIn req) {
         PageResponse<SplitVerificationOut> page = splitVerificationService.getList(req);
@@ -45,7 +45,7 @@ public class SplitVerificationController {
     }
     
     @ApiOperation(value = "专题管理-结果修正/取消修正")
-    @RequiresPermissions("readFilmCreate:visceraSplitCheck:amend")
+    //@RequiresPermissions("readFilmCreate:visceraSplitCheck:amend")
     @PostMapping("/updateResult")
     public R updateResult(@Validated @RequestBody ResultCorrectionIn req) {
         splitVerificationService.updateResult(req);
