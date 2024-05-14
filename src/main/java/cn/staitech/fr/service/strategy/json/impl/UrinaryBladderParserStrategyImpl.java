@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.staitech.common.core.utils.SpringUtils;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
@@ -43,16 +44,17 @@ import java.util.stream.Collectors;
 @Component("Urinary_bladder")
 public class UrinaryBladderParserStrategyImpl implements ParserStrategy {
 
+
     @Resource
-    public SpecialAnnotationRelMapper specialAnnotationRelMapper;
+    public SpecialAnnotationRelMapper specialAnnotationRelMapper = SpringUtils.getBean(SpecialAnnotationRelMapper.class);
     @Resource
-    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
+    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper = SpringUtils.getBean(PathologicalIndicatorCategoryMapper.class);
     @Resource
-    private AnnotationMapper annotationMapper;
+    private AnnotationMapper annotationMapper = SpringUtils.getBean(AnnotationMapper.class);
     @Resource
-    private SingleSlideMapper singleSlideMapper;
+    private SingleSlideMapper singleSlideMapper = SpringUtils.getBean(SingleSlideMapper.class);
     @Resource
-    private AiForecastService aiForecastService;
+    private AiForecastService aiForecastService = SpringUtils.getBean(AiForecastService.class);
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
         if (element.isObject()) {

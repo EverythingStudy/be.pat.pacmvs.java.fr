@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.staitech.common.core.utils.SpringUtils;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonFile;
@@ -54,16 +55,17 @@ import java.util.stream.Collectors;
 @Component("Skin_mammary")
 public class MammaryGlandParserStrategyImpl implements ParserStrategy {
 
+
     @Resource
-    public SpecialAnnotationRelMapper specialAnnotationRelMapper;
+    public SpecialAnnotationRelMapper specialAnnotationRelMapper = SpringUtils.getBean(SpecialAnnotationRelMapper.class);
     @Resource
-    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
+    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper = SpringUtils.getBean(PathologicalIndicatorCategoryMapper.class);
     @Resource
-    private AnnotationMapper annotationMapper;
+    private AnnotationMapper annotationMapper = SpringUtils.getBean(AnnotationMapper.class);
     @Resource
-    private SingleSlideMapper singleSlideMapper;
+    private SingleSlideMapper singleSlideMapper = SpringUtils.getBean(SingleSlideMapper.class);
     @Resource
-    private AiForecastService aiForecastService;
+    private AiForecastService aiForecastService = SpringUtils.getBean(AiForecastService.class);
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
