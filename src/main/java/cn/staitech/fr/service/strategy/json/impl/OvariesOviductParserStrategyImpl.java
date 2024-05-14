@@ -1,8 +1,8 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.staitech.common.core.utils.SpringUtils;
 import cn.staitech.fr.domain.*;
-import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
@@ -29,7 +29,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -51,15 +50,15 @@ import java.util.stream.Collectors;
 public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 
 	@Resource
-	public SpecialAnnotationRelMapper specialAnnotationRelMapper;
+	public SpecialAnnotationRelMapper specialAnnotationRelMapper = SpringUtils.getBean(SpecialAnnotationRelMapper.class);
 	@Resource
-	private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
+	private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper = SpringUtils.getBean(PathologicalIndicatorCategoryMapper.class);
 	@Resource
-	private AnnotationMapper annotationMapper;
+	private AnnotationMapper annotationMapper = SpringUtils.getBean(AnnotationMapper.class);
 	@Resource
-	private SingleSlideMapper singleSlideMapper;
+	private SingleSlideMapper singleSlideMapper = SpringUtils.getBean(SingleSlideMapper.class);
 	@Resource
-	private AiForecastService aiForecastService;
+	private AiForecastService aiForecastService = SpringUtils.getBean(AiForecastService.class);
 
 	private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap) {
 		if (element.isObject()) {

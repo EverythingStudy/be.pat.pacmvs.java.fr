@@ -2,15 +2,14 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.staitech.common.core.utils.SpringUtils;
 import cn.staitech.fr.domain.*;
-import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.CustomParserStrategy;
-
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -37,7 +36,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -49,16 +47,17 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service("Thymus")
 public class ThymusParserStrategyImpl implements CustomParserStrategy {
+
     @Resource
-    public SpecialAnnotationRelMapper specialAnnotationRelMapper;
+    public SpecialAnnotationRelMapper specialAnnotationRelMapper = SpringUtils.getBean(SpecialAnnotationRelMapper.class);
     @Resource
-    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
+    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper = SpringUtils.getBean(PathologicalIndicatorCategoryMapper.class);
     @Resource
-    private AnnotationMapper annotationMapper;
+    private AnnotationMapper annotationMapper = SpringUtils.getBean(AnnotationMapper.class);
     @Resource
-    private SingleSlideMapper singleSlideMapper;
+    private SingleSlideMapper singleSlideMapper = SpringUtils.getBean(SingleSlideMapper.class);
     @Resource
-    private AiForecastService aiForecastService;
+    private AiForecastService aiForecastService = SpringUtils.getBean(AiForecastService.class);
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
         if (element.isObject()) {
