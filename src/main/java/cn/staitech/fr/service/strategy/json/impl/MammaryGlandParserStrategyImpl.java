@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 /**
  * @Author wudi
  * @Date 2024/5/13 10:05
- * @desc 乳腺
+ * @desc 乳腺-皮肤
  */
 @Slf4j
 @Component("Skin_mammary")
@@ -156,6 +156,10 @@ public class MammaryGlandParserStrategyImpl implements ParserStrategy {
 
         //查询切片缩放
         String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
+        BigDecimal resolutions = new BigDecimal("0.262");
+        if(StringUtils.isNotEmpty(resolution)){
+            resolutions= new BigDecimal(resolution);
+        }
 
         //计算A面积
         BigDecimal bigDecimalA = new BigDecimal(0);
@@ -165,10 +169,9 @@ public class MammaryGlandParserStrategyImpl implements ParserStrategy {
             annotation.setCategoryId(pathologicalMap.get("123005"));
             annotation.setSequenceNumber(sequenceNumber);
             Annotation structureArea = annotationMapper.getStructureArea(annotation);
-            if (StringUtils.isNotEmpty(resolution) && StringUtils.isNotEmpty(structureArea.getArea())) {
-                BigDecimal bigDecimal = new BigDecimal(resolution);
+            if (StringUtils.isNotEmpty(structureArea.getArea())) {
                 BigDecimal bigDecimal1 = new BigDecimal(structureArea.getArea());
-                bigDecimalA = bigDecimal1.multiply(bigDecimal).multiply(bigDecimal).multiply(new BigDecimal(0.000001));
+                bigDecimalA = bigDecimal1.multiply(resolutions).multiply(resolutions).multiply(new BigDecimal(0.000001));
             }
         }
         Annotation annotation = new Annotation();
@@ -177,10 +180,9 @@ public class MammaryGlandParserStrategyImpl implements ParserStrategy {
         annotation.setSequenceNumber(sequenceNumber);
         Annotation structureArea = annotationMapper.getStructureArea(annotation);
         BigDecimal bigDecimalB = new BigDecimal(0);
-        if (StringUtils.isNotEmpty(resolution) && StringUtils.isNotEmpty(structureArea.getArea())) {
-            BigDecimal bigDecimal = new BigDecimal(resolution);
+        if ( StringUtils.isNotEmpty(structureArea.getArea())) {
             BigDecimal bigDecimal1 = new BigDecimal(structureArea.getArea());
-            bigDecimalB = bigDecimal1.multiply(bigDecimal).multiply(bigDecimal).multiply(new BigDecimal(0.000001));
+            bigDecimalB = bigDecimal1.multiply(resolutions).multiply(resolutions).multiply(new BigDecimal(0.000001));
         }
         AiForecast aiForecast1 = new AiForecast();
         aiForecast1.setQuantitativeIndicators("腺上皮面积（全片）");
