@@ -29,11 +29,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -171,25 +166,10 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         }
     }
 
-    private static Annotation processJsonElement(JsonNode element, ExecutorService executorService, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
-
-        try {
-            Future<Annotation> future = executorService.submit(() -> ThyroidGlandParserStrategyImpl.handleSingleJsonElement(element, pathologicalMap, jsonTask));
-            Annotation annotation = future.get();
-            future.get(30, TimeUnit.SECONDS);  // 设定超时时间以避免无限等待
-            return annotation;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         String filePath = jsonFileS.getFileUrl();
 
-        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
         QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
         wrapper.eq("special_id", jsonTask.getSpecialId());
         SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
@@ -211,28 +191,27 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
             List<JsonNode> elementsList = new ArrayList<>();
             while (!jsonParser.isClosed()) {
                 JsonToken token = jsonParser.nextToken();
-                if (token == null) break;
+                if (token == null) {
+                    break;
+                }
                 if (token == JsonToken.START_OBJECT) {
                     processObjectNode(objectMapper, jsonParser, elementsList);
                 }
             }
             List<Annotation> arrayList = new ArrayList<>();
-            AtomicInteger count = new AtomicInteger();
             elementsList.stream().forEach(element -> {
-                count.addAndGet(1);
-                Annotation annotation = processJsonElement(element, executorService, pathologicalMap, jsonTask);
+                Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask);
                 if (!ObjectUtil.isEmpty(annotation)) {
                     arrayList.add(annotation);
                 }
             });
             anno.setList(arrayList);
+            batchProcessAndSave(anno, 1000);
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         } finally {
-            executorService.shutdown();
-        }
-        batchProcessAndSave(anno, 1000, Runtime.getRuntime().availableProcessors());
 
+        }
     }
 
     @Override
@@ -248,8 +227,8 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 
-    public void batchProcessAndSave(Annotation annotation, int batchSize, int threadCount) {
-        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+    public void batchProcessAndSave(Annotation annotation, int batchSize) {
+
         List<Annotation> annotations = annotation.getList();
         int listSize = annotations.size();
 
@@ -257,27 +236,15 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         for (int i = 0; i < listSize; i += batchSize) {
             int endIndex = Math.min(i + batchSize, listSize);
             List<Annotation> batch = annotations.subList(i, endIndex);
-            // 提交任务到线程池
-            executor.submit(() -> {
-                Annotation annotation1 = new Annotation();
-                annotation1.setSequenceNumber(annotation.getSequenceNumber());
-                annotation1.setList(batch);
-                try {
-                    annotationMapper.batchSave(annotation1);
-                } catch (Exception e) {
-                    // 处理异常，例如记录日志
-                    log.error("Error occurred while processing batch: " + e.getMessage(), e);
-                }
-            });
-        }
-
-        // 等待所有任务完成
-        executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            // 处理中断异常
-            Thread.currentThread().interrupt();
+            Annotation annotation1 = new Annotation();
+            annotation1.setSequenceNumber(annotation.getSequenceNumber());
+            annotation1.setList(batch);
+            try {
+                annotationMapper.batchSave(annotation1);
+            } catch (Exception e) {
+                // 处理异常，例如记录日志
+                log.error("Error occurred while processing batch: " + e.getMessage(), e);
+            }
         }
     }
 }
