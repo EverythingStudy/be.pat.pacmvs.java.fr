@@ -29,7 +29,7 @@ public class JsonTaskParserService {
 
     public static final ExecutorService jsonTaskExecutorService = new ThreadPoolExecutor(
             Runtime.getRuntime().availableProcessors(),
-            Runtime.getRuntime().availableProcessors() * 2,
+            Runtime.getRuntime().availableProcessors() -1,
             // 空闲线程等待工作的超时时间
             10L,
             TimeUnit.SECONDS,
