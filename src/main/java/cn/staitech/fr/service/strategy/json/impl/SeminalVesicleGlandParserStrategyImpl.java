@@ -107,13 +107,13 @@ public class SeminalVesicleGlandParserStrategyImpl implements ParserStrategy {
             Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
             elementsList.stream().forEach(element -> {
                 Annotation annotation = processJsonElement(element, executorService, pathologicalMap, jsonTask);
-                /*if (!ObjectUtil.isEmpty(annotation)) {
+                if (!ObjectUtil.isEmpty(annotation)) {
                     annotation1.setContour(annotation.getContour40000());
                     Annotation annotationBy = annotationMapper.intersectsGeometry(annotation1);
                     if (ObjectUtil.equals("t", annotationBy.getIntersectsResults())) {
                         arrayList.add(annotation);
                     }
-                }*/
+                }
                 arrayList.add(annotation);
             });
             anno.setList(arrayList);
