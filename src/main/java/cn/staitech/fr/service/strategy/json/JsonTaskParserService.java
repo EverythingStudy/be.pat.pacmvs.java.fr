@@ -80,6 +80,7 @@ public class JsonTaskParserService {
 
         // 获取解析器
         ParserStrategy parser = parserStrategyFactory.getParserStrategy(algorithmCode);
+        log.info("++++parser1:{}", parser);
         if (parser == null) {
             for (CustomParserStrategy parserStrategy : customParserStrategies) {
                 if (parserStrategy.getAlgorithmCode().equals(algorithmCode)) {
@@ -87,15 +88,17 @@ public class JsonTaskParserService {
                 }
             }
         }
+        log.info("+++parser2:{}", parser);
 
 
         // 线程池 异步  调用策略提交任务
         for (JsonFile jsonFile : jsonFileList) {
             ParserStrategy finalParser = parser;
-            log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            log.info("++++parseJson:{} {} {}", jsonTask,jsonFile,finalParser);
-            log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+            log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++1");
+            log.info("++++parseJson:{} {} {}", jsonTask, jsonFile, finalParser);
+            log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++2");
             finalParser.parseJson(jsonTask, jsonFile);
+            log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++3");
         }
 
         // 指标计算
