@@ -23,9 +23,9 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -41,15 +41,15 @@ import java.util.stream.Collectors;
 @Component("Thyroid_gland")
 public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
 
-    @Resource
+    @Autowired
     public SpecialAnnotationRelMapper specialAnnotationRelMapper = SpringUtils.getBean(SpecialAnnotationRelMapper.class);
-    @Resource
+    @Autowired
     private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper = SpringUtils.getBean(PathologicalIndicatorCategoryMapper.class);
-    @Resource
+    @Autowired
     private AnnotationMapper annotationMapper = SpringUtils.getBean(AnnotationMapper.class);
-    @Resource
+    @Autowired
     private SingleSlideMapper singleSlideMapper = SpringUtils.getBean(SingleSlideMapper.class);
-    @Resource
+    @Autowired
     private AiForecastService aiForecastService = SpringUtils.getBean(AiForecastService.class);
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
@@ -210,8 +210,6 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
             batchProcessAndSave(anno, 1000);
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
-        } finally {
-
         }
     }
 
