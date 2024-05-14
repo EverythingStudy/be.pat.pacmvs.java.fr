@@ -357,7 +357,24 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
                 return R.fail(MessageSource.M("START_SPECIAL_ERROR"));
             }
         }
-
+        //锁定传4,解锁 5
+        if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {
+        	Special special = this.baseMapper.selectById(req.getSpecialId());
+            if (special == null) {
+                return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
+            }
+            //状态(0待启动，1进行中，2暂停，3已完成，4锁定)
+            Integer status = req.getStatus();
+            //已经锁定判断
+            if(status.equals(CommonConstant.INT_4) && req.getStatus().equals(CommonConstant.INT_4)){
+            	 return R.fail(MessageSource.M("SPECIAL_HAVE_LOCK"));
+            }
+            //解锁判断
+            if(status.equals(CommonConstant.INT_1) && req.getStatus().equals(CommonConstant.INT_5)){
+           	 return R.fail(MessageSource.M("SPECIAL_HAVE_UNLOCK"));
+           }
+        }
+        
         Integer unlock = 0;
         //锁定传4,解锁 5 校验
         if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {

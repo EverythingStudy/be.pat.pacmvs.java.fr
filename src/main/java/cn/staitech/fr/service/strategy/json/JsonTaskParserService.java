@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author: wangfeng
@@ -188,7 +187,14 @@ public class JsonTaskParserService {
                 JsonFile jsonFile = new JsonFile();
 
                 jsonFile.setStructureName(jsonObject.has("structureName") ? jsonObject.getString("structureName") : "");
-                jsonFile.setFileUrl(jsonObject.has("fileUrl") ? jsonObject.getString("fileUrl") : "");
+                if (jsonObject.has("fileUrl")) {
+                    String fileUrl = jsonObject.getString("fileUrl");
+                    if (fileUrl.toLowerCase().endsWith(".json")) {
+                        jsonFile.setFileUrl(fileUrl);
+                    } else {
+                        continue;
+                    }
+                }
 
                 jsonFile.setTaskId(task.getTaskId());
                 jsonFile.setStatus(0);
