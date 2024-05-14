@@ -2,10 +2,12 @@ package cn.staitech.fr.utils;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.PathologicalIndicatorCategory;
 import cn.staitech.fr.domain.SpecialAnnotationRel;
 import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
@@ -34,14 +36,15 @@ public class AreaUtils {
     private AnnotationMapper annotationMapper;
     @Resource
     private SingleSlideMapper singleSlideMapper;
+    @Resource
+    private ImageMapper imageMapper;
 
     /**
-     *
      * @param jsonTask
      * @param structure_id 结构组织id
      * @return 返回毫米
      */
-    public String getArea(JsonTask jsonTask,String structure_id){
+    public String getArea(JsonTask jsonTask, String structure_id) {
         QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
         // 查询所有未被删除且登录机构相同的数据
         qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
@@ -54,25 +57,32 @@ public class AreaUtils {
         Long sequenceNumber = annotationRel.getSequenceNumber();
 
         //查询切片缩放
-        String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
+        BigDecimal resolutions = new BigDecimal(0.262);
+        Image image = imageMapper.selectById(jsonTask.getImageId());
+        if (ObjectUtil.isNotEmpty(image)) {
+            if(StringUtils.isNotEmpty(image.getResolutionX())){
+                resolutions = new BigDecimal(image.getResolutionX());
+            }
 
-        BigDecimal bigDecimalA = new BigDecimal(0.262);
+        }
+
+        BigDecimal bigDecimalA = new BigDecimal(0);
         if (ObjectUtil.isNotEmpty(pathologicalMap.get(structure_id))) {
             Annotation annotation = new Annotation();
             annotation.setSingleSlideId(jsonTask.getSingleId());
             annotation.setCategoryId(pathologicalMap.get(structure_id));
             annotation.setSequenceNumber(sequenceNumber);
             Annotation structureArea = annotationMapper.getStructureArea(annotation);
-            if (StringUtils.isNotEmpty(resolution) && StringUtils.isNotEmpty(structureArea.getArea())) {
-                BigDecimal bigDecimal = new BigDecimal(resolution);
+            if ( StringUtils.isNotEmpty(structureArea.getArea())) {
                 BigDecimal bigDecimal1 = new BigDecimal(structureArea.getArea());
-                bigDecimalA = bigDecimal1.multiply(bigDecimal).multiply(bigDecimal).multiply(new BigDecimal(0.000001));
+                bigDecimalA = bigDecimal1.multiply(resolutions).multiply(resolutions).multiply(new BigDecimal(0.000001));
 
             }
         }
         return bigDecimalA.toString();
     }
-    public Integer count(JsonTask jsonTask,String structure_id){
+
+    public Integer count(JsonTask jsonTask, String structure_id) {
         QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
         // 查询所有未被删除且登录机构相同的数据
         qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
@@ -91,5 +101,48 @@ public class AreaUtils {
         Integer result = annotationMapper.countDucts(annotation1);
         return result;
 
+    }
+
+    /**
+     * @param jsonTask
+     * @param structure_id 结构组织id
+     * @return 返回微米
+     */
+    public String getAreaUm(JsonTask jsonTask, String structure_id) {
+        QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
+        // 查询所有未被删除且登录机构相同的数据
+        qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
+        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
+        Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+        //定位表
+        QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
+        wrapper.eq("special_id", jsonTask.getSpecialId());
+        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
+        Long sequenceNumber = annotationRel.getSequenceNumber();
+
+        //查询切片缩放
+        BigDecimal resolutions = new BigDecimal(0.262);
+        Image image = imageMapper.selectById(jsonTask.getImageId());
+        if (ObjectUtil.isNotEmpty(image)) {
+            if(StringUtils.isNotEmpty(image.getResolutionX())){
+                resolutions = new BigDecimal(image.getResolutionX());
+            }
+
+        }
+
+        BigDecimal bigDecimalA = new BigDecimal(0);
+        if (ObjectUtil.isNotEmpty(pathologicalMap.get(structure_id))) {
+            Annotation annotation = new Annotation();
+            annotation.setSingleSlideId(jsonTask.getSingleId());
+            annotation.setCategoryId(pathologicalMap.get(structure_id));
+            annotation.setSequenceNumber(sequenceNumber);
+            Annotation structureArea = annotationMapper.getStructureArea(annotation);
+            if (StringUtils.isNotEmpty(structureArea.getArea())) {
+                BigDecimal bigDecimal1 = new BigDecimal(structureArea.getArea());
+                bigDecimalA = bigDecimal1.multiply(resolutions).multiply(resolutions);
+
+            }
+        }
+        return bigDecimalA.toString();
     }
 }
