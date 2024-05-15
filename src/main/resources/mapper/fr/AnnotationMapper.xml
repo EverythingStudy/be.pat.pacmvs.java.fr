@@ -504,4 +504,16 @@
         where single_slide_id = #{singleSlideId}
           and category_id = #{categoryId}
     </select>
+
+    <delete id="deleteAiAnnotation" parameterType="cn.staitech.fr.domain.Annotation">
+        DELETE
+        FROM
+        fr_ai_annotation_${sequenceNumber}
+        WHERE
+        single_slide_id = #{singleSlideId}
+        <if test="contour != null">
+            AND ST_Intersects ( ( SELECT ST_Collect ( contour40000 ) AS collectContour FROM fr_annotation WHERE
+            single_slide_id = #{singleSlideId} AND contour_type = 3 ), contour40000 ) = 'f'
+        </if>
+    </delete>
 </mapper>

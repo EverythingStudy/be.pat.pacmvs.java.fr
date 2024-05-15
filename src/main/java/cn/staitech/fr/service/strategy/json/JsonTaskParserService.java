@@ -2,8 +2,10 @@ package cn.staitech.fr.service.strategy.json;
 
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.service.JsonFileService;
 import cn.staitech.fr.service.JsonTaskService;
+import cn.staitech.fr.service.SlideService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +46,8 @@ public class JsonTaskParserService {
     JsonTaskService jsonTaskService;
     @Resource
     JsonFileService jsonFileService;
+    @Resource
+    SlideService slideService;
     @Resource
     ParserStrategyFactory parserStrategyFactory;
     @Resource
@@ -153,10 +157,10 @@ public class JsonTaskParserService {
             JsonTask jsonTask = new JsonTask();
             jsonTask.setAlgorithmCode(jsonObject.get("algorithmCode").toString());
 
+            Long slideId = jsonObject.containsKey("slideId") ? Long.parseLong(jsonObject.get("slideId").toString()) : 0L;
+            jsonTask.setSlideId(slideId);
             jsonTask.setImageId(jsonObject.containsKey("imageId") ? Long.parseLong(jsonObject.get("imageId").toString()) : 0L);
-            jsonTask.setSlideId(jsonObject.containsKey("slideId") ? Long.parseLong(jsonObject.get("slideId").toString()) : 0L);
             jsonTask.setSingleId(jsonObject.containsKey("singleId") ? Long.parseLong(jsonObject.get("singleId").toString()) : 0L);
-            jsonTask.setSpecialId(jsonObject.containsKey("specialId") ? Long.parseLong(jsonObject.get("specialId").toString()) : 0L);
             jsonTask.setOrganizationId(jsonObject.containsKey("organizationId") ? Long.parseLong(jsonObject.get("organizationId").toString()) : 0L);
 
             jsonTask.setCode(jsonObject.containsKey("code") ? jsonObject.get("code").toString() : "");
@@ -166,8 +170,10 @@ public class JsonTaskParserService {
             jsonTask.setCreateTime(new Date());
             jsonTask.setStartTime(new Date());
             jsonTask.setStatus(0);
-            // TODO:判重、丢弃任务
 
+            Slide slide = slideService.getById(slideId);
+            jsonTask.setSpecialId(slide.getSpecialId());
+            // TODO:判重、丢弃任务
             jsonTaskService.save(jsonTask);
             return jsonTask;
         } catch (Exception e) {

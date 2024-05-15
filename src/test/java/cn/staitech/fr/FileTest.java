@@ -83,9 +83,8 @@ public class FileTest {
                 "  \"msg\": \"\",\n" +
                 "  \"algorithmCode\": \"Harderian_gland\",\n" +
                 "  \"imageId\":10906,\n" +
-                "  \"slideId\":85,\n" +
+                "  \"slideId\":115,\n" +
                 "  \"singleId\":130,\n" +
-                "  \"specialId\":25,\n" +
                 "  \"organizationId\":1,\n" +
                 "  \"data\": [\n" +
                 "    {\n" +
@@ -113,10 +112,9 @@ public class FileTest {
                 "  \"code\": \"200\",\n" +
                 "  \"msg\": \"\",\n" +
                 "  \"algorithmCode\": \"Thyroid_gland\",\n" +
-                "  \"imageId\":10906,\n" +
-                "  \"slideId\":85,\n" +
+                "  \"imageId\":10924,\n" +
+                "  \"slideId\":115,\n" +
                 "  \"singleId\":130,\n" +
-                "  \"specialId\":25,\n" +
                 "  \"organizationId\":1,\n" +
                 "  \"data\": [\n" +
                 "    {\n" +
@@ -160,10 +158,10 @@ public class FileTest {
                 "  \"code\": \"200\",\n" +
                 "  \"msg\": \"\",\n" +
                 "  \"algorithmCode\": \"Cerebellum\",\n" +
-                "  \"imageId\":10906,\n" +
-                "  \"slideId\":85,\n" +
+                "  \"imageId\":10924,\n" +
+//                "  \"slideId\":85,\n" +
+                "  \"slideId\":115,\n" +
                 "  \"singleId\":130,\n" +
-                "  \"specialId\":25,\n" +
                 "  \"organizationId\":1,\n" +
                 "  \"data\": [\n" +
                 "    {\n" +
@@ -174,6 +172,16 @@ public class FileTest {
                 "}\n" +
                 "\n";
 
+        jsonTaskParserService.input(content);
+    }
+
+    /**
+     * Harderian_gland 哈氏腺
+     */
+    @Test
+    public void processHarderian_gland1() {
+        String content = "{\"redis_status_key\":\"172.31.2.101_0\",\"imageId\":10924,\"slideId\":115,\"organizationId\":1,\"task_id\":\"ff9d875a-d098-4e6a-8c41-03af9373add1\",\"categoryId\":2,\"singleId\":154,\"algorithmCode\":\"Harderian_gland\",\"AlgorithmName\":\"大鼠哈氏腺\",\"occupy_time\":360,\"elapsed_time\":560,\"code\":200,\"msg\":\"success\",\"data\":[{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/102-v1.0/10206D.json\"},{\"structureName\":\"time1\",\"fileUrl\":\"哈氏腺腺泡推理耗时:718.70 s\"},{\"structureName\":\"fileurl2\",\"fileUrl\":\"D:/2.0-20240510/102-v1.0/10206E.json\"},{\"structureName\":\"time2\",\"fileUrl\":\"哈氏腺腺泡细胞核推理耗时:635.85 s\"}]}";
+//        String content = "{\"redis_status_key\":\"172.31.2.101_0\",\"imageId\":10924,\"slideId\":115,\"organizationId\":1,\"task_id\":\"ff9d875a-d098-4e6a-8c41-03af9373add1\",\"categoryId\":2,\"singleId\":154,\"algorithmCode\":\"Cerebellum\",\"AlgorithmName\":\"大鼠哈氏腺\",\"occupy_time\":360,\"elapsed_time\":560,\"code\":200,\"msg\":\"success\",\"data\":[{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/102-v1.0/10206D.json\"},{\"structureName\":\"time1\",\"fileUrl\":\"哈氏腺腺泡推理耗时:718.70 s\"},{\"structureName\":\"fileurl2\",\"fileUrl\":\"D:/2.0-20240510/102-v1.0/10206E.json\"},{\"structureName\":\"time2\",\"fileUrl\":\"哈氏腺腺泡细胞核推理耗时:635.85 s\"}]}";
         jsonTaskParserService.input(content);
     }
 

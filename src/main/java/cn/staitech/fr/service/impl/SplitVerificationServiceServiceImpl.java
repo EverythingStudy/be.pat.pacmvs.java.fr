@@ -6,7 +6,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TreeMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -63,8 +65,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 
 	@Override
 	public PageResponse<SplitVerificationOut>  getList(SplitVerificationQueryIn req) {
-//				Long organizationId = 1L;
-		Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+				Long organizationId = 6L;
+//		Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
 		PageResponse<SplitVerificationOut> pageResponse = new PageResponse<>();
 		//查看切片明细  0：否  1：是
 		int detailType = req.getDetailType();
@@ -271,6 +273,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 					//切图脏器信息==》按照切片脏器统计汇总
 					List<Long> annoSlideIdList = animalSlideList.stream().map(Slide::getSlideId).collect(Collectors.toList());
 					List<Annotation>  annoList = annotationMapper.getAnnoListByParm(annoSlideIdList);
+//					Map<Long, Long> categoryCountGroupedBycategory = annoList.stream().filter(anno -> Objects.nonNull(anno.getCategoryId())).collect(Collectors.groupingBy(Annotation::getCategoryId, Collectors.counting()));
 					Map<Long, Long> categoryCountGroupedBycategory = annoList.stream().collect(Collectors.groupingBy(Annotation::getCategoryId, Collectors.counting()));
 					//AI 切图数据处理
 					Map<String, Long> annoCategoryMap = new HashMap<String, Long>();
@@ -387,7 +390,12 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 						}
 					}
 				}else{
-					categoryColour = 1;
+					// checkStatus 修正标识（ 0：初始 1：正确 2：修正正常 3：错误 ）
+					if(checkStatus == 2){
+						categoryColour = 2;
+					}else{
+						categoryColour = 1;
+					}
 				}
 			}
 			CategoryChild child = new CategoryChild();

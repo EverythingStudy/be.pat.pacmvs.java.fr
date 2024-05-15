@@ -289,6 +289,7 @@ public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 			Annotation annotation1 = new Annotation();
 			annotation1.setSingleSlideId(jsonTask.getSingleId());
 			annotation1.setCategoryId(pathologicalMap.get("1240CA"));
+			annotation1.setSequenceNumber(sequenceNumber);
 			Integer result = annotationMapper.countDucts(annotation1);
 			AiForecast aiForecast = new AiForecast();
 			aiForecast.setQuantitativeIndicators("黄体数量");
@@ -299,16 +300,18 @@ public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 			insertEntity.add(aiForecast);
 
 			//黄体面积（全片） 2=C
-			annotation1.setSequenceNumber(sequenceNumber);
 			Annotation structureArea = annotationMapper.getStructureArea(annotation1);
 
 			//SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
 			//查询切片缩放
 			String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
-
-			if (StringUtils.isNotEmpty(resolution) && StringUtils.isNotEmpty(structureArea.getArea())) {
+			BigDecimal resolutions = new BigDecimal("0.262");
+	        if(StringUtils.isNotEmpty(resolution)){
+	            resolutions= new BigDecimal(resolution);
+	        }
+			if (StringUtils.isNotEmpty(structureArea.getArea())) {
 				BigDecimal bigDecimal1 = new BigDecimal(structureArea.getArea());
-
+				bigDecimal1 = bigDecimal1.multiply(resolutions).multiply(resolutions).multiply(new BigDecimal(0.000001));
 				AiForecast aiForecast1 = new AiForecast();
 				aiForecast1.setQuantitativeIndicators("黄体面积（全片）");
 				aiForecast1.setQuantitativeIndicatorsEn("Corpus luteum area(all)");
@@ -324,6 +327,7 @@ public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 			Annotation annotation2 = new Annotation();
 			annotation2.setSingleSlideId(jsonTask.getSingleId());
 			annotation2.setCategoryId(pathologicalMap.get("1240CB"));
+			annotation2.setSequenceNumber(sequenceNumber);
 			Integer result2 = annotationMapper.countDucts(annotation2);
 			AiForecast aiForecast2 = new AiForecast();
 			aiForecast2.setQuantitativeIndicators("黄体数量");

@@ -22,13 +22,15 @@
     </sql>
 
     <select id="getAiForecastBySingle" resultType="cn.staitech.fr.domain.out.AipreAirepostOut">
-        select DATE_FORMAT(aat.start_time, '%Y-%m-%d %H:%i') startTime,
-               aat.waste_time                                wasteTime,
+        select DATE_FORMAT(fss.start_time, '%Y-%m-%d %H:%i')         startTime,
+               fss.fine_contour_time + fss.structure_time  wasteTime,
                am.algorithm_name,
                am.model_version
         from aipre_airepost aat
                  left join aipre_algorithm am
                            on aat.algorithm_id = am.algorithm_uuid
+                 left join fr_single_slide fss
+                           on aat.single_slide_id = fss.single_id
         where aat.single_slide_id = #{singleId}
         order by report_uuid desc limit 1
 
