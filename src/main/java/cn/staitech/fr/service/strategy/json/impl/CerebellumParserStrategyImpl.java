@@ -250,17 +250,7 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
 
             anno.setList(processedAnnotations);
             log.info("大鼠小脑:{}", processedAnnotations.size());
-            Annotation annotation = new Annotation();
-            annotation.setSequenceNumber(sequenceNumber);
-            annotation.setSingleSlideId(jsonTask.getSingleId());
-            annotationMapper.deleteAiAnnotation(annotation);
             annotationService.batchProcessAndSave(anno, 1000);
-            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
-            if (ObjectUtil.isNotEmpty(annotation1) && ObjectUtil.isNotEmpty(annotation1.getCollectContour())) {
-                annotation.setContour(annotation1.getCollectContour());
-                annotationMapper.deleteAiAnnotation(annotation);
-            }
-
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
