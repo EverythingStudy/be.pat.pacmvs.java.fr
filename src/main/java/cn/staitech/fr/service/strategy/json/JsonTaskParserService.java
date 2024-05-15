@@ -79,6 +79,15 @@ public class JsonTaskParserService {
             return;
         }
 
+        if (jsonTask.getCode().equals("500")) {
+        	SingleSlide singleSlide = new SingleSlide();
+            singleSlide.setSingleId(jsonTask.getSingleId());
+            //0未预测、1预测成功、2预测失败、3预测中
+            singleSlide.setForecastStatus("2");
+            singleSlideService.updateById(singleSlide);
+            return;
+        }
+        
         log.info("jsonTask:{}", jsonTask);
 
 
@@ -128,9 +137,8 @@ public class JsonTaskParserService {
         jsonTask.setStatus(1);
         jsonTaskService.updateById(jsonTask);
 
-        Long singleId = (Long) jsonObject.get("singleId");
         SingleSlide singleSlide = new SingleSlide();
-        singleSlide.setSingleId(singleId);
+        singleSlide.setSingleId(jsonTask.getSingleId());
         //0未预测、1预测成功、2预测失败、3预测中
         singleSlide.setForecastStatus("1");
         singleSlideService.updateById(singleSlide);
