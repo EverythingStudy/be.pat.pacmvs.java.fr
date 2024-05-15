@@ -304,6 +304,9 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
         annotation.setCategoryId(pathologicalMap.get(structCode));// 标注类别ID
         Annotation structure = annotationMapper.getStructureArea(annotation);
+        if (structure == null || structure.getArea() == null) {
+            return new BigDecimal("0");
+        }
         String structureArea = structure.getArea();
 
         // 查询切片缩放
