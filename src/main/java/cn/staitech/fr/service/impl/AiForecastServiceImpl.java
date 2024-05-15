@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
@@ -74,19 +75,25 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
 
     }
 
+    /**
+     * 批量插入指标预测结果
+     */
     @Override
     public void addAiForecast(Long singleSlideId, Map<String, IndicatorAddIn> indicatorResultsMap) {
         List<AiForecast> aiForecasts = new ArrayList<>();
         for (Map.Entry<String, IndicatorAddIn> entry : indicatorResultsMap.entrySet()) {
+            // 指标名称
             String indicatorCode = entry.getKey();
-            IndicatorAddIn indicatorInfo = entry.getValue();
+            // 指标信息
+            IndicatorAddIn indicator = entry.getValue();
 
             AiForecast forecast = new AiForecast();
             forecast.setSingleSlideId(singleSlideId);
             forecast.setQuantitativeIndicators(indicatorCode);
-            forecast.setResults(indicatorInfo.getResult());
-            forecast.setUnit(indicatorInfo.getUnit());
-
+            forecast.setQuantitativeIndicatorsEn(indicator.getEnglishName());
+            forecast.setResults(indicator.getResult());
+            forecast.setUnit(indicator.getUnit());
+            forecast.setCreateTime(DateUtil.now());
             aiForecasts.add(forecast);
         }
         // 批量插入
