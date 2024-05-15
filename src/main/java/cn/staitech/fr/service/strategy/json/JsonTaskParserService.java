@@ -5,6 +5,7 @@ import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.JsonFileService;
 import cn.staitech.fr.service.JsonTaskService;
+import cn.staitech.fr.service.SingleSlideService;
 import cn.staitech.fr.service.SlideService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -57,6 +58,9 @@ public class JsonTaskParserService {
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
     private AnnotationMapper annotationMapper;
+    
+    @Resource
+    private SingleSlideService singleSlideService;
 
     public void input(String input) {
         JSONObject jsonObject = JSON.parseObject(input);
@@ -124,7 +128,12 @@ public class JsonTaskParserService {
         jsonTask.setStatus(1);
         jsonTaskService.updateById(jsonTask);
 
-
+        Long singleId = (Long) jsonObject.get("singleId");
+        SingleSlide singleSlide = new SingleSlide();
+        singleSlide.setSingleId(singleId);
+        //0未预测、1预测成功、2预测失败、3预测中
+        singleSlide.setForecastStatus("1");
+        singleSlideService.updateById(singleSlide);
 //        CountDownLatch countDownLatch = new CountDownLatch(count);
 //
 //        AtomicInteger id = new AtomicInteger();
