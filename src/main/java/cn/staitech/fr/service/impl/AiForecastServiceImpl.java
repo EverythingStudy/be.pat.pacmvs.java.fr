@@ -44,7 +44,7 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             annotation.setSingleSlideId(singleSlideId);
             annotation.setFiligreeContour(true);
             Annotation annotationBy = annotationMapper.getOrganArea(annotation);
-            if (annotationBy == null) {
+            if (annotationBy == null || annotationBy.getArea() == null) {
                 return false;
             }
             // 查询图像分辨率
