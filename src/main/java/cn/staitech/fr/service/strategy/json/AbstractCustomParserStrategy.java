@@ -3,6 +3,7 @@ package cn.staitech.fr.service.strategy.json;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.*;
+import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.vo.geojson.Indicator;
@@ -157,6 +158,10 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
 
     private static void processObjectNode(ObjectMapper objectMapper, JsonParser jsonParser, List<JsonNode> elementsList) throws IOException {
         ObjectNode objectNode = objectMapper.readTree(jsonParser);
+        if (objectNode == null || !objectNode.isObject()) {
+            log.error("Input JSON data is not a valid object.");
+            return;
+        }
         if (objectNode.has("features")) {
             ArrayNode featuresNode = (ArrayNode) objectNode.get("features");
             if (featuresNode.isArray()) {
@@ -171,6 +176,7 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
             log.info("'features' field not found in the current JSON object.");
         }
     }
+
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
@@ -207,7 +213,10 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
                     processObjectNode(objectMapper, jsonParser, elementsList);
                 }
             }
-
+            if (CollectionUtil.isEmpty(elementsList)) {
+                log.error("No valid JSON data found in the file.");
+                return;
+            }
             Image image = imageMapper.selectById(jsonTask.getImageId());
             String resolutionX = image.getResolutionX();
             if (StringUtils.isEmpty(resolutionX)) {
@@ -226,17 +235,7 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
 
             anno.setList(processedAnnotations);
             log.info("hashixiandaxiao:{}", processedAnnotations.size());
-            Annotation annotation = new Annotation();
-            annotation.setSequenceNumber(sequenceNumber);
-            annotation.setSingleSlideId(jsonTask.getSingleId());
-            annotationMapper.deleteAiAnnotation(annotation);
             batchProcessAndSave(anno, 1000);
-            annotation.setContour("1");
-            annotationMapper.deleteAiAnnotation(annotation);
-            log.info("hashixianchenggong.....");
-//            long endTime = System.currentTimeMillis();
-//            long executionTime = endTime - startTime; // 执行时间，单位毫秒
-//            System.out.println("执行时间毫秒："+executionTime);
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
