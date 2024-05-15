@@ -194,10 +194,8 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
-
-//        long startTime = System.currentTimeMillis();
         String filePath = jsonFileS.getFileUrl();
-        log.info("大鼠小脑:{}", filePath);
+        log.info("大鼠小脑指标计算开始:{}", filePath);
 
         QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
         wrapper.eq("special_id", jsonTask.getSpecialId());
@@ -262,7 +260,7 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        indicatorResultsMap.put("大鼠小脑面积", new IndicatorAddIn("Cerebellum and Brainstem area", singleSlide.getArea(), "平方毫米"));
+        indicatorResultsMap.put("小脑和脑干面积", new IndicatorAddIn("Cerebellum and Brainstem area", singleSlide.getArea(), "平方毫米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }

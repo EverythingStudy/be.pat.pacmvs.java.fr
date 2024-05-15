@@ -11,6 +11,7 @@ import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -255,16 +256,72 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
 
     }
 
-
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
+        log.info("大鼠甲状腺指标计算开始");
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        // 若甲状腺轮廓面积里包括了甲状旁腺，计算时需要用H-I，若甲状旁腺和甲状腺是分开单独识别的，则只需要H
-        indicatorResultsMap.put("甲状腺面积", new IndicatorAddIn("Thyroid gland area", singleSlide.getArea(), "平方毫米"));
-        indicatorResultsMap.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", singleSlide.getArea(), "10^3平方微米"));
 
+        // H:精细轮廓总面积（甲状腺）-平方毫米
+        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+        String accurateArea = singleSlide.getArea();
+
+
+        // I:甲状旁腺组织轮廓面积-平方毫米
+        BigDecimal organArea = getorganArea(jsonTask, "108111");
+
+        // 若甲状腺轮廓面积里包括了甲状旁腺，计算时需要用H-I，若甲状旁腺和甲状腺是分开单独识别的，则只需要H
+        if (new BigDecimal(accurateArea).compareTo(BigDecimal.ZERO) > 0
+                && organArea.compareTo(BigDecimal.ZERO) > 0) {
+            // H-I
+            BigDecimal areaNum = new BigDecimal(accurateArea).subtract(organArea);
+            accurateArea = areaNum.toString();
+        }
+
+        indicatorResultsMap.put("甲状腺面积", new IndicatorAddIn("Thyroid gland area", accurateArea, "平方毫米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
+
+
+    /**
+     * 获取脏器轮廓面积
+     */
+    private BigDecimal getorganArea(JsonTask jsonTask, String structCode) {
+        // 查询所有未被删除且登录机构相同的数据
+        LambdaQueryWrapper<PathologicalIndicatorCategory> CategoryQueryWrapper = new LambdaQueryWrapper<>();
+        CategoryQueryWrapper.eq(PathologicalIndicatorCategory::getDelFlag, 0)
+                .eq(PathologicalIndicatorCategory::getOrganizationId, jsonTask.getOrganizationId());
+        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(CategoryQueryWrapper);
+        Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+
+        // 定位表
+        LambdaQueryWrapper<SpecialAnnotationRel> SpecialQueryWrapper = new LambdaQueryWrapper<>();
+        SpecialQueryWrapper.eq(SpecialAnnotationRel::getSpecialId, jsonTask.getSpecialId());
+        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(SpecialQueryWrapper);
+        Long sequenceNumber = annotationRel.getSequenceNumber();
+
+        // 非精细轮廓总面积
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(sequenceNumber);
+        annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
+        annotation.setCategoryId(pathologicalMap.get(structCode));// 标注类别ID
+        Annotation structure = annotationMapper.getStructureArea(annotation);
+        String structureArea = structure.getArea();
+
+        // 查询切片缩放
+        BigDecimal resolutionNum = new BigDecimal("0.262");
+        String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
+        if (StringUtils.isNotEmpty(resolution)) {
+            resolutionNum = new BigDecimal(resolution);
+        }
+
+        // 计算面积
+        BigDecimal organArea = BigDecimal.ZERO;
+        if (StringUtils.isNotEmpty(structureArea)) {
+            BigDecimal structureAreaNum = new BigDecimal(structureArea);
+            organArea = structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.000001));
+        }
+        return organArea;
+    }
+
 
 }
