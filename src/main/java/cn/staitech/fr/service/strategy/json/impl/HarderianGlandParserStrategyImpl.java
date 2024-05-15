@@ -242,17 +242,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
             anno.setList(processedAnnotations);
             log.info("hashixiandaxiao:{}", processedAnnotations.size());
-            Annotation annotation = new Annotation();
-            annotation.setSequenceNumber(sequenceNumber);
-            annotation.setSingleSlideId(jsonTask.getSingleId());
-            annotationMapper.deleteAiAnnotation(annotation);
             batchProcessAndSave(anno, 1000);
-            annotation.setContour("1");
-            annotationMapper.deleteAiAnnotation(annotation);
-            log.info("hashixianchenggong.....");
-//            long endTime = System.currentTimeMillis();
-//            long executionTime = endTime - startTime; // 执行时间，单位毫秒
-//            System.out.println("执行时间毫秒："+executionTime);
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
