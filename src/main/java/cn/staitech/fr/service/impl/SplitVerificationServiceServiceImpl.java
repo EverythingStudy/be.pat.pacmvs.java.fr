@@ -390,7 +390,12 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 						}
 					}
 				}else{
-					categoryColour = 1;
+					// checkStatus 修正标识（ 0：初始 1：正确 2：修正正常 3：错误 ）
+					if(checkStatus == 2){
+						categoryColour = 2;
+					}else{
+						categoryColour = 1;
+					}
 				}
 			}
 			CategoryChild child = new CategoryChild();
