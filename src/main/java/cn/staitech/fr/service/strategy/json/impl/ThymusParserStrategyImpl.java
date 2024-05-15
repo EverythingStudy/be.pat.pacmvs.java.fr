@@ -2,10 +2,7 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.hutool.core.date.DateUtil;
 import cn.staitech.fr.domain.*;
-import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
-import cn.staitech.fr.mapper.SingleSlideMapper;
-import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
+import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -28,7 +25,7 @@ import java.util.stream.Collectors;
 @Service("Thymus")
 public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
-    public SpecialAnnotationRelMapper specialAnnotationRelMapper;
+    private SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
     private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
     @Resource
@@ -37,6 +34,8 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
     private SingleSlideMapper singleSlideMapper;
     @Resource
     private AiForecastService aiForecastService;
+    @Resource
+    private ImageMapper imageMapper;
 
     @PostConstruct
     public void init() {
@@ -45,6 +44,7 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
         setPathologicalIndicatorCategoryMapper(pathologicalIndicatorCategoryMapper);
         setSingleSlideMapper(singleSlideMapper);
         setSpecialAnnotationRelMapper(specialAnnotationRelMapper);
+        setImageMapper(imageMapper);
         log.info("ThymusParserStrategyImpl init");
     }
 

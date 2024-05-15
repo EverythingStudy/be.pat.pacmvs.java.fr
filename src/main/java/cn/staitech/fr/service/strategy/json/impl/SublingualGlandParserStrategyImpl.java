@@ -2,10 +2,7 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
-import cn.staitech.fr.mapper.SingleSlideMapper;
-import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
+import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +19,7 @@ import java.util.*;
  * @date 2024/5/13 10:06:53
  */
 @Slf4j
-@Service("SublingualGland")
+@Service("Sublingual_gland")
 public class SublingualGlandParserStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
     private SpecialAnnotationRelMapper specialAnnotationRelMapper;
@@ -34,6 +31,8 @@ public class SublingualGlandParserStrategyImpl extends AbstractCustomParserStrat
     private SingleSlideMapper singleSlideMapper;
     @Resource
     private AiForecastService aiForecastService;
+    @Resource
+    private ImageMapper imageMapper;
 
     @PostConstruct
     public void init() {
@@ -42,6 +41,7 @@ public class SublingualGlandParserStrategyImpl extends AbstractCustomParserStrat
         setPathologicalIndicatorCategoryMapper(pathologicalIndicatorCategoryMapper);
         setSingleSlideMapper(singleSlideMapper);
         setSpecialAnnotationRelMapper(specialAnnotationRelMapper);
+        setImageMapper(imageMapper);
         log.info("SublingualGlandParserStrategyImpl init");
     }
 
@@ -55,6 +55,6 @@ public class SublingualGlandParserStrategyImpl extends AbstractCustomParserStrat
 
     @Override
     public String getAlgorithmCode() {
-        return "Sublingual gland";
+        return "Sublingual_gland";
     }
 }
