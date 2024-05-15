@@ -111,7 +111,7 @@
 	                #{item}
 	            </foreach>
         	</if>
-        	and t1.del_flag='0'
+        	and t1.del_flag = '0'
 		</where>
 		ORDER BY	t1.create_time ASC
     </select>
@@ -170,6 +170,7 @@
 				AND t1.analyze_status = '0'
 				AND t1.animal_code is not NULL
 				AND t1.check_status > 0 
+				AND t1.del_flag = '0'
 		ORDER BY	t1.animal_code,t1.animal_check_status desc,t1.check_status desc,t2.file_name
      </select>
 
