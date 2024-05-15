@@ -180,7 +180,7 @@ public class MammaryGlandParserStrategyImpl implements ParserStrategy {
         annotation.setSequenceNumber(sequenceNumber);
         Annotation structureArea = annotationMapper.getStructureArea(annotation);
         BigDecimal bigDecimalB = new BigDecimal(0);
-        if ( StringUtils.isNotEmpty(structureArea.getArea())) {
+        if ( ObjectUtil.isNotEmpty(structureArea)&&StringUtils.isNotEmpty(structureArea.getArea())) {
             BigDecimal bigDecimal1 = new BigDecimal(structureArea.getArea());
             bigDecimalB = bigDecimal1.multiply(resolutions).multiply(resolutions).multiply(new BigDecimal(0.000001));
         }
