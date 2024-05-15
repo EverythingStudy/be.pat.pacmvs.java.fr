@@ -126,25 +126,25 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     );
 
     // 比之前快0.5
-    public List<Features> getFeaturesList(List<Annotation> annotations) {
-        List<Features> featuresList = new ArrayList<>();
-
-        for (Annotation annotation : annotations) {
-            executorService.submit(new Runnable() {
-                @Override
-                public void run() {
-                    Features features = new Features();
-                    features.setGeometry(JSONObject.parseObject(annotation.getContour()));
-                    features.setId(null);
-                    features.setType("Feature");
-                    JSONObject jsonObject = (JSONObject) JSON.toJSON(getProperties(annotation));
-                    features.setProperties(jsonObject);
-                    featuresList.add(features);
-                }
-            });
-        }
-        return featuresList;
-    }
+//    public List<Features> getFeaturesList(List<Annotation> annotations) {
+//        List<Features> featuresList = new ArrayList<>();
+//
+//        for (Annotation annotation : annotations) {
+//            executorService.submit(new Runnable() {
+//                @Override
+//                public void run() {
+//                    Features features = new Features();
+//                    features.setGeometry(JSONObject.parseObject(annotation.getContour()));
+//                    features.setId(null);
+//                    features.setType("Feature");
+//                    JSONObject jsonObject = (JSONObject) JSON.toJSON(getProperties(annotation));
+//                    features.setProperties(jsonObject);
+//                    featuresList.add(features);
+//                }
+//            });
+//        }
+//        return featuresList;
+//    }
 
 
 //    public List<Features> getFeaturesList(List<Annotation> annotations) {
@@ -176,19 +176,19 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 //        return featuresList;
 //    }
 
-//    public List<Features> getFeaturesList(List<Annotation> annotations) {
-//        List<Features> featuresList = new ArrayList<>();
-//        for (Annotation annotation : annotations) {
-//            Features features = new Features();
-//            features.setGeometry(JSONObject.parseObject(annotation.getContour()));
-//            features.setId(null);
-//            features.setType("Feature");
-//            JSONObject jsonObject = (JSONObject) JSON.toJSON(getProperties(annotation));
-//            features.setProperties(jsonObject);
-//            featuresList.add(features);
-//        }
-//        return featuresList;
-//    }
+    public List<Features> getFeaturesList(List<Annotation> annotations) {
+        List<Features> featuresList = new ArrayList<>();
+        for (Annotation annotation : annotations) {
+            Features features = new Features();
+            features.setGeometry(JSONObject.parseObject(annotation.getContour()));
+            features.setId(null);
+            features.setType("Feature");
+            JSONObject jsonObject = (JSONObject) JSON.toJSON(getProperties(annotation));
+            features.setProperties(jsonObject);
+            featuresList.add(features);
+        }
+        return featuresList;
+    }
 
     public cn.staitech.fr.vo.geojson.Properties getProperties(Annotation annotation) {
         cn.staitech.fr.vo.geojson.Properties properties = new cn.staitech.fr.vo.geojson.Properties();
