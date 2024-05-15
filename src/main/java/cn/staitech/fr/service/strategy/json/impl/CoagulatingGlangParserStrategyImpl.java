@@ -2,7 +2,6 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.staitech.common.core.utils.SpringUtils;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.*;
@@ -268,10 +267,10 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         Annotation annotation = new Annotation();
 //        annotation.setSingleSlideId(jsonTask.getSingleId());
         annotation.setSlideId(jsonTask.getSlideId());
-        annotation.setCategoryId(pathologicalMap.get("123005"));
+        annotation.setCategoryId(pathologicalMap.get("12B074"));
         annotation.setSequenceNumber(sequenceNumber);
         Annotation structureArea = annotationMapper.getStructureArea(annotation);
-        indicatorResultsMap.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", structureArea.getArea(), "平方毫米"));
+        indicatorResultsMap.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", ObjectUtil.isNotEmpty(structureArea) ? structureArea.getArea() : "0", "平方毫米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 
