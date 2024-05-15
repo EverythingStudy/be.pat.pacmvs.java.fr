@@ -83,6 +83,7 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
 
     /**
      * 获取脏器轮廓面积
+     * @return 脏器面积-毫米
      */
     private BigDecimal getorganArea(JsonTask jsonTask) {
         // 查询所有未被删除且登录机构相同的数据
@@ -104,7 +105,9 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
         annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
         annotation.setCategoryId(pathologicalMap.get("11E034"));// 标注类别ID
         Annotation structure = annotationMapper.getStructureArea(annotation);
-        String structureArea = structure.getArea();
+        if(null == structure || StringUtils.isEmpty(structure.getArea())){
+            return BigDecimal.ZERO;
+        }
 
         // 查询切片缩放
         BigDecimal resolutionNum = new BigDecimal("0.262");
@@ -114,11 +117,7 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
         }
 
         // 计算面积
-        BigDecimal organArea = BigDecimal.ZERO;
-        if (StringUtils.isNotEmpty(structureArea)) {
-            BigDecimal structureAreaNum = new BigDecimal(structureArea);
-            organArea = structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.000001));
-        }
-        return organArea;
+        BigDecimal structureAreaNum = new BigDecimal(structure.getArea());
+        return structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.000001));
     }
 }
