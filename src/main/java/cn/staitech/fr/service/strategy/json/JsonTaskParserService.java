@@ -134,7 +134,7 @@ public class JsonTaskParserService {
         parser.alculationIndicators(jsonTask);
 
         // 修改任务状态
-        jsonTask.setStatus(1);
+        jsonTask.setStatus(2);
         jsonTaskService.updateById(jsonTask);
 
         SingleSlide singleSlide = new SingleSlide();
