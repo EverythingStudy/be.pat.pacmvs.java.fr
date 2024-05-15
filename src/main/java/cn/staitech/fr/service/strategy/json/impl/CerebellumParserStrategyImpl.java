@@ -271,12 +271,8 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        /*indicatorResultsMap.put("腺泡面积占比（全片）", new IndicatorAddIn("Duct area%", "", ""));
-        indicatorResultsMap.put("腺泡细胞核密度(单个)", new IndicatorAddIn("Nucleus density of acinus", "", ""));
-        indicatorResultsMap.put("色素面积占比", new IndicatorAddIn("Epithelial apex cytoplasm area%", "", ""));
-        indicatorResultsMap.put("腺泡细胞核密度（全片）", new IndicatorAddIn("Mesenchyme area%", "", ""));*/
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        indicatorResultsMap.put("大鼠小脑面积", new IndicatorAddIn("Acinus area%", singleSlide.getArea(), "平方毫米"));
+        indicatorResultsMap.put("大鼠小脑面积", new IndicatorAddIn("Cerebellum and Brainstem area", singleSlide.getArea(), "平方毫米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }

@@ -268,12 +268,10 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        /*indicatorResultsMap.put("腺泡面积占比（全片）", new IndicatorAddIn("Duct area%", "", ""));
-        indicatorResultsMap.put("腺泡细胞核密度(单个)", new IndicatorAddIn("Nucleus density of acinus", "", ""));
-        indicatorResultsMap.put("色素面积占比", new IndicatorAddIn("Epithelial apex cytoplasm area%", "", ""));
-        indicatorResultsMap.put("腺泡细胞核密度（全片）", new IndicatorAddIn("Mesenchyme area%", "", ""));*/
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        indicatorResultsMap.put("大鼠甲状腺面积", new IndicatorAddIn("Acinus area%", singleSlide.getArea(), "平方毫米"));
+        // 若甲状腺轮廓面积里包括了甲状旁腺，计算时需要用H-I，若甲状旁腺和甲状腺是分开单独识别的，则只需要H
+        indicatorResultsMap.put("甲状腺面积", new IndicatorAddIn("Thyroid gland area", singleSlide.getArea(), "平方毫米"));
+        indicatorResultsMap.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", singleSlide.getArea(), "10^3平方微米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
