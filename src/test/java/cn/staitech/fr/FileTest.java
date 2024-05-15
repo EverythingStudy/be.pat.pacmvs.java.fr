@@ -83,9 +83,8 @@ public class FileTest {
                 "  \"msg\": \"\",\n" +
                 "  \"algorithmCode\": \"Harderian_gland\",\n" +
                 "  \"imageId\":10906,\n" +
-                "  \"slideId\":85,\n" +
+                "  \"slideId\":115,\n" +
                 "  \"singleId\":130,\n" +
-                "  \"specialId\":25,\n" +
                 "  \"organizationId\":1,\n" +
                 "  \"data\": [\n" +
                 "    {\n" +
@@ -113,10 +112,9 @@ public class FileTest {
                 "  \"code\": \"200\",\n" +
                 "  \"msg\": \"\",\n" +
                 "  \"algorithmCode\": \"Thyroid_gland\",\n" +
-                "  \"imageId\":10906,\n" +
-                "  \"slideId\":85,\n" +
+                "  \"imageId\":10924,\n" +
+                "  \"slideId\":115,\n" +
                 "  \"singleId\":130,\n" +
-                "  \"specialId\":25,\n" +
                 "  \"organizationId\":1,\n" +
                 "  \"data\": [\n" +
                 "    {\n" +
@@ -160,11 +158,10 @@ public class FileTest {
                 "  \"code\": \"200\",\n" +
                 "  \"msg\": \"\",\n" +
                 "  \"algorithmCode\": \"Cerebellum\",\n" +
-                "  \"imageId\":10906,\n" +
+                "  \"imageId\":10924,\n" +
 //                "  \"slideId\":85,\n" +
                 "  \"slideId\":115,\n" +
                 "  \"singleId\":130,\n" +
-//                "  \"specialId\":25,\n" +
                 "  \"organizationId\":1,\n" +
                 "  \"data\": [\n" +
                 "    {\n" +

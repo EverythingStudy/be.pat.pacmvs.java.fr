@@ -1,15 +1,13 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.staitech.common.core.utils.SpringUtils;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
-import cn.staitech.fr.mapper.SingleSlideMapper;
-import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
+import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -23,12 +21,14 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -40,18 +40,21 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component("Cerebellum")
 public class CerebellumParserStrategyImpl implements ParserStrategy {
-    @Autowired
-    public SpecialAnnotationRelMapper specialAnnotationRelMapper = SpringUtils.getBean(SpecialAnnotationRelMapper.class);
-    @Autowired
-    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper = SpringUtils.getBean(PathologicalIndicatorCategoryMapper.class);
-    @Autowired
-    private AnnotationMapper annotationMapper = SpringUtils.getBean(AnnotationMapper.class);
-    @Autowired
-    private SingleSlideMapper singleSlideMapper = SpringUtils.getBean(SingleSlideMapper.class);
-    @Autowired
-    private AiForecastService aiForecastService = SpringUtils.getBean(AiForecastService.class);
 
-    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
+    @Resource
+    public SpecialAnnotationRelMapper specialAnnotationRelMapper;
+    @Resource
+    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
+    @Resource
+    private AnnotationMapper annotationMapper;
+    @Resource
+    private SingleSlideMapper singleSlideMapper;
+    @Resource
+    private AiForecastService aiForecastService;
+    @Resource
+    private ImageMapper imageMapper;
+
+    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX) {
         if (element.isObject()) {
             JsonNode node = element.get("id");
             // node 转换成String
@@ -113,7 +116,18 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
             }
             Annotation annotation = new Annotation();
             // 查询标签信息
-            annotation.setArea(properties.getArea());
+            Map<String, Indicator> dataIndicators = properties.getData_indicators();
+            if (!CollectionUtil.isEmpty(dataIndicators)) {
+                dataIndicators.forEach((k, v) -> {
+                    if (StringUtils.isNotEmpty(v.getUnit())) {
+                        double value = v.getValue();
+                        BigDecimal bigDecimal = new BigDecimal(resolutionX);
+                        BigDecimal bigDecimal1 = new BigDecimal(value);
+                        annotation.setArea(bigDecimal1.multiply(bigDecimal).multiply(bigDecimal).setScale(3, RoundingMode.HALF_UP) + "");
+                    }
+                });
+            }
+
             annotation.setPerimeter(properties.getPerimeter());
             annotation.setCreateBy(0L);
             annotation.setCreateTime(String.valueOf(new Date()));
@@ -149,31 +163,44 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
         }
     }
 
-    private static void processObjectNode(ObjectMapper objectMapper, JsonParser jsonParser, List<JsonNode> elementsList) throws IOException {
-        ObjectNode objectNode = objectMapper.readTree(jsonParser);
-        if (objectNode.has("features")) {
-            ArrayNode featuresNode = (ArrayNode) objectNode.get("features");
-            if (featuresNode.isArray()) {
-                Iterator<JsonNode> elementsIterator = featuresNode.elements();
-                while (elementsIterator.hasNext()) {
-                    elementsList.add(elementsIterator.next());
+    private List<JsonNode> processObjectNode(ObjectMapper objectMapper, JsonParser jsonParser) {
+        try {
+            List<JsonNode> elementsList = new ArrayList<>();
+            ObjectNode objectNode = objectMapper.readTree(jsonParser);
+            if (objectNode.has("features")) {
+                ArrayNode featuresNode = (ArrayNode) objectNode.get("features");
+                if (featuresNode.isArray()) {
+                    Iterator<JsonNode> elementsIterator = featuresNode.elements();
+                    while (elementsIterator.hasNext()) {
+                        elementsList.add(elementsIterator.next());
+                    }
+                    return elementsList;
+                } else {
+                    log.error("Merged JSON data is not an array of objects as expected at current JSON object.");
                 }
             } else {
-                log.error("Merged JSON data is not an array of objects as expected at current JSON object.");
+                log.info("'features' field not found in the current JSON object.");
             }
-        } else {
-            log.info("'features' field not found in the current JSON object.");
+            return null;
+        } catch (IOException e) {
+
         }
+        return null;
     }
+
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
+
+//        long startTime = System.currentTimeMillis();
         String filePath = jsonFileS.getFileUrl();
+        log.info("大鼠小脑:{}", filePath);
 
         QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
         wrapper.eq("special_id", jsonTask.getSpecialId());
         SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
         Long sequenceNumber = annotationRel.getSequenceNumber();
+        log.info("sequenceNumber:{}", sequenceNumber);
         Annotation anno = new Annotation();
         anno.setSequenceNumber(sequenceNumber);
         ObjectMapper objectMapper = new ObjectMapper();
@@ -195,22 +222,48 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
                     break;
                 }
                 if (token == JsonToken.START_OBJECT) {
-                    processObjectNode(objectMapper, jsonParser, elementsList);
+                    elementsList = processObjectNode(objectMapper, jsonParser);
+                    if (elementsList == null) {
+                        return;
+                    }
                 }
             }
-            List<Annotation> arrayList = new ArrayList<>();
-            elementsList.stream().forEach(element -> {
-                Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask);
-                if (!ObjectUtil.isEmpty(annotation)) {
-                    arrayList.add(annotation);
-                }
-            });
-            anno.setList(arrayList);
+
+            Image image = imageMapper.selectById(jsonTask.getImageId());
+            String resolutionX = image.getResolutionX();
+            if (StringUtils.isEmpty(resolutionX)) {
+                resolutionX = "0.262";
+            }
+            String finalResolutionX = resolutionX;
+            List<Annotation> processedAnnotations;
+            processedAnnotations = elementsList.parallelStream()
+                    .map(element -> {
+                        Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, finalResolutionX);
+                        if (!ObjectUtil.isEmpty(annotation)) {
+                            return annotation;
+                        }
+                        return null;
+                    }).filter(Objects::nonNull).collect(Collectors.toList());
+
+            anno.setList(processedAnnotations);
+            log.info("大鼠小脑:{}", processedAnnotations.size());
+            Annotation annotation = new Annotation();
+            annotation.setSequenceNumber(sequenceNumber);
+            annotation.setSingleSlideId(jsonTask.getSingleId());
+            annotationMapper.deleteAiAnnotation(annotation);
             batchProcessAndSave(anno, 1000);
+            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
+            if (ObjectUtil.isNotEmpty(annotation1) && ObjectUtil.isNotEmpty(annotation1.getCollectContour())) {
+                annotation.setContour(annotation1.getCollectContour());
+                annotationMapper.deleteAiAnnotation(annotation);
+            }
+
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
+
     }
+
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
@@ -228,6 +281,9 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
     public void batchProcessAndSave(Annotation annotation, int batchSize) {
 
         List<Annotation> annotations = annotation.getList();
+        if (CollectionUtil.isEmpty(annotations)) {
+            return;
+        }
         int listSize = annotations.size();
 
         // 分批处理
@@ -245,4 +301,5 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
             }
         }
     }
+
 }
