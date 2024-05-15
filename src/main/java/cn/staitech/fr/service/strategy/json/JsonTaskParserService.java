@@ -1,13 +1,14 @@
 package cn.staitech.fr.service.strategy.json;
 
-import cn.staitech.fr.domain.JsonFile;
-import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.*;
+import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.JsonFileService;
 import cn.staitech.fr.service.JsonTaskService;
 import cn.staitech.fr.service.SlideService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,7 +53,10 @@ public class JsonTaskParserService {
     ParserStrategyFactory parserStrategyFactory;
     @Resource
     private List<CustomParserStrategy> customParserStrategies;
-
+    @Resource
+    public SpecialAnnotationRelMapper specialAnnotationRelMapper;
+    @Resource
+    private AnnotationMapper annotationMapper;
 
     public void input(String input) {
         JSONObject jsonObject = JSON.parseObject(input);
@@ -92,7 +96,12 @@ public class JsonTaskParserService {
                 }
             }
         }
+
+
         log.info("+++parser2:{}", parser);
+
+        Annotation annotation = getAnnotation(jsonTask);
+        annotationMapper.deleteAiAnnotation(annotation);
 
 
         // 线程池 异步  调用策略提交任务
@@ -104,6 +113,9 @@ public class JsonTaskParserService {
             finalParser.parseJson(jsonTask, jsonFile);
             log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++3");
         }
+
+        annotation.setContour("1");
+        annotationMapper.deleteAiAnnotation(annotation);
 
         // 指标计算
         parser.alculationIndicators(jsonTask);
@@ -144,6 +156,18 @@ public class JsonTaskParserService {
 //        } catch (InterruptedException e) {
 //
 //        }
+    }
+
+    private Annotation getAnnotation(JsonTask jsonTask) {
+        QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
+        wrapper.eq("special_id", jsonTask.getSpecialId());
+        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
+        Long sequenceNumber = annotationRel.getSequenceNumber();
+
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(sequenceNumber);
+        annotation.setSingleSlideId(jsonTask.getSingleId());
+        return annotation;
     }
 
     /**

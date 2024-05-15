@@ -57,7 +57,7 @@ public class SingleSlide implements Serializable {
     private String area;
 
     @ApiModelProperty(value = "精轮廓分析状态")
-    private int aiStatusFine;
+    private Integer aiStatusFine;
 
     @ApiModelProperty(value = "精轮廓总时间")
     private Long fineContourTime;

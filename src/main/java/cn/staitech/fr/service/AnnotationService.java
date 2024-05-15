@@ -56,4 +56,10 @@ public interface AnnotationService extends IService<Annotation> {
 
     Annotation updateOperationByHistory(Annotation annotation);
 
+    /**
+     * 批量保存
+     * @param annotation
+     * @param batchSize
+     */
+    void batchProcessAndSave(Annotation annotation, int batchSize);
 }
