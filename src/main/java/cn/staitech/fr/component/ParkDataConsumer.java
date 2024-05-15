@@ -5,6 +5,7 @@ import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -40,8 +41,8 @@ public class ParkDataConsumer {
             channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
         }
     }
-
     // 示例方法，实际应用中根据业务逻辑处理数据
+    @Async
     private void processParkData(String data) {
         jsonTaskParserService.input(data);
     }

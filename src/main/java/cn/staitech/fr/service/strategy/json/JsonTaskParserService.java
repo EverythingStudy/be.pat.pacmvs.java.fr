@@ -5,6 +5,7 @@ import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.JsonFileService;
 import cn.staitech.fr.service.JsonTaskService;
+import cn.staitech.fr.service.SingleSlideService;
 import cn.staitech.fr.service.SlideService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -57,6 +58,9 @@ public class JsonTaskParserService {
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
     private AnnotationMapper annotationMapper;
+    
+    @Resource
+    private SingleSlideService singleSlideService;
 
     public void input(String input) {
         JSONObject jsonObject = JSON.parseObject(input);
@@ -75,6 +79,15 @@ public class JsonTaskParserService {
             return;
         }
 
+        if (jsonTask.getCode().equals("500")) {
+        	SingleSlide singleSlide = new SingleSlide();
+            singleSlide.setSingleId(jsonTask.getSingleId());
+            //0未预测、1预测成功、2预测失败、3预测中
+            singleSlide.setForecastStatus("2");
+            singleSlideService.updateById(singleSlide);
+            return;
+        }
+        
         log.info("jsonTask:{}", jsonTask);
 
 
@@ -103,8 +116,11 @@ public class JsonTaskParserService {
         Annotation annotation = getAnnotation(jsonTask);
         annotationMapper.deleteAiAnnotation(annotation);
 
+        // 修改任务状态
+        jsonTask.setStatus(1);
+        jsonTaskService.updateById(jsonTask);
 
-        // 线程池 异步  调用策略提交任务
+        // 调用策略提交任务
         for (JsonFile jsonFile : jsonFileList) {
             ParserStrategy finalParser = parser;
             log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++1");
@@ -121,10 +137,14 @@ public class JsonTaskParserService {
         parser.alculationIndicators(jsonTask);
 
         // 修改任务状态
-        jsonTask.setStatus(1);
+        jsonTask.setStatus(2);
         jsonTaskService.updateById(jsonTask);
 
-
+        SingleSlide singleSlide = new SingleSlide();
+        singleSlide.setSingleId(jsonTask.getSingleId());
+        //0未预测、1预测成功、2预测失败、3预测中
+        singleSlide.setForecastStatus("1");
+        singleSlideService.updateById(singleSlide);
 //        CountDownLatch countDownLatch = new CountDownLatch(count);
 //
 //        AtomicInteger id = new AtomicInteger();

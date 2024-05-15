@@ -4,7 +4,10 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.mapper.ImageMapper;
+import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
+import cn.staitech.fr.mapper.SingleSlideMapper;
+import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
@@ -46,8 +49,6 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
     private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
-    @Resource
-    private AnnotationMapper annotationMapper;
     @Resource
     private SingleSlideMapper singleSlideMapper;
     @Resource
