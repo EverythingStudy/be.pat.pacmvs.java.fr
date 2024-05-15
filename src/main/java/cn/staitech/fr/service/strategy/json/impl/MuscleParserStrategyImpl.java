@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,8 +58,15 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", "", ""));
         */
 
+        // F精细轮廓总面积-平方毫米
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        indicatorResultsMap.put("骨骼肌面积", new IndicatorAddIn("Skeletal muscle area", singleSlide.getArea(), "平方毫米"));
+        String slideArea = singleSlide.getArea();
+
+        // 单位换算
+        BigDecimal areaNum = new BigDecimal(slideArea).multiply(new BigDecimal(1000));
+        String result = areaNum.setScale(3, RoundingMode.HALF_UP).toString();
+
+        indicatorResultsMap.put("骨骼肌面积", new IndicatorAddIn("Skeletal muscle area", result, "10³平方微米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 
