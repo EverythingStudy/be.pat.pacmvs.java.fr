@@ -231,11 +231,8 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
             annotation.setSingleSlideId(jsonTask.getSingleId());
             annotationMapper.deleteAiAnnotation(annotation);
             batchProcessAndSave(anno, 1000);
-            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
-            if (ObjectUtil.isNotEmpty(annotation1)&&ObjectUtil.isNotEmpty(annotation1.getCollectContour())){
-                annotation.setContour(annotation1.getCollectContour());
-                annotationMapper.deleteAiAnnotation(annotation);
-            }
+            annotation.setContour("1");
+            annotationMapper.deleteAiAnnotation(annotation);
             log.info("hashixianchenggong.....");
 //            long endTime = System.currentTimeMillis();
 //            long executionTime = endTime - startTime; // 执行时间，单位毫秒
