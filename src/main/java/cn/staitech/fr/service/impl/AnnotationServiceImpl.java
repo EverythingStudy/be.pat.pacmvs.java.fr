@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.config.AsyncTask;
@@ -1342,6 +1343,35 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
     }
 
+    /**
+     * 批量保存
+     * @param annotation
+     * @param batchSize
+     */
+    @Override
+    public void batchProcessAndSave(Annotation annotation, int batchSize) {
+
+        List<Annotation> annotations = annotation.getList();
+        if (CollectionUtil.isEmpty(annotations)) {
+            return;
+        }
+        int listSize = annotations.size();
+
+        // 分批处理
+        for (int i = 0; i < listSize; i += batchSize) {
+            int endIndex = Math.min(i + batchSize, listSize);
+            List<Annotation> batch = annotations.subList(i, endIndex);
+            Annotation annotation1 = new Annotation();
+            annotation1.setSequenceNumber(annotation.getSequenceNumber());
+            annotation1.setList(batch);
+            try {
+                annotationMapper.batchSave(annotation1);
+            } catch (Exception e) {
+                // 处理异常，例如记录日志
+                log.error("Error occurred while processing batch: " + e.getMessage(), e);
+            }
+        }
+    }
 
 }
 

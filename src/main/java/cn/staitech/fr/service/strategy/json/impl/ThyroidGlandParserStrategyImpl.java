@@ -2,11 +2,11 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.staitech.common.core.utils.SpringUtils;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
+import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -56,6 +55,8 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
     private AiForecastService aiForecastService;
     @Resource
     private ImageMapper imageMapper;
+    @Resource
+    private AnnotationService annotationService;
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX) {
         if (element.isObject()) {
@@ -251,9 +252,9 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
             annotation.setSequenceNumber(sequenceNumber);
             annotation.setSingleSlideId(jsonTask.getSingleId());
             annotationMapper.deleteAiAnnotation(annotation);
-            batchProcessAndSave(anno, 1000);
+            annotationService.batchProcessAndSave(anno, 1000);
             Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
-            if (ObjectUtil.isNotEmpty(annotation1)&&ObjectUtil.isNotEmpty(annotation1.getCollectContour())){
+            if (ObjectUtil.isNotEmpty(annotation1) && ObjectUtil.isNotEmpty(annotation1.getCollectContour())) {
                 annotation.setContour(annotation1.getCollectContour());
                 annotationMapper.deleteAiAnnotation(annotation);
             }
@@ -275,30 +276,6 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         indicatorResultsMap.put("大鼠甲状腺面积", new IndicatorAddIn("Acinus area%", singleSlide.getArea(), "平方毫米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
-    }
-
-    public void batchProcessAndSave(Annotation annotation, int batchSize) {
-
-        List<Annotation> annotations = annotation.getList();
-        if (CollectionUtil.isEmpty(annotations)) {
-            return;
-        }
-        int listSize = annotations.size();
-
-        // 分批处理
-        for (int i = 0; i < listSize; i += batchSize) {
-            int endIndex = Math.min(i + batchSize, listSize);
-            List<Annotation> batch = annotations.subList(i, endIndex);
-            Annotation annotation1 = new Annotation();
-            annotation1.setSequenceNumber(annotation.getSequenceNumber());
-            annotation1.setList(batch);
-            try {
-                annotationMapper.batchSave(annotation1);
-            } catch (Exception e) {
-                // 处理异常，例如记录日志
-                log.error("Error occurred while processing batch: " + e.getMessage(), e);
-            }
-        }
     }
 
 }
