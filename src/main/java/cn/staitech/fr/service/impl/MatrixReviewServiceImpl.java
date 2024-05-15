@@ -52,10 +52,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -438,7 +438,14 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
 		//请求算法处理
 		if(CollectionUtils.isNotEmpty(singleSlideList)){
-			for(MatrixReviewListOut matrixReviewListOut:singleSlideList){
+		    //修改算法执行时间
+            List<Long> collect = singleSlideList.stream().map(MatrixReviewListOut::getSingleId).collect(Collectors.toList());
+            LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
+            wrapper.in(SingleSlide::getSingleId,collect);
+            SingleSlide singleSlide = new SingleSlide();
+            singleSlide.setStartTime(new Date());
+            singleSlideMapper.update(singleSlide,wrapper);
+            for(MatrixReviewListOut matrixReviewListOut:singleSlideList){
 				Long singleId = matrixReviewListOut.getSingleId();
 				Long slideId = matrixReviewListOut.getSlideId();
 				String imageUrl = matrixReviewListOut.getImageUrl();
