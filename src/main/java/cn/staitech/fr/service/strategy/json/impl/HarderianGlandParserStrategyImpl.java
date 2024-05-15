@@ -222,30 +222,30 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
             if (StringUtils.isEmpty(resolutionX)) {
                 resolutionX = "0.262";
             }
-            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
             String finalResolutionX = resolutionX;
             List<Annotation> processedAnnotations;
             processedAnnotations = elementsList.parallelStream()
                     .map(element -> {
                         Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, finalResolutionX);
                         if (!ObjectUtil.isEmpty(annotation)) {
-                            if (ObjectUtil.isNotEmpty(annotation1)) {
-                                annotation1.setContour(annotation.getContour40000());
-                                Annotation annotationBy = annotationMapper.intersectsGeometry(annotation1);
-                                if (ObjectUtil.equals("t", annotationBy.getIntersectsResults())) {
-                                    return annotation;
-                                }
-                            } else {
-                                return annotation;
-                            }
+                            return annotation;
                         }
                         return null;
                     }).filter(Objects::nonNull).collect(Collectors.toList());
 
             anno.setList(processedAnnotations);
             log.info("hashixiandaxiao:{}", processedAnnotations.size());
+            Annotation annotation = new Annotation();
+            annotation.setSequenceNumber(sequenceNumber);
+            annotation.setSingleSlideId(jsonTask.getSingleId());
+            annotationMapper.deleteAiAnnotation(annotation);
             batchProcessAndSave(anno, 1000);
-            log.info("hashixianchenggong....." );
+            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
+            if (ObjectUtil.isNotEmpty(annotation1)&&ObjectUtil.isNotEmpty(annotation1.getCollectContour())){
+                annotation.setContour(annotation1.getCollectContour());
+                annotationMapper.deleteAiAnnotation(annotation);
+            }
+            log.info("hashixianchenggong.....");
 //            long endTime = System.currentTimeMillis();
 //            long executionTime = endTime - startTime; // 执行时间，单位毫秒
 //            System.out.println("执行时间毫秒："+executionTime);
