@@ -116,8 +116,11 @@ public class JsonTaskParserService {
         Annotation annotation = getAnnotation(jsonTask);
         annotationMapper.deleteAiAnnotation(annotation);
 
+        // 修改任务状态
+        jsonTask.setStatus(1);
+        jsonTaskService.updateById(jsonTask);
 
-        // 线程池 异步  调用策略提交任务
+        // 调用策略提交任务
         for (JsonFile jsonFile : jsonFileList) {
             ParserStrategy finalParser = parser;
             log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++1");
