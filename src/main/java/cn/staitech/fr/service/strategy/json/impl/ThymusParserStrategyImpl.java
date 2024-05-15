@@ -75,7 +75,7 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
         if (StringUtils.isNotEmpty(resolution) && StringUtils.isNotEmpty(structureArea.getArea())) {
             BigDecimal bigDecimal = new BigDecimal(resolution);
             BigDecimal bigDecimal1 = new BigDecimal(structureArea.getArea());
-            bigDecimalB = bigDecimal1.multiply(bigDecimal).multiply(bigDecimal).multiply(new BigDecimal(0.000001));
+            bigDecimalB = bigDecimal1.multiply(bigDecimal).multiply(bigDecimal).multiply(new BigDecimal(0.000001).setScale(3));
         }
         AiForecast aiForecast = new AiForecast();
         aiForecast.setQuantitativeIndicators("胸腺面积");
