@@ -1,20 +1,23 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.staitech.common.core.utils.SpringUtils;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.PathologicalIndicatorCategory;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.SpecialAnnotationRel;
 import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -40,10 +43,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -57,22 +57,23 @@ public class MammaryGlandParserStrategyImpl implements ParserStrategy {
 
 
     @Resource
-    public SpecialAnnotationRelMapper specialAnnotationRelMapper = SpringUtils.getBean(SpecialAnnotationRelMapper.class);
+    public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
-    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper = SpringUtils.getBean(PathologicalIndicatorCategoryMapper.class);
+    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
     @Resource
-    private AnnotationMapper annotationMapper = SpringUtils.getBean(AnnotationMapper.class);
+    private AnnotationMapper annotationMapper;
     @Resource
-    private SingleSlideMapper singleSlideMapper = SpringUtils.getBean(SingleSlideMapper.class);
+    private SingleSlideMapper singleSlideMapper;
     @Resource
-    private AiForecastService aiForecastService = SpringUtils.getBean(AiForecastService.class);
+    private AiForecastService aiForecastService;
+    @Resource
+    private ImageMapper imageMapper;
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         log.info("开始解析乳腺组织");
         String filePath = jsonFileS.getFileUrl();
 
-        ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
         QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
         wrapper.eq("special_id", jsonTask.getSpecialId());
         SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
@@ -101,25 +102,32 @@ public class MammaryGlandParserStrategyImpl implements ParserStrategy {
                     processObjectNode(objectMapper, jsonParser, elementsList);
                 }
             }
-            List<Annotation> arrayList = new ArrayList<>();
-            Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
-            elementsList.stream().forEach(element -> {
-                Annotation annotation = processJsonElement(element, executorService, pathologicalMap, jsonTask);
-                if (!ObjectUtil.isEmpty(annotation)) {
-                    annotation1.setContour(annotation.getContour40000());
-                    Annotation annotationBy = annotationMapper.intersectsGeometry(annotation1);
-                    if (ObjectUtil.equals("t", annotationBy.getIntersectsResults())) {
-                        arrayList.add(annotation);
-                    }
-                }
-            });
-            anno.setList(arrayList);
+            if (CollectionUtil.isEmpty(elementsList)) {
+                log.error("No valid JSON data found in the file.");
+                return;
+            }
+            Image image = imageMapper.selectById(jsonTask.getImageId());
+            String resolutionX = image.getResolutionX();
+            if (StringUtils.isEmpty(resolutionX)) {
+                resolutionX = "0.262";
+            }
+            String finalResolutionX = resolutionX;
+            List<Annotation> processedAnnotations;
+            processedAnnotations = elementsList.parallelStream()
+                    .map(element -> {
+                        Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, finalResolutionX);
+                        if (!ObjectUtil.isEmpty(annotation)) {
+                            return annotation;
+                        }
+                        return null;
+                    }).filter(Objects::nonNull).collect(Collectors.toList());
+
+            anno.setList(processedAnnotations);
+            log.info("皮肤+乳腺:{}", processedAnnotations.size());
+            batchProcessAndSave(anno, 1000);
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
-        } finally {
-            executorService.shutdown();
         }
-        batchProcessAndSave(anno, 1000, Runtime.getRuntime().availableProcessors());
     }
 
     @Override
@@ -244,53 +252,31 @@ public class MammaryGlandParserStrategyImpl implements ParserStrategy {
         }
     }
 
-    private static Annotation processJsonElement(JsonNode element, ExecutorService executorService, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
+    public void batchProcessAndSave(Annotation annotation, int batchSize) {
 
-        try {
-            Future<Annotation> future = executorService.submit(() -> MammaryGlandParserStrategyImpl.handleSingleJsonElement(element, pathologicalMap, jsonTask));
-            Annotation annotation = future.get();
-            future.get(30, TimeUnit.SECONDS);  // 设定超时时间以避免无限等待
-            return annotation;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public void batchProcessAndSave(Annotation annotation, int batchSize, int threadCount) {
-        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
         List<Annotation> annotations = annotation.getList();
+        if (CollectionUtil.isEmpty(annotations)) {
+            return;
+        }
         int listSize = annotations.size();
 
         // 分批处理
         for (int i = 0; i < listSize; i += batchSize) {
             int endIndex = Math.min(i + batchSize, listSize);
             List<Annotation> batch = annotations.subList(i, endIndex);
-            // 提交任务到线程池
-            executor.submit(() -> {
-                Annotation annotation1 = new Annotation();
-                annotation1.setSequenceNumber(annotation.getSequenceNumber());
-                annotation1.setList(batch);
-                try {
-                    annotationMapper.batchSave(annotation1);
-                } catch (Exception e) {
-                    // 处理异常，例如记录日志
-                    log.error("Error occurred while processing batch: " + e.getMessage(), e);
-                }
-            });
-        }
-
-        // 等待所有任务完成
-        executor.shutdown();
-        try {
-            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-        } catch (InterruptedException e) {
-            // 处理中断异常
-            Thread.currentThread().interrupt();
+            Annotation annotation1 = new Annotation();
+            annotation1.setSequenceNumber(annotation.getSequenceNumber());
+            annotation1.setList(batch);
+            try {
+                annotationMapper.batchSave(annotation1);
+            } catch (Exception e) {
+                // 处理异常，例如记录日志
+                log.error("Error occurred while processing batch: " + e.getMessage(), e);
+            }
         }
     }
 
-    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
+    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX) {
         if (element.isObject()) {
             JsonNode node = element.get("id");
             // node 转换成String
@@ -352,7 +338,18 @@ public class MammaryGlandParserStrategyImpl implements ParserStrategy {
             }
             Annotation annotation = new Annotation();
             // 查询标签信息
-            annotation.setArea(properties.getArea());
+            Map<String, Indicator> dataIndicators = properties.getData_indicators();
+            if (!CollectionUtil.isEmpty(dataIndicators)) {
+                dataIndicators.forEach((k, v) -> {
+                    if (StringUtils.isNotEmpty(v.getUnit())) {
+                        double value = v.getValue();
+                        BigDecimal bigDecimal = new BigDecimal(resolutionX);
+                        BigDecimal bigDecimal1 = new BigDecimal(value);
+                        annotation.setArea(bigDecimal1.multiply(bigDecimal).multiply(bigDecimal).setScale(3, RoundingMode.HALF_UP) + "");
+                    }
+                });
+            }
+
             annotation.setPerimeter(properties.getPerimeter());
             annotation.setCreateBy(0L);
             annotation.setCreateTime(String.valueOf(new Date()));
