@@ -204,30 +204,42 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
         PageDataResponse<AnimalDimensionOut> resp = new PageDataResponse<>();
         AnimalDimensionOut ret = new AnimalDimensionOut();
-        //查询基础数据
-        LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
-        wrapper.eq(Slide::getSpecialId, req.getSpecialId());
-        wrapper.isNotNull(Slide::getAnimalCode);
-        wrapper.like(StringUtils.isNotEmpty(req.getAnimalCode()),Slide::getAnimalCode,req.getAnimalCode());
-        wrapper.like(StringUtils.isNotEmpty(req.getGroupCode()),Slide::getGroupCode,req.getGroupCode());
+        //查询动物
+        LambdaQueryWrapper<Slide> wrapper2 = new LambdaQueryWrapper<>();
+        wrapper2.select(Slide::getAnimalCode,Slide::getGroupCode,Slide::getGenderFlag);
+        wrapper2.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
+        wrapper2.eq(Slide::getSpecialId, req.getSpecialId());
+        wrapper2.isNotNull(Slide::getAnimalCode);
+        wrapper2.like(StringUtils.isNotEmpty(req.getAnimalCode()), Slide::getAnimalCode, req.getAnimalCode());
+        wrapper2.like(StringUtils.isNotEmpty(req.getGroupCode()), Slide::getGroupCode, req.getGroupCode());
+        wrapper2.groupBy(Slide::getAnimalCode,Slide::getGroupCode,Slide::getGenderFlag);
         Page<Slide> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
-        List<Slide> slideList = slideMapper.selectList(wrapper);
-        if (CollectionUtils.isEmpty(slideList)) {
+        List<Slide> slideLists = slideMapper.selectList(wrapper2);
+        if (CollectionUtils.isEmpty(slideLists)) {
             resp.setTotal(page.getTotal());
             resp.setPageNum(req.getPageNum());
             resp.setPageSize(req.getPageSize());
             resp.setData(ret);
             resp.setPages(page.getPages());
         }
+        //每一个动物处理
         List<AnimalDimensionData> retData = new ArrayList<>();
-        for (Slide slide : slideList) {
+        for (Slide slideList : slideLists) {
+            //查询基础数据
+            LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
+            wrapper.eq(Slide::getSpecialId, req.getSpecialId());
+            wrapper.eq(Slide::getAnimalCode,slideList.getAnimalCode());
+            wrapper.eq(Slide::getGroupCode,slideList.getGroupCode());
+            wrapper.eq(Slide::getGenderFlag,slideList.getGenderFlag());
+            List<Slide> slides = slideMapper.selectList(wrapper);
+            //每个动物的脏器
             //数据
             AnimalDimensionData out = new AnimalDimensionData();
-            out.setGroupCode(slide.getGroupCode());
-            out.setAnimalCode(slide.getAnimalCode());
-            out.setGenderFlag(slide.getGenderFlag());
-            List<OrgansData> organsData = slideMapper.selectRespData(slide.getSlideId());
+            out.setGroupCode(slideList.getGroupCode());
+            out.setAnimalCode(slideList.getAnimalCode());
+            out.setGenderFlag(slideList.getGenderFlag());
+            List<OrgansData> organsData = slideMapper.selectRespData(slides);
             out.setOrgans(organsData);
             retData.add(out);
         }

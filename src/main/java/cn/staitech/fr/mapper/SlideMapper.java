@@ -45,7 +45,7 @@ public interface SlideMapper extends BaseMapper<Slide> {
     List<MatrixReviewListOut> SingleSlideAdjacent(SingleSlideAdjacent req);
     List<SelectImageSlideOut> selectSlideList(MatrixReviewListIn req);
 
-    List<OrgansData> selectRespData(Long slideId);
+    List<OrgansData> selectRespData(@Param("list") List<Slide> list);
 
     List<Category> selectHeadList(Long specialId);
 }
