@@ -31,6 +31,7 @@ import cn.staitech.system.api.domain.SysUser;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import cn.staitech.fr.service.AnnotationService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.google.gson.Gson;
@@ -124,25 +125,25 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     );
 
     // 比之前快0.5
-//    public List<Features> getFeaturesList(List<Annotation> annotations) {
-//        List<Features> featuresList = new ArrayList<>();
-//
-//        for (Annotation annotation : annotations) {
-//            executorService.submit(new Runnable() {
-//                @Override
-//                public void run() {
-//                    Features features = new Features();
-//                    features.setGeometry(JSONObject.parseObject(annotation.getContour()));
-//                    features.setId(null);
-//                    features.setType("Feature");
-//                    JSONObject jsonObject = (JSONObject) JSON.toJSON(getProperties(annotation));
-//                    features.setProperties(jsonObject);
-//                    featuresList.add(features);
-//                }
-//            });
-//        }
-//        return featuresList;
-//    }
+    public List<Features> getFeaturesList(List<Annotation> annotations) {
+        List<Features> featuresList = new ArrayList<>();
+
+        for (Annotation annotation : annotations) {
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    Features features = new Features();
+                    features.setGeometry(JSONObject.parseObject(annotation.getContour()));
+                    features.setId(null);
+                    features.setType("Feature");
+                    JSONObject jsonObject = (JSONObject) JSON.toJSON(getProperties(annotation));
+                    features.setProperties(jsonObject);
+                    featuresList.add(features);
+                }
+            });
+        }
+        return featuresList;
+    }
 
 
 //    public List<Features> getFeaturesList(List<Annotation> annotations) {
@@ -174,19 +175,19 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 //        return featuresList;
 //    }
 
-    public List<Features> getFeaturesList(List<Annotation> annotations) {
-        List<Features> featuresList = new ArrayList<>();
-        for (Annotation annotation : annotations) {
-            Features features = new Features();
-            features.setGeometry(JSONObject.parseObject(annotation.getContour()));
-            features.setId(null);
-            features.setType("Feature");
-            JSONObject jsonObject = (JSONObject) JSON.toJSON(getProperties(annotation));
-            features.setProperties(jsonObject);
-            featuresList.add(features);
-        }
-        return featuresList;
-    }
+//    public List<Features> getFeaturesList(List<Annotation> annotations) {
+//        List<Features> featuresList = new ArrayList<>();
+//        for (Annotation annotation : annotations) {
+//            Features features = new Features();
+//            features.setGeometry(JSONObject.parseObject(annotation.getContour()));
+//            features.setId(null);
+//            features.setType("Feature");
+//            JSONObject jsonObject = (JSONObject) JSON.toJSON(getProperties(annotation));
+//            features.setProperties(jsonObject);
+//            featuresList.add(features);
+//        }
+//        return featuresList;
+//    }
 
     public cn.staitech.fr.vo.geojson.Properties getProperties(Annotation annotation) {
         cn.staitech.fr.vo.geojson.Properties properties = new cn.staitech.fr.vo.geojson.Properties();
@@ -297,7 +298,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
         SingleSlide singleSlide = singleSlideMapper.selectById(req.getSingleSlideId());
         Slide slide = slideMapper.selectById(singleSlide.getSlideId());
-        SpecialAnnotationRel specialAnnotationRel = specialAnnotationRelMapper.selectById(slide.getSpecialId());
+        LambdaQueryWrapper<SpecialAnnotationRel> queryWrapper = new LambdaQueryWrapper<SpecialAnnotationRel>().eq(SpecialAnnotationRel::getSpecialId, slide.getSpecialId());
+        SpecialAnnotationRel specialAnnotationRel = specialAnnotationRelMapper.selectOne(queryWrapper);
         annotation.setSequenceNumber(specialAnnotationRel.getSequenceNumber());
         List<Annotation> annotationList = annotationMapper.aiSelectListBy(annotation);
         List<Features> annoList = getFeaturesList(annotationList);
