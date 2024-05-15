@@ -111,6 +111,7 @@
 	                #{item}
 	            </foreach>
         	</if>
+        	and t1.del_flag='0'
 		</where>
 		ORDER BY	t1.create_time ASC
     </select>
