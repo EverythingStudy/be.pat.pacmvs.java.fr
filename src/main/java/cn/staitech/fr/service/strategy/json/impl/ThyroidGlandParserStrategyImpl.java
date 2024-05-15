@@ -265,7 +265,6 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
 
-
         // I:甲状旁腺组织轮廓面积-平方毫米
         BigDecimal organArea = getorganArea(jsonTask, "108111");
 
