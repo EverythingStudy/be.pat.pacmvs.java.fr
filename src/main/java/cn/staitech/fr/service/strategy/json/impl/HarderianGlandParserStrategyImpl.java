@@ -165,6 +165,10 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
     private static void processObjectNode(ObjectMapper objectMapper, JsonParser jsonParser, List<JsonNode> elementsList) throws IOException {
         ObjectNode objectNode = objectMapper.readTree(jsonParser);
+        if (objectNode == null || !objectNode.isObject()) {
+            log.error("Input JSON data is not a valid object.");
+            return;
+        }
         if (objectNode.has("features")) {
             ArrayNode featuresNode = (ArrayNode) objectNode.get("features");
             if (featuresNode.isArray()) {
@@ -216,7 +220,10 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
                     processObjectNode(objectMapper, jsonParser, elementsList);
                 }
             }
-
+            if (CollectionUtil.isEmpty(elementsList)) {
+                log.error("No valid JSON data found in the file.");
+                return;
+            }
             Image image = imageMapper.selectById(jsonTask.getImageId());
             String resolutionX = image.getResolutionX();
             if (StringUtils.isEmpty(resolutionX)) {
