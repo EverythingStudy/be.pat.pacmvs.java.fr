@@ -14,6 +14,8 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
+
+import com.alibaba.excel.converters.string.StringNumberConverter;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonFactory;
@@ -276,20 +278,27 @@ public class SternumParserStrategyImpl implements ParserStrategy {
 		//定位表
 		QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
 		wrapper.eq("special_id", jsonTask.getSpecialId());
-		//SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
-		//Long sequenceNumber = annotationRel.getSequenceNumber();
+		SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
+		Long sequenceNumber = annotationRel.getSequenceNumber();
 
-		//骨髓腔:	14E00E 红系细胞核:	14E011 粒系细胞:	14E01A 巨核系细胞:	
-		//14E022 红细胞:	14E004 脂肪细胞:	14E012 骨质:	14E00F 组织轮廓:	14E111
+		//骨髓腔:14E00E 
+		//红系细胞核:14E011
+		//粒系细胞:14E01A 
+		//巨核系细胞:14E022
+		//红细胞:14E004 
+		//脂肪细胞:	14E012 
+		//骨质:	14E00F 
+		//组织轮廓:	14E111
 
 		List<AiForecast> insertEntity = new ArrayList<>();
 
 		Integer result = 0;
 		//粒系细胞数量C 个
-		if (ObjectUtil.isNotEmpty(pathologicalMap.get("14E011"))) {
+		if (ObjectUtil.isNotEmpty(pathologicalMap.get("14E01A"))) {
 			Annotation annotation1 = new Annotation();
 			annotation1.setSingleSlideId(jsonTask.getSingleId());
-			annotation1.setCategoryId(pathologicalMap.get("14E011"));
+			annotation1.setCategoryId(pathologicalMap.get("14E01A"));
+			annotation1.setSequenceNumber(sequenceNumber);
 			result = annotationMapper.countDucts(annotation1);
 		}
 
@@ -299,6 +308,7 @@ public class SternumParserStrategyImpl implements ParserStrategy {
 			Annotation annotation2 = new Annotation();
 			annotation2.setSingleSlideId(jsonTask.getSingleId());
 			annotation2.setCategoryId(pathologicalMap.get("14E011"));
+			annotation2.setSequenceNumber(sequenceNumber);
 			result2 = annotationMapper.countDucts(annotation2);
 		}
 
@@ -325,7 +335,28 @@ public class SternumParserStrategyImpl implements ParserStrategy {
 			aiForecast2.setQuantitativeIndicatorsEn("Sternum area");
 			aiForecast2.setUnit("平方毫米");
 			SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-			aiForecast2.setResults(singleSlide.getArea());
+			if(StringUtils.isNotEmpty(singleSlide.getArea())){
+				aiForecast2.setResults(singleSlide.getArea());
+			}else{
+				//查询切片缩放
+		        String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
+		        BigDecimal resolutions = new BigDecimal("0.262");
+		        if(StringUtils.isNotEmpty(resolution)){
+		            resolutions= new BigDecimal(resolution);
+		        }
+				//计算面积
+				Annotation annotation = new Annotation();
+		        annotation.setSingleSlideId(jsonTask.getSingleId());
+		        annotation.setCategoryId(pathologicalMap.get("14E111"));
+		        annotation.setSequenceNumber(sequenceNumber);
+		        Annotation structureArea = annotationMapper.getStructureArea(annotation);
+		        BigDecimal bigDecimalB = new BigDecimal(0);
+		        if ( StringUtils.isNotEmpty(structureArea.getArea())) {
+		            BigDecimal bigDecimal1 = new BigDecimal(structureArea.getArea());
+		            bigDecimalB = bigDecimal1.multiply(resolutions).multiply(resolutions).multiply(new BigDecimal(0.000001));
+		        }
+		        aiForecast2.setResults(bigDecimalB.setScale(3, RoundingMode.HALF_UP).toString());
+			}
 			aiForecast2.setSingleSlideId(jsonTask.getSingleId());
 			insertEntity.add(aiForecast2);
 		}
