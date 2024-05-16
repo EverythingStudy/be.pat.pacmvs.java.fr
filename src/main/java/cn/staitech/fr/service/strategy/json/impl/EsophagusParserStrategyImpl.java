@@ -14,6 +14,7 @@ import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
+import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
@@ -53,15 +54,11 @@ public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Autowired
     private AreaUtils areaUtils;
-
+    @Resource
+    private CommonJsonParser commonJsonParser;
     @PostConstruct
     public void init() {
-        setAiForecastService(aiForecastService);
-        setAnnotationMapper(annotationMapper);
-        setPathologicalIndicatorCategoryMapper(pathologicalIndicatorCategoryMapper);
-        setSingleSlideMapper(singleSlideMapper);
-        setSpecialAnnotationRelMapper(specialAnnotationRelMapper);
-        setImageMapper(imageMapper);
+        setCommonJsonParser(commonJsonParser);
         log.info("EsophagusParserStrategyImpl init");
     }
 

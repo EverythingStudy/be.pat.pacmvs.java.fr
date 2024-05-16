@@ -11,6 +11,7 @@ import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
+import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -42,14 +43,11 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
     private ImageMapper imageMapper;
 
 
+    @Resource
+    private CommonJsonParser commonJsonParser;
     @PostConstruct
     public void init() {
-        setAiForecastService(aiForecastService);
-        setAnnotationMapper(annotationMapper);
-        setPathologicalIndicatorCategoryMapper(pathologicalIndicatorCategoryMapper);
-        setSingleSlideMapper(singleSlideMapper);
-        setSpecialAnnotationRelMapper(specialAnnotationRelMapper);
-        setImageMapper(imageMapper);
+        setCommonJsonParser(commonJsonParser);
         log.info("LarynxParserStrategyImpl init");
     }
     @Override
