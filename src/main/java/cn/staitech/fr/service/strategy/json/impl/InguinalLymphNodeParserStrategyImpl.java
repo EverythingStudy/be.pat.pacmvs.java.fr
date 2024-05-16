@@ -4,7 +4,10 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.mapper.ImageMapper;
+import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
+import cn.staitech.fr.mapper.SingleSlideMapper;
+import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.service.strategy.json.CommonParserStrategy;
@@ -12,7 +15,6 @@ import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -43,14 +45,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component("Inguinal_lymph_node")
 public class InguinalLymphNodeParserStrategyImpl implements ParserStrategy {
-
-
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
     private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
-    @Resource
-    private AnnotationMapper annotationMapper;
     @Resource
     private SingleSlideMapper singleSlideMapper;
     @Resource
@@ -269,7 +267,7 @@ public class InguinalLymphNodeParserStrategyImpl implements ParserStrategy {
         String accurateArea = singleSlide.getArea();
 
         // I:甲状旁腺组织轮廓面积-平方毫米
-        BigDecimal organArea = getorganArea(jsonTask, "108111");
+        BigDecimal organArea = commonParserStrategy.getorganArea(jsonTask, "108111");
 
         // 若甲状腺轮廓面积里包括了甲状旁腺，计算时需要用H-I，若甲状旁腺和甲状腺是分开单独识别的，则只需要H
         if (new BigDecimal(accurateArea).compareTo(BigDecimal.ZERO) > 0
@@ -282,44 +280,4 @@ public class InguinalLymphNodeParserStrategyImpl implements ParserStrategy {
         indicatorResultsMap.put("甲状腺面积", new IndicatorAddIn("Thyroid gland area", accurateArea, "平方毫米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
-
-
-    /**
-     * 获取脏器轮廓面积
-     */
-    private BigDecimal getorganArea(JsonTask jsonTask, String structCode) {
-        // 查询所有未被删除且登录机构相同的数据
-        Map<String, Long> pathologicalMap = commonParserStrategy.getPathologicalMap(jsonTask);
-
-        // 定位表
-        Long sequenceNumber = commonParserStrategy.getSequenceNumber(jsonTask);
-
-        // 非精细轮廓总面积
-        Annotation annotation = new Annotation();
-        annotation.setSequenceNumber(sequenceNumber);
-        annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
-        annotation.setCategoryId(pathologicalMap.get(structCode));// 标注类别ID
-        Annotation structure = annotationMapper.getStructureArea(annotation);
-        if (structure == null || structure.getArea() == null) {
-            return new BigDecimal("0");
-        }
-        String structureArea = structure.getArea();
-
-        // 查询切片缩放
-        BigDecimal resolutionNum = new BigDecimal("0.262");
-        String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
-        if (StringUtils.isNotEmpty(resolution)) {
-            resolutionNum = new BigDecimal(resolution);
-        }
-
-        // 计算面积
-        BigDecimal organArea = BigDecimal.ZERO;
-        if (StringUtils.isNotEmpty(structureArea)) {
-            BigDecimal structureAreaNum = new BigDecimal(structureArea);
-            organArea = structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.000001));
-        }
-        return organArea;
-    }
-
-
 }
