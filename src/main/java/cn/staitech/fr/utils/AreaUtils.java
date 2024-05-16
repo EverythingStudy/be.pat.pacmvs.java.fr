@@ -35,6 +35,9 @@ public class AreaUtils {
      */
     public String getFineContourArea(Long singleSlideId) {
         SingleSlide singleSlide = singleSlideMapper.selectById(singleSlideId);
+        if(null == singleSlide || StringUtils.isEmpty(singleSlide.getArea())){
+            return "0";
+        }
         return singleSlide.getArea();
     }
 
@@ -44,8 +47,12 @@ public class AreaUtils {
      * @return 转换后结果
      */
     public String convertToSquareMicrometer(String str){
-        BigDecimal areaNum = new BigDecimal(str).multiply(new BigDecimal(1000));
-        BigDecimal result = areaNum.setScale(3, RoundingMode.HALF_UP);
+        BigDecimal result = BigDecimal.ZERO;
+        if(StringUtils.isEmpty(str)){
+            BigDecimal areaNum = new BigDecimal(str).multiply(new BigDecimal(1000));
+            result = areaNum.setScale(3, RoundingMode.HALF_UP);
+        }
+
         return result.toString();
     }
 

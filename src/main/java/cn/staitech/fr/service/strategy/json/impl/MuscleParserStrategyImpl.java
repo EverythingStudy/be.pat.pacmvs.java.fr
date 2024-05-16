@@ -58,12 +58,13 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular erythrocyte area%", "", ""));
         indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", "", ""));
         */
+        AreaUtils areaUtils = new AreaUtils();
 
         // F精细轮廓总面积-平方毫米
-        String slideArea = new AreaUtils().getFineContourArea(jsonTask.getSingleId());
+        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
 
         // 单位换算
-        String result = new AreaUtils().convertToSquareMicrometer(slideArea);
+        String result = areaUtils.convertToSquareMicrometer(slideArea);
 
         indicatorResultsMap.put("骨骼肌面积", new IndicatorAddIn("Skeletal muscle area", result, "10³平方微米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
