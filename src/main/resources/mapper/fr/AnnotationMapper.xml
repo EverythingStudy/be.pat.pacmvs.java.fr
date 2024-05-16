@@ -171,6 +171,7 @@
             "single_slide_id" INT8,
             "single"          INT2          DEFAULT 1,
             "contour_type"    INT8          DEFAULT 4,
+            structure_size    INT2,
             "id"              VARCHAR(500) COLLATE "pg_catalog"."default",
             CONSTRAINT "fr_ai_annotation_${sequenceNumber}_pkey" PRIMARY KEY ("annotation_id")
         );
@@ -256,6 +257,7 @@
         create_time,
         slide_id,
         single_slide_id,
+        structure_size,
         id
         )
         values
@@ -274,6 +276,7 @@
             NOW(),
             #{item.slideId},
             #{item.singleSlideId},
+            #{item.structureSize},
             #{item.id}
             )
         </foreach>
@@ -388,6 +391,12 @@
             </if>
             <if test="contour != null">
                 AND ST_Intersects(st_geomfromgeojson(#{contour}),contour${magnification})
+            </if>
+            <if test="structureSizeList != null and structureSizeList.size > 0">
+                AND structure_size in
+                <foreach collection="structureSizeList" item="structureSize" open="(" separator="," close=")">
+                    #{structureSize}
+                </foreach>
             </if>
         </where>
     </select>

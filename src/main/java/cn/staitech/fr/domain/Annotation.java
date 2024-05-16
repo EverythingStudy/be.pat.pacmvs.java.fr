@@ -143,6 +143,9 @@ public class Annotation implements Serializable {
     @TableField(exist = false)
     private String intersectsResults;
 
+    @TableField(exist = false)
+    private String structureSize;
+
     @Override
     public boolean equals(Object that) {
         if (this == that) {
