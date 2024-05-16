@@ -48,7 +48,7 @@ public class StomachParserStrategyImpl extends AbstractCustomParserStrategy {
     }
     @Override
     public String getAlgorithmCode() {
-        return "Duodenum";
+        return "Stomach";
     }
 
     @Override

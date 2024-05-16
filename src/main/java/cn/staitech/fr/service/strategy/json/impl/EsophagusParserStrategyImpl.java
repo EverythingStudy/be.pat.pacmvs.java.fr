@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
@@ -83,6 +84,7 @@ public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy {
         aiForecast.setSingleSlideId(jsonTask.getSingleId());
         BigDecimal area = areaUtils.getOrganArea(jsonTask, "10F120");
         aiForecast.setResults(new BigDecimal(singleSlide.getArea()).subtract(area).toString());
+        aiForecast.setCreateTime(DateUtil.now());
         insertEntity.add(aiForecast);
         aiForecastService.saveBatch(insertEntity);
 

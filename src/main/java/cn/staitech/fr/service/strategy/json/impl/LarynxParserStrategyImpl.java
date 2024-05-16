@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
@@ -10,13 +11,11 @@ import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
-import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,6 +70,7 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
         aiForecast.setUnit("平方毫米");
         aiForecast.setResults(singleSlide.getArea());
         aiForecast.setSingleSlideId(jsonTask.getSingleId());
+        aiForecast.setCreateTime(DateUtil.now());
         insertEntity.add(aiForecast);
         aiForecastService.saveBatch(insertEntity);
 

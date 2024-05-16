@@ -1,11 +1,9 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Annotation;
-import cn.staitech.fr.domain.Image;
-import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.PathologicalIndicatorCategory;
 import cn.staitech.fr.domain.SingleSlide;
@@ -17,36 +15,17 @@ import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
-import cn.staitech.fr.service.strategy.json.ParserStrategy;
-import cn.staitech.fr.vo.geojson.Indicator;
-import cn.staitech.fr.vo.geojson.Properties;
-import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -110,6 +89,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         aiForecast.setUnit("个");
         aiForecast.setResults(result.toString());
         aiForecast.setSingleSlideId(jsonTask.getSingleId());
+        aiForecast.setCreateTime(DateUtil.now());
         insertEntity.add(aiForecast);
         //乳腺面积=H-A-B
         //H
@@ -150,6 +130,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         aiForecast1.setQuantitativeIndicatorsEn("Acinar epithelial area (all)");
         aiForecast1.setUnit("平方毫米");
         aiForecast1.setSingleSlideId(jsonTask.getSingleId());
+        aiForecast1.setCreateTime(DateUtil.now());
         if (StringUtils.isNotEmpty(singleSlide.getArea())) {
             BigDecimal bigDecimal = new BigDecimal(singleSlide.getArea()).subtract(bigDecimalA).subtract(bigDecimalB).setScale(3, RoundingMode.HALF_UP);
             aiForecast1.setResults(bigDecimal.toString());
@@ -160,12 +141,14 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         aiForecast2.setQuantitativeIndicatorsEn("Skin area");
         aiForecast2.setUnit("平方毫米");
         aiForecast2.setSingleSlideId(jsonTask.getSingleId());
+        aiForecast2.setCreateTime(DateUtil.now());
         aiForecast2.setResults(bigDecimalB.setScale(3, RoundingMode.HALF_UP).toString());
         insertEntity.add(aiForecast2);
         AiForecast aiForecast3 = new AiForecast();
         aiForecast3.setQuantitativeIndicators("皮脂腺密度");
         aiForecast3.setQuantitativeIndicatorsEn("Density of Sebaceous glands");
         aiForecast3.setUnit("个/平方毫米");
+        aiForecast3.setCreateTime(DateUtil.now());
         aiForecast3.setSingleSlideId(jsonTask.getSingleId());
         // 获取皮脂腺的数量
         annotation.setCategoryId(pathologicalMap.get("121099"));
@@ -178,6 +161,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         aiForecast4.setQuantitativeIndicatorsEn("Density of hair follicles");
         aiForecast4.setUnit("个/平方毫米");
         aiForecast4.setSingleSlideId(jsonTask.getSingleId());
+        aiForecast4.setCreateTime(DateUtil.now());
         // 获取毛囊密度的数量
         annotation.setCategoryId(pathologicalMap.get("121098"));
         Integer i1 = annotationMapper.countDucts(annotation);

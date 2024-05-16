@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
@@ -68,6 +69,7 @@ public class DuodenumParserStrategyImpl extends AbstractCustomParserStrategy {
         aiForecast.setUnit("平方毫米");
         aiForecast.setResults(singleSlide.getArea());
         aiForecast.setSingleSlideId(jsonTask.getSingleId());
+        aiForecast.setCreateTime(DateUtil.now());
         insertEntity.add(aiForecast);
         aiForecastService.saveBatch(insertEntity);
     }

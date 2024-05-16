@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
@@ -84,6 +85,7 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
         aiForecast.setUnit("平方毫米");
         aiForecast.setResults(singleSlide.getArea());
         aiForecast.setSingleSlideId(jsonTask.getSingleId());
+        aiForecast.setCreateTime(DateUtil.now());
         insertEntity.add(aiForecast);
         //腺上皮面积（全片）
         //查询切片缩放
@@ -101,6 +103,7 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
         aiForecast1.setQuantitativeIndicatorsEn("Acinar epithelial area (all)");
         aiForecast1.setUnit("平方毫米");
         aiForecast1.setSingleSlideId(jsonTask.getSingleId());
+        aiForecast1.setCreateTime(DateUtil.now());
         if (StringUtils.isNotEmpty(resolution)) {
             bigDecimal = new BigDecimal(resolution);
         }
