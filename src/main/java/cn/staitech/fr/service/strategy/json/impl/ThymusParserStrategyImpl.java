@@ -1,19 +1,25 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.hutool.core.date.DateUtil;
-import cn.staitech.fr.domain.*;
-import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.domain.AiForecast;
+import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.SpecialAnnotationRel;
+import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.SingleSlideMapper;
+import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
+import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 /**
  * @author mugw
@@ -27,34 +33,23 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
     private SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
-    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
-    @Resource
     private AnnotationMapper annotationMapper;
     @Resource
     private SingleSlideMapper singleSlideMapper;
     @Resource
     private AiForecastService aiForecastService;
     @Resource
-    private ImageMapper imageMapper;
+    private CommonJsonParser commonJsonParser;
 
     @PostConstruct
     public void init() {
-        setAiForecastService(aiForecastService);
-        setAnnotationMapper(annotationMapper);
-        setPathologicalIndicatorCategoryMapper(pathologicalIndicatorCategoryMapper);
-        setSingleSlideMapper(singleSlideMapper);
-        setSpecialAnnotationRelMapper(specialAnnotationRelMapper);
-        setImageMapper(imageMapper);
+        setCommonJsonParser(commonJsonParser);
         log.info("ThymusParserStrategyImpl init");
     }
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
-        // 查询所有未被删除且登录机构相同的数据
-        qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
-        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
-        Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+        Map<String, Long> pathologicalMap = commonJsonParser.getPathologicalMap(jsonTask);
         //定位表
         QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
         wrapper.eq("special_id", jsonTask.getSpecialId());
@@ -69,7 +64,7 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal bigDecimalB = new BigDecimal(0);
         //查询切片缩放
         String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
-        if (StringUtils.isEmpty(resolution)){
+        if (StringUtils.isEmpty(resolution)) {
             resolution = "0.262";
         }
         if (StringUtils.isNotEmpty(resolution) && StringUtils.isNotEmpty(structureArea.getArea())) {

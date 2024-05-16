@@ -54,6 +54,7 @@
         from fr_annotation
         <where>
             contour_type='2'
+            and single_slide_id is null
             <if test="slideIds != null and slideIds.size>0">
                 AND slide_id in
                 <foreach collection="slideIds" item="id" open="(" separator="," close=")">
@@ -189,14 +190,14 @@
     </select>
 
     <select id="getRangOut" resultType="java.lang.String">
-        select concat(min(cast( faf.results AS DECIMAL ( 18, 3 ) )),faf.unit,'-',max(cast( faf.results AS DECIMAL ( 18, 3 ) )),faf.unit)
-        from fr_single_slide fss
-                 left join fr_slide fs on fss.slide_id = fs.slide_id
-            and fs.del_flag='0'
-                 left join fr_ai_forecast faf on faf.single_slide_id=fss.single_id
+        select concat(min(cast(faf.results AS DECIMAL(18, 3))), faf.unit, '-', max(cast(faf.results AS DECIMAL(18, 3))),
+                      faf.unit)
+        from fr_ai_forecast faf
+                 left join fr_single_slide fss on faf.single_slide_id = fss.single_id
+                 left join fr_slide fs on fss.slide_id = fs.slide_id and fs.del_flag = '0'
         where fss.category_id = #{categoryId}
-          and fs.special_id= #{specialId}
-          and fs.group_code= #{groupCode}
+          and fs.special_id = #{specialId}
+          and fs.group_code = #{groupCode}
         group by faf.unit;
     </select>
     <select id="getImageId" resultType="java.lang.String">

@@ -11,11 +11,12 @@
         <result property="speciesId" column="species_id"/>
         <result property="type" column="type"/>
         <result property="organizationId" column="organization_id"/>
+        <result property="structureSize" column="structure_size"/>
     </resultMap>
 
     <select id="selectList" parameterType="cn.staitech.fr.domain.Structure"
             resultType="cn.staitech.fr.domain.Structure">
-        SELECT organ_id,`name`, `name_en`, species_id, structure_id,organization_id,type FROM tb_structure
+        SELECT organ_id,`name`, `name_en`, species_id, structure_id,organization_id,type,structure_size FROM tb_structure
         <where>
             <if test="structureId != null">
                 AND structure_id = #{structureId}

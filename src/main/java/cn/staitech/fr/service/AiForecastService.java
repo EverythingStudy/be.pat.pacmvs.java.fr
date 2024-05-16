@@ -4,6 +4,7 @@ import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,5 +17,7 @@ public interface AiForecastService extends IService<AiForecast> {
     Boolean forecastResults(Long singleSlideId, Long imageId);
 
     void addAiForecast(Long singleSlideId, Map<String, IndicatorAddIn> indicatorResultsMap);
+
+    List<AiForecast> selectList(Long singleSlideId);
 
 }

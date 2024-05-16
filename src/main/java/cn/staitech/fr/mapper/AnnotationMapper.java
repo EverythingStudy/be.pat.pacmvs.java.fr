@@ -66,6 +66,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     Integer countDucts(Annotation annotation1);
 
+    Annotation stIsValid(Annotation annotation);
+
     Integer deleteAiAnnotation(Annotation annotation);
 }
 

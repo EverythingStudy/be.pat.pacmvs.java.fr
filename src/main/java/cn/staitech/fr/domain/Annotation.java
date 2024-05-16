@@ -138,10 +138,15 @@ public class Annotation implements Serializable {
     private String collectContour;
 
     @TableField(exist = false)
+    private String results;
+
+    @TableField(exist = false)
     private List<Annotation> list;
 
     @TableField(exist = false)
     private String intersectsResults;
+
+    private Integer structureSize;
 
     @Override
     public boolean equals(Object that) {

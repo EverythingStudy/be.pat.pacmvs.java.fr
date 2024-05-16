@@ -51,31 +51,32 @@ public class PathologicalIndicatorCategoryController {
             return R.ok(new ArrayList<>());
         }
         List<String> organList = new ArrayList<>();
-        switch (organId) {
-            case "7D":
-                organList.add("3E");
-                organList.add("3D");
-                break;
-            case "7C":
-                organList.add("24");
-                organList.add("25");
-                break;
-            case "7B":
-                organList.add("5F");
-                organList.add("3F");
-                break;
-            case "7A":
-                organList.add("21");
-                organList.add("23");
-                break;
-            case "53":
-                organList.add("50");
-                organList.add("51");
-                break;
-            default:
-                organList.add(organId);
-                break;
-        }
+//        switch (organId) {
+//            case "7D":
+//                organList.add("3E");
+//                organList.add("3D");
+//                break;
+//            case "7C":
+//                organList.add("24");
+//                organList.add("25");
+//                break;
+//            case "7B":
+//                organList.add("5F");
+//                organList.add("3F");
+//                break;
+//            case "7A":
+//                organList.add("21");
+//                organList.add("23");
+//                break;
+//            case "53":
+//                organList.add("50");
+//                organList.add("51");
+//                break;
+//            default:
+//                organList.add(organId);
+//                break;
+//        }
+        organList.add(organId);
         Long speciesId = Long.valueOf(specialService.getById(specialId).getSpeciesId());
         QueryWrapper<PathologicalIndicator> pathologicalIndicatorQueryWrapper = new QueryWrapper<>();
         pathologicalIndicatorQueryWrapper

@@ -16,6 +16,7 @@ import cn.staitech.fr.domain.Structure;
 public interface StructureService extends IService<Structure> {
 
     Map<String, String> selectMap();
+    Map<String, Integer> selectStructureSizeMap();
 
     Map<String, String> selectMapEn();
 

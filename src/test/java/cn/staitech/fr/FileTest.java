@@ -160,7 +160,7 @@ public class FileTest {
                 "  \"algorithmCode\": \"Cerebellum\",\n" +
                 "  \"imageId\":10924,\n" +
 //                 "  \"slideId\":85,\n" +
-               "  \"slideId\":115,\n" +
+                "  \"slideId\":115,\n" +
                 "  \"singleId\":154,\n" +
                 "  \"organizationId\":1,\n" +
                 "  \"data\": [\n" +
@@ -182,6 +182,91 @@ public class FileTest {
     public void processHarderian_gland1() {
         String content = "{\"redis_status_key\":\"172.31.2.101_0\",\"imageId\":10924,\"slideId\":115,\"organizationId\":1,\"task_id\":\"ff9d875a-d098-4e6a-8c41-03af9373add1\",\"categoryId\":2,\"singleId\":154,\"algorithmCode\":\"Harderian_gland\",\"AlgorithmName\":\"大鼠哈氏腺\",\"occupy_time\":360,\"elapsed_time\":560,\"code\":200,\"msg\":\"success\",\"data\":[{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/102-v1.0/10206D.json\"},{\"structureName\":\"time1\",\"fileUrl\":\"哈氏腺腺泡推理耗时:718.70 s\"},{\"structureName\":\"fileurl2\",\"fileUrl\":\"D:/2.0-20240510/102-v1.0/10206E.json\"},{\"structureName\":\"time2\",\"fileUrl\":\"哈氏腺腺泡细胞核推理耗时:635.85 s\"}]}";
 //        String content = "{\"redis_status_key\":\"172.31.2.101_0\",\"imageId\":10924,\"slideId\":115,\"organizationId\":1,\"task_id\":\"ff9d875a-d098-4e6a-8c41-03af9373add1\",\"categoryId\":2,\"singleId\":154,\"algorithmCode\":\"Cerebellum\",\"AlgorithmName\":\"大鼠哈氏腺\",\"occupy_time\":360,\"elapsed_time\":560,\"code\":200,\"msg\":\"success\",\"data\":[{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/102-v1.0/10206D.json\"},{\"structureName\":\"time1\",\"fileUrl\":\"哈氏腺腺泡推理耗时:718.70 s\"},{\"structureName\":\"fileurl2\",\"fileUrl\":\"D:/2.0-20240510/102-v1.0/10206E.json\"},{\"structureName\":\"time2\",\"fileUrl\":\"哈氏腺腺泡细胞核推理耗时:635.85 s\"}]}";
+        jsonTaskParserService.input(content);
+    }
+
+    /**
+     * 大鼠大脑 BR1_BR2 Brain
+     */
+    @Test
+    public void process_Brain() {
+        String content = "{\"redis_status_key\":\"172.31.2.101_0\",\"imageId\":10924,\"slideId\":115,\"organizationId\":1,\"task_id\":\"ff9d875a-1\",\"categoryId\":2,\"singleId\":154," +
+                "\"algorithmCode\":\"Brain\",\"AlgorithmName\":\"大鼠大脑 \",\"occupy_time\":360,\"elapsed_time\":560,\"code\":200,\"msg\":\"success\",\"" +
+                "data\":[{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/132-v1.0/13209C.json\"}," +
+                "{\"structureName\":\"fileurl2\",\"fileUrl\":\"D:/2.0-20240510/132-v1.0/132004.json\"}," +
+                "{\"structureName\":\"time2\",\"fileUrl\":\"大鼠大脑 :635.85 s\"}]}";
+        jsonTaskParserService.input(content);
+    }
+
+    /**
+     * 大鼠脾脏	SP Spleen
+     */
+    @Test
+    public void process_Spleen() {
+        String content = "{\"redis_status_key\":\"172.31.2.101_0\",\"imageId\":10924,\"slideId\":115,\"organizationId\":1,\"task_id\":\"ff9d875a-2\",\"categoryId\":2,\"singleId\":154," +
+                "\"algorithmCode\":\"Spleen\",\"AlgorithmName\":\"大鼠脾脏\",\"occupy_time\":360,\"elapsed_time\":560,\"code\":200,\"msg\":\"success\"," +
+                "\"data\":[" +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/145-v1.0/14504A.json\"}," +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/145-v1.0/145004.json\"}," +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/145-v1.0/145045.json\"}," +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/145-v1.0/145046.json\"}," +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/145-v1.0/145047.json\"}," +
+                "{\"structureName\":\"fileurl2\",\"fileUrl\":\"D:/2.0-20240510/145-v1.0/145048.json\"}," +
+                "{\"structureName\":\"time2\",\"fileUrl\":\"大鼠脾脏:635.85 s\"}" +
+                "]}";
+        jsonTaskParserService.input(content);
+    }
+
+    /**
+     * 大鼠肝脏	LI Liver
+     */
+    @Test
+    public void process_Liver() {
+        String content = "{\"redis_status_key\":\"172.31.2.101_0\",\"imageId\":10924,\"slideId\":115,\"organizationId\":1,\"task_id\":\"ff9d875a-3\",\"categoryId\":2,\"singleId\":154," +
+                "\"algorithmCode\":\"Liver\",\"AlgorithmName\":\"大鼠肝脏\",\"occupy_time\":360,\"elapsed_time\":560,\"code\":200,\"msg\":\"success\"," +
+                "\"data\":[" +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/112-v1.0/11214A.json\"}," +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/112-v1.0/11214D.json\"}," +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/112-v1.0/112145.json\"}," +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/112-v1.0/112146.json\"}," +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/112-v1.0/112147.json\"}," +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/112-v1.0/112149.json\"}," +
+                "{\"structureName\":\"time2\",\"fileUrl\":\"大鼠肝脏635.85 s\"}" +
+                "]}";
+        jsonTaskParserService.input(content);
+    }
+
+    /**
+     * 大鼠腹股沟淋巴结	Inguinal lymph node
+     */
+    @Test
+    public void process_InguinalLymphNode() {
+        String content = "{\"redis_status_key\":\"172.31.2.101_0\",\"imageId\":10924,\"slideId\":115,\"organizationId\":1,\"task_id\":\"ff9d875a-4\",\"categoryId\":2,\"singleId\":154," +
+                "\"algorithmCode\":\"Inguinal_lymph_node\",\"AlgorithmName\":\"大鼠腹股沟淋巴结\",\"occupy_time\":360,\"elapsed_time\":560,\"code\":200,\"msg\":\"success\",\"data" +
+                "\":[" +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/147-v1.0/14703E.json\"}," +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/147-v1.0/147030.json\"}," +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/147-v1.0/147031.json\"}," +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/147-v1.0/147032.json\"}," +
+                "{\"structureName\":\"time2\",\"fileUrl\":\"大鼠腹股沟淋巴结:635.85 s\"}" +
+                "]}";
+        jsonTaskParserService.input(content);
+    }
+
+    /**
+     * 大鼠颌下淋巴结 ML Mandibular_lymph_node
+     */
+    @Test
+    public void process_MandibularLymphNode() {
+        String content = "{\"redis_status_key\":\"172.31.2.101_0\",\"imageId\":10924,\"slideId\":115,\"organizationId\":1,\"task_id\":\"ff9d875a-5\",\"categoryId\":2,\"singleId\":154," +
+                "\"algorithmCode\":\"Mandibular_lymph_node\",\"AlgorithmName\":\"大鼠颌下淋巴结\",\"occupy_time\":360,\"elapsed_time\":560,\"code\":200,\"msg\":\"success\",\"data" +
+                "\":[" +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/148-v1.0/14803E.json\"}," +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/148-v1.0/148030.json\"}," +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/148-v1.0/148031.json\"}," +
+                "{\"structureName\":\"fileurl1\",\"fileUrl\":\"D:/2.0-20240510/148-v1.0/148032.json\"}," +
+                "{\"structureName\":\"time2\",\"fileUrl\":\"大鼠颌下淋巴结:635.85 s\"}" +
+                "]}";
         jsonTaskParserService.input(content);
     }
 

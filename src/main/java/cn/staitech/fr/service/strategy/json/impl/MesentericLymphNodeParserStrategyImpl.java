@@ -16,11 +16,11 @@ import java.util.Map;
 
 
 /**
- * 骨骼肌
+ * 颌下腺-MN
  */
 @Slf4j
-@Service("Muscle")
-public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
+@Service("Mesenteric_lymph_node")
+public class MesentericLymphNodeParserStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
     private AiForecastService aiForecastService;
     @Resource
@@ -29,33 +29,31 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
-        log.info("MuscleParserStrategyImpl init");
+        log.info("MesentericLymphNodeParserStrategyImpl init");
     }
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         /*
-        indicatorResultsMap.put("肌纤维面积（单个）", new IndicatorAddIn("Muscle fiber area (per)", "", ""));
-        indicatorResultsMap.put("间质面积占比", new IndicatorAddIn("Mesenchyme area %", "", ""));
-        indicatorResultsMap.put("血管面积占比", new IndicatorAddIn("Vessel area%", "", ""));
-        indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular erythrocyte area%", "", ""));
-        indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", "", ""));
+        indicatorResultsMap.put("生发中心占比", new IndicatorAddIn("Germinal center area%", "", "%"));
+        indicatorResultsMap.put("髓质占比", new IndicatorAddIn("Medulla area%", "", "%"));
+        indicatorResultsMap.put("皮质和副皮质占比", new IndicatorAddIn("Cortex and paracortex area%", "", "%"));
         */
         AreaUtils areaUtils = new AreaUtils();
 
-        // F精细轮廓总面积-平方毫米
+        // D组织轮廓-平方毫米
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+        // A生发中心数量
+        Integer areaCount = areaUtils.getOrganAreaCount(jsonTask, "146051");
 
-        // 单位换算
-        String result = areaUtils.convertToSquareMicrometer(slideArea);
-
-        indicatorResultsMap.put("骨骼肌面积", new IndicatorAddIn("Skeletal muscle area", result, "10³平方微米"));
+        indicatorResultsMap.put("淋巴结面积", new IndicatorAddIn("Submadibular gland area", slideArea, "平方毫米"));
+        indicatorResultsMap.put("生发中心数量", new IndicatorAddIn("Number of germinal center", areaCount.toString(), "个"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 
     @Override
     public String getAlgorithmCode() {
-        return "Muscle";
+        return "Mesenteric_lymph_node";
     }
 }
