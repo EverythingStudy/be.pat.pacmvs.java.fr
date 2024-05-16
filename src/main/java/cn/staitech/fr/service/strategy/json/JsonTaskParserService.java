@@ -131,11 +131,16 @@ public class JsonTaskParserService {
         }
 
         annotation.setContour("1");
-        annotationMapper.deleteAiAnnotation(annotation);
-
+        try {
+            annotationMapper.deleteAiAnnotation(annotation);
+        } catch (Exception e) {
+            log.error("deleteAiAnnotation error:------------------------------------------------------4");
+            log.error("deleteAiAnnotation error:{}", e.getMessage());
+        }
+        log.info("------------------------------------------------------5");
         // 指标计算
         parser.alculationIndicators(jsonTask);
-
+        log.info("------------------------------------------------------6");
         // 修改任务状态
         jsonTask.setStatus(2);
         jsonTaskService.updateById(jsonTask);
