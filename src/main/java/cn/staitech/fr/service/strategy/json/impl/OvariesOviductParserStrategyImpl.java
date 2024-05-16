@@ -5,11 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Annotation;
@@ -23,6 +27,8 @@ import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
+import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.service.strategy.json.CommonParserStrategy;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -49,16 +55,14 @@ public  class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrat
     private AiForecastService aiForecastService;
     @Resource
     private ImageMapper imageMapper;
-
+    @Resource
+    private CommonParserStrategy commonParserStrategy;
+    @Resource
+    private CommonJsonParser commonJsonParser;
 
     @PostConstruct
     public void init() {
-        setAiForecastService(aiForecastService);
-        setAnnotationMapper(annotationMapper);
-        setPathologicalIndicatorCategoryMapper(pathologicalIndicatorCategoryMapper);
-        setSingleSlideMapper(singleSlideMapper);
-        setSpecialAnnotationRelMapper(specialAnnotationRelMapper);
-        setImageMapper(imageMapper);
+    	setCommonJsonParser(commonJsonParser);
         log.info("OvariesOviductParserStrategyImpl init");
     }
     
