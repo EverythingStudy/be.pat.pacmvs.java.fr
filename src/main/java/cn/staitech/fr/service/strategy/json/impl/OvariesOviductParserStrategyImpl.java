@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
  * @version V1.0
  */
 @Slf4j
-@Component("Ovaries_Oviduct")
+@Component("Ovaries")
 public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 
 	@Resource
