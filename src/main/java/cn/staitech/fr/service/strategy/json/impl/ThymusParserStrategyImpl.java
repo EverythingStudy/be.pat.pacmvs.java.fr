@@ -5,6 +5,7 @@ import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
+import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.CommonParserStrategy;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
@@ -14,7 +15,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author mugw
@@ -28,27 +28,20 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
     private SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
-    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
-    @Resource
     private AnnotationMapper annotationMapper;
     @Resource
     private SingleSlideMapper singleSlideMapper;
     @Resource
     private AiForecastService aiForecastService;
     @Resource
-    private ImageMapper imageMapper;
-    @Resource
     private CommonParserStrategy commonParserStrategy;
+    @Resource
+    private CommonJsonParser commonJsonParser;
 
     @PostConstruct
     public void init() {
-        setAiForecastService(aiForecastService);
-        setAnnotationMapper(annotationMapper);
-        setPathologicalIndicatorCategoryMapper(pathologicalIndicatorCategoryMapper);
-        setSingleSlideMapper(singleSlideMapper);
-        setSpecialAnnotationRelMapper(specialAnnotationRelMapper);
-        setImageMapper(imageMapper);
-        setCommonParserStrategy(commonParserStrategy);
+        setCommonJsonParser(commonJsonParser);
+
         log.info("ThymusParserStrategyImpl init");
     }
 
