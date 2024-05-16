@@ -3,18 +3,20 @@ package cn.staitech.fr.service.impl;
 import cn.hutool.core.date.DateUtil;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.ImageMapper;
-import cn.staitech.fr.mapper.SingleSlideMapper;
+import cn.staitech.fr.domain.out.*;
+import cn.staitech.fr.mapper.*;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.staitech.fr.service.AiForecastService;
-import cn.staitech.fr.mapper.AiForecastMapper;
-import lombok.Data;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author admin
@@ -33,6 +35,15 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
 
     @Resource
     private ImageMapper imageMapper;
+
+    @Resource
+    private SlideMapper slideMapper;
+
+    @Resource
+    private AiForecastMapper aiForecastMapper;
+
+    @Resource
+    private SpecialMapper specialMapper;
 
     @Override
     public Boolean forecastResults(Long singleSlideId, Long imageId) {
@@ -101,6 +112,47 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             this.saveBatch(aiForecasts);
         }
     }
+
+
+    @Override
+    public List<AiForecast> selectList(Long singleSlideId) {
+        Map<Long, Long> categorys = new HashMap<>();
+        SingleSlide singleSlide = singleSlideMapper.selectById(singleSlideId);
+        Slide slide = slideMapper.selectById(singleSlide.getSlideId());
+        Special special = specialMapper.selectById(slide.getSpecialId());
+        if (StringUtils.isNotEmpty(special.getControlGroup())) {
+            LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(SingleSlide::getSingleId, singleSlideId);
+            List<SingleSlide> singleSlides = singleSlideMapper.selectList(wrapper);
+            categorys = singleSlides.stream().collect(Collectors.toMap(SingleSlide::getSingleId, SingleSlide::getCategoryId));
+        }
+        LambdaQueryWrapper<AiForecast> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(AiForecast::getSingleSlideId, singleSlideId);
+        List<AiForecast> aiForecasts = aiForecastMapper.selectList(wrapper);
+        if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(aiForecasts)) {
+            for (AiForecast aiForecast : aiForecasts) {
+                ExportAiListVO exportAiListVO = new ExportAiListVO();
+                BeanUtils.copyProperties(aiForecast, exportAiListVO);
+                //范围数据
+                if (StringUtils.isNotEmpty(special.getControlGroup())) {
+                    String result = setRang(special, singleSlideId, exportAiListVO, categorys);
+                    aiForecast.setResults(result);
+                }
+            }
+        }
+        return aiForecasts;
+    }
+
+    private String setRang(Special special, Long singleId, ExportAiListVO exportAiListVO, Map<Long, Long> categorys) {
+        if (ObjectUtils.isNotEmpty(categorys.get(singleId))) {
+            String rangOut = singleSlideMapper.getRangOut(categorys.get(singleId), special.getSpecialId(), special.getControlGroup());
+            exportAiListVO.setForecastRange(rangOut);
+            return rangOut;
+        }
+        return null;
+
+    }
+
 
 }
 

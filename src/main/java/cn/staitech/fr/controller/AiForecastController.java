@@ -36,7 +36,7 @@ public class AiForecastController {
         }
         QueryWrapper<AiForecast> aiForecastQueryWrapper = new QueryWrapper<>();
         aiForecastQueryWrapper.eq("single_slide_id", singleSlideId);
-        return R.ok(aiForecastService.list(aiForecastQueryWrapper));
+        return R.ok(aiForecastService.selectList(singleSlideId));
     }
 
 
