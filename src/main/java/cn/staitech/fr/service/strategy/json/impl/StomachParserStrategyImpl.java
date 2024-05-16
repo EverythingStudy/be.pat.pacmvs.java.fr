@@ -1,12 +1,7 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.ImageMapper;
-import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
-import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
-import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import lombok.extern.slf4j.Slf4j;
@@ -27,23 +22,14 @@ public class StomachParserStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
-    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
-    @Resource
-    private AnnotationMapper annotationMapper;
-    @Resource
-    private SingleSlideMapper singleSlideMapper;
-    @Resource
-    private AiForecastService aiForecastService;
-    @Resource
-    private ImageMapper imageMapper;
-
-    @Resource
     private CommonJsonParser commonJsonParser;
+
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
         log.info("StomachParserStrategyImpl init");
     }
+
     @Override
     public String getAlgorithmCode() {
         return "Stomach";
@@ -52,7 +38,5 @@ public class StomachParserStrategyImpl extends AbstractCustomParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("大鼠胃结构指标计算：");
-
-
     }
 }

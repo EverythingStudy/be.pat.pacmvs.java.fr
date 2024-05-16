@@ -38,7 +38,6 @@ import java.util.stream.Collectors;
 @Component("Skin_mammary")
 public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy {
 
-
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
@@ -49,9 +48,6 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
     private SingleSlideMapper singleSlideMapper;
     @Resource
     private AiForecastService aiForecastService;
-    @Resource
-    private ImageMapper imageMapper;
-
     @Resource
     private CommonJsonParser commonJsonParser;
     @PostConstruct

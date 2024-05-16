@@ -1,14 +1,8 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.hutool.core.date.DateUtil;
-import cn.staitech.fr.domain.AiForecast;
-import cn.staitech.fr.domain.Annotation;
-import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.PathologicalIndicatorCategory;
-import cn.staitech.fr.domain.SingleSlide;
-import cn.staitech.fr.domain.SpecialAnnotationRel;
+import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
@@ -19,6 +13,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
@@ -48,10 +43,8 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
     @Resource
     private AiForecastService aiForecastService;
     @Resource
-    private ImageMapper imageMapper;
-
-    @Resource
     private CommonJsonParser commonJsonParser;
+
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
