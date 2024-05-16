@@ -29,15 +29,15 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * 
- * @ClassName: SternumParserStrategyImpl
- * @Description:大鼠胸骨
+ * @ClassName: ParathyroidParserStrategyImpl
+ * @Description:大鼠甲状旁腺
  * @author wanglibei
  * @date 2024年5月13日
  * @version V1.0
  */
 @Slf4j
-@Component("Sternum")
-public class SternumParserStrategyImpl  extends AbstractCustomParserStrategy {
+@Component("Parathyroid")
+public class ParathyroidParserStrategyImpl  extends AbstractCustomParserStrategy {
 
 	@Resource
     private SpecialAnnotationRelMapper specialAnnotationRelMapper;
@@ -61,14 +61,14 @@ public class SternumParserStrategyImpl  extends AbstractCustomParserStrategy {
         setSingleSlideMapper(singleSlideMapper);
         setSpecialAnnotationRelMapper(specialAnnotationRelMapper);
         setImageMapper(imageMapper);
-        log.info("SternumParserStrategyImpl init");
+        log.info("ParathyroidParserStrategyImpl init");
     }
 
 
 	@Override
 	public void alculationIndicators(JsonTask jsonTask) {
 
-		log.info("大鼠胸骨构指标计算开始");
+		log.info("大鼠甲状旁腺构指标计算开始");
 		QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
 		// 查询所有未被删除且登录机构相同的数据
 		qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
@@ -80,73 +80,70 @@ public class SternumParserStrategyImpl  extends AbstractCustomParserStrategy {
 		SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
 		Long sequenceNumber = annotationRel.getSequenceNumber();
 
-		//骨髓腔:14E00E 
-		//红系细胞核:14E011
-		//粒系细胞:14E01A 
-		//巨核系细胞:14E022
-		//红细胞:14E004 
-		//脂肪细胞:	14E012 
-		//骨质:	14E00F 
-		//组织轮廓:	14E111
+		//主细胞核:108091
+		//组织轮廓:（默认都有）	108111
+		
+//		算法输出指标	指标代码（仅限本文档）	单位（保留小数点后三位）	备注
+//		主细胞核数量	A	个	无
+//		组织轮廓面积	B	10³平方微米	若多个数据则相加输出
+//
+//		产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
+//		主细胞核密度	1	个/10³平方微米	Nucleus density of chief cell 	1=A/B	
+//		甲状旁腺面积	2	10³平方微米	Parathyroid gland area	2=B	
 
 		List<AiForecast> insertEntity = new ArrayList<>();
-
+		
+		//主细胞核密度
+		
 		Integer result = 0;
-		//粒系细胞数量C 个
-		if (ObjectUtil.isNotEmpty(pathologicalMap.get("14E01A"))) {
+		//主细胞核数量A 个
+		if (ObjectUtil.isNotEmpty(pathologicalMap.get("108091"))) {
 			Annotation annotation1 = new Annotation();
 			annotation1.setSingleSlideId(jsonTask.getSingleId());
-			annotation1.setCategoryId(pathologicalMap.get("14E01A"));
+			annotation1.setCategoryId(pathologicalMap.get("108091"));
 			annotation1.setSequenceNumber(sequenceNumber);
 			result = annotationMapper.countDucts(annotation1);
 		}
 
-		Integer result2 = 0;
-		//红系细胞核数量B 个
-		if (ObjectUtil.isNotEmpty(pathologicalMap.get("14E011"))) {
-			Annotation annotation2 = new Annotation();
-			annotation2.setSingleSlideId(jsonTask.getSingleId());
-			annotation2.setCategoryId(pathologicalMap.get("14E011"));
-			annotation2.setSequenceNumber(sequenceNumber);
-			result2 = annotationMapper.countDucts(annotation2);
-		}
-
-		//粒红比  2=C/B
-
-		if (null != result && null != result2) {
-			AiForecast aiForecast1 = new AiForecast();
-			aiForecast1.setQuantitativeIndicators("粒红比");
-			aiForecast1.setQuantitativeIndicatorsEn("Myelocyte:erythropoiesis ratio");
-			aiForecast1.setUnit("无");
-			aiForecast1.setSingleSlideId(jsonTask.getSingleId());
-			//保留小数点后3位
-			BigDecimal bigDecimal = new BigDecimal(result);
-			BigDecimal bigDecimal2 = new BigDecimal(result2);
-			BigDecimal bigDecimal3 = bigDecimal.divide(bigDecimal2, 3, RoundingMode.HALF_UP);
-			aiForecast1.setResults(bigDecimal3.toString());
-			insertEntity.add(aiForecast1);
-		}
-
-		//胸骨面积 ==>组织轮廓面积
-		if (ObjectUtil.isNotEmpty(pathologicalMap.get("14E111"))) {
+		BigDecimal bigDecimalB = new BigDecimal(0);
+		//组织轮廓面积==>甲状旁腺面积 B 10³平方微米
+		if (ObjectUtil.isNotEmpty(pathologicalMap.get("108111"))) {
 			AiForecast aiForecast2 = new AiForecast();
-			aiForecast2.setQuantitativeIndicators("胸骨面积");
-			aiForecast2.setQuantitativeIndicatorsEn("Sternum area");
-			aiForecast2.setUnit("平方毫米");
+			aiForecast2.setQuantitativeIndicators("甲状旁腺面积");
+			aiForecast2.setQuantitativeIndicatorsEn("Parathyroid gland area");
+			aiForecast2.setUnit("10³平方微米");
 			SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
 			if(StringUtils.isNotEmpty(singleSlide.getArea())){
-				aiForecast2.setResults(singleSlide.getArea());
+				BigDecimal cimal = new BigDecimal(1000000);
+				BigDecimal areaDecimal = new BigDecimal(singleSlide.getArea());
+				//转平方微米
+				bigDecimalB = areaDecimal.multiply(cimal).setScale(3, RoundingMode.HALF_UP);
+				aiForecast2.setResults(areaDecimal.toString());
 			}
 			aiForecast2.setSingleSlideId(jsonTask.getSingleId());
 			insertEntity.add(aiForecast2);
 		}
 
+		//主细胞核密度 1=A/B
+		BigDecimal bigDecimaE = new BigDecimal(0);
+		if (null != bigDecimalB) {
+			AiForecast aiForecast1 = new AiForecast();
+			aiForecast1.setQuantitativeIndicators("主细胞核密度");
+			aiForecast1.setQuantitativeIndicatorsEn("Nucleus density of chief cell");
+			aiForecast1.setUnit("个/10³平方微米");
+			aiForecast1.setSingleSlideId(jsonTask.getSingleId());
+			//保留小数点后3位
+			BigDecimal bigDecimal = new BigDecimal(result);
+			bigDecimaE = bigDecimal.divide(bigDecimalB, 3, RoundingMode.HALF_UP);
+			aiForecast1.setResults(bigDecimaE.toString());
+			insertEntity.add(aiForecast1);
+		}
 
 		aiForecastService.saveBatch(insertEntity);
 	}
 
 	@Override
     public String getAlgorithmCode() {
-        return "Sternum";
+        return "Parathyroid";
     }
 }
