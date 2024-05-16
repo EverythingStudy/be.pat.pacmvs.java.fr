@@ -58,7 +58,7 @@ public class JsonTaskParserService {
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
     private AnnotationMapper annotationMapper;
-    
+
     @Resource
     private SingleSlideService singleSlideService;
 
@@ -80,14 +80,14 @@ public class JsonTaskParserService {
         }
 
         if (jsonTask.getCode().equals("500")) {
-        	SingleSlide singleSlide = new SingleSlide();
+            SingleSlide singleSlide = new SingleSlide();
             singleSlide.setSingleId(jsonTask.getSingleId());
             //0未预测、1预测成功、2预测失败、3预测中
             singleSlide.setForecastStatus("2");
             singleSlideService.updateById(singleSlide);
             return;
         }
-        
+
         log.info("jsonTask:{}", jsonTask);
 
 
@@ -120,23 +120,23 @@ public class JsonTaskParserService {
         jsonTask.setStatus(1);
         jsonTaskService.updateById(jsonTask);
 
-        // 调用策略提交任务
         for (JsonFile jsonFile : jsonFileList) {
             ParserStrategy finalParser = parser;
             log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++1");
             log.info("++++parseJson:{} {} {}", jsonTask, jsonFile, finalParser);
             log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++2");
             finalParser.parseJson(jsonTask, jsonFile);
+//            commonJsonParser.parseJson(jsonTask, jsonFile);
             log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++3");
         }
 
-        annotation.setContour("1");
-        try {
-            annotationMapper.deleteAiAnnotation(annotation);
-        } catch (Exception e) {
-            log.error("deleteAiAnnotation error:------------------------------------------------------4");
-            log.error("deleteAiAnnotation error:{}", e.getMessage());
-        }
+//        annotation.setContour("1");
+//        try {
+//            annotationMapper.deleteAiAnnotation(annotation);
+//        } catch (Exception e) {
+//            log.error("deleteAiAnnotation error:------------------------------------------------------4");
+//            log.error("deleteAiAnnotation error:{}", e.getMessage());
+//        }
         log.info("------------------------------------------------------5");
         // 指标计算
         parser.alculationIndicators(jsonTask);
@@ -222,6 +222,8 @@ public class JsonTaskParserService {
 
             Slide slide = slideService.getById(slideId);
             jsonTask.setSpecialId(slide.getSpecialId());
+            SingleSlide singleSlide = singleSlideService.getById(jsonTask.getSingleId());
+            jsonTask.setCategoryId(singleSlide.getCategoryId());
             // TODO:判重、丢弃任务
             jsonTaskService.save(jsonTask);
             return jsonTask;

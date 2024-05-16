@@ -2,11 +2,13 @@ package cn.staitech.fr.config;
 
 import cn.staitech.fr.service.CategoryService;
 import cn.staitech.fr.service.OrganizationService;
+import cn.staitech.fr.service.StructureService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author wanglibei
@@ -26,12 +28,14 @@ public class MapConstant {
      */
     public static Map<Long, String> ORGANIZATION_MAP;
 
+    public static Map<String, Integer> STRUCTURESIZR_MAP;
 
     @Resource
     private CategoryService categoryService;
     @Resource
     private OrganizationService organizationService;
-
+    @Resource
+    private StructureService structureService;
     /**
      * 获取脏器名称
      *
@@ -58,13 +62,25 @@ public class MapConstant {
         }
         return "";
     }
-
+    /**
+     * 获取结构名称
+     *
+     * @param
+     * @return
+     */
+    public static Integer getStructureSize(String organizationIdStructureId) {
+        if (STRUCTURESIZR_MAP.containsKey(organizationIdStructureId)) {
+            return STRUCTURESIZR_MAP.get(organizationIdStructureId);
+        }
+        return null;
+    }
     @PostConstruct
     public void init() {
         // 脏器
         CATEGORY_MAP = categoryService.getCategory();
         // 机构
         ORGANIZATION_MAP = organizationService.selectMap();
+        STRUCTURESIZR_MAP = structureService.selectStructureSizeMap();
     }
 
 }

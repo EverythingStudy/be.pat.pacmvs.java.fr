@@ -1,54 +1,52 @@
-package cn.staitech.fr.service.strategy.json.impl;
+package cn.staitech.fr.service.strategy.json;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.config.MapConstant;
-import cn.staitech.fr.domain.Annotation;
-import cn.staitech.fr.domain.JsonFile;
-import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.SingleSlide;
-import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.SingleSlideMapper;
-import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
+import cn.staitech.fr.domain.*;
+import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
-import cn.staitech.fr.service.strategy.json.CommonJsonParser;
-import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * @author: wangfeng
- * @create: 2024-05-10 14:18:48
- * @Description: Harderian_gland Json Parser 哈氏腺
+ *
  */
 @Slf4j
-@Component("Harderian_gland")
-public class HarderianGlandParserStrategyImpl implements ParserStrategy {
-
+@Service
+public class CommonJsonParser {
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
-    private SingleSlideMapper singleSlideMapper;
+    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
     @Resource
-    private AiForecastService aiForecastService;
+    private AnnotationMapper annotationMapper;
     @Resource
-    private CommonJsonParser commonJsonParser;
+    private ImageMapper imageMapper;
+    @Resource
+    private CategoryMapper categoryMapper;
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX, String key) {
         if (element.isObject()) {
@@ -184,21 +182,108 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         }
     }
 
-
-    @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
-        commonJsonParser.parseJson(jsonTask, jsonFileS);
+        String filePath = jsonFileS.getFileUrl();
+        QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
+        wrapper.eq("special_id", jsonTask.getSpecialId());
+        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
+        Long sequenceNumber = annotationRel.getSequenceNumber();
+        Annotation anno = new Annotation();
+        anno.setSequenceNumber(sequenceNumber);
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonFactory jsonFactory = objectMapper.getFactory();
+        File jsonFile = new File(filePath);
+        QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
+        // 查询所有未被删除且登录机构相同的数据
+        qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
+        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
+        Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+
+        try (FileInputStream fis = new FileInputStream(jsonFile);
+             JsonParser jsonParser = jsonFactory.createParser(fis)) {
+
+            List<JsonNode> elementsList = new ArrayList<>();
+            while (!jsonParser.isClosed()) {
+                JsonToken token = jsonParser.nextToken();
+                if (token == null) {
+                    break;
+                }
+                if (token == JsonToken.START_OBJECT) {
+                    processObjectNode(objectMapper, jsonParser, elementsList);
+                }
+            }
+            if (CollectionUtil.isEmpty(elementsList)) {
+                log.error("No valid JSON data found in the file.");
+                return;
+            }
+            Image image = imageMapper.selectById(jsonTask.getImageId());
+            String resolutionX = image.getResolutionX();
+            if (StringUtils.isEmpty(resolutionX)) {
+                resolutionX = "0.262";
+            }
+            QueryWrapper<Category> wrapper1 = new QueryWrapper<>();
+            wrapper1.eq("organization_id", jsonTask.getOrganizationId());
+            wrapper1.eq("del_flag", 0);
+            wrapper1.eq("category_id", jsonTask.getCategoryId());
+            Category category = categoryMapper.selectOne(wrapper1);
+            if (ObjectUtil.isEmpty(category)) return;
+            String key = jsonTask.getOrganizationId() + "";
+            String finalResolutionX = resolutionX;
+            List<Annotation> processedAnnotations;
+            processedAnnotations = elementsList.parallelStream()
+                    .map(element -> {
+                        Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, finalResolutionX, key);
+                        if (!ObjectUtil.isEmpty(annotation)) {
+                            return annotation;
+                        }
+                        return null;
+                    }).filter(Objects::nonNull).collect(Collectors.toList());
+
+            anno.setList(processedAnnotations);
+            batchProcessAndSave(anno, 1000);
+            Annotation annotation = new Annotation();
+            annotation.setMagnification(40000L);
+            annotation.setFiligreeContour(true);
+            annotation.setSingleSlideId(jsonTask.getSingleId());
+            List<Annotation> annotations = annotationMapper.selectListBy(annotation);
+            // 循环annotations并执行官删除操作
+            if (CollectionUtil.isNotEmpty(annotations)) {
+                annotations.forEach(annotation1 -> {
+                    annotation1.setSequenceNumber(sequenceNumber);
+                    Annotation annotation2 = annotationMapper.stIsValid(annotation1);
+                    if (ObjectUtil.equals(annotation2.getResults(), "t")) {
+                        annotationMapper.deleteAiAnnotation(annotation1);
+                    }
+                });
+            }
+
+        } catch (Exception e) {
+            log.error("Unexpected error occurred: " + e.getMessage(), e);
+        }
+
     }
 
+    public void batchProcessAndSave(Annotation annotation, int batchSize) {
 
-    @Override
-    public void alculationIndicators(JsonTask jsonTask) {
-        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        indicatorResultsMap.put("哈氏腺面积", new IndicatorAddIn("Acinus area%", ObjectUtil.isNotEmpty(singleSlide) ? singleSlide.getArea() : "0", "平方毫米"));
+        List<Annotation> annotations = annotation.getList();
+        if (CollectionUtil.isEmpty(annotations)) {
+            return;
+        }
+        int listSize = annotations.size();
 
-        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        // 分批处理
+        for (int i = 0; i < listSize; i += batchSize) {
+            int endIndex = Math.min(i + batchSize, listSize);
+            List<Annotation> batch = annotations.subList(i, endIndex);
+            Annotation annotation1 = new Annotation();
+            annotation1.setSequenceNumber(annotation.getSequenceNumber());
+            annotation1.setList(batch);
+            try {
+                annotationMapper.batchSave(annotation1);
+            } catch (Exception e) {
+                // 处理异常，例如记录日志
+                log.error("Error occurred while processing batch: " + e.getMessage(), e);
+            }
+        }
     }
-
-
 }
