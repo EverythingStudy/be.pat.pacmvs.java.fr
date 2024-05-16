@@ -5,7 +5,6 @@ import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -26,24 +25,152 @@ public class ParkDataConsumer {
     @Resource
     private JsonTaskParserService jsonTaskParserService;
 
-    @RabbitListener(queues = "parkdata", ackMode = "MANUAL")
-    public void consumeParkData(Message message, Channel channel) throws IOException {
+    @RabbitListener(queues = "test", ackMode = "MANUAL")
+    public void consumetest(Message message, Channel channel) throws IOException {
         try {
             String receivedMessage = new String(message.getBody(), StandardCharsets.UTF_8);
             log.info("消费者收到消息: " + receivedMessage);
             // 成功处理后手动确认消息
             channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             // 处理消息逻辑...
-            processParkData(receivedMessage);
+            processtest(receivedMessage);
 
         } catch (Exception e) {
             // 出现异常时可以选择拒绝消息，以便重试或死信队列处理
             channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
         }
     }
+
+    @RabbitListener(queues = "test", ackMode = "MANUAL")
+    public void consumetest1(Message message, Channel channel) throws IOException {
+        try {
+            String receivedMessage = new String(message.getBody(), StandardCharsets.UTF_8);
+            log.info("消费者收到消息: " + receivedMessage);
+            // 成功处理后手动确认消息
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            // 处理消息逻辑...
+            processtest(receivedMessage);
+
+        } catch (Exception e) {
+            // 出现异常时可以选择拒绝消息，以便重试或死信队列处理
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
+        }
+    }
+
+    @RabbitListener(queues = "test", ackMode = "MANUAL")
+    public void consumetest2(Message message, Channel channel) throws IOException {
+        try {
+            String receivedMessage = new String(message.getBody(), StandardCharsets.UTF_8);
+            log.info("消费者收到消息: " + receivedMessage);
+            // 成功处理后手动确认消息
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            // 处理消息逻辑...
+            processtest(receivedMessage);
+
+        } catch (Exception e) {
+            // 出现异常时可以选择拒绝消息，以便重试或死信队列处理
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
+        }
+    }
+
+    @RabbitListener(queues = "test", ackMode = "MANUAL")
+    public void consumetest3(Message message, Channel channel) throws IOException {
+        try {
+            String receivedMessage = new String(message.getBody(), StandardCharsets.UTF_8);
+            log.info("消费者收到消息: " + receivedMessage);
+            // 成功处理后手动确认消息
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            // 处理消息逻辑...
+            processtest(receivedMessage);
+
+        } catch (Exception e) {
+            // 出现异常时可以选择拒绝消息，以便重试或死信队列处理
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
+        }
+    }
+
+    @RabbitListener(queues = "test", ackMode = "MANUAL")
+    public void consumetest4(Message message, Channel channel) throws IOException {
+        try {
+            String receivedMessage = new String(message.getBody(), StandardCharsets.UTF_8);
+            log.info("消费者收到消息: " + receivedMessage);
+            // 成功处理后手动确认消息
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            // 处理消息逻辑...
+            processtest(receivedMessage);
+
+        } catch (Exception e) {
+            // 出现异常时可以选择拒绝消息，以便重试或死信队列处理
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
+        }
+    }
+
+    @RabbitListener(queues = "test", ackMode = "MANUAL")
+    public void consumetest5(Message message, Channel channel) throws IOException {
+        try {
+            String receivedMessage = new String(message.getBody(), StandardCharsets.UTF_8);
+            log.info("消费者收到消息: " + receivedMessage);
+            // 成功处理后手动确认消息
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            // 处理消息逻辑...
+            processtest(receivedMessage);
+
+        } catch (Exception e) {
+            // 出现异常时可以选择拒绝消息，以便重试或死信队列处理
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
+        }
+    }
+
+    @RabbitListener(queues = "test", ackMode = "MANUAL")
+    public void consumetest6(Message message, Channel channel) throws IOException {
+        try {
+            String receivedMessage = new String(message.getBody(), StandardCharsets.UTF_8);
+            log.info("消费者收到消息: " + receivedMessage);
+            // 成功处理后手动确认消息
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            // 处理消息逻辑...
+            processtest(receivedMessage);
+
+        } catch (Exception e) {
+            // 出现异常时可以选择拒绝消息，以便重试或死信队列处理
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
+        }
+    }
+
+    @RabbitListener(queues = "test", ackMode = "MANUAL")
+    public void consumetest7(Message message, Channel channel) throws IOException {
+        try {
+            String receivedMessage = new String(message.getBody(), StandardCharsets.UTF_8);
+            log.info("消费者收到消息: " + receivedMessage);
+            // 成功处理后手动确认消息
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            // 处理消息逻辑...
+            processtest(receivedMessage);
+
+        } catch (Exception e) {
+            // 出现异常时可以选择拒绝消息，以便重试或死信队列处理
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
+        }
+    }
+
+    @RabbitListener(queues = "test", ackMode = "MANUAL")
+    public void consumetest8(Message message, Channel channel) throws IOException {
+        try {
+            String receivedMessage = new String(message.getBody(), StandardCharsets.UTF_8);
+            log.info("消费者收到消息: " + receivedMessage);
+            // 成功处理后手动确认消息
+            channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
+            // 处理消息逻辑...
+            processtest(receivedMessage);
+
+        } catch (Exception e) {
+            // 出现异常时可以选择拒绝消息，以便重试或死信队列处理
+            channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
+        }
+    }
+
     // 示例方法，实际应用中根据业务逻辑处理数据
-    @Async
-    private void processParkData(String data) {
+    private void processtest(String data) {
         jsonTaskParserService.input(data);
     }
 }
