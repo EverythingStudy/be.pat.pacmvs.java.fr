@@ -1,28 +1,20 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.in.IndicatorAddIn;
+import cn.staitech.fr.service.AiForecastService;
+import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
+import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.utils.AreaUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-
-import org.springframework.stereotype.Service;
-
-import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.ImageMapper;
-import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
-import cn.staitech.fr.mapper.SingleSlideMapper;
-import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
-import cn.staitech.fr.service.AiForecastService;
-import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
-import cn.staitech.fr.service.strategy.json.CommonJsonParser;
-import cn.staitech.fr.service.strategy.json.CommonParserStrategy;
-import cn.staitech.fr.utils.AreaUtils;
-import lombok.extern.slf4j.Slf4j;
 
 
 /**
@@ -32,26 +24,13 @@ import lombok.extern.slf4j.Slf4j;
 @Service("Testis")
 public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
-    private SpecialAnnotationRelMapper specialAnnotationRelMapper;
-    @Resource
-    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
-    @Resource
-    private AnnotationMapper annotationMapper;
-    @Resource
-    private SingleSlideMapper singleSlideMapper;
-    @Resource
     private AiForecastService aiForecastService;
-    @Resource
-    private ImageMapper imageMapper;
-    
-    @Resource
-    private CommonParserStrategy commonParserStrategy;
     @Resource
     private CommonJsonParser commonJsonParser;
 
     @PostConstruct
     public void init() {
-    	 setCommonJsonParser(commonJsonParser);
+        setCommonJsonParser(commonJsonParser);
         log.info("TestisParserStrategyImpl init");
     }
 

@@ -5,10 +5,10 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
-import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -47,6 +47,8 @@ public class CommonJsonParser {
     private ImageMapper imageMapper;
     @Resource
     private CategoryMapper categoryMapper;
+    @Resource
+    private SingleSlideMapper singleSlideMapper;
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX, String key) {
         if (element.isObject()) {
@@ -264,13 +266,11 @@ public class CommonJsonParser {
     }
 
     public void batchProcessAndSave(Annotation annotation, int batchSize) {
-
         List<Annotation> annotations = annotation.getList();
         if (CollectionUtil.isEmpty(annotations)) {
             return;
         }
         int listSize = annotations.size();
-
         // 分批处理
         for (int i = 0; i < listSize; i += batchSize) {
             int endIndex = Math.min(i + batchSize, listSize);
@@ -286,4 +286,79 @@ public class CommonJsonParser {
             }
         }
     }
+
+    /**
+     * 查询所有未被删除且登录机构相同的数据
+     *
+     * @param jsonTask
+     * @return
+     */
+    public Map<String, Long> getPathologicalMap(JsonTask jsonTask) {
+        QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
+        // 查询所有未被删除且登录机构相同的数据
+        qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
+        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
+        Map<String, Long> pathologicalMap = list.stream().collect(
+                Collectors.toMap(
+                        PathologicalIndicatorCategory::getStructureId,
+                        PathologicalIndicatorCategory::getCategoryId,
+                        (entity1, entity2) -> entity1));
+        return pathologicalMap;
+    }
+
+    /**
+     * 定位表
+     *
+     * @param jsonTask
+     * @return
+     */
+    public Long getSequenceNumber(JsonTask jsonTask) {
+        LambdaQueryWrapper<SpecialAnnotationRel> SpecialQueryWrapper = new LambdaQueryWrapper<>();
+        SpecialQueryWrapper.eq(SpecialAnnotationRel::getSpecialId, jsonTask.getSpecialId());
+        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(SpecialQueryWrapper);
+        Long sequenceNumber = annotationRel.getSequenceNumber();
+        return sequenceNumber;
+    }
+
+    /**
+     * 获取脏器轮廓面积
+     *
+     * @param jsonTask
+     * @param structCode
+     * @return
+     */
+    public BigDecimal getOrganArea(JsonTask jsonTask, String structCode) {
+        // 查询所有未被删除且登录机构相同的数据
+        Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask);
+        // 定位表
+        Long sequenceNumber = getSequenceNumber(jsonTask);
+
+        // 非精细轮廓总面积
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(sequenceNumber);
+        annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
+        annotation.setCategoryId(pathologicalMap.get(structCode));// 标注类别ID
+        Annotation structure = annotationMapper.getStructureArea(annotation);
+        if (structure == null || structure.getArea() == null) {
+            return new BigDecimal("0");
+        }
+        String structureArea = structure.getArea();
+
+        // 查询切片缩放
+        BigDecimal resolutionNum = new BigDecimal("0.262");
+        String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
+        if (StringUtils.isNotEmpty(resolution)) {
+            resolutionNum = new BigDecimal(resolution);
+        }
+
+        // 计算面积
+        BigDecimal organArea = BigDecimal.ZERO;
+        if (StringUtils.isNotEmpty(structureArea)) {
+            BigDecimal structureAreaNum = new BigDecimal(structureArea);
+            organArea = structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.000001));
+        }
+        return organArea;
+    }
+
+
 }

@@ -4,10 +4,13 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.mapper.ImageMapper;
+import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
+import cn.staitech.fr.mapper.SingleSlideMapper;
+import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.AnnotationService;
-import cn.staitech.fr.service.strategy.json.CommonParserStrategy;
+import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
@@ -56,7 +59,7 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
     @Resource
     private AnnotationService annotationService;
     @Resource
-    private CommonParserStrategy commonParserStrategy;
+    private CommonJsonParser commonJsonParser;
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX) {
         if (element.isObject()) {
@@ -265,7 +268,7 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
         String accurateArea = singleSlide.getArea();
 
         // I:甲状旁腺组织轮廓面积-平方毫米
-        BigDecimal organArea = commonParserStrategy.getOrganArea(jsonTask, "108111");
+        BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "108111");
 
         // 若甲状腺轮廓面积里包括了甲状旁腺，计算时需要用H-I，若甲状旁腺和甲状腺是分开单独识别的，则只需要H
         if (new BigDecimal(accurateArea).compareTo(BigDecimal.ZERO) > 0

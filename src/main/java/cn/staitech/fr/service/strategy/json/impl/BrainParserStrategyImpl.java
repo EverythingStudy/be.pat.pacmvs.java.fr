@@ -10,7 +10,7 @@ import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.AnnotationService;
-import cn.staitech.fr.service.strategy.json.CommonParserStrategy;
+import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
@@ -58,7 +58,7 @@ public class BrainParserStrategyImpl implements ParserStrategy {
     @Resource
     private AnnotationService annotationService;
     @Resource
-    private CommonParserStrategy commonParserStrategy;
+    private CommonJsonParser commonJsonParser;
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX) {
         if (element.isObject()) {
@@ -267,7 +267,7 @@ public class BrainParserStrategyImpl implements ParserStrategy {
         String accurateArea = singleSlide.getArea();
 
         // I:甲状旁腺组织轮廓面积-平方毫米
-        BigDecimal organArea = commonParserStrategy.getOrganArea(jsonTask, "108111");
+        BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "108111");
 
         // 若甲状腺轮廓面积里包括了甲状旁腺，计算时需要用H-I，若甲状旁腺和甲状腺是分开单独识别的，则只需要H
         if (new BigDecimal(accurateArea).compareTo(BigDecimal.ZERO) > 0
@@ -280,5 +280,4 @@ public class BrainParserStrategyImpl implements ParserStrategy {
         indicatorResultsMap.put("甲状腺面积", new IndicatorAddIn("Thyroid gland area", accurateArea, "平方毫米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
-
 }
