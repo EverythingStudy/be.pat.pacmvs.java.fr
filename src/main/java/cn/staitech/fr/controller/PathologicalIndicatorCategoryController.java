@@ -76,6 +76,7 @@ public class PathologicalIndicatorCategoryController {
 //                organList.add(organId);
 //                break;
 //        }
+        organList.add(organId);
         Long speciesId = Long.valueOf(specialService.getById(specialId).getSpeciesId());
         QueryWrapper<PathologicalIndicator> pathologicalIndicatorQueryWrapper = new QueryWrapper<>();
         pathologicalIndicatorQueryWrapper
