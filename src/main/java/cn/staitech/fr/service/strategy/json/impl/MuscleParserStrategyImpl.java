@@ -6,6 +6,7 @@ import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
+import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -59,12 +60,10 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
         */
 
         // F精细轮廓总面积-平方毫米
-        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        String slideArea = singleSlide.getArea();
+        String slideArea = new AreaUtils().getFineContourArea(jsonTask.getSingleId());
 
         // 单位换算
-        BigDecimal areaNum = new BigDecimal(slideArea).multiply(new BigDecimal(1000));
-        String result = areaNum.setScale(3, RoundingMode.HALF_UP).toString();
+        String result = new AreaUtils().convertToSquareMicrometer(slideArea);
 
         indicatorResultsMap.put("骨骼肌面积", new IndicatorAddIn("Skeletal muscle area", result, "10³平方微米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
