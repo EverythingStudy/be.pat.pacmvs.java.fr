@@ -264,7 +264,7 @@ public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 		} finally {
 			executorService.shutdown();
 		}
-		batchProcessAndSave(anno, 1000, Runtime.getRuntime().availableProcessors());
+		batchProcessAndSave(anno, 1000);
 	}
 
 	@Override
@@ -343,36 +343,27 @@ public class OvariesOviductParserStrategyImpl implements ParserStrategy {
 
 	}
 
-	public void batchProcessAndSave(Annotation annotation, int batchSize, int threadCount) {
-		ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-		List<Annotation> annotations = annotation.getList();
-		int listSize = annotations.size();
-		//         分批处理
-		for (int i = 0; i < listSize; i += batchSize) {
-			int endIndex = Math.min(i + batchSize, listSize);
-			List<Annotation> batch = annotations.subList(i, endIndex);
-			// 提交任务到线程池
-			executor.submit(() -> {
-				Annotation annotation1 = new Annotation();
-				annotation1.setSequenceNumber(annotation.getSequenceNumber());
-				annotation1.setList(batch);
-				try {
-					annotationMapper.batchSave(annotation1);
-				} catch (Exception e) {
-					// 处理异常，例如记录日志
-					log.error("Error occurred while processing batch: " + e.getMessage(), e);
-				}
-			});
-		}
+	public void batchProcessAndSave(Annotation annotation, int batchSize) {
 
-		//         等待所有任务完成
-		executor.shutdown();
-		try {
-			executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-		} catch (InterruptedException e) {
-			// 处理中断异常
-			Thread.currentThread().interrupt();
-		}
-		System.out.println("集合总数：" + listSize);
-	}
+        List<Annotation> annotations = annotation.getList();
+        if (CollectionUtil.isEmpty(annotations)) {
+            return;
+        }
+        int listSize = annotations.size();
+
+        // 分批处理
+        for (int i = 0; i < listSize; i += batchSize) {
+            int endIndex = Math.min(i + batchSize, listSize);
+            List<Annotation> batch = annotations.subList(i, endIndex);
+            Annotation annotation1 = new Annotation();
+            annotation1.setSequenceNumber(annotation.getSequenceNumber());
+            annotation1.setList(batch);
+            try {
+                annotationMapper.batchSave(annotation1);
+            } catch (Exception e) {
+                // 处理异常，例如记录日志
+                log.error("Error occurred while processing batch: " + e.getMessage(), e);
+            }
+        }
+    }
 }
