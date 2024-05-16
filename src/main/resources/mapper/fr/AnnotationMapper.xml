@@ -516,7 +516,7 @@
 
 
     <select id="stIsValid" parameterType="cn.staitech.fr.domain.Annotation" resultType="cn.staitech.fr.domain.Annotation">
-        select ST_IsValid(#{contour}) as results
+        select ST_IsValid(st_geomfromgeojson(#{contour})) as results
     </select>
 
     <delete id="deleteAiAnnotation" parameterType="cn.staitech.fr.domain.Annotation">
