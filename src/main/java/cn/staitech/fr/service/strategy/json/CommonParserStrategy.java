@@ -84,7 +84,7 @@ public class CommonParserStrategy {
      * @param structCode
      * @return
      */
-    public BigDecimal getorganArea(JsonTask jsonTask, String structCode) {
+    public BigDecimal getOrganArea(JsonTask jsonTask, String structCode) {
         // 查询所有未被删除且登录机构相同的数据
         Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask);
         // 定位表

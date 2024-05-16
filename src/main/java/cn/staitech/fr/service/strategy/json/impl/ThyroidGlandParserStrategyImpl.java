@@ -12,7 +12,6 @@ import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -265,7 +264,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         String accurateArea = singleSlide.getArea();
 
         // I:甲状旁腺组织轮廓面积-平方毫米
-        BigDecimal organArea = commonParserStrategy.getorganArea(jsonTask, "108111");
+        BigDecimal organArea = commonParserStrategy.getOrganArea(jsonTask, "108111");
 
         // 若甲状腺轮廓面积里包括了甲状旁腺，计算时需要用H-I，若甲状旁腺和甲状腺是分开单独识别的，则只需要H
         if (new BigDecimal(accurateArea).compareTo(BigDecimal.ZERO) > 0
