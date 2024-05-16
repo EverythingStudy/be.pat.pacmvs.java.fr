@@ -54,6 +54,7 @@
         from fr_annotation
         <where>
             contour_type='2'
+            and single_slide_id is null
             <if test="slideIds != null and slideIds.size>0">
                 AND slide_id in
                 <foreach collection="slideIds" item="id" open="(" separator="," close=")">
