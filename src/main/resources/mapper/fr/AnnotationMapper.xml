@@ -514,6 +514,11 @@
           and category_id = #{categoryId}
     </select>
 
+
+    <select id="stIsValid" parameterType="cn.staitech.fr.domain.Annotation" resultType="cn.staitech.fr.domain.Annotation">
+        select ST_IsValid(#{contour}) as results
+    </select>
+
     <delete id="deleteAiAnnotation" parameterType="cn.staitech.fr.domain.Annotation">
         DELETE
         FROM
@@ -521,8 +526,7 @@
         WHERE
         single_slide_id = #{singleSlideId}
         <if test="contour != null">
-            AND ST_Intersects ( ( SELECT ST_Collect ( contour40000 ) AS collectContour FROM fr_annotation WHERE
-            single_slide_id = #{singleSlideId} AND contour_type = 3 ), contour40000 ) = 'f'
+            AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = 'f'
         </if>
     </delete>
 </mapper>
