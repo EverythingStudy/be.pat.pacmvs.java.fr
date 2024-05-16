@@ -6,6 +6,7 @@ import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
+import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
@@ -53,6 +54,8 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
     private AiForecastService aiForecastService;
     @Resource
     private ImageMapper imageMapper;
+    @Resource
+    private AnnotationService annotationService;
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX) {
         if (element.isObject()) {
@@ -242,13 +245,12 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
 
             anno.setList(processedAnnotations);
             log.info("dashuningguxiandaxiao:{}", processedAnnotations.size());
-            batchProcessAndSave(anno, 1000);
+            annotationService.batchProcessAndSave(anno, 1000);
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
 
     }
-
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
@@ -273,29 +275,4 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         indicatorResultsMap.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", ObjectUtil.isNotEmpty(structureArea) ? structureArea.getArea() : "0", "平方毫米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
-
-    public void batchProcessAndSave(Annotation annotation, int batchSize) {
-
-        List<Annotation> annotations = annotation.getList();
-        if (CollectionUtil.isEmpty(annotations)) {
-            return;
-        }
-        int listSize = annotations.size();
-
-        // 分批处理
-        for (int i = 0; i < listSize; i += batchSize) {
-            int endIndex = Math.min(i + batchSize, listSize);
-            List<Annotation> batch = annotations.subList(i, endIndex);
-            Annotation annotation1 = new Annotation();
-            annotation1.setSequenceNumber(annotation.getSequenceNumber());
-            annotation1.setList(batch);
-            try {
-                annotationMapper.batchSave(annotation1);
-            } catch (Exception e) {
-                // 处理异常，例如记录日志
-                log.error("Error occurred while processing batch: " + e.getMessage(), e);
-            }
-        }
-    }
-
 }

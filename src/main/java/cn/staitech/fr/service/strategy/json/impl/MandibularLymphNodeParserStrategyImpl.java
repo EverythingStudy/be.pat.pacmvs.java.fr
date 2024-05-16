@@ -4,16 +4,14 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.ImageMapper;
-import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
-import cn.staitech.fr.mapper.SingleSlideMapper;
-import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
+import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
@@ -39,24 +37,27 @@ import java.util.stream.Collectors;
 /**
  * @author: wangfeng
  * @create: 2024-05-10 14:18:48
- * @Description: Harderian_gland Json Parser 哈氏腺
+ * @Description: Json Parser 颌下淋巴结
  */
 @Slf4j
-@Component("Harderian_gland")
-public class HarderianGlandParserStrategyImpl implements ParserStrategy {
+@Component("Mandibular_lymph_node")
+public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
+
 
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
     private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
     @Resource
-    private AnnotationService annotationService;
+    private AnnotationMapper annotationMapper;
     @Resource
     private SingleSlideMapper singleSlideMapper;
     @Resource
     private AiForecastService aiForecastService;
     @Resource
     private ImageMapper imageMapper;
+    @Resource
+    private AnnotationService annotationService;
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX) {
         if (element.isObject()) {
@@ -167,34 +168,35 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         }
     }
 
-    private static void processObjectNode(ObjectMapper objectMapper, JsonParser jsonParser, List<JsonNode> elementsList) throws IOException {
-        ObjectNode objectNode = objectMapper.readTree(jsonParser);
-        if (objectNode == null || !objectNode.isObject()) {
-            log.error("Input JSON data is not a valid object.");
-            return;
-        }
-        if (objectNode.has("features")) {
-            ArrayNode featuresNode = (ArrayNode) objectNode.get("features");
-            if (featuresNode.isArray()) {
-                Iterator<JsonNode> elementsIterator = featuresNode.elements();
-                while (elementsIterator.hasNext()) {
-                    elementsList.add(elementsIterator.next());
+    private List<JsonNode> processObjectNode(ObjectMapper objectMapper, JsonParser jsonParser) {
+        try {
+            List<JsonNode> elementsList = new ArrayList<>();
+            ObjectNode objectNode = objectMapper.readTree(jsonParser);
+            if (objectNode.has("features")) {
+                ArrayNode featuresNode = (ArrayNode) objectNode.get("features");
+                if (featuresNode.isArray()) {
+                    Iterator<JsonNode> elementsIterator = featuresNode.elements();
+                    while (elementsIterator.hasNext()) {
+                        elementsList.add(elementsIterator.next());
+                    }
+                    return elementsList;
+                } else {
+                    log.error("Merged JSON data is not an array of objects as expected at current JSON object.");
                 }
             } else {
-                log.error("Merged JSON data is not an array of objects as expected at current JSON object.");
+                log.info("'features' field not found in the current JSON object.");
             }
-        } else {
-            log.info("'features' field not found in the current JSON object.");
-        }
-    }
+            return null;
+        } catch (IOException e) {
 
+        }
+        return null;
+    }
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
-
-//        long startTime = System.currentTimeMillis();
         String filePath = jsonFileS.getFileUrl();
-        log.info("hashixian:{}", filePath);
+        log.info("大鼠甲状腺面积:{}", filePath);
 
         QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
         wrapper.eq("special_id", jsonTask.getSpecialId());
@@ -202,6 +204,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         Long sequenceNumber = annotationRel.getSequenceNumber();
         Annotation anno = new Annotation();
         anno.setSequenceNumber(sequenceNumber);
+        log.info("sequenceNumber:{}", sequenceNumber);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonFactory jsonFactory = objectMapper.getFactory();
         File jsonFile = new File(filePath);
@@ -221,13 +224,13 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
                     break;
                 }
                 if (token == JsonToken.START_OBJECT) {
-                    processObjectNode(objectMapper, jsonParser, elementsList);
+                    elementsList = processObjectNode(objectMapper, jsonParser);
+                    if (elementsList == null) {
+                        return;
+                    }
                 }
             }
-            if (CollectionUtil.isEmpty(elementsList)) {
-                log.error("No valid JSON data found in the file.");
-                return;
-            }
+
             Image image = imageMapper.selectById(jsonTask.getImageId());
             String resolutionX = image.getResolutionX();
             if (StringUtils.isEmpty(resolutionX)) {
@@ -245,7 +248,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
                     }).filter(Objects::nonNull).collect(Collectors.toList());
 
             anno.setList(processedAnnotations);
-            log.info("hashixiandaxiao:{}", processedAnnotations.size());
+            log.info("大鼠甲状腺面积:{}", processedAnnotations.size());
             annotationService.batchProcessAndSave(anno, 1000);
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
@@ -255,10 +258,72 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
+        log.info("大鼠甲状腺指标计算开始");
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        indicatorResultsMap.put("哈氏腺面积", new IndicatorAddIn("Acinus area%", singleSlide.getArea(), "平方毫米"));
 
+        // H:精细轮廓总面积（甲状腺）-平方毫米
+        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+        String accurateArea = singleSlide.getArea();
+
+        // I:甲状旁腺组织轮廓面积-平方毫米
+        BigDecimal organArea = getorganArea(jsonTask, "108111");
+
+        // 若甲状腺轮廓面积里包括了甲状旁腺，计算时需要用H-I，若甲状旁腺和甲状腺是分开单独识别的，则只需要H
+        if (new BigDecimal(accurateArea).compareTo(BigDecimal.ZERO) > 0
+                && organArea.compareTo(BigDecimal.ZERO) > 0) {
+            // H-I
+            BigDecimal areaNum = new BigDecimal(accurateArea).subtract(organArea);
+            accurateArea = areaNum.toString();
+        }
+
+        indicatorResultsMap.put("甲状腺面积", new IndicatorAddIn("Thyroid gland area", accurateArea, "平方毫米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
+
+
+    /**
+     * 获取脏器轮廓面积
+     */
+    private BigDecimal getorganArea(JsonTask jsonTask, String structCode) {
+        // 查询所有未被删除且登录机构相同的数据
+        LambdaQueryWrapper<PathologicalIndicatorCategory> CategoryQueryWrapper = new LambdaQueryWrapper<>();
+        CategoryQueryWrapper.eq(PathologicalIndicatorCategory::getDelFlag, 0)
+                .eq(PathologicalIndicatorCategory::getOrganizationId, jsonTask.getOrganizationId());
+        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(CategoryQueryWrapper);
+        Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+
+        // 定位表
+        LambdaQueryWrapper<SpecialAnnotationRel> SpecialQueryWrapper = new LambdaQueryWrapper<>();
+        SpecialQueryWrapper.eq(SpecialAnnotationRel::getSpecialId, jsonTask.getSpecialId());
+        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(SpecialQueryWrapper);
+        Long sequenceNumber = annotationRel.getSequenceNumber();
+
+        // 非精细轮廓总面积
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(sequenceNumber);
+        annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
+        annotation.setCategoryId(pathologicalMap.get(structCode));// 标注类别ID
+        Annotation structure = annotationMapper.getStructureArea(annotation);
+        if (structure == null || structure.getArea() == null) {
+            return new BigDecimal("0");
+        }
+        String structureArea = structure.getArea();
+
+        // 查询切片缩放
+        BigDecimal resolutionNum = new BigDecimal("0.262");
+        String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
+        if (StringUtils.isNotEmpty(resolution)) {
+            resolutionNum = new BigDecimal(resolution);
+        }
+
+        // 计算面积
+        BigDecimal organArea = BigDecimal.ZERO;
+        if (StringUtils.isNotEmpty(structureArea)) {
+            BigDecimal structureAreaNum = new BigDecimal(structureArea);
+            organArea = structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.000001));
+        }
+        return organArea;
+    }
+
+
 }
