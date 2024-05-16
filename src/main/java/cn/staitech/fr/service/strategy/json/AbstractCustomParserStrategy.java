@@ -22,6 +22,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -46,6 +47,7 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
     private SingleSlideMapper singleSlideMapper;
     private AiForecastService aiForecastService;
     private ImageMapper imageMapper;
+    private CommonParserStrategy commonParserStrategy;
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX) {
         if (element.isObject()) {

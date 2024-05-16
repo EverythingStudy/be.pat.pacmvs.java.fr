@@ -5,6 +5,7 @@ import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
+import cn.staitech.fr.service.strategy.json.CommonParserStrategy;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -36,6 +37,8 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
     private AiForecastService aiForecastService;
     @Resource
     private ImageMapper imageMapper;
+    @Resource
+    private CommonParserStrategy commonParserStrategy;
 
     @PostConstruct
     public void init() {
@@ -45,16 +48,13 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
         setSingleSlideMapper(singleSlideMapper);
         setSpecialAnnotationRelMapper(specialAnnotationRelMapper);
         setImageMapper(imageMapper);
+        setCommonParserStrategy(commonParserStrategy);
         log.info("ThymusParserStrategyImpl init");
     }
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
-        // 查询所有未被删除且登录机构相同的数据
-        qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
-        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
-        Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+        Map<String, Long> pathologicalMap = commonParserStrategy.getPathologicalMap(jsonTask);
         //定位表
         QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
         wrapper.eq("special_id", jsonTask.getSpecialId());

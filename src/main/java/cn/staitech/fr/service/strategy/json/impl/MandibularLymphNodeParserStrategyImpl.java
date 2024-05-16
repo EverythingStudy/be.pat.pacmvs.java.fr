@@ -7,6 +7,7 @@ import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.AnnotationService;
+import cn.staitech.fr.service.strategy.json.CommonParserStrategy;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
@@ -58,6 +59,8 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
     private ImageMapper imageMapper;
     @Resource
     private AnnotationService annotationService;
+    @Resource
+    private CommonParserStrategy commonParserStrategy;
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX) {
         if (element.isObject()) {
@@ -286,17 +289,10 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
      */
     private BigDecimal getorganArea(JsonTask jsonTask, String structCode) {
         // 查询所有未被删除且登录机构相同的数据
-        LambdaQueryWrapper<PathologicalIndicatorCategory> CategoryQueryWrapper = new LambdaQueryWrapper<>();
-        CategoryQueryWrapper.eq(PathologicalIndicatorCategory::getDelFlag, 0)
-                .eq(PathologicalIndicatorCategory::getOrganizationId, jsonTask.getOrganizationId());
-        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(CategoryQueryWrapper);
-        Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+        Map<String, Long> pathologicalMap = commonParserStrategy.getPathologicalMap(jsonTask);
 
         // 定位表
-        LambdaQueryWrapper<SpecialAnnotationRel> SpecialQueryWrapper = new LambdaQueryWrapper<>();
-        SpecialQueryWrapper.eq(SpecialAnnotationRel::getSpecialId, jsonTask.getSpecialId());
-        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(SpecialQueryWrapper);
-        Long sequenceNumber = annotationRel.getSequenceNumber();
+        Long sequenceNumber = commonParserStrategy.getSequenceNumber(jsonTask);
 
         // 非精细轮廓总面积
         Annotation annotation = new Annotation();
