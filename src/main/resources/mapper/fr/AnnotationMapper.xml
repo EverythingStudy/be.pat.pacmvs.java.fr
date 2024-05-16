@@ -515,7 +515,8 @@
     </select>
 
 
-    <select id="stIsValid" parameterType="cn.staitech.fr.domain.Annotation" resultType="cn.staitech.fr.domain.Annotation">
+    <select id="stIsValid" parameterType="cn.staitech.fr.domain.Annotation"
+            resultType="cn.staitech.fr.domain.Annotation">
         select ST_IsValid(st_geomfromgeojson(#{contour})) as results
     </select>
 
