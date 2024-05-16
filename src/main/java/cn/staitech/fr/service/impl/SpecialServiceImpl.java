@@ -364,7 +364,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
                 return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
             }
             //状态(0待启动，1进行中，2暂停，3已完成，4锁定)
-            Integer status = req.getStatus();
+            Integer status = special.getStatus();
             //已经锁定判断
             if(status.equals(CommonConstant.INT_4) && req.getStatus().equals(CommonConstant.INT_4)){
             	 return R.fail(MessageSource.M("SPECIAL_HAVE_LOCK"));
