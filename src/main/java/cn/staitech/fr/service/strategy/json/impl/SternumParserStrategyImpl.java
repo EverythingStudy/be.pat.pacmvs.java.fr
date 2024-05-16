@@ -209,62 +209,64 @@ public class SternumParserStrategyImpl implements ParserStrategy {
 
 	@Override
 	public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
-		String filePath = jsonFileS.getFileUrl();
+        log.info("开始解析胸骨组织");
+        String filePath = jsonFileS.getFileUrl();
 
-		ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() / 2);
-		QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
-		wrapper.eq("special_id", jsonTask.getSpecialId());
-		SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
-		Long sequenceNumber = annotationRel.getSequenceNumber();
-		Annotation anno = new Annotation();
-		anno.setSequenceNumber(sequenceNumber);
-		ObjectMapper objectMapper = new ObjectMapper();
-		JsonFactory jsonFactory = objectMapper.getFactory();
-		File jsonFile = new File(filePath);
-		QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
-		// 查询所有未被删除且登录机构相同的数据
-		qw.eq("del_flag", 0)
-		.eq("organization_id", jsonTask.getOrganizationId());
-		List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
-		Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
-		
-		Image image = imageMapper.selectById(jsonTask.getImageId());
-        String resolutionX = image.getResolutionX();
-        if (StringUtils.isEmpty(resolutionX)) {
-            resolutionX = "0.262";
+        QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
+        wrapper.eq("special_id", jsonTask.getSpecialId());
+        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
+        Long sequenceNumber = annotationRel.getSequenceNumber();
+        Annotation anno = new Annotation();
+        anno.setSequenceNumber(sequenceNumber);
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonFactory jsonFactory = objectMapper.getFactory();
+        File jsonFile = new File(filePath);
+        QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
+        // 查询所有未被删除且登录机构相同的数据
+        qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
+        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
+        Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+
+        try (FileInputStream fis = new FileInputStream(jsonFile);
+             JsonParser jsonParser = jsonFactory.createParser(fis)) {
+
+            List<JsonNode> elementsList = new ArrayList<>();
+            while (!jsonParser.isClosed()) {
+                JsonToken token = jsonParser.nextToken();
+                if (token == null) {
+                    break;
+                }
+                if (token == JsonToken.START_OBJECT) {
+                    processObjectNode(objectMapper, jsonParser, elementsList);
+                }
+            }
+            if (CollectionUtil.isEmpty(elementsList)) {
+                log.error("No valid JSON data found in the file.");
+                return;
+            }
+            Image image = imageMapper.selectById(jsonTask.getImageId());
+            String resolutionX = image.getResolutionX();
+            if (StringUtils.isEmpty(resolutionX)) {
+                resolutionX = "0.262";
+            }
+            String finalResolutionX = resolutionX;
+            List<Annotation> processedAnnotations;
+            processedAnnotations = elementsList.parallelStream()
+                    .map(element -> {
+                        Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, finalResolutionX);
+                        if (!ObjectUtil.isEmpty(annotation)) {
+                            return annotation;
+                        }
+                        return null;
+                    }).filter(Objects::nonNull).collect(Collectors.toList());
+
+            anno.setList(processedAnnotations);
+            log.info("胸骨:{}", processedAnnotations.size());
+            batchProcessAndSave(anno, 1000);
+        } catch (Exception e) {
+            log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
-        String finalResolutionX = resolutionX;
-		try (FileInputStream fis = new FileInputStream(jsonFile);
-				JsonParser jsonParser = jsonFactory.createParser(fis)) {
-
-			List<JsonNode> elementsList = new ArrayList<>();
-			while (!jsonParser.isClosed()) {
-				JsonToken token = jsonParser.nextToken();
-				if (token == null) break;
-				if (token == JsonToken.START_OBJECT) {
-					processObjectNode(objectMapper, jsonParser, elementsList);
-				}
-			}
-			List<Annotation> arrayList = new ArrayList<>();
-			 Annotation annotation1 = annotationMapper.collectGeometry(jsonTask.getSingleId());
-	            elementsList.stream().forEach(element -> {
-	                Annotation annotation = processJsonElement(element, executorService, pathologicalMap, jsonTask,finalResolutionX);
-	                if (!ObjectUtil.isEmpty(annotation)) {
-	                    annotation1.setContour(annotation.getContour40000());
-	                    Annotation annotationBy = annotationMapper.intersectsGeometry(annotation1);
-	                    if (ObjectUtil.equals("t", annotationBy.getIntersectsResults())) {
-	                        arrayList.add(annotation);
-	                    }
-	                }
-	            });
-			anno.setList(arrayList);
-		} catch (Exception e) {
-			log.error("Unexpected error occurred: " + e.getMessage(), e);
-		} finally {
-			executorService.shutdown();
-		}
-		batchProcessAndSave(anno, 1000);
-	}
+    }
 
 	@Override
 	public void alculationIndicators(JsonTask jsonTask) {
