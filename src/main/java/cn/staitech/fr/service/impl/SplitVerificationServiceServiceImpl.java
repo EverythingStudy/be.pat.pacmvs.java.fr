@@ -65,8 +65,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 
 	@Override
 	public PageResponse<SplitVerificationOut>  getList(SplitVerificationQueryIn req) {
-				Long organizationId = 6L;
-//		Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+//				Long organizationId = 1L;
+		Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
 		PageResponse<SplitVerificationOut> pageResponse = new PageResponse<>();
 		//查看切片明细  0：否  1：是
 		int detailType = req.getDetailType();
