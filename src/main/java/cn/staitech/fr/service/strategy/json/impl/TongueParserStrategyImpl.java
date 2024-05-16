@@ -1,5 +1,15 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.mapper.AnnotationMapper;
@@ -9,16 +19,10 @@ import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
+import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.service.strategy.json.CommonParserStrategy;
 import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @Author wudi
@@ -44,16 +48,14 @@ public class TongueParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Autowired
     private AreaUtils areaUtils;
-
+    @Resource
+    private CommonParserStrategy commonParserStrategy;
+    @Resource
+    private CommonJsonParser commonJsonParser;
 
     @PostConstruct
     public void init() {
-        setAiForecastService(aiForecastService);
-        setAnnotationMapper(annotationMapper);
-        setPathologicalIndicatorCategoryMapper(pathologicalIndicatorCategoryMapper);
-        setSingleSlideMapper(singleSlideMapper);
-        setSpecialAnnotationRelMapper(specialAnnotationRelMapper);
-        setImageMapper(imageMapper);
+    	setCommonJsonParser(commonJsonParser);
         log.info("TongueParserStrategyImpl init");
     }
     @Override
