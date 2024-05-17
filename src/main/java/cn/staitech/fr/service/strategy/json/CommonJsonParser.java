@@ -228,7 +228,9 @@ public class CommonJsonParser {
             wrapper1.eq("del_flag", 0);
             wrapper1.eq("category_id", jsonTask.getCategoryId());
             Category category = categoryMapper.selectOne(wrapper1);
-            if (ObjectUtil.isEmpty(category)) return;
+            if (ObjectUtil.isEmpty(category)) {
+                return;
+            }
             String key = jsonTask.getOrganizationId() + "";
             String finalResolutionX = resolutionX;
             List<Annotation> processedAnnotations;
@@ -290,59 +292,57 @@ public class CommonJsonParser {
     /**
      * 查询所有未被删除且登录机构相同的数据
      *
-     * @param jsonTask
-     * @return
+     * @param organizationId 机构id
+     * @return 指标的结构ID和类别ID
      */
-    public Map<String, Long> getPathologicalMap(JsonTask jsonTask) {
-        QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
-        // 查询所有未被删除且登录机构相同的数据
-        qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
-        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
-        Map<String, Long> pathologicalMap = list.stream().collect(
-                Collectors.toMap(
-                        PathologicalIndicatorCategory::getStructureId,
-                        PathologicalIndicatorCategory::getCategoryId,
-                        (entity1, entity2) -> entity1));
-        return pathologicalMap;
+    public Map<String, Long> getPathologicalMap(Long organizationId) {
+        LambdaQueryWrapper<PathologicalIndicatorCategory> CategoryQueryWrapper = new LambdaQueryWrapper<>();
+        CategoryQueryWrapper.eq(PathologicalIndicatorCategory::getDelFlag, 0)
+                .eq(PathologicalIndicatorCategory::getOrganizationId, organizationId);
+        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(CategoryQueryWrapper);
+
+        return list.stream().collect(Collectors.toMap(
+                PathologicalIndicatorCategory::getStructureId,
+                PathologicalIndicatorCategory::getCategoryId,
+                (entity1, entity2) -> entity1));
     }
+
 
     /**
      * 定位表
      *
-     * @param jsonTask
-     * @return
+     * @param specialId 专题ID
+     * @return 表后缀
      */
-    public Long getSequenceNumber(JsonTask jsonTask) {
+    private Long getSequenceNumber(Long specialId) {
         LambdaQueryWrapper<SpecialAnnotationRel> SpecialQueryWrapper = new LambdaQueryWrapper<>();
-        SpecialQueryWrapper.eq(SpecialAnnotationRel::getSpecialId, jsonTask.getSpecialId());
+        SpecialQueryWrapper.eq(SpecialAnnotationRel::getSpecialId, specialId);
         SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(SpecialQueryWrapper);
-        Long sequenceNumber = annotationRel.getSequenceNumber();
-        return sequenceNumber;
+        return annotationRel.getSequenceNumber();
     }
 
     /**
      * 获取脏器轮廓面积
      *
-     * @param jsonTask
-     * @param structCode
-     * @return
+     * @param jsonTask    jsonTask
+     * @param structureId 结构ID
+     * @return 脏器面积-平方毫米
      */
-    public BigDecimal getOrganArea(JsonTask jsonTask, String structCode) {
+    public BigDecimal getOrganArea(JsonTask jsonTask, String structureId) {
         // 查询所有未被删除且登录机构相同的数据
-        Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask);
+        Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
         // 定位表
-        Long sequenceNumber = getSequenceNumber(jsonTask);
+        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
 
-        // 非精细轮廓总面积
+        // 脏器轮廓信息
         Annotation annotation = new Annotation();
         annotation.setSequenceNumber(sequenceNumber);
         annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
-        annotation.setCategoryId(pathologicalMap.get(structCode));// 标注类别ID
+        annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
         Annotation structure = annotationMapper.getStructureArea(annotation);
-        if (structure == null || structure.getArea() == null) {
-            return new BigDecimal("0");
+        if (null == structure || StringUtils.isEmpty(structure.getArea())) {
+            return BigDecimal.ZERO;
         }
-        String structureArea = structure.getArea();
 
         // 查询切片缩放
         BigDecimal resolutionNum = new BigDecimal("0.262");
@@ -352,12 +352,32 @@ public class CommonJsonParser {
         }
 
         // 计算面积
-        BigDecimal organArea = BigDecimal.ZERO;
-        if (StringUtils.isNotEmpty(structureArea)) {
-            BigDecimal structureAreaNum = new BigDecimal(structureArea);
-            organArea = structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.000001));
-        }
-        return organArea;
+        BigDecimal structureAreaNum = new BigDecimal(structure.getArea());
+        return structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.000001));
+    }
+
+
+    /**
+     * 取脏器轮廓数量
+     *
+     * @param jsonTask    jsonTask
+     * @param structureId 结构ID
+     * @return 脏器轮廓数量
+     */
+    public Integer getOrganAreaCount(JsonTask jsonTask, String structureId) {
+        // 查询所有未被删除且登录机构相同的数据
+        Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
+
+        // 定位表
+        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
+
+        // 脏器轮廓信息
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(sequenceNumber);
+        annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
+        annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
+        return annotationMapper.countDucts(annotation);
+
     }
 
 

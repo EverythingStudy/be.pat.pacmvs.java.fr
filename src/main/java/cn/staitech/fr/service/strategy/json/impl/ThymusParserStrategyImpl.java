@@ -49,7 +49,7 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Map<String, Long> pathologicalMap = commonJsonParser.getPathologicalMap(jsonTask);
+        Map<String, Long> pathologicalMap = commonJsonParser.getPathologicalMap(jsonTask.getOrganizationId());
         //定位表
         QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
         wrapper.eq("special_id", jsonTask.getSpecialId());
