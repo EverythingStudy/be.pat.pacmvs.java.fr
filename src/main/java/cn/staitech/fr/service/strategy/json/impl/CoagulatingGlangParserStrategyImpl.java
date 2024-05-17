@@ -63,8 +63,8 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         indicatorResultsMap.put("大鼠凝固腺面积", new IndicatorAddIn("Coagulating gland area", singleSlide.getArea(), "平方毫米"));
         Annotation annotation = new Annotation();
-//        annotation.setSingleSlideId(jsonTask.getSingleId());
-        annotation.setSlideId(jsonTask.getSlideId());
+        annotation.setSingleSlideId(jsonTask.getSingleId());
+       // annotation.setSlideId(jsonTask.getSlideId());
         annotation.setCategoryId(pathologicalMap.get("12B074"));
         annotation.setSequenceNumber(sequenceNumber);
         Annotation structureArea = annotationMapper.getStructureArea(annotation);

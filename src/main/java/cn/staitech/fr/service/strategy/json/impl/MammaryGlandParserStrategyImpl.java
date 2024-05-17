@@ -120,8 +120,8 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
             bigDecimalB = bigDecimal1.multiply(resolutions).multiply(resolutions).multiply(new BigDecimal(0.000001));
         }
         AiForecast aiForecast1 = new AiForecast();
-        aiForecast1.setQuantitativeIndicators("腺上皮面积（全片）");
-        aiForecast1.setQuantitativeIndicatorsEn("Acinar epithelial area (all)");
+        aiForecast1.setQuantitativeIndicators("乳腺面积");
+        aiForecast1.setQuantitativeIndicatorsEn("Mammary gland area");
         aiForecast1.setUnit("平方毫米");
         aiForecast1.setSingleSlideId(jsonTask.getSingleId());
         aiForecast1.setCreateTime(DateUtil.now());
