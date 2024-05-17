@@ -48,16 +48,16 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
 
-        // I:甲状旁腺组织轮廓面积-平方毫米
-        BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "108111");
-
-        // 若甲状腺轮廓面积里包括了甲状旁腺，计算时需要用H-I，若甲状旁腺和甲状腺是分开单独识别的，则只需要H
-        if (new BigDecimal(accurateArea).compareTo(BigDecimal.ZERO) > 0
-                && organArea.compareTo(BigDecimal.ZERO) > 0) {
-            // H-I
-            BigDecimal areaNum = new BigDecimal(accurateArea).subtract(organArea);
-            accurateArea = areaNum.toString();
-        }
+//        // I:甲状旁腺组织轮廓面积-平方毫米
+//        BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "108111");
+//
+//        // 若甲状腺轮廓面积里包括了甲状旁腺，计算时需要用H-I，若甲状旁腺和甲状腺是分开单独识别的，则只需要H
+//        if (new BigDecimal(accurateArea).compareTo(BigDecimal.ZERO) > 0
+//                && organArea.compareTo(BigDecimal.ZERO) > 0) {
+//            // H-I
+//            BigDecimal areaNum = new BigDecimal(accurateArea).subtract(organArea);
+//            accurateArea = areaNum.toString();
+//        }
 
         indicatorResultsMap.put("甲状腺面积", new IndicatorAddIn("Thyroid gland area", accurateArea, "平方毫米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
