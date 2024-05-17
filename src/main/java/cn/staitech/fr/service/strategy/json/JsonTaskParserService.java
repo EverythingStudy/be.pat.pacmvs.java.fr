@@ -9,7 +9,6 @@ import cn.staitech.fr.service.SingleSlideService;
 import cn.staitech.fr.service.SlideService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,20 +29,22 @@ import java.util.concurrent.*;
 @Slf4j
 public class JsonTaskParserService {
 
-    public static final ExecutorService jsonTaskExecutorService = new ThreadPoolExecutor(
-            Runtime.getRuntime().availableProcessors() - 1,
-            Runtime.getRuntime().availableProcessors() * 2,
-            // 空闲线程等待工作的超时时间
-            10L,
-            TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(4096),
-            new ThreadFactory() {
-                public Thread newThread(Runnable r) {
-                    return new Thread(r, "json-task-service-thread-" + r.hashCode());
-                }
-            },
-            new ThreadPoolExecutor.DiscardOldestPolicy());
+//    public static final ExecutorService jsonTaskExecutorService = new ThreadPoolExecutor(
+//            Runtime.getRuntime().availableProcessors() - 1,
+//            Runtime.getRuntime().availableProcessors() * 2,
+//            // 空闲线程等待工作的超时时间
+//            10L,
+//            TimeUnit.SECONDS,
+//            new LinkedBlockingQueue<Runnable>(4096),
+//            new ThreadFactory() {
+//                public Thread newThread(Runnable r) {
+//                    return new Thread(r, "json-task-service-thread-" + r.hashCode());
+//                }
+//            },
+//            new ThreadPoolExecutor.DiscardOldestPolicy());
 
+    @Resource
+    public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
     JsonTaskService jsonTaskService;
     @Resource
@@ -55,12 +56,13 @@ public class JsonTaskParserService {
     @Resource
     private List<CustomParserStrategy> customParserStrategies;
     @Resource
-    public SpecialAnnotationRelMapper specialAnnotationRelMapper;
-    @Resource
     private AnnotationMapper annotationMapper;
 
     @Resource
     private SingleSlideService singleSlideService;
+
+    @Resource
+    private CommonJsonParser commonJsonParser;
 
     public void input(String input) {
         JSONObject jsonObject = JSON.parseObject(input);
@@ -184,10 +186,7 @@ public class JsonTaskParserService {
     }
 
     private Annotation getAnnotation(JsonTask jsonTask) {
-        QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
-        wrapper.eq("special_id", jsonTask.getSpecialId());
-        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
-        Long sequenceNumber = annotationRel.getSequenceNumber();
+        Long sequenceNumber = commonJsonParser.getSequenceNumber(jsonTask.getSpecialId());
 
         Annotation annotation = new Annotation();
         annotation.setSequenceNumber(sequenceNumber);

@@ -4,14 +4,11 @@ import cn.hutool.core.date.DateUtil;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.SpecialAnnotationRel;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
-import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -31,8 +28,6 @@ import java.util.Map;
 @Service("Thymus")
 public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
-    private SpecialAnnotationRelMapper specialAnnotationRelMapper;
-    @Resource
     private AnnotationMapper annotationMapper;
     @Resource
     private SingleSlideMapper singleSlideMapper;
@@ -51,10 +46,7 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, Long> pathologicalMap = commonJsonParser.getPathologicalMap(jsonTask.getOrganizationId());
         //定位表
-        QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
-        wrapper.eq("special_id", jsonTask.getSpecialId());
-        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
-        Long sequenceNumber = annotationRel.getSequenceNumber();
+        Long sequenceNumber = commonJsonParser.getSequenceNumber(jsonTask.getSpecialId());
 
         Annotation annotation = new Annotation();
         annotation.setSingleSlideId(jsonTask.getSingleId());

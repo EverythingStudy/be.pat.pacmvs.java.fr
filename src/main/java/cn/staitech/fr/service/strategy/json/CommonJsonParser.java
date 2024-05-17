@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
@@ -49,6 +50,8 @@ public class CommonJsonParser {
     private CategoryMapper categoryMapper;
     @Resource
     private SingleSlideMapper singleSlideMapper;
+    @Resource
+    private AnnotationService annotationService;
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX, String key) {
         if (element.isObject()) {
@@ -186,20 +189,15 @@ public class CommonJsonParser {
 
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         String filePath = jsonFileS.getFileUrl();
-        QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
-        wrapper.eq("special_id", jsonTask.getSpecialId());
-        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
-        Long sequenceNumber = annotationRel.getSequenceNumber();
+        // 定位表
+        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
         Annotation anno = new Annotation();
         anno.setSequenceNumber(sequenceNumber);
         ObjectMapper objectMapper = new ObjectMapper();
         JsonFactory jsonFactory = objectMapper.getFactory();
         File jsonFile = new File(filePath);
-        QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
-        // 查询所有未被删除且登录机构相同的数据
-        qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
-        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
-        Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+
+        Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
 
         try (FileInputStream fis = new FileInputStream(jsonFile);
              JsonParser jsonParser = jsonFactory.createParser(fis)) {
@@ -244,7 +242,7 @@ public class CommonJsonParser {
                     }).filter(Objects::nonNull).collect(Collectors.toList());
 
             anno.setList(processedAnnotations);
-            batchProcessAndSave(anno, 1000);
+            annotationService.batchProcessAndSave(anno, 1000);
             Annotation annotation = new Annotation();
             annotation.setMagnification(40000L);
             annotation.setFiligreeContour(true);
@@ -265,28 +263,6 @@ public class CommonJsonParser {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
 
-    }
-
-    public void batchProcessAndSave(Annotation annotation, int batchSize) {
-        List<Annotation> annotations = annotation.getList();
-        if (CollectionUtil.isEmpty(annotations)) {
-            return;
-        }
-        int listSize = annotations.size();
-        // 分批处理
-        for (int i = 0; i < listSize; i += batchSize) {
-            int endIndex = Math.min(i + batchSize, listSize);
-            List<Annotation> batch = annotations.subList(i, endIndex);
-            Annotation annotation1 = new Annotation();
-            annotation1.setSequenceNumber(annotation.getSequenceNumber());
-            annotation1.setList(batch);
-            try {
-                annotationMapper.batchSave(annotation1);
-            } catch (Exception e) {
-                // 处理异常，例如记录日志
-                log.error("Error occurred while processing batch: " + e.getMessage(), e);
-            }
-        }
     }
 
     /**
@@ -314,7 +290,7 @@ public class CommonJsonParser {
      * @param specialId 专题ID
      * @return 表后缀
      */
-    private Long getSequenceNumber(Long specialId) {
+    public Long getSequenceNumber(Long specialId) {
         LambdaQueryWrapper<SpecialAnnotationRel> SpecialQueryWrapper = new LambdaQueryWrapper<>();
         SpecialQueryWrapper.eq(SpecialAnnotationRel::getSpecialId, specialId);
         SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(SpecialQueryWrapper);
