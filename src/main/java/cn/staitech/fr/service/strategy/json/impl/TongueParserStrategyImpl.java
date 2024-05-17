@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class TongueParserStrategyImpl extends AbstractCustomParserStrategy {
         aiForecast.setUnit("平方毫米");
         aiForecast.setSingleSlideId(jsonTask.getSingleId());
         BigDecimal area = areaUtils.getOrganArea(jsonTask, "10D12E");
-        aiForecast.setResults(area.toString());
+        aiForecast.setResults(area.setScale(3, RoundingMode.HALF_UP).toString());
         insertEntity.add(aiForecast);
         aiForecastService.saveBatch(insertEntity);
 

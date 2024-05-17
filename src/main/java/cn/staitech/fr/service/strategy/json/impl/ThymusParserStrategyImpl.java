@@ -53,6 +53,9 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
         annotation.setCategoryId(pathologicalMap.get("14403D"));
         annotation.setSequenceNumber(sequenceNumber);
         Annotation structureArea = annotationMapper.getStructureArea(annotation);
+        if (structureArea==null){
+            return;
+        }
         BigDecimal bigDecimalB = new BigDecimal(0);
         //查询切片缩放
         String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
