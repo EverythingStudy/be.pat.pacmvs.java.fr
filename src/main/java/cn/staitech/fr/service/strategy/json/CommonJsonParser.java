@@ -6,7 +6,6 @@ import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AnnotationService;
-import cn.staitech.fr.vo.geojson.Indicator;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -53,7 +52,7 @@ public class CommonJsonParser {
     @Resource
     private AnnotationService annotationService;
 
-    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String resolutionX, String key) {
+    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String key) {
         if (element.isObject()) {
             JsonNode node = element.get("id");
             // node 转换成String
@@ -118,18 +117,6 @@ public class CommonJsonParser {
             String keys = key + labelCode;
             Integer size = MapConstant.getStructureSize(keys);
             annotation.setStructureSize(size);
-            // 查询标签信息
-            Map<String, Indicator> dataIndicators = properties.getData_indicators();
-            if (!CollectionUtil.isEmpty(dataIndicators)) {
-                dataIndicators.forEach((k, v) -> {
-                    if (StringUtils.isNotEmpty(v.getUnit())) {
-                        double value = v.getValue();
-                        BigDecimal bigDecimal = new BigDecimal(resolutionX);
-                        BigDecimal bigDecimal1 = new BigDecimal(value);
-                        annotation.setArea(bigDecimal1.multiply(bigDecimal).multiply(bigDecimal).setScale(3, RoundingMode.HALF_UP) + "");
-                    }
-                });
-            }
 
             annotation.setPerimeter(properties.getPerimeter());
             annotation.setCreateBy(0L);
@@ -230,12 +217,19 @@ public class CommonJsonParser {
                 return;
             }
             String key = jsonTask.getOrganizationId() + "";
-            String finalResolutionX = resolutionX;
             List<Annotation> processedAnnotations;
+            String finalResolutionX = resolutionX;
             processedAnnotations = elementsList.parallelStream()
                     .map(element -> {
-                        Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, finalResolutionX, key);
+                        Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, key);
                         if (!ObjectUtil.isEmpty(annotation)) {
+                            annotation.setContour(annotation.getContour40000());
+                            Annotation area = annotationMapper.getArea(annotation);
+                            BigDecimal decimal = new BigDecimal(ObjectUtil.isNotEmpty(area.getArea()) ? area.getArea() : "0");
+                            annotation.setArea(decimal.multiply(new BigDecimal(finalResolutionX)).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString());
+                            String perimeter = ObjectUtil.isNotEmpty(area.getPerimeter()) ? area.getPerimeter() : "0";// 周长
+                            String multiply = new BigDecimal(perimeter).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString();
+                            annotation.setPerimeter(multiply);
                             return annotation;
                         }
                         return null;
