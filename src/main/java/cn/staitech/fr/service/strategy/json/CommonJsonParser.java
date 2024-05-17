@@ -111,7 +111,7 @@ public class CommonJsonParser {
                 return null;
             }
             Annotation annotation = new Annotation();
-            log.info("MapConstant.STRUCTURESIZR_MAP {}", MapConstant.STRUCTURESIZR_MAP);
+            // log.info("MapConstant.STRUCTURESIZR_MAP {}", MapConstant.STRUCTURESIZR_MAP);
             String keys = key + labelCode;
             Integer size = MapConstant.getStructureSize(keys);
             annotation.setStructureSize(size);
