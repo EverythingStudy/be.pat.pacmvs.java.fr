@@ -96,15 +96,15 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         //        }
 
 
-        indicatorResultsMap.put("甲状腺滤泡面积（单个）", new IndicatorAddIn("Thyroid follicle area (per)", "", "平方毫米"));
-        indicatorResultsMap.put("甲状腺滤泡腔面积（单个）", new IndicatorAddIn("Thyroid follicular lumen area (per)", "", "平方毫米"));
-        indicatorResultsMap.put("血管面积", new IndicatorAddIn("Vessel area%", vesselArea.toString(), "平方毫米"));
+        indicatorResultsMap.put("甲状腺滤泡面积（单个）", new IndicatorAddIn("Thyroid follicle area (per)", "", "10³平方微米"));
+        indicatorResultsMap.put("甲状腺滤泡腔面积（单个）", new IndicatorAddIn("Thyroid follicular lumen area (per)", "", "10³平方微米"));
+        indicatorResultsMap.put("血管面积", new IndicatorAddIn("Vessel area%", vesselArea.toString(), "10³平方微米"));
         indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular erythrocyte area", "", "平方毫米"));
         indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular erythrocyte area", "", "平方毫米"));
         indicatorResultsMap.put("肥大细胞数量", new IndicatorAddIn("Density of mast cells", densityOfMastCells.toString(), "个"));
         indicatorResultsMap.put("滤泡上皮细胞核数量（单个）", new IndicatorAddIn("Nucleus density of follicular cell (per)", nucleusOfFollicular.toString(), "个"));
         indicatorResultsMap.put("组织轮廓面积(甲状腺面积)", new IndicatorAddIn("Thyroid gland area", accurateArea, "平方毫米"));
-        indicatorResultsMap.put("甲状旁腺组织轮廓面积", new IndicatorAddIn("Parathyroid gland area", parathyroidGlandArea.toString(), "平方毫米"));
+        indicatorResultsMap.put("甲状旁腺组织轮廓面积", new IndicatorAddIn("Parathyroid gland area", parathyroidGlandArea.toString(), "10³平方微米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 }

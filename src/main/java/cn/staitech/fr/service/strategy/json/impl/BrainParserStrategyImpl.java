@@ -43,11 +43,35 @@ public class BrainParserStrategyImpl implements ParserStrategy {
         log.info("大鼠大脑 BR1_BR2 指标计算开始……{}", jsonTask);
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
+        //        大脑
+        //        结构	编码
+        //        脉络丛	13209C
+        //        血管	132003
+        //        红细胞	132004
+        //        组织轮廓	132111
+
+        //        算法输出指标	指标代码（仅限本文档）	单位（保留小数点后3位）	备注
+        //        脉络丛面积	A	平方毫米	无
+        //        血管外红细胞面积	B	103平方微米	无
+        //        血管内红细胞面积	C	平方毫米	无
+        //        大脑面积	D	平方毫米	无
+
+        //        产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后3位）	English	计算方式	备注
+        //        脉络丛面积占比	1	%	Choroid Plexus area %	1=A/D	无
+        //        血管外红细胞面积占比	2	%	Extravascular Erythrocyte area%	2=B/D	无
+        //        血管内红细胞面积占比	3	%	Intravascular Erythrocyte area%	3=C/D	无
+        //        大脑面积	4	平方毫米	Brain area	4=D	无
+
+
         // D:精细轮廓总面积（大鼠大脑）- 平方毫米
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
 
+        indicatorResultsMap.put("脉络丛面积", new IndicatorAddIn("Choroid Plexus area", accurateArea, "平方毫米"));
+        indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", accurateArea, "10³平方微米"));
+        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", accurateArea, "平方毫米"));
         indicatorResultsMap.put("大脑面积", new IndicatorAddIn("Brain area", accurateArea, "平方毫米"));
+
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 }
