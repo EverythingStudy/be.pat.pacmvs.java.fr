@@ -373,7 +373,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (req.getSingle_slide_id() != null) {
             NioWebSocketHandler.sendSingle(req.getSingle_slide_id(), broadcastVO);
         } else {
-            NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
+            NioWebSocketHandler.sendAll(req.getSlide_id(), broadcastVO);
         }
 
         if (req.getSingle_slide_id() == null) {
