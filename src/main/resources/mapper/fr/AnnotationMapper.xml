@@ -122,9 +122,8 @@
 
     <select id="getArea" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
-        select ST_LengthSpheroid(st_geomfromgeojson(#{contour}),
-                                 'SPHEROID["WGS 84",6378137,298.257223563]') as perimeter,
-               ST_Area(st_geomfromgeojson(#{contour}))                       as area
+        select ST_Perimeter(st_geomfromgeojson(#{contour})) as perimeter,
+               ST_Area(st_geomfromgeojson(#{contour})) as area
     </select>
 
     <select id="getOrganArea" parameterType="cn.staitech.fr.domain.Annotation"
