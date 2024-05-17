@@ -1,4 +1,4 @@
-package cn.staitech.fr.service.strategy.json.impl;
+package cn.staitech.fr.service.strategy.json.impl.digestive;
 
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;

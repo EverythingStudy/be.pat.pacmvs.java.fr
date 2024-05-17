@@ -1,4 +1,4 @@
-package cn.staitech.fr.service.strategy.json.impl;
+package cn.staitech.fr.service.strategy.json.impl.digestive;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;

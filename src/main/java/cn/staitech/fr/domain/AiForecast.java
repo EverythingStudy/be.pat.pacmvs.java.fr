@@ -69,6 +69,11 @@ public class AiForecast implements Serializable {
     @ApiModelProperty(name = "unit" , value = "单位")
     private String unit;
 
+    @ApiModelProperty("结构指标类别\n" +
+            "0：产品呈现指标\n" +
+            "1：算法输出指标")
+    private String structType;
+
 
 
     @TableField(exist = false)
