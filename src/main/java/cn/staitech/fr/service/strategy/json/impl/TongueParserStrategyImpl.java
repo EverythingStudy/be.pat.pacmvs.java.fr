@@ -1,13 +1,17 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.SingleSlide;
+import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +40,9 @@ public class TongueParserStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
     private CommonJsonParser commonJsonParser;
 
+    @Resource
+    private SingleSlideMapper singleSlideMapper;
+
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -56,8 +63,11 @@ public class TongueParserStrategyImpl extends AbstractCustomParserStrategy {
         aiForecast.setQuantitativeIndicatorsEn("Tongue area");
         aiForecast.setUnit("平方毫米");
         aiForecast.setSingleSlideId(jsonTask.getSingleId());
-        BigDecimal area = areaUtils.getOrganArea(jsonTask, "10D12E");
-        aiForecast.setResults(area.setScale(3, RoundingMode.HALF_UP).toString());
+        //组织轮廓面积
+        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+        if(ObjectUtil.isNotEmpty(singleSlide)&& StringUtils.isNotEmpty(singleSlide.getArea())){
+            aiForecast.setResults(singleSlide.getArea());
+        }
         insertEntity.add(aiForecast);
         aiForecastService.saveBatch(insertEntity);
 

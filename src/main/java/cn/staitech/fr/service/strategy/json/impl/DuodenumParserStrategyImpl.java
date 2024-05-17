@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
@@ -10,10 +11,12 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +60,9 @@ public class DuodenumParserStrategyImpl extends AbstractCustomParserStrategy {
         aiForecast.setQuantitativeIndicators("十二指肠面积");
         aiForecast.setQuantitativeIndicatorsEn("Duodenum area");
         aiForecast.setUnit("平方毫米");
-        aiForecast.setResults(singleSlide.getArea());
+        if(ObjectUtil.isNotEmpty(singleSlide)&& StringUtils.isNotEmpty(singleSlide.getArea())){
+            aiForecast.setResults(singleSlide.getArea());
+        }
         aiForecast.setSingleSlideId(jsonTask.getSingleId());
         aiForecast.setCreateTime(DateUtil.now());
         insertEntity.add(aiForecast);
