@@ -300,6 +300,7 @@
                contour_type,
                single_slide_id,
                single,
+               ST_AsGeoJSON(contour40000) AS contour,
                ST_AsGeoJSON(contour40000) AS contour40000,
                ST_AsGeoJSON(contour10000) AS contour10000,
                ST_AsGeoJSON(contour2500)  AS contour2500,
