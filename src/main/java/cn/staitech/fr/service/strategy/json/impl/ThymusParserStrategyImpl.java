@@ -4,6 +4,8 @@ import cn.hutool.core.date.DateUtil;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.SingleSlide;
+import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -44,37 +47,10 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Map<String, Long> pathologicalMap = commonJsonParser.getPathologicalMap(jsonTask.getOrganizationId());
-        //定位表
-        Long sequenceNumber = commonJsonParser.getSequenceNumber(jsonTask.getSpecialId());
-
-        Annotation annotation = new Annotation();
-        annotation.setSingleSlideId(jsonTask.getSingleId());
-        annotation.setCategoryId(pathologicalMap.get("14403D"));
-        annotation.setSequenceNumber(sequenceNumber);
-        Annotation structureArea = annotationMapper.getStructureArea(annotation);
-        if (structureArea==null){
-            return;
-        }
-        BigDecimal bigDecimalB = new BigDecimal(0);
-        //查询切片缩放
-        String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
-        if (StringUtils.isEmpty(resolution)) {
-            resolution = "0.262";
-        }
-        if (StringUtils.isNotEmpty(resolution) && StringUtils.isNotEmpty(structureArea.getArea())) {
-            BigDecimal bigDecimal = new BigDecimal(resolution);
-            BigDecimal bigDecimal1 = new BigDecimal(structureArea.getArea());
-            bigDecimalB = bigDecimal1.multiply(bigDecimal).multiply(bigDecimal).multiply(new BigDecimal(0.000001).setScale(3));
-        }
-        AiForecast aiForecast = new AiForecast();
-        aiForecast.setQuantitativeIndicators("胸腺面积");
-        aiForecast.setQuantitativeIndicatorsEn("Thymus area (all)");
-        aiForecast.setUnit("平方毫米");
-        aiForecast.setSingleSlideId(jsonTask.getSingleId());
-        aiForecast.setCreateTime(DateUtil.now());
-        aiForecast.setResults(bigDecimalB.toString());
-        aiForecastService.save(aiForecast);
+        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+        indicatorResultsMap.put("胸腺面积", new IndicatorAddIn("Thymus Gland area%", singleSlide.getArea(), "平方毫米"));
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 
     @Override
