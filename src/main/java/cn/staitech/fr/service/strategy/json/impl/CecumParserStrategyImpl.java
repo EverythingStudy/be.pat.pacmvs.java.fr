@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
@@ -24,13 +25,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @Author wudi
+ * @Author
  * @Date 2024/5/13 10:05
- * @desc 精囊腺
+ * @desc 大鼠结肠
  */
 @Slf4j
-@Component("Seminal_vesicles")
-public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserStrategy {
+@Component("Cecum")
+public class CecumParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
@@ -48,70 +49,48 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
-        log.info("SeminalVesicleGlandParserStrategyImpl init");
+        log.info("CecumParserStrategyImpl init");
     }
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        log.info("精囊腺结构指标计算开始");
-
+        log.info("大鼠盲肠结构指标计算开始");
         QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
         // 查询所有未被删除且登录机构相同的数据
         qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
         List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
         Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
-        //定位表
         QueryWrapper<SpecialAnnotationRel> wrapper = new QueryWrapper<>();
         wrapper.eq("special_id", jsonTask.getSpecialId());
         SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(wrapper);
         Long sequenceNumber = annotationRel.getSequenceNumber();
-
-        //组织轮廓面积
-        List<AiForecast> insertEntity = new ArrayList<>();
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        //面积
+        String area = ObjectUtil.isNotEmpty(singleSlide) ? singleSlide.getArea() : "0";
+        List<AiForecast> insertEntity = new ArrayList<>();
         AiForecast aiForecast = new AiForecast();
-        aiForecast.setQuantitativeIndicators("精囊腺面积");
-        aiForecast.setQuantitativeIndicatorsEn("Seminal vesicle area");
+        aiForecast.setQuantitativeIndicators("盲肠面积");
+        aiForecast.setQuantitativeIndicatorsEn("Cecum area");
         aiForecast.setUnit("平方毫米");
-        aiForecast.setResults(singleSlide.getArea());
         aiForecast.setSingleSlideId(jsonTask.getSingleId());
         aiForecast.setCreateTime(DateUtil.now());
+        if (ObjectUtil.isNotEmpty(pathologicalMap.get("114156"))) {
+            Annotation annotation = new Annotation();
+            annotation.setSingleSlideId(jsonTask.getSingleId());
+            annotation.setCategoryId(pathologicalMap.get("114156"));
+            annotation.setSequenceNumber(sequenceNumber);
+            Annotation structureArea = annotationMapper.getStructureArea(annotation);
+            String area1 = StringUtils.isNotEmpty(structureArea.getArea()) ? structureArea.getArea() : "0";
+            BigDecimal area2 = new BigDecimal(area1);
+            BigDecimal decimal = new BigDecimal(area).subtract(area2).setScale(3, RoundingMode.HALF_UP);
+            aiForecast.setResults(decimal.toString());
+        }
         insertEntity.add(aiForecast);
-        //腺上皮面积（全片）
-        //查询切片缩放
-        String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
-        BigDecimal bigDecimal = new BigDecimal("0.262");
-        //计算结构面积
-        Annotation annotation = new Annotation();
-        annotation.setSingleSlideId(jsonTask.getSingleId());
-        annotation.setCategoryId(pathologicalMap.get("12D074"));
-        annotation.setSequenceNumber(sequenceNumber);
-        Annotation structureArea = annotationMapper.getStructureArea(annotation);
-
-        AiForecast aiForecast1 = new AiForecast();
-        aiForecast1.setQuantitativeIndicators("腺上皮面积（全片）");
-        aiForecast1.setQuantitativeIndicatorsEn("Acinar epithelial area (all)");
-        aiForecast1.setUnit("平方毫米");
-        aiForecast1.setSingleSlideId(jsonTask.getSingleId());
-        aiForecast1.setCreateTime(DateUtil.now());
-        if (StringUtils.isNotEmpty(resolution)) {
-            bigDecimal = new BigDecimal(resolution);
-        }
-        if (StringUtils.isNotEmpty(structureArea.getArea())) {
-            BigDecimal bigDecimal1 = new BigDecimal(structureArea.getArea());
-            BigDecimal multiply = bigDecimal1.multiply(bigDecimal).multiply(bigDecimal).multiply(new BigDecimal(0.000001)).setScale(3, RoundingMode.HALF_UP);
-            aiForecast1.setResults(multiply.toString());
-
-        }
-        insertEntity.add(aiForecast1);
-
         aiForecastService.saveBatch(insertEntity);
 
     }
 
     @Override
     public String getAlgorithmCode() {
-        return "Seminal_vesicles";
+        return "Cecum";
     }
 }
