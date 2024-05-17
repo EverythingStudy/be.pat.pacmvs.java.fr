@@ -298,9 +298,18 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             annotation.setContour(String.valueOf(req.getGeometry()));
         }
         SingleSlide singleSlide = singleSlideMapper.selectById(req.getSingleSlideId());
+        if(singleSlide == null){
+            return new ArrayList<>();
+        }
         Slide slide = slideMapper.selectById(singleSlide.getSlideId());
+        if(slide == null){
+            return new ArrayList<>();
+        }
         LambdaQueryWrapper<SpecialAnnotationRel> queryWrapper = new LambdaQueryWrapper<SpecialAnnotationRel>().eq(SpecialAnnotationRel::getSpecialId, slide.getSpecialId());
         SpecialAnnotationRel specialAnnotationRel = specialAnnotationRelMapper.selectOne(queryWrapper);
+        if(specialAnnotationRel == null){
+            return new ArrayList<>();
+        }
         annotation.setSequenceNumber(specialAnnotationRel.getSequenceNumber());
         List<Annotation> annotationList = annotationMapper.aiSelectListBy(annotation);
         List<Features> annoList = getFeaturesList(annotationList);
