@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,15 +45,41 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
         log.info("颌下淋巴结指标计算开始…… {}", jsonTask);
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-        // 生发中心数量	1	个	 Number of germinal center	1=A  148051
-        Integer count = commonJsonParser.getOrganAreaCount(jsonTask, "148051");
+        //        颌下淋巴结
+        //
+        //        结构	编码
+        //        淋巴滤泡	148050
+        //        生发中心	148051
+        //        髓质	14803E
+        //        组织轮廓	148111
 
+        //        算法输出指标	指标代码（仅限本文档）	单位（保留3位小数）	备注
+        //        生发中心数量	A	个
+        //        生发中心面积（全片）	B	平方毫米	数据相加输出
+        //        髓质面积	C	平方毫米
+        //        组织轮廓面积	D	平方毫米
+        //
+        //        产品呈现指标	指标代码（仅限本文档）	单位（保留3位小数）	English	计算方式	备注
+        //        生发中心数量	1	个	 Number of germinal center	1=A
+        //        生发中心占比	2	%	Germinal center area%	2=B/D
+        //        髓质占比	3	%	Medulla area%	3=C/D
+        //        皮质和副皮质占比	4	%	Cortex and paracortex area%	4=（D-C）/D
+        //        淋巴结面积	5	平方毫米	Lymph node area	5=D
+
+        // 生发中心数量	1	个	 Number of germinal center	1=A  147051
+        Integer count = commonJsonParser.getOrganAreaCount(jsonTask, "148051");
+        // 生发中心面积（全片）	B	平方毫米	数据相加输出
+        BigDecimal germinalCenterArea = commonJsonParser.getOrganArea(jsonTask, "148051");
+        // 髓质面积	C	平方毫米
+        BigDecimal medullaArea = commonJsonParser.getOrganArea(jsonTask, "14803E");
         // 5=D:淋巴结面积-平方毫米
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
 
-        indicatorResultsMap.put("生发中心数量", new IndicatorAddIn(" Number of germinal center", count.toString(), "个"));
-        indicatorResultsMap.put("淋巴结面积", new IndicatorAddIn("Lymph node area", accurateArea, "平方毫米"));
+        indicatorResultsMap.put("生发中心数量", new IndicatorAddIn("Number of germinal center", count.toString(), "个"));
+        indicatorResultsMap.put("生发中心面积（全片）", new IndicatorAddIn("Number of germinal center", germinalCenterArea.toString(), "平方毫米"));
+        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("Medulla area", medullaArea.toString(), "平方毫米"));
+        indicatorResultsMap.put("组织轮廓面积（颌下淋巴结面积）", new IndicatorAddIn("Lymph node area", accurateArea, "平方毫米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
