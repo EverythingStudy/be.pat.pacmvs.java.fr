@@ -84,7 +84,8 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
         BigDecimal bigDecimal = new BigDecimal("0.262");
         //计算结构面积
         Annotation annotation = new Annotation();
-        annotation.setSingleSlideId(jsonTask.getSingleId());
+        //annotation.setSingleSlideId(jsonTask.getSingleId());
+        annotation.setSlideId(jsonTask.getSlideId());
         annotation.setCategoryId(pathologicalMap.get("12D074"));
         annotation.setSequenceNumber(sequenceNumber);
         Annotation structureArea = annotationMapper.getStructureArea(annotation);
