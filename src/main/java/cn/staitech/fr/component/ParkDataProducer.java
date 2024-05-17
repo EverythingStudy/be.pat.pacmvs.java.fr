@@ -2,8 +2,11 @@ package cn.staitech.fr.component;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+
 /**
  * @author mugw
  * @version 1.0
@@ -15,17 +18,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class ParkDataProducer {
 
-    private final RabbitTemplate rabbitTemplate;
+    @Value("${queues.algoMsg:algo.message.queue}")
+    private String ALGO_MSG_QUEUE;
 
-    @Autowired
-    public ParkDataProducer(RabbitTemplate rabbitTemplate) {
-        this.rabbitTemplate = rabbitTemplate;
-    }
+    @Resource
+    private  RabbitTemplate rabbitTemplate;
 
     public void sendMessage(String message) {
 
         // 设置消息属性，如需持久化可以设置消息类型为AMQP.BasicProperties.Type.PERSISTENT_TEXT_PLAIN
-        rabbitTemplate.convertAndSend("parkdata", message);
+        rabbitTemplate.convertAndSend(ALGO_MSG_QUEUE, message);
         log.info("生产者发送消息成功: " + message);
     }
 }
