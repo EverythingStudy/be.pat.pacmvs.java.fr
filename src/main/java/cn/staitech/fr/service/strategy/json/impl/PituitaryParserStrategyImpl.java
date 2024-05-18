@@ -1,22 +1,22 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.staitech.fr.domain.AiForecast;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
+import org.springframework.stereotype.Component;
+
 import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.SingleSlide;
+import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author wanglibei
@@ -28,59 +28,93 @@ import java.util.Map;
 @Slf4j
 @Component("Pituitary")
 public class PituitaryParserStrategyImpl extends AbstractCustomParserStrategy {
-    @Resource
-    private SingleSlideMapper singleSlideMapper;
-    @Resource
-    private AiForecastService aiForecastService;
-    @Resource
-    private CommonJsonParser commonJsonParser;
+	@Resource
+	private SingleSlideMapper singleSlideMapper;
+	@Resource
+	private AiForecastService aiForecastService;
+	@Resource
+	private CommonJsonParser commonJsonParser;
 
-    @PostConstruct
-    public void init() {
-        setCommonJsonParser(commonJsonParser);
-        log.info("PituitaryParserStrategyImpl init");
-    }
+	@PostConstruct
+	public void init() {
+		setCommonJsonParser(commonJsonParser);
+		log.info("PituitaryParserStrategyImpl init");
+	}
 
-    @Override
-    public void alculationIndicators(JsonTask jsonTask) {
+	@Override
+	public void alculationIndicators(JsonTask jsonTask) {
 
-        log.info("大鼠垂体构指标计算开始");
-        // 查询所有未被删除且登录机构相同的数据
-        Map<String, Long> pathologicalMap = commonJsonParser.getPathologicalMap(jsonTask.getOrganizationId());
+		log.info("大鼠垂体构指标计算开始");
 
-//		神经部:	10607F
-//		神经部细胞核（胶质细胞）:	106080
-//		中间部:	106081
-//		中间部细胞核:（嫌色细胞或嗜碱性细胞）	106082
-//		远侧部:	106083
-//		远侧部细胞核（嗜酸性细胞、嗜碱性细胞、嫌色细胞）:	106084
-//		红细胞:	106004
-//		组织轮廓	:106111
+		// 神经部: 10607F
+		// 神经部细胞核（胶质细胞）: 106080
+		// 中间部: 106081
+		// 中间部细胞核:（嫌色细胞或嗜碱性细胞） 106082
+		// 远侧部: 106083
+		// 远侧部细胞核（嗜酸性细胞、嗜碱性细胞、嫌色细胞）: 106084
+		// 红细胞: 106004
+		// 组织轮廓 :106111
 
-        List<AiForecast> insertEntity = new ArrayList<>();
+		// 神经部面积 A 平方毫米 若多个数据则相加输出
+		BigDecimal pituitaryA = commonJsonParser.getOrganArea(jsonTask, "10607F").getStructureAreaNum();
+		// 中间部面积 B 平方毫米 若多个数据则相加输出
+		BigDecimal pituitaryB = commonJsonParser.getOrganArea(jsonTask, "106081").getStructureAreaNum();
+		// 远侧部面积 C 平方毫米 若多个数据则相加输出
+		BigDecimal pituitaryC = commonJsonParser.getOrganArea(jsonTask, "106083").getStructureAreaNum();
+		// 红细胞面积 D 平方毫米 数据相加输出
+		BigDecimal pituitaryD = commonJsonParser.getOrganArea(jsonTask, "106004").getStructureAreaNum();
+		// 胸骨面积 ==>组织轮廓面积H
+		BigDecimal pituitaryH = commonJsonParser.getOrganArea(jsonTask, "106111").getStructureAreaNum();
 
-        //垂体面积 8=H
+		// 神经部细胞核数量 E 个 无
+		Integer mucosaCountE = commonJsonParser.getOrganAreaCount(jsonTask, "106080");
+		// 中间部细胞核数量 F 个 无
+		Integer mucosaCountF = commonJsonParser.getOrganAreaCount(jsonTask, "106082");
+		// 远侧部细胞核数量 G 个 无
+		Integer mucosaCountG = commonJsonParser.getOrganAreaCount(jsonTask, "106084");
 
-        //胸骨面积 ==>组织轮廓面积
-        if (ObjectUtil.isNotEmpty(pathologicalMap.get("106111"))) {
-            AiForecast aiForecast2 = new AiForecast();
-            aiForecast2.setQuantitativeIndicators("垂体面积");
-            aiForecast2.setQuantitativeIndicatorsEn("Pituitary gland area");
-            aiForecast2.setUnit("平方毫米");
-            SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-            if (StringUtils.isNotEmpty(singleSlide.getArea())) {
-                aiForecast2.setResults(singleSlide.getArea());
-            }
-            aiForecast2.setSingleSlideId(jsonTask.getSingleId());
-            insertEntity.add(aiForecast2);
-        }
+		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+		indicatorResultsMap.put("神经部面积", new IndicatorAddIn("", String.valueOf(pituitaryA), "平方毫米", "1"));
+		indicatorResultsMap.put("中间部面积", new IndicatorAddIn("", String.valueOf(pituitaryB), "平方毫米", "1"));
+		indicatorResultsMap.put("远侧部面积", new IndicatorAddIn("", String.valueOf(pituitaryC), "平方毫米", "1"));
+		indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", String.valueOf(pituitaryD), "平方毫米", "1"));
+		indicatorResultsMap.put("垂体面积", new IndicatorAddIn("", String.valueOf(pituitaryH), "平方毫米", "0"));
+
+		indicatorResultsMap.put("神经部细胞核数量", new IndicatorAddIn("", String.valueOf(mucosaCountE), "个", "1"));
+		indicatorResultsMap.put("中间部细胞核数量", new IndicatorAddIn("", String.valueOf(mucosaCountF), "个", "1"));
+		indicatorResultsMap.put("远侧部细胞核数量", new IndicatorAddIn("", String.valueOf(mucosaCountG), "个", "1"));
+
+		//		神经部面积占比	1	%	Pars nervosa area%	1=A/H
+		BigDecimal pituitaryA_H = pituitaryA.divide(pituitaryH).setScale(3, RoundingMode.HALF_UP);
+		indicatorResultsMap.put("神经部面积占比", new IndicatorAddIn("Pars nervosa area%", String.valueOf(pituitaryA_H), "%", "0"));
+		//				中间部面积占比	2	%	Pars intermedia area%	2=B/H
+		BigDecimal pituitaryB_H = pituitaryB.divide(pituitaryH).setScale(3, RoundingMode.HALF_UP);
+		indicatorResultsMap.put("中间部面积占比", new IndicatorAddIn("Pars intermedia area%", String.valueOf(pituitaryB_H), "%", "0"));
+		//				远侧部面积占比	3	%	Pars distalis area%	3=C/H
+		BigDecimal pituitaryC_H = pituitaryC.divide(pituitaryH).setScale(3, RoundingMode.HALF_UP);
+		indicatorResultsMap.put("远侧部面积占比", new IndicatorAddIn("Pars distalis area%", String.valueOf(pituitaryC_H), "%", "0"));
+		//		
+		//				红细胞面积占比	4	%	Erythrocyte area%	4=D/H
+		BigDecimal pituitaryD_H = pituitaryD.divide(pituitaryH).setScale(3, RoundingMode.HALF_UP);
+		indicatorResultsMap.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", String.valueOf(pituitaryD_H), "%", "0"));
+		//				神经部细胞核密度	5	个/平方毫米	Nucleus density of pars nervosa	5=E/A
+		BigDecimal pituitaryE_A = new BigDecimal(mucosaCountE).divide(pituitaryA).setScale(3, RoundingMode.HALF_UP);
+		indicatorResultsMap.put("神经部细胞核密度", new IndicatorAddIn("Erythrocyte area pars nervosa", String.valueOf(pituitaryE_A), "个/平方毫米", "0"));
+		//		
+		//				中间部细胞核密度	6	个/平方毫米	Nucleus density of pars intermedia	6=F/B
+		BigDecimal pituitaryF_B = new BigDecimal(mucosaCountF).divide(pituitaryB).setScale(3, RoundingMode.HALF_UP);
+		indicatorResultsMap.put("中间部细胞核密度", new IndicatorAddIn("Nucleus density of pars intermedi", String.valueOf(pituitaryF_B), "个/平方毫米", "0"));
+		//				远侧部细胞核密度	7	个/平方毫米	Nucleus density of 7=G/C
+		BigDecimal pituitaryG_C = new BigDecimal(mucosaCountG).divide(pituitaryC).setScale(3, RoundingMode.HALF_UP);
+		indicatorResultsMap.put("远侧部细胞核密度", new IndicatorAddIn("Nucleus density of pars distalis", String.valueOf(pituitaryG_C), "个/平方毫米", "0"));
 
 
-        aiForecastService.saveBatch(insertEntity);
-    }
 
-    @Override
-    public String getAlgorithmCode() {
-        return "Pituitary";
-    }
+		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+	}
+
+	@Override
+	public String getAlgorithmCode() {
+		return "Pituitary";
+	}
 }
