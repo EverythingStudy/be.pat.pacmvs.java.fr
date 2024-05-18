@@ -54,7 +54,7 @@ public class BrainParserStrategyImpl implements ParserStrategy {
         //        算法输出指标	指标代码（仅限本文档）	单位（保留小数点后3位）	备注
         //        脉络丛面积	A	平方毫米	无
         Annotation choroidOPlexusAreaAnnotation = commonJsonParser.getOrganArea(jsonTask, "13209C");
-        // TODO:需先判断血管与红细胞的关系，再进行面积计算，本期暂不计算
+        //          TODO:需先判断血管与红细胞的关系，再进行面积计算，本期暂不计算
         //        血管外红细胞面积	B	103平方微米	无
         //        血管内红细胞面积	C	平方毫米	无
         //        大脑面积	D	平方毫米	无
@@ -69,7 +69,7 @@ public class BrainParserStrategyImpl implements ParserStrategy {
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
 
-        indicatorResultsMap.put("脉络丛面积", new IndicatorAddIn("Choroid Plexus area", choroidOPlexusAreaAnnotation.getArea(), "平方毫米"));
+        indicatorResultsMap.put("脉络丛面积", new IndicatorAddIn("Choroid Plexus area", choroidOPlexusAreaAnnotation.getStructureAreaNum().toString(), "平方毫米"));
         indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", "", "10³平方微米"));
         indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", "", "平方毫米"));
         indicatorResultsMap.put("大脑面积", new IndicatorAddIn("Brain area", accurateArea, "平方毫米"));
