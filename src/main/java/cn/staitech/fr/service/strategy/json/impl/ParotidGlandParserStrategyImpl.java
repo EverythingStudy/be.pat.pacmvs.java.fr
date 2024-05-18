@@ -27,7 +27,8 @@ public class ParotidGlandParserStrategyImpl extends AbstractCustomParserStrategy
     private AiForecastService aiForecastService;
     @Resource
     private CommonJsonParser commonJsonParser;
-
+    @Resource
+    private AreaUtils areaUtils;
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -41,8 +42,6 @@ public class ParotidGlandParserStrategyImpl extends AbstractCustomParserStrategy
         indicatorResultsMap.put("血管面积占比", new IndicatorAddIn("Vessel area%", "", "%"));
         indicatorResultsMap.put("导管面积占比", new IndicatorAddIn("Ducts area%", "", "%"));
         */
-
-        AreaUtils areaUtils = new AreaUtils();
 
         // D组织轮廓-平方毫米
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
