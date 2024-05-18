@@ -234,7 +234,7 @@ public class CommonJsonParser {
             }).filter(Objects::nonNull).collect(Collectors.toList());
 
             anno.setList(processedAnnotations);
-            annotationService.batchProcessAndSave(anno, 1000);
+            annotationService.batchProcessAndSave(anno, 500);
             Annotation annotation = new Annotation();
             annotation.setMagnification(40000L);
             annotation.setFiligreeContour(true);
