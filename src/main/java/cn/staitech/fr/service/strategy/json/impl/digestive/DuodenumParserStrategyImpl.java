@@ -1,24 +1,23 @@
 package cn.staitech.fr.service.strategy.json.impl.digestive;
 
-import cn.hutool.core.date.DateUtil;
-import cn.hutool.core.util.ObjectUtil;
-import cn.staitech.fr.domain.AiForecast;
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
+import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author wudi
@@ -52,20 +51,14 @@ public class DuodenumParserStrategyImpl extends AbstractCustomParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("十二指肠结构面积计算：");
-        //组织轮廓面积
-        List<AiForecast> insertEntity = new ArrayList<>();
+        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        //面积
-        AiForecast aiForecast = new AiForecast();
-        aiForecast.setQuantitativeIndicators("十二指肠面积");
-        aiForecast.setQuantitativeIndicatorsEn("Duodenum area");
-        aiForecast.setUnit("平方毫米");
-        if(ObjectUtil.isNotEmpty(singleSlide)&& StringUtils.isNotEmpty(singleSlide.getArea())){
-            aiForecast.setResults(singleSlide.getArea());
-        }
-        aiForecast.setSingleSlideId(jsonTask.getSingleId());
-        aiForecast.setCreateTime(DateUtil.now());
-        insertEntity.add(aiForecast);
-        aiForecastService.saveBatch(insertEntity);
+        BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "11900C").getStructureAreaNum();
+        BigDecimal organArea1 = commonJsonParser.getOrganArea(jsonTask, "11901E").getStructureAreaNum();
+
+        indicatorResultsMap.put("十二指肠面积", new IndicatorAddIn("Duodenum area", singleSlide.getArea(), "平方毫米"));
+        indicatorResultsMap.put("肌层", new IndicatorAddIn("Muscular layer", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("黏膜上皮+固有层", new IndicatorAddIn("Mucosal epithelium+lamina propria", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 }
