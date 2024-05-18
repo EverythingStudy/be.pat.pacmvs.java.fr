@@ -76,7 +76,7 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		//        脂肪细胞面积	F	103平方微米	若输出结果为多个则相加
 		//        骨质面积	G	103平方微米	 负样本，辅助得到骨髓腔，若输出结果为多个则相加
 		//        组织轮廓面积	H	平方毫米	无
-
+		log.info("大鼠胸骨构指标计算开始-1");
 		//		骨髓腔面积	A
 		if (ObjectUtil.isNotEmpty(pathologicalMap.get("14E00E"))) {
 			Annotation annotation2 = new Annotation();
@@ -86,7 +86,7 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 			Integer result2 = annotationMapper.countDucts(annotation2);
 		}
 
-
+		log.info("大鼠胸骨构指标计算开始-2");
 		Integer resultC = 0;
 		//粒系细胞数量C 个
 		if (ObjectUtil.isNotEmpty(pathologicalMap.get("14E01A"))) {
@@ -96,7 +96,7 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 			annotation1.setSequenceNumber(sequenceNumber);
 			resultC = annotationMapper.countDucts(annotation1);
 		}
-		
+		log.info("大鼠胸骨构指标计算开始-3");
 		Integer resultB = 0;
 		//红系细胞核数量B 个
 		if (ObjectUtil.isNotEmpty(pathologicalMap.get("14E011"))) {
@@ -106,11 +106,7 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 			annotation2.setSequenceNumber(sequenceNumber);
 			resultB = annotationMapper.countDucts(annotation2);
 		}
-
-
-
-
-
+		log.info("大鼠胸骨构指标计算开始-4");
 		//粒红比  2=C/B
 
 		AiForecast aiForecast1 = new AiForecast();
@@ -119,9 +115,12 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		aiForecast1.setUnit("无");
 		aiForecast1.setSingleSlideId(jsonTask.getSingleId());
 		//保留小数点后3位
-		BigDecimal bigDecimalC = new BigDecimal(resultC);
-		BigDecimal bigDecimalB = new BigDecimal(resultB);
-		BigDecimal bigDecimal3 = bigDecimalC.divide(bigDecimalB, 3, RoundingMode.HALF_UP);
+		BigDecimal bigDecimal3 = new BigDecimal(0);
+		if(!resultC.equals(0)&& !resultB.equals(0)){
+			BigDecimal bigDecimalC = new BigDecimal(resultC);
+			BigDecimal bigDecimalB = new BigDecimal(resultB);
+			bigDecimal3 = bigDecimalC.divide(bigDecimalB, 3, RoundingMode.HALF_UP);
+		}
 		aiForecast1.setResults(bigDecimal3.toString());
 		insertEntity.add(aiForecast1);
 
@@ -137,8 +136,9 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		aiForecast2.setSingleSlideId(jsonTask.getSingleId());
 		insertEntity.add(aiForecast2);
 
-
+		log.info("大鼠胸骨构指标计算开始-5");
 		aiForecastService.saveBatch(insertEntity);
+		log.info("大鼠胸骨构指标计算开始-6");
 	}
 
 	@Override

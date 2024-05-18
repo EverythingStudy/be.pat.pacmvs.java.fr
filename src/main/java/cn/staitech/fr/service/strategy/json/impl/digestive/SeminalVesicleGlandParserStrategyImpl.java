@@ -4,7 +4,6 @@ import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
@@ -29,8 +28,6 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
 
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
-    @Resource
-    private AnnotationMapper annotationMapper;
     @Resource
     private SingleSlideMapper singleSlideMapper;
     @Resource

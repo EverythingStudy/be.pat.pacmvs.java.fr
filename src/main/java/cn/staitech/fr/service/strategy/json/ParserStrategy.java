@@ -10,7 +10,7 @@ import cn.staitech.fr.domain.JsonTask;
  */
 
 public interface ParserStrategy {
-    
+
     /**
      * 单个Json文件解析
      *

@@ -1,23 +1,17 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
-import cn.hutool.core.date.DateUtil;
-import cn.staitech.fr.domain.AiForecast;
-import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,8 +24,6 @@ import java.util.Map;
 @Slf4j
 @Service("Thymus")
 public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
-    @Resource
-    private AnnotationMapper annotationMapper;
     @Resource
     private SingleSlideMapper singleSlideMapper;
     @Resource

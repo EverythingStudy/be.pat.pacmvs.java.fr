@@ -56,26 +56,27 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
         // 查询所有未被删除且登录机构相同的数据
         Map<String, Long> pathologicalMap = commonJsonParser.getPathologicalMap(jsonTask.getOrganizationId());
         //定位表
-        Long sequenceNumber = commonJsonParser.getSequenceNumber(jsonTask.getSpecialId());
 
         //空腔	15D113  A     10³平方微米
         //组织轮廓	15D111  D   10³平方微米
 
         List<AiForecast> insertEntity = new ArrayList<>();
 
+        BigDecimal bigDecimalA = new BigDecimal(0);
+        BigDecimal bigDecimalB = new BigDecimal(0);
+        BigDecimal bigDecimalC = new BigDecimal(0);
         BigDecimal bigDecimalD = new BigDecimal(0);
         //组织轮廓面积 D 10³平方微米
         if (ObjectUtil.isNotEmpty(pathologicalMap.get("15D111"))) {
             SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
             if (StringUtils.isNotEmpty(singleSlide.getArea())) {
                 bigDecimalD = new BigDecimal(singleSlide.getArea());
+                bigDecimalC =  new BigDecimal(singleSlide.getPerimeter());
             }
         }
 
 
-        BigDecimal bigDecimalA = new BigDecimal(0);
-        BigDecimal bigDecimalB = new BigDecimal(0);
-        BigDecimal bigDecimalC = new BigDecimal(0);
+       
         //空腔面积 A 10³平方微米
         if (ObjectUtil.isNotEmpty(pathologicalMap.get("15D113"))) {
         	Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "15D113");
@@ -135,18 +136,18 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
             insertEntity.add(aiForecast2);
             
             //TODO 组织轮廓周长	C	毫米
-            /*AiForecast aiForecast2 = new AiForecast();
-            aiForecast2.setQuantitativeIndicators("主动脉壁面积");
-            aiForecast2.setUnit("10³平方微米");
-            aiForecast2.setSingleSlideId(jsonTask.getSingleId());
-            bigDecimalC = new BigDecimal(singleSlide.getArea());
-            aiForecast2.setResults(result.toString());
+            AiForecast aiForecast3 = new AiForecast();
+            aiForecast3.setQuantitativeIndicators("组织轮廓周长");
+            aiForecast3.setUnit("毫米");
+            aiForecast3.setSingleSlideId(jsonTask.getSingleId());
+//            bigDecimalC = commonJsonParser.getOrganArea(jsonTask, "15D111").getStructurePerimeterNum();
+            aiForecast3.setResults(bigDecimalC.toString());
           //结构指标类别0：产品呈现指标 1：算法输出指标
-            aiForecast1.setStructType("1");
-            insertEntity.add(aiForecast2);*/
+            aiForecast3.setStructType("1");
+            insertEntity.add(aiForecast3);
         }
         
-        //TODO 主动脉壁平均厚度	2	微米	Average thickness of aorta wall 	2=2*（D-A）/(B+C)
+        // 主动脉壁平均厚度	2	微米	Average thickness of aorta wall 	2=2*（D-A）/(B+C)
         AiForecast aiForecast2 = new AiForecast();
         aiForecast2.setQuantitativeIndicators("主动脉壁平均厚度");
         aiForecast2.setUnit("微米");
