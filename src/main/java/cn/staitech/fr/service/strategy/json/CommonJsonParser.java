@@ -320,7 +320,41 @@ public class CommonJsonParser {
         }
         return annotation;
     }
+    
+    /**
+     * 获取脏器轮廓面积（micron）
+     *
+     * @param jsonTask    jsonTask
+     * @param structureId 结构ID
+     * @return 脏器面积-10³平方微米
+     */
+    public BigDecimal getOrganAreaMicron(JsonTask jsonTask, String structureId) {
+        // 查询所有未被删除且登录机构相同的数据
+        Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
+        // 定位表
+        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
 
+        // 脏器轮廓信息
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(sequenceNumber);
+        annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
+        annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
+        Annotation structure = annotationMapper.getStructureArea(annotation);
+        if (null == structure || StringUtils.isEmpty(structure.getArea())) {
+            return BigDecimal.ZERO;
+        }
+
+        // 查询切片缩放
+        BigDecimal resolutionNum = new BigDecimal("0.262");
+        String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
+        if (StringUtils.isNotEmpty(resolution)) {
+            resolutionNum = new BigDecimal(resolution);
+        }
+
+        // 计算面积
+        BigDecimal structureAreaNum = new BigDecimal(structure.getArea());
+        return structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.001));
+    }
 
     /**
      * 取脏器轮廓数量
