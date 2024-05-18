@@ -27,6 +27,8 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
     private AiForecastService aiForecastService;
     @Resource
     private CommonJsonParser commonJsonParser;
+    @Resource
+    private AreaUtils areaUtils;
 
     @PostConstruct
     public void init() {
@@ -50,7 +52,6 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("间质面积占比", new IndicatorAddIn("Mesenchyme area%", "", "%"));
         indicatorResultsMap.put("间质细胞核密度", new IndicatorAddIn("Nucleus density of leydig cells", "", "个/平方毫米"));
         */
-        AreaUtils areaUtils = new AreaUtils();
 
         // J组织轮廓-平方毫米
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());

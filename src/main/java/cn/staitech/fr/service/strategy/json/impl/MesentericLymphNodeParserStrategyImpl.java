@@ -25,6 +25,8 @@ public class MesentericLymphNodeParserStrategyImpl extends AbstractCustomParserS
     private AiForecastService aiForecastService;
     @Resource
     private CommonJsonParser commonJsonParser;
+    @Resource
+    private AreaUtils areaUtils;
 
     @PostConstruct
     public void init() {
@@ -40,8 +42,6 @@ public class MesentericLymphNodeParserStrategyImpl extends AbstractCustomParserS
         indicatorResultsMap.put("髓质占比", new IndicatorAddIn("Medulla area%", "", "%"));
         indicatorResultsMap.put("皮质和副皮质占比", new IndicatorAddIn("Cortex and paracortex area%", "", "%"));
         */
-        AreaUtils areaUtils = new AreaUtils();
-
         // D组织轮廓-平方毫米
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
         // A生发中心数量

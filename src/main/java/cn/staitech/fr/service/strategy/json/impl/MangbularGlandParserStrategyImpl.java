@@ -27,6 +27,8 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
     private AiForecastService aiForecastService;
     @Resource
     private CommonJsonParser commonJsonParser;
+    @Resource
+    private AreaUtils areaUtils;
 
     @PostConstruct
     public void init() {
@@ -43,8 +45,6 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
         indicatorResultsMap.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", "", "%"));
         indicatorResultsMap.put("颗粒管面积占比（全片）", new IndicatorAddIn("Granular convoluted tubules area% (all)", "", "%"));
         */
-        AreaUtils areaUtils = new AreaUtils();
-
         // I组织轮廓-平方毫米
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
         // A颗粒管（红色）数量

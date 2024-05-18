@@ -25,6 +25,8 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
     private AiForecastService aiForecastService;
     @Resource
     private CommonJsonParser commonJsonParser;
+    @Resource
+    private AreaUtils areaUtils;
 
     @PostConstruct
     public void init() {
@@ -42,7 +44,6 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular erythrocyte area%", "", ""));
         indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", "", ""));
         */
-        AreaUtils areaUtils = new AreaUtils();
 
         // F精细轮廓总面积-平方毫米
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
