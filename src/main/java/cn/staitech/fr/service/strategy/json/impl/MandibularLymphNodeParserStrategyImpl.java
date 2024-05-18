@@ -52,6 +52,7 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
         //        生发中心	148051
         //        髓质	14803E
         //        组织轮廓	148111
+        //        14803E.json  148050.json  148051.json  148052.json
 
         //        算法输出指标	指标代码（仅限本文档）	单位（保留3位小数）	备注
         //        生发中心数量	A	个
