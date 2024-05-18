@@ -513,25 +513,11 @@
     <select id="getOrganArea" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
         SELECT
-        sum(ST_Area(contour40000)) AS area
+        sum(ST_Area(ST_Collect(contour40000))) AS area,
+        sum(ST_Perimeter(ST_Collect(contour40000))) AS perimeter
         from fr_annotation
         where single_slide_id = #{singleSlideId}
           and contour_type = 3
-    </select>
-
-    <select id="getStructureArea" parameterType="cn.staitech.fr.domain.Annotation"
-            resultMap="BaseResultMap">
-        SELECT
-        sum(cast(area as float8)) AS area,
-        sum(cast(perimeter as float8)) AS perimeter
-        from fr_ai_annotation_${sequenceNumber}
-        where category_id = #{categoryId}
-        <if test="singleSlideId != null">
-            AND single_slide_id = #{singleSlideId}
-        </if>
-        <if test="slideId != null">
-            AND slide_id = #{slideId}
-        </if>
     </select>
 
     <select id="getStructureArea" parameterType="cn.staitech.fr.domain.Annotation"
