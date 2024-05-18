@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.domain.out.*;
@@ -105,6 +106,9 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             forecast.setResults(indicator.getResult());
             forecast.setUnit(indicator.getUnit());
             forecast.setCreateTime(DateUtil.now());
+            if(StringUtils.isNotEmpty(indicator.getStruct_type())){
+                forecast.setStructType(indicator.getStruct_type());
+            }
             aiForecasts.add(forecast);
         }
         // 批量插入

@@ -2,6 +2,7 @@ package cn.staitech.fr.domain.in;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 指标信息类
@@ -19,5 +20,11 @@ public class IndicatorAddIn {
     // 单位
     private String unit;
 
+    private String struct_type;
 
+    public IndicatorAddIn(String englishName, String result, String unit) {
+        this.englishName = englishName;
+        this.result = result;
+        this.unit = unit;
+    }
 }

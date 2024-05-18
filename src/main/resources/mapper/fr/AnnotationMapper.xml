@@ -120,34 +120,6 @@
         1;
     </insert>
 
-    <select id="getArea" parameterType="cn.staitech.fr.domain.Annotation"
-            resultMap="BaseResultMap">
-        select ST_LengthSpheroid(st_geomfromgeojson(#{contour}),
-                                 'SPHEROID["WGS 84",6378137,298.257223563]') as perimeter,
-               ST_Area(st_geomfromgeojson(#{contour}))                       as area
-    </select>
-
-    <select id="getOrganArea" parameterType="cn.staitech.fr.domain.Annotation"
-            resultMap="BaseResultMap">
-        SELECT sum(ST_Area(contour40000)) AS area
-        from fr_annotation
-        where single_slide_id = #{singleSlideId}
-          and contour_type = 3
-    </select>
-
-    <select id="getStructureArea" parameterType="cn.staitech.fr.domain.Annotation"
-            resultMap="BaseResultMap">
-        SELECT sum(ST_Area(contour40000)) AS area
-        from fr_ai_annotation_${sequenceNumber}
-        where category_id = #{categoryId}
-        <if test="singleSlideId != null">
-            AND single_slide_id = #{singleSlideId}
-        </if>
-        <if test="slideId != null">
-            AND slide_id = #{slideId}
-        </if>
-    </select>
-
 
     <insert id="createTable" parameterType="cn.staitech.fr.domain.Annotation">
         CREATE TABLE "public".fr_ai_annotation_${sequenceNumber}
@@ -301,6 +273,7 @@
                contour_type,
                single_slide_id,
                single,
+               ST_AsGeoJSON(contour40000) AS contour,
                ST_AsGeoJSON(contour40000) AS contour40000,
                ST_AsGeoJSON(contour10000) AS contour10000,
                ST_AsGeoJSON(contour2500)  AS contour2500,
@@ -530,4 +503,33 @@
             AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = 'f'
         </if>
     </delete>
+
+    <select id="getArea" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        select ST_Perimeter(st_geomfromgeojson(#{contour})) as perimeter,
+               ST_Area(st_geomfromgeojson(#{contour})) as area
+    </select>
+
+    <select id="getOrganArea" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT sum(ST_Area(contour40000)) AS area
+        from fr_annotation
+        where single_slide_id = #{singleSlideId}
+          and contour_type = 3
+    </select>
+
+    <select id="getStructureArea" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT
+        sum(area) AS area,
+        sum(perimeter) AS perimeter,
+        from fr_ai_annotation_${sequenceNumber}
+        where category_id = #{categoryId}
+        <if test="singleSlideId != null">
+            AND single_slide_id = #{singleSlideId}
+        </if>
+        <if test="slideId != null">
+            AND slide_id = #{slideId}
+        </if>
+    </select>
 </mapper>

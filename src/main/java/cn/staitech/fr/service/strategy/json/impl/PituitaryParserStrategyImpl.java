@@ -3,14 +3,11 @@ package cn.staitech.fr.service.strategy.json.impl;
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.PathologicalIndicatorCategory;
 import cn.staitech.fr.domain.SingleSlide;
-import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -20,7 +17,6 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * @author wanglibei
@@ -32,8 +28,6 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component("Pituitary")
 public class PituitaryParserStrategyImpl extends AbstractCustomParserStrategy {
-    @Resource
-    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
     @Resource
     private SingleSlideMapper singleSlideMapper;
     @Resource
@@ -51,11 +45,8 @@ public class PituitaryParserStrategyImpl extends AbstractCustomParserStrategy {
     public void alculationIndicators(JsonTask jsonTask) {
 
         log.info("大鼠垂体构指标计算开始");
-        QueryWrapper<PathologicalIndicatorCategory> qw = new QueryWrapper<>();
         // 查询所有未被删除且登录机构相同的数据
-        qw.eq("del_flag", 0).eq("organization_id", jsonTask.getOrganizationId());
-        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(qw);
-        Map<String, Long> pathologicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+        Map<String, Long> pathologicalMap = commonJsonParser.getPathologicalMap(jsonTask.getOrganizationId());
 
 //		神经部:	10607F
 //		神经部细胞核（胶质细胞）:	106080

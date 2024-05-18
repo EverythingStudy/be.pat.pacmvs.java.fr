@@ -1,9 +1,10 @@
-package cn.staitech.fr.service.strategy.json.impl;
+package cn.staitech.fr.service.strategy.json.impl.digestive;
 
-import cn.hutool.core.date.DateUtil;
-import cn.staitech.fr.domain.AiForecast;
+
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
+import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
@@ -14,8 +15,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author wudi
@@ -50,18 +53,15 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("大鼠喉结构指标面积开始：");
-        //组织轮廓面积
-        List<AiForecast> insertEntity = new ArrayList<>();
+
+        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        //面积
-        AiForecast aiForecast = new AiForecast();
-        aiForecast.setQuantitativeIndicators("喉面积");
-        aiForecast.setQuantitativeIndicatorsEn("Larynx area");
-        aiForecast.setUnit("平方毫米");
-        aiForecast.setResults(singleSlide.getArea());
-        aiForecast.setSingleSlideId(jsonTask.getSingleId());
-        aiForecast.setCreateTime(DateUtil.now());
-        insertEntity.add(aiForecast);
-        aiForecastService.saveBatch(insertEntity);
+        BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "10E035").getStructureAreaNum();
+        BigDecimal organArea1 = commonJsonParser.getOrganArea(jsonTask, "10E133").getStructureAreaNum();
+
+        indicatorResultsMap.put("喉面积", new IndicatorAddIn("Larynx area", singleSlide.getArea(), "平方毫米"));
+        indicatorResultsMap.put("黏膜上皮面积", new IndicatorAddIn("Muscular layer", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("腺体面积", new IndicatorAddIn("Glandular area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 }

@@ -21,7 +21,7 @@ import java.util.Map;
  * 腮腺-PG
  */
 @Slf4j
-@Service("Adrenal_gland")
+@Service("Parotid_gland")
 public class ParotidGlandParserStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
     private AiForecastService aiForecastService;
@@ -59,6 +59,6 @@ public class ParotidGlandParserStrategyImpl extends AbstractCustomParserStrategy
 
     @Override
     public String getAlgorithmCode() {
-        return "Adrenal_gland";
+        return "Parotid_gland";
     }
 }

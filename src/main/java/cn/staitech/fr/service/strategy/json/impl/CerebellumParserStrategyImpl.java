@@ -41,6 +41,7 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
+        log.info("小脑指标计算开始…… {}", jsonTask);
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         indicatorResultsMap.put("小脑和脑干面积", new IndicatorAddIn("Cerebellum and Brainstem area", singleSlide.getArea(), "平方毫米"));

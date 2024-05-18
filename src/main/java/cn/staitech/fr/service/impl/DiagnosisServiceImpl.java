@@ -469,6 +469,13 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		BeanUtils.copyProperties(specialDiagnosisAbnormalVo, singleSlide);
 		singleSlide.setAbnormalCreateBy(currentUserId);
 		singleSlide.setAbnormalCreateTime(new Date());
+		//异常状态 0：取消 ；1：未见异常
+		if(specialDiagnosisAbnormalVo.getAbnormalStatus().equals("1")){
+			//人工诊断状态 0：未诊断；1：已诊断
+			singleSlide.setDiagnosisStatus("1");
+		}else{
+			singleSlide.setDiagnosisStatus("0");
+		}
 		singleSlideMapper.updateById(singleSlide);
 	}
 
