@@ -532,4 +532,42 @@
             AND slide_id = #{slideId}
         </if>
     </select>
+
+    <select id="getStructureArea" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT
+        sum(area) AS area,
+        sum(perimeter) AS perimeter,
+        from fr_ai_annotation_${sequenceNumber}
+        where category_id = #{categoryId}
+        <if test="singleSlideId != null">
+            AND single_slide_id = #{singleSlideId}
+        </if>
+        <if test="slideId != null">
+            AND slide_id = #{slideId}
+        </if>
+    </select>
+
+    <select id="getInsideOrOutside" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT
+        sum(area) AS area,
+        sum(perimeter) AS perimeter,
+        from fr_ai_annotation_${sequenceNumber}
+        where category_id = #{categoryId}
+        <if test="singleSlideId != null">
+            AND single_slide_id = #{singleSlideId}
+        </if>
+        <if test="contour != null">
+            AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = #{operation}
+        </if>
+    </select>
+
+
+    <select id="collectAiGeometry" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT st_asgeojson(ST_Collect(contour40000)) as collectContour
+        FROM fr_ai_annotation_${sequenceNumber}
+        WHERE single_slide_id = #{singleSlideId}
+          AND category_id = #{categoryId}
+    </select>
 </mapper>

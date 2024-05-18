@@ -71,6 +71,10 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     Annotation stIsValid(Annotation annotation);
 
     Integer deleteAiAnnotation(Annotation annotation);
+
+    Annotation getInsideOrOutside(Annotation annotation);
+
+    Annotation collectAiGeometry(Annotation annotation);
 }
 
 
