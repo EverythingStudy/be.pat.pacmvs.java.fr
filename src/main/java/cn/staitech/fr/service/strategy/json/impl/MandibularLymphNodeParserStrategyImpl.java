@@ -20,7 +20,7 @@ import java.util.Map;
 /**
  * @author: wangfeng
  * @create: 2024-05-10 14:18:48
- * @Description: Json Parser 颌下淋巴结
+ * @Description: Json Parser 颌下淋巴结 Mandibular_lymph_node
  */
 @Slf4j
 @Component("Mandibular_lymph_node")
@@ -67,7 +67,7 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
         //        淋巴结面积	5	平方毫米	Lymph node area	5=D
 
         // 生发中心数量	1	个	 Number of germinal center	1=A  147051
-        Integer count = commonJsonParser.getOrganAreaCount(jsonTask, "148051");
+        Integer germinalCenterCount = commonJsonParser.getOrganAreaCount(jsonTask, "148051");
         // 生发中心面积（全片）	B	平方毫米	数据相加输出
         BigDecimal germinalCenterArea = commonJsonParser.getOrganArea(jsonTask, "148051").getStructureAreaNum();
         // 髓质面积	C	平方毫米
@@ -76,10 +76,10 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
 
-        indicatorResultsMap.put("生发中心数量", new IndicatorAddIn("Number of germinal center", count.toString(), "个"));
-        indicatorResultsMap.put("生发中心面积（全片）", new IndicatorAddIn("Number of germinal center", germinalCenterArea.toString(), "平方毫米"));
-        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("Medulla area", medullaArea.toString(), "平方毫米"));
-        indicatorResultsMap.put("组织轮廓面积（颌下淋巴结面积）", new IndicatorAddIn("Lymph node area", accurateArea, "平方毫米"));
+        indicatorResultsMap.put("生发中心数量", new IndicatorAddIn("Number of germinal center", germinalCenterCount.toString(), "个"));
+        indicatorResultsMap.put("生发中心面积（全片）", new IndicatorAddIn("Number of germinal center", germinalCenterArea.toString(), "平方毫米", "1"));
+        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("Medulla area", medullaArea.toString(), "平方毫米", "1"));
+        indicatorResultsMap.put("淋巴结面积", new IndicatorAddIn("Lymph node area", accurateArea, "平方毫米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
