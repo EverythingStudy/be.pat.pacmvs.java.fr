@@ -107,10 +107,6 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 			resultB = annotationMapper.countDucts(annotation2);
 		}
 
-
-
-
-
 		//粒红比  2=C/B
 
 		AiForecast aiForecast1 = new AiForecast();
@@ -119,9 +115,12 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		aiForecast1.setUnit("无");
 		aiForecast1.setSingleSlideId(jsonTask.getSingleId());
 		//保留小数点后3位
-		BigDecimal bigDecimalC = new BigDecimal(resultC);
-		BigDecimal bigDecimalB = new BigDecimal(resultB);
-		BigDecimal bigDecimal3 = bigDecimalC.divide(bigDecimalB, 3, RoundingMode.HALF_UP);
+		BigDecimal bigDecimal3 = new BigDecimal(0);
+		if(!resultC.equals(0)&& !resultB.equals(0)){
+			BigDecimal bigDecimalC = new BigDecimal(resultC);
+			BigDecimal bigDecimalB = new BigDecimal(resultB);
+			bigDecimal3 = bigDecimalC.divide(bigDecimalB, 3, RoundingMode.HALF_UP);
+		}
 		aiForecast1.setResults(bigDecimal3.toString());
 		insertEntity.add(aiForecast1);
 
