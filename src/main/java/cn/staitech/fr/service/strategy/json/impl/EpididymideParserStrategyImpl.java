@@ -25,6 +25,8 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
     private AiForecastService aiForecastService;
     @Resource
     private CommonJsonParser commonJsonParser;
+    @Resource
+    private AreaUtils areaUtils;
 
     @PostConstruct
     public void init() {
@@ -45,8 +47,6 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         indicatorResultsMap.put("血管相对面积", new IndicatorAddIn("Vessel area%", "", "%"));
         indicatorResultsMap.put("黏膜上皮厚度（单个）", new IndicatorAddIn("Average thickness of mucosal epithelium (per)", "", "微米"));
         */
-        AreaUtils areaUtils = new AreaUtils();
-
         // J组织轮廓面积-平方毫米
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
 
