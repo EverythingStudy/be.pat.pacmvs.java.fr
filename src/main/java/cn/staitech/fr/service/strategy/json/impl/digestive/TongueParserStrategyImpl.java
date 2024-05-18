@@ -1,23 +1,22 @@
 package cn.staitech.fr.service.strategy.json.impl.digestive;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.staitech.fr.domain.AiForecast;
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
+import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
-import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author wudi
@@ -32,8 +31,7 @@ public class TongueParserStrategyImpl extends AbstractCustomParserStrategy {
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
     private AiForecastService aiForecastService;
-    @Autowired
-    private AreaUtils areaUtils;
+
     @Resource
     private CommonJsonParser commonJsonParser;
 
@@ -54,19 +52,19 @@ public class TongueParserStrategyImpl extends AbstractCustomParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("大鼠舌结构指标面积计算：");
-        List<AiForecast> insertEntity = new ArrayList<>();
-        AiForecast aiForecast = new AiForecast();
-        aiForecast.setQuantitativeIndicators("舌面积");
-        aiForecast.setQuantitativeIndicatorsEn("Tongue area");
-        aiForecast.setUnit("平方毫米");
-        aiForecast.setSingleSlideId(jsonTask.getSingleId());
         //组织轮廓面积
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        if(ObjectUtil.isNotEmpty(singleSlide)&& StringUtils.isNotEmpty(singleSlide.getArea())){
-            aiForecast.setResults(singleSlide.getArea());
-        }
-        insertEntity.add(aiForecast);
-        aiForecastService.saveBatch(insertEntity);
+        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        BigDecimal organArea = commonJsonParser.getOrganAreaMicron(jsonTask, "10D12E");
+        BigDecimal organArea1 = commonJsonParser.getOrganAreaMicron(jsonTask, "10D12F");
+        BigDecimal organArea2 = commonJsonParser.getOrganArea(jsonTask, "10D01C").getStructureAreaNum();
+
+
+        indicatorResultsMap.put("舌面积", new IndicatorAddIn("Tongue area", singleSlide.getArea(), "平方毫米"));
+        indicatorResultsMap.put("角质层面积", new IndicatorAddIn("Stratum corneum area", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("颗粒层+棘层+基底细胞层面积", new IndicatorAddIn("Nucleated cell layer area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("固有层+肌层面积", new IndicatorAddIn("Lamina propria and Muscularis area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 
     }
 }
