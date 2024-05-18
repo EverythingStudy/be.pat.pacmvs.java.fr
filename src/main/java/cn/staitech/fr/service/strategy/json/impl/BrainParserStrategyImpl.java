@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
@@ -69,9 +70,9 @@ public class BrainParserStrategyImpl implements ParserStrategy {
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
 
-        indicatorResultsMap.put("脉络丛面积", new IndicatorAddIn("Choroid Plexus area", choroidOPlexusAreaAnnotation.getStructureAreaNum().toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", "", "10³平方微米", "1"));
-        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", "", "平方毫米", "1"));
+        indicatorResultsMap.put("脉络丛面积", new IndicatorAddIn("Choroid Plexus area", choroidOPlexusAreaAnnotation.getStructureAreaNum().toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", "", "10³平方微米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", "", "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("大脑面积", new IndicatorAddIn("Brain area", accurateArea, "平方毫米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);

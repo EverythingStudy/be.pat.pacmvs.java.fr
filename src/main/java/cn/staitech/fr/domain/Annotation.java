@@ -150,10 +150,13 @@ public class Annotation implements Serializable {
     private Integer structureSize;
 
     @TableField(exist = false)
-    private BigDecimal structureAreaNum;
+    private BigDecimal structureAreaNum = BigDecimal.ZERO;
 
     @TableField(exist = false)
-    private BigDecimal structurePerimeterNum;
+    private BigDecimal structurePerimeterNum = BigDecimal.ZERO;
+
+    @TableField(exist = false)
+    private Boolean insideOrOutside;
 
 
 

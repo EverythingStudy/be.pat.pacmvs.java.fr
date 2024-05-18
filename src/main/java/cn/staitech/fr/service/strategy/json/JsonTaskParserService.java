@@ -121,28 +121,33 @@ public class JsonTaskParserService {
         // 修改任务状态
         jsonTask.setStatus(1);
         jsonTaskService.updateById(jsonTask);
-
-        for (JsonFile jsonFile : jsonFileList) {
-            ParserStrategy finalParser = parser;
-            log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++1");
-            log.info("++++parseJson:{} {} {}", jsonTask, jsonFile, finalParser);
-            log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++2");
-            finalParser.parseJson(jsonTask, jsonFile);
-//            commonJsonParser.parseJson(jsonTask, jsonFile);
-            log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++3");
+        
+        try{
+	        for (JsonFile jsonFile : jsonFileList) {
+	            ParserStrategy finalParser = parser;
+	            log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++1");
+	            log.info("++++parseJson:{} {} {}", jsonTask, jsonFile, finalParser);
+	            log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++2");
+	            finalParser.parseJson(jsonTask, jsonFile);
+	//            commonJsonParser.parseJson(jsonTask, jsonFile);
+	            log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++3");
+	        }
+	
+	//        annotation.setContour("1");
+	//        try {
+	//            annotationMapper.deleteAiAnnotation(annotation);
+	//        } catch (Exception e) {
+	//            log.error("deleteAiAnnotation error:------------------------------------------------------4");
+	//            log.error("deleteAiAnnotation error:{}", e.getMessage());
+	//        }
+	        log.info("------------------------------------------------------5");
+	        // 指标计算
+	        parser.alculationIndicators(jsonTask);
+	        log.info("------------------------------------------------------6");
+        }catch(Exception e){
+        	 log.info("------------------------------------------------------7");
+        	e.printStackTrace();
         }
-
-//        annotation.setContour("1");
-//        try {
-//            annotationMapper.deleteAiAnnotation(annotation);
-//        } catch (Exception e) {
-//            log.error("deleteAiAnnotation error:------------------------------------------------------4");
-//            log.error("deleteAiAnnotation error:{}", e.getMessage());
-//        }
-        log.info("------------------------------------------------------5");
-        // 指标计算
-        parser.alculationIndicators(jsonTask);
-        log.info("------------------------------------------------------6");
         // 修改任务状态
         jsonTask.setStatus(2);
         jsonTaskService.updateById(jsonTask);

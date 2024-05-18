@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
@@ -52,6 +53,7 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
         //        生发中心	148051
         //        髓质	14803E
         //        组织轮廓	148111
+        //        14803E.json  148050.json  148051.json  148052.json
 
         //        算法输出指标	指标代码（仅限本文档）	单位（保留3位小数）	备注
         //        生发中心数量	A	个
@@ -77,8 +79,8 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
         String accurateArea = singleSlide.getArea();
 
         indicatorResultsMap.put("生发中心数量", new IndicatorAddIn("Number of germinal center", germinalCenterCount.toString(), "个"));
-        indicatorResultsMap.put("生发中心面积（全片）", new IndicatorAddIn("Number of germinal center", germinalCenterArea.toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("Medulla area", medullaArea.toString(), "平方毫米", "1"));
+        indicatorResultsMap.put("生发中心面积（全片）", new IndicatorAddIn("Number of germinal center", germinalCenterArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("Medulla area", medullaArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("淋巴结面积", new IndicatorAddIn("Lymph node area", accurateArea, "平方毫米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
