@@ -56,6 +56,9 @@ public class SingleSlide implements Serializable {
     @ApiModelProperty(value = "精细轮廓总面积")
     private String area;
 
+    @ApiModelProperty(value = "精细轮廓总周长")
+    private String perimeter;
+
     @ApiModelProperty(value = "精轮廓分析状态")
     private Integer aiStatusFine;
 
