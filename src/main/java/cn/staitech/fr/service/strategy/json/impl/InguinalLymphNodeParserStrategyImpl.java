@@ -48,6 +48,7 @@ public class InguinalLymphNodeParserStrategyImpl implements ParserStrategy {
         //        生发中心	147051
         //        髓质	14703E
         //        组织轮廓	147111
+        //        14703E.json  147050.json  147051.json  147052.json (皮质与副皮质区域)
 
         //        算法输出指标	指标代码（仅限本文档）	单位（保留3位小数）	备注
         //        生发中心数量	A	个
@@ -66,7 +67,7 @@ public class InguinalLymphNodeParserStrategyImpl implements ParserStrategy {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
         // 生发中心数量	1	个	 Number of germinal center	1=A  147051
-        Integer count = commonJsonParser.getOrganAreaCount(jsonTask, "147051");
+        Integer germinalCenterCount = commonJsonParser.getOrganAreaCount(jsonTask, "147051");
         // 生发中心面积（全片）	B	平方毫米	数据相加输出
         BigDecimal germinalCenterArea = commonJsonParser.getOrganArea(jsonTask, "147051").getStructureAreaNum();
         // 髓质面积	C	平方毫米
@@ -75,10 +76,10 @@ public class InguinalLymphNodeParserStrategyImpl implements ParserStrategy {
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
 
-        indicatorResultsMap.put("生发中心数量", new IndicatorAddIn("Number of germinal center", count.toString(), "个"));
-        indicatorResultsMap.put("生发中心面积（全片）", new IndicatorAddIn("Number of germinal center", germinalCenterArea.toString(), "平方毫米"));
-        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("Medulla area", medullaArea.toString(), "平方毫米"));
-        indicatorResultsMap.put("组织轮廓面积（淋巴结面积）", new IndicatorAddIn("Lymph node area", accurateArea, "平方毫米"));
+        indicatorResultsMap.put("生发中心数量", new IndicatorAddIn("Number of germinal center", germinalCenterCount.toString(), "个"));
+        indicatorResultsMap.put("生发中心面积（全片）", new IndicatorAddIn("Number of germinal center", germinalCenterArea.toString(), "平方毫米", "1"));
+        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("Medulla area", medullaArea.toString(), "平方毫米", "1"));
+        indicatorResultsMap.put("淋巴结面积", new IndicatorAddIn("Lymph node area", accurateArea, "平方毫米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
