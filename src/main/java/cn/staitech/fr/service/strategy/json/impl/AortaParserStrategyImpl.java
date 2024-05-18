@@ -74,22 +74,40 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 
 
         BigDecimal bigDecimalA = new BigDecimal(0);
-        //空腔面积 D 10³平方微米
+        BigDecimal bigDecimalB = new BigDecimal(0);
+        BigDecimal bigDecimalC = new BigDecimal(0);
+        //空腔面积 A 10³平方微米
         if (ObjectUtil.isNotEmpty(pathologicalMap.get("15D113"))) {
-            Annotation annotation1 = new Annotation();
-            annotation1.setSingleSlideId(jsonTask.getSingleId());
-            annotation1.setCategoryId(pathologicalMap.get("15D113"));
-            annotation1.setSequenceNumber(sequenceNumber);
-            Annotation structureArea = annotationMapper.getStructureArea(annotation1);
-            if (StringUtils.isNotEmpty(structureArea.getArea())) {
-                bigDecimalA = new BigDecimal(structureArea.getArea());
+        	Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "15D113");
+        	bigDecimalA = commonJsonParser.getOrganAreaMicron(jsonTask, "15D113");
+            AiForecast aiForecast1 = new AiForecast();
+            aiForecast1.setQuantitativeIndicators("空腔面积");
+            aiForecast1.setUnit("10³平方微米");
+            aiForecast1.setSingleSlideId(jsonTask.getSingleId());
+            aiForecast1.setResults(bigDecimalA.toString());
+          //结构指标类别0：产品呈现指标 1：算法输出指标
+            aiForecast1.setStructType("1");
+            insertEntity.add(aiForecast1);
+            
+            //空腔周长	B	毫米
+            if (StringUtils.isNotEmpty(annotation.getPerimeter())) {
+            	bigDecimalB = new BigDecimal(annotation.getPerimeter());
+            	AiForecast aiForecast2 = new AiForecast();
+            	aiForecast2.setQuantitativeIndicators("空腔周长");
+            	aiForecast2.setUnit("毫米");
+            	aiForecast2.setSingleSlideId(jsonTask.getSingleId());
+            	aiForecast2.setResults(bigDecimalB.toString());
+            	//结构指标类别0：产品呈现指标 1：算法输出指标
+            	aiForecast2.setStructType("1");
+            	insertEntity.add(aiForecast2);
             }
+            
+            
         }
 
         //主动脉壁面积  1=D-A
 
         if (null != bigDecimalD) {
-
             AiForecast aiForecast1 = new AiForecast();
             aiForecast1.setQuantitativeIndicators("主动脉壁面积");
             aiForecast1.setQuantitativeIndicatorsEn("Aorta wall area");
@@ -102,8 +120,47 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
             //保留小数点后3位
             result = result.setScale(3, RoundingMode.HALF_UP);
             aiForecast1.setResults(result.toString());
+          //结构指标类别0：产品呈现指标 1：算法输出指标
+            aiForecast1.setStructType("0");
             insertEntity.add(aiForecast1);
+            
+            //组织轮廓面积	D	103平方微米
+            AiForecast aiForecast2 = new AiForecast();
+            aiForecast2.setQuantitativeIndicators("主动脉壁面积");
+            aiForecast2.setUnit("10³平方微米");
+            aiForecast2.setSingleSlideId(jsonTask.getSingleId());
+            aiForecast2.setResults(result.toString());
+          //结构指标类别0：产品呈现指标 1：算法输出指标
+            aiForecast1.setStructType("1");
+            insertEntity.add(aiForecast2);
+            
+            //TODO 组织轮廓周长	C	毫米
+            /*AiForecast aiForecast2 = new AiForecast();
+            aiForecast2.setQuantitativeIndicators("主动脉壁面积");
+            aiForecast2.setUnit("10³平方微米");
+            aiForecast2.setSingleSlideId(jsonTask.getSingleId());
+            bigDecimalC = new BigDecimal(singleSlide.getArea());
+            aiForecast2.setResults(result.toString());
+          //结构指标类别0：产品呈现指标 1：算法输出指标
+            aiForecast1.setStructType("1");
+            insertEntity.add(aiForecast2);*/
         }
+        
+        //TODO 主动脉壁平均厚度	2	微米	Average thickness of aorta wall 	2=2*（D-A）/(B+C)
+        AiForecast aiForecast2 = new AiForecast();
+        aiForecast2.setQuantitativeIndicators("主动脉壁平均厚度");
+        aiForecast2.setUnit("微米");
+        aiForecast2.setQuantitativeIndicatorsEn("Average thickness of aorta wall");
+        aiForecast2.setSingleSlideId(jsonTask.getSingleId());
+        //2=2*（D-A）/(B+C)
+        BigDecimal  bigDecimalDA = bigDecimalD.subtract(bigDecimalA);
+        BigDecimal  bigDecimalBC = bigDecimalB.add(bigDecimalC);
+        BigDecimal  bigDecimal2 = new BigDecimal(2);
+        BigDecimal mal =  bigDecimal2.multiply(bigDecimalDA.divide(bigDecimalBC)); 
+        aiForecast2.setResults(mal.toString());
+      //结构指标类别0：产品呈现指标 1：算法输出指标
+        aiForecast2.setStructType("1");
+        insertEntity.add(aiForecast2);
 
         aiForecastService.saveBatch(insertEntity);
     }
