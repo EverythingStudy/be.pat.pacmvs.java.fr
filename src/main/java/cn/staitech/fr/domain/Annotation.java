@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -147,6 +148,14 @@ public class Annotation implements Serializable {
     private String intersectsResults;
 
     private Integer structureSize;
+
+    @TableField(exist = false)
+    private BigDecimal structureAreaNum;
+
+    @TableField(exist = false)
+    private BigDecimal structurePerimeterNum;
+
+
 
     @Override
     public boolean equals(Object that) {

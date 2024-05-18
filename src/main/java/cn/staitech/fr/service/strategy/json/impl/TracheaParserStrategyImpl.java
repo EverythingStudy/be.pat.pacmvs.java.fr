@@ -44,7 +44,12 @@ public class TracheaParserStrategyImpl extends AbstractCustomParserStrategy {
         String accurateArea = singleSlide.getArea();
 
         // 查询气管腔面积
-        BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "14D007");
+        BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "14D007").getStructureAreaNum();
+
+        // 查询黏膜上皮层
+        BigDecimal mucosaArea = commonJsonParser.getOrganArea(jsonTask, "14D035").getStructureAreaNum();
+
+
 
         // 使用组织轮廓面积减去气管腔面积
         BigDecimal areaNum = new BigDecimal(accurateArea).subtract(organArea);

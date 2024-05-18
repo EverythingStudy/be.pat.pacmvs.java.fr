@@ -186,8 +186,7 @@ public class CommonJsonParser {
 
         Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
 
-        try (FileInputStream fis = new FileInputStream(jsonFile);
-             JsonParser jsonParser = jsonFactory.createParser(fis)) {
+        try (FileInputStream fis = new FileInputStream(jsonFile); JsonParser jsonParser = jsonFactory.createParser(fis)) {
 
             List<JsonNode> elementsList = new ArrayList<>();
             while (!jsonParser.isClosed()) {
@@ -219,21 +218,20 @@ public class CommonJsonParser {
             String key = jsonTask.getOrganizationId() + "";
             List<Annotation> processedAnnotations;
             String finalResolutionX = resolutionX;
-            processedAnnotations = elementsList.parallelStream()
-                    .map(element -> {
-                        Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, key);
-                        if (!ObjectUtil.isEmpty(annotation)) {
-                            annotation.setContour(annotation.getContour40000());
-                            Annotation area = annotationMapper.getArea(annotation);
-                            BigDecimal decimal = new BigDecimal(ObjectUtil.isNotEmpty(area.getArea()) ? area.getArea() : "0");
-                            annotation.setArea(decimal.multiply(new BigDecimal(finalResolutionX)).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString());
-                            String perimeter = ObjectUtil.isNotEmpty(area.getPerimeter()) ? area.getPerimeter() : "0";// 周长
-                            String multiply = new BigDecimal(perimeter).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString();
-                            annotation.setPerimeter(multiply);
-                            return annotation;
-                        }
-                        return null;
-                    }).filter(Objects::nonNull).collect(Collectors.toList());
+            processedAnnotations = elementsList.parallelStream().map(element -> {
+                Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, key);
+                if (!ObjectUtil.isEmpty(annotation)) {
+                    annotation.setContour(annotation.getContour40000());
+                    Annotation area = annotationMapper.getArea(annotation);
+                    BigDecimal decimal = new BigDecimal(ObjectUtil.isNotEmpty(area.getArea()) ? area.getArea() : "0");
+                    annotation.setArea(decimal.multiply(new BigDecimal(finalResolutionX)).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString());
+                    String perimeter = ObjectUtil.isNotEmpty(area.getPerimeter()) ? area.getPerimeter() : "0";// 周长
+                    String multiply = new BigDecimal(perimeter).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString();
+                    annotation.setPerimeter(multiply);
+                    return annotation;
+                }
+                return null;
+            }).filter(Objects::nonNull).collect(Collectors.toList());
 
             anno.setList(processedAnnotations);
             annotationService.batchProcessAndSave(anno, 1000);
@@ -267,14 +265,10 @@ public class CommonJsonParser {
      */
     public Map<String, Long> getPathologicalMap(Long organizationId) {
         LambdaQueryWrapper<PathologicalIndicatorCategory> CategoryQueryWrapper = new LambdaQueryWrapper<>();
-        CategoryQueryWrapper.eq(PathologicalIndicatorCategory::getDelFlag, 0)
-                .eq(PathologicalIndicatorCategory::getOrganizationId, organizationId);
+        CategoryQueryWrapper.eq(PathologicalIndicatorCategory::getDelFlag, 0).eq(PathologicalIndicatorCategory::getOrganizationId, organizationId);
         List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(CategoryQueryWrapper);
 
-        return list.stream().collect(Collectors.toMap(
-                PathologicalIndicatorCategory::getStructureId,
-                PathologicalIndicatorCategory::getCategoryId,
-                (entity1, entity2) -> entity1));
+        return list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
     }
 
 
@@ -298,7 +292,7 @@ public class CommonJsonParser {
      * @param structureId 结构ID
      * @return 脏器面积-平方毫米
      */
-    public BigDecimal getOrganArea(JsonTask jsonTask, String structureId) {
+    public Annotation getOrganArea(JsonTask jsonTask, String structureId) {
         // 查询所有未被删除且登录机构相同的数据
         Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
         // 定位表
@@ -310,20 +304,21 @@ public class CommonJsonParser {
         annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
         annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
         Annotation structure = annotationMapper.getStructureArea(annotation);
-        if (null == structure || StringUtils.isEmpty(structure.getArea())) {
-            return BigDecimal.ZERO;
+        if (null != structure) {
+            if (StringUtils.isEmpty(structure.getArea())) {
+                annotation.setStructureAreaNum(BigDecimal.ZERO);
+            } else {
+                BigDecimal structureAreaNum = new BigDecimal(structure.getArea());
+                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")));
+            }
+            if (StringUtils.isEmpty(structure.getPerimeter())) {
+                annotation.setStructurePerimeterNum(BigDecimal.ZERO);
+            } else {
+                BigDecimal structureAreaNum = new BigDecimal(structure.getPerimeter());
+                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")));
+            }
         }
-
-        // 查询切片缩放
-        BigDecimal resolutionNum = new BigDecimal("0.262");
-        String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
-        if (StringUtils.isNotEmpty(resolution)) {
-            resolutionNum = new BigDecimal(resolution);
-        }
-
-        // 计算面积
-        BigDecimal structureAreaNum = new BigDecimal(structure.getArea());
-        return structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.000001));
+        return annotation;
     }
 
 

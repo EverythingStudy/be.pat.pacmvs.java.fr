@@ -68,9 +68,9 @@ public class InguinalLymphNodeParserStrategyImpl implements ParserStrategy {
         // 生发中心数量	1	个	 Number of germinal center	1=A  147051
         Integer count = commonJsonParser.getOrganAreaCount(jsonTask, "147051");
         // 生发中心面积（全片）	B	平方毫米	数据相加输出
-        BigDecimal germinalCenterArea = commonJsonParser.getOrganArea(jsonTask, "147051");
+        BigDecimal germinalCenterArea = commonJsonParser.getOrganArea(jsonTask, "147051").getStructureAreaNum();
         // 髓质面积	C	平方毫米
-        BigDecimal medullaArea = commonJsonParser.getOrganArea(jsonTask, "14703E");
+        BigDecimal medullaArea = commonJsonParser.getOrganArea(jsonTask, "14703E").getStructureAreaNum();
         // 5=D:淋巴结面积-平方毫米
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();

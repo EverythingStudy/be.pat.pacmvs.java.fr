@@ -59,7 +59,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         //        甲状腺滤泡面积（单个）	A	103平方微米	单个甲状腺滤泡面积
         //        甲状腺滤泡腔面积（单个）	B	103平方微米	若单个甲状腺滤泡内有多个滤泡腔，则相加输出
         //        血管面积	C	103平方微米	若多个数据则相加输出
-        BigDecimal vesselArea = commonJsonParser.getOrganArea(jsonTask, "107003");
+        BigDecimal vesselArea = commonJsonParser.getOrganArea(jsonTask, "107003").getStructureAreaNum();
         //        血管内红细胞面积	D	平方微米	若多个数据则相加输出
         //        血管外红细胞面积	E	平方微米	若多个数据则相加输出
         //        肥大细胞数量	F	个
@@ -70,7 +70,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
         //        甲状旁腺组织轮廓面积	I	103平方微米	若多个数据则相加输出(I:甲状旁腺组织轮廓面积-平方毫米)
-        BigDecimal parathyroidGlandArea = commonJsonParser.getOrganArea(jsonTask, "108111");
+        BigDecimal parathyroidGlandArea = commonJsonParser.getOrganArea(jsonTask, "108111").getStructureAreaNum();
 
         //        产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
         //        甲状腺滤泡面积（单个）	1	103平方微米	Thyroid follicle area (per)	1=A	以95%置信区间和均数±标准差呈现
