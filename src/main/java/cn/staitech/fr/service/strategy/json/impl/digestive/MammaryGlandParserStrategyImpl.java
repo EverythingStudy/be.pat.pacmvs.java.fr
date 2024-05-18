@@ -2,10 +2,12 @@ package cn.staitech.fr.service.strategy.json.impl.digestive;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
+import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
@@ -21,6 +23,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,81 +56,47 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("乳腺结构指标计算开始");
-        // 查询所有未被删除且登录机构相同的数据
-        Map<String, Long> pathologicalMap = commonJsonParser.getPathologicalMap(jsonTask.getOrganizationId());
-        //定位表
-        Long sequenceNumber = commonJsonParser.getSequenceNumber(jsonTask.getSpecialId());
-
-        //乳腺腺泡和导管数量
-        Annotation annotation1 = new Annotation();
-        annotation1.setSingleSlideId(jsonTask.getSingleId());
-        annotation1.setCategoryId(pathologicalMap.get("12306C"));
-        annotation1.setSequenceNumber(sequenceNumber);
-        Integer result = annotationMapper.countDucts(annotation1);
-        List<AiForecast> insertEntity = new ArrayList<>();
-        AiForecast aiForecast = new AiForecast();
-        aiForecast.setQuantitativeIndicators("乳腺腺泡和导管数量");
-        aiForecast.setQuantitativeIndicatorsEn("Number of acinus and ducts");
-        aiForecast.setUnit("个");
-        aiForecast.setResults(result.toString());
-        aiForecast.setSingleSlideId(jsonTask.getSingleId());
-        aiForecast.setCreateTime(DateUtil.now());
-        insertEntity.add(aiForecast);
-        //乳腺面积=H-A-B
-        //H
+        //H-面积
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         BigDecimal h = new BigDecimal(0);
         if (ObjectUtil.isNotEmpty(singleSlide) && StringUtils.isNotEmpty(singleSlide.getArea())) {
             h = new BigDecimal(singleSlide.getArea());
         }
+        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        Integer organAreaCount = commonJsonParser.getOrganAreaCount(jsonTask, "12306C");
+        //淋巴结A
+        BigDecimal organAreaA = commonJsonParser.getOrganArea(jsonTask, "123005").getStructureAreaNum();
+        //皮肤B
+        BigDecimal organAreaB = commonJsonParser.getOrganArea(jsonTask, "1230C3").getStructureAreaNum();
+        BigDecimal organArea1 = commonJsonParser.getOrganArea(jsonTask, "12306C").getStructureAreaNum();
+        BigDecimal organArea2 = commonJsonParser.getOrganArea(jsonTask, "12303F").getStructureAreaNum();
+        Integer organAreaCount2 = commonJsonParser.getOrganAreaCount(jsonTask, "1230C7");
 
-        //查询切片缩放
-        String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
-        BigDecimal resolutions = new BigDecimal("0.262");
-        if (StringUtils.isNotEmpty(resolution)) {
-            resolutions = new BigDecimal(resolution);
-        }
 
-        //计算A面积
-        BigDecimal bigDecimalA = new BigDecimal(0);
-        if (ObjectUtil.isNotEmpty(pathologicalMap.get("123005"))) {
-            Annotation annotation = new Annotation();
-            annotation.setSingleSlideId(jsonTask.getSingleId());
-            annotation.setCategoryId(pathologicalMap.get("123005"));
-            annotation.setSequenceNumber(sequenceNumber);
-            Annotation structureArea = annotationMapper.getStructureArea(annotation);
-            if (StringUtils.isNotEmpty(structureArea.getArea())) {
-                BigDecimal bigDecimal1 = new BigDecimal(structureArea.getArea());
-                bigDecimalA = bigDecimal1.multiply(resolutions).multiply(resolutions).multiply(new BigDecimal(0.000001));
-            }
-        }
+        indicatorResultsMap.put("乳腺腺泡和导管数量", new IndicatorAddIn("Number of acinus and ducts", organAreaCount.toString(), "个"));
+        indicatorResultsMap.put("乳腺面积", new IndicatorAddIn("Mammary gland area", h.subtract(organAreaA).subtract(organAreaB).setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米"));
+        indicatorResultsMap.put("淋巴结面积", new IndicatorAddIn("Lymph node area", organAreaA.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("皮肤面积", new IndicatorAddIn("Skin area", organAreaB.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("乳腺腺泡/导管面积（全片）", new IndicatorAddIn("Breast acinar/ductal area (all)", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("结缔组织面积", new IndicatorAddIn("Connective tissue area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("Organizational contour area", h.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("乳腺细胞核数量（全片）", new IndicatorAddIn("Number of breast cell nuclei (all)", organAreaCount2.toString(), "个", CommonConstant.NUMBER_1));
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        // 查询所有未被删除且登录机构相同的数据
+        Map<String, Long> pathologicalMap = commonJsonParser.getPathologicalMap(jsonTask.getOrganizationId());
+        //定位表
+        Long sequenceNumber = commonJsonParser.getSequenceNumber(jsonTask.getSpecialId());
         Annotation annotation = new Annotation();
         annotation.setSingleSlideId(jsonTask.getSingleId());
-        annotation.setCategoryId(pathologicalMap.get("1230C3"));
         annotation.setSequenceNumber(sequenceNumber);
-        Annotation structureArea = annotationMapper.getStructureArea(annotation);
-        BigDecimal bigDecimalB = new BigDecimal(0);
-        if (ObjectUtil.isNotEmpty(structureArea) && StringUtils.isNotEmpty(structureArea.getArea())) {
-            BigDecimal bigDecimal1 = new BigDecimal(structureArea.getArea());
-            bigDecimalB = bigDecimal1.multiply(resolutions).multiply(resolutions).multiply(new BigDecimal(0.000001));
-        }
-        AiForecast aiForecast1 = new AiForecast();
-        aiForecast1.setQuantitativeIndicators("乳腺面积");
-        aiForecast1.setQuantitativeIndicatorsEn("Mammary gland area");
-        aiForecast1.setUnit("平方毫米");
-        aiForecast1.setSingleSlideId(jsonTask.getSingleId());
-        aiForecast1.setCreateTime(DateUtil.now());
-        BigDecimal bigDecimal = h.subtract(bigDecimalA).subtract(bigDecimalB).setScale(3, RoundingMode.HALF_UP);
-        aiForecast1.setResults(bigDecimal.toString());
-
-        insertEntity.add(aiForecast1);
+        List<AiForecast> insertEntity = new ArrayList<>();
         AiForecast aiForecast2 = new AiForecast();
         aiForecast2.setQuantitativeIndicators("皮肤面积");
         aiForecast2.setQuantitativeIndicatorsEn("Skin area");
         aiForecast2.setUnit("平方毫米");
         aiForecast2.setSingleSlideId(jsonTask.getSingleId());
         aiForecast2.setCreateTime(DateUtil.now());
-        aiForecast2.setResults(bigDecimalB.setScale(3, RoundingMode.HALF_UP).toString());
+        aiForecast2.setResults(organAreaB.setScale(3, RoundingMode.HALF_UP).toString());
         insertEntity.add(aiForecast2);
         AiForecast aiForecast3 = new AiForecast();
         aiForecast3.setQuantitativeIndicators("皮脂腺密度");
@@ -139,7 +108,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         annotation.setCategoryId(pathologicalMap.get("121099"));
         Integer i = annotationMapper.countDucts(annotation);
         BigDecimal decimal = new BigDecimal(i);
-        aiForecast3.setResults(decimal.divide(bigDecimalB, 3, RoundingMode.HALF_UP) + "");
+        aiForecast3.setResults(decimal.divide(organAreaB, 3, RoundingMode.HALF_UP) + "");
         insertEntity.add(aiForecast3);
         AiForecast aiForecast4 = new AiForecast();
         aiForecast4.setQuantitativeIndicators("毛囊密度");
@@ -151,7 +120,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         annotation.setCategoryId(pathologicalMap.get("121098"));
         Integer i1 = annotationMapper.countDucts(annotation);
         BigDecimal decimal1 = new BigDecimal(i1);
-        aiForecast4.setResults(decimal1.divide(bigDecimalB, 3, RoundingMode.HALF_UP) + "");
+        aiForecast4.setResults(decimal1.divide(organAreaB, 3, RoundingMode.HALF_UP) + "");
         insertEntity.add(aiForecast4);
 
         aiForecastService.saveBatch(insertEntity);
