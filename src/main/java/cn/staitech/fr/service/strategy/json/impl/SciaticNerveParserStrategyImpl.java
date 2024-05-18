@@ -14,8 +14,6 @@ import org.springframework.stereotype.Component;
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
@@ -32,11 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component("Sciatic_nerve")
 public class SciaticNerveParserStrategyImpl extends AbstractCustomParserStrategy {
 	@Resource
-	private AnnotationMapper annotationMapper;
-	@Resource
 	private AiForecastService aiForecastService;
-	@Resource
-	private SingleSlideMapper singleSlideMapper;
 	@Resource
 	private CommonJsonParser commonJsonParser;
 
