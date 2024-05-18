@@ -512,7 +512,8 @@
 
     <select id="getOrganArea" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
-        SELECT sum(ST_Area(contour40000)) AS area
+        SELECT
+        sum(ST_Area(contour40000)) AS area
         from fr_annotation
         where single_slide_id = #{singleSlideId}
           and contour_type = 3
@@ -521,8 +522,8 @@
     <select id="getStructureArea" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
         SELECT
-        sum(area) AS area,
-        sum(perimeter) AS perimeter,
+        sum(cast(area as float8)) AS area,
+        sum(cast(perimeter as float8)) AS perimeter
         from fr_ai_annotation_${sequenceNumber}
         where category_id = #{categoryId}
         <if test="singleSlideId != null">
@@ -536,8 +537,8 @@
     <select id="getStructureArea" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
         SELECT
-        sum(area) AS area,
-        sum(perimeter) AS perimeter,
+        sum(cast(area as float8)) AS area,
+        sum(cast(perimeter as float8)) AS perimeter
         from fr_ai_annotation_${sequenceNumber}
         where category_id = #{categoryId}
         <if test="singleSlideId != null">
@@ -551,15 +552,15 @@
     <select id="getInsideOrOutside" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
         SELECT
-        sum(area) AS area,
-        sum(perimeter) AS perimeter,
+        sum(cast(area as float8)) AS area,
+        sum(cast(perimeter as float8)) AS perimeter
         from fr_ai_annotation_${sequenceNumber}
         where category_id = #{categoryId}
         <if test="singleSlideId != null">
             AND single_slide_id = #{singleSlideId}
         </if>
         <if test="contour != null">
-            AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = #{operation}
+            AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = #{insideOrOutside}
         </if>
     </select>
 
@@ -570,4 +571,5 @@
         WHERE single_slide_id = #{singleSlideId}
           AND category_id = #{categoryId}
     </select>
+
 </mapper>

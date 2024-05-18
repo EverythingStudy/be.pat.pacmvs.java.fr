@@ -335,13 +335,16 @@ public class CommonJsonParser {
         annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
         // 查询合并后的轮廓数据
         Annotation annotationBy = annotationMapper.collectAiGeometry(annotation);
+        if(annotationBy == null){
+            return new Annotation();
+        }
         annotation.setContour(annotationBy.getCollectContour());
         // 校验轮廓的合理性
         String result = annotationMapper.stIsValid(annotation).getResults();
         if(Objects.equals(result, "f")){
             return new Annotation();
         }
-        annotation.setOperation("f");
+        annotation.setInsideOrOutside(false);
         annotation.setCategoryId(pathologicalMap.get(structureIds));
         Annotation annotations = annotationMapper.getInsideOrOutside(annotation);
 
@@ -375,13 +378,16 @@ public class CommonJsonParser {
         annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
         // 查询合并后的轮廓数据
         Annotation annotationBy = annotationMapper.collectAiGeometry(annotation);
+        if(annotationBy == null){
+            return new Annotation();
+        }
         annotation.setContour(annotationBy.getCollectContour());
         // 校验轮廓的合理性
         String result = annotationMapper.stIsValid(annotation).getResults();
         if(Objects.equals(result, "f")){
             return new Annotation();
         }
-        annotation.setOperation("t");
+        annotation.setInsideOrOutside(true);
         annotation.setCategoryId(pathologicalMap.get(structureIds));
         Annotation annotations = annotationMapper.getInsideOrOutside(annotation);
         if (null != annotations) {

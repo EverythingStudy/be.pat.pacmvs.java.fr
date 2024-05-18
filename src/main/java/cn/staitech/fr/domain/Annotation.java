@@ -155,6 +155,9 @@ public class Annotation implements Serializable {
     @TableField(exist = false)
     private BigDecimal structurePerimeterNum = BigDecimal.ZERO;
 
+    @TableField(exist = false)
+    private Boolean insideOrOutside;
+
 
 
     @Override
