@@ -1,9 +1,8 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
-import cn.hutool.core.date.DateUtil;
-import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
+import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
@@ -13,8 +12,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @Service("Lung")
@@ -41,33 +41,25 @@ public class LungParserStrategyImpl extends AbstractCustomParserStrategy {
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
 
-        // 肺泡上皮细胞核 e 个	14C006
         Integer count = commonJsonParser.getOrganAreaCount(jsonTask, "14C006");
 
+        //肺泡上皮细胞核数量
         Double density = count / Double.parseDouble(accurateArea);
 
-        List<AiForecast> insertEntity = new ArrayList<>();
+        // 查询支气管面积
+        BigDecimal bronchiArea = commonJsonParser.getOrganArea(jsonTask, "14C002").getStructureAreaNum();
 
-        AiForecast aiForecast = new AiForecast();
-        aiForecast.setSingleSlideId(jsonTask.getSingleId());
-        aiForecast.setCreateTime(DateUtil.now());
+        // 查询血管面积
+        BigDecimal vesselArea = commonJsonParser.getOrganArea(jsonTask, "14C003").getStructureAreaNum();
 
-        aiForecast.setQuantitativeIndicators("肺脏面积");
-        aiForecast.setQuantitativeIndicatorsEn("Lung area");
-        aiForecast.setUnit("平方毫米");
-        aiForecast.setResults(accurateArea);
-        insertEntity.add(aiForecast);
+        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        indicatorResultsMap.put("肺脏面积", new IndicatorAddIn("Lung area", accurateArea, "平方毫米"));
+        indicatorResultsMap.put("肺泡上皮细胞核密度", new IndicatorAddIn("Nucleus density of alveolar epithelial cell", String.valueOf(density), "个/平方毫米"));
 
-        aiForecast.setQuantitativeIndicators("肺泡上皮细胞核密度");
-        aiForecast.setQuantitativeIndicatorsEn("Nucleus density of alveolar epithelial cell");
-        aiForecast.setUnit("个/平方毫米");
-        aiForecast.setResults(String.valueOf(density));
-        insertEntity.add(aiForecast);
-
-        aiForecastService.saveBatch(insertEntity);
-
-
-
+        indicatorResultsMap.put("支气管面积", new IndicatorAddIn("支气管面积", String.valueOf(bronchiArea), "平方毫米", "1"));
+        indicatorResultsMap.put("血管面积", new IndicatorAddIn("血管面积", String.valueOf(vesselArea), "平方毫米", "1"));
+        indicatorResultsMap.put("肺泡上皮细胞核数量", new IndicatorAddIn("density", String.valueOf(density), "个", "1"));
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 
     @Override
