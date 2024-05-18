@@ -1,7 +1,6 @@
 package cn.staitech.fr.service.impl;
 
 import cn.hutool.core.date.DateUtil;
-import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.domain.out.*;
@@ -70,10 +69,13 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             double resolutions = Double.parseDouble(image.getResolutionX());
             double areas = (Double.parseDouble(annotationBy.getArea()) * resolutions * resolutions) * 0.000001;
             String area = String.format("%.3f", areas);
+            double perimeters = (Double.parseDouble(annotationBy.getArea()) * resolutions) * 0.001;
+            String perimeter = String.format("%.3f", perimeters);
             annotationBy.setArea(area);
             SingleSlide singleSlide = new SingleSlide();
             singleSlide.setSingleId(singleSlideId);
             singleSlide.setArea(annotationBy.getArea());
+            singleSlide.setPerimeter(perimeter);
             int res = singleSlideMapper.updateById(singleSlide);
             if (res > 0) {
                 return true;
@@ -106,7 +108,7 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             forecast.setResults(indicator.getResult());
             forecast.setUnit(indicator.getUnit());
             forecast.setCreateTime(DateUtil.now());
-            if(StringUtils.isNotEmpty(indicator.getStruct_type())){
+            if (StringUtils.isNotEmpty(indicator.getStruct_type())) {
                 forecast.setStructType(indicator.getStruct_type());
             }
             aiForecasts.add(forecast);
