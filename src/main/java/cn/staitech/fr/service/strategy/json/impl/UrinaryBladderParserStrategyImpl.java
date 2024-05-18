@@ -3,7 +3,6 @@ package cn.staitech.fr.service.strategy.json.impl;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.service.AiForecastService;
-import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
