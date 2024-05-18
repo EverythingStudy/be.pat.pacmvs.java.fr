@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
@@ -83,13 +84,13 @@ public class SpleenParserStrategyImpl implements ParserStrategy {
         //        动脉周围淋巴鞘面积占比	6	%	Periarterial lymphatic sheath area%	6=（B-C）/F	包含淋巴滤泡
         //        脾脏面积	7	平方毫米	Spleen area	7=F
 
-        indicatorResultsMap.put("白髓面积", new IndicatorAddIn("White pulp area", whitePulpArea.toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("动脉周围淋巴鞘面积", new IndicatorAddIn("Periarterial lymphatic sheath area", periarterialLymphaticSheathArea.toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("中央动脉面积", new IndicatorAddIn("Central artery area", centralArteryArea.toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("含铁血黄素面积", new IndicatorAddIn("Hemosiderin area", hemosiderinArea.toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("Marginal zone area", erythrocyteArea.toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("边缘区面积", new IndicatorAddIn("Marginal zone area", marginalZoneArea.toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("红髓面积", new IndicatorAddIn("Red pulp", redPulpArea.toString(), "平方毫米", "1"));
+        indicatorResultsMap.put("白髓面积", new IndicatorAddIn("White pulp area", whitePulpArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("动脉周围淋巴鞘面积", new IndicatorAddIn("Periarterial lymphatic sheath area", periarterialLymphaticSheathArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("中央动脉面积", new IndicatorAddIn("Central artery area", centralArteryArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("含铁血黄素面积", new IndicatorAddIn("Hemosiderin area", hemosiderinArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("Marginal zone area", erythrocyteArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("边缘区面积", new IndicatorAddIn("Marginal zone area", marginalZoneArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("红髓面积", new IndicatorAddIn("Red pulp", redPulpArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("脾脏面积", new IndicatorAddIn("Spleen area", accurateArea, "平方毫米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
