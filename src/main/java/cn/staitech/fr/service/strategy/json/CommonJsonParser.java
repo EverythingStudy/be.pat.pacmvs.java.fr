@@ -323,49 +323,7 @@ public class CommonJsonParser {
 
 
 
-    public Annotation getOutside(JsonTask jsonTask, String structureId, String structureIds) {
-        // 查询所有未被删除且登录机构相同的数据
-        Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
-        // 定位表
-        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
-        // 脏器轮廓信息
-        Annotation annotation = new Annotation();
-        annotation.setSequenceNumber(sequenceNumber);
-        annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
-        annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
-        // 查询合并后的轮廓数据
-        Annotation annotationBy = annotationMapper.collectAiGeometry(annotation);
-        if(annotationBy == null){
-            return new Annotation();
-        }
-        annotation.setContour(annotationBy.getCollectContour());
-        // 校验轮廓的合理性
-        String result = annotationMapper.stIsValid(annotation).getResults();
-        if(Objects.equals(result, "f")){
-            return new Annotation();
-        }
-        annotation.setInsideOrOutside(false);
-        annotation.setCategoryId(pathologicalMap.get(structureIds));
-        Annotation annotations = annotationMapper.getInsideOrOutside(annotation);
-
-        if (null != annotations) {
-            if (StringUtils.isEmpty(annotations.getArea())) {
-                annotation.setStructureAreaNum(BigDecimal.ZERO);
-            } else {
-                BigDecimal structureAreaNum = new BigDecimal(annotations.getArea());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")));
-            }
-            if (StringUtils.isEmpty(annotations.getPerimeter())) {
-                annotation.setStructurePerimeterNum(BigDecimal.ZERO);
-            } else {
-                BigDecimal structureAreaNum = new BigDecimal(annotations.getPerimeter());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")));
-            }
-        }
-        return annotation;
-    }
-
-    public Annotation getInside(JsonTask jsonTask, String structureId, String structureIds) {
+    public Annotation getInsideOrOutside(JsonTask jsonTask, String structureId, String structureIds,Boolean InsideOrOutside) {
         // 查询所有未被删除且登录机构相同的数据
         Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
         // 定位表
@@ -387,7 +345,7 @@ public class CommonJsonParser {
         if(Objects.equals(result, "f")){
             return new Annotation();
         }
-        annotation.setInsideOrOutside(true);
+        annotation.setInsideOrOutside(InsideOrOutside);
         annotation.setCategoryId(pathologicalMap.get(structureIds));
         Annotation annotations = annotationMapper.getInsideOrOutside(annotation);
         if (null != annotations) {

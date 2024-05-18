@@ -53,10 +53,10 @@ public class LungParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal vesselArea = commonJsonParser.getOrganArea(jsonTask, "14C003").getStructureAreaNum();
 
         // 查询血管内红细胞面积
-        BigDecimal intravascularErythrocyteArea = commonJsonParser.getInside(jsonTask,"14C003","14C004").getStructureAreaNum();
+        BigDecimal intravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask,"14C003","14C004",true).getStructureAreaNum();
 
         // 查询血管外红细胞面积
-        BigDecimal extravascularErythrocyteArea = commonJsonParser.getOutside(jsonTask,"14C003","14C004").getStructureAreaNum();
+        BigDecimal extravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask,"14C003","14C004",false).getStructureAreaNum();
 
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         indicatorResultsMap.put("肺脏面积", new IndicatorAddIn("Lung area", accurateArea, "平方毫米"));
