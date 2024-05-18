@@ -146,6 +146,19 @@
             AND slide_id = #{slideId}
         </if>
     </select>
+    
+    <select id="getStructurePerimeter" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT sum(ST_Perimeter(contour40000)) AS perimeter
+        from fr_ai_annotation_${sequenceNumber}
+        where category_id = #{categoryId}
+        <if test="singleSlideId != null">
+            AND single_slide_id = #{singleSlideId}
+        </if>
+        <if test="slideId != null">
+            AND slide_id = #{slideId}
+        </if>
+    </select>
 
 
     <insert id="createTable" parameterType="cn.staitech.fr.domain.Annotation">
