@@ -365,7 +365,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
                     BeanUtils.copyProperties(aiForecast, exportAiListVO);
                     //范围数据
                     if(StringUtils.isNotEmpty(special.getControlGroup())){
-                        setRang(special,id,exportAiListVO,categorys);
+                        setRang(aiForecast.getQuantitativeIndicators(),special,id,exportAiListVO,categorys);
                     }
                     collect.add( exportAiListVO);
                 }
@@ -421,9 +421,9 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
      * @param singleId
      * @param exportAiListVO
      */
-    private void setRang(Special special, Long singleId, ExportAiListVO exportAiListVO, Map<Long, Long> categorys) {
+    private void setRang(String quantitativeIndicators,Special special, Long singleId, ExportAiListVO exportAiListVO, Map<Long, Long> categorys) {
         if(ObjectUtils.isNotEmpty(categorys.get(singleId))){
-            String rangOut = singleSlideMapper.getRangOut(categorys.get(singleId), special.getSpecialId(), special.getControlGroup());
+            String rangOut = singleSlideMapper.getRangOut(quantitativeIndicators,categorys.get(singleId), special.getSpecialId(), special.getControlGroup());
             exportAiListVO.setForecastRange(rangOut);
         }
 

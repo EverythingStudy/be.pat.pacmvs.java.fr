@@ -48,11 +48,24 @@ public class AreaUtils {
      */
     public String convertToSquareMicrometer(String str){
         BigDecimal result = BigDecimal.ZERO;
-        if(StringUtils.isEmpty(str)){
-            BigDecimal areaNum = new BigDecimal(str).multiply(new BigDecimal(1000));
-            result = areaNum.setScale(3, RoundingMode.HALF_UP);
+        if (!StringUtils.isEmpty(str)) {
+            BigDecimal areaNum = new BigDecimal(str).multiply(BigDecimal.valueOf(1000));
+            result = areaNum.setScale(3, BigDecimal.ROUND_HALF_UP);
         }
+        return result.toString();
+    }
 
+    /**
+     * 平方毫米换算为平方微米
+     * @param str 输入值
+     * @return 转换后结果
+     */
+    public String convertToMicrometer(String str) {
+        BigDecimal result = BigDecimal.ZERO;
+        if (!StringUtils.isEmpty(str)) {
+            BigDecimal areaNum = new BigDecimal(str).multiply(BigDecimal.valueOf(1000000));
+            result = areaNum.setScale(3, BigDecimal.ROUND_HALF_UP);
+        }
         return result.toString();
     }
 

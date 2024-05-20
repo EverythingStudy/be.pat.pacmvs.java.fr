@@ -20,7 +20,7 @@ public class IndicatorAddIn {
     // 单位
     private String unit;
 
-    private String struct_type;
+    private String structType;
 
     public IndicatorAddIn(String englishName, String result, String unit) {
         this.englishName = englishName;

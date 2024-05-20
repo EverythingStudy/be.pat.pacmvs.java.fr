@@ -31,7 +31,7 @@ public interface SingleSlideMapper extends BaseMapper<SingleSlide> {
 
     List<SingleSlideSelectBy> singleSlideList(SingleSlideAdjacent singleSlideAdjacent);
 
-    String getRangOut(@Param("categoryId") Long categoryId,@Param("specialId") Long specialId,@Param("groupCode")String groupCode);
+    String getRangOut(@Param("quantitativeIndicators") String quantitativeIndicators,@Param("categoryId") Long categoryId,@Param("specialId") Long specialId,@Param("groupCode")String groupCode);
 
     String getImageId(Long slideId);
 }

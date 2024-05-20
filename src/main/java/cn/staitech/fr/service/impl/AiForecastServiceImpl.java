@@ -108,8 +108,8 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             forecast.setResults(indicator.getResult());
             forecast.setUnit(indicator.getUnit());
             forecast.setCreateTime(DateUtil.now());
-            if (StringUtils.isNotEmpty(indicator.getStruct_type())) {
-                forecast.setStructType(indicator.getStruct_type());
+            if (StringUtils.isNotEmpty(indicator.getStructType())) {
+                forecast.setStructType(indicator.getStructType());
             }
             aiForecasts.add(forecast);
         }
@@ -151,7 +151,7 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
 
     private String setRang(Special special, Long singleId, ExportAiListVO exportAiListVO, Map<Long, Long> categorys) {
         if (ObjectUtils.isNotEmpty(categorys.get(singleId))) {
-            String rangOut = singleSlideMapper.getRangOut(categorys.get(singleId), special.getSpecialId(), special.getControlGroup());
+            String rangOut = singleSlideMapper.getRangOut(exportAiListVO.getQuantitativeIndicators(),categorys.get(singleId), special.getSpecialId(), special.getControlGroup());
             exportAiListVO.setForecastRange(rangOut);
             return rangOut;
         }

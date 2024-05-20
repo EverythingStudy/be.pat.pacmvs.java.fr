@@ -1,110 +1,109 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.SingleSlide;
+import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author wanglibei
  * @version V1.0
  * @ClassName: OvariesOviductParserStrategyImpl
- * @Description:大鼠卵巢
+ * @Description:大鼠卵巢-7I
  * @date 2024年5月13日
  */
 @Slf4j
 @Component("Ovaries")
 public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrategy {
-    @Resource
-    private AnnotationMapper annotationMapper;
-    @Resource
-    private AiForecastService aiForecastService;
-    @Resource
-    private CommonJsonParser commonJsonParser;
+	@Resource
+	private AnnotationMapper annotationMapper;
+	@Resource
+	private AiForecastService aiForecastService;
+	@Resource
+	private CommonJsonParser commonJsonParser;
+	@Resource
+    private AreaUtils areaUtils;
 
-    @PostConstruct
-    public void init() {
-        setCommonJsonParser(commonJsonParser);
-        log.info("OvariesOviductParserStrategyImpl init");
-    }
+	@PostConstruct
+	public void init() {
+		setCommonJsonParser(commonJsonParser);
+		log.info("OvariesOviductParserStrategyImpl init");
+	}
 
-    @Override
-    public void alculationIndicators(JsonTask jsonTask) {
-        log.info("大鼠卵巢构指标计算开始");
-        // 查询所有未被删除且登录机构相同的数据
-        Map<String, Long> pathologicalMap = commonJsonParser.getPathologicalMap(jsonTask.getOrganizationId());
-        //定位表
-        Long sequenceNumber = commonJsonParser.getSequenceNumber(jsonTask.getSpecialId());
+	@Override
+	public void alculationIndicators(JsonTask jsonTask) {
+		log.info("大鼠卵巢构指标计算开始");
 
-        //黄体:1240CA 红细胞:124004 卵泡:1240CB 血管:124003 组织轮廓:124111
+		// 黄体:1240CA 
+		//红细胞:124004 
+		//卵泡:1240CB 
+		//血管:124003 
+		//组织轮廓:124111
 
-        List<AiForecast> insertEntity = new ArrayList<>();
-        //黄体数量 1=A
-        if (ObjectUtil.isNotEmpty(pathologicalMap.get("1240CA"))) {
-            Annotation annotation1 = new Annotation();
-            annotation1.setSingleSlideId(jsonTask.getSingleId());
-            annotation1.setCategoryId(pathologicalMap.get("1240CA"));
-            annotation1.setSequenceNumber(sequenceNumber);
-            Integer result = annotationMapper.countDucts(annotation1);
-            AiForecast aiForecast = new AiForecast();
-            aiForecast.setQuantitativeIndicators("黄体数量");
-            aiForecast.setQuantitativeIndicatorsEn("Corpus luteum numbers");
-            aiForecast.setUnit("个");
-            aiForecast.setResults(result.toString());
-            aiForecast.setSingleSlideId(jsonTask.getSingleId());
-            insertEntity.add(aiForecast);
+		// 黄体数量 A 个
+		Integer mucosaCountA = commonJsonParser.getOrganAreaCount(jsonTask, "1240CA");
+		// 黄体面积（全片） C 平方毫米
+		Annotation annotationC  = commonJsonParser.getOrganArea(jsonTask, "1240CA");
+		BigDecimal bigDecimalC = annotationC.getStructureAreaNum();
+		// 卵泡数量 D 个
+		Integer mucosaCountD = commonJsonParser.getOrganAreaCount(jsonTask, "1240CB");
+		// 卵泡面积（全片） F 平方毫米
+		Annotation annotationF  = commonJsonParser.getOrganArea(jsonTask, "1240CA");
+		BigDecimal bigDecimalF = annotationF.getStructureAreaNum();
+		// 血管面积 H 平方微米
+		Annotation annotationH  = commonJsonParser.getOrganArea(jsonTask, "124003");
+		BigDecimal bigDecimalH = annotationH.getStructureAreaNum();
+		bigDecimalH = bigDecimalH.multiply(new BigDecimal("0.001"));
+		//TODO 血管外红细胞面积 I 平方微米
+		BigDecimal bigDecimalI = new BigDecimal(0);
+		//TODO 血管内红细胞面积 J 平方微米
+		BigDecimal bigDecimalJ = new BigDecimal(0);
+		// 组织轮廓面积 E 平方毫米
+		String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+		
+		//算法保存
+		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+		indicatorResultsMap.put("黄体数量", new IndicatorAddIn("Corpus luteum numbers", String.valueOf(mucosaCountA), "个", "0"));
+		indicatorResultsMap.put("黄体面积（全片）", new IndicatorAddIn("Corpus luteum area(all)", String.valueOf(bigDecimalC), "平方毫米", "0"));
+		indicatorResultsMap.put("卵泡数量", new IndicatorAddIn("Follicle numbers", String.valueOf(mucosaCountD), "个", "0"));
+		indicatorResultsMap.put("卵泡面积（全片）", new IndicatorAddIn("Follicle area", String.valueOf(bigDecimalF), "平方毫米", "0"));
+		//TODO
+//		indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", String.valueOf(bigDecimalI), "平方微米", "0"));
+//		indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", String.valueOf(bigDecimalJ), "平方微米", "0"));
+		indicatorResultsMap.put("血管面积", new IndicatorAddIn("Vessel area", String.valueOf(bigDecimalH), "平方微米", "0"));
+		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", slideArea, "平方毫米", "1"));
+		
+		
+		
+		//AI指标保存
+		
+		// 黄体数量 1 个 Corpus luteum numbers 1=A
+		// 黄体面积（全片） 2 平方毫米 Corpus luteum area(all) 2=C
+		// 卵泡数量 3 个 Follicle numbers 3=D
+		// 卵泡面积（全片） 4 平方毫米 Follicle area 4=F
+		// 血管面积 3 平方微米 Vessel area 3=H
+		// 血管外红细胞面积 4 平方微米 Extravascular Erythrocyte area 4=I
+		// 血管内红细胞面积 5 平方微米 Intravascular Erythrocyte area 5=J
+		
+		// aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 
-            //黄体面积（全片） 2=C
-            Annotation structureArea = annotationMapper.getStructureArea(annotation1);
-            if (StringUtils.isNotEmpty(structureArea.getArea())) {
-                BigDecimal bigDecimal1 = new BigDecimal(structureArea.getArea());
-                AiForecast aiForecast1 = new AiForecast();
-                aiForecast1.setQuantitativeIndicators("黄体面积（全片）");
-                aiForecast1.setQuantitativeIndicatorsEn("Corpus luteum area(all)");
-                aiForecast1.setUnit("平方毫米");
-                aiForecast1.setSingleSlideId(jsonTask.getSingleId());
-                aiForecast1.setResults(bigDecimal1.toString());
-                insertEntity.add(aiForecast1);
-            }
-        }
+	}
 
-        //卵泡数量 3=D
-        if (ObjectUtil.isNotEmpty(pathologicalMap.get("1240CB"))) {
-            Annotation annotation2 = new Annotation();
-            annotation2.setSingleSlideId(jsonTask.getSingleId());
-            annotation2.setCategoryId(pathologicalMap.get("1240CB"));
-            annotation2.setSequenceNumber(sequenceNumber);
-            Integer result2 = annotationMapper.countDucts(annotation2);
-            AiForecast aiForecast2 = new AiForecast();
-            aiForecast2.setQuantitativeIndicators("黄体数量");
-            aiForecast2.setQuantitativeIndicatorsEn("Corpus luteum numbers");
-            aiForecast2.setUnit("个");
-            aiForecast2.setResults(result2.toString());
-            aiForecast2.setSingleSlideId(jsonTask.getSingleId());
-            insertEntity.add(aiForecast2);
-        }
-
-        aiForecastService.saveBatch(insertEntity);
-
-    }
-
-
-    @Override
-    public String getAlgorithmCode() {
-        return "Ovaries";
-    }
+	@Override
+	public String getAlgorithmCode() {
+		return "Ovaries";
+	}
 }

@@ -1,9 +1,19 @@
 package cn.staitech.fr.service.strategy.json;
 
+import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.PathologicalIndicatorCategory;
+import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
@@ -18,8 +28,41 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
 
     private CommonJsonParser commonJsonParser;
 
+
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         commonJsonParser.parseJson(jsonTask, jsonFileS);
     }
+
+    /**
+     * 获取脏器轮廓面积
+     *
+     * @param jsonTask    jsonTask
+     * @param structureId 结构ID
+     * @return 脏器面积-平方毫米
+     */
+    protected Annotation getOrganArea(JsonTask jsonTask, String structureId) {
+        return commonJsonParser.getOrganArea(jsonTask,structureId);
+    }
+
+    protected Annotation getOrganArea(JsonTask jsonTask, String structureId,BigDecimal unit) {
+        Annotation annotation = commonJsonParser.getOrganArea(jsonTask,structureId);
+        BigDecimal bigDecimal = annotation.getStructureAreaNum();
+        if (bigDecimal!=null){
+            annotation.setStructureAreaNum(bigDecimal.multiply(unit));
+        }
+        return annotation;
+    }
+
+    /**
+     * 取脏器轮廓数量
+     *
+     * @param jsonTask    jsonTask
+     * @param structureId 结构ID
+     * @return 脏器轮廓数量
+     */
+    protected Integer getOrganAreaCount(JsonTask jsonTask, String structureId) {
+        return commonJsonParser.getOrganAreaCount(jsonTask,structureId);
+    }
+
 }
