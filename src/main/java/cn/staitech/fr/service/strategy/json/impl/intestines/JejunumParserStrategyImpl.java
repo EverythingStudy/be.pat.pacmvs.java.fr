@@ -1,11 +1,10 @@
 package cn.staitech.fr.service.strategy.json.impl.intestines;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.staitech.fr.domain.AiForecast;
-import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
+import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
@@ -13,21 +12,19 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @Author
  * @Date 2024/5/13 10:05
- * @desc 大鼠结肠
+ * @desc 大鼠空肠
  */
 @Slf4j
 @Component("Jejunum")
@@ -53,32 +50,29 @@ public class JejunumParserStrategyImpl extends AbstractCustomParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("大鼠空肠结构指标计算开始");
-        // 查询所有未被删除且登录机构相同的数据
-        Map<String, Long> pathologicalMap = commonJsonParser.getPathologicalMap(jsonTask.getOrganizationId());
-        Long sequenceNumber = commonJsonParser.getSequenceNumber(jsonTask.getSpecialId());
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String area = ObjectUtil.isNotEmpty(singleSlide) ? singleSlide.getArea() : "0";
-        List<AiForecast> insertEntity = new ArrayList<>();
-        AiForecast aiForecast = new AiForecast();
-        aiForecast.setQuantitativeIndicators("空肠面积");
-        aiForecast.setQuantitativeIndicatorsEn("Jejunum area");
-        aiForecast.setUnit("平方毫米");
-        aiForecast.setSingleSlideId(jsonTask.getSingleId());
-        aiForecast.setCreateTime(DateUtil.now());
-        if (ObjectUtil.isNotEmpty(pathologicalMap.get("118156"))) {
-            Annotation annotation = new Annotation();
-            annotation.setSingleSlideId(jsonTask.getSingleId());
-            annotation.setCategoryId(pathologicalMap.get("118156"));
-            annotation.setSequenceNumber(sequenceNumber);
-            Annotation structureArea = annotationMapper.getStructureArea(annotation);
-            String area1 = StringUtils.isNotEmpty(structureArea.getArea()) ? structureArea.getArea() : "0";
-            BigDecimal area2 = new BigDecimal(area1);
-            BigDecimal decimal = new BigDecimal(area).subtract(area2).setScale(3, RoundingMode.HALF_UP);
-            aiForecast.setResults(decimal.toString());
-        }
-        insertEntity.add(aiForecast);
-        aiForecastService.saveBatch(insertEntity);
-
+        Map<String, IndicatorAddIn> resultMap = new HashMap<>();
+        // 肠腔面积
+        BigDecimal colonArea = commonJsonParser.getOrganArea(jsonTask, "118156").getStructureAreaNum();
+        // 黏膜层面积
+        BigDecimal areaNum = commonJsonParser.getOrganArea(jsonTask, "118008").getStructureAreaNum();
+        // 黏膜下层面积
+        BigDecimal areaNum2 = commonJsonParser.getOrganArea(jsonTask, "118009").getStructureAreaNum();
+        // 肌层面积
+        BigDecimal areaNum3 = commonJsonParser.getOrganArea(jsonTask, "11800C").getStructureAreaNum();
+        // 组织轮廓
+        BigDecimal areaNum4 = new BigDecimal(area);
+        // 结肠面积
+        BigDecimal areaNum5 = areaNum4.subtract(colonArea).setScale(3, RoundingMode.HALF_UP);
+        resultMap.put("肠腔面积", new IndicatorAddIn("Intestinal cavity area", colonArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        resultMap.put("黏膜层面积", new IndicatorAddIn("Mucosal layer area", areaNum.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        resultMap.put("黏膜下层面积", new IndicatorAddIn("Submucosal area", areaNum2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        resultMap.put("肌层面积", new IndicatorAddIn("Muscle layer area", areaNum3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        resultMap.put("组织轮廓面积", new IndicatorAddIn("Organizational Profile area", areaNum4.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        resultMap.put("空肠面积", new IndicatorAddIn("Jejunum area", areaNum5.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_0));
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), resultMap);
+        log.info("大鼠空肠结构指标计算结束");
     }
 
     @Override
