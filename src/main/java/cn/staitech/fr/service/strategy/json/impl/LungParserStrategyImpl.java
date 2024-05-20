@@ -53,10 +53,10 @@ public class LungParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal vesselArea = commonJsonParser.getOrganArea(jsonTask, "14C003").getStructureAreaNum();
 
         // 查询血管内红细胞面积
-        BigDecimal intravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask,"14C003","14C004",true).getStructureAreaNum();
-
-        // 查询血管外红细胞面积
-        BigDecimal extravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask,"14C003","14C004",false).getStructureAreaNum();
+//        BigDecimal intravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask,"14C003","14C004",true).getStructureAreaNum();
+//
+//        // 查询血管外红细胞面积
+//        BigDecimal extravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask,"14C003","14C004",false).getStructureAreaNum();
 
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         indicatorResultsMap.put("肺脏面积", new IndicatorAddIn("Lung area", accurateArea, "平方毫米"));
@@ -65,8 +65,8 @@ public class LungParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("支气管面积", new IndicatorAddIn("支气管面积", String.valueOf(bronchiArea), "平方毫米", "1"));
         indicatorResultsMap.put("血管面积", new IndicatorAddIn("血管面积", String.valueOf(vesselArea), "平方毫米", "1"));
         indicatorResultsMap.put("肺泡上皮细胞核数量", new IndicatorAddIn("肺泡上皮细胞核数量", String.valueOf(density), "个", "1"));
-        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("血管内红细胞面积", String.valueOf(intravascularErythrocyteArea), "平方毫米", "1"));
-        indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("血管外红细胞面积", String.valueOf(extravascularErythrocyteArea), "平方毫米", "1"));
+//        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("血管内红细胞面积", String.valueOf(intravascularErythrocyteArea), "平方毫米", "1"));
+//        indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("血管外红细胞面积", String.valueOf(extravascularErythrocyteArea), "平方毫米", "1"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 
