@@ -9,6 +9,7 @@ import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -39,6 +40,8 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 	private AiForecastService aiForecastService;
 	@Resource
 	private CommonJsonParser commonJsonParser;
+	@Resource
+    private AreaUtils areaUtils;
 
 	@PostConstruct
 	public void init() {
@@ -58,8 +61,8 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		
 		//空腔面积 A 10³平方微米
 		Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "15D113");
-		BigDecimal bigDecimalA = commonJsonParser.getOrganAreaMicron(jsonTask, "15D113");
-		bigDecimalA = bigDecimalA.multiply(new BigDecimal("0.001"));
+		String bigDecimalAStr = areaUtils.convertToSquareMicrometer(annotation.getArea());
+		BigDecimal bigDecimalA =  new BigDecimal(bigDecimalAStr);
 
 
 		//空腔周长	B	毫米
@@ -72,8 +75,8 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		//组织轮廓面积 D 10³平方微米
 		SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
 		if (StringUtils.isNotEmpty(singleSlide.getArea())) {
-			bigDecimalD = new BigDecimal(singleSlide.getArea());
-			bigDecimalD = bigDecimalD.multiply(new BigDecimal("0.001"));
+			String area = areaUtils.convertToSquareMicrometer(singleSlide.getArea());
+			bigDecimalD = new BigDecimal(area);
 			bigDecimalC =  new BigDecimal(singleSlide.getPerimeter());
 		}
 

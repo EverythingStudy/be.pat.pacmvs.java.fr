@@ -31,8 +31,6 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 	@Resource
 	private AnnotationMapper annotationMapper;
 	@Resource
-	private SingleSlideMapper singleSlideMapper;
-	@Resource
 	private AiForecastService aiForecastService;
 	@Resource
 	private CommonJsonParser commonJsonParser;

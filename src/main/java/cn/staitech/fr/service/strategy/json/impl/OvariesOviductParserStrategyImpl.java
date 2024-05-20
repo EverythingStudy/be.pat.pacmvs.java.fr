@@ -81,8 +81,8 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		indicatorResultsMap.put("卵泡数量", new IndicatorAddIn("Follicle numbers", String.valueOf(mucosaCountD), "个", "0"));
 		indicatorResultsMap.put("卵泡面积（全片）", new IndicatorAddIn("Follicle area", String.valueOf(bigDecimalF), "平方毫米", "0"));
 		//TODO
-		indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", String.valueOf(bigDecimalI), "平方微米", "0"));
-		indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", String.valueOf(bigDecimalJ), "平方微米", "0"));
+//		indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", String.valueOf(bigDecimalI), "平方微米", "0"));
+//		indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", String.valueOf(bigDecimalJ), "平方微米", "0"));
 		indicatorResultsMap.put("血管面积", new IndicatorAddIn("Vessel area", String.valueOf(bigDecimalH), "平方微米", "0"));
 		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", slideArea, "平方毫米", "1"));
 		
@@ -98,7 +98,7 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		// 血管外红细胞面积 4 平方微米 Extravascular Erythrocyte area 4=I
 		// 血管内红细胞面积 5 平方微米 Intravascular Erythrocyte area 5=J
 		
-		 aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+		// aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 
 	}
 
