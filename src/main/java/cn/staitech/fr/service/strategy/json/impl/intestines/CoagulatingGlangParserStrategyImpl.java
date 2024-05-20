@@ -1,4 +1,4 @@
-package cn.staitech.fr.service.strategy.json.impl;
+package cn.staitech.fr.service.strategy.json.impl.intestines;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.Annotation;

@@ -1,4 +1,4 @@
-package cn.staitech.fr.service.strategy.json.impl;
+package cn.staitech.fr.service.strategy.json.impl.intestines;
 
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
@@ -30,8 +30,8 @@ import java.util.Map;
  * @desc 大鼠结肠
  */
 @Slf4j
-@Component("Cecum")
-public class CecumParserStrategyImpl extends AbstractCustomParserStrategy {
+@Component("Jejunum")
+public class JejunumParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
@@ -47,12 +47,12 @@ public class CecumParserStrategyImpl extends AbstractCustomParserStrategy {
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
-        log.info("CecumParserStrategyImpl init");
+        log.info("JejunumParserStrategyImpl init");
     }
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        log.info("大鼠盲肠结构指标计算开始");
+        log.info("大鼠空肠结构指标计算开始");
         // 查询所有未被删除且登录机构相同的数据
         Map<String, Long> pathologicalMap = commonJsonParser.getPathologicalMap(jsonTask.getOrganizationId());
         Long sequenceNumber = commonJsonParser.getSequenceNumber(jsonTask.getSpecialId());
@@ -60,15 +60,15 @@ public class CecumParserStrategyImpl extends AbstractCustomParserStrategy {
         String area = ObjectUtil.isNotEmpty(singleSlide) ? singleSlide.getArea() : "0";
         List<AiForecast> insertEntity = new ArrayList<>();
         AiForecast aiForecast = new AiForecast();
-        aiForecast.setQuantitativeIndicators("盲肠面积");
-        aiForecast.setQuantitativeIndicatorsEn("Cecum area");
+        aiForecast.setQuantitativeIndicators("空肠面积");
+        aiForecast.setQuantitativeIndicatorsEn("Jejunum area");
         aiForecast.setUnit("平方毫米");
         aiForecast.setSingleSlideId(jsonTask.getSingleId());
         aiForecast.setCreateTime(DateUtil.now());
-        if (ObjectUtil.isNotEmpty(pathologicalMap.get("114156"))) {
+        if (ObjectUtil.isNotEmpty(pathologicalMap.get("118156"))) {
             Annotation annotation = new Annotation();
             annotation.setSingleSlideId(jsonTask.getSingleId());
-            annotation.setCategoryId(pathologicalMap.get("114156"));
+            annotation.setCategoryId(pathologicalMap.get("118156"));
             annotation.setSequenceNumber(sequenceNumber);
             Annotation structureArea = annotationMapper.getStructureArea(annotation);
             String area1 = StringUtils.isNotEmpty(structureArea.getArea()) ? structureArea.getArea() : "0";
@@ -83,6 +83,6 @@ public class CecumParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Override
     public String getAlgorithmCode() {
-        return "Cecum";
+        return "Jejunum";
     }
 }
