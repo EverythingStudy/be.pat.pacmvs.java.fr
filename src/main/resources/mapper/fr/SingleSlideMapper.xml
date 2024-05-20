@@ -198,6 +198,7 @@
         where fss.category_id = #{categoryId}
           and fs.special_id = #{specialId}
           and fs.group_code = #{groupCode}
+          and faf.quantitative_indicators= #{quantitativeIndicators}
         group by faf.unit;
     </select>
     <select id="getImageId" resultType="java.lang.String">
