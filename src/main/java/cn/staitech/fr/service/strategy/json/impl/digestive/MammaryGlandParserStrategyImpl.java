@@ -108,7 +108,9 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         annotation.setCategoryId(pathologicalMap.get("121099"));
         Integer i = annotationMapper.countDucts(annotation);
         BigDecimal decimal = new BigDecimal(i);
-        aiForecast3.setResults(decimal.divide(organAreaB, 3, RoundingMode.HALF_UP) + "");
+        if (ObjectUtil.isNotEmpty(organAreaB) && !ObjectUtil.equals(organAreaB, new BigDecimal(0))){
+            aiForecast3.setResults(decimal.divide(organAreaB, 3, RoundingMode.HALF_UP) + "");
+        }
         insertEntity.add(aiForecast3);
         AiForecast aiForecast4 = new AiForecast();
         aiForecast4.setQuantitativeIndicators("毛囊密度");
@@ -120,7 +122,9 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         annotation.setCategoryId(pathologicalMap.get("121098"));
         Integer i1 = annotationMapper.countDucts(annotation);
         BigDecimal decimal1 = new BigDecimal(i1);
-        aiForecast4.setResults(decimal1.divide(organAreaB, 3, RoundingMode.HALF_UP) + "");
+        if (ObjectUtil.isNotEmpty(organAreaB) && !ObjectUtil.equals(organAreaB, new BigDecimal(0))){
+            aiForecast4.setResults(decimal1.divide(organAreaB, 3, RoundingMode.HALF_UP) + "");
+        }
         insertEntity.add(aiForecast4);
 
         aiForecastService.saveBatch(insertEntity);
