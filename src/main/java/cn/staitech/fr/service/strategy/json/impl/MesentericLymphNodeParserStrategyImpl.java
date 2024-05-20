@@ -11,12 +11,13 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
 
 /**
- * 颌下腺-MN
+ *肠系膜淋巴结-MN
  */
 @Slf4j
 @Service("Mesenteric_lymph_node")
@@ -37,18 +38,29 @@ public class MesentericLymphNodeParserStrategyImpl extends AbstractCustomParserS
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+
+        // A生发中心数量
+        Integer areaCount = areaUtils.getOrganAreaCount(jsonTask, "146051");
+        // B生发中心面积（全片）-平方毫米
+        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "146051");
+        // C髓质面积-平方毫米
+        BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask, "14603E");
+        // D组织轮廓-平方毫米
+        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+
+        // 算法输出指标
+        indicatorResultsMap.put("生发中心面积（全片）", new IndicatorAddIn("", organAreaB.toString(), "平方毫米", "1"));
+        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("", organAreaC.toString(), "平方毫米", "1"));
+
+        // 产品呈现指标
+        indicatorResultsMap.put("淋巴结面积", new IndicatorAddIn("Submadibular gland area", slideArea, "平方毫米"));
+        indicatorResultsMap.put("生发中心数量", new IndicatorAddIn("Number of germinal center", areaCount.toString(), "个"));
         /*
         indicatorResultsMap.put("生发中心占比", new IndicatorAddIn("Germinal center area%", "", "%"));
         indicatorResultsMap.put("髓质占比", new IndicatorAddIn("Medulla area%", "", "%"));
         indicatorResultsMap.put("皮质和副皮质占比", new IndicatorAddIn("Cortex and paracortex area%", "", "%"));
         */
-        // D组织轮廓-平方毫米
-        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
-        // A生发中心数量
-        Integer areaCount = areaUtils.getOrganAreaCount(jsonTask, "146051");
 
-        indicatorResultsMap.put("淋巴结面积", new IndicatorAddIn("Submadibular gland area", slideArea, "平方毫米"));
-        indicatorResultsMap.put("生发中心数量", new IndicatorAddIn("Number of germinal center", areaCount.toString(), "个"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 

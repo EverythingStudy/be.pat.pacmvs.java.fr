@@ -41,7 +41,41 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
     	try{
 	        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 	        log.info("UrinaryBladderParserStrategyImpl start-2");
-	        /*
+
+            // A 膀胱腔面积-平方毫米
+            BigDecimal organAreaA = areaUtils.getOrganArea(jsonTask, "11E034");
+	        // B 组织轮廓面积-平方毫米
+	        String accurateArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+            // C 黏膜上皮面积-平方毫米
+            BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask,"11E035");
+            // D 黏膜固有层+黏膜下层面积-平方毫米
+            BigDecimal organAreaD = areaUtils.getOrganArea(jsonTask,"11E037");
+            // E 黏膜上皮细胞核数量
+            Integer areaCountE = areaUtils.getOrganAreaCount(jsonTask, "11E036");
+            // todo F 血管面积-平方毫米 删了
+            // todo G 血管外红细胞面积-平方毫米
+            BigDecimal organAreaG = areaUtils.getOrganArea(jsonTask,"11E004");
+            // todo H 血管内红细胞面积-平方毫米 删了
+
+            // 算法输出指标
+            indicatorResultsMap.put("膀胱腔面积", new IndicatorAddIn("", organAreaA.toString(), "平方毫米", "1"));
+            indicatorResultsMap.put("黏膜上皮面积", new IndicatorAddIn("", organAreaC.toString(), "平方毫米", "1"));
+            indicatorResultsMap.put("黏膜固有层+黏膜下层面积", new IndicatorAddIn("", organAreaD.toString(), "平方毫米", "1"));
+            indicatorResultsMap.put("黏液腺细胞核数量", new IndicatorAddIn("", areaCountE.toString(), "个", "1"));
+            indicatorResultsMap.put("血管面积", new IndicatorAddIn("", organAreaA.toString(), "平方毫米", "1"));
+            indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("", organAreaC.toString(), "平方毫米", "1"));
+            indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("", organAreaD.toString(), "平方毫米", "1"));
+
+            // 膀胱面积 B-A
+            String result = "";
+            if(!"0".equals(accurateArea)){
+                BigDecimal areaNum = new BigDecimal(accurateArea).subtract(organAreaA);
+                result = areaNum.setScale(3, RoundingMode.HALF_UP).toString();
+            }
+
+            // 产品呈现指标
+	        indicatorResultsMap.put("膀胱面积", new IndicatorAddIn("Urinary bladder area", result, "平方毫米"));
+            /*
 	        indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucosa epithelium area %", "", ""));
 	        indicatorResultsMap.put("黏膜固有层和黏膜下层面积占比", new IndicatorAddIn("Lamina propria and submucosa area %", "", ""));
 	        indicatorResultsMap.put("黏膜上皮细胞核密度", new IndicatorAddIn("Nucleus density of mucosal epithelial nucleus", "", ""));
@@ -49,17 +83,7 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
 	        indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", "", ""));
 	        indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular erythrocyte area%", "", ""));
 	        */
-	        
-	
-	        // B 精细轮廓总面积-平方毫米
-	        String accurateArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
-	        // A 膀胱腔面积-平方毫米
-	        BigDecimal organArea = areaUtils.getOrganArea(jsonTask, "11E034");
-	        // 膀胱面积 B-A
-	        BigDecimal areaNum = new BigDecimal(accurateArea).subtract(organArea);
-	        String result = areaNum.setScale(3, RoundingMode.HALF_UP).toString();
-	
-	        indicatorResultsMap.put("膀胱面积", new IndicatorAddIn("Urinary bladder area", result, "平方毫米"));
+
 	        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     	}catch(Exception e){
     		 log.info("UrinaryBladderParserStrategyImpl start-2:{}",e);
