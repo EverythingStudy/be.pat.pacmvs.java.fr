@@ -194,14 +194,7 @@ public class CommonJsonParser {
                                 processedAnnotations = elementsList.parallelStream().map(element -> {
                                     Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask);
                                     if (!ObjectUtil.isEmpty(annotation)) {
-                                        annotation.setContour(annotation.getContour40000());
-                                        Annotation area = annotationMapper.getArea(annotation);
-                                        BigDecimal decimal = new BigDecimal(ObjectUtil.isNotEmpty(area.getArea()) ? area.getArea() : "0");
-                                        annotation.setArea(decimal.multiply(new BigDecimal(finalResolutionX)).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString());
-                                        String perimeter = ObjectUtil.isNotEmpty(area.getPerimeter()) ? area.getPerimeter() : "0";// 周长
-                                        String multiply = new BigDecimal(perimeter).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString();
-                                        annotation.setPerimeter(multiply);
-                                        return annotation;
+                                        return processAnnotation(finalResolutionX, annotation);
                                     }
                                     return null;
                                 }).filter(Objects::nonNull).collect(Collectors.toList());
@@ -220,14 +213,7 @@ public class CommonJsonParser {
                 processedAnnotations = elementsList.parallelStream().map(element -> {
                     Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask);
                     if (!ObjectUtil.isEmpty(annotation)) {
-                        annotation.setContour(annotation.getContour40000());
-                        Annotation area = annotationMapper.getArea(annotation);
-                        BigDecimal decimal = new BigDecimal(ObjectUtil.isNotEmpty(area.getArea()) ? area.getArea() : "0");
-                        annotation.setArea(decimal.multiply(new BigDecimal(finalResolutionX)).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString());
-                        String perimeter = ObjectUtil.isNotEmpty(area.getPerimeter()) ? area.getPerimeter() : "0";// 周长
-                        String multiply = new BigDecimal(perimeter).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString();
-                        annotation.setPerimeter(multiply);
-                        return annotation;
+                        return processAnnotation(finalResolutionX, annotation);
                     }
                     return null;
                 }).filter(Objects::nonNull).collect(Collectors.toList());
@@ -257,6 +243,17 @@ public class CommonJsonParser {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
 
+    }
+
+    private Annotation processAnnotation(String finalResolutionX, Annotation annotation) {
+        annotation.setContour(annotation.getContour40000());
+        Annotation area = annotationMapper.getArea(annotation);
+        BigDecimal decimal = new BigDecimal(ObjectUtil.isNotEmpty(area.getArea()) ? area.getArea() : "0");
+        annotation.setArea(decimal.multiply(new BigDecimal(finalResolutionX)).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString());
+        String perimeter = ObjectUtil.isNotEmpty(area.getPerimeter()) ? area.getPerimeter() : "0";// 周长
+        String multiply = new BigDecimal(perimeter).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString();
+        annotation.setPerimeter(multiply);
+        return annotation;
     }
 
     /**
