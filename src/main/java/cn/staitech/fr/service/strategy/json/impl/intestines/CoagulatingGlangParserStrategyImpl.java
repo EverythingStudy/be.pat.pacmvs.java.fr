@@ -54,7 +54,7 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         // 腺上皮面积（全片）
         BigDecimal colonArea = commonJsonParser.getOrganArea(jsonTask, "12B074").getStructureAreaNum();
         // 腺腔面积（单个）
-        BigDecimal areaNum = commonJsonParser.getOrganArea(jsonTask, "12B0E9").getStructureAreaNum();
+//        BigDecimal areaNum = commonJsonParser.getOrganArea(jsonTask, "12B0E9").getStructureAreaNum();
         // 腺上皮细胞核数量（单个）
         Integer areaCount = commonJsonParser.getOrganAreaCount(jsonTask, "12B0ED");
         // 腺腔面积（全片）
@@ -66,7 +66,7 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         // 腺腔面积（全片）
         resultMap.put("腺腔面积（全片）", new IndicatorAddIn("Gland cavity area (all)", areaNum2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         // 腺腔面积（单个）
-        resultMap.put("腺腔面积（单个）", new IndicatorAddIn("Gland cavity area (individual)", areaNum.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+//        resultMap.put("腺腔面积（单个）", new IndicatorAddIn("Gland cavity area (individual)", areaNum.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         // 腺上皮面积（全片）
         resultMap.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", colonArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_0));
         // 组织轮廓的面积
