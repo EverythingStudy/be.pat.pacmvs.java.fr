@@ -51,7 +51,7 @@ public class CommonJsonParser {
     @Resource
     private AnnotationService annotationService;
 
-    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String key) {
+    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
         if (element.isObject()) {
             JsonNode node = element.get("id");
             // node 转换成String
@@ -113,7 +113,7 @@ public class CommonJsonParser {
             }
             Annotation annotation = new Annotation();
             // log.info("MapConstant.STRUCTURESIZR_MAP {}", MapConstant.STRUCTURESIZR_MAP);
-            String keys = key + labelCode;
+            String keys = jsonTask.getOrganizationId() + "" + labelCode;
             Integer size = MapConstant.getStructureSize(keys);
             annotation.setStructureSize(size);
 
@@ -153,35 +153,29 @@ public class CommonJsonParser {
     }
 
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
-        String filePath = jsonFileS.getFileUrl();
+        if (checkCategory(jsonTask)) {
+            return;
+        }
+
         // 定位表
         Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
         Annotation anno = new Annotation();
         anno.setSequenceNumber(sequenceNumber);
-        File jsonFile = new File(filePath);
-        ObjectMapper mapper = new ObjectMapper();
-        Image image = imageMapper.selectById(jsonTask.getImageId());
-        String resolutionX = image.getResolutionX();
-        if (StringUtils.isEmpty(resolutionX)) {
-            resolutionX = "0.262";
-        }
-        QueryWrapper<Category> wrapper1 = new QueryWrapper<>();
-        wrapper1.eq("organization_id", jsonTask.getOrganizationId());
-        wrapper1.eq("del_flag", 0);
-        wrapper1.eq("category_id", jsonTask.getCategoryId());
-        Category category = categoryMapper.selectOne(wrapper1);
-        if (ObjectUtil.isEmpty(category)) {
-            return;
-        }
-        String key = jsonTask.getOrganizationId() + "";
-        List<Annotation> processedAnnotations;
-        String finalResolutionX = resolutionX;
 
-        JsonFactory jsonFactory = new MappingJsonFactory();
-        JsonToken current;
         Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
+
+        String finalResolutionX = getResolutionX(jsonTask);
+
+        File jsonFile = new File(jsonFileS.getFileUrl());
+        ObjectMapper mapper = new ObjectMapper();
+        JsonFactory jsonFactory = new MappingJsonFactory();
+
         List<JsonNode> elementsList = new ArrayList<>();
-        int bathSize = 5000;
+        List<Annotation> processedAnnotations;
+
+        JsonToken current;
+        int bathSize=5000;
+
         try (FileInputStream fis = new FileInputStream(jsonFile); JsonParser jsonParser = jsonFactory.createParser(fis)) {
             current = jsonParser.nextToken();
             if (current != JsonToken.START_OBJECT) {
@@ -198,7 +192,7 @@ public class CommonJsonParser {
                             elementsList.add(jsonNode);
                             if (elementsList.size() >= bathSize) {
                                 processedAnnotations = elementsList.parallelStream().map(element -> {
-                                    Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, key);
+                                    Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask);
                                     if (!ObjectUtil.isEmpty(annotation)) {
                                         annotation.setContour(annotation.getContour40000());
                                         Annotation area = annotationMapper.getArea(annotation);
@@ -224,7 +218,7 @@ public class CommonJsonParser {
             }
             if (CollectionUtil.isNotEmpty(elementsList)) {
                 processedAnnotations = elementsList.parallelStream().map(element -> {
-                    Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, key);
+                    Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask);
                     if (!ObjectUtil.isEmpty(annotation)) {
                         annotation.setContour(annotation.getContour40000());
                         Annotation area = annotationMapper.getArea(annotation);
@@ -248,7 +242,7 @@ public class CommonJsonParser {
             List<Annotation> annotations = annotationMapper.selectListBy(annotation);
             Annotation annotation3 = annotationMapper.collectGeometry(jsonTask.getSingleId());
 
-            // 循环annotations并执行官删除操作
+            // 循环annotations并执行删除操作
             if (CollectionUtil.isNotEmpty(annotations)) {
                 annotation3.setContour(annotation3.getCollectContour());
                 Annotation annotation2 = annotationMapper.stIsValid(annotation3);
@@ -263,6 +257,37 @@ public class CommonJsonParser {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
 
+    }
+
+    /**
+     * get resolutionX
+     * @param jsonTask
+     * @return
+     */
+    private String getResolutionX(JsonTask jsonTask) {
+        Image image = imageMapper.selectById(jsonTask.getImageId());
+        String resolutionX = image.getResolutionX();
+        if (StringUtils.isEmpty(resolutionX)) {
+            resolutionX = "0.262";
+        }
+        return resolutionX;
+    }
+
+    /**
+     * checkCategory
+     * @param jsonTask
+     * @return
+     */
+    private boolean checkCategory(JsonTask jsonTask) {
+        QueryWrapper<Category> wrapper1 = new QueryWrapper<>();
+        wrapper1.eq("organization_id", jsonTask.getOrganizationId());
+        wrapper1.eq("del_flag", 0);
+        wrapper1.eq("category_id", jsonTask.getCategoryId());
+        Category category = categoryMapper.selectOne(wrapper1);
+        if (ObjectUtil.isEmpty(category)) {
+            return true;
+        }
+        return false;
     }
 
 
