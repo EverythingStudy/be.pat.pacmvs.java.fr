@@ -1,7 +1,5 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
@@ -19,16 +17,14 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
  * @author wanglibei
  * @version V1.0
  * @ClassName: AortaParserStrategyImpl
- * @Description:大鼠主动脉
+ * @Description:大鼠主动脉-7I
  * @date 2024年5月13日
  */
 @Slf4j

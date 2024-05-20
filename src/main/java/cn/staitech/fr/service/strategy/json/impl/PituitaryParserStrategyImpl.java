@@ -16,20 +16,21 @@ import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author wanglibei
  * @version V1.0
  * @ClassName: PituitaryParserStrategyImpl
- * @Description:大鼠垂体
+ * @Description:大鼠垂体-7I
  * @date 2024年5月13日
  */
 @Slf4j
 @Component("Pituitary")
 public class PituitaryParserStrategyImpl extends AbstractCustomParserStrategy {
 	@Resource
-	private SingleSlideMapper singleSlideMapper;
+    private AreaUtils areaUtils;
 	@Resource
 	private AiForecastService aiForecastService;
 	@Resource
@@ -64,8 +65,10 @@ public class PituitaryParserStrategyImpl extends AbstractCustomParserStrategy {
 		// 红细胞面积 D 平方毫米 数据相加输出
 		BigDecimal pituitaryD = commonJsonParser.getOrganArea(jsonTask, "106004").getStructureAreaNum();
 		// 胸骨面积 ==>组织轮廓面积H
-		BigDecimal pituitaryH = commonJsonParser.getOrganArea(jsonTask, "106111").getStructureAreaNum();
-
+//		BigDecimal pituitaryH = commonJsonParser.getOrganArea(jsonTask, "106111").getStructureAreaNum();
+		 String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+		 BigDecimal pituitaryH = new BigDecimal(0);
+		 pituitaryH = new BigDecimal(slideArea);
 		// 神经部细胞核数量 E 个 无
 		Integer mucosaCountE = commonJsonParser.getOrganAreaCount(jsonTask, "106080");
 		// 中间部细胞核数量 F 个 无

@@ -22,7 +22,7 @@ import java.util.Map;
  * @author wanglibei
  * @version V1.0
  * @ClassName: ParathyroidParserStrategyImpl
- * @Description:大鼠甲状旁腺
+ * @Description:大鼠甲状旁腺-7I
  * @date 2024年5月13日
  */
 @Slf4j

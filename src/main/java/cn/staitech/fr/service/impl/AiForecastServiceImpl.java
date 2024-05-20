@@ -108,8 +108,8 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             forecast.setResults(indicator.getResult());
             forecast.setUnit(indicator.getUnit());
             forecast.setCreateTime(DateUtil.now());
-            if (StringUtils.isNotEmpty(indicator.getStruct_type())) {
-                forecast.setStructType(indicator.getStruct_type());
+            if (StringUtils.isNotEmpty(indicator.getStructType())) {
+                forecast.setStructType(indicator.getStructType());
             }
             aiForecasts.add(forecast);
         }
