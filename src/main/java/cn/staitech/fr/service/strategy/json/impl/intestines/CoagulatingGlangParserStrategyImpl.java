@@ -56,13 +56,13 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         // 腺腔面积（单个）
 //        BigDecimal areaNum = commonJsonParser.getOrganArea(jsonTask, "12B0E9").getStructureAreaNum();
         // 腺上皮细胞核数量（单个）
-        Integer areaCount = commonJsonParser.getOrganAreaCount(jsonTask, "12B0ED");
+//        Integer areaCount = commonJsonParser.getOrganAreaCount(jsonTask, "12B0ED");
         // 腺腔面积（全片）
         BigDecimal areaNum2 = commonJsonParser.getInsideOrOutside(jsonTask, "12B074", "12B0E9", true).getStructureAreaNum();
         // 组织轮廓
         BigDecimal areaNum4 = new BigDecimal(area);
         // 腺上皮细胞核数量（单个）
-        resultMap.put("腺上皮细胞核数量（单个）", new IndicatorAddIn("Acinar epithelial cell number (individual)", areaCount.toString(), "个", CommonConstant.NUMBER_1));
+//        resultMap.put("腺上皮细胞核数量（单个）", new IndicatorAddIn("Acinar epithelial cell number (individual)", areaCount.toString(), "个", CommonConstant.NUMBER_1));
         // 腺腔面积（全片）
         resultMap.put("腺腔面积（全片）", new IndicatorAddIn("Gland cavity area (all)", areaNum2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         // 腺腔面积（单个）
