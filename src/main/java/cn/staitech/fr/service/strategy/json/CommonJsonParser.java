@@ -17,7 +17,6 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.rmi.RemoteException;
@@ -183,7 +181,7 @@ public class CommonJsonParser {
         JsonToken current;
         Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
         List<JsonNode> elementsList = new ArrayList<>();
-        int bathSize=5000;
+        int bathSize = 5000;
         try (FileInputStream fis = new FileInputStream(jsonFile); JsonParser jsonParser = jsonFactory.createParser(fis)) {
             current = jsonParser.nextToken();
             if (current != JsonToken.START_OBJECT) {
@@ -198,7 +196,7 @@ public class CommonJsonParser {
                             String node = jsonParser.readValueAsTree().toString();
                             JsonNode jsonNode = mapper.readTree(node);
                             elementsList.add(jsonNode);
-                            if (elementsList.size()>=bathSize){
+                            if (elementsList.size() >= bathSize) {
                                 processedAnnotations = elementsList.parallelStream().map(element -> {
                                     Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, key);
                                     if (!ObjectUtil.isEmpty(annotation)) {
@@ -215,7 +213,7 @@ public class CommonJsonParser {
                                 }).filter(Objects::nonNull).collect(Collectors.toList());
                                 anno.setList(processedAnnotations);
                                 annotationService.batchProcessAndSave(anno, 1000);
-                                elementsList=new ArrayList<>();
+                                elementsList = new ArrayList<>();
                             }
                         }
                     }
@@ -224,7 +222,7 @@ public class CommonJsonParser {
                     jsonParser.skipChildren();
                 }
             }
-            if (CollectionUtil.isNotEmpty(elementsList)){
+            if (CollectionUtil.isNotEmpty(elementsList)) {
                 processedAnnotations = elementsList.parallelStream().map(element -> {
                     Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, key);
                     if (!ObjectUtil.isEmpty(annotation)) {
@@ -248,16 +246,17 @@ public class CommonJsonParser {
             annotation.setFiligreeContour(true);
             annotation.setSingleSlideId(jsonTask.getSingleId());
             List<Annotation> annotations = annotationMapper.selectListBy(annotation);
+            Annotation annotation3 = annotationMapper.collectGeometry(jsonTask.getSingleId());
 
             // 循环annotations并执行官删除操作
             if (CollectionUtil.isNotEmpty(annotations)) {
-                annotations.forEach(annotation1 -> {
-                    annotation1.setSequenceNumber(sequenceNumber);
-                    Annotation annotation2 = annotationMapper.stIsValid(annotation1);
-                    if (ObjectUtil.equals(annotation2.getResults(), "t")) {
-                        annotationMapper.deleteAiAnnotation(annotation1);
-                    }
-                });
+                annotation3.setContour(annotation3.getCollectContour());
+                Annotation annotation2 = annotationMapper.stIsValid(annotation3);
+                if (ObjectUtil.equals(annotation2.getResults(), "t")) {
+                    annotation3.setSequenceNumber(sequenceNumber);
+                    annotation3.setSingleSlideId(jsonTask.getSingleId());
+                    annotationMapper.deleteAiAnnotation(annotation3);
+                }
             }
 
         } catch (Exception e) {
