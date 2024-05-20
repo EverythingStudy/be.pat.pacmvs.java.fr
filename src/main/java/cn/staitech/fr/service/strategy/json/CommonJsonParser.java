@@ -179,7 +179,8 @@ public class CommonJsonParser {
         try (FileInputStream fis = new FileInputStream(jsonFile); JsonParser jsonParser = jsonFactory.createParser(fis)) {
             current = jsonParser.nextToken();
             if (current != JsonToken.START_OBJECT) {
-                throw new RemoteException("json type error！");
+                log.error("json type error！ : {}",current);
+                return;
             }
             while (jsonParser.nextToken() != JsonToken.END_OBJECT) {
                 String fieldName = jsonParser.getCurrentName();
