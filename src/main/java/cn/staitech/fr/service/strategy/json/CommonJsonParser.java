@@ -245,6 +245,12 @@ public class CommonJsonParser {
 
     }
 
+    /**
+     * 处理周长、面积等
+     * @param finalResolutionX
+     * @param annotation
+     * @return
+     */
     private Annotation processAnnotation(String finalResolutionX, Annotation annotation) {
         annotation.setContour(annotation.getContour40000());
         Annotation area = annotationMapper.getArea(annotation);
