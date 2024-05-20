@@ -41,14 +41,14 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-        // todo A生精小管面积（单个）-平方毫米
+        // todo A生精小管面积（单个）
         // B生精小管面积（全片）-平方毫米
         BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "12E0FA");
         // C生精小管周长（单个）
         Annotation annotation = commonJsonParser.getOrganArea(jsonTask, "12E0FA");
         BigDecimal structurePerimeterNum = annotation.getStructurePerimeterNum();
         // D生精小管数量
-        Integer areaCount = areaUtils.getOrganAreaCount(jsonTask, "12E0FA");
+        Integer areaCountD = areaUtils.getOrganAreaCount(jsonTask, "12E0FA");
         // todo E生精小管内腔面积（单个）
         // todo F生精细胞核数量（单个）
         // todo G支持细胞核数量（单个）
@@ -60,20 +60,21 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
 
         // 算法输出指标
-        //indicatorResultsMap.put("生精小管面积（单个）", new IndicatorAddIn("", "", "10³平方微米", "1"));
         indicatorResultsMap.put("生精小管面积（全片）", new IndicatorAddIn("", organAreaB.toString(), "平方毫米", "1"));
         indicatorResultsMap.put("生精小管周长（单个）", new IndicatorAddIn("", structurePerimeterNum.toString(), "毫米", "1"));
-        indicatorResultsMap.put("生精小管数量", new IndicatorAddIn("", areaCount.toString(), "个", "1"));
-        //indicatorResultsMap.put("生精小管内腔面积（单个）", new IndicatorAddIn("", areaCount.toString(), "平方毫米", "1"));
-        //indicatorResultsMap.put("生精细胞核数量（单个）", new IndicatorAddIn("", , "个", "1"));
-        //indicatorResultsMap.put("支持细胞核数量（单个）", new IndicatorAddIn("", , "个", "1"));
+        indicatorResultsMap.put("生精小管数量", new IndicatorAddIn("", areaCountD.toString(), "个", "1"));
         indicatorResultsMap.put("间质细胞核数量", new IndicatorAddIn("", areaCountH.toString(), "个", "1"));
         indicatorResultsMap.put("血管面积", new IndicatorAddIn("", organAreaI.toString(), "平方毫米", "1"));
-
+        /*
+        indicatorResultsMap.put("生精小管面积（单个）", new IndicatorAddIn("", "", "10³平方微米", "1"));
+        indicatorResultsMap.put("生精小管内腔面积（单个）", new IndicatorAddIn("", areaCount.toString(), "平方毫米", "1"));
+        indicatorResultsMap.put("生精细胞核数量（单个）", new IndicatorAddIn("", , "个", "1"));
+        indicatorResultsMap.put("支持细胞核数量（单个）", new IndicatorAddIn("", , "个", "1"));
+         */
 
         // D/J生精小管密度
-        BigDecimal densityResult = (null == areaCount) ? BigDecimal.ZERO
-                : new BigDecimal(areaCount).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP);
+        BigDecimal densityResult = (0 == areaCountD) ? BigDecimal.ZERO
+                : new BigDecimal(areaCountD).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP);
 
         // 产品呈现指标
         indicatorResultsMap.put("睾丸面积", new IndicatorAddIn("Testicular area", slideArea, "平方毫米"));
