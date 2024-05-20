@@ -154,26 +154,6 @@ public class CommonJsonParser {
         }
     }
 
-    private static void processObjectNode(JsonParser jsonParser, List<JsonNode> elementsList) throws IOException {
-        JsonNode objectNode = jsonParser.readValueAsTree(); // 仅读取当前对象，不会加载整个文件
-        if (ObjectUtil.isNotEmpty(objectNode) && objectNode.has("features")) {
-            ArrayNode featuresNode = (ArrayNode) objectNode.get("features");
-            if (featuresNode.isArray()) {
-                Iterator<JsonNode> elementsIterator = featuresNode.elements();
-                while (elementsIterator.hasNext()) {
-                    elementsList.add(elementsIterator.next());
-                }
-            } else {
-                log.error("Merged JSON data is not an array of objects as expected at current JSON object.");
-            }
-        } else {
-            log.info("'features' field not found in the current JSON object.");
-        }
-        while (!jsonParser.isClosed() && jsonParser.nextToken() != JsonToken.END_OBJECT) {
-            jsonParser.skipChildren(); // 跳过当前对象的所有子节点
-        }
-    }
-
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         String filePath = jsonFileS.getFileUrl();
         // 定位表
@@ -182,11 +162,28 @@ public class CommonJsonParser {
         anno.setSequenceNumber(sequenceNumber);
         File jsonFile = new File(filePath);
         ObjectMapper mapper = new ObjectMapper();
+        Image image = imageMapper.selectById(jsonTask.getImageId());
+        String resolutionX = image.getResolutionX();
+        if (StringUtils.isEmpty(resolutionX)) {
+            resolutionX = "0.262";
+        }
+        QueryWrapper<Category> wrapper1 = new QueryWrapper<>();
+        wrapper1.eq("organization_id", jsonTask.getOrganizationId());
+        wrapper1.eq("del_flag", 0);
+        wrapper1.eq("category_id", jsonTask.getCategoryId());
+        Category category = categoryMapper.selectOne(wrapper1);
+        if (ObjectUtil.isEmpty(category)) {
+            return;
+        }
+        String key = jsonTask.getOrganizationId() + "";
+        List<Annotation> processedAnnotations;
+        String finalResolutionX = resolutionX;
 
         JsonFactory jsonFactory = new MappingJsonFactory();
         JsonToken current;
         Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
         List<JsonNode> elementsList = new ArrayList<>();
+        int bathSize=5000;
         try (FileInputStream fis = new FileInputStream(jsonFile); JsonParser jsonParser = jsonFactory.createParser(fis)) {
             current = jsonParser.nextToken();
             if (current != JsonToken.START_OBJECT) {
@@ -200,58 +197,58 @@ public class CommonJsonParser {
                         while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
                             String node = jsonParser.readValueAsTree().toString();
                             JsonNode jsonNode = mapper.readTree(node);
-//                            log.info("node:{}", jsonNode);
                             elementsList.add(jsonNode);
+                            if (elementsList.size()>=bathSize){
+                                processedAnnotations = elementsList.parallelStream().map(element -> {
+                                    Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, key);
+                                    if (!ObjectUtil.isEmpty(annotation)) {
+                                        annotation.setContour(annotation.getContour40000());
+                                        Annotation area = annotationMapper.getArea(annotation);
+                                        BigDecimal decimal = new BigDecimal(ObjectUtil.isNotEmpty(area.getArea()) ? area.getArea() : "0");
+                                        annotation.setArea(decimal.multiply(new BigDecimal(finalResolutionX)).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString());
+                                        String perimeter = ObjectUtil.isNotEmpty(area.getPerimeter()) ? area.getPerimeter() : "0";// 周长
+                                        String multiply = new BigDecimal(perimeter).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString();
+                                        annotation.setPerimeter(multiply);
+                                        return annotation;
+                                    }
+                                    return null;
+                                }).filter(Objects::nonNull).collect(Collectors.toList());
+                                anno.setList(processedAnnotations);
+                                annotationService.batchProcessAndSave(anno, 1000);
+                                elementsList=new ArrayList<>();
+                            }
                         }
-
                     }
 
                 } else {
                     jsonParser.skipChildren();
                 }
             }
-            if (CollectionUtil.isEmpty(elementsList)) {
-                log.error("No valid JSON data found in the file.");
-                return;
+            if (CollectionUtil.isNotEmpty(elementsList)){
+                processedAnnotations = elementsList.parallelStream().map(element -> {
+                    Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, key);
+                    if (!ObjectUtil.isEmpty(annotation)) {
+                        annotation.setContour(annotation.getContour40000());
+                        Annotation area = annotationMapper.getArea(annotation);
+                        BigDecimal decimal = new BigDecimal(ObjectUtil.isNotEmpty(area.getArea()) ? area.getArea() : "0");
+                        annotation.setArea(decimal.multiply(new BigDecimal(finalResolutionX)).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString());
+                        String perimeter = ObjectUtil.isNotEmpty(area.getPerimeter()) ? area.getPerimeter() : "0";// 周长
+                        String multiply = new BigDecimal(perimeter).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString();
+                        annotation.setPerimeter(multiply);
+                        return annotation;
+                    }
+                    return null;
+                }).filter(Objects::nonNull).collect(Collectors.toList());
+                anno.setList(processedAnnotations);
+                annotationService.batchProcessAndSave(anno, 1000);
             }
-            Image image = imageMapper.selectById(jsonTask.getImageId());
-            String resolutionX = image.getResolutionX();
-            if (StringUtils.isEmpty(resolutionX)) {
-                resolutionX = "0.262";
-            }
-            QueryWrapper<Category> wrapper1 = new QueryWrapper<>();
-            wrapper1.eq("organization_id", jsonTask.getOrganizationId());
-            wrapper1.eq("del_flag", 0);
-            wrapper1.eq("category_id", jsonTask.getCategoryId());
-            Category category = categoryMapper.selectOne(wrapper1);
-            if (ObjectUtil.isEmpty(category)) {
-                return;
-            }
-            String key = jsonTask.getOrganizationId() + "";
-            List<Annotation> processedAnnotations;
-            String finalResolutionX = resolutionX;
-            processedAnnotations = elementsList.parallelStream().map(element -> {
-                Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, key);
-                if (!ObjectUtil.isEmpty(annotation)) {
-                    annotation.setContour(annotation.getContour40000());
-                    Annotation area = annotationMapper.getArea(annotation);
-                    BigDecimal decimal = new BigDecimal(ObjectUtil.isNotEmpty(area.getArea()) ? area.getArea() : "0");
-                    annotation.setArea(decimal.multiply(new BigDecimal(finalResolutionX)).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString());
-                    String perimeter = ObjectUtil.isNotEmpty(area.getPerimeter()) ? area.getPerimeter() : "0";// 周长
-                    String multiply = new BigDecimal(perimeter).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString();
-                    annotation.setPerimeter(multiply);
-                    return annotation;
-                }
-                return null;
-            }).filter(Objects::nonNull).collect(Collectors.toList());
 
-            anno.setList(processedAnnotations);
-            annotationService.batchProcessAndSave(anno, 500);
             Annotation annotation = new Annotation();
             annotation.setMagnification(40000L);
             annotation.setFiligreeContour(true);
             annotation.setSingleSlideId(jsonTask.getSingleId());
             List<Annotation> annotations = annotationMapper.selectListBy(annotation);
+
             // 循环annotations并执行官删除操作
             if (CollectionUtil.isNotEmpty(annotations)) {
                 annotations.forEach(annotation1 -> {
