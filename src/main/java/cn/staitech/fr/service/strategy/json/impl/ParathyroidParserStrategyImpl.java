@@ -8,6 +8,7 @@ import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -31,11 +32,11 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy 
 	@Resource
 	private AnnotationMapper annotationMapper;
 	@Resource
-	private SingleSlideMapper singleSlideMapper;
-	@Resource
 	private AiForecastService aiForecastService;
 	@Resource
 	private CommonJsonParser commonJsonParser;
+	@Resource
+    private AreaUtils areaUtils;
 
 	@PostConstruct
 	public void init() {
@@ -58,17 +59,14 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy 
 		//		产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
 		//		主细胞核密度	1	个/10³平方微米	Nucleus density of chief cell 	1=A/B	
 		//		甲状旁腺面积	2	10³平方微米	Parathyroid gland area	2=B	
-		SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-
+		String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
 		//主细胞核数量A 个
 		Integer mucosaCountA = commonJsonParser.getOrganAreaCount(jsonTask, "108091");
 		//组织轮廓面积==>甲状旁腺面积 B 10³平方微米
 		BigDecimal areaDecimalB = new BigDecimal(0);
-		if (StringUtils.isNotEmpty(singleSlide.getArea())) {
-			BigDecimal cimal = new BigDecimal(1000000);
-			BigDecimal areaDecimal = new BigDecimal(singleSlide.getArea());
-			//转平方微米
-			areaDecimalB = areaDecimal.multiply(cimal).setScale(3, RoundingMode.HALF_UP);
+		if (StringUtils.isNotEmpty(slideArea)) {
+			String area = areaUtils.convertToSquareMicrometer(slideArea);
+			areaDecimalB  = new BigDecimal(area);
 		}
 
 		

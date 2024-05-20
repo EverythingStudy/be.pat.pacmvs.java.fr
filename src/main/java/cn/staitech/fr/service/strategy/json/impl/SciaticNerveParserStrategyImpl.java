@@ -11,6 +11,7 @@ import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -27,7 +28,8 @@ public class SciaticNerveParserStrategyImpl extends AbstractCustomParserStrategy
 	private AiForecastService aiForecastService;
 	@Resource
 	private CommonJsonParser commonJsonParser;
-
+	@Resource
+    private AreaUtils areaUtils;
 	@PostConstruct
 	public void init() {
 		setCommonJsonParser(commonJsonParser);
@@ -53,8 +55,7 @@ public class SciaticNerveParserStrategyImpl extends AbstractCustomParserStrategy
 
 		//神经纤维束面积	1	10³平方微米	Nerve fiber bundles area	1=A
 		BigDecimal pituitaryA = commonJsonParser.getOrganArea(jsonTask, "1400BB").getStructureAreaNum();
-		BigDecimal pituitaryAmicron = pituitaryA.multiply(new BigDecimal("0.001"));
-
+		String accurateArea = areaUtils.convertToSquareMicrometer(pituitaryA.toString());
 
 		//神经外膜结缔组织面积 B 平方毫米
 		BigDecimal bigDecimalB = commonJsonParser.getOrganArea(jsonTask, "1400BA").getStructureAreaNum();
@@ -65,7 +66,7 @@ public class SciaticNerveParserStrategyImpl extends AbstractCustomParserStrategy
 
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 		//神经纤维束面积	1	10³平方微米	Nerve fiber bundles area	1=A
-		indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("Nerve fiber bundles area", String.valueOf(pituitaryAmicron), "10³平方微米", "0"));
+		indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("Nerve fiber bundles area", accurateArea, "10³平方微米", "0"));
 		indicatorResultsMap.put("神经外膜结缔组织面积", new IndicatorAddIn("", String.valueOf(bigDecimalB), "平方毫米", "1"));
 		indicatorResultsMap.put("结缔组织面积", new IndicatorAddIn("Connective tissue area", String.valueOf(BigDecimalB_A), "平方毫米", "0"));
 
