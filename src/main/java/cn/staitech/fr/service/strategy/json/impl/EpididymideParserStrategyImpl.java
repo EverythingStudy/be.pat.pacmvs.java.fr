@@ -52,23 +52,24 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         // todo F精子面积（单个）
         // G精子面积（全片）
         BigDecimal organAreaG = commonJsonParser.getOrganAreaMicron(jsonTask, "12F0F7");
-        // H黏膜上皮细胞核数量（单个）
-        Integer areaCount = areaUtils.getOrganAreaCount(jsonTask, "12F0F6");
+        // todo H黏膜上皮细胞核数量（单个）
         // I血管面积
         BigDecimal organAreaI = commonJsonParser.getOrganAreaMicron(jsonTask, "12F003");
         // J组织轮廓面积-平方毫米
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
 
         // 算法输出指标
-        //indicatorResultsMap.put("输出小管/附睾管黏膜上皮面积（单个）", new IndicatorAddIn("", "", "10³平方微米", "1"));
         indicatorResultsMap.put("输出小管/附睾管黏膜上皮面积（全片）", new IndicatorAddIn("", organAreaB.toString(), "平方毫米", "1"));
         indicatorResultsMap.put("输出小管/附睾管黏膜上皮周长（单个）", new IndicatorAddIn("", structurePerimeterNum.toString(), "毫米", "1"));
-        //indicatorResultsMap.put("输出小管/附睾管管腔面积（单个）", new IndicatorAddIn("", "", "10³平方微米", "1"));
         indicatorResultsMap.put("输出小管/附睾管管腔面积（全片）", new IndicatorAddIn("", organAreaE.toString(), "平方毫米", "1"));
-        //indicatorResultsMap.put("精子面积（单个）", new IndicatorAddIn("", "", "10³平方微米", "1"));
         indicatorResultsMap.put("精子面积（全片）", new IndicatorAddIn("", organAreaG.toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("黏膜上皮细胞核数量（单个）", new IndicatorAddIn("", areaCount.toString(), "个", "1"));
         indicatorResultsMap.put("血管面积", new IndicatorAddIn("", organAreaI.toString(), "平方毫米", "1"));
+        /*
+         indicatorResultsMap.put("输出小管/附睾管黏膜上皮面积（单个）", new IndicatorAddIn("", "", "10³平方微米", "1"));
+         indicatorResultsMap.put("输出小管/附睾管管腔面积（单个）", new IndicatorAddIn("", "", "10³平方微米", "1"));
+         indicatorResultsMap.put("精子面积（单个）", new IndicatorAddIn("", "", "10³平方微米", "1"));
+         indicatorResultsMap.put("黏膜上皮细胞核数量（单个）", new IndicatorAddIn("", areaCount.toString(), "个", "1"));
+         */
 
         // 产品呈现指标
         indicatorResultsMap.put("附睾面积", new IndicatorAddIn("Epididymal area", slideArea, "平方毫米"));
