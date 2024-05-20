@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
  * @author wanglibei
  * @version V1.0
  * @ClassName: SciaticNerveParserStrategyImpl
- * @Description:大鼠坐骨神经
+ * @Description:大鼠坐骨神经-7I
  * @date 2024年5月13日
  */
 @Slf4j
