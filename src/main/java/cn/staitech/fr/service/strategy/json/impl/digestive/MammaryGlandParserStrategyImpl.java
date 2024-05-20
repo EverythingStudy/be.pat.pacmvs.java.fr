@@ -1,10 +1,7 @@
 package cn.staitech.fr.service.strategy.json.impl.digestive;
 
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.constant.CommonConstant;
-import cn.staitech.fr.domain.AiForecast;
-import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -22,9 +19,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -71,7 +66,30 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         BigDecimal organArea1 = commonJsonParser.getOrganArea(jsonTask, "12306C").getStructureAreaNum();
         BigDecimal organArea2 = commonJsonParser.getOrganArea(jsonTask, "12303F").getStructureAreaNum();
         Integer organAreaCount2 = commonJsonParser.getOrganAreaCount(jsonTask, "1230C7");
-
+        // 表皮角质层面积
+        BigDecimal organArea3 = commonJsonParser.getOrganArea(jsonTask, "121096").getStructureAreaNum();
+        // 表皮基底层+棘层+颗粒层面积
+        BigDecimal organArea4 = commonJsonParser.getOrganArea(jsonTask, "121097").getStructureAreaNum();
+        // 毛囊数量
+        Integer areaCount = commonJsonParser.getOrganAreaCount(jsonTask, "121098");
+        // 皮脂腺面积
+        BigDecimal organArea5 = commonJsonParser.getOrganAreaMicron(jsonTask, "121099");
+        // 皮脂腺数量
+        Integer organAreaCount1 = commonJsonParser.getOrganAreaCount(jsonTask, "121099");
+        // 毛囊面积（全片）
+        BigDecimal organArea6 = commonJsonParser.getOrganArea(jsonTask, "121098").getStructureAreaNum();
+        // 毛囊密度
+        BigDecimal divide = new BigDecimal(0);
+        if (ObjectUtil.isNotEmpty(organAreaB) && !ObjectUtil.equals(organAreaB, new BigDecimal(0))) {
+            BigDecimal decimal = new BigDecimal(areaCount);
+            divide = decimal.divide(organAreaB, 3, RoundingMode.HALF_UP);
+        }
+        // 皮脂腺密度
+        BigDecimal divide1 = new BigDecimal(0);
+        if (ObjectUtil.isNotEmpty(organAreaB) && !ObjectUtil.equals(organAreaB, new BigDecimal(0))) {
+            BigDecimal decimal = new BigDecimal(organAreaCount1);
+            divide1 = decimal.divide(organAreaB, 3, RoundingMode.HALF_UP);
+        }
 
         indicatorResultsMap.put("乳腺腺泡和导管数量", new IndicatorAddIn("Number of acinus and ducts", organAreaCount.toString(), "个"));
         indicatorResultsMap.put("乳腺面积", new IndicatorAddIn("Mammary gland area", h.subtract(organAreaA).subtract(organAreaB).setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米"));
@@ -81,53 +99,23 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         indicatorResultsMap.put("结缔组织面积", new IndicatorAddIn("Connective tissue area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("Organizational contour area", h.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("乳腺细胞核数量（全片）", new IndicatorAddIn("Number of breast cell nuclei (all)", organAreaCount2.toString(), "个", CommonConstant.NUMBER_1));
+        // 表皮角质层面积
+        indicatorResultsMap.put("表皮角质层面积", new IndicatorAddIn("Epidermal stratum corneum area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米"));
+        // 表皮基底层+棘层+颗粒层面积
+        indicatorResultsMap.put("表皮基底层+棘层+颗粒层面积", new IndicatorAddIn("Area of basal layer+spinous layer+granular layer of epidermis", organArea4.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米"));
+        // 毛囊数量
+        indicatorResultsMap.put("毛囊数量", new IndicatorAddIn("Number of mucous sacs", areaCount.toString(), "个"));
+        // 皮脂腺面积
+        indicatorResultsMap.put("皮脂腺面积", new IndicatorAddIn("Sebaceous gland area", organArea5.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米"));
+        // 皮脂腺数量
+        indicatorResultsMap.put("皮脂腺数量", new IndicatorAddIn("Number of sebaceous glands", organAreaCount1.toString(), "个"));
+        // 毛囊面积（全片）
+        indicatorResultsMap.put("毛囊面积（全片）", new IndicatorAddIn("Mucous sac area (all)", organArea6.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米"));
+        // 毛囊密度
+        indicatorResultsMap.put("毛囊密度", new IndicatorAddIn("Mucous sac density", divide.toString(), "个/平方毫米", CommonConstant.NUMBER_1));
+        // 皮脂腺密度
+        indicatorResultsMap.put("皮脂腺密度", new IndicatorAddIn("Sebaceous gland density", divide1.toString(), "个/平方毫米", CommonConstant.NUMBER_1));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
-        // 查询所有未被删除且登录机构相同的数据
-        Map<String, Long> pathologicalMap = commonJsonParser.getPathologicalMap(jsonTask.getOrganizationId());
-        //定位表
-        Long sequenceNumber = commonJsonParser.getSequenceNumber(jsonTask.getSpecialId());
-        Annotation annotation = new Annotation();
-        annotation.setSingleSlideId(jsonTask.getSingleId());
-        annotation.setSequenceNumber(sequenceNumber);
-        List<AiForecast> insertEntity = new ArrayList<>();
-        AiForecast aiForecast2 = new AiForecast();
-        aiForecast2.setQuantitativeIndicators("皮肤面积");
-        aiForecast2.setQuantitativeIndicatorsEn("Skin area");
-        aiForecast2.setUnit("平方毫米");
-        aiForecast2.setSingleSlideId(jsonTask.getSingleId());
-        aiForecast2.setCreateTime(DateUtil.now());
-        aiForecast2.setResults(organAreaB.setScale(3, RoundingMode.HALF_UP).toString());
-        insertEntity.add(aiForecast2);
-        AiForecast aiForecast3 = new AiForecast();
-        aiForecast3.setQuantitativeIndicators("皮脂腺密度");
-        aiForecast3.setQuantitativeIndicatorsEn("Density of Sebaceous glands");
-        aiForecast3.setUnit("个/平方毫米");
-        aiForecast3.setCreateTime(DateUtil.now());
-        aiForecast3.setSingleSlideId(jsonTask.getSingleId());
-        // 获取皮脂腺的数量
-        annotation.setCategoryId(pathologicalMap.get("121099"));
-        Integer i = annotationMapper.countDucts(annotation);
-        BigDecimal decimal = new BigDecimal(i);
-        if (ObjectUtil.isNotEmpty(organAreaB) && !ObjectUtil.equals(organAreaB, new BigDecimal(0))){
-            aiForecast3.setResults(decimal.divide(organAreaB, 3, RoundingMode.HALF_UP) + "");
-        }
-        insertEntity.add(aiForecast3);
-        AiForecast aiForecast4 = new AiForecast();
-        aiForecast4.setQuantitativeIndicators("毛囊密度");
-        aiForecast4.setQuantitativeIndicatorsEn("Density of hair follicles");
-        aiForecast4.setUnit("个/平方毫米");
-        aiForecast4.setSingleSlideId(jsonTask.getSingleId());
-        aiForecast4.setCreateTime(DateUtil.now());
-        // 获取毛囊密度的数量
-        annotation.setCategoryId(pathologicalMap.get("121098"));
-        Integer i1 = annotationMapper.countDucts(annotation);
-        BigDecimal decimal1 = new BigDecimal(i1);
-        if (ObjectUtil.isNotEmpty(organAreaB) && !ObjectUtil.equals(organAreaB, new BigDecimal(0))){
-            aiForecast4.setResults(decimal1.divide(organAreaB, 3, RoundingMode.HALF_UP) + "");
-        }
-        insertEntity.add(aiForecast4);
-
-        aiForecastService.saveBatch(insertEntity);
     }
 
     @Override
