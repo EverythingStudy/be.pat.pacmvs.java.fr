@@ -15,9 +15,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -28,6 +28,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.rmi.RemoteException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -153,13 +154,9 @@ public class CommonJsonParser {
         }
     }
 
-    private static void processObjectNode(ObjectMapper objectMapper, JsonParser jsonParser, List<JsonNode> elementsList) throws IOException {
-        ObjectNode objectNode = objectMapper.readTree(jsonParser);
-        if (objectNode == null || !objectNode.isObject()) {
-            log.error("Input JSON data is not a valid object.");
-            return;
-        }
-        if (objectNode.has("features")) {
+    private static void processObjectNode(JsonParser jsonParser, List<JsonNode> elementsList) throws IOException {
+        JsonNode objectNode = jsonParser.readValueAsTree(); // 仅读取当前对象，不会加载整个文件
+        if (ObjectUtil.isNotEmpty(objectNode) && objectNode.has("features")) {
             ArrayNode featuresNode = (ArrayNode) objectNode.get("features");
             if (featuresNode.isArray()) {
                 Iterator<JsonNode> elementsIterator = featuresNode.elements();
@@ -172,6 +169,9 @@ public class CommonJsonParser {
         } else {
             log.info("'features' field not found in the current JSON object.");
         }
+        while (!jsonParser.isClosed() && jsonParser.nextToken() != JsonToken.END_OBJECT) {
+            jsonParser.skipChildren(); // 跳过当前对象的所有子节点
+        }
     }
 
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
@@ -180,22 +180,34 @@ public class CommonJsonParser {
         Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
         Annotation anno = new Annotation();
         anno.setSequenceNumber(sequenceNumber);
-        ObjectMapper objectMapper = new ObjectMapper();
-        JsonFactory jsonFactory = objectMapper.getFactory();
         File jsonFile = new File(filePath);
+        ObjectMapper mapper = new ObjectMapper();
 
+        JsonFactory jsonFactory = new MappingJsonFactory();
+        JsonToken current;
         Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
-
+        List<JsonNode> elementsList = new ArrayList<>();
         try (FileInputStream fis = new FileInputStream(jsonFile); JsonParser jsonParser = jsonFactory.createParser(fis)) {
+            current = jsonParser.nextToken();
+            if (current != JsonToken.START_OBJECT) {
+                throw new RemoteException("json type error！");
+            }
+            while (jsonParser.nextToken() != JsonToken.END_OBJECT) {
+                String fieldName = jsonParser.getCurrentName();
+                current = jsonParser.nextToken();
+                if ("features".equals(fieldName)) {
+                    if (current == JsonToken.START_ARRAY) {
+                        while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
+                            String node = jsonParser.readValueAsTree().toString();
+                            JsonNode jsonNode = mapper.readTree(node);
+//                            log.info("node:{}", jsonNode);
+                            elementsList.add(jsonNode);
+                        }
 
-            List<JsonNode> elementsList = new ArrayList<>();
-            while (!jsonParser.isClosed()) {
-                JsonToken token = jsonParser.nextToken();
-                if (token == null) {
-                    break;
-                }
-                if (token == JsonToken.START_OBJECT) {
-                    processObjectNode(objectMapper, jsonParser, elementsList);
+                    }
+
+                } else {
+                    jsonParser.skipChildren();
                 }
             }
             if (CollectionUtil.isEmpty(elementsList)) {
@@ -256,6 +268,7 @@ public class CommonJsonParser {
         }
 
     }
+
 
     /**
      * 查询所有未被删除且登录机构相同的数据
@@ -322,8 +335,7 @@ public class CommonJsonParser {
     }
 
 
-
-    public Annotation getInsideOrOutside(JsonTask jsonTask, String structureId, String structureIds,Boolean InsideOrOutside) {
+    public Annotation getInsideOrOutside(JsonTask jsonTask, String structureId, String structureIds, Boolean InsideOrOutside) {
         // 查询所有未被删除且登录机构相同的数据
         Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
         // 定位表
@@ -336,13 +348,13 @@ public class CommonJsonParser {
         annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
         // 查询合并后的轮廓数据
         Annotation annotationBy = annotationMapper.collectAiGeometry(annotation);
-        if(annotationBy == null){
+        if (annotationBy == null) {
             return new Annotation();
         }
         annotation.setContour(annotationBy.getCollectContour());
         // 校验轮廓的合理性
         String result = annotationMapper.stIsValid(annotation).getResults();
-        if(Objects.equals(result, "f")){
+        if (Objects.equals(result, "f")) {
             return new Annotation();
         }
         annotation.setInsideOrOutside(InsideOrOutside);
@@ -364,7 +376,7 @@ public class CommonJsonParser {
         }
         return annotation;
     }
-    
+
     /**
      * 获取脏器轮廓面积（micron）
      *
