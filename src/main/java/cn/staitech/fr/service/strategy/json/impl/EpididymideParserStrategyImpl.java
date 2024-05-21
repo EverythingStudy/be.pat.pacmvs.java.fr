@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -41,16 +42,13 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-        // todo A输出小管/附睾管黏膜上皮面积（单个）
         // B输出小管/附睾管黏膜上皮面积（全片）
         BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "12F0F5");
         // C输出小管/附睾管黏膜上皮周长（单个）
         Annotation annotation = commonJsonParser.getOrganArea(jsonTask, "12F0F5");
         BigDecimal structurePerimeterNum = annotation.getStructurePerimeterNum();
-        // todo D输出小管/附睾管管腔面积（单个）
         // E输出小管/附睾管管腔面积（全片）
         BigDecimal organAreaE = areaUtils.getOrganArea(jsonTask, "12F0F4");
-        // todo F精子面积（单个）
         // G精子面积（全片）
         BigDecimal organAreaG = areaUtils.getOrganArea(jsonTask, "12F0F7");
         // todo H黏膜上皮细胞核数量（单个）
@@ -60,17 +58,15 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
 
         // 算法输出指标
-        indicatorResultsMap.put("输出小管/附睾管黏膜上皮面积（全片）", new IndicatorAddIn("", organAreaB.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("输出小管/附睾管黏膜上皮周长（单个）", new IndicatorAddIn("", structurePerimeterNum.toString(), "毫米", "1"));
-        indicatorResultsMap.put("输出小管/附睾管管腔面积（全片）", new IndicatorAddIn("", organAreaE.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("精子面积（全片）", new IndicatorAddIn("", organAreaG.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("血管面积", new IndicatorAddIn("", organAreaI.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", "1"));
-        /*
-         indicatorResultsMap.put("输出小管/附睾管黏膜上皮面积（单个）", new IndicatorAddIn("", "", "10³平方微米", "1"));
-         indicatorResultsMap.put("输出小管/附睾管管腔面积（单个）", new IndicatorAddIn("", "", "10³平方微米", "1"));
-         indicatorResultsMap.put("精子面积（单个）", new IndicatorAddIn("", "", "10³平方微米", "1"));
-         indicatorResultsMap.put("黏膜上皮细胞核数量（单个）", new IndicatorAddIn("", areaCount.toString(), "个", "1"));
-         */
+        indicatorResultsMap.put("输出小管/附睾管黏膜上皮面积（全片）", new IndicatorAddIn("", organAreaB.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("输出小管/附睾管黏膜上皮周长（单个）", new IndicatorAddIn("", structurePerimeterNum.toString(), "毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("输出小管/附睾管管腔面积（全片）", new IndicatorAddIn("", organAreaE.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("精子面积（全片）", new IndicatorAddIn("", organAreaG.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("血管面积", new IndicatorAddIn("", organAreaI.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("输出小管/附睾管黏膜上皮面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT,CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("输出小管/附睾管管腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT,CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("精子面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        //indicatorResultsMap.put("黏膜上皮细胞核数量（单个）", new IndicatorAddIn("", areaCount.toString(), "个", "1"));
 
         // 产品呈现指标
         indicatorResultsMap.put("附睾面积", new IndicatorAddIn("Epididymal area", new BigDecimal(slideArea).setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米"));

@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.service.AiForecastService;
@@ -39,7 +40,6 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-        // todo A肌纤维面积（单个）
         // B间质面积
         BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "15C027");
         // C血管面积
@@ -52,11 +52,11 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
 
         // 算法输出指标
-        //indicatorResultsMap.put("肌纤维面积（单个）", new IndicatorAddIn("", organAreaA.toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("间质面积", new IndicatorAddIn("", areaUtils.convertToSquareMicrometer(organAreaB.toString()), "10³平方微米", "1"));
-        indicatorResultsMap.put("血管面积", new IndicatorAddIn("", areaUtils.convertToSquareMicrometer(organAreaC.toString()), "10³平方微米", "1"));
-        indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", areaUtils.convertToMicrometer(organAreaD.toString()), "平方微米", "1"));
-        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("", areaUtils.convertToMicrometer(organAreaE.toString()), "平方微米", "1"));
+        indicatorResultsMap.put("肌纤维面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("间质面积", new IndicatorAddIn("", areaUtils.convertToSquareMicrometer(organAreaB.toString()), "10³平方微米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("血管面积", new IndicatorAddIn("", areaUtils.convertToSquareMicrometer(organAreaC.toString()), "10³平方微米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", areaUtils.convertToMicrometer(organAreaD.toString()), "平方微米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("", areaUtils.convertToMicrometer(organAreaE.toString()), "平方微米", CommonConstant.NUMBER_1));
 
         // 产品呈现指标
         indicatorResultsMap.put("骨骼肌面积", new IndicatorAddIn("Skeletal muscle area", areaUtils.convertToSquareMicrometer(slideArea), "10³平方微米"));

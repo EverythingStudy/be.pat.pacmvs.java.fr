@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -41,7 +42,6 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-        // todo A生精小管面积（单个）
         // B生精小管面积（全片）-平方毫米
         BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "12E0FA");
         // C生精小管周长（单个）
@@ -49,7 +49,6 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal structurePerimeterNum = annotation.getStructurePerimeterNum();
         // D生精小管数量
         Integer areaCountD = areaUtils.getOrganAreaCount(jsonTask, "12E0FA");
-        // todo E生精小管内腔面积（单个）
         // todo F生精细胞核数量（单个）
         // todo G支持细胞核数量（单个）
         // H间质细胞核数量
@@ -60,14 +59,14 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         String slideAreaJ = areaUtils.getFineContourArea(jsonTask.getSingleId());
 
         // 算法输出指标
-        indicatorResultsMap.put("生精小管面积（全片）", new IndicatorAddIn("", organAreaB.toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("生精小管周长（单个）", new IndicatorAddIn("", structurePerimeterNum.toString(), "毫米", "1"));
-        indicatorResultsMap.put("生精小管数量", new IndicatorAddIn("", areaCountD.toString(), "个", "1"));
-        indicatorResultsMap.put("间质细胞核数量", new IndicatorAddIn("", areaCountH.toString(), "个", "1"));
-        indicatorResultsMap.put("血管面积", new IndicatorAddIn("", organAreaI.toString(), "平方毫米", "1"));
+        indicatorResultsMap.put("生精小管面积（全片）", new IndicatorAddIn("", organAreaB.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("生精小管周长（单个）", new IndicatorAddIn("", structurePerimeterNum.toString(), "毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("生精小管数量", new IndicatorAddIn("", areaCountD.toString(), "个", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("间质细胞核数量", new IndicatorAddIn("", areaCountH.toString(), "个", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("血管面积", new IndicatorAddIn("", organAreaI.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("生精小管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("生精小管内腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         /*
-        indicatorResultsMap.put("生精小管面积（单个）", new IndicatorAddIn("", "", "10³平方微米", "1"));
-        indicatorResultsMap.put("生精小管内腔面积（单个）", new IndicatorAddIn("", areaCount.toString(), "平方毫米", "1"));
         indicatorResultsMap.put("生精细胞核数量（单个）", new IndicatorAddIn("", , "个", "1"));
         indicatorResultsMap.put("支持细胞核数量（单个）", new IndicatorAddIn("", , "个", "1"));
          */

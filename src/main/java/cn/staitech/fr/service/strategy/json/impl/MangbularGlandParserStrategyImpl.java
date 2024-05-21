@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.service.AiForecastService;
@@ -51,23 +52,20 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
         Integer organAreaCountE = areaUtils.getOrganAreaCount(jsonTask, "10B003");
         // F红细胞面积-平方毫米
         BigDecimal organAreaF = areaUtils.getOrganArea(jsonTask, "10B004");
-        // todo G颗粒管（红色）面积（单个）10B125
         // H组织轮廓-平方毫米
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
         // I颗粒管（红色）面积（全片）-平方毫米
         BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "10B125");
 
         // 算法输出指标
-        indicatorResultsMap.put("颗粒管（红色）数量", new IndicatorAddIn("", organAreaCountA.toString(), "个", "1"));
-        indicatorResultsMap.put("黏液腺细胞核数量", new IndicatorAddIn("", organAreaCountB.toString(), "个", "1"));
-        indicatorResultsMap.put("有血管壁的血管面积", new IndicatorAddIn("", organAreaD.toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("有血管壁的血管数量", new IndicatorAddIn("", organAreaCountE.toString(), "个", "1"));
-        indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", organAreaF.toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("颗粒管（红色）面积（全片）", new IndicatorAddIn("", organAreaI.toString(), "平方毫米", "1"));
-        /*
-        indicatorResultsMap.put("颗粒管细胞核数量（单个）", new IndicatorAddIn("", "", "个", "1"));
-        indicatorResultsMap.put("颗粒管（红色）面积（单个）", new IndicatorAddIn("", "", "10³平方微米", "1"));
-         */
+        indicatorResultsMap.put("颗粒管（红色）数量", new IndicatorAddIn("", organAreaCountA.toString(), "个", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("黏液腺细胞核数量", new IndicatorAddIn("", organAreaCountB.toString(), "个", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("有血管壁的血管面积", new IndicatorAddIn("", organAreaD.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("有血管壁的血管数量", new IndicatorAddIn("", organAreaCountE.toString(), "个", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", organAreaF.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("颗粒管（红色）面积（全片）", new IndicatorAddIn("", organAreaI.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        //indicatorResultsMap.put("颗粒管细胞核数量（单个）", new IndicatorAddIn("", "", "个", "1"));
+        indicatorResultsMap.put("颗粒管（红色）面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
 
         // A/H颗粒管（红色）密度
         BigDecimal densityResult = (0 == organAreaCountA) ? BigDecimal.ZERO
