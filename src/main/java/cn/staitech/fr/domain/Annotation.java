@@ -82,6 +82,11 @@ public class Annotation implements Serializable {
     private Long projectId;
 
     /**
+     * 矩形轮廓
+     */
+    private String contourPolygon;
+
+    /**
      * 切片id
      */
     private Long slideId;

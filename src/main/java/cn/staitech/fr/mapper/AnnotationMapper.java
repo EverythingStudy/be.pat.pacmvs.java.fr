@@ -75,6 +75,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     Annotation collectAiGeometry(Annotation annotation);
     
     int batchDeleteBySsIds(List<Long> singleSlideIdList);
+
+    Annotation stEnvelope(Annotation annotation);
 }
 
 
