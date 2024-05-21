@@ -84,6 +84,6 @@
                 AND delete_flag = #{deleteFlag}
             </if>
         </where>
-        order by create_by asc
+        order by create_time asc
     </select>
 </mapper>
