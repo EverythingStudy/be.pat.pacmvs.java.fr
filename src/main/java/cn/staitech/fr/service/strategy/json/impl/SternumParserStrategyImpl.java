@@ -72,7 +72,8 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		//        红细胞面积	E	103平方微米	若输出结果为多个则相加
 		Annotation annotationE  = commonJsonParser.getOrganArea(jsonTask, "14E004");
 		BigDecimal bigDecimalE = annotationE.getStructureAreaNum();
-		bigDecimalE = bigDecimalE.multiply(new BigDecimal("0.001"));
+		String bigDecimalEStr = areaUtils.convertToSquareMicrometer(bigDecimalE.toString());
+		bigDecimalE = new BigDecimal(bigDecimalEStr);
 		//        脂肪细胞面积	F	103平方微米	若输出结果为多个则相加
 		Annotation annotationF  = commonJsonParser.getOrganArea(jsonTask, "14E012");
 		BigDecimal bigDecimalF_1 = annotationF.getStructureAreaNum();
@@ -81,7 +82,9 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		//        骨质面积	G	103平方微米	 负样本，辅助得到骨髓腔，若输出结果为多个则相加
 		Annotation annotationG  = commonJsonParser.getOrganArea(jsonTask, "14E00F");
 		BigDecimal bigDecimalG = annotationG.getStructureAreaNum();
-		BigDecimal bigDecimalGM = bigDecimalG.multiply(new BigDecimal("0.001"));
+//		BigDecimal bigDecimalGM = bigDecimalG.multiply(new BigDecimal("0.001"));
+		String bigDecimalGStr = areaUtils.convertToSquareMicrometer(bigDecimalG.toString());
+		BigDecimal bigDecimalGM = new BigDecimal(bigDecimalGStr);
 
 		//        组织轮廓面积	H	平方毫米	无
 //		Annotation annotationH  = commonJsonParser.getOrganArea(jsonTask, "14E111");
@@ -97,15 +100,15 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		BigDecimal BigDecimalC_B = new BigDecimal(mucosaCountC).divide(new BigDecimal(mucosaCountB)).setScale(3,RoundingMode.HALF_UP);
 		//		红细胞面积占比	3	%	Erythrocyte area%	3=E/(A-G)
 		BigDecimal bigDecimalA_G = bigDecimalA.subtract(bigDecimalG);
-		BigDecimal BigDecimalE_A_G = bigDecimalE.divide(bigDecimalA_G).setScale(3,RoundingMode.HALF_UP);
+		BigDecimal BigDecimalE_A_G = commonJsonParser.getProportion(bigDecimalE, bigDecimalA_G);
 		//		脂肪细胞面积占比	4	%	Adipocyte area%	4=F/(A-G)
-		BigDecimal bigDecimalF_A_G = bigDecimalF_1.divide(bigDecimalA_G).setScale(3,RoundingMode.HALF_UP);
+		BigDecimal bigDecimalF_A_G = commonJsonParser.getProportion(bigDecimalF_1, bigDecimalA_G);
 		//		粒系细胞密度	3	个/平方毫米	Density of myelocyte	5=C/(A-G)
-		BigDecimal bigDecimalC_A_G = new BigDecimal(mucosaCountC).divide(bigDecimalA_G).setScale(3,RoundingMode.HALF_UP);
+		BigDecimal bigDecimalC_A_G = commonJsonParser.getProportion(new BigDecimal(mucosaCountC), bigDecimalA_G);
 		//		红系细胞核密度	4	个/平方毫米	Nucleus density of erythropoiesis	6=B/(A-G)
-		BigDecimal bigDecimalB_A_G = new BigDecimal(mucosaCountB).divide(bigDecimalA_G).setScale(3,RoundingMode.HALF_UP);
+		BigDecimal bigDecimalB_A_G = commonJsonParser.getProportion(new BigDecimal(mucosaCountB), bigDecimalA_G);
 		//		巨核系细胞密度	5	个/平方毫米	Density of megakaryocyte	7=D/(A-G)
-		BigDecimal bigDecimalD_A_G = new BigDecimal(mucosaCountD).divide(bigDecimalA_G).setScale(3,RoundingMode.HALF_UP);
+		BigDecimal bigDecimalD_A_G = commonJsonParser.getProportion(new BigDecimal(mucosaCountD), bigDecimalA_G);
 		//		胸骨面积	8	平方毫米	Sternum area	8=H
 
 		//算法保存

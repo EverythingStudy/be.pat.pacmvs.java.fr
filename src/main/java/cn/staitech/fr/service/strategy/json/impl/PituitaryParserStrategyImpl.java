@@ -88,27 +88,27 @@ public class PituitaryParserStrategyImpl extends AbstractCustomParserStrategy {
 		indicatorResultsMap.put("远侧部细胞核数量", new IndicatorAddIn("", String.valueOf(mucosaCountG), "个", "1"));
 
 		//		神经部面积占比	1	%	Pars nervosa area%	1=A/H
-		BigDecimal pituitaryA_H = pituitaryA.divide(pituitaryH).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal pituitaryA_H = commonJsonParser.getProportion(pituitaryA, pituitaryH);
 		indicatorResultsMap.put("神经部面积占比", new IndicatorAddIn("Pars nervosa area%", String.valueOf(pituitaryA_H), "%", "0"));
 		//				中间部面积占比	2	%	Pars intermedia area%	2=B/H
-		BigDecimal pituitaryB_H = pituitaryB.divide(pituitaryH).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal pituitaryB_H =  commonJsonParser.getProportion(pituitaryB, pituitaryH);
 		indicatorResultsMap.put("中间部面积占比", new IndicatorAddIn("Pars intermedia area%", String.valueOf(pituitaryB_H), "%", "0"));
 		//				远侧部面积占比	3	%	Pars distalis area%	3=C/H
-		BigDecimal pituitaryC_H = pituitaryC.divide(pituitaryH).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal pituitaryC_H = commonJsonParser.getProportion(pituitaryC, pituitaryH);
 		indicatorResultsMap.put("远侧部面积占比", new IndicatorAddIn("Pars distalis area%", String.valueOf(pituitaryC_H), "%", "0"));
 		//		
 		//				红细胞面积占比	4	%	Erythrocyte area%	4=D/H
-		BigDecimal pituitaryD_H = pituitaryD.divide(pituitaryH).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal pituitaryD_H = commonJsonParser.getProportion(pituitaryD, pituitaryH); 
 		indicatorResultsMap.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", String.valueOf(pituitaryD_H), "%", "0"));
 		//				神经部细胞核密度	5	个/平方毫米	Nucleus density of pars nervosa	5=E/A
-		BigDecimal pituitaryE_A = new BigDecimal(mucosaCountE).divide(pituitaryA).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal pituitaryE_A = commonJsonParser.getProportion(new BigDecimal(mucosaCountE), pituitaryA); 
 		indicatorResultsMap.put("神经部细胞核密度", new IndicatorAddIn("Erythrocyte area pars nervosa", String.valueOf(pituitaryE_A), "个/平方毫米", "0"));
 		//		
 		//				中间部细胞核密度	6	个/平方毫米	Nucleus density of pars intermedia	6=F/B
-		BigDecimal pituitaryF_B = new BigDecimal(mucosaCountF).divide(pituitaryB).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal pituitaryF_B = commonJsonParser.getProportion(new BigDecimal(mucosaCountF), pituitaryB); 
 		indicatorResultsMap.put("中间部细胞核密度", new IndicatorAddIn("Nucleus density of pars intermedi", String.valueOf(pituitaryF_B), "个/平方毫米", "0"));
 		//				远侧部细胞核密度	7	个/平方毫米	Nucleus density of 7=G/C
-		BigDecimal pituitaryG_C = new BigDecimal(mucosaCountG).divide(pituitaryC).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal pituitaryG_C = commonJsonParser.getProportion(new BigDecimal(mucosaCountG), pituitaryC); 
 		indicatorResultsMap.put("远侧部细胞核密度", new IndicatorAddIn("Nucleus density of pars distalis", String.valueOf(pituitaryG_C), "个/平方毫米", "0"));
 
 

@@ -73,6 +73,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     Annotation getInsideOrOutside(Annotation annotation);
 
     Annotation collectAiGeometry(Annotation annotation);
+    
+    int batchDeleteBySsIds(List<Long> singleSlideIdList);
 }
 
 

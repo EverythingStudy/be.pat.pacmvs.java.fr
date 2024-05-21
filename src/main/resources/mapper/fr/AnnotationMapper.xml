@@ -369,6 +369,12 @@
                     #{structureSize}
                 </foreach>
             </if>
+            <if test="singleSlideIdList != null and singleSlideIdList.size > 0">
+                AND single_slide_id in
+                <foreach collection="singleSlideIdList" item="singleSlideId" open="(" separator="," close=")">
+                    #{singleSlideId}
+                </foreach>
+            </if>
         </where>
     </select>
 
@@ -500,6 +506,17 @@
         <if test="contour != null">
             AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = 'f'
         </if>
+    </delete>
+    
+    <!-- 批量删除方法 -->
+    <delete id="batchDeleteBySsIds">
+        DELETE 
+        FROM 
+        fr_ai_annotation_${sequenceNumber}
+        WHERE single_slide_id IN
+        <foreach item="singleSlideId" index="index" collection="list" open="(" separator="," close=")">
+            #{singleSlideId}
+        </foreach>
     </delete>
 
     <select id="getArea" parameterType="cn.staitech.fr.domain.Annotation"

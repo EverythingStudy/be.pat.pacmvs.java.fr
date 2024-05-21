@@ -80,15 +80,16 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 
 		//		灰质面积占比（单个）	1	%	Gray matter area（per）	1=A/(A+B)
 		BigDecimal BigDecimalA_add_B = bigDecimalA.add(bigDecimalB);
-		BigDecimal mucosaCountA_B = bigDecimalA.divide(BigDecimalA_add_B).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal mucosaCountA_B = commonJsonParser.getProportion(bigDecimalA, BigDecimalA_add_B);
 		//		白质面积占比（单个）	2	%	White matter area（per） 	2=B/(A+B)	
-		BigDecimal bigDecimalB_A_B =  bigDecimalB.divide(BigDecimalA_add_B).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal bigDecimalB_A_B = commonJsonParser.getProportion(bigDecimalB, BigDecimalA_add_B);
 		//		中央管面积占比（单个）	3	%	Central canal area（per）	3=C/A
-		BigDecimal bigDecimalC_A =  bigDecimalC.divide(bigDecimalA).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal bigDecimalC_A = commonJsonParser.getProportion(bigDecimalC, bigDecimalA);
+
 		//		室管膜细胞核密度（单个）	4	个/10³平方微米	Ependyma nucleus%(per)	4=D/C	
-		BigDecimal bigDecimalD_C =  new BigDecimal(mucosaCountD).divide(bigDecimalC).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal bigDecimalD_C = commonJsonParser.getProportion(new BigDecimal(mucosaCountD), bigDecimalC); 	
 		//		红细胞面积占比（单个）	5	%	Erythrocyte area%（per）	5=E/(A+B)	
-		BigDecimal bigDecimalE_A_B =  bigDecimalE.divide(BigDecimalA_add_B).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal bigDecimalE_A_B = commonJsonParser.getProportion(bigDecimalE, BigDecimalA_add_B);
 		//		脊髓面积（单个）	6	平方毫米	Spinal cord area（per）	6=A+B
 		
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();

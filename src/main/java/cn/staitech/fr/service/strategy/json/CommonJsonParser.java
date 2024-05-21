@@ -435,6 +435,23 @@ public class CommonJsonParser {
         BigDecimal structureAreaNum = new BigDecimal(structure.getArea());
         return structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.001));
     }
+    
+    
+    /**
+     * 占比计算（保留三位小数）
+     *
+     * @param jsonTask    jsonTask
+     * @param structureId 结构ID
+     * @return 脏器面积-10³平方微米
+     */
+    public BigDecimal getProportion(BigDecimal BigDecimal1, BigDecimal BigDecimal2) {
+    	BigDecimal proportion = new BigDecimal(0);
+    	if(null == BigDecimal1 || null == BigDecimal2){
+    		return BigDecimal.ZERO;
+    	}
+    	proportion = BigDecimal1.divide(BigDecimal2).setScale(3, RoundingMode.HALF_UP);
+    	return proportion;
+    }
 
     /**
      * 取脏器轮廓数量

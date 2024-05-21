@@ -158,7 +158,8 @@ public class Annotation implements Serializable {
     @TableField(exist = false)
     private Boolean insideOrOutside;
 
-
+    @TableField(exist = false)
+    private List<Long> singleSlideIdList;
 
     @Override
     public boolean equals(Object that) {
