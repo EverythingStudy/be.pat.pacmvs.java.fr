@@ -78,7 +78,7 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
         //        分子层红细胞面积占比	2	%	Molecular level erythrocyte area%	2=B/C	无
         //        小脑和脑干面积	3	平方毫米	Cerebellum and Brainstem area	3=C	此组织面积为小脑＋脑干面积
 
-        String erythrocyteArea = commonJsonParser.getOrganArea(jsonTask, "13209C").getStructureAreaNum().toString();
+        String erythrocyteArea = commonJsonParser.getOrganArea(jsonTask, "13D004").getStructureAreaNum().toString();
         String granulocyteAndPurkinjeArea = commonJsonParser.getOrganArea(jsonTask, "13E0A5").getStructureAreaNum().toString();
 
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
