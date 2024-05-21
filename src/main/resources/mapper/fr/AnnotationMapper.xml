@@ -54,8 +54,7 @@
         <if test="contourType != null and contourType != ''">contour_type,</if>
         <if test="singleSlideId != null and singleSlideId != ''">single_slide_id,</if>
         <if test="single != null and single != ''">single,</if>
-        create_time,
-        update_time
+        create_time
         )values(
         <if test="area != null and area != ''">#{area},</if>
         <if test="perimeter != null and perimeter != ''">#{perimeter},</if>
@@ -73,7 +72,6 @@
         <if test="contourType != null and contourType != ''">#{contourType},</if>
         <if test="singleSlideId != null and singleSlideId != ''">#{singleSlideId},</if>
         <if test="single != null and single != ''">#{single},</if>
-        now(),
         now()
         )
     </insert>
@@ -470,7 +468,7 @@
     </select>
 
     <select id="collectGeometry" parameterType="long" resultMap="BaseResultMap">
-        SELECT st_asgeojson(ST_Collect(contour40000)) as collectContour
+        SELECT st_asgeojson(st_union(contour40000)) as collectContour
         FROM fr_annotation
         WHERE single_slide_id = #{singleSlideId}
           AND contour_type = 3
