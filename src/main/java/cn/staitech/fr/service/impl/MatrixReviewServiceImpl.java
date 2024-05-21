@@ -434,8 +434,9 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
     @Override
 	public R algorithm(AlgorithmIn req) {
-		Long organizationId  = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
-//		Long organizationId  = 1L;
+        log.info("ai算法预测接口开始：");
+		//Long organizationId  = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+		Long organizationId  = 1L;
 		Long specialId = req.getSpecialId();
 		MatrixReviewListIn mrl = new MatrixReviewListIn();
 		mrl.setSpecialId(specialId);
