@@ -125,19 +125,17 @@ public class JsonTaskParserService {
         try{
 	        for (JsonFile jsonFile : jsonFileList) {
 	            ParserStrategy finalParser = parser;
-	            log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++1");
 
 	            log.info("Json文件解析开始:{} {} {} {}",System.currentTimeMillis() , jsonTask.getTaskId(), jsonFile.getFileUrl(), finalParser.getClass().getName());
                 jsonFile.setStartTime(new Date());
                 jsonFileService.updateById(jsonFile);
 
 	            finalParser.parseJson(jsonTask, jsonFile);
-	//            commonJsonParser.parseJson(jsonTask, jsonFile);
+	            // commonJsonParser.parseJson(jsonTask, jsonFile);
 
                 log.info("Json文件解析结束:{} {} {} {}",System.currentTimeMillis() , jsonTask.getTaskId(), jsonFile.getFileUrl(), finalParser.getClass().getName());
                 jsonFile.setEndTime(new Date());
                 jsonFileService.updateById(jsonFile);
-	            log.info("++++++++++++++++++++++++++++++++++++++++++++++++++++++3");
 	        }
 
 	//        annotation.setContour("1");
