@@ -26,7 +26,7 @@ import java.util.Map;
  * @date 2024年5月13日
  */
 @Slf4j
-@Component("Ovaries")
+@Component("OvariesOviduct")
 public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrategy {
 	@Resource
 	private AnnotationMapper annotationMapper;
@@ -64,9 +64,10 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		Annotation annotationF  = commonJsonParser.getOrganArea(jsonTask, "1240CA");
 		BigDecimal bigDecimalF = annotationF.getStructureAreaNum();
 		// 血管面积 H 平方微米
-		Annotation annotationH  = commonJsonParser.getOrganArea(jsonTask, "124003");
-		BigDecimal bigDecimalH = annotationH.getStructureAreaNum();
-		bigDecimalH = bigDecimalH.multiply(new BigDecimal("0.001"));
+//		Annotation annotationH  = commonJsonParser.getOrganArea(jsonTask, "124003");
+//		BigDecimal bigDecimalH = annotationH.getStructureAreaNum();
+//		bigDecimalH = bigDecimalH.multiply(new BigDecimal("0.001"));
+		BigDecimal bigDecimalH  =  commonJsonParser.getOrganAreaMicron(jsonTask, "124003");
 		//TODO 血管外红细胞面积 I 平方微米
 		BigDecimal bigDecimalI = new BigDecimal(0);
 		//TODO 血管内红细胞面积 J 平方微米
@@ -98,12 +99,13 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		// 血管外红细胞面积 4 平方微米 Extravascular Erythrocyte area 4=I
 		// 血管内红细胞面积 5 平方微米 Intravascular Erythrocyte area 5=J
 		
-		// aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+		//TODO 输卵管算法暂时不支持
+		 aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 
 	}
 
 	@Override
 	public String getAlgorithmCode() {
-		return "Ovaries";
+		return "OvariesOviduct";
 	}
 }

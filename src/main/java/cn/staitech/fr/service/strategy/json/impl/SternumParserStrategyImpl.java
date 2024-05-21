@@ -78,7 +78,9 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		Annotation annotationF  = commonJsonParser.getOrganArea(jsonTask, "14E012");
 		BigDecimal bigDecimalF_1 = annotationF.getStructureAreaNum();
 		BigDecimal bigDecimalF = annotationF.getStructureAreaNum();
-		bigDecimalF = bigDecimalF.multiply(new BigDecimal("0.001"));
+		String bigDecimalFStr = areaUtils.convertToSquareMicrometer(annotationF.getStructureAreaNum().toString());
+		//bigDecimalF = bigDecimalF.multiply(new BigDecimal("0.001"));
+		bigDecimalF = new BigDecimal(bigDecimalFStr);
 		//        骨质面积	G	103平方微米	 负样本，辅助得到骨髓腔，若输出结果为多个则相加
 		Annotation annotationG  = commonJsonParser.getOrganArea(jsonTask, "14E00F");
 		BigDecimal bigDecimalG = annotationG.getStructureAreaNum();
