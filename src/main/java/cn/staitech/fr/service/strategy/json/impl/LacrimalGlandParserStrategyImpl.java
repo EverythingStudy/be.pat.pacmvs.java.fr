@@ -60,7 +60,6 @@ public class LacrimalGlandParserStrategyImpl implements ParserStrategy {
         //        腺泡细胞核数量	B	个	无
         Integer nucleusCount = commonJsonParser.getOrganAreaCount(jsonTask, "16906E");
         //        腺泡细胞核面积（单个）	C	平方微米	单个数值输出
-        BigDecimal nucleusArea = commonJsonParser.getOrganArea(jsonTask, "16906E").getStructureAreaNum();
         //        上皮顶部胞质面积	D	平方毫米	数据相加输出
         BigDecimal epithelialApexCytoplasmArea = commonJsonParser.getOrganArea(jsonTask, "16906A").getStructureAreaNum();
         //        间质面积	E	平方毫米	数据相加输出
@@ -79,7 +78,7 @@ public class LacrimalGlandParserStrategyImpl implements ParserStrategy {
 
         indicatorResultsMap.put("导管面积", new IndicatorAddIn("Duct area", ductArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("腺泡细胞核数量", new IndicatorAddIn("Nucleus counts of acinus", nucleusCount.toString(), "个", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("腺泡细胞核面积（单个）", new IndicatorAddIn("Nucleus area of acinus", nucleusArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("腺泡细胞核面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("上皮顶部胞质面积", new IndicatorAddIn("Epithelial apex cytoplasm area", epithelialApexCytoplasmArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("间质面积", new IndicatorAddIn("Mesenchyme area", mesenchymeArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("泪腺面积", new IndicatorAddIn("Lacrimal gland area", singleSlide.getArea(), "平方毫米"));

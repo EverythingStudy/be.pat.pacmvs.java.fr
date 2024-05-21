@@ -60,7 +60,6 @@ public class LiverParserStrategyImpl implements ParserStrategy {
 
         //        算法输出指标	指标代码（仅限本文档）	单位（保留小数点后三位）	备注
         //        门管区面积（单个）	A	103平方微米	单个门管区面积
-        BigDecimal portalArea = commonJsonParser.getOrganAreaMicron(jsonTask, "112145");
         //        中央静脉面积	B	103平方微米	若多个数据则相加输出
         BigDecimal centralVeinsArea = commonJsonParser.getOrganAreaMicron(jsonTask, "112147");
         //        大静脉面积	C	103平方微米	若多个数据则相加输出
@@ -90,7 +89,7 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         //        运算前统一单位
         //        窦内细胞核密度	6	个/平方毫米	Nucleus density of Sinus cell	6=G/H
 
-        indicatorResultsMap.put("门管区面积（单个）", new IndicatorAddIn("portal area of liver", portalArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("门管区面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("中央静脉面积", new IndicatorAddIn("central veins area", centralVeinsArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("大静脉面积", new IndicatorAddIn("vena cava area", venaCavaArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("肝细胞核数量", new IndicatorAddIn("Nucleus count of hepatocyte", nucleusCount.toString(), "个", CommonConstant.NUMBER_1));
