@@ -50,6 +50,7 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         // 组织轮廓面积
         String area = ObjectUtil.isNotEmpty(singleSlide) ? singleSlide.getArea() : "0";
+        area = ObjectUtil.isEmpty(area) ? "0" : area;
         Map<String, IndicatorAddIn> resultMap = new HashMap<>();
         // 腺上皮面积（全片）
         BigDecimal colonArea = commonJsonParser.getOrganArea(jsonTask, "12B074").getStructureAreaNum();

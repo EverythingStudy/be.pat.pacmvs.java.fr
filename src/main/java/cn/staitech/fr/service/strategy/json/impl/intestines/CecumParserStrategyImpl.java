@@ -53,6 +53,7 @@ public class CecumParserStrategyImpl extends AbstractCustomParserStrategy {
         // 查询所有未被删除且登录机构相同的数据
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String area = ObjectUtil.isNotEmpty(singleSlide) ? singleSlide.getArea() : "0";
+        area = ObjectUtil.isEmpty(area) ? "0" : area;
         Map<String, IndicatorAddIn> resultMap = new HashMap<>();
         // 肠腔面积
         BigDecimal colonArea = commonJsonParser.getOrganArea(jsonTask, "114156").getStructureAreaNum();
@@ -67,7 +68,10 @@ public class CecumParserStrategyImpl extends AbstractCustomParserStrategy {
         // 组织轮廓
         BigDecimal areaNum5 = new BigDecimal(area);
         // 盲肠面积
-        BigDecimal areaNum6 = areaNum5.subtract(colonArea).setScale(3, RoundingMode.HALF_UP);
+        BigDecimal areaNum6 = new BigDecimal(0);
+        if (areaNum5.compareTo(BigDecimal.ZERO) != 0) {
+            areaNum6 = areaNum5.subtract(colonArea).setScale(3, RoundingMode.HALF_UP);
+        }
         resultMap.put("肠腔面积", new IndicatorAddIn("Intestinal cavity area", colonArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         resultMap.put("黏膜层面积", new IndicatorAddIn("Mucosal layer area", areaNum.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         resultMap.put("黏膜下层面积", new IndicatorAddIn("Submucosal area", areaNum2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
