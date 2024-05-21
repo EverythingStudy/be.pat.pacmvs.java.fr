@@ -68,6 +68,7 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         resultMap.put("腺腔面积（全片）", new IndicatorAddIn("Gland cavity area (all)", areaNum2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         // 腺腔面积（单个）
 //        resultMap.put("腺腔面积（单个）", new IndicatorAddIn("Gland cavity area (individual)", areaNum.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        resultMap.put("腺腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         // 腺上皮面积（全片）
         resultMap.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", colonArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_0));
         // 组织轮廓的面积

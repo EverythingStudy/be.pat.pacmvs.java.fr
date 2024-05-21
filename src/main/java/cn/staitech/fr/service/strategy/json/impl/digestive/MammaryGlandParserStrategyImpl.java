@@ -99,7 +99,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         indicatorResultsMap.put("结缔组织面积", new IndicatorAddIn("Connective tissue area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("Organizational contour area", h.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("乳腺细胞核数量（全片）", new IndicatorAddIn("Number of breast cell nuclei (all)", organAreaCount2.toString(), "个", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("乳腺腺泡/导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT,CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("乳腺腺泡/导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
 
         // 表皮角质层面积
         indicatorResultsMap.put("表皮角质层面积", new IndicatorAddIn("Epidermal stratum corneum area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米"));
@@ -117,6 +117,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         indicatorResultsMap.put("毛囊密度", new IndicatorAddIn("Mucous sac density", divide.toString(), "个/平方毫米", CommonConstant.NUMBER_1));
         // 皮脂腺密度
         indicatorResultsMap.put("皮脂腺密度", new IndicatorAddIn("Sebaceous gland density", divide1.toString(), "个/平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("毛囊面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 
