@@ -58,7 +58,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
         //        算法输出指标	指标代码（仅限本文档）	单位（保留三位小数点）	备注
         //        腺泡面积（单个）	A	103平方微米
-        BigDecimal acinusAreaPer = commonJsonParser.getOrganAreaMicron(jsonTask, "10206D");
+
         //        腺泡细胞核数量（单个）	B	个	单个腺泡内数据相加输出
         Integer nucleusCountPer = commonJsonParser.getOrganAreaCount(jsonTask, "10206E");
         //        色素面积	C	平方毫米	数据相加输出
@@ -80,7 +80,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
 
-        indicatorResultsMap.put("腺泡面积（单个）", new IndicatorAddIn("Acinus area (per)", acinusAreaPer.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("腺泡面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT,CommonConstant.NUMBER_1));
         indicatorResultsMap.put("腺泡细胞核数量（单个）", new IndicatorAddIn("Nucleus counts of acinus (per)", nucleusCountPer.toString(), "个", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("色素面积", new IndicatorAddIn("Pigment area", pigmentArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("腺泡面积（全片）", new IndicatorAddIn("Acinus area (all)", acinusArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
