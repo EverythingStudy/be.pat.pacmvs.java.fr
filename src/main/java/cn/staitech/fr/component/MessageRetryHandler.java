@@ -10,6 +10,9 @@ import javax.annotation.Resource;
  * @author mugw
  * @version 1.0
  * @description
+ *      2024-05-18需求：
+ *      1、业务方法在mq消费者线程中同步执行。
+ *      2、新增重试队列，业务方法异常时入重试队列。
  * @date 2024/5/16 14:55:40
  */
 @Component
