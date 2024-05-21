@@ -57,7 +57,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         // I血管面积
         BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "12E003");
         // J组织轮廓-平方毫米
-        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+        String slideAreaJ = areaUtils.getFineContourArea(jsonTask.getSingleId());
 
         // 算法输出指标
         indicatorResultsMap.put("生精小管面积（全片）", new IndicatorAddIn("", organAreaB.toString(), "平方毫米", "1"));
@@ -73,11 +73,18 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
          */
 
         // D/J生精小管密度
-        BigDecimal densityResult = (0 == areaCountD) ? BigDecimal.ZERO
-                : new BigDecimal(areaCountD).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP);
+        BigDecimal areaCountBD = new BigDecimal(areaCountD);
+        BigDecimal slideAreaBD = new BigDecimal(slideAreaJ);
+
+        BigDecimal densityResult;
+        if (areaCountBD.compareTo(BigDecimal.ZERO) == 0 || slideAreaBD.compareTo(BigDecimal.ZERO) == 0) {
+            densityResult = BigDecimal.ZERO;
+        } else {
+            densityResult = areaCountBD.divide(slideAreaBD, 3, RoundingMode.HALF_UP);
+        }
 
         // 产品呈现指标
-        indicatorResultsMap.put("睾丸面积", new IndicatorAddIn("Testicular area", slideArea, "平方毫米"));
+        indicatorResultsMap.put("睾丸面积", new IndicatorAddIn("Testicular area", slideAreaJ, "平方毫米"));
         indicatorResultsMap.put("生精小管密度", new IndicatorAddIn("Density of seminiferous tubules", densityResult.toString(), "个/平方毫米"));
         /*
         indicatorResultsMap.put("生精小管面积（全片）", new IndicatorAddIn("Seminiferous tubules area (all)", "", "平方毫米"));
