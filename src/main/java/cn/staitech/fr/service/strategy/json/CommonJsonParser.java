@@ -346,13 +346,13 @@ public class CommonJsonParser {
                 annotation.setStructureAreaNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(structure.getArea());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")));
+                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
             if (StringUtils.isEmpty(structure.getPerimeter())) {
                 annotation.setStructurePerimeterNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(structure.getPerimeter());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")));
+                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
         }
         return annotation;
@@ -389,13 +389,13 @@ public class CommonJsonParser {
                 annotation.setStructureAreaNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(annotations.getArea());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")));
+                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
             if (StringUtils.isEmpty(annotations.getPerimeter())) {
                 annotation.setStructurePerimeterNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(annotations.getPerimeter());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")));
+                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
         }
         return annotation;

@@ -10,6 +10,25 @@ import java.math.RoundingMode;
  * @desc
  */
 public class MathUtils {
+    public static void main(String[] args) {
+        //BigDecimal[] data={new BigDecimal("211"),new BigDecimal("275"),new BigDecimal("334"),new BigDecimal("383"),new BigDecimal("426")};
+        BigDecimal[] data = {new BigDecimal("23.6"),new BigDecimal("999999999.213")};
+
+        //保留小数位
+        int scale = 1000;
+        BigDecimal average = calculateAve(data, scale);
+        System.out.println("平均值" + average);
+
+        BigDecimal sum = sum(data, scale);
+        System.out.println("Σ(x-x̄)2 / N值" + sum);
+
+        BigDecimal variance = variance(data, scale);
+        System.out.println("总体方差" + variance);
+
+        BigDecimal sqrt = sqrt(variance, scale);
+        System.out.println("总体标准差" + sqrt);
+
+    }
 
     /**
      *
@@ -18,9 +37,13 @@ public class MathUtils {
      * @return 总体方差
      */
     public static BigDecimal variance(BigDecimal[] data, int scale) {
-        if(data.length<=1){
-            throw new RuntimeException("数据集的总数应大于1");
+        if(data.length==1){
+            return BigDecimal.ZERO;
         }
+        if(data.length<1){
+            throw new RuntimeException("数据集的总数应大于0");
+        }
+
         BigDecimal sum = sum(data, scale);
         return sum.divide(new BigDecimal(data.length), new MathContext(scale, RoundingMode.HALF_UP));
         // return  sum .divide(new BigDecimal( data.length),scale,BigDecimal.ROUND_HALF_UP);
@@ -33,8 +56,11 @@ public class MathUtils {
      * @return 样本方差
      */
     public static BigDecimal sampleVariance( BigDecimal[] data, int scale) {
-        if(data.length<=1){
-            throw new RuntimeException("数据集的总数应大于1");
+        if(data.length==1){
+            return BigDecimal.ZERO;
+        }
+        if(data.length<1){
+            throw new RuntimeException("数据集的总数应大于0");
         }
         BigDecimal sum = sum(data, scale);
         return sum.divide(new BigDecimal(data.length - 1), new MathContext(scale, RoundingMode.HALF_UP));
@@ -93,6 +119,9 @@ public class MathUtils {
      * @return 总体标准差
      */
     public static BigDecimal sqrt(BigDecimal value, int scale) {
+        if(BigDecimal.ZERO.equals(value)){
+            return BigDecimal.ZERO;
+        }
         BigDecimal num2 = BigDecimal.valueOf(2);
         int precision = 1001;
         MathContext mc = new MathContext(precision, RoundingMode.HALF_UP);
