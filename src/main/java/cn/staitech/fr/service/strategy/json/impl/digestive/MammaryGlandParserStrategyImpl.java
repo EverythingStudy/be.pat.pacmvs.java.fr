@@ -123,6 +123,6 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
 
     @Override
     public String getAlgorithmCode() {
-        return "Skin_mammary";
+        return "D66_Integument_and_Mammary_gland";
     }
 }
