@@ -1,5 +1,24 @@
 package cn.staitech.fr.service.impl;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
@@ -7,11 +26,12 @@ import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.Diagnosis;
-import cn.staitech.fr.domain.Group;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.Measure;
 import cn.staitech.fr.domain.SingleSlide;
+import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
+import cn.staitech.fr.domain.SpecialAnnotationRel;
 import cn.staitech.fr.domain.in.ChoiceSaveInVo;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
 import cn.staitech.fr.domain.out.ImageListOutVO;
@@ -23,33 +43,14 @@ import cn.staitech.fr.mapper.DiagnosisMapper;
 import cn.staitech.fr.mapper.JsonTaskMapper;
 import cn.staitech.fr.mapper.MeasureMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
+import cn.staitech.fr.mapper.SlideMapper;
+import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.mapper.WaxBlockInfoMapper;
 import cn.staitech.fr.service.GroupService;
-import cn.staitech.fr.utils.MessageSource;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.service.SlideService;
-import cn.staitech.fr.service.strategy.json.CommonJsonParser;
-import cn.staitech.fr.mapper.SlideMapper;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
+import cn.staitech.fr.utils.MessageSource;
 import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author admin
@@ -80,7 +81,7 @@ implements SlideService {
 	@Resource
 	private AnnotationMapper annotationMapper;
 	@Resource
-	private CommonJsonParser commonJsonParser;
+	private SpecialAnnotationRelMapper specialAnnotationRelMapper;
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
@@ -250,7 +251,10 @@ implements SlideService {
 					annotationMapper.delete(aWrapper);
 				}
 				//查询专题和fr_ai_annotation_X管理
-				Long aiSequenceNumber = commonJsonParser.getSequenceNumber(specialId);
+				LambdaQueryWrapper<SpecialAnnotationRel> SpecialQueryWrapper = new LambdaQueryWrapper<>();
+		        SpecialQueryWrapper.eq(SpecialAnnotationRel::getSpecialId, specialId);
+		        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(SpecialQueryWrapper);
+				Long aiSequenceNumber = annotationRel.getSequenceNumber();
 				if(null != aiSequenceNumber){
 					//fr_ai_annotation_X
 					Annotation annotation = new Annotation();
