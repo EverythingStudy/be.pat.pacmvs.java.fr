@@ -309,6 +309,7 @@
             <if test="slideId != null">
                 AND slide_id = #{slideId}
                 AND single_slide_id is null
+                AND category_id NOT IN (27,28,39,40,41,51,58)
             </if>
             <if test="categoryId != null">
                 AND category_id = #{categoryId}
@@ -324,6 +325,7 @@
             </if>
             <if test="filigreeContour != null and filigreeContour == true">
                 AND contour_type = 3
+                AND category_id NOT IN (27,28,39,40,41,51,58)
             </if>
             <if test="filigreeContour != null and filigreeContour == false">
                 AND contour_type != 3
