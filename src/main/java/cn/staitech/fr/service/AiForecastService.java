@@ -2,6 +2,7 @@ package cn.staitech.fr.service;
 
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
+import cn.staitech.fr.domain.out.AiForecastListOut;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface AiForecastService extends IService<AiForecast> {
 
     List<AiForecast> selectList(Long singleSlideId);
 
+
+    List<AiForecastListOut> calculateList(Long singleSlideId,String structType);
 }
