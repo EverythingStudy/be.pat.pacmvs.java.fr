@@ -240,20 +240,35 @@ implements SlideService {
 				}
 
 				//postgre数据处理
+				int batchSize = 2000;
 				//fr_annotation
 				QueryWrapper<Annotation> queryAnnowrapper = new QueryWrapper<>();
 				queryAnnowrapper.in("slide_id",slideIdList);
 				List<Annotation> annoList = annotationMapper.selectList(queryAnnowrapper);
 				if(CollectionUtils.isNotEmpty(annoList)){
 					//数据处理
-					QueryWrapper<Annotation> aWrapper = new QueryWrapper<>();
-					aWrapper.in("slide_id", slideIdList);
-					annotationMapper.delete(aWrapper);
+					//					QueryWrapper<Annotation> aWrapper = new QueryWrapper<>();
+					//					aWrapper.in("slide_id", slideIdList);
+					//					annotationMapper.delete(aWrapper);
+					// 如果待删除的singleSlideId少于或等于1000，则直接一次性删除
+
+					if (CollectionUtils.isNotEmpty(slideIdList)) {
+						if (slideIdList.size() <= batchSize) {
+							annotationMapper.deleteBatchIds(slideIdList);
+						}else{
+							// 分批次删除，每次处理batchSize条
+							for (int i = 0; i < slideIdList.size(); i += batchSize) {
+								int end = Math.min(i + batchSize, slideIdList.size()); // 防止数组越界
+								List<Long> idsBatch = slideIdList.subList(i, end); // 获取当前批次的ID
+								annotationMapper.deleteBatchIds(slideIdList);
+							}
+						}
+					}
 				}
 				//查询专题和fr_ai_annotation_X管理
 				LambdaQueryWrapper<SpecialAnnotationRel> SpecialQueryWrapper = new LambdaQueryWrapper<>();
-		        SpecialQueryWrapper.eq(SpecialAnnotationRel::getSpecialId, specialId);
-		        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(SpecialQueryWrapper);
+				SpecialQueryWrapper.eq(SpecialAnnotationRel::getSpecialId, specialId);
+				SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(SpecialQueryWrapper);
 				Long aiSequenceNumber = annotationRel.getSequenceNumber();
 				if(null != aiSequenceNumber){
 					//fr_ai_annotation_X
@@ -262,17 +277,17 @@ implements SlideService {
 					annotation.setSingleSlideIdList(singleSlideIdList);
 					List<Annotation> aiAnnoList = annotationMapper.aiSelectListBy(annotation);
 					// 如果待删除的singleSlideId少于或等于1000，则直接一次性删除
-					int batchSize = 2000;
 					if (CollectionUtils.isNotEmpty(aiAnnoList)) {
 						List<Long> annoIdList = aiAnnoList.stream().map(Annotation::getAnnotationId).collect(Collectors.toList());
 						if (aiAnnoList.size() <= batchSize) {
 							annotationMapper.batchDeleteBySsIds(annoIdList);
-						}
-						// 分批次删除，每次处理batchSize条
-						for (int i = 0; i < annoIdList.size(); i += batchSize) {
-							int end = Math.min(i + batchSize, annoIdList.size()); // 防止数组越界
-							List<Long> idsBatch = annoIdList.subList(i, end); // 获取当前批次的ID
-							annotationMapper.batchDeleteBySsIds(idsBatch);
+						}else{
+							// 分批次删除，每次处理batchSize条
+							for (int i = 0; i < annoIdList.size(); i += batchSize) {
+								int end = Math.min(i + batchSize, annoIdList.size()); // 防止数组越界
+								List<Long> idsBatch = annoIdList.subList(i, end); // 获取当前批次的ID
+								annotationMapper.batchDeleteBySsIds(idsBatch);
+							}
 						}
 					}
 				}
