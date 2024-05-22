@@ -34,7 +34,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
-        log.info("KidneyParserStrategyImpl init");
+        log.debug("KidneyParserStrategyImpl init");
     }
     /**
      * 结构	编码

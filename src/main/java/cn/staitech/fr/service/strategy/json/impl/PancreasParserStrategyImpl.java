@@ -36,7 +36,7 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
-        log.info("PancreasParserStrategyImpl init");
+        log.debug("PancreasParserStrategyImpl init");
     }
 
     /**
@@ -74,10 +74,9 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        BigDecimal unit = new BigDecimal(1000000);
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        BigDecimal organArea = getOrganArea(jsonTask, "105076",unit).getStructureAreaNum();
-        BigDecimal organArea1 = getOrganArea(jsonTask, "105077",unit).getStructureAreaNum();
+        BigDecimal organArea = getOrganArea(jsonTask, "105076").getStructureAreaNum();
+        BigDecimal organArea1 = getOrganArea(jsonTask, "105077").getStructureAreaNum();
         BigDecimal organArea2 = getOrganArea(jsonTask, "105027").getStructureAreaNum();
         BigDecimal organArea3 = getOrganArea(jsonTask, "10506F").getStructureAreaNum();
         BigDecimal organArea4 = getOrganArea(jsonTask, "105003").getStructureAreaNum();

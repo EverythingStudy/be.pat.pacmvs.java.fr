@@ -34,7 +34,7 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
-        log.info("ThymusParserStrategyImpl init");
+        log.debug("D65EyeAndOpticNerveParserStrategyImpl init");
     }
 
 

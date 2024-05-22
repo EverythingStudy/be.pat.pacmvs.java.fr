@@ -36,7 +36,7 @@ public class SublingualGlandParserStrategyImpl extends AbstractCustomParserStrat
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
-        log.info("SublingualGlandParserStrategyImpl init");
+        log.debug("SublingualGlandParserStrategyImpl init");
     }
 
     /**
@@ -56,7 +56,7 @@ public class SublingualGlandParserStrategyImpl extends AbstractCustomParserStrat
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        BigDecimal unit = new BigDecimal(1000000);
+        BigDecimal unit = new BigDecimal(1000);
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         BigDecimal organArea = getOrganArea(jsonTask, "10A06F",unit).getStructureAreaNum();
         BigDecimal organArea2 = getOrganArea(jsonTask, "10A06D").getStructureAreaNum();

@@ -36,7 +36,7 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
-        log.info("ThymusParserStrategyImpl init");
+        log.debug("ThymusParserStrategyImpl init");
     }
 
 
