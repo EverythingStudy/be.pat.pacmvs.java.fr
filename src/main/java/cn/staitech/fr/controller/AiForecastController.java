@@ -51,7 +51,7 @@ public class AiForecastController {
     @ApiOperation(value = "计算指标列表")
     @GetMapping("/calculateList")
     public R<List<AiForecastListOut>> calculateList(@RequestParam(value = "singleSlideId") @ApiParam(name = "singleSlideId", value = "单切片ID", required = true) Long singleSlideId,
-                                                    @RequestParam(value = "structType") @ApiParam(name = "structType", value = "查询类型：0-预测指标列表；1-计算指标列表", required = true) String structType) throws Exception {
+                                                    @RequestParam(value = "structType") @ApiParam(name = "structType", value = "查询类型：1-预测指标列表；0-计算指标列表", required = true) String structType) throws Exception {
         if (!Optional.ofNullable(singleSlideId).isPresent()) {
             return R.fail(MessageSource.M("ARGUMENT_INVALID"));
         }
