@@ -30,7 +30,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- *
+ * CommonJsonParser
  */
 @Slf4j
 @Service
@@ -111,7 +111,6 @@ public class CommonJsonParser {
                 return null;
             }
             Annotation annotation = new Annotation();
-            // log.info("MapConstant.STRUCTURESIZR_MAP {}", MapConstant.STRUCTURESIZR_MAP);
             String keys = jsonTask.getOrganizationId() + "" + labelCode;
             Integer size = MapConstant.getStructureSize(keys);
             annotation.setStructureSize(size);
@@ -436,16 +435,14 @@ public class CommonJsonParser {
         return structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.001));
     }
     
-    
     /**
      * 占比计算（保留三位小数）
-     *
-     * @param jsonTask    jsonTask
-     * @param structureId 结构ID
+     * @param BigDecimal1
+     * @param BigDecimal2
      * @return 脏器面积-10³平方微米
      */
     public BigDecimal getProportion(BigDecimal BigDecimal1, BigDecimal BigDecimal2) {
-    	BigDecimal proportion = new BigDecimal(0);
+    	BigDecimal proportion;
     	if(null == BigDecimal1 || null == BigDecimal2){
     		return BigDecimal.ZERO;
     	}

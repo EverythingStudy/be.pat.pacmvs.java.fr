@@ -13,9 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.domain.Organ;
 import cn.staitech.fr.mapper.OrganMapper;
-import cn.staitech.fr.service.IndicatorService;
 import cn.staitech.fr.service.OrganService;
-import cn.staitech.fr.service.StructureService;
 import cn.staitech.fr.utils.LanguageUtils;
 
 
@@ -29,13 +27,6 @@ class OrganServiceImpl extends ServiceImpl<OrganMapper, Organ> implements OrganS
 
     @Resource
     OrganMapper organMapper;
-
-    @Resource
-    private StructureService structureService;
-
-    @Resource
-    private IndicatorService indicatorService;
-
 
     @Override
     public Map<String, String> selectMap() {

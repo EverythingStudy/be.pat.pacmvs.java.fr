@@ -65,7 +65,7 @@ public class AlgorithmCallBackController {
     @SuppressWarnings("rawtypes")
 	@ApiOperation(value = "脏器识别回调")
 	@PostMapping("/recognition")
-	public R recognition(@Validated @RequestBody AlgorithmAnnIn  algorithmAnnIn) throws Exception {
+	public R recognition(@Validated @RequestBody AlgorithmAnnIn  algorithmAnnIn) {
 		log.info("脏器识别算法回调专题,完整数据是：{}",JSONUtil.toJsonStr(algorithmAnnIn));
 		// 多线程处理
         algorithmPredictionService.recognition(algorithmAnnIn);

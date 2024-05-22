@@ -10,7 +10,6 @@ import cn.staitech.fr.domain.SpecialRecycling;
 import cn.staitech.fr.domain.in.SpecialRecyclingListQueryIn;
 import cn.staitech.fr.domain.in.SpecialRecyclingRecoverIn;
 import cn.staitech.fr.domain.out.SpecialRecyclingListQueryOut;
-import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.mapper.SpecialRecyclingMapper;
 import cn.staitech.fr.service.SpecialRecyclingService;
@@ -39,8 +38,6 @@ import java.util.List;
 public class SpecialRecyclingServiceImpl extends ServiceImpl<SpecialRecyclingMapper, SpecialRecycling> implements SpecialRecyclingService {
     @Resource
     private SpecialMapper specialMapper;
-    @Resource
-    private SlideMapper slideMapper;
 
     @Override
     public PageResponse<SpecialRecyclingListQueryOut> getSpecialRecyclingList(SpecialRecyclingListQueryIn req) {

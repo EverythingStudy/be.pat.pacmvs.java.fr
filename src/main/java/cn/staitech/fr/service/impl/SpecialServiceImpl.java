@@ -1,17 +1,13 @@
 package cn.staitech.fr.service.impl;
 
-import cn.staitech.common.core.constant.Constants;
 import cn.staitech.common.core.constant.SecurityConstants;
 import cn.staitech.common.core.constant.UserConstants;
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.enums.UserStatus;
 import cn.staitech.common.core.exception.ServiceException;
-import cn.staitech.common.core.utils.DateUtils;
 import cn.staitech.common.core.utils.RSAUtils;
-import cn.staitech.common.core.utils.ServletUtils;
 import cn.staitech.common.core.utils.bean.BeanUtils;
-import cn.staitech.common.core.utils.ip.IpUtils;
 import cn.staitech.common.redis.service.RedisService;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
@@ -24,15 +20,12 @@ import cn.staitech.fr.domain.in.SpecialListQueryIn;
 import cn.staitech.fr.domain.in.SpecialsQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
 import cn.staitech.fr.mapper.*;
-import cn.staitech.fr.service.GroupService;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.SpecialRecyclingService;
 import cn.staitech.fr.service.SpecialService;
 import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.system.api.RemoteUserService;
-import cn.staitech.system.api.domain.SysLogininfor;
 import cn.staitech.system.api.domain.SysUser;
-import cn.staitech.system.api.domain.document.SysLoginInfoDoc;
 import cn.staitech.system.api.model.LoginUser;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -79,9 +72,6 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 
     @Autowired
     private SlideService slideService;
-
-    @Autowired
-    private GroupService groupService;
 
     @Resource
     private WaxBlockInfoMapper waxBlockInfoMapper;

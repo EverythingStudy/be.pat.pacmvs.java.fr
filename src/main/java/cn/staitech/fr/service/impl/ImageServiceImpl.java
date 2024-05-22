@@ -78,7 +78,7 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements
      * @return
      */
     @Override
-    public boolean exists(Image image) throws Exception {
+    public boolean exists(Image image) {
         LambdaQueryWrapper<Image> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.select(Image::getImageId);
         queryWrapper.eq(Image::getMd5, image.getMd5());

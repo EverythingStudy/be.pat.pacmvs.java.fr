@@ -6,9 +6,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TreeMap;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -17,7 +15,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import com.alibaba.excel.converters.string.StringNumberConverter;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.github.pagehelper.Page;
@@ -65,7 +62,6 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 
 	@Override
 	public PageResponse<SplitVerificationOut>  getList(SplitVerificationQueryIn req) {
-//				Long organizationId = 1L;
 		Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
 		PageResponse<SplitVerificationOut> pageResponse = new PageResponse<>();
 		//查看切片明细  0：否  1：是

@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ExecutorBuilder;
 import cn.hutool.json.JSONUtil;
@@ -38,17 +37,13 @@ import cn.staitech.fr.domain.in.AlgorithmAnnIn;
 import cn.staitech.fr.domain.in.StartPredictionIn;
 import cn.staitech.fr.domain.out.AlgorithmImageOut;
 import cn.staitech.fr.feign.PythonOrganRecognitionService;
-import cn.staitech.fr.feign.PythonService;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.service.AlgorithmPredictionService;
-import cn.staitech.fr.service.AnnotationService;
-import cn.staitech.fr.service.CategoryService;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.WaxBlockInfoService;
-import cn.staitech.fr.service.WaxBlockNumberService;
 import cn.staitech.fr.vo.annotation.AnnotationCountByCategory;
 import cn.staitech.fr.vo.annotation.StartRecognition;
 import lombok.extern.slf4j.Slf4j;
@@ -80,14 +75,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	private WaxBlockInfoService waxBlockInfoService;
 
 	@Resource
-	private WaxBlockNumberService waxBlockNumberService;
-
-	@Resource
 	private RedisService redisService;
-
-	@Resource
-	private CategoryService categoryService;
-
 
 	@Resource
 	private SpecialMapper specialMapper;
@@ -204,7 +192,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	}
 
 
-	public void process(AlgorithmAnnIn  algorithmAnnIn) throws Exception {
+	public void process(AlgorithmAnnIn  algorithmAnnIn){
 		Long startTime = System.currentTimeMillis();
 		Long slideId = algorithmAnnIn.getSlideId();
 		if(null != slideId){
