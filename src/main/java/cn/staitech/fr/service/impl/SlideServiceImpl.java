@@ -47,7 +47,6 @@ import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.mapper.WaxBlockInfoMapper;
-import cn.staitech.fr.service.GroupService;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.MessageSource;
 import lombok.extern.slf4j.Slf4j;
@@ -62,8 +61,6 @@ import lombok.extern.slf4j.Slf4j;
 public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide>
 implements SlideService {
 
-	@Resource
-	private GroupService groupService;
 	@Resource
 	private WaxBlockInfoMapper waxBlockInfoMapper;
 	@Resource
