@@ -152,6 +152,7 @@ public class Annotation implements Serializable {
     @TableField(exist = false)
     private String intersectsResults;
 
+    @TableField(exist = false)
     private Integer structureSize;
 
     @TableField(exist = false)
