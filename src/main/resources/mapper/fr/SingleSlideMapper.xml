@@ -220,5 +220,11 @@
         group by faf.forecast_id;
 
     </select>
+    <select id="getGender" resultType="java.lang.String">
+        select fs.gender_flag
+        from fr_slide fs
+                 left join fr_single_slide fss on fs.slide_id = fss.slide_id
+        where fss.single_id = #{id}
+    </select>
 
 </mapper>

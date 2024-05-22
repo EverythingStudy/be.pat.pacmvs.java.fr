@@ -38,6 +38,8 @@ public interface SingleSlideMapper extends BaseMapper<SingleSlide> {
     List<BigDecimal> getReferenceScope(@Param("quantitativeIndicators") String quantitativeIndicators,
                                        @Param("categoryId") Long aLong,@Param("specialId") Long specialId,
                                        @Param("groupCode")String groupCode, @Param("genderFlag")String genderFlag);
+
+    String getGender(Long id);
 }
 
 
