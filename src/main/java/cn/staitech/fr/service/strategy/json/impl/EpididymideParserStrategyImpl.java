@@ -42,24 +42,19 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-        // B输出小管/附睾管黏膜上皮面积（全片）
-        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "12F0F5");
-        // C输出小管/附睾管黏膜上皮周长（单个）
-        Annotation annotation = commonJsonParser.getOrganArea(jsonTask, "12F0F5");
-        BigDecimal structurePerimeterNum = annotation.getStructurePerimeterNum();
-        // E输出小管/附睾管管腔面积（全片）
-        BigDecimal organAreaE = areaUtils.getOrganArea(jsonTask, "12F0F4");
-        // G精子面积（全片）
-        BigDecimal organAreaG = areaUtils.getOrganArea(jsonTask, "12F0F7");
+        // 获取各种指标
+        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "12F0F5");// B输出小管/附睾管黏膜上皮面积（全片）
+        Annotation annotation = commonJsonParser.getOrganArea(jsonTask, "12F0F5");// C输出小管/附睾管黏膜上皮周长（单个）
+        BigDecimal perimeterC = annotation.getStructurePerimeterNum();
+        BigDecimal organAreaE = areaUtils.getOrganArea(jsonTask, "12F0F4");// E输出小管/附睾管管腔面积（全片）
+        BigDecimal organAreaG = areaUtils.getOrganArea(jsonTask, "12F0F7");// G精子面积（全片）
         // todo H黏膜上皮细胞核数量（单个）
-        // I血管面积
-        BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "12F003");
-        // J组织轮廓面积-平方毫米
-        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+        BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "12F003");// I血管面积
+        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// J组织轮廓面积
 
         // 算法输出指标
         indicatorResultsMap.put("输出小管/附睾管黏膜上皮面积（全片）", new IndicatorAddIn("", organAreaB.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("输出小管/附睾管黏膜上皮周长（单个）", new IndicatorAddIn("", structurePerimeterNum.toString(), "毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("输出小管/附睾管黏膜上皮周长（单个）", new IndicatorAddIn("", perimeterC.toString(), "毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("输出小管/附睾管管腔面积（全片）", new IndicatorAddIn("", organAreaE.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("精子面积（全片）", new IndicatorAddIn("", organAreaG.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("血管面积", new IndicatorAddIn("", organAreaI.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));

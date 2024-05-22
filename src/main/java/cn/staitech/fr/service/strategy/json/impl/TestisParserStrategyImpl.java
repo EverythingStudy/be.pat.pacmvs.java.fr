@@ -42,21 +42,16 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-        // B生精小管面积（全片）-平方毫米
-        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "12E0FA");
-        // C生精小管周长（单个）
-        Annotation annotation = commonJsonParser.getOrganArea(jsonTask, "12E0FA");
+        // 获取各种指标
+        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "12E0FA");// B生精小管面积（全片）
+        Annotation annotation = commonJsonParser.getOrganArea(jsonTask, "12E0FA");// C生精小管周长（单个）
         BigDecimal structurePerimeterNum = annotation.getStructurePerimeterNum();
-        // D生精小管数量
-        Integer areaCountD = areaUtils.getOrganAreaCount(jsonTask, "12E0FA");
+        Integer areaCountD = areaUtils.getOrganAreaCount(jsonTask, "12E0FA");// D生精小管数量
         // todo F生精细胞核数量（单个）
         // todo G支持细胞核数量（单个）
-        // H间质细胞核数量
-        Integer areaCountH = areaUtils.getOrganAreaCount(jsonTask, "12E0FE");
-        // I血管面积
-        BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "12E003");
-        // J组织轮廓-平方毫米
-        String slideAreaJ = areaUtils.getFineContourArea(jsonTask.getSingleId());
+        Integer areaCountH = areaUtils.getOrganAreaCount(jsonTask, "12E0FE");// H间质细胞核数量
+        BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "12E003");// I血管面积
+        String slideAreaJ = areaUtils.getFineContourArea(jsonTask.getSingleId());// J组织轮廓
 
         // 算法输出指标
         indicatorResultsMap.put("生精小管面积（全片）", new IndicatorAddIn("", organAreaB.toString(), "平方毫米", CommonConstant.NUMBER_1));
@@ -71,15 +66,14 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("支持细胞核数量（单个）", new IndicatorAddIn("", , "个", "1"));
          */
 
-        // D/J生精小管密度
+        // 计算指标
         BigDecimal areaCountBD = new BigDecimal(areaCountD);
         BigDecimal slideAreaBD = new BigDecimal(slideAreaJ);
-
         BigDecimal densityResult;
         if (areaCountBD.compareTo(BigDecimal.ZERO) == 0 || slideAreaBD.compareTo(BigDecimal.ZERO) == 0) {
             densityResult = BigDecimal.ZERO;
         } else {
-            densityResult = areaCountBD.divide(slideAreaBD, 3, RoundingMode.HALF_UP);
+            densityResult = areaCountBD.divide(slideAreaBD, 3, RoundingMode.HALF_UP);// D/J
         }
 
         // 产品呈现指标

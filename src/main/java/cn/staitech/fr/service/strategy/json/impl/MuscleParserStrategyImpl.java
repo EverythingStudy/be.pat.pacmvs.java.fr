@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.service.AiForecastService;
@@ -40,16 +41,13 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-        // B间质面积
-        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "15C027");
-        // C血管面积
-        BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask, "15C003");
-        // D红细胞面积
-        BigDecimal organAreaD = areaUtils.getOrganArea(jsonTask, "15C004");
-        // E血管内红细胞面积
-        BigDecimal organAreaE = commonJsonParser.getInsideOrOutside(jsonTask,"15C003","15C004",true).getStructureAreaNum();
-        // F精细轮廓总面积-平方毫米
-        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+        // 获取各种指标
+        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "15C027");// B间质面积
+        BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask, "15C003");// C血管面积
+        BigDecimal organAreaD = areaUtils.getOrganArea(jsonTask, "15C004");// D红细胞面积
+        Annotation annotation = commonJsonParser.getInsideOrOutside(jsonTask,"15C003","15C004",true);
+        BigDecimal organAreaE = annotation.getStructureAreaNum();// E血管内红细胞面积
+        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// F精细轮廓总面积
 
         // 算法输出指标
         indicatorResultsMap.put("肌纤维面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));

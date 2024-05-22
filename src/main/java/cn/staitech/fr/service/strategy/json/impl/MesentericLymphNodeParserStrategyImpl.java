@@ -39,14 +39,11 @@ public class MesentericLymphNodeParserStrategyImpl extends AbstractCustomParserS
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-        // A生发中心数量
-        Integer areaCount = areaUtils.getOrganAreaCount(jsonTask, "146051");
-        // B生发中心面积（全片）-平方毫米
-        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "146051");
-        // C髓质面积-平方毫米
-        BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask, "14603E");
-        // D组织轮廓-平方毫米
-        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+        // 获取各种指标
+        Integer areaCount = areaUtils.getOrganAreaCount(jsonTask, "146051");// A生发中心数量
+        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "146051");// B生发中心面积（全片）
+        BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask, "14603E");// C髓质面积
+        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// D组织轮廓
 
         // 算法输出指标
         indicatorResultsMap.put("生发中心面积（全片）", new IndicatorAddIn("", organAreaB.toString(), "平方毫米", "1"));

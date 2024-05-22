@@ -42,16 +42,12 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
 	        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 	        log.info("UrinaryBladderParserStrategyImpl start-2");
 
-            // A 膀胱腔面积-平方毫米
-            BigDecimal organAreaA = areaUtils.getOrganArea(jsonTask, "11E034");
-	        // B 组织轮廓面积-平方毫米
-	        String accurateAreaB = areaUtils.getFineContourArea(jsonTask.getSingleId());
-            // C 黏膜上皮面积-平方毫米
-            BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask,"11E035");
-            // D 黏膜固有层+黏膜下层面积-平方毫米
-            BigDecimal organAreaD = areaUtils.getOrganArea(jsonTask,"11E037");
-            // E 黏膜上皮细胞核数量
-            Integer areaCountE = areaUtils.getOrganAreaCount(jsonTask, "11E036");
+            // 获取各种指标
+            BigDecimal organAreaA = areaUtils.getOrganArea(jsonTask, "11E034");// A 膀胱腔面积
+	        String accurateAreaB = areaUtils.getFineContourArea(jsonTask.getSingleId()); // B 组织轮廓面积
+            BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask,"11E035");// C 黏膜上皮面积
+            BigDecimal organAreaD = areaUtils.getOrganArea(jsonTask,"11E037");// D 黏膜固有层+黏膜下层面积
+            Integer areaCountE = areaUtils.getOrganAreaCount(jsonTask, "11E036");// E 黏膜上皮细胞核数量
 
             // 算法输出指标
             indicatorResultsMap.put("膀胱腔面积", new IndicatorAddIn("", organAreaA.toString(), "平方毫米", "1"));
@@ -62,11 +58,11 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
             indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("", , "平方毫米", "1"));//11E004
             indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("", , "平方毫米", "1"));*/
 
-            // 膀胱面积 B-A
+            // 计算指标
             String result = "";
             if(!"0".equals(accurateAreaB)){
                 BigDecimal areaNum = new BigDecimal(accurateAreaB).subtract(organAreaA);
-                result = areaNum.setScale(3, RoundingMode.HALF_UP).toString();
+                result = areaNum.setScale(3, RoundingMode.HALF_UP).toString();// B-A
             }
 
             // 产品呈现指标

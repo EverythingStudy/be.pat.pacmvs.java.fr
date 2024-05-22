@@ -41,21 +41,15 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-        // A颗粒管（红色）数量-个
-        Integer organAreaCountA = areaUtils.getOrganAreaCount(jsonTask, "10B125");
-        // B黏液腺细胞核数量-个
-        Integer organAreaCountB = areaUtils.getOrganAreaCount(jsonTask, "10B128");
+        // 获取各种指标
+        Integer organAreaCountA = areaUtils.getOrganAreaCount(jsonTask, "10B125");// A颗粒管（红色）数量
+        Integer organAreaCountB = areaUtils.getOrganAreaCount(jsonTask, "10B128");// B黏液腺细胞核数量
         // todo C颗粒管细胞核数量（单个）10B126
-        // D有血管壁的血管面积-平方毫米
-        BigDecimal organAreaD = areaUtils.getOrganArea(jsonTask, "10B003");
-        // E有血管壁的血管数量-个
-        Integer organAreaCountE = areaUtils.getOrganAreaCount(jsonTask, "10B003");
-        // F红细胞面积-平方毫米
-        BigDecimal organAreaF = areaUtils.getOrganArea(jsonTask, "10B004");
-        // H组织轮廓-平方毫米
-        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
-        // I颗粒管（红色）面积（全片）-平方毫米
-        BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "10B125");
+        BigDecimal organAreaD = areaUtils.getOrganArea(jsonTask, "10B003");// D有血管壁的血管面积
+        Integer organAreaCountE = areaUtils.getOrganAreaCount(jsonTask, "10B003");// E有血管壁的血管数量
+        BigDecimal organAreaF = areaUtils.getOrganArea(jsonTask, "10B004");// F红细胞面积
+        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId()); // H组织轮廓
+        BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "10B125");// I颗粒管（红色）面积（全片）
 
         // 算法输出指标
         indicatorResultsMap.put("颗粒管（红色）数量", new IndicatorAddIn("", organAreaCountA.toString(), "个", CommonConstant.NUMBER_1));
@@ -67,12 +61,12 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
         //indicatorResultsMap.put("颗粒管细胞核数量（单个）", new IndicatorAddIn("", "", "个", "1"));
         indicatorResultsMap.put("颗粒管（红色）面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
 
-        // A/H颗粒管（红色）密度
+        // 计算指标
         BigDecimal densityResult = (0 == organAreaCountA) ? BigDecimal.ZERO
-                : new BigDecimal(organAreaCountA).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP);
-        // B/H黏液腺细胞核密度
+                : new BigDecimal(organAreaCountA).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP);// A/H
+
         BigDecimal nucleusResult = (0 == organAreaCountB) ? BigDecimal.ZERO
-                : new BigDecimal(organAreaCountB).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP);
+                : new BigDecimal(organAreaCountB).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP); // B/H
 
         // 产品呈现指标
         indicatorResultsMap.put("颌下腺面积", new IndicatorAddIn("Submadibular gland area", slideArea, "平方毫米"));
