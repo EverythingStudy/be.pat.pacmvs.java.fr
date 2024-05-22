@@ -39,7 +39,7 @@ public class AlgorithmCallBackController {
     @Resource
     private AlgorithmPredictionService algorithmPredictionService;
 
-    @ApiOperation(value = "清晰度回调")
+    /*@ApiOperation(value = "清晰度回调")
     @PostMapping("/verification")
     public R verification(@Validated @RequestBody DefinitionIn req) {
     	if (null != req) {
@@ -59,7 +59,7 @@ public class AlgorithmCallBackController {
     		imageService.updateById(image);
     	}
         return R.ok();
-    }
+    }*/
     
     
     @SuppressWarnings("rawtypes")
