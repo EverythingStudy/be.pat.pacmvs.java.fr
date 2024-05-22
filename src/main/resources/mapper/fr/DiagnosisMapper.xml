@@ -44,6 +44,9 @@
             <if test="userName != null">
                 AND user_name = #{userName}
             </if>
+             <if test="organizationId != null">
+                AND organization_id = #{organizationId}
+            </if>
         </where>
     </select>
 

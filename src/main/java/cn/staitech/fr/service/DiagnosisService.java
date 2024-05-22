@@ -1,17 +1,18 @@
 package cn.staitech.fr.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import cn.staitech.fr.domain.Diagnosis;
-import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisAbnormalVo;
 import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisAddVo;
 import cn.staitech.fr.vo.diagnosis.SpecialDiagnosisVo;
 import cn.staitech.fr.vo.diagnosis.SysDictDataVo;
 import cn.staitech.fr.vo.diagnosis.SysDictResultVo;
 import cn.staitech.fr.vo.diagnosis.VisceraVo;
+import cn.staitech.system.api.domain.SysUser;
 
 /**
  * <p>
@@ -41,4 +42,5 @@ public interface DiagnosisService extends IService<Diagnosis> {
 	
 	public void abnormalOperation(SpecialDiagnosisAbnormalVo specialDiagnosisAbnormalVo);
 
+	public SysUser getUserInfo(Map<String,Object> parm);
 }
