@@ -143,7 +143,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         }*/
         //校验文件名称
         String originalFilename = req.getFile().getOriginalFilename();
-        if (!originalFilename.endsWith(".doc") && !originalFilename.endsWith(".docx")) {
+        if (!originalFilename.toLowerCase().endsWith(".doc") && !originalFilename.toLowerCase().endsWith(".docx")) {
             return R.fail(MessageSource.M("FILE_TYPE_ERROR"));
         }
         LambdaQueryWrapper<WaxBlockNumber> queryWrapper = new LambdaQueryWrapper<>();
