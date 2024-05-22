@@ -113,10 +113,10 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         //校验是否生成专题
         WaxBlockNumber byId = getById(id);
         LambdaQueryWrapper<Special> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Special::getTopicId,byId.getTopicId());
-        queryWrapper.eq(Special::getDelFlag,CommonConstant.NUMBER_0);
+        queryWrapper.eq(Special::getTopicId, byId.getTopicId());
+        queryWrapper.eq(Special::getDelFlag, CommonConstant.NUMBER_0);
         Integer integer = specialMapper.selectCount(queryWrapper);
-        if(integer>0){
+        if (integer > 0) {
             return R.fail(MessageSource.M("SPECIAL_EXIST_DELETE_FAILURE"));
         }
         WaxBlockNumber waxBlockNumber = new WaxBlockNumber();
@@ -143,7 +143,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         }*/
         //校验文件名称
         String originalFilename = req.getFile().getOriginalFilename();
-        if(!originalFilename.endsWith(".doc")&&!originalFilename.endsWith(".docx")){
+        if (!originalFilename.endsWith(".doc") && !originalFilename.endsWith(".docx")) {
             return R.fail(MessageSource.M("FILE_TYPE_ERROR"));
         }
         LambdaQueryWrapper<WaxBlockNumber> queryWrapper = new LambdaQueryWrapper<>();
@@ -154,10 +154,16 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         if (count > 0) {
             return R.fail(MessageSource.M("TOPIC_EXIST_WAX"));
         }
-        File file1 = new File(waxPath+req.getFile().getOriginalFilename());
+        File file1 = new File(waxPath + req.getFile().getOriginalFilename());
         FileUtils.copyInputStreamToFile(req.getFile().getInputStream(), file1);
         FileInputStream fis = new FileInputStream(file1);
-        XWPFDocument document = new XWPFDocument(fis);
+        XWPFDocument document;
+        try {
+            document = new XWPFDocument(fis);
+        } catch (Exception e) {
+            throw new RuntimeException(MessageSource.M("FILE_TYPE_ERROR"));
+        }
+        //XWPFDocument document = new XWPFDocument(fis);
         //解析专题号
         List<XWPFParagraph> paragraphs = document.getParagraphs();
         String text = paragraphs.get(1).getText().trim();
@@ -171,15 +177,15 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         Topic topic = getTopic(topicName);
         if (ObjectUtils.isEmpty(topic)) {
             fis.close();
-            if(file1.exists()){
+            if (file1.exists()) {
                 FileUtils.delete(file1);
             }
             return R.fail(MessageSource.M("UPLOAD_FILE_NOT_EXIST_TOPIC"));
         }
         //校验专题是否一致
-        if(!topic.getTopicId().equals(req.getTopicId())){
+        if (!topic.getTopicId().equals(req.getTopicId())) {
             fis.close();
-            if(file1.exists()){
+            if (file1.exists()) {
                 FileUtils.delete(file1);
             }
             return R.fail(MessageSource.M("UPLOAD_FILE_TOPIC_NAME_ERROR"));
@@ -192,15 +198,15 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         Species species = getSpecies(speciesName);
         if (ObjectUtils.isEmpty(species)) {
             fis.close();
-            if(file1.exists()){
+            if (file1.exists()) {
                 FileUtils.delete(file1);
             }
             return R.fail(MessageSource.M("UPLOAD_FILE_NOT_EXIST_SPECIES"));
         }
         //校验种属
-        if(!species.getSpeciesId().equals(req.getSpeciesId())){
+        if (!species.getSpeciesId().equals(req.getSpeciesId())) {
             fis.close();
-            if(file1.exists()){
+            if (file1.exists()) {
                 FileUtils.delete(file1);
             }
             return R.fail(MessageSource.M("UPLOAD_FILE_SPECIES_ERROR"));
@@ -217,7 +223,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
 
         if (CollectionUtils.isEmpty(rows)) {
             fis.close();
-            if(file1.exists()){
+            if (file1.exists()) {
                 FileUtils.delete(file1);
             }
             return R.fail(MessageSource.M("UPLOAD_FILE_IS_NULL"));
@@ -232,8 +238,8 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
                     .map(cell -> cell.getText().trim())
                     .reduce((cell1, cell2) -> cell1 + " | " + cell2)
                     .orElse("");
-            s1=s1.replace(") ",")");
-            if(s1.contains("Male")){
+            s1 = s1.replace(") ", ")");
+            if (s1.contains("Male")) {
                 System.out.println(s1);
             }
             log.info("详情信息：{}", s1);
@@ -244,7 +250,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
             if (split.length == 0) {
                 return R.fail(MessageSource.M("FILE_FORMART_ERROR"));
             } else if (split.length == 2) {
-                if (s1.contains(CommonConstant.MALE_FLAG)&&s1.contains(CommonConstant.MALE_FLAG_CN)) {
+                if (s1.contains(CommonConstant.MALE_FLAG) && s1.contains(CommonConstant.MALE_FLAG_CN)) {
                     if (split[0].trim().contains(CommonConstant.MALE)) {
                         sexList.add(CommonConstant.MALE);
                         sexList.add(CommonConstant.FEMALE);
@@ -290,7 +296,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
             }
         }
         fis.close();
-        if(file1.exists()){
+        if (file1.exists()) {
             FileUtils.delete(file1);
         }
         waxBlockInfoService.saveBatch(insertList);
@@ -314,7 +320,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
 
     private void extracted(WaxBlockInfo waxBlockInfo1, Map<String, String> organList, List<WaxBlockInfo> insertList, String s2, String genderFlag) {
         Pattern pattern = Pattern.compile(CommonConstant.EN_FLAG_NEW);
-        if(StringUtils.isEmpty(s2)){
+        if (StringUtils.isEmpty(s2)) {
             return;
         }
         log.info("脏器数据" + s2);
@@ -331,7 +337,7 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         if (!s4.matches("^[0-9]+$")) {
             throw new RuntimeException(MessageSource.M("FILE_ORGAN_NUMBER_ERROR"));
         }
-        String s6 = StringUtils.substringAfterLast(s2, part+CommonConstant.CODE_END);
+        String s6 = StringUtils.substringAfterLast(s2, part + CommonConstant.CODE_END);
         log.info("脏器英文+数量:{}", s6);
         String s7 = StringUtils.substringBeforeLast(s6, CommonConstant.CODE_START);
         log.info("脏器英文:{}", s7);
