@@ -91,7 +91,7 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		//        组织轮廓面积	H	平方毫米	无
 //		Annotation annotationH  = commonJsonParser.getOrganArea(jsonTask, "14E111");
 //		BigDecimal bigDecimalH = annotationH.getStructureAreaNum();
-		BigDecimal bigDecimalH = new BigDecimal(0);
+		BigDecimal bigDecimalH = BigDecimal.ZERO;
 		String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
 		bigDecimalH = new BigDecimal(slideArea);
 

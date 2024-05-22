@@ -67,7 +67,7 @@ public class PituitaryParserStrategyImpl extends AbstractCustomParserStrategy {
 		// 胸骨面积 ==>组织轮廓面积H
 //		BigDecimal pituitaryH = commonJsonParser.getOrganArea(jsonTask, "106111").getStructureAreaNum();
 		 String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
-		 BigDecimal pituitaryH = new BigDecimal(0);
+		 BigDecimal pituitaryH = BigDecimal.ZERO;
 		 pituitaryH = new BigDecimal(slideArea);
 		// 神经部细胞核数量 E 个 无
 		Integer mucosaCountE = commonJsonParser.getOrganAreaCount(jsonTask, "106080");

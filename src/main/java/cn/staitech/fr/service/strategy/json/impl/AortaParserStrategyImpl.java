@@ -61,16 +61,21 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		
 		//空腔面积 A 10³平方微米
 		Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "15D113");
-		String bigDecimalAStr = areaUtils.convertToSquareMicrometer(annotation.getArea());
-		BigDecimal bigDecimalA =  new BigDecimal(bigDecimalAStr);
+		BigDecimal bigDecimalA = BigDecimal.ZERO;
+		if(null !=annotation.getArea()){
+			String bigDecimalAStr = areaUtils.convertToSquareMicrometer(annotation.getArea());
+			bigDecimalA =  new BigDecimal(bigDecimalAStr);
+		}
 
 
 		//空腔周长	B	毫米
-		BigDecimal bigDecimalB =  new BigDecimal(annotation.getPerimeter());
-
+		BigDecimal bigDecimalB =  BigDecimal.ZERO;
+		if(null !=annotation.getPerimeter()){
+			 bigDecimalB =  new BigDecimal(annotation.getPerimeter());
+		}
 		
-		BigDecimal bigDecimalC = new BigDecimal(0);
-		BigDecimal bigDecimalD = new BigDecimal(0);
+		BigDecimal bigDecimalC = BigDecimal.ZERO;
+		BigDecimal bigDecimalD = BigDecimal.ZERO;
 
 		//组织轮廓面积 D 10³平方微米
 		SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
