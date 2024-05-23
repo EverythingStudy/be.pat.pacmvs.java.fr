@@ -44,6 +44,37 @@ public class IleumParserStrategyImpl extends AbstractCustomParserStrategy {
         log.info("IleumParserStrategyImpl init");
     }
 
+    /**
+     * 结构指标计算
+     * 结构	编码
+     * 肠腔	117156
+     * 黏膜层	117008
+     * 黏膜下层 	117009
+     * 肌层	11700C
+     * 淋巴小结	117049
+     * 组织轮廓	117111
+     * 算法输出指标	指标代码（仅限本文档）	单位（保留小数点后三位）	备注
+     * 肠腔面积	A	平方毫米
+     * 黏膜层面积	B	平方毫米	无
+     * 黏膜下层面积	C	平方毫米	无
+     * 肌层面积	D	平方毫米	无
+     * 淋巴小结面积	E	平方毫米	若多个数据则相加输出
+     * 组织轮廓面积	F	平方毫米	无
+     * <p>
+     * 产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
+     * 黏膜层面积占比（环型）	1	%	Mucosal area%	1=（B-A）/（F-A）
+     * 黏膜层面积占比（C型）	2	%	Mucosal area%	2=B/（F-A）
+     * 黏膜下层面积占比（环型）	3	%	Submucosal area%	3=（C-B）/（F-A）
+     * 黏膜下层面积占比
+     * （C型）	4	%	Submucosal area%	4=C/（F-A）
+     * 肌层面积占比（环型）	5	%	Muscular area%	5=（D-C）/（F-A）
+     * 肌层面积占比
+     * （C型）	6	%	Muscular area%	6=D/（F-A）
+     * 淋巴小结面积占比	7	%	Lymphatic nodule area%	7=E/（F-A）
+     * 回肠面积	8	平方毫米	Ileum area	8=F-A
+     *
+     * @param jsonTask
+     */
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("大鼠回肠结构指标计算开始");

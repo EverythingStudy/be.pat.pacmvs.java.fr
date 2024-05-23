@@ -44,6 +44,34 @@ public class JejunumParserStrategyImpl extends AbstractCustomParserStrategy {
         log.info("JejunumParserStrategyImpl init");
     }
 
+    /**
+     * 结构指标计算
+     * 结构	编码
+     * 肠腔	118156
+     * 黏膜层	118008
+     * 黏膜下层 	118009
+     * 肌层	11800C
+     * 组织轮廓	118111
+     * 算法输出指标	指标代码（仅限本文档）	单位（保留小数点后三位）	备注
+     * 肠腔面积	A	平方毫米
+     * 黏膜层面积	B	平方毫米	无
+     * 黏膜下层面积	C	平方毫米	无
+     * 肌层面积	D	平方毫米	无
+     * 空肠面积	E	平方毫米	无
+     * <p>
+     * 产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
+     * 黏膜层面积占比（环型）	1	%	Mucosal area%	1=（B-A）/（E-A）
+     * 黏膜层面积占比（C型）	2	%	Mucosal area%	2=B/（E-A）
+     * 黏膜下层面积占比（环型）	3	%	Submucosal area%	3=（C-B）/（E-A）
+     * 黏膜下层面积占比
+     * （C型）	4	%	Submucosal area%	4=C/（E-A）
+     * 肌层面积占比（环型）	5	%	Muscular area%	5=（D-C）/（E-A）
+     * 肌层面积占比
+     * （C型）	6	%	Muscular area%	6=D/（E-A）
+     * 空肠面积	7	平方毫米	Jejunum area	7=E-A
+     *
+     * @param jsonTask
+     */
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("大鼠空肠结构指标计算开始");

@@ -44,6 +44,26 @@ public class CecumParserStrategyImpl extends AbstractCustomParserStrategy {
         log.info("CecumParserStrategyImpl init");
     }
 
+    /**
+     * 结构指标计算
+     * 结构	编码
+     * 肠腔	114156
+     * 黏膜层	114008
+     * 黏膜下层 	114009
+     * 肌层	11400C
+     * 淋巴小结	114049
+     * 组织轮廓	114111
+     * 算法输出指标	指标代码（仅限本文档）	单位（保留小数点后3位）	备注
+     * 肠腔面积	A	平方毫米
+     * 黏膜层面积	B	平方毫米	无
+     * 黏膜下层面积	C	平方毫米	无
+     * 肌层面积	D	平方毫米	无
+     * 淋巴小结面积	E	平方毫米	若多个数据则相加输出
+     * 组织轮廓面积	F	平方毫米	无
+     * 盲肠面积	8	平方毫米	Cecum area	8=F-A
+     *
+     * @param jsonTask
+     */
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("大鼠盲肠结构指标计算开始");
