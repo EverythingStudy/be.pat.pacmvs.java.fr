@@ -8,6 +8,7 @@ import cn.staitech.fr.domain.in.IndicatorAddIn;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * @author mugw
@@ -82,6 +83,10 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
      * @return 指标对象
      */
     protected IndicatorAddIn createIndicator(Object result, String unit) {
+        if (result instanceof BigDecimal) {
+            BigDecimal roundedResult = ((BigDecimal) result).setScale(3, RoundingMode.HALF_UP);
+            return new IndicatorAddIn(String.valueOf(roundedResult), unit, CommonConstant.NUMBER_1);
+        }
         return new IndicatorAddIn(String.valueOf(result), unit, CommonConstant.NUMBER_1);
     }
 
@@ -93,7 +98,11 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
      * @param unit   单位
      * @return 指标对象
      */
-    protected IndicatorAddIn createNamedIndicator(String enName, Object result, String unit) {
+    protected IndicatorAddIn createNameIndicator(String enName, Object result, String unit) {
+        if (result instanceof BigDecimal) {
+            BigDecimal roundedResult = ((BigDecimal) result).setScale(3, RoundingMode.HALF_UP);
+            return new IndicatorAddIn(enName, String.valueOf(roundedResult), unit, CommonConstant.NUMBER_0);
+        }
         return new IndicatorAddIn(enName, String.valueOf(result), unit, CommonConstant.NUMBER_0);
     }
 

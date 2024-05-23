@@ -39,47 +39,46 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
 
         // 获取各种指标
         Integer organAreaCountA = areaUtils.getOrganAreaCount(jsonTask, "10B125");// A颗粒管（红色）数量
         Integer organAreaCountB = areaUtils.getOrganAreaCount(jsonTask, "10B128");// B黏液腺细胞核数量
-        // todo C颗粒管细胞核数量（单个）10B126
         BigDecimal organAreaD = areaUtils.getOrganArea(jsonTask, "10B003");// D有血管壁的血管面积
         Integer organAreaCountE = areaUtils.getOrganAreaCount(jsonTask, "10B003");// E有血管壁的血管数量
         BigDecimal organAreaF = areaUtils.getOrganArea(jsonTask, "10B004");// F红细胞面积
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId()); // H组织轮廓
         BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "10B125");// I颗粒管（红色）面积（全片）
+        // todo C颗粒管细胞核数量（单个）10B126
 
         // 算法输出指标
-        indicatorResultsMap.put("颗粒管（红色）数量", new IndicatorAddIn("", organAreaCountA.toString(), "个", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("黏液腺细胞核数量", new IndicatorAddIn("", organAreaCountB.toString(), "个", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("有血管壁的血管面积", new IndicatorAddIn("", organAreaD.toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("有血管壁的血管数量", new IndicatorAddIn("", organAreaCountE.toString(), "个", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", organAreaF.toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("颗粒管（红色）面积（全片）", new IndicatorAddIn("", organAreaI.toString(), "平方毫米", CommonConstant.NUMBER_1));
-        //indicatorResultsMap.put("颗粒管细胞核数量（单个）", new IndicatorAddIn("", "", "个", "1"));
-        indicatorResultsMap.put("颗粒管（红色）面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        resultsMap.put("颗粒管（红色）数量", createIndicator(organAreaCountA, PIECE));
+        resultsMap.put("黏液腺细胞核数量", createIndicator(organAreaCountB, PIECE));
+        resultsMap.put("有血管壁的血管面积", createIndicator(organAreaD, SQ_MM));
+        resultsMap.put("有血管壁的血管数量", createIndicator(organAreaCountE, PIECE));
+        resultsMap.put("红细胞面积", createIndicator(organAreaF, SQ_MM));
+        resultsMap.put("颗粒管（红色）面积（单个）", createDefaultIndicator());// G颗粒管（红色）面积（单个）
+        resultsMap.put("颗粒管（红色）面积（全片）", createIndicator(organAreaI, SQ_MM));// I颗粒管（红色）面积（全片）
 
         // 计算指标
-        BigDecimal densityResult = (0 == organAreaCountA) ? BigDecimal.ZERO
-                : new BigDecimal(organAreaCountA).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP);// A/H
-
-        BigDecimal nucleusResult = (0 == organAreaCountB) ? BigDecimal.ZERO
-                : new BigDecimal(organAreaCountB).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP); // B/H
+        BigDecimal densityResult = getDensityResult(organAreaCountA, slideArea);// A/H
+        BigDecimal nucleusResult = getDensityResult(organAreaCountB, slideArea);// B/H
 
         // 产品呈现指标
-        indicatorResultsMap.put("颌下腺面积", new IndicatorAddIn("Submadibular gland area", slideArea, "平方毫米"));
-        indicatorResultsMap.put("颗粒管（红色）密度", new IndicatorAddIn("Density of granular convoluted tubules (eosinophilic)", densityResult.toString(), "个/平方毫米"));
-        indicatorResultsMap.put("黏液腺细胞核密度", new IndicatorAddIn("Nucleus density of mucous gland", nucleusResult.toString(), "个/平方毫米"));
-         /*
-        indicatorResultsMap.put("颗粒管细胞核密度(单个颗粒管)", new IndicatorAddIn("Nucleus density of granular convoluted tubule (per)", "", "个/平方毫米"));
-        indicatorResultsMap.put("血管面积占比", new IndicatorAddIn("Vessel area%", "", "%"));
-        indicatorResultsMap.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", "", "%"));
-        indicatorResultsMap.put("颗粒管面积占比（全片）", new IndicatorAddIn("Granular convoluted tubules area% (all)", "", "%"));
-        */
+        resultsMap.put("颌下腺面积", createNameIndicator("Submadibular gland area", slideArea, SQ_MM));
+        resultsMap.put("颗粒管（红色）密度", createNameIndicator("Density of granular convoluted tubules (eosinophilic)", densityResult, SQ_MM_PIECE));
+        resultsMap.put("黏液腺细胞核密度", createNameIndicator("Nucleus density of mucous gland", nucleusResult, SQ_MM_PIECE));
 
-        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
+    }
+
+    /**
+     * 计算指标
+     * @return organAreaCount/slideArea结果
+     */
+    private BigDecimal getDensityResult(Integer organAreaCount, String slideArea) {
+        return (0 == organAreaCount) ? BigDecimal.ZERO
+                : new BigDecimal(organAreaCount).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP);
     }
 
     @Override

@@ -40,7 +40,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        Map<String, IndicatorAddIn>  resultsMap = new HashMap<>();
 
         // 获取各种指标
         BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "12F0F5");// B输出小管/附睾管黏膜上皮面积（全片）
@@ -48,35 +48,24 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         BigDecimal perimeterC = annotation.getStructurePerimeterNum();
         BigDecimal organAreaE = areaUtils.getOrganArea(jsonTask, "12F0F4");// E输出小管/附睾管管腔面积（全片）
         BigDecimal organAreaG = areaUtils.getOrganArea(jsonTask, "12F0F7");// G精子面积（全片）
-        // todo H黏膜上皮细胞核数量（单个）
         BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "12F003");// I血管面积
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// J组织轮廓面积
+        // todo H黏膜上皮细胞核数量（单个）
 
         // 算法输出指标
-        indicatorResultsMap.put("输出小管/附睾管黏膜上皮面积（全片）", new IndicatorAddIn("", organAreaB.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("输出小管/附睾管黏膜上皮周长（单个）", new IndicatorAddIn("", perimeterC.toString(), "毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("输出小管/附睾管管腔面积（全片）", new IndicatorAddIn("", organAreaE.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("精子面积（全片）", new IndicatorAddIn("", organAreaG.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("血管面积", new IndicatorAddIn("", organAreaI.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("输出小管/附睾管黏膜上皮面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT,CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("输出小管/附睾管管腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT,CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("精子面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
-        //indicatorResultsMap.put("黏膜上皮细胞核数量（单个）", new IndicatorAddIn("", areaCount.toString(), "个", "1"));
+        resultsMap.put("输出小管/附睾管黏膜上皮面积（全片）", createIndicator(organAreaB, SQ_MM));
+        resultsMap.put("输出小管/附睾管黏膜上皮周长（单个）", createIndicator(perimeterC, MM));
+        resultsMap.put("输出小管/附睾管管腔面积（全片）", createIndicator(organAreaE, SQ_MM));
+        resultsMap.put("精子面积（全片）", createIndicator(organAreaG, SQ_MM));
+        resultsMap.put("血管面积", createIndicator(organAreaI, SQ_MM));
+        resultsMap.put("输出小管/附睾管黏膜上皮面积（单个）", createDefaultIndicator());// A输出小管/附睾管黏膜上皮面积（单个）
+        resultsMap.put("输出小管/附睾管管腔面积（单个）", createDefaultIndicator());// D输出小管/附睾管管腔面积（单个）
+        resultsMap.put("精子面积（单个）", createDefaultIndicator());// F精子面积（单个）
 
         // 产品呈现指标
-        indicatorResultsMap.put("附睾面积", new IndicatorAddIn("Epididymal area", new BigDecimal(slideArea).setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米"));
-        /*
-        indicatorResultsMap.put("输出小管和附睾管面积占比（全片）", new IndicatorAddIn("Efferent ducts and epididymal ducts area%（all）", "", "%"));
-        indicatorResultsMap.put("间质面积占比", new IndicatorAddIn("Mesenchyme area%", "", "%"));
-        indicatorResultsMap.put("黏膜上皮面积占比（单个）", new IndicatorAddIn("Mucosal epithelium area% (per)", "", "%"));
-        indicatorResultsMap.put("精子面积占比（单个）", new IndicatorAddIn("Sperm area% (per)", "", "%"));
-        indicatorResultsMap.put("精子面积占比（全片）", new IndicatorAddIn("Sperm area% (all)", "", "%"));
-        indicatorResultsMap.put("黏膜上皮细胞核密度（单个）", new IndicatorAddIn("Mucosal epithelial nucleus% (per)", "", "个/毫米"));
-        indicatorResultsMap.put("血管相对面积", new IndicatorAddIn("Vessel area%", "", "%"));
-        indicatorResultsMap.put("黏膜上皮厚度（单个）", new IndicatorAddIn("Average thickness of mucosal epithelium (per)", "", "微米"));
-        */
+        resultsMap.put("附睾面积", createNameIndicator("Epididymal area", new BigDecimal(slideArea), SQ_MM));
 
-        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        aiForecastService.addAiForecast(jsonTask.getSingleId(),  resultsMap);
     }
 
     @Override

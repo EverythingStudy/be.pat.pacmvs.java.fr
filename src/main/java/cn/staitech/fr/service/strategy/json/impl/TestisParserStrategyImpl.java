@@ -40,7 +40,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
 
         // 获取各种指标
         BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "12E0FA");// B生精小管面积（全片）
@@ -54,21 +54,21 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         // todo G支持细胞核数量（单个）
 
         // 算法输出指标
-        indicatorResultsMap.put("生精小管面积（全片）", createIndicator(organAreaB, SQ_MM));
-        indicatorResultsMap.put("生精小管周长（单个）", createIndicator(perimeterC, MM));
-        indicatorResultsMap.put("生精小管数量", createIndicator(areaCountD, PIECE));
-        indicatorResultsMap.put("间质细胞核数量", createIndicator(areaCountH, PIECE));
-        indicatorResultsMap.put("血管面积", createIndicator(organAreaI, SQ_MM));
-        indicatorResultsMap.put("生精小管面积（单个）", createDefaultIndicator());// A生精小管面积（单个）
-        indicatorResultsMap.put("生精小管内腔面积（单个）", createDefaultIndicator());// E生精小管内腔面积（单个）
+        resultsMap.put("生精小管面积（全片）", createIndicator(organAreaB, SQ_MM));
+        resultsMap.put("生精小管周长（单个）", createIndicator(perimeterC, MM));
+        resultsMap.put("生精小管数量", createIndicator(areaCountD, PIECE));
+        resultsMap.put("间质细胞核数量", createIndicator(areaCountH, PIECE));
+        resultsMap.put("血管面积", createIndicator(organAreaI, SQ_MM));
+        resultsMap.put("生精小管面积（单个）", createDefaultIndicator());// A生精小管面积（单个）
+        resultsMap.put("生精小管内腔面积（单个）", createDefaultIndicator());// E生精小管内腔面积（单个）
 
         // 计算指标
         BigDecimal densityResult = getDensityResult(areaCountD, slideAreaJ);
 
         // 产品呈现指标
-        indicatorResultsMap.put("睾丸面积", createNamedIndicator("Testicular area", slideAreaJ, SQ_MM));
-        indicatorResultsMap.put("生精小管密度", createNamedIndicator("Density of seminiferous tubules", densityResult, SQ_UM_THOUSAND));
-        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        resultsMap.put("睾丸面积", createNameIndicator("Testicular area", slideAreaJ, SQ_MM));
+        resultsMap.put("生精小管密度", createNameIndicator("Density of seminiferous tubules", densityResult, SQ_UM_THOUSAND));
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }
 
     /**
