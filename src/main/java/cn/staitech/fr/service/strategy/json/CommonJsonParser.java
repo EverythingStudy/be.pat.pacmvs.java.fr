@@ -437,16 +437,16 @@ public class CommonJsonParser {
     
     /**
      * 占比计算（保留三位小数）
-     * @param BigDecimal1
-     * @param BigDecimal2
+     * @param bigDecimal1
+     * @param bigDecimal2
      * @return 脏器面积-10³平方微米
      */
-    public BigDecimal getProportion(BigDecimal BigDecimal1, BigDecimal BigDecimal2) {
+    public BigDecimal getProportion(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
     	BigDecimal proportion;
-    	if(null == BigDecimal1 || null == BigDecimal2){
+    	if(null == bigDecimal1 || null == bigDecimal2){
     		return BigDecimal.ZERO;
     	}
-    	proportion = BigDecimal1.divide(BigDecimal2).setScale(3, RoundingMode.HALF_UP);
+    	proportion = bigDecimal1.divide(bigDecimal2).setScale(3, RoundingMode.HALF_UP);
     	return proportion;
     }
 
