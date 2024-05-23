@@ -2,7 +2,9 @@ package cn.staitech.fr.service.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
@@ -26,6 +28,7 @@ import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.Diagnosis;
+import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.Measure;
 import cn.staitech.fr.domain.SingleSlide;
@@ -40,6 +43,7 @@ import cn.staitech.fr.domain.out.SlideSelectBy;
 import cn.staitech.fr.mapper.AiForecastMapper;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.DiagnosisMapper;
+import cn.staitech.fr.mapper.JsonFileMapper;
 import cn.staitech.fr.mapper.JsonTaskMapper;
 import cn.staitech.fr.mapper.MeasureMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
@@ -75,6 +79,8 @@ implements SlideService {
 	private DiagnosisMapper diagnosisMapper;
 	@Resource
 	private JsonTaskMapper jsonTaskMapper;
+	@Resource
+	private JsonFileMapper jsonFileMapper;
 	@Resource
 	private AnnotationMapper annotationMapper;
 	@Resource
@@ -199,9 +205,14 @@ implements SlideService {
 			if(CollectionUtils.isNotEmpty(singleSlideList)){
 				List<Long> singleSlideIdList = singleSlideList.stream().map(SingleSlide::getSingleId).collect(Collectors.toList());
 				//fr_measure表数据处理
-				QueryWrapper<Measure> wrapper = new QueryWrapper<>();
-				wrapper.in("single_slide_id", singleSlideIdList);
-				measureMapper.delete(wrapper);
+				QueryWrapper<Measure> queryAmWrapper = new QueryWrapper<>();
+				queryAmWrapper.in("single_slide_id",singleSlideIdList);
+				List<Measure> amList = measureMapper.selectList(queryAmWrapper);
+				if(CollectionUtils.isNotEmpty(amList)){
+					QueryWrapper<Measure> wrapper = new QueryWrapper<>();
+					wrapper.in("single_slide_id", singleSlideIdList);
+					measureMapper.delete(wrapper);
+				}
 
 				//fr_ai_forecast 查询
 				QueryWrapper<AiForecast> queryAfWrapper = new QueryWrapper<>();
@@ -230,6 +241,10 @@ implements SlideService {
 				queryJWrapper.in("single_id",singleSlideIdList);
 				List<JsonTask> jsonTaskList = jsonTaskMapper.selectList(queryJWrapper);
 				if(CollectionUtils.isNotEmpty(jsonTaskList)){
+					List<Long> taskIdList = jsonTaskList.stream().map(JsonTask::getTaskId).collect(Collectors.toList());
+					QueryWrapper<JsonFile> jFrapper = new QueryWrapper<>();
+					jFrapper.in("task_id", taskIdList);
+					jsonFileMapper.delete(jFrapper);
 					//数据处理
 					QueryWrapper<JsonTask> jWrapper = new QueryWrapper<>();
 					jWrapper.in("single_id", singleSlideIdList);
@@ -244,11 +259,7 @@ implements SlideService {
 				List<Annotation> annoList = annotationMapper.selectList(queryAnnowrapper);
 				if(CollectionUtils.isNotEmpty(annoList)){
 					//数据处理
-					//					QueryWrapper<Annotation> aWrapper = new QueryWrapper<>();
-					//					aWrapper.in("slide_id", slideIdList);
-					//					annotationMapper.delete(aWrapper);
-					// 如果待删除的singleSlideId少于或等于1000，则直接一次性删除
-
+					// 如果待删除的singleSlideId少于或等于batchSize，则直接一次性删除
 					if (CollectionUtils.isNotEmpty(slideIdList)) {
 						if (slideIdList.size() <= batchSize) {
 							annotationMapper.deleteBatchIds(slideIdList);
@@ -257,33 +268,40 @@ implements SlideService {
 							for (int i = 0; i < slideIdList.size(); i += batchSize) {
 								int end = Math.min(i + batchSize, slideIdList.size()); // 防止数组越界
 								List<Long> idsBatch = slideIdList.subList(i, end); // 获取当前批次的ID
-								annotationMapper.deleteBatchIds(slideIdList);
+								annotationMapper.deleteBatchIds(idsBatch);
 							}
 						}
 					}
 				}
 				//查询专题和fr_ai_annotation_X管理
-				LambdaQueryWrapper<SpecialAnnotationRel> SpecialQueryWrapper = new LambdaQueryWrapper<>();
-				SpecialQueryWrapper.eq(SpecialAnnotationRel::getSpecialId, specialId);
-				SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(SpecialQueryWrapper);
+				QueryWrapper<SpecialAnnotationRel> specialQueryWrapper = new QueryWrapper<>();
+				specialQueryWrapper.in("special_id",specialId);
+				SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(specialQueryWrapper);
 				Long aiSequenceNumber = annotationRel.getSequenceNumber();
 				if(null != aiSequenceNumber){
 					//fr_ai_annotation_X
 					Annotation annotation = new Annotation();
 					annotation.setSequenceNumber(aiSequenceNumber);
 					annotation.setSingleSlideIdList(singleSlideIdList);
+					annotation.setMagnification(40000L);
 					List<Annotation> aiAnnoList = annotationMapper.aiSelectListBy(annotation);
-					// 如果待删除的singleSlideId少于或等于1000，则直接一次性删除
+					// 如果待删除的singleSlideId少于或等于batchSize，则直接一次性删除
 					if (CollectionUtils.isNotEmpty(aiAnnoList)) {
 						List<Long> annoIdList = aiAnnoList.stream().map(Annotation::getAnnotationId).collect(Collectors.toList());
 						if (aiAnnoList.size() <= batchSize) {
-							annotationMapper.batchDeleteBySsIds(annoIdList);
+							Map<String,Object> parm = new HashMap<String, Object>();
+								parm.put("list", annoIdList);
+								parm.put("sequenceNumber", aiSequenceNumber);
+							annotationMapper.batchDeleteBySsIds(parm);
 						}else{
 							// 分批次删除，每次处理batchSize条
 							for (int i = 0; i < annoIdList.size(); i += batchSize) {
 								int end = Math.min(i + batchSize, annoIdList.size()); // 防止数组越界
 								List<Long> idsBatch = annoIdList.subList(i, end); // 获取当前批次的ID
-								annotationMapper.batchDeleteBySsIds(idsBatch);
+								Map<String,Object> parm = new HashMap<String, Object>();
+								parm.put("list", idsBatch);
+								parm.put("sequenceNumber", aiSequenceNumber);
+								annotationMapper.batchDeleteBySsIds(parm);
 							}
 						}
 					}

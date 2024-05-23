@@ -514,13 +514,13 @@
     </delete>
     
     <!-- 批量删除方法 -->
-    <delete id="batchDeleteBySsIds">
+    <delete id="batchDeleteBySsIds" parameterType="map" >
         DELETE 
         FROM 
         fr_ai_annotation_${sequenceNumber}
-        WHERE single_slide_id IN
-        <foreach item="singleSlideId" index="index" collection="list" open="(" separator="," close=")">
-            #{singleSlideId}
+        WHERE annotation_id IN
+        <foreach item="annotationId" index="index" collection="list" open="(" separator="," close=")">
+            #{annotationId}
         </foreach>
     </delete>
 
