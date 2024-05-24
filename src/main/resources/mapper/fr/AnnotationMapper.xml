@@ -134,6 +134,7 @@
             "contour2500"     geometry ( GEOMETRY ),
             "contour10000"    geometry ( GEOMETRY ),
             "contour40000"    geometry ( GEOMETRY ),
+            "contour5000"    geometry ( GEOMETRY ),
             "location_type"   VARCHAR(100) COLLATE "pg_catalog"."default",
             "annotation_type" VARCHAR(50) COLLATE "pg_catalog"."default",
             "create_by"       INT8,
@@ -144,7 +145,8 @@
             "single_slide_id" INT8,
             "single"          INT2          DEFAULT 1,
             "contour_type"    INT8          DEFAULT 4,
-            structure_size    INT2,
+            "structure_size"    INT2,
+            "cell_type"    VARCHAR(50) COLLATE "pg_catalog"."default",
             "id"              VARCHAR(500) COLLATE "pg_catalog"."default",
             CONSTRAINT "fr_ai_annotation_${sequenceNumber}_pkey" PRIMARY KEY ("annotation_id")
         );
