@@ -100,6 +100,13 @@ public class CommonJsonParser {
                 log.info("geometry625解析失败");
                 return null;
             }
+            JsonNode geometry0 = element.get("geometry0");
+            // geometry转换成JSONObject
+            JSONObject jsonObject0 = JSONObject.parseObject(JSONObject.toJSONString(geometry0));
+            if (null == jsonObject0) {
+                log.info("geometry0解析失败");
+                return null;
+            }
             String labelCode = properties.getLabel_code();
             if (StringUtils.isEmpty(labelCode)) {
                 log.info("labelCode为空");
@@ -132,6 +139,9 @@ public class CommonJsonParser {
             if (null != geometry625) {
                 annotation.setContour625(geometry625.toString());
             }
+            if (null != geometry0) {
+                annotation.setContour5000(geometry0.toString());
+            }
             annotation.setId(annotationId);
             // 拿到categoryId
             Long categoryId = pathologicalMap.get(labelCode);
@@ -143,6 +153,7 @@ public class CommonJsonParser {
             annotation.setSingleSlideId(jsonTask.getSingleId());
             annotation.setCategoryId(categoryId);
             annotation.setAnnotationType(annotationType.toUpperCase());
+            annotation.setCellType(properties.getCell_type());
             return annotation;
         } else {
             log.error("Expected an object, but got a non-object node: " + element);
@@ -172,12 +183,12 @@ public class CommonJsonParser {
         List<Annotation> processedAnnotations;
 
         JsonToken current;
-        int bathSize=5000;
+        int bathSize = 5000;
 
         try (FileInputStream fis = new FileInputStream(jsonFile); JsonParser jsonParser = jsonFactory.createParser(fis)) {
             current = jsonParser.nextToken();
             if (current != JsonToken.START_OBJECT) {
-                log.error("json type error！ : {}",current);
+                log.error("json type error！ : {}", current);
                 return;
             }
             while (jsonParser.nextToken() != JsonToken.END_OBJECT) {
@@ -246,6 +257,7 @@ public class CommonJsonParser {
 
     /**
      * 处理周长、面积等
+     *
      * @param finalResolutionX
      * @param annotation
      * @return
@@ -263,6 +275,7 @@ public class CommonJsonParser {
 
     /**
      * get resolutionX
+     *
      * @param jsonTask
      * @return
      */
@@ -277,6 +290,7 @@ public class CommonJsonParser {
 
     /**
      * checkCategory
+     *
      * @param jsonTask
      * @return
      */
@@ -434,20 +448,21 @@ public class CommonJsonParser {
         BigDecimal structureAreaNum = new BigDecimal(structure.getArea());
         return structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.001));
     }
-    
+
     /**
      * 占比计算（保留三位小数）
+     *
      * @param bigDecimal1
      * @param bigDecimal2
      * @return 脏器面积-10³平方微米
      */
     public BigDecimal getProportion(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
-    	BigDecimal proportion;
-    	if(null == bigDecimal1 || null == bigDecimal2){
-    		return BigDecimal.ZERO;
-    	}
-    	proportion = bigDecimal1.divide(bigDecimal2).setScale(3, RoundingMode.HALF_UP);
-    	return proportion;
+        BigDecimal proportion;
+        if (null == bigDecimal1 || null == bigDecimal2) {
+            return BigDecimal.ZERO;
+        }
+        proportion = bigDecimal1.divide(bigDecimal2).setScale(3, RoundingMode.HALF_UP);
+        return proportion;
     }
 
     /**
