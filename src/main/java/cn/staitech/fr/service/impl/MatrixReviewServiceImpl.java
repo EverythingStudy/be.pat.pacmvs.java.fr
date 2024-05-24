@@ -476,7 +476,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 				Long imageId = matrixReviewListOut.getImageId();
 				String organizatinName = geNumber(organizationId);
 				if(null != slideId && StringUtils.isNotEmpty(imageUrl)){
-					if(imageUrl.endsWith("svs")||imageUrl.endsWith("SVS") && !organName.equals("盲肠-回肠-直肠-结肠")){
+					if(imageUrl.toLowerCase().endsWith("svs") && !organName.equals("盲肠-回肠-直肠-结肠")){
 						//请求算法接口
 						try {
 							log.info("AI算法请求内容是singleId:{},slideId:{},organizationId:{},imageUrl:{},algorithm_name:{}", singleId,slideId,organizationId,imageUrl,CommonConstant.ALGORITHM_MODEL_NAME);

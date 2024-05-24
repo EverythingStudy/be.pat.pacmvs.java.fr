@@ -126,7 +126,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 				Long imageId = algorithmImageOut.getImageId();
 				String organizatinName = geNumber(organizationId);
 				if(null != slideId && StringUtils.isNotEmpty(imageUrl)){
-					if(imageUrl.endsWith("svs")||imageUrl.endsWith("SVS")){
+					if(imageUrl.toLowerCase().endsWith("svs")){
 						//请求算法接口
 						try {
 							log.info("AI算法请求内容是imageId:{},slideId:{},organizationId:{},imageUrl:{},algorithm_name:{}", imageId,slideId,organizationId,imageUrl,CommonConstant.RECOGNITION_MODEL_NAME);
