@@ -54,6 +54,8 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
         indicatorResultsMap.put("精囊腺面积", new IndicatorAddIn("Seminal vesicle area", singleSlide.getArea(), "平方毫米"));
         indicatorResultsMap.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", organArea.toString(), "平方毫米"));
         indicatorResultsMap.put("腺腔面积（全片）", new IndicatorAddIn("Glandular cavity area (all)", organArea1.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("腺上皮面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("腺腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 
 
