@@ -14,6 +14,7 @@ import cn.staitech.fr.vo.measure.BroadcastVO;
 import cn.staitech.fr.vo.measure.MarkingSelectListVO;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.staitech.fr.service.MeasureService;
@@ -54,7 +55,8 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
             features.setGeometry(JSONObject.parseObject(measure.getContour()));
             features.setId(null);
             features.setType("Feature");
-            JSONObject jsonObject = (JSONObject) JSON.toJSON(getPropertiesBriefly(measure));
+            String s1 = JSONObject.toJSONString(getProperties(measure), SerializerFeature.PrettyFormat);
+            JSONObject jsonObject = JSONObject.parseObject(s1);
             features.setProperties(jsonObject);
             featuresList.add(features);
         }

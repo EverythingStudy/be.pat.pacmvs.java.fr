@@ -232,6 +232,7 @@
         slide_id,
         single_slide_id,
         structure_size,
+        cell_type,
         id
         )
         values
@@ -252,6 +253,7 @@
             #{item.slideId},
             #{item.singleSlideId},
             #{item.structureSize},
+            #{item.cellType},
             #{item.id}
             )
         </foreach>
@@ -373,6 +375,7 @@
         END AS contour,
         single_slide_id,
         contour_type,
+        cell_type,
         single
         from fr_ai_annotation_${sequenceNumber}
         <where>

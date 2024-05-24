@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.json.JSONUtil;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.config.AsyncTask;
@@ -33,6 +34,7 @@ import cn.staitech.system.api.domain.SysUser;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import cn.staitech.fr.service.AnnotationService;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -184,7 +186,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             features.setGeometry(JSONObject.parseObject(annotation.getContour()));
             features.setId(null);
             features.setType("Feature");
-            JSONObject jsonObject = (JSONObject) JSON.toJSON(getProperties(annotation));
+            String s1 = JSONObject.toJSONString(getProperties(annotation),SerializerFeature.PrettyFormat);
+            JSONObject jsonObject = JSONObject.parseObject(s1);
             features.setProperties(jsonObject);
             featuresList.add(features);
         }
@@ -203,6 +206,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         properties.setA11(annotation.getCreateBy());
         properties.setA12(String.valueOf(annotation.getCreateTime()));
         properties.setA13(annotation.getUpdateBy());
+        properties.setA29(annotation.getCellType());
         properties.setA28(annotation.getContourType());
         properties.setA27(annotation.getSingle());
         if (annotation.getSingle() == 1 && (annotation.getContourType() == 2 || annotation.getContourType() == 4)) {
