@@ -4,9 +4,7 @@ import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
-import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,11 +30,7 @@ import java.util.Map;
 public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 
 	@Resource
-	private AnnotationMapper annotationMapper;
-	@Resource
 	private SingleSlideMapper singleSlideMapper;
-	@Resource
-	private AiForecastService aiForecastService;
 	@Resource
 	private CommonJsonParser commonJsonParser;
 	@Resource
@@ -58,7 +51,6 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		//空腔	15D113  A     10³平方微米
 		//组织轮廓	15D111  D   10³平方微米
 
-		
 		//空腔面积 A 10³平方微米
 		Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "15D113");
 		BigDecimal bigDecimalA = BigDecimal.ZERO;
@@ -86,7 +78,6 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		}
 
 
-
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 		indicatorResultsMap.put("空腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA), "10³平方微米", "1"));
 		indicatorResultsMap.put("空腔周长", new IndicatorAddIn("", String.valueOf(bigDecimalB), "毫米", "1"));
@@ -101,8 +92,6 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		BigDecimal  bigDecimal2 = new BigDecimal(2);
 		BigDecimal mal =  bigDecimal2.multiply(commonJsonParser.getProportion(bigDecimalDA, bigDecimalBC));
 		indicatorResultsMap.put("主动脉壁平均厚度", new IndicatorAddIn("Average thickness of aorta wall", String.valueOf(mal), "平方毫米", "0"));
-
-
 	}
 
 	@Override
