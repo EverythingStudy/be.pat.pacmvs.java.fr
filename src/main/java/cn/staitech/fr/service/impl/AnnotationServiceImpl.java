@@ -293,6 +293,11 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         List<Features> list = new ArrayList<>();
         Annotation annotation = new Annotation();
         BeanUtils.copyProperties(req, annotation);
+        if(req.getMagnification() == 5000){
+            annotation.setMagnifications(10000L);
+        } else {
+            annotation.setMagnifications(req.getMagnification());
+        }
         if (req.getGeometry() != null) {
             annotation.setContour(String.valueOf(req.getGeometry()));
         }
