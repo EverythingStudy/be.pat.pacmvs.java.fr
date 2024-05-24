@@ -224,6 +224,7 @@
         contour625,
         contour2500,
         contour10000,
+        contour5000,
         location_type,
         annotation_type,
         create_by,
@@ -243,6 +244,7 @@
             st_geomfromgeojson(#{item.contour625}),
             st_geomfromgeojson(#{item.contour2500}),
             st_geomfromgeojson(#{item.contour10000}),
+            st_geomfromgeojson(#{item.contour5000}),
             #{item.locationType},
             #{item.annotationType},
             #{item.createBy},
@@ -356,7 +358,19 @@
         update_time,
         slide_id,
         id,
-        ST_AsGeoJSON(contour${magnification}) as contour,
+        CASE
+        ${magnification}
+        WHEN '5000' THEN
+            CASE
+            structure_size
+            WHEN 2 THEN
+                ST_AsGeoJSON(contour5000)
+            WHEN 3 THEN
+                ST_AsGeoJSON(contour10000)
+            ELSE NULL END
+        ELSE
+            ST_AsGeoJSON(contour${magnification})
+        END AS contour,
         single_slide_id,
         contour_type,
         single
@@ -366,7 +380,7 @@
                 single_slide_id = #{singleSlideId}
             </if>
             <if test="contour != null">
-                AND ST_Intersects(st_geomfromgeojson(#{contour}),contour${magnification})
+                AND ST_Intersects(st_geomfromgeojson(#{contour}),contour${magnifications})
             </if>
             <if test="structureSizeList != null and structureSizeList.size > 0">
                 AND structure_size in
