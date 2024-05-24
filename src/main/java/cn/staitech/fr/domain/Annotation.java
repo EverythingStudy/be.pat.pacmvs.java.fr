@@ -106,6 +106,8 @@ public class Annotation implements Serializable {
 
     private String contour10000;
 
+    private String contour5000;
+
     private String contour2500;
 
     private String contour625;

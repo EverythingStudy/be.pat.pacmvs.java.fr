@@ -1,15 +1,12 @@
 package cn.staitech.fr.utils;
 
-import cn.staitech.fr.domain.Measure;
 import cn.staitech.fr.vo.geojson.Features;
-import cn.staitech.fr.vo.geojson.Properties;
+import cn.staitech.fr.vo.geojson.PropertiesBriefly;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.io.WKTReader;
-import com.vividsolutions.jts.io.WKTWriter;
-import com.vividsolutions.jts.operation.overlay.OverlayOp;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.geotools.geojson.GeoJSONUtil;
@@ -352,7 +349,7 @@ public class MarkingUtils {
     }
 
 
-    public static Features socketData(String annotationId, JSONObject geometry, Properties properties) {
+    public static Features socketData(String annotationId, JSONObject geometry, PropertiesBriefly properties) {
         Features features = new Features();
         features.setGeometry(geometry);
         features.setId(annotationId);

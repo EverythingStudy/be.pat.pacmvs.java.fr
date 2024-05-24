@@ -8,6 +8,7 @@ import cn.staitech.fr.netty.websocket.NioWebSocketHandler;
 import cn.staitech.fr.utils.*;
 import cn.staitech.fr.vo.geojson.Features;
 import cn.staitech.fr.vo.geojson.Properties;
+import cn.staitech.fr.vo.geojson.PropertiesBriefly;
 import cn.staitech.fr.vo.geojson.in.ViewAddIn;
 import cn.staitech.fr.vo.measure.BroadcastVO;
 import cn.staitech.fr.vo.measure.MarkingSelectListVO;
@@ -53,7 +54,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
             features.setGeometry(JSONObject.parseObject(measure.getContour()));
             features.setId(null);
             features.setType("Feature");
-            JSONObject jsonObject = (JSONObject) JSON.toJSON(getProperties(measure));
+            JSONObject jsonObject = (JSONObject) JSON.toJSON(getPropertiesBriefly(measure));
             features.setProperties(jsonObject);
             featuresList.add(features);
         }
@@ -152,7 +153,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         measure.setNumber(number);
         measureMapper.insert(measure);
         Measure measureBy = measureMapper.selectById(measure.getMeasureId());
-        cn.staitech.fr.vo.geojson.Properties properties = getProperties(measureBy);
+        PropertiesBriefly properties = getPropertiesBriefly(measureBy);
         Features features = MarkingUtils.socketData(null, JSONObject.parseObject(measure.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_MEASURE, ADD_STATUS, features);
         NioWebSocketHandler.sendSingle(req.getSingle_slide_id(), broadcastVO);
@@ -171,7 +172,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }
         Measure measureBy = measureMapper.selectById(measure.getMeasureId());
-        cn.staitech.fr.vo.geojson.Properties properties = getProperties(measureBy);
+        PropertiesBriefly properties = getPropertiesBriefly(measureBy);
         Features features = MarkingUtils.socketData(null, JSONObject.parseObject(measure.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_MEASURE, DELETE_STATUS, features);
         NioWebSocketHandler.sendSingle(measure.getSingleSlideId(), broadcastVO);
@@ -273,6 +274,59 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         return measure;
     }
 
+    public PropertiesBriefly getPropertiesBriefly(Measure measure) {
+        PropertiesBriefly properties = new PropertiesBriefly();
+        properties.setA0(String.valueOf(measure.getMeasureId()));
+        properties.setA7(measure.getArea());
+        properties.setA6(measure.getPerimeter());
+        properties.setA2(measure.getAnnotationType());
+        properties.setA1(measure.getLocationType());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        properties.setA12(sdf.format(measure.getCreateTime()));
+        properties.setA21(measure.getMeasureName());
+        properties.setA24(measure.getMeasureType());
+//        properties.setNumber(measure.getNumber());
+        properties.setA23(measure.getMeasureRelation());
+        properties.setA22(measure.getMeasureNumber());
+        properties.setA19(measure.getMeanDistance());
+        properties.setA20(measure.getMinDistance());
+        properties.setA18(measure.getMaxDistance());
+        properties.setA16(measure.getInnerAngle());
+        properties.setA15(measure.getExteriorAngle());
+        properties.setA14(measure.getCenterPoint());
+        properties.setA17(measure.getRadius());
+        properties.setA25(measure.getMeasureFullName());
+        if (measure.getCreateBy() != null) {
+            User createUser = userMap.get(measure.getCreateBy());
+            if (createUser == null) {
+                createUser = userMapper.selectById(measure.getCreateBy());
+                if (createUser != null) {
+                    userMap.put(createUser.getUserId(), createUser);
+                }
+            }
+            if (createUser != null) {
+                properties.setA9(createUser.getUserName());
+            }
+        }
+        if (measure.getUpdateBy() != null) {
+            User updateUser = userMap.get(measure.getUpdateBy());
+            if (updateUser == null) {
+                updateUser = userMapper.selectById(measure.getUpdateBy());
+                if (updateUser != null) {
+                    userMap.put(updateUser.getUserId(), updateUser);
+                }
+            }
+            if (updateUser != null) {
+                properties.setA10(updateUser.getUserName());
+            }
+        }
+        return properties;
+    }
+
+
+
+
+
     public cn.staitech.fr.vo.geojson.Properties getProperties(Measure measure) {
         cn.staitech.fr.vo.geojson.Properties properties = new cn.staitech.fr.vo.geojson.Properties();
         properties.setMarking_id(String.valueOf(measure.getMeasureId()));
@@ -321,6 +375,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         }
         return properties;
     }
+
 
 
 }

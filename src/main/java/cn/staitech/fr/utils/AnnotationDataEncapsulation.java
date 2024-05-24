@@ -4,6 +4,7 @@ import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
 import cn.staitech.fr.vo.geojson.Features;
 import cn.staitech.fr.vo.geojson.Properties;
+import cn.staitech.fr.vo.geojson.PropertiesBriefly;
 import cn.staitech.fr.vo.measure.BroadcastVO;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -34,7 +35,7 @@ public class AnnotationDataEncapsulation {
     }
 
 
-    public static Features socketData(String annotationId, JSONObject geometry, Properties properties) {
+    public static Features socketData(String annotationId, JSONObject geometry, PropertiesBriefly properties) {
         Features features = new Features();
         features.setGeometry(geometry);
         features.setId(annotationId);
