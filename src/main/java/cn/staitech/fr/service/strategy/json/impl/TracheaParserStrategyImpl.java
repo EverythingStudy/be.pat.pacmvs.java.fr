@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
@@ -65,11 +66,11 @@ public class TracheaParserStrategyImpl extends AbstractCustomParserStrategy {
 
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         indicatorResultsMap.put("气管面积", new IndicatorAddIn("Tracheal area", String.valueOf(areaNum), "平方毫米"));
-        indicatorResultsMap.put("气管腔面积", new IndicatorAddIn("气管腔面积", String.valueOf(organArea), "平方毫米", "1"));
-        indicatorResultsMap.put("黏膜上皮层面积", new IndicatorAddIn("黏膜上皮层面积", String.valueOf(mucosaArea), "平方毫米", "1"));
-        indicatorResultsMap.put("黏膜上皮层周长", new IndicatorAddIn("黏膜上皮层周长", String.valueOf(mucosaPerimeter), "毫米", "1"));
-        indicatorResultsMap.put("黏膜上皮细胞核数量", new IndicatorAddIn("黏膜上皮细胞核数量", String.valueOf(mucosaCount), "个", "1"));
-        indicatorResultsMap.put("软骨面积", new IndicatorAddIn("软骨面积", String.valueOf(cartilageArea), "平方毫米", "1"));
+        indicatorResultsMap.put("气管腔面积", new IndicatorAddIn("气管腔面积", String.valueOf(organArea), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("黏膜上皮层面积", new IndicatorAddIn("黏膜上皮层面积", String.valueOf(mucosaArea), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("黏膜上皮层周长", new IndicatorAddIn("黏膜上皮层周长", String.valueOf(mucosaPerimeter), "毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("黏膜上皮细胞核数量", new IndicatorAddIn("黏膜上皮细胞核数量", String.valueOf(mucosaCount), "个", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("软骨面积", new IndicatorAddIn("软骨面积", String.valueOf(cartilageArea), "平方毫米", CommonConstant.NUMBER_1));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 

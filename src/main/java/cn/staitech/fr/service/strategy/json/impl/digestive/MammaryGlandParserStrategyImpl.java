@@ -28,13 +28,11 @@ import java.util.Map;
  * @desc 乳腺-皮肤
  */
 @Slf4j
-@Component("Skin_mammary")
+@Component("D66_Integument_and_Mammary_gland")
 public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
-    @Resource
-    private AnnotationMapper annotationMapper;
     @Resource
     private SingleSlideMapper singleSlideMapper;
     @Resource
@@ -48,6 +46,36 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         log.info("MammaryGlandParserStrategyImpl init");
     }
 
+    /**
+     * 结构指标计算
+     * 结构	编码
+     * 表皮角质层	121096
+     * 表皮基底层+棘层+颗粒层	121097
+     * 毛囊	121098
+     * 皮脂腺	121099
+     * 组织轮廓	121111
+     * 算法输出指标	指标代码（仅限本文档）	单位（保留小数点后三位）	备注
+     * 表皮角质层面积	A	平方毫米	若多个数据则相加输出
+     * 表皮基底层+棘层+颗粒层面积	B	平方毫米	若多个数据则相加输出
+     * 毛囊面积（单个）	C	103平方微米	单个毛囊面积输出
+     * 毛囊数量	D	个	无
+     * 皮脂腺面积	E	103平方微米	数据相加输出
+     * 皮脂腺数量	F	个	无
+     * 皮肤面积	G	平方毫米	此数据使用乳腺中皮肤数据
+     * 毛囊面积（全片）	H	平方毫米	无
+     * <p>
+     * 产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
+     * 表皮角质层面积占比	1	%	Stratum corneum area%	1=A/G
+     * 表皮基底层+棘层+颗粒层面积占比	2	%	 Nucleated cell layer area%	2=B/G
+     * 毛囊面积（单个）	3	103平方微米	Hair follicle area（per）	3=C	以95%置信区间和均数±标准差呈现
+     * 毛囊密度	4	个/平方毫米	Density of hair follicles 	4=D/G
+     * 皮脂腺密度	5	个/平方毫米	Density of Sebaceous glands 	5=F/G
+     * 皮脂腺面积占比	6	%	Sebaceous glands area%	6=E/G	运算前注意统一单位
+     * 毛囊面积占比	7	%	Hair follicles area%	7=H/G
+     * 皮肤面积	8	平方毫米	Skin area	8=G
+     *
+     * @param jsonTask
+     */
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("乳腺结构指标计算开始");
@@ -99,6 +127,8 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         indicatorResultsMap.put("结缔组织面积", new IndicatorAddIn("Connective tissue area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("Organizational contour area", h.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("乳腺细胞核数量（全片）", new IndicatorAddIn("Number of breast cell nuclei (all)", organAreaCount2.toString(), "个", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("乳腺腺泡/导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+
         // 表皮角质层面积
         indicatorResultsMap.put("表皮角质层面积", new IndicatorAddIn("Epidermal stratum corneum area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米"));
         // 表皮基底层+棘层+颗粒层面积
@@ -115,11 +145,12 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         indicatorResultsMap.put("毛囊密度", new IndicatorAddIn("Mucous sac density", divide.toString(), "个/平方毫米", CommonConstant.NUMBER_1));
         // 皮脂腺密度
         indicatorResultsMap.put("皮脂腺密度", new IndicatorAddIn("Sebaceous gland density", divide1.toString(), "个/平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("毛囊面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 
     @Override
     public String getAlgorithmCode() {
-        return "Skin_mammary";
+        return "D66_Integument_and_Mammary_gland";
     }
 }

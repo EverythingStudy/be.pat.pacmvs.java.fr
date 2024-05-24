@@ -5,7 +5,6 @@ import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
@@ -33,8 +32,6 @@ public class CecumParserStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
-    private AnnotationMapper annotationMapper;
-    @Resource
     private SingleSlideMapper singleSlideMapper;
     @Resource
     private AiForecastService aiForecastService;
@@ -47,12 +44,33 @@ public class CecumParserStrategyImpl extends AbstractCustomParserStrategy {
         log.info("CecumParserStrategyImpl init");
     }
 
+    /**
+     * 结构指标计算
+     * 结构	编码
+     * 肠腔	114156
+     * 黏膜层	114008
+     * 黏膜下层 	114009
+     * 肌层	11400C
+     * 淋巴小结	114049
+     * 组织轮廓	114111
+     * 算法输出指标	指标代码（仅限本文档）	单位（保留小数点后3位）	备注
+     * 肠腔面积	A	平方毫米
+     * 黏膜层面积	B	平方毫米	无
+     * 黏膜下层面积	C	平方毫米	无
+     * 肌层面积	D	平方毫米	无
+     * 淋巴小结面积	E	平方毫米	若多个数据则相加输出
+     * 组织轮廓面积	F	平方毫米	无
+     * 盲肠面积	8	平方毫米	Cecum area	8=F-A
+     *
+     * @param jsonTask
+     */
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("大鼠盲肠结构指标计算开始");
         // 查询所有未被删除且登录机构相同的数据
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String area = ObjectUtil.isNotEmpty(singleSlide) ? singleSlide.getArea() : "0";
+        area = ObjectUtil.isEmpty(area) ? "0" : area;
         Map<String, IndicatorAddIn> resultMap = new HashMap<>();
         // 肠腔面积
         BigDecimal colonArea = commonJsonParser.getOrganArea(jsonTask, "114156").getStructureAreaNum();
@@ -67,7 +85,10 @@ public class CecumParserStrategyImpl extends AbstractCustomParserStrategy {
         // 组织轮廓
         BigDecimal areaNum5 = new BigDecimal(area);
         // 盲肠面积
-        BigDecimal areaNum6 = areaNum5.subtract(colonArea).setScale(3, RoundingMode.HALF_UP);
+        BigDecimal areaNum6 = new BigDecimal(0);
+        if (areaNum5.compareTo(BigDecimal.ZERO) != 0) {
+            areaNum6 = areaNum5.subtract(colonArea).setScale(3, RoundingMode.HALF_UP);
+        }
         resultMap.put("肠腔面积", new IndicatorAddIn("Intestinal cavity area", colonArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         resultMap.put("黏膜层面积", new IndicatorAddIn("Mucosal layer area", areaNum.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         resultMap.put("黏膜下层面积", new IndicatorAddIn("Submucosal area", areaNum2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));

@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
-
+import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author: wangfeng
  * @create: 2024-05-10 15:52:39
@@ -27,21 +27,21 @@ import java.util.concurrent.*;
  */
 @Service
 @Slf4j
-public class JsonTaskParserService {
+public class AsyncJsonTaskParserService {
 
-//    public static final ExecutorService jsonTaskExecutorService = new ThreadPoolExecutor(
-//            Runtime.getRuntime().availableProcessors() - 1,
-//            Runtime.getRuntime().availableProcessors() * 2,
-//            // 空闲线程等待工作的超时时间
-//            10L,
-//            TimeUnit.SECONDS,
-//            new LinkedBlockingQueue<Runnable>(4096),
-//            new ThreadFactory() {
-//                public Thread newThread(Runnable r) {
-//                    return new Thread(r, "json-task-service-thread-" + r.hashCode());
-//                }
-//            },
-//            new ThreadPoolExecutor.DiscardOldestPolicy());
+    public static final ExecutorService jsonTaskExecutorService = new ThreadPoolExecutor(
+            Runtime.getRuntime().availableProcessors() - 1,
+            Runtime.getRuntime().availableProcessors() * 2,
+            // 空闲线程等待工作的超时时间
+            10L,
+            TimeUnit.SECONDS,
+            new LinkedBlockingQueue<Runnable>(4096),
+            new ThreadFactory() {
+                public Thread newThread(Runnable r) {
+                    return new Thread(r, "json-task-service-thread-" + r.hashCode());
+                }
+            },
+            new ThreadPoolExecutor.DiscardOldestPolicy());
 
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
@@ -123,20 +123,52 @@ public class JsonTaskParserService {
         jsonTaskService.updateById(jsonTask);
 
         try{
-	        for (JsonFile jsonFile : jsonFileList) {
-	            ParserStrategy finalParser = parser;
 
-	            log.info("Json文件解析开始:{} {} {} {}",System.currentTimeMillis() , jsonTask.getTaskId(), jsonFile.getFileUrl(), finalParser.getClass().getName());
+//	        for (JsonFile jsonFile : jsonFileList) {
+//	            ParserStrategy finalParser = parser;
+//
+//	            log.info("Json文件解析开始:{} {} {} {}",System.currentTimeMillis() , jsonTask.getTaskId(), jsonFile.getFileUrl(), finalParser.getClass().getName());
+//                jsonFile.setStartTime(new Date());
+//                jsonFileService.updateById(jsonFile);
+//
+//	            finalParser.parseJson(jsonTask, jsonFile);
+//	            // commonJsonParser.parseJson(jsonTask, jsonFile);
+//
+//                log.info("Json文件解析结束:{} {} {} {}",System.currentTimeMillis() , jsonTask.getTaskId(), jsonFile.getFileUrl(), finalParser.getClass().getName());
+//                jsonFile.setEndTime(new Date());
+//                jsonFileService.updateById(jsonFile);
+//	        }
+
+            CountDownLatch countDownLatch = new CountDownLatch(count);
+
+            AtomicInteger id = new AtomicInteger();
+            // 线程池 异步  调用策略提交任务
+            for (JsonFile jsonFile : jsonFileList) {
+
+                ParserStrategy finalParser = parser;
+
+                log.info("Json文件解析开始:{} {} {} {}",System.currentTimeMillis() , jsonTask.getTaskId(), jsonFile.getFileUrl(), finalParser.getClass().getName());
                 jsonFile.setStartTime(new Date());
                 jsonFileService.updateById(jsonFile);
 
-	            finalParser.parseJson(jsonTask, jsonFile);
-	            // commonJsonParser.parseJson(jsonTask, jsonFile);
+                try {
+                    jsonTaskExecutorService.submit(() -> {
+                                log.info("---> {} {}", id.getAndIncrement(), jsonFile.getFileUrl());
+                                finalParser.parseJson(jsonTask, jsonFile);
+                            }
+                    );
+                } catch (Exception e) {
+                    log.info("{}",e);
+                } finally {
+                    log.info("Json文件解析结束:{} {} {} {}",System.currentTimeMillis() , jsonTask.getTaskId(), jsonFile.getFileUrl(), finalParser.getClass().getName());
+                    jsonFile.setEndTime(new Date());
+                    jsonFileService.updateById(jsonFile);
+                    countDownLatch.countDown();
+                }
+            }
 
-                log.info("Json文件解析结束:{} {} {} {}",System.currentTimeMillis() , jsonTask.getTaskId(), jsonFile.getFileUrl(), finalParser.getClass().getName());
-                jsonFile.setEndTime(new Date());
-                jsonFileService.updateById(jsonFile);
-	        }
+
+
 
 	//        annotation.setContour("1");
 	//        try {
@@ -146,8 +178,18 @@ public class JsonTaskParserService {
 	//            log.error("deleteAiAnnotation error:{}", e.getMessage());
 	//        }
 	        log.info("------------------------------------------------------5");
-	        // 指标计算
-	        parser.alculationIndicators(jsonTask);
+            // 避免主线程无法执行到
+            try {
+                countDownLatch.await();
+                // 指标计算
+                parser.alculationIndicators(jsonTask);
+                // 修改任务状态
+                jsonTask.setStatus(1);
+                jsonTaskService.updateById(jsonTask);
+            } catch (InterruptedException e) {
+
+            }
+
 	        log.info("------------------------------------------------------6");
         }catch(Exception e){
         	 log.info("------------------------------------------------------7");
@@ -162,37 +204,7 @@ public class JsonTaskParserService {
         //0未预测、1预测成功、2预测失败、3预测中
         singleSlide.setForecastStatus("1");
         singleSlideService.updateById(singleSlide);
-//        CountDownLatch countDownLatch = new CountDownLatch(count);
-//
-//        AtomicInteger id = new AtomicInteger();
-//        // 线程池 异步  调用策略提交任务
-//        for (JsonFile jsonFile : jsonFileList) {
-//            try {
-//                ParserStrategy finalParser = parser;
-//                jsonTaskExecutorService.submit(() -> {
-//                            log.info("---> {} {}", id.getAndIncrement(), jsonFile.getFileUrl());
-//                            // finalParser.parseJson(jsonTask, jsonFile);
-//                            finalParser.parseJson(jsonTask, jsonFile, finalParser);
-//                        }
-//                );
-//            } catch (Exception e) {
-//
-//            } finally {
-//                countDownLatch.countDown();
-//            }
-//        }
-//
-//        // 避免主线程无法执行到
-//        try {
-//            countDownLatch.await();
-//            // 指标计算
-//            parser.alculationIndicators(jsonTask);
-//            // 修改任务状态
-//            jsonTask.setStatus(1);
-//            jsonTaskService.updateById(jsonTask);
-//        } catch (InterruptedException e) {
-//
-//        }
+
     }
 
     private Annotation getAnnotation(JsonTask jsonTask) {
@@ -283,4 +295,5 @@ public class JsonTaskParserService {
         }
         return list;
     }
+
 }

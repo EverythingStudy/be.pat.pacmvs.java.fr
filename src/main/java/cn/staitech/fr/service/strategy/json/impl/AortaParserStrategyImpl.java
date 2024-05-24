@@ -4,9 +4,7 @@ import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
-import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,11 +30,7 @@ import java.util.Map;
 public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 
 	@Resource
-	private AnnotationMapper annotationMapper;
-	@Resource
 	private SingleSlideMapper singleSlideMapper;
-	@Resource
-	private AiForecastService aiForecastService;
 	@Resource
 	private CommonJsonParser commonJsonParser;
 	@Resource
@@ -58,19 +51,23 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		//空腔	15D113  A     10³平方微米
 		//组织轮廓	15D111  D   10³平方微米
 
-		
 		//空腔面积 A 10³平方微米
 		Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "15D113");
-		String bigDecimalAStr = areaUtils.convertToSquareMicrometer(annotation.getArea());
-		BigDecimal bigDecimalA =  new BigDecimal(bigDecimalAStr);
+		BigDecimal bigDecimalA = BigDecimal.ZERO;
+		if(null !=annotation.getArea()){
+			String bigDecimalAStr = areaUtils.convertToSquareMicrometer(annotation.getArea());
+			bigDecimalA =  new BigDecimal(bigDecimalAStr);
+		}
 
 
 		//空腔周长	B	毫米
-		BigDecimal bigDecimalB =  new BigDecimal(annotation.getPerimeter());
-
+		BigDecimal bigDecimalB =  BigDecimal.ZERO;
+		if(null !=annotation.getPerimeter()){
+			 bigDecimalB =  new BigDecimal(annotation.getPerimeter());
+		}
 		
-		BigDecimal bigDecimalC = new BigDecimal(0);
-		BigDecimal bigDecimalD = new BigDecimal(0);
+		BigDecimal bigDecimalC = BigDecimal.ZERO;
+		BigDecimal bigDecimalD = BigDecimal.ZERO;
 
 		//组织轮廓面积 D 10³平方微米
 		SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
@@ -79,7 +76,6 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 			bigDecimalD = new BigDecimal(area);
 			bigDecimalC =  new BigDecimal(singleSlide.getPerimeter());
 		}
-
 
 
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
@@ -94,10 +90,8 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		BigDecimal  bigDecimalDA = bigDecimalD.subtract(bigDecimalA);
 		BigDecimal  bigDecimalBC = bigDecimalB.add(bigDecimalC);
 		BigDecimal  bigDecimal2 = new BigDecimal(2);
-		BigDecimal mal =  bigDecimal2.multiply(bigDecimalDA.divide(bigDecimalBC)).setScale(2, RoundingMode.HALF_UP); 
+		BigDecimal mal =  bigDecimal2.multiply(commonJsonParser.getProportion(bigDecimalDA, bigDecimalBC));
 		indicatorResultsMap.put("主动脉壁平均厚度", new IndicatorAddIn("Average thickness of aorta wall", String.valueOf(mal), "平方毫米", "0"));
-
-
 	}
 
 	@Override

@@ -1,20 +1,14 @@
 package cn.staitech.fr.service.strategy.json;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.PathologicalIndicatorCategory;
-import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import cn.staitech.fr.domain.in.IndicatorAddIn;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
+import java.math.RoundingMode;
 
 /**
  * @author mugw
@@ -28,6 +22,13 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
 
     private CommonJsonParser commonJsonParser;
 
+    // 指标单位
+    protected static final String PIECE = "个";
+    protected static final String MM = "毫米";
+    protected static final String SQ_MM = "平方毫米";
+    protected static final String SQ_UM = "平方微米";
+    protected static final String SQ_MM_PIECE = "个/平方毫米";
+    protected static final String SQ_UM_THOUSAND = "10³平方微米";
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
@@ -63,6 +64,46 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
      */
     protected Integer getOrganAreaCount(JsonTask jsonTask, String structureId) {
         return commonJsonParser.getOrganAreaCount(jsonTask,structureId);
+    }
+
+    /**
+     * 创建指标对象（单个面积的提示）
+     *
+     * @return 指标对象
+     */
+    protected IndicatorAddIn createDefaultIndicator() {
+        return new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1);
+    }
+
+    /**
+     * 创建指标对象（算法输出指标）
+     *
+     * @param result 结果
+     * @param unit   单位
+     * @return 指标对象
+     */
+    protected IndicatorAddIn createIndicator(Object result, String unit) {
+        if (result instanceof BigDecimal) {
+            BigDecimal roundedResult = ((BigDecimal) result).setScale(3, RoundingMode.HALF_UP);
+            return new IndicatorAddIn(String.valueOf(roundedResult), unit, CommonConstant.NUMBER_1);
+        }
+        return new IndicatorAddIn(String.valueOf(result), unit, CommonConstant.NUMBER_1);
+    }
+
+    /**
+     * 创建指标对象（产品呈现指标）
+     *
+     * @param enName 指标英文名称
+     * @param result 结果
+     * @param unit   单位
+     * @return 指标对象
+     */
+    protected IndicatorAddIn createNameIndicator(String enName, Object result, String unit) {
+        if (result instanceof BigDecimal) {
+            BigDecimal roundedResult = ((BigDecimal) result).setScale(3, RoundingMode.HALF_UP);
+            return new IndicatorAddIn(enName, String.valueOf(roundedResult), unit, CommonConstant.NUMBER_0);
+        }
+        return new IndicatorAddIn(enName, String.valueOf(result), unit, CommonConstant.NUMBER_0);
     }
 
 }

@@ -1,13 +1,16 @@
 package cn.staitech.fr.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.domain.out.*;
 import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.utils.MathUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.staitech.fr.service.AiForecastService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -15,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,6 +29,7 @@ import java.util.stream.Collectors;
  * @createDate 2024-04-09 14:42:38
  */
 @Service
+@Slf4j
 public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForecast> implements AiForecastService {
 
 
@@ -126,6 +132,7 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
         SingleSlide singleSlide = singleSlideMapper.selectById(singleSlideId);
         Slide slide = slideMapper.selectById(singleSlide.getSlideId());
         Special special = specialMapper.selectById(slide.getSpecialId());
+
         if (StringUtils.isNotEmpty(special.getControlGroup())) {
             LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(SingleSlide::getSingleId, singleSlideId);
@@ -147,6 +154,75 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             }
         }
         return aiForecasts;
+    }
+
+    @Override
+    public List<AiForecastListOut> calculateList(Long singleSlideId,String structType) {
+        log.info("计算指标列表查询开始：");
+        List<AiForecastListOut> resp = new ArrayList<>();
+        Map<Long, Long> categorys = new HashMap<>();
+        SingleSlide singleSlide = singleSlideMapper.selectById(singleSlideId);
+        Slide slide = slideMapper.selectById(singleSlide.getSlideId());
+        Special special = specialMapper.selectById(slide.getSpecialId());
+
+        if (StringUtils.isNotEmpty(special.getControlGroup())) {
+            LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(SingleSlide::getSingleId, singleSlideId);
+            List<SingleSlide> singleSlides = singleSlideMapper.selectList(wrapper);
+            categorys = singleSlides.stream().collect(Collectors.toMap(SingleSlide::getSingleId, SingleSlide::getCategoryId));
+        }
+        LambdaQueryWrapper<AiForecast> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(AiForecast::getSingleSlideId, singleSlideId);
+        wrapper.eq(AiForecast::getStructType,structType);
+        List<AiForecast> aiForecasts = aiForecastMapper.selectList(wrapper);
+        if(!CollectionUtils.isEmpty(aiForecasts)){
+            for (AiForecast aiForecast : aiForecasts) {
+                AiForecastListOut exportAiListVO = new AiForecastListOut();
+                BeanUtils.copyProperties(aiForecast, exportAiListVO);
+                //范围数据
+                if (StringUtils.isNotEmpty(special.getControlGroup())&& !CommonConstant.SINGLE_RESULT.equals(aiForecast.getQuantitativeIndicators())) {
+
+                    setReferenceScope(special, singleSlideId, exportAiListVO, categorys,slide.getGenderFlag());
+
+                }
+                resp.add(exportAiListVO);
+            }
+        }
+        return resp;
+    }
+
+    /**
+     * 设置参考范围
+     * @param special
+     * @param singleId
+     * @param exportAiListVO
+     * @param categorys
+     * @param genderFlag
+     */
+    private void setReferenceScope(Special special, Long singleId, AiForecastListOut exportAiListVO, Map<Long, Long> categorys, String genderFlag) {
+        List<BigDecimal> dataList= singleSlideMapper.getReferenceScope(exportAiListVO.getQuantitativeIndicators(),categorys.get(singleId), special.getSpecialId(), special.getControlGroup(),genderFlag);
+        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(dataList)){
+            BigDecimal bigDecimal = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
+            log.info("平均值"+ bigDecimal);
+            BigDecimal variance = MathUtils.variance(dataList.toArray(new BigDecimal[dataList.size()]), 3);
+            log.info("总体方差" + variance);
+            BigDecimal sqrt = MathUtils.sqrt(variance, 3);
+            log.info("总体标准差" + sqrt);
+            //平均值-标准差
+            BigDecimal subtract = bigDecimal.subtract(sqrt).setScale(3, RoundingMode.UP);
+            //平均值+标准差
+            BigDecimal add = bigDecimal.add(sqrt).setScale(3, RoundingMode.UP);
+            exportAiListVO.setAverageValue(subtract+"-"+add);
+
+            //正态分布(下限)
+            BigDecimal subtract2 = bigDecimal.subtract(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
+            //正态分布(上限)
+            BigDecimal add2 = bigDecimal.add(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
+            exportAiListVO.setNormalDistribution(subtract2+"-"+add2);
+        }
+
+
+
     }
 
     private String setRang(Special special, Long singleId, ExportAiListVO exportAiListVO, Map<Long, Long> categorys) {

@@ -82,6 +82,11 @@ public class Annotation implements Serializable {
     private Long projectId;
 
     /**
+     * 矩形轮廓
+     */
+    private String contourPolygon;
+
+    /**
      * 切片id
      */
     private Long slideId;
@@ -147,6 +152,7 @@ public class Annotation implements Serializable {
     @TableField(exist = false)
     private String intersectsResults;
 
+    @TableField(exist = false)
     private Integer structureSize;
 
     @TableField(exist = false)
@@ -158,7 +164,8 @@ public class Annotation implements Serializable {
     @TableField(exist = false)
     private Boolean insideOrOutside;
 
-
+    @TableField(exist = false)
+    private List<Long> singleSlideIdList;
 
     @Override
     public boolean equals(Object that) {

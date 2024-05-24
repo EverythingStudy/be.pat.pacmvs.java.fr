@@ -36,7 +36,7 @@ public class AdrenalGlandParserStrategyImpl extends AbstractCustomParserStrategy
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
-        log.info("AdrenalGlandParserStrategyImpl init");
+        log.debug("AdrenalGlandParserStrategyImpl init");
     }
 
     /**
@@ -57,10 +57,9 @@ public class AdrenalGlandParserStrategyImpl extends AbstractCustomParserStrategy
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        BigDecimal unit = new BigDecimal(1000000);
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        BigDecimal organArea = getOrganArea(jsonTask, "10103D",unit).getStructureAreaNum();
-        BigDecimal organArea1 = getOrganArea(jsonTask, "101004",unit).getStructureAreaNum();
+        BigDecimal organArea = getOrganArea(jsonTask, "10103D").getStructureAreaNum();
+        BigDecimal organArea1 = getOrganArea(jsonTask, "101004").getStructureAreaNum();
         BigDecimal organArea2 = getOrganArea(jsonTask, "10103E").getStructureAreaNum();
         Integer count = getOrganAreaCount(jsonTask, "10103D");
         Integer count1 = getOrganAreaCount(jsonTask, "10103E");

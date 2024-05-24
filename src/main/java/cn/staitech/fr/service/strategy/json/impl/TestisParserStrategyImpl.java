@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -39,60 +40,50 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
 
-        // todo A生精小管面积（单个）
-        // B生精小管面积（全片）-平方毫米
-        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "12E0FA");
-        // C生精小管周长（单个）
-        Annotation annotation = commonJsonParser.getOrganArea(jsonTask, "12E0FA");
-        BigDecimal structurePerimeterNum = annotation.getStructurePerimeterNum();
-        // D生精小管数量
-        Integer areaCountD = areaUtils.getOrganAreaCount(jsonTask, "12E0FA");
-        // todo E生精小管内腔面积（单个）
+        // 获取各种指标
+        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "12E0FA");// B生精小管面积（全片）
+        Annotation annotation = commonJsonParser.getOrganArea(jsonTask, "12E0FA");// C生精小管周长（单个）
+        BigDecimal perimeterC = annotation.getStructurePerimeterNum();
+        Integer areaCountD = areaUtils.getOrganAreaCount(jsonTask, "12E0FA");// D生精小管数量
+        Integer areaCountH = areaUtils.getOrganAreaCount(jsonTask, "12E0FE");// H间质细胞核数量
+        BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "12E003");// I血管面积
+        String slideAreaJ = areaUtils.getFineContourArea(jsonTask.getSingleId());// J组织轮廓
         // todo F生精细胞核数量（单个）
         // todo G支持细胞核数量（单个）
-        // H间质细胞核数量
-        Integer areaCountH = areaUtils.getOrganAreaCount(jsonTask, "12E0FE");
-        // I血管面积
-        BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "12E003");
-        // J组织轮廓-平方毫米
-        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
 
         // 算法输出指标
-        indicatorResultsMap.put("生精小管面积（全片）", new IndicatorAddIn("", organAreaB.toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("生精小管周长（单个）", new IndicatorAddIn("", structurePerimeterNum.toString(), "毫米", "1"));
-        indicatorResultsMap.put("生精小管数量", new IndicatorAddIn("", areaCountD.toString(), "个", "1"));
-        indicatorResultsMap.put("间质细胞核数量", new IndicatorAddIn("", areaCountH.toString(), "个", "1"));
-        indicatorResultsMap.put("血管面积", new IndicatorAddIn("", organAreaI.toString(), "平方毫米", "1"));
-        /*
-        indicatorResultsMap.put("生精小管面积（单个）", new IndicatorAddIn("", "", "10³平方微米", "1"));
-        indicatorResultsMap.put("生精小管内腔面积（单个）", new IndicatorAddIn("", areaCount.toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("生精细胞核数量（单个）", new IndicatorAddIn("", , "个", "1"));
-        indicatorResultsMap.put("支持细胞核数量（单个）", new IndicatorAddIn("", , "个", "1"));
-         */
+        resultsMap.put("生精小管面积（全片）", createIndicator(organAreaB, SQ_MM));
+        resultsMap.put("生精小管周长（单个）", createIndicator(perimeterC, MM));
+        resultsMap.put("生精小管数量", createIndicator(areaCountD, PIECE));
+        resultsMap.put("间质细胞核数量", createIndicator(areaCountH, PIECE));
+        resultsMap.put("血管面积", createIndicator(organAreaI, SQ_MM));
+        resultsMap.put("生精小管面积（单个）", createDefaultIndicator());// A生精小管面积（单个）
+        resultsMap.put("生精小管内腔面积（单个）", createDefaultIndicator());// E生精小管内腔面积（单个）
 
-        // D/J生精小管密度
-        BigDecimal densityResult = (0 == areaCountD) ? BigDecimal.ZERO
-                : new BigDecimal(areaCountD).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP);
+        // 计算指标
+        BigDecimal densityResult = getDensityResult(areaCountD, slideAreaJ);
 
         // 产品呈现指标
-        indicatorResultsMap.put("睾丸面积", new IndicatorAddIn("Testicular area", slideArea, "平方毫米"));
-        indicatorResultsMap.put("生精小管密度", new IndicatorAddIn("Density of seminiferous tubules", densityResult.toString(), "个/平方毫米"));
-        /*
-        indicatorResultsMap.put("生精小管面积（全片）", new IndicatorAddIn("Seminiferous tubules area (all)", "", "平方毫米"));
-        indicatorResultsMap.put("生精小管面积占比", new IndicatorAddIn("Seminiferous tubules area%", "", "%"));
-        indicatorResultsMap.put("生精小管面积（单个）", new IndicatorAddIn("Seminiferous tubules area (per)", "", "10³平方微米"));
-        indicatorResultsMap.put("生精小管厚度（单个）", new IndicatorAddIn("Average thickness of spermatogenic tubules (per)", "", "微米"));
-        indicatorResultsMap.put("生精细胞核密度（单个）", new IndicatorAddIn("Nucleus density of Spermatogenic cells (per)", "", "个/毫米"));
-        indicatorResultsMap.put("支持细胞核密度（单个）", new IndicatorAddIn("Nucleus density of Sertoli (per) ", "", "个/毫米"));
-        indicatorResultsMap.put("生精细胞核：支持细胞核（单个）", new IndicatorAddIn("Spermatogenic nucleus:  Sertoli nucleus ratio (per)", "", ""));
-        indicatorResultsMap.put("血管面积占比", new IndicatorAddIn("Vessel area%", "", "%"));
-        indicatorResultsMap.put("间质细胞核：生精小管", new IndicatorAddIn("Leydig nucleus: seminiferous tubules ratio", "", ""));
-        indicatorResultsMap.put("间质面积占比", new IndicatorAddIn("Mesenchyme area%", "", "%"));
-        indicatorResultsMap.put("间质细胞核密度", new IndicatorAddIn("Nucleus density of leydig cells", "", "个/平方毫米"));
-        */
-        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        resultsMap.put("睾丸面积", createNameIndicator("Testicular area", slideAreaJ, SQ_MM));
+        resultsMap.put("生精小管密度", createNameIndicator("Density of seminiferous tubules", densityResult, SQ_UM_THOUSAND));
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
+    }
+
+    /**
+     * 生精小管密度计算
+     */
+    private BigDecimal getDensityResult(Integer areaCountD, String slideAreaJ) {
+        BigDecimal areaCountBD = new BigDecimal(areaCountD);
+        BigDecimal slideAreaBD = new BigDecimal(slideAreaJ);
+        BigDecimal densityResult;
+        if (areaCountBD.compareTo(BigDecimal.ZERO) == 0 || slideAreaBD.compareTo(BigDecimal.ZERO) == 0) {
+            densityResult = BigDecimal.ZERO;
+        } else {
+            densityResult = areaCountBD.divide(slideAreaBD, 3, RoundingMode.HALF_UP);// D/J
+        }
+        return densityResult;
     }
 
     @Override

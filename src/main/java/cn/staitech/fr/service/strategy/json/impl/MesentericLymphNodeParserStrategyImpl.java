@@ -37,31 +37,23 @@ public class MesentericLymphNodeParserStrategyImpl extends AbstractCustomParserS
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
 
-        // A生发中心数量
-        Integer areaCount = areaUtils.getOrganAreaCount(jsonTask, "146051");
-        // B生发中心面积（全片）-平方毫米
-        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "146051");
-        // C髓质面积-平方毫米
-        BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask, "14603E");
-        // D组织轮廓-平方毫米
-        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+        // 获取各种指标
+        Integer areaCountA = areaUtils.getOrganAreaCount(jsonTask, "146051");// A生发中心数量
+        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "146051");// B生发中心面积（全片）
+        BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask, "14603E");// C髓质面积
+        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// D组织轮廓
 
         // 算法输出指标
-        indicatorResultsMap.put("生发中心面积（全片）", new IndicatorAddIn("", organAreaB.toString(), "平方毫米", "1"));
-        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("", organAreaC.toString(), "平方毫米", "1"));
+        resultsMap.put("生发中心面积（全片）", createIndicator(organAreaB, SQ_MM));
+        resultsMap.put("髓质面积", createIndicator(organAreaC, SQ_MM));
 
         // 产品呈现指标
-        indicatorResultsMap.put("淋巴结面积", new IndicatorAddIn("Submadibular gland area", slideArea, "平方毫米"));
-        indicatorResultsMap.put("生发中心数量", new IndicatorAddIn("Number of germinal center", areaCount.toString(), "个"));
-        /*
-        indicatorResultsMap.put("生发中心占比", new IndicatorAddIn("Germinal center area%", "", "%"));
-        indicatorResultsMap.put("髓质占比", new IndicatorAddIn("Medulla area%", "", "%"));
-        indicatorResultsMap.put("皮质和副皮质占比", new IndicatorAddIn("Cortex and paracortex area%", "", "%"));
-        */
+        resultsMap.put("淋巴结面积", createNameIndicator("Submadibular gland area", slideArea, SQ_MM));
+        resultsMap.put("生发中心数量", createNameIndicator("Number of germinal center", areaCountA, PIECE));
 
-        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }
 
     @Override

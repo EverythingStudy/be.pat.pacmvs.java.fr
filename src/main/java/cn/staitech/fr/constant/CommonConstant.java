@@ -199,4 +199,7 @@ public class CommonConstant {
     public static final String ZIP_FILE = ".zip";
     public static final String WROD_PATH ="templete/123.docx";
     public static final String WROD_AI_PATH ="templete/234.docx";
+
+    public static final String SINGLE_RESULT ="详情见单个标注轮廓详情弹窗！";
+
 }

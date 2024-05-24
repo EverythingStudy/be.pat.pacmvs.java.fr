@@ -27,4 +27,9 @@ public class IndicatorAddIn {
         this.result = result;
         this.unit = unit;
     }
+
+    public IndicatorAddIn(String result, String structType) {
+        this.result = result;
+        this.structType = structType;
+    }
 }

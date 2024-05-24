@@ -63,7 +63,7 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy 
 		//主细胞核数量A 个
 		Integer mucosaCountA = commonJsonParser.getOrganAreaCount(jsonTask, "108091");
 		//组织轮廓面积==>甲状旁腺面积 B 10³平方微米
-		BigDecimal areaDecimalB = new BigDecimal(0);
+		BigDecimal areaDecimalB = BigDecimal.ZERO;
 		if (StringUtils.isNotEmpty(slideArea)) {
 			String area = areaUtils.convertToSquareMicrometer(slideArea);
 			areaDecimalB  = new BigDecimal(area);
@@ -72,8 +72,7 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy 
 		
 
 		//主细胞核密度 1=A/B
-		BigDecimal bigDecimaE = new BigDecimal(0);
-		bigDecimaE = new BigDecimal(mucosaCountA).divide(areaDecimalB, 3, RoundingMode.HALF_UP);
+		BigDecimal bigDecimaE = commonJsonParser.getProportion(new BigDecimal(mucosaCountA), areaDecimalB);
 		
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 		indicatorResultsMap.put("主细胞核数", new IndicatorAddIn("", String.valueOf(mucosaCountA), "个", "1"));

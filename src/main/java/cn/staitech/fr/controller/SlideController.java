@@ -70,4 +70,11 @@ public class SlideController  extends BaseController {
         return slideService.deleteById(slideId);
 
     }
+    
+    @ApiOperation(value = "选片列表-全部删除")
+    @GetMapping("/deleteAll")
+    public R deleteAll(@RequestParam(value = "specialId") @ApiParam(name = "specialId", value = "专题id", required = true) Long specialId) {
+        return slideService.deleteAll(specialId);
+
+    }
 }

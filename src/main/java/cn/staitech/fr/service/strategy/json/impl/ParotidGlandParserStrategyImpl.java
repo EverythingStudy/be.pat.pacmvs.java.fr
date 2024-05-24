@@ -37,35 +37,35 @@ public class ParotidGlandParserStrategyImpl extends AbstractCustomParserStrategy
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
 
-        // A腺泡细胞核数量
-        Integer areaCountA = areaUtils.getOrganAreaCount(jsonTask, "10906E");
-        // B导管面积-平方毫米
-        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "10906F");
-        // C血管面积-平方毫米
-        BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask, "109003");
-        // D组织轮廓-平方毫米
-        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+        // 获取各种指标
+        Integer areaCountA = areaUtils.getOrganAreaCount(jsonTask, "10906E");// A腺泡细胞核数量
+        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "10906F");// B导管面积
+        BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask, "109003");// C血管面积
+        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// D组织轮廓
 
         // 算法输出指标
-        indicatorResultsMap.put("腺泡细胞核数量", new IndicatorAddIn("", areaCountA.toString(), "个", "1"));
-        indicatorResultsMap.put("导管面积", new IndicatorAddIn("", areaUtils.convertToSquareMicrometer(organAreaB.toString()), "10³平方微米", "1"));
-        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("", areaUtils.convertToSquareMicrometer(organAreaC.toString()), "10³平方微米", "1"));
+        resultsMap.put("腺泡细胞核数量", createIndicator(areaCountA.toString(), PIECE));
+        resultsMap.put("导管面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaB.toString()), SQ_UM_THOUSAND));
+        resultsMap.put("髓质面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaC.toString()), SQ_UM_THOUSAND));
 
-        // A/D腺泡细胞核密度
-        BigDecimal nucleusResult = (0 == areaCountA) ? BigDecimal.ZERO
-                : new BigDecimal(areaCountA).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP);
+        // 计算指标
+        BigDecimal nucleusResult = getNucleusResult(areaCountA, slideArea);// A/D
 
         // 产品呈现指标
-        indicatorResultsMap.put("腮腺面积", new IndicatorAddIn("Parotid gland area", slideArea, "平方毫米"));
-        indicatorResultsMap.put("腺泡细胞核密度", new IndicatorAddIn("Nucleus density of acinar cell", nucleusResult.toString(), "个/平方毫米"));
-        /*
-        indicatorResultsMap.put("血管面积占比", new IndicatorAddIn("Vessel area%", "", "%"));
-        indicatorResultsMap.put("导管面积占比", new IndicatorAddIn("Ducts area%", "", "%"));
-        */
+        resultsMap.put("腮腺面积", createNameIndicator("Parotid gland area", slideArea, SQ_MM));
+        resultsMap.put("腺泡细胞核密度", createNameIndicator("Nucleus density of acinar cell", nucleusResult, SQ_MM_PIECE));
 
-        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
+    }
+
+    /**
+     * 计算指标
+     */
+    private static BigDecimal getNucleusResult(Integer areaCountA, String slideArea) {
+        return (0 == areaCountA) ? BigDecimal.ZERO
+                : new BigDecimal(areaCountA).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP);
     }
 
     @Override

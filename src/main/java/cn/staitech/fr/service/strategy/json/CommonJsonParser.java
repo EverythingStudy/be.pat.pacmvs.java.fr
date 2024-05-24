@@ -26,12 +26,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.rmi.RemoteException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- *
+ * CommonJsonParser
  */
 @Slf4j
 @Service
@@ -51,7 +50,7 @@ public class CommonJsonParser {
     @Resource
     private AnnotationService annotationService;
 
-    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask, String key) {
+    private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
         if (element.isObject()) {
             JsonNode node = element.get("id");
             // node 转换成String
@@ -112,8 +111,7 @@ public class CommonJsonParser {
                 return null;
             }
             Annotation annotation = new Annotation();
-            // log.info("MapConstant.STRUCTURESIZR_MAP {}", MapConstant.STRUCTURESIZR_MAP);
-            String keys = key + labelCode;
+            String keys = jsonTask.getOrganizationId() + "" + labelCode;
             Integer size = MapConstant.getStructureSize(keys);
             annotation.setStructureSize(size);
 
@@ -153,39 +151,34 @@ public class CommonJsonParser {
     }
 
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
-        String filePath = jsonFileS.getFileUrl();
+        if (checkCategory(jsonTask)) {
+            return;
+        }
+
         // 定位表
         Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
         Annotation anno = new Annotation();
         anno.setSequenceNumber(sequenceNumber);
-        File jsonFile = new File(filePath);
-        ObjectMapper mapper = new ObjectMapper();
-        Image image = imageMapper.selectById(jsonTask.getImageId());
-        String resolutionX = image.getResolutionX();
-        if (StringUtils.isEmpty(resolutionX)) {
-            resolutionX = "0.262";
-        }
-        QueryWrapper<Category> wrapper1 = new QueryWrapper<>();
-        wrapper1.eq("organization_id", jsonTask.getOrganizationId());
-        wrapper1.eq("del_flag", 0);
-        wrapper1.eq("category_id", jsonTask.getCategoryId());
-        Category category = categoryMapper.selectOne(wrapper1);
-        if (ObjectUtil.isEmpty(category)) {
-            return;
-        }
-        String key = jsonTask.getOrganizationId() + "";
-        List<Annotation> processedAnnotations;
-        String finalResolutionX = resolutionX;
 
-        JsonFactory jsonFactory = new MappingJsonFactory();
-        JsonToken current;
         Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
+
+        String finalResolutionX = getResolutionX(jsonTask);
+
+        File jsonFile = new File(jsonFileS.getFileUrl());
+        ObjectMapper mapper = new ObjectMapper();
+        JsonFactory jsonFactory = new MappingJsonFactory();
+
         List<JsonNode> elementsList = new ArrayList<>();
-        int bathSize = 5000;
+        List<Annotation> processedAnnotations;
+
+        JsonToken current;
+        int bathSize=5000;
+
         try (FileInputStream fis = new FileInputStream(jsonFile); JsonParser jsonParser = jsonFactory.createParser(fis)) {
             current = jsonParser.nextToken();
             if (current != JsonToken.START_OBJECT) {
-                throw new RemoteException("json type error！");
+                log.error("json type error！ : {}",current);
+                return;
             }
             while (jsonParser.nextToken() != JsonToken.END_OBJECT) {
                 String fieldName = jsonParser.getCurrentName();
@@ -198,16 +191,9 @@ public class CommonJsonParser {
                             elementsList.add(jsonNode);
                             if (elementsList.size() >= bathSize) {
                                 processedAnnotations = elementsList.parallelStream().map(element -> {
-                                    Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, key);
+                                    Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask);
                                     if (!ObjectUtil.isEmpty(annotation)) {
-                                        annotation.setContour(annotation.getContour40000());
-                                        Annotation area = annotationMapper.getArea(annotation);
-                                        BigDecimal decimal = new BigDecimal(ObjectUtil.isNotEmpty(area.getArea()) ? area.getArea() : "0");
-                                        annotation.setArea(decimal.multiply(new BigDecimal(finalResolutionX)).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString());
-                                        String perimeter = ObjectUtil.isNotEmpty(area.getPerimeter()) ? area.getPerimeter() : "0";// 周长
-                                        String multiply = new BigDecimal(perimeter).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString();
-                                        annotation.setPerimeter(multiply);
-                                        return annotation;
+                                        return processAnnotation(finalResolutionX, annotation);
                                     }
                                     return null;
                                 }).filter(Objects::nonNull).collect(Collectors.toList());
@@ -224,16 +210,9 @@ public class CommonJsonParser {
             }
             if (CollectionUtil.isNotEmpty(elementsList)) {
                 processedAnnotations = elementsList.parallelStream().map(element -> {
-                    Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask, key);
+                    Annotation annotation = handleSingleJsonElement(element, pathologicalMap, jsonTask);
                     if (!ObjectUtil.isEmpty(annotation)) {
-                        annotation.setContour(annotation.getContour40000());
-                        Annotation area = annotationMapper.getArea(annotation);
-                        BigDecimal decimal = new BigDecimal(ObjectUtil.isNotEmpty(area.getArea()) ? area.getArea() : "0");
-                        annotation.setArea(decimal.multiply(new BigDecimal(finalResolutionX)).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString());
-                        String perimeter = ObjectUtil.isNotEmpty(area.getPerimeter()) ? area.getPerimeter() : "0";// 周长
-                        String multiply = new BigDecimal(perimeter).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString();
-                        annotation.setPerimeter(multiply);
-                        return annotation;
+                        return processAnnotation(finalResolutionX, annotation);
                     }
                     return null;
                 }).filter(Objects::nonNull).collect(Collectors.toList());
@@ -248,7 +227,7 @@ public class CommonJsonParser {
             List<Annotation> annotations = annotationMapper.selectListBy(annotation);
             Annotation annotation3 = annotationMapper.collectGeometry(jsonTask.getSingleId());
 
-            // 循环annotations并执行官删除操作
+            // 循环annotations并执行删除操作
             if (CollectionUtil.isNotEmpty(annotations)) {
                 annotation3.setContour(annotation3.getCollectContour());
                 Annotation annotation2 = annotationMapper.stIsValid(annotation3);
@@ -263,6 +242,54 @@ public class CommonJsonParser {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
 
+    }
+
+    /**
+     * 处理周长、面积等
+     * @param finalResolutionX
+     * @param annotation
+     * @return
+     */
+    private Annotation processAnnotation(String finalResolutionX, Annotation annotation) {
+        annotation.setContour(annotation.getContour40000());
+        Annotation area = annotationMapper.getArea(annotation);
+        BigDecimal decimal = new BigDecimal(ObjectUtil.isNotEmpty(area.getArea()) ? area.getArea() : "0");
+        annotation.setArea(decimal.multiply(new BigDecimal(finalResolutionX)).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString());
+        String perimeter = ObjectUtil.isNotEmpty(area.getPerimeter()) ? area.getPerimeter() : "0";// 周长
+        String multiply = new BigDecimal(perimeter).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString();
+        annotation.setPerimeter(multiply);
+        return annotation;
+    }
+
+    /**
+     * get resolutionX
+     * @param jsonTask
+     * @return
+     */
+    private String getResolutionX(JsonTask jsonTask) {
+        Image image = imageMapper.selectById(jsonTask.getImageId());
+        String resolutionX = image.getResolutionX();
+        if (StringUtils.isEmpty(resolutionX)) {
+            resolutionX = "0.262";
+        }
+        return resolutionX;
+    }
+
+    /**
+     * checkCategory
+     * @param jsonTask
+     * @return
+     */
+    private boolean checkCategory(JsonTask jsonTask) {
+        QueryWrapper<Category> wrapper1 = new QueryWrapper<>();
+        wrapper1.eq("organization_id", jsonTask.getOrganizationId());
+        wrapper1.eq("del_flag", 0);
+        wrapper1.eq("category_id", jsonTask.getCategoryId());
+        Category category = categoryMapper.selectOne(wrapper1);
+        if (ObjectUtil.isEmpty(category)) {
+            return true;
+        }
+        return false;
     }
 
 
@@ -318,13 +345,13 @@ public class CommonJsonParser {
                 annotation.setStructureAreaNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(structure.getArea());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")));
+                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
             if (StringUtils.isEmpty(structure.getPerimeter())) {
                 annotation.setStructurePerimeterNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(structure.getPerimeter());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")));
+                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
         }
         return annotation;
@@ -361,13 +388,13 @@ public class CommonJsonParser {
                 annotation.setStructureAreaNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(annotations.getArea());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")));
+                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
             if (StringUtils.isEmpty(annotations.getPerimeter())) {
                 annotation.setStructurePerimeterNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(annotations.getPerimeter());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")));
+                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
         }
         return annotation;
@@ -406,6 +433,21 @@ public class CommonJsonParser {
         // 计算面积
         BigDecimal structureAreaNum = new BigDecimal(structure.getArea());
         return structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.001));
+    }
+    
+    /**
+     * 占比计算（保留三位小数）
+     * @param bigDecimal1
+     * @param bigDecimal2
+     * @return 脏器面积-10³平方微米
+     */
+    public BigDecimal getProportion(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
+    	BigDecimal proportion;
+    	if(null == bigDecimal1 || null == bigDecimal2){
+    		return BigDecimal.ZERO;
+    	}
+    	proportion = bigDecimal1.divide(bigDecimal2).setScale(3, RoundingMode.HALF_UP);
+    	return proportion;
     }
 
     /**

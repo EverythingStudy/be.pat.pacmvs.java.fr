@@ -27,12 +27,11 @@ import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.service.MatrixReviewService;
-import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.DateUtils;
 import cn.staitech.fr.utils.ExportPdfUtils;
 import cn.staitech.fr.utils.LanguageUtils;
+import cn.staitech.fr.utils.MathUtils;
 import cn.staitech.fr.vo.annotation.AiAlgorithm;
-import cn.staitech.fr.vo.annotation.StartRecognition;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.deepoove.poi.data.PictureRenderData;
@@ -52,6 +51,8 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -349,6 +350,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         }
         for (Long id : ids) {
             ExportAiVO exportVO = singleSlideMapper.getExportAiVO(id);
+
             if (LanguageUtils.isEn()) {
                 exportVO.setColorType(Container.COLOR_TYPE_EN.get(Integer.valueOf(exportVO.getColorType())));
             } else {
@@ -357,6 +359,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             //算法结果数据填充
             LambdaQueryWrapper<AiForecast> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(AiForecast::getSingleSlideId, id);
+            wrapper.eq(AiForecast::getStructType,CommonConstant.NUMBER_0);
             List<AiForecast> aiForecasts = aiForecastMapper.selectList(wrapper);
             List<ExportAiListVO> collect = new ArrayList<>();
             if (CollectionUtils.isNotEmpty(aiForecasts)) {
@@ -365,7 +368,12 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
                     BeanUtils.copyProperties(aiForecast, exportAiListVO);
                     //范围数据
                     if(StringUtils.isNotEmpty(special.getControlGroup())){
-                        setRang(aiForecast.getQuantitativeIndicators(),special,id,exportAiListVO,categorys);
+                        String genderFlag=singleSlideMapper.getGender(id);
+                        //setRang(aiForecast.getQuantitativeIndicators(),special,id,exportAiListVO,categorys);
+                        if(StringUtils.isNotEmpty(genderFlag)){
+                            setReferenceScope(special, id, exportAiListVO, categorys,genderFlag);
+                        }
+
                     }
                     collect.add( exportAiListVO);
                 }
@@ -434,8 +442,9 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
     @Override
 	public R algorithm(AlgorithmIn req) {
+        log.info("ai算法预测接口开始：");
 		Long organizationId  = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
-//		Long organizationId  = 1L;
+		//Long organizationId  = 1L;
 		Long specialId = req.getSpecialId();
 		MatrixReviewListIn mrl = new MatrixReviewListIn();
 		mrl.setSpecialId(specialId);
@@ -467,7 +476,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 				Long imageId = matrixReviewListOut.getImageId();
 				String organizatinName = geNumber(organizationId);
 				if(null != slideId && StringUtils.isNotEmpty(imageUrl)){
-					if(imageUrl.endsWith("svs")||imageUrl.endsWith("SVS") && !organName.equals("盲肠-回肠-直肠-结肠")){
+					if(imageUrl.toLowerCase().endsWith("svs") && !organName.equals("盲肠-回肠-直肠-结肠")){
 						//请求算法接口
 						try {
 							log.info("AI算法请求内容是singleId:{},slideId:{},organizationId:{},imageUrl:{},algorithm_name:{}", singleId,slideId,organizationId,imageUrl,CommonConstant.ALGORITHM_MODEL_NAME);
@@ -511,4 +520,39 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 		formatter.setGroupingUsed(false);
 		return "C" + formatter.format(organizationId);
 	}
+
+    /**
+     * 设置参考范围
+     * @param special
+     * @param singleId
+     * @param exportAiListVO
+     * @param categorys
+     * @param genderFlag
+     */
+    private void setReferenceScope(Special special, Long singleId, ExportAiListVO exportAiListVO, Map<Long, Long> categorys, String genderFlag) {
+        List<BigDecimal> dataList= singleSlideMapper.getReferenceScope(exportAiListVO.getQuantitativeIndicators(),categorys.get(singleId), special.getSpecialId(), special.getControlGroup(),genderFlag);
+        if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(dataList)){
+            BigDecimal bigDecimal = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
+            log.info("平均值"+ bigDecimal);
+            BigDecimal variance = MathUtils.variance(dataList.toArray(new BigDecimal[dataList.size()]), 3);
+            log.info("总体方差" + variance);
+            BigDecimal sqrt = MathUtils.sqrt(variance, 3);
+            log.info("总体标准差" + sqrt);
+            //平均值-标准差
+            BigDecimal subtract = bigDecimal.subtract(sqrt).setScale(3, RoundingMode.UP);
+            //平均值+标准差
+            BigDecimal add = bigDecimal.add(sqrt).setScale(3, RoundingMode.UP);
+            exportAiListVO.setAverageValue(subtract+"-"+add);
+
+            //正态分布(下限)
+            BigDecimal subtract2 = bigDecimal.subtract(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
+            //正态分布(上限)
+            BigDecimal add2 = bigDecimal.add(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
+            exportAiListVO.setNormalDistribution(subtract2+"-"+add2);
+        }
+
+
+
+    }
+
 }

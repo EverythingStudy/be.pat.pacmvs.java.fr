@@ -2,7 +2,6 @@ package cn.staitech.fr.service.impl;
 
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.WaxBlockInfo;
-import cn.staitech.fr.mapper.StructureMapper;
 import cn.staitech.fr.mapper.WaxBlockInfoMapper;
 import cn.staitech.fr.service.WaxBlockInfoService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;

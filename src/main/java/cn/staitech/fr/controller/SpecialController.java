@@ -17,6 +17,7 @@ import cn.staitech.fr.domain.in.SpecialsQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
 import cn.staitech.fr.mapper.DiagnosisMapper;
 import cn.staitech.fr.service.AccessProjectRecordsService;
+import cn.staitech.fr.service.DiagnosisService;
 import cn.staitech.fr.service.SpecialLockLogService;
 import cn.staitech.fr.service.SpecialService;
 import cn.staitech.fr.utils.LanguageUtils;
@@ -64,7 +65,7 @@ public class SpecialController  extends BaseController {
     private SpecialLockLogService specialLockLogService;
     
     @Resource
-	private DiagnosisMapper diagnosisMapper;
+	private DiagnosisService diagnosisService;
 
     @ApiOperation(value = "专题列表分页查询")
     @PostMapping("/list")
@@ -165,8 +166,14 @@ public class SpecialController  extends BaseController {
     		for(SpecialLockLog log:list){
     			Map<String,Object> parm = new HashMap<>();
 				parm.put("userId", log.getCreateBy());
-				List<SysUser> loginUserList = diagnosisMapper.selectUserById(parm);
-				log.setNickName(loginUserList.get(0).getNickName());
+//				List<SysUser> loginUserList = diagnosisMapper.selectUserById(parm);
+//				log.setNickName(loginUserList.get(0).getNickName());
+				SysUser loginUser =  diagnosisService.getUserInfo(parm);
+				if(null != loginUser){
+					log.setNickName(loginUser.getNickName());
+				}else{
+					log.setNickName("");
+				}
     		}
     	}
     	return R.ok(list);
@@ -178,10 +185,17 @@ public class SpecialController  extends BaseController {
     	//查询锁定记录
     	Map<String,Object> parm = new HashMap<>();
 		parm.put("userName", userName);
-		List<SysUser> userList = diagnosisMapper.selectUserById(parm);
+		parm.put("organizationId", SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
+		/*List<SysUser> userList = diagnosisMapper.selectUserById(parm);
 		String nickName = "";
 		if(CollectionUtils.isNotEmpty(userList)){
 			 nickName = userList.get(0).getNickName();
+		}*/
+//		List<SysUser> userList =  diagnosisService.getUserInfo(parm);
+		String nickName = "";
+		SysUser loginUser =  diagnosisService.getUserInfo(parm);
+		if(null != loginUser){
+			 nickName = loginUser.getNickName();
 		}
     	return R.ok(nickName);
     }

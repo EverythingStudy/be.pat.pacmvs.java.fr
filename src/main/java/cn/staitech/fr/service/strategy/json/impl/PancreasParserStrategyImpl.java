@@ -36,7 +36,7 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
-        log.info("PancreasParserStrategyImpl init");
+        log.debug("PancreasParserStrategyImpl init");
     }
 
     /**
@@ -74,10 +74,9 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        BigDecimal unit = new BigDecimal(1000000);
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        BigDecimal organArea = getOrganArea(jsonTask, "105076",unit).getStructureAreaNum();
-        BigDecimal organArea1 = getOrganArea(jsonTask, "105077",unit).getStructureAreaNum();
+        BigDecimal organArea = getOrganArea(jsonTask, "105076").getStructureAreaNum();
+        BigDecimal organArea1 = getOrganArea(jsonTask, "105077").getStructureAreaNum();
         BigDecimal organArea2 = getOrganArea(jsonTask, "105027").getStructureAreaNum();
         BigDecimal organArea3 = getOrganArea(jsonTask, "10506F").getStructureAreaNum();
         BigDecimal organArea4 = getOrganArea(jsonTask, "105003").getStructureAreaNum();
@@ -96,6 +95,9 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("胰岛细胞核数量（全片）", new IndicatorAddIn("", String.valueOf(count3), "个", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("胰腺面积", new IndicatorAddIn("Pancreas area%", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_0));
+
+        indicatorResultsMap.put("胰岛面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT,CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT,CommonConstant.NUMBER_1));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 

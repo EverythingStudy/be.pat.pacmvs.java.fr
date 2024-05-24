@@ -40,11 +40,15 @@ public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, Singl
     @Override
     public List<OrganDisassemblyOut> getSingleList(OrganDisassemblyQueryIn req) {
         List<OrganDisassemblyOut> outList = getBaseMapper().selectSingleOrgan(req);
-        if (CollectionUtil.isEmpty(outList)) return outList;
+        if (CollectionUtil.isEmpty(outList)) {
+            return outList;
+        }
         List<Long> slideIds = outList.stream().map(OrganDisassemblyOut::getSlideId).distinct().collect(Collectors.toList());
         // 根据切片id和脏器id拿到脏器数量
         List<SingleOrganNumber> organNumbers = getBaseMapper().selectNumber(slideIds, req.getCategoryId());
-        if (CollectionUtil.isEmpty(organNumbers)) return outList;
+        if (CollectionUtil.isEmpty(organNumbers)) {
+            return outList;
+        }
         Map<Long, Map<Long, Long>> map = organNumbers.stream()
                 .collect(Collectors.groupingBy(
                         SingleOrganNumber::getSlideId,

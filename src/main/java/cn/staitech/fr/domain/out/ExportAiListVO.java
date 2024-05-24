@@ -23,5 +23,10 @@ public class ExportAiListVO {
     @ApiModelProperty(value = "单位")
     private String unit;
 
+    @ApiModelProperty(name = "averageValue", value = "平均值+标准差")
+    private String averageValue;
+
+    @ApiModelProperty(name = "normalDistribution", value = "正态分布95%")
+    private String normalDistribution;
  
 }

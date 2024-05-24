@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -57,7 +58,7 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 		 */
 
 		//		灰质面积（单个）	A	平方毫米	
-		Annotation annotationA  = commonJsonParser.getOrganArea(jsonTask, "1390B3");
+		/*Annotation annotationA  = commonJsonParser.getOrganArea(jsonTask, "1390B3");
 		BigDecimal bigDecimalA = annotationA.getStructureAreaNum();
 		//		白质面积（单个）	B	平方毫米	已扣除灰质
 		Annotation annotationB  = commonJsonParser.getOrganArea(jsonTask, "1390B2");
@@ -80,15 +81,16 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 
 		//		灰质面积占比（单个）	1	%	Gray matter area（per）	1=A/(A+B)
 		BigDecimal BigDecimalA_add_B = bigDecimalA.add(bigDecimalB);
-		BigDecimal mucosaCountA_B = bigDecimalA.divide(BigDecimalA_add_B).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal mucosaCountA_B = commonJsonParser.getProportion(bigDecimalA, BigDecimalA_add_B);
 		//		白质面积占比（单个）	2	%	White matter area（per） 	2=B/(A+B)	
-		BigDecimal bigDecimalB_A_B =  bigDecimalB.divide(BigDecimalA_add_B).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal bigDecimalB_A_B = commonJsonParser.getProportion(bigDecimalB, BigDecimalA_add_B);
 		//		中央管面积占比（单个）	3	%	Central canal area（per）	3=C/A
-		BigDecimal bigDecimalC_A =  bigDecimalC.divide(bigDecimalA).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal bigDecimalC_A = commonJsonParser.getProportion(bigDecimalC, bigDecimalA);
+
 		//		室管膜细胞核密度（单个）	4	个/10³平方微米	Ependyma nucleus%(per)	4=D/C	
-		BigDecimal bigDecimalD_C =  new BigDecimal(mucosaCountD).divide(bigDecimalC).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal bigDecimalD_C = commonJsonParser.getProportion(new BigDecimal(mucosaCountD), bigDecimalC); 	
 		//		红细胞面积占比（单个）	5	%	Erythrocyte area%（per）	5=E/(A+B)	
-		BigDecimal bigDecimalE_A_B =  bigDecimalE.divide(BigDecimalA_add_B).setScale(3, RoundingMode.HALF_UP);
+		BigDecimal bigDecimalE_A_B = commonJsonParser.getProportion(bigDecimalE, BigDecimalA_add_B);
 		//		脊髓面积（单个）	6	平方毫米	Spinal cord area（per）	6=A+B
 		
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
@@ -108,9 +110,26 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 		indicatorResultsMap.put("中央管面积占比（单个）", new IndicatorAddIn("Central canal area（per）", String.valueOf(bigDecimalC_A), "%", "0"));
 		indicatorResultsMap.put("室管膜细胞核密度（单个）", new IndicatorAddIn("Ependyma nucleus%(per)", String.valueOf(bigDecimalD_C), "个/10³平方微米", "0"));
 		indicatorResultsMap.put("红细胞面积占比（单个）", new IndicatorAddIn("Erythrocyte area%（per）", String.valueOf(bigDecimalE_A_B), "%", "0"));
-		indicatorResultsMap.put("脊髓面积（单个）", new IndicatorAddIn("Sternum area", String.valueOf(BigDecimalA_add_B), "平方毫米", "0"));
+		indicatorResultsMap.put("脊髓面积（单个）", new IndicatorAddIn("Sternum area", String.valueOf(BigDecimalA_add_B), "平方毫米", "0"));*/
+		
+//        indicatorResultsMap.put("乳腺腺泡/导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+
+		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+		indicatorResultsMap.put("灰质面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT , CommonConstant.NUMBER_1));
+		indicatorResultsMap.put("白质面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT , CommonConstant.NUMBER_1));
+		indicatorResultsMap.put("中央管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT , CommonConstant.NUMBER_1));
+		indicatorResultsMap.put("室管膜细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT , CommonConstant.NUMBER_1));
+		
+		indicatorResultsMap.put("红细胞面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT , CommonConstant.NUMBER_1));
 
 		
+		//AI指标保存
+//		indicatorResultsMap.put("灰质面积占比（单个）", new IndicatorAddIn("Gray matter area（per）", String.valueOf(mucosaCountA_B), "%", "0"));
+//		indicatorResultsMap.put("白质面积占比（单个）", new IndicatorAddIn("White matter area（per）", String.valueOf(bigDecimalB_A_B), "%", "0"));
+//		indicatorResultsMap.put("中央管面积占比（单个）", new IndicatorAddIn("Central canal area（per）", String.valueOf(bigDecimalC_A), "%", "0"));
+//		indicatorResultsMap.put("室管膜细胞核密度（单个）", new IndicatorAddIn("Ependyma nucleus%(per)", String.valueOf(bigDecimalD_C), "个/10³平方微米", "0"));
+//		indicatorResultsMap.put("红细胞面积占比（单个）", new IndicatorAddIn("Erythrocyte area%（per）", String.valueOf(bigDecimalE_A_B), "%", "0"));
+//		indicatorResultsMap.put("脊髓面积（单个）", new IndicatorAddIn("Sternum area", String.valueOf(BigDecimalA_add_B), "平方毫米", "0"));
 		
 		
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);

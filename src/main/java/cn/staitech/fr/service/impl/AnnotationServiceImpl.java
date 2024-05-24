@@ -895,6 +895,11 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             String per = String.valueOf(Double.parseDouble(annotationArea.getPerimeter()) * resolutions);
             annotation.setPerimeter(per);
         }
+        if(annotation.getSingleSlideId() == null){
+            // 更新矩形轮廓
+            Annotation annotationPolygon = annotationMapper.stEnvelope(annotations);
+            annotationBys.setContourPolygon(annotationPolygon.getContourPolygon());
+        }
         annotationMapper.updateById(annotationBys);
         // 更新后查询数据并返回
         Annotation annotationById = annotationMapper.selectById(annotations);

@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
 
@@ -21,6 +22,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.staitech.common.redis.service.RedisService;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Diagnosis;
@@ -74,6 +76,9 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 	@Resource
 	private DiagnosisMapper diagnosisMapper;
 
+	@Resource
+	private RedisService redisService;
+
 
 	@Override
 	public List<SpecialDiagnosisVo> getSpecialDiagnosisVo(Long singleId) {
@@ -96,10 +101,15 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 				//根据创建人查询名称
 				Map<String,Object> parm = new HashMap<>();
 				parm.put("userId", createBy);
-				List<SysUser> loginUserList = diagnosisMapper.selectUserById(parm);
-				vo.setCreateUser(loginUserList.get(0).getNickName());
+				//List<SysUser> loginUserList = diagnosisMapper.selectUserById(parm);
+				SysUser loginUser = getUserInfo(parm);
+				if(null != loginUser){
+					vo.setCreateUser(loginUser.getNickName());
+				}else{
+					vo.setCreateUser("");
+				}
 				if (createBy.equals(SecurityUtils.getLoginUser().getSysUser().getUserId())) {
-//														if (createBy.equals(1L)) {
+					//														if (createBy.equals(1L)) {
 					vo.setEditStatus(1);
 				}
 				voList.add(vo);
@@ -114,8 +124,8 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 	@Transactional(rollbackFor = Exception.class)
 	public int saveOrUpdateSpecialDiagnosisVo(SpecialDiagnosisAddVo addVo) {
 		Long currentUserId = SecurityUtils.getLoginUser().getSysUser().getUserId();
-//		Long currentUserId = 10L;
-		
+		//		Long currentUserId = 10L;
+
 		int checkFlage = 0;
 		Long specialDiagnosisId = addVo.getDiagnosisId();
 		//根据singleId查询专题id
@@ -141,12 +151,12 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 		Diagnosis record = new Diagnosis();
 		//copy
 		BeanUtils.copyProperties(addVo, record);
-		
-//		List<DdefinitionChild> dcList = addVo.getDdefinition();
-//		JSONObject jsonObject = new JSONObject();
-//        jsonObject.put("ddefinition", dcList);
-//		record.setDdefinition(jsonObject);
-		
+
+		//		List<DdefinitionChild> dcList = addVo.getDdefinition();
+		//		JSONObject jsonObject = new JSONObject();
+		//        jsonObject.put("ddefinition", dcList);
+		//		record.setDdefinition(jsonObject);
+
 		String viscera =  addVo.getViscera();
 		if(null != viscera){
 			String visceraName = getLabelNameByParm(SysDictTypeEnum.organization.label(), Long.valueOf(viscera),"");
@@ -187,7 +197,7 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 					nameList.add(ddefinition);
 				}
 			}
-			
+
 			if(CollectionUtils.isNotEmpty(nameList)){
 				String ddefinitionFullName =  String.join("|", nameList);
 				record.setDdefinitionName(ddefinitionFullName);
@@ -477,6 +487,32 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 			singleSlide.setDiagnosisStatus("0");
 		}
 		singleSlideMapper.updateById(singleSlide);
+	}
+
+	@Override
+	public SysUser getUserInfo(Map<String, Object> parm) {
+		String cacheKey = "";
+		if(null!=parm && parm.containsKey("userId")){
+			cacheKey = (String) parm.get("userId");
+		}
+
+		if(null!=parm && parm.containsKey("userName")){
+			String userName =(String) parm.get("userName");
+			Long organizationId =(Long) parm.get("organizationId");
+			cacheKey = organizationId+"_"+userName;
+		}
+
+		SysUser sysUser = redisService.getCacheObject(cacheKey);
+		if(null != sysUser){
+			return sysUser;
+		}else{
+			List<SysUser> userList = diagnosisMapper.selectUserById(parm);
+			if(CollectionUtils.isNotEmpty(userList)){
+				sysUser = userList.get(0);
+				redisService.setCacheObject(cacheKey,sysUser, 31L, TimeUnit.DAYS);
+			}
+		}
+		return sysUser;
 	}
 
 

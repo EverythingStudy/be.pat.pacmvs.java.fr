@@ -1,19 +1,14 @@
 package cn.staitech.fr.service.impl;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.springframework.stereotype.Service;
-
 import cn.staitech.fr.domain.Indicator;
 import cn.staitech.fr.mapper.IndicatorMapper;
-import cn.staitech.fr.mapper.OrganMapper;
-import cn.staitech.fr.mapper.SpeciesMapper;
 import cn.staitech.fr.service.IndicatorService;
-import cn.staitech.fr.service.PathologicalIndicatorCategoryService;
 import cn.staitech.fr.utils.LanguageUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @author wangf
@@ -23,14 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 public class IndicatorServiceImpl implements IndicatorService {
     @Resource
     private IndicatorMapper indicatorMapper;
-    @Resource
-    private PathologicalIndicatorCategoryService pathologicalIndicatorCategoryService;
-
-    @Resource
-    private OrganMapper organMapper;
-
-    @Resource
-    private SpeciesMapper speciesMapper;
 
     /**
      * 添加病例指标
@@ -42,7 +29,6 @@ public class IndicatorServiceImpl implements IndicatorService {
     public int insertIndicator(Indicator indicator) {
         return indicatorMapper.insertIndicator(indicator);
     }
-
 
 
     /**
