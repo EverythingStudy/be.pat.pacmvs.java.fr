@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import cn.hutool.core.util.ObjectUtil;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -179,18 +180,20 @@ implements SlideService {
 	}
 
 	@Override
-	public R deleteAll(Long specialId) {
+	public R deleteAll(Long specialId,Long slideId) {
 		log.info("删除全部切片接口开始：");
 		//fr_slide 切片删除
 		QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("special_id",specialId);
+		queryWrapper.eq(ObjectUtil.isNotEmpty(specialId),"special_id",specialId);
+		queryWrapper.eq(ObjectUtil.isNotEmpty(slideId),"slide_id",slideId);
 		//逻辑删除状态（0存在，1删除）
 		queryWrapper.eq("del_flag",CommonConstant.NUMBER_0);
 		List<Slide> slideList = list(queryWrapper);
 		if(CollectionUtils.isNotEmpty(slideList)){
 			//当前专题
 			UpdateWrapper<Slide> updateWrapper = new UpdateWrapper<>();
-			updateWrapper.eq("special_id", specialId);
+			updateWrapper.eq(ObjectUtil.isNotEmpty(specialId),"special_id", specialId);
+			updateWrapper.eq(ObjectUtil.isNotEmpty(slideId),"slide_id",slideId);
 			//修改状态
 			Slide sd = new Slide();
 			sd.setDelFlag("1");

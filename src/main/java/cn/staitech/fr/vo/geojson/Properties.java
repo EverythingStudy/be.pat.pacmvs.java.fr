@@ -114,4 +114,6 @@ public class Properties {
     private int single;
     @ApiModelProperty(value = "指标")
     private Map<String, Indicator> data_indicators;
+    @ApiModelProperty(value = "质点标识")
+    private String cell_type;
 }

@@ -491,15 +491,16 @@ public class DiagnosisServiceImpl extends ServiceImpl<DiagnosisMapper, Diagnosis
 
 	@Override
 	public SysUser getUserInfo(Map<String, Object> parm) {
-		String cacheKey = "";
+		String cacheKey = "user_";
 		if(null!=parm && parm.containsKey("userId")){
-			cacheKey = (String) parm.get("userId");
+			Long cacheUserIdKey = (Long) parm.get("userId");
+			cacheKey = cacheKey+cacheUserIdKey.toString(); 
 		}
 
 		if(null!=parm && parm.containsKey("userName")){
 			String userName =(String) parm.get("userName");
 			Long organizationId =(Long) parm.get("organizationId");
-			cacheKey = organizationId+"_"+userName;
+			cacheKey = cacheKey+organizationId+"_"+userName;
 		}
 
 		SysUser sysUser = redisService.getCacheObject(cacheKey);

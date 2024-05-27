@@ -134,6 +134,7 @@
             "contour2500"     geometry ( GEOMETRY ),
             "contour10000"    geometry ( GEOMETRY ),
             "contour40000"    geometry ( GEOMETRY ),
+            "contour5000"    geometry ( GEOMETRY ),
             "location_type"   VARCHAR(100) COLLATE "pg_catalog"."default",
             "annotation_type" VARCHAR(50) COLLATE "pg_catalog"."default",
             "create_by"       INT8,
@@ -144,7 +145,8 @@
             "single_slide_id" INT8,
             "single"          INT2          DEFAULT 1,
             "contour_type"    INT8          DEFAULT 4,
-            structure_size    INT2,
+            "structure_size"    INT2,
+            "cell_type"    VARCHAR(50) COLLATE "pg_catalog"."default",
             "id"              VARCHAR(500) COLLATE "pg_catalog"."default",
             CONSTRAINT "fr_ai_annotation_${sequenceNumber}_pkey" PRIMARY KEY ("annotation_id")
         );
@@ -224,6 +226,7 @@
         contour625,
         contour2500,
         contour10000,
+        contour5000,
         location_type,
         annotation_type,
         create_by,
@@ -231,6 +234,7 @@
         slide_id,
         single_slide_id,
         structure_size,
+        cell_type,
         id
         )
         values
@@ -243,6 +247,7 @@
             st_geomfromgeojson(#{item.contour625}),
             st_geomfromgeojson(#{item.contour2500}),
             st_geomfromgeojson(#{item.contour10000}),
+            st_geomfromgeojson(#{item.contour5000}),
             #{item.locationType},
             #{item.annotationType},
             #{item.createBy},
@@ -250,6 +255,7 @@
             #{item.slideId},
             #{item.singleSlideId},
             #{item.structureSize},
+            #{item.cellType},
             #{item.id}
             )
         </foreach>
@@ -356,9 +362,22 @@
         update_time,
         slide_id,
         id,
-        ST_AsGeoJSON(contour${magnification}) as contour,
+        CASE
+        ${magnification}
+        WHEN '5000' THEN
+            CASE
+            structure_size
+            WHEN 2 THEN
+                ST_AsGeoJSON(contour10000)
+            WHEN 3 THEN
+                ST_AsGeoJSON(contour5000)
+            ELSE NULL END
+        ELSE
+            ST_AsGeoJSON(contour${magnification})
+        END AS contour,
         single_slide_id,
         contour_type,
+        cell_type,
         single
         from fr_ai_annotation_${sequenceNumber}
         <where>
@@ -366,7 +385,7 @@
                 single_slide_id = #{singleSlideId}
             </if>
             <if test="contour != null">
-                AND ST_Intersects(st_geomfromgeojson(#{contour}),contour${magnification})
+                AND ST_Intersects(st_geomfromgeojson(#{contour}),contour${magnifications})
             </if>
             <if test="structureSizeList != null and structureSizeList.size > 0">
                 AND structure_size in

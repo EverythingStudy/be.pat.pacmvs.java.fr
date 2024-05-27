@@ -106,6 +106,8 @@ public class Annotation implements Serializable {
 
     private String contour10000;
 
+    private String contour5000;
+
     private String contour2500;
 
     private String contour625;
@@ -141,6 +143,9 @@ public class Annotation implements Serializable {
     private Long magnification;
 
     @TableField(exist = false)
+    private Long magnifications;
+
+    @TableField(exist = false)
     private String collectContour;
 
     @TableField(exist = false)
@@ -166,6 +171,9 @@ public class Annotation implements Serializable {
 
     @TableField(exist = false)
     private List<Long> singleSlideIdList;
+
+    @TableField(exist = false)
+    private String cellType;
 
     @Override
     public boolean equals(Object that) {
