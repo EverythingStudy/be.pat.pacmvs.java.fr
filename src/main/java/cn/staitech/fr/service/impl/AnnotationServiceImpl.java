@@ -60,11 +60,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cn.staitech.fr.constant.CommonConstant.*;
-import static cn.staitech.fr.utils.MarkingUtils.socketData;
+import static cn.staitech.fr.utils.AnnotationDataEncapsulation.socketData;
 import static cn.staitech.fr.utils.SendMessage.sendOneMessages;
 
 /**
- * @author admin
+ * @author adminimport static cn.staitech.fr.utils.AnnotationDataEncapsulation.socketData
  * @description 针对表【fr_annotation】的数据库操作Service实现
  * @createDate 2024-04-01 09:42:42
  */
@@ -549,7 +549,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         BroadcastVO broadcastVO = sendOneMessages(DELETE_STATUS, features);
 
         if (annotationBy.getSingleSlideId() != null) {
-            NioWebSocketHandler.sendSingle(annotationBy.getSlideId(), broadcastVO);
+            NioWebSocketHandler.sendSingle(annotationBy.getSingleSlideId(), broadcastVO);
         } else {
             NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
         }
@@ -691,7 +691,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotationMapper.updateById(annotation);
         Annotation annotationBys = annotationMapper.selectById(annotation);
         PropertiesBriefly properties = getProperties(annotationBys);
-        Features features = AnnotationDataEncapsulation.socketData(annotation.getId(), req.getGeometry(), properties);
+        Features features = socketData(annotation.getId(), req.getGeometry(), properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
         if (annotationBy.getSingleSlideId() != null) {
             NioWebSocketHandler.sendSingle(annotationBy.getSingleSlideId(), broadcastVO);
@@ -806,7 +806,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         int res = annotationMapper.updateById(annotation);
         Annotation annotationBys = annotationMapper.selectById(annotations);
         PropertiesBriefly properties = getProperties(annotationBys);
-        Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), geometryJson, properties);
+        Features features = socketData(annotationBys.getId(), geometryJson, properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
         NioWebSocketHandler.sendSingle(annotation.getSingleSlideId(), broadcastVO);
         return res;
@@ -824,7 +824,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         int res = annotationMapper.insert(annotation);
         Annotation annotationBys = annotationMapper.selectById(annotation.getAnnotationId());
         PropertiesBriefly properties = getProperties(annotationBys);
-        Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), JSONObject.parseObject(annotation.getContour()), properties);
+        Features features = socketData(annotationBys.getId(), JSONObject.parseObject(annotation.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(ADD_STATUS, features);
         NioWebSocketHandler.sendSingle(annotation.getSingleSlideId(), broadcastVO);
         return res;
@@ -912,7 +912,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         // 更新后查询数据并返回
         Annotation annotationById = annotationMapper.selectById(annotations);
         PropertiesBriefly properties = getProperties(annotationById);
-        Features features = AnnotationDataEncapsulation.socketData(annotationBys.getId(), JSONObject.parseObject(annotation1.getContour()), properties);
+        Features features = socketData(annotationBys.getId(), JSONObject.parseObject(annotation1.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
         if (annotation.getSingleSlideId() != null) {
             NioWebSocketHandler.sendSingle(annotation.getSingleSlideId(), broadcastVO);
@@ -1052,7 +1052,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotationMapper.insert(annotation);
         Annotation annotationById = annotationMapper.selectById(annotation.getAnnotationId());
         PropertiesBriefly properties = getProperties(annotationById);
-        Features features = MarkingUtils.socketData(String.valueOf(annotation.getAnnotationId()), JSONObject.parseObject(annotation.getContour()), properties);
+        Features features = socketData(String.valueOf(annotation.getAnnotationId()), JSONObject.parseObject(annotation.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendListMessages(CommonConstant.ANNO_TYPE_DRAW, ADD_STATUS, features, null);
         if (annotationById.getSingleSlideId() != null) {
             NioWebSocketHandler.sendSingle(annotationById.getSingleSlideId(), broadcastVO);
@@ -1079,7 +1079,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setUpdateTime(String.valueOf(new Date()));
         annotationMapper.updateById(annotation);
         PropertiesBriefly properties = getProperties(annotationBy);
-        Features features = AnnotationDataEncapsulation.socketData(String.valueOf(annotationBy.getAnnotationId()), JSONObject.parseObject(req.getContour()), properties);
+        Features features = socketData(String.valueOf(annotationBy.getAnnotationId()), JSONObject.parseObject(req.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_DRAW, UPDATE_STATUS, features);
         if (annotationBy.getSingleSlideId() != null) {
             NioWebSocketHandler.sendSingle(annotationBy.getSingleSlideId(), broadcastVO);
@@ -1094,7 +1094,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     public Annotation deleteByHistory(Long annotationId) {
         Annotation annotationById = annotationMapper.selectById(annotationId);
         PropertiesBriefly properties = getProperties(annotationById);
-        Features features = AnnotationDataEncapsulation.socketData(String.valueOf(annotationId), JSONObject.parseObject(annotationById.getContour()), properties);
+        Features features = socketData(String.valueOf(annotationId), JSONObject.parseObject(annotationById.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendListMessages(CommonConstant.ANNO_TYPE_DRAW, DELETE_STATUS, features, null);
         annotationMapper.deleteById(annotationById);
         if (annotationById.getSingleSlideId() != null) {

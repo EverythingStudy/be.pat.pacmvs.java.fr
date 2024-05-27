@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 import static cn.staitech.fr.constant.CommonConstant.ADD_STATUS;
+import static cn.staitech.fr.utils.AnnotationDataEncapsulation.socketData;
 import static cn.staitech.fr.constant.CommonConstant.DELETE_STATUS;
 
 /**
@@ -55,7 +56,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
             features.setGeometry(JSONObject.parseObject(measure.getContour()));
             features.setId(null);
             features.setType("Feature");
-            String s1 = JSONObject.toJSONString(getProperties(measure), SerializerFeature.PrettyFormat);
+            String s1 = JSONObject.toJSONString(getPropertiesBriefly(measure), SerializerFeature.PrettyFormat);
             JSONObject jsonObject = JSONObject.parseObject(s1);
             features.setProperties(jsonObject);
             featuresList.add(features);
@@ -156,7 +157,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         measureMapper.insert(measure);
         Measure measureBy = measureMapper.selectById(measure.getMeasureId());
         PropertiesBriefly properties = getPropertiesBriefly(measureBy);
-        Features features = MarkingUtils.socketData(null, JSONObject.parseObject(measure.getContour()), properties);
+        Features features = socketData(null, JSONObject.parseObject(measure.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_MEASURE, ADD_STATUS, features);
         NioWebSocketHandler.sendSingle(req.getSingle_slide_id(), broadcastVO);
         return measure.getMeasureId();
@@ -175,11 +176,13 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         }
         Measure measureBy = measureMapper.selectById(measure.getMeasureId());
         PropertiesBriefly properties = getPropertiesBriefly(measureBy);
-        Features features = MarkingUtils.socketData(null, JSONObject.parseObject(measure.getContour()), properties);
+        Features features = socketData(null, JSONObject.parseObject(measure.getContour()), properties);
         BroadcastVO broadcastVO = SendMessage.sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_MEASURE, DELETE_STATUS, features);
         NioWebSocketHandler.sendSingle(measure.getSingleSlideId(), broadcastVO);
         return measureMapper.deleteById(markingId);
     }
+
+
 
     @Override
     public void execlExport(Long singleSlideId, HttpServletResponse response) throws Exception {

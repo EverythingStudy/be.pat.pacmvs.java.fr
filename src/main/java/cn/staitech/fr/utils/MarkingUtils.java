@@ -170,23 +170,6 @@ public class MarkingUtils {
 
 
 
-    public static Features socketData(String annotationId, JSONObject geometry, PropertiesBriefly properties) {
-        Features features = new Features();
-        features.setGeometry(geometry);
-        features.setId(annotationId);
-        features.setType("Feature");
-        String s1 = JSONObject.toJSONString(properties, SerializerFeature.PrettyFormat);
-        JSONObject jsonObject = JSONObject.parseObject(s1);
-        features.setProperties(jsonObject);
-        return features;
-    }
-
-    public static double precision(Double d) {
-        BigDecimal bd = new BigDecimal(d);
-        return bd.setScale(3, RoundingMode.DOWN).doubleValue();
-    }
-
-
 
     public static String jsonToWkt(JSONObject jsonObject) {
         String wkt = null;
