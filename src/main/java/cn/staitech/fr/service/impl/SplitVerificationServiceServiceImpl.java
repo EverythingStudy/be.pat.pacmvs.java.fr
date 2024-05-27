@@ -196,6 +196,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			QueryWrapper<Slide> animalQueryWrapper = new QueryWrapper<>();
 			animalQueryWrapper.eq("special_id",req.getSpecialId());
 			animalQueryWrapper.in("animal_code",allAnimalCodeList);
+			animalQueryWrapper.eq("del_flag","0");
 			//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
 			animalQueryWrapper.eq("process_flag",2);
 			//:核对状态 0：初始 1：正确 2：修正正常 3：错误 
