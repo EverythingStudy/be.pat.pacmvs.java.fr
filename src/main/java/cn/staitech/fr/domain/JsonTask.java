@@ -2,6 +2,7 @@ package cn.staitech.fr.domain;
 
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.annotations.ApiModelProperty;
@@ -60,6 +61,7 @@ public class JsonTask implements Serializable {
     //更新时间
     private Date updateTime;
     //结构化时间
+    @TableField(exist = false)
     private Long structureTime;
 
 }
