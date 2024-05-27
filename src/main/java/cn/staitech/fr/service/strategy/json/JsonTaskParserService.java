@@ -161,6 +161,7 @@ public class JsonTaskParserService {
         singleSlide.setSingleId(jsonTask.getSingleId());
         //0未预测、1预测成功、2预测失败、3预测中
         singleSlide.setForecastStatus("1");
+        singleSlide.setStructureTime(jsonTask.getStructureTime());
         singleSlideService.updateById(singleSlide);
 //        CountDownLatch countDownLatch = new CountDownLatch(count);
 //
@@ -220,7 +221,7 @@ public class JsonTaskParserService {
             jsonTask.setImageId(jsonObject.containsKey("imageId") ? Long.parseLong(jsonObject.get("imageId").toString()) : 0L);
             jsonTask.setSingleId(jsonObject.containsKey("singleId") ? Long.parseLong(jsonObject.get("singleId").toString()) : 0L);
             jsonTask.setOrganizationId(jsonObject.containsKey("organizationId") ? Long.parseLong(jsonObject.get("organizationId").toString()) : 0L);
-
+            jsonTask.setStructureTime(jsonObject.containsKey("elapsed_time") ? Long.parseLong(jsonObject.get("elapsed_time").toString()) : 0L);
             jsonTask.setCode(jsonObject.containsKey("code") ? jsonObject.get("code").toString() : "");
             jsonTask.setMsg(jsonObject.containsKey("msg") ? jsonObject.get("msg").toString() : "");
             jsonTask.setData(jsonObject.containsKey("data") ? jsonObject.get("data").toString() : "");
