@@ -368,9 +368,9 @@
             CASE
             structure_size
             WHEN 2 THEN
-                ST_AsGeoJSON(contour5000)
-            WHEN 3 THEN
                 ST_AsGeoJSON(contour10000)
+            WHEN 3 THEN
+                ST_AsGeoJSON(contour5000)
             ELSE NULL END
         ELSE
             ST_AsGeoJSON(contour${magnification})
