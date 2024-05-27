@@ -105,7 +105,8 @@ public class Annotation implements Serializable {
     private String contour40000;
 
     private String contour10000;
-
+    
+    @TableField(exist = false)
     private String contour5000;
 
     private String contour2500;
