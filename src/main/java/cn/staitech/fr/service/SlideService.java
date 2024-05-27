@@ -30,5 +30,5 @@ public interface SlideService extends IService<Slide> {
 
     R deleteById(Long slideId);
     
-    R deleteAll(Long specialId);
+    R deleteAll(Long specialId,Long slideId);
 }

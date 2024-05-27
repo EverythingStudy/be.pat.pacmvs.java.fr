@@ -73,8 +73,9 @@ public class SlideController  extends BaseController {
     
     @ApiOperation(value = "选片列表-全部删除")
     @GetMapping("/deleteAll")
-    public R deleteAll(@RequestParam(value = "specialId") @ApiParam(name = "specialId", value = "专题id", required = true) Long specialId) {
-        return slideService.deleteAll(specialId);
+    public R deleteAll(@RequestParam(value = "specialId") @ApiParam(name = "specialId", value = "专题id") Long specialId,
+                       @RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "切片id") Long slideId) {
+        return slideService.deleteAll(specialId,slideId);
 
     }
 }
