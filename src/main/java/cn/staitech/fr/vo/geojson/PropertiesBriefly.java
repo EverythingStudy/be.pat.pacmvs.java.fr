@@ -74,7 +74,7 @@ public class PropertiesBriefly {
 
     public void setA0(String a0) {
         if (a0 != null) {
-            A29 = a0;
+            A0 = a0;
         }
     }
 
