@@ -92,6 +92,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
 		queryWrapper.select("DISTINCT( animal_code )  animal_code");
 		queryWrapper.eq("special_id",req.getSpecialId());
+		//0存在，1删除
+		queryWrapper.eq("del_flag","0");
 		//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
 		queryWrapper.eq("process_flag",2);
 		//:核对状态 0：初始 1：正确 2：修正正常 3：错误 
@@ -118,6 +120,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			animalWrapper.eq("special_id",req.getSpecialId());
 			//切片名称解析，0：成功；1：失败
 			animalWrapper.eq("analyze_status","0");
+			//0存在，1删除
+			animalWrapper.eq("del_flag","0");
 			animalWrapper.isNotNull("animal_code");
 			List<Slide> slideDataList = slideMapper.selectList(animalWrapper);
 			if(CollectionUtils.isNotEmpty(slideDataList)){
@@ -436,6 +440,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			animalWrapper.eq("special_id",req.getSpecialId());
 			//切片名称解析，0：成功；1：失败
 			animalWrapper.eq("analyze_status","0");
+			//0存在，1删除
+			animalWrapper.eq("del_flag","0");
 			animalWrapper.isNotNull("animal_code");
 			List<Slide> slideDataList = slideMapper.selectList(animalWrapper);
 			if(CollectionUtils.isNotEmpty(slideDataList)){
