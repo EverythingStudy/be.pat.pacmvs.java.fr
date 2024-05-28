@@ -100,13 +100,13 @@ public class CommonJsonParser {
                 log.info("geometry625解析失败");
                 return null;
             }
-            JsonNode geometry0 = element.get("geometry0");
-            // geometry转换成JSONObject
-            JSONObject jsonObject0 = JSONObject.parseObject(JSONObject.toJSONString(geometry0));
-            if (null == jsonObject0) {
-                log.info("geometry0解析失败");
-                return null;
-            }
+//            JsonNode geometry0 = element.get("geometry0");
+//            // geometry转换成JSONObject
+//            JSONObject jsonObject0 = JSONObject.parseObject(JSONObject.toJSONString(geometry0));
+//            if (null == jsonObject0) {
+//                log.info("geometry0解析失败");
+//                return null;
+//            }
             String labelCode = properties.getLabel_code();
             if (StringUtils.isEmpty(labelCode)) {
                 log.info("labelCode为空");
@@ -139,9 +139,9 @@ public class CommonJsonParser {
             if (null != geometry625) {
                 annotation.setContour625(geometry625.toString());
             }
-            if (null != geometry0) {
-                annotation.setContour5000(geometry0.toString());
-            }
+//            if (null != geometry0) {
+//                annotation.setContour5000(geometry0.toString());
+//            }
             annotation.setId(annotationId);
             // 拿到categoryId
             Long categoryId = pathologicalMap.get(labelCode);
