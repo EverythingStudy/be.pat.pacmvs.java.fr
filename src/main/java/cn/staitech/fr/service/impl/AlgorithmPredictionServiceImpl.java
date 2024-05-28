@@ -39,11 +39,11 @@ import cn.staitech.fr.domain.in.AlgorithmAnnIn;
 import cn.staitech.fr.domain.in.StartPredictionIn;
 import cn.staitech.fr.domain.out.AlgorithmImageOut;
 import cn.staitech.fr.feign.PythonOrganRecognitionService;
+import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.service.AlgorithmPredictionService;
-import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.service.CategoryService;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.WaxBlockInfoService;
@@ -72,7 +72,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	private SlideMapper slideMapper;
 
 	@Resource
-	private AnnotationService annotationService;
+	private AnnotationMapper annotationMapper;
 
 	@Resource
 	private WaxBlockInfoService waxBlockInfoService;
@@ -309,12 +309,12 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			Annotation annotationParm = new Annotation();
 			annotationParm.setSlideId(slideId);
 			//查询
-			QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
+			QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
 			queryWrapper.eq("del_flag", 1);
-			List<Category> categoryList =  categoryService.list();
+			List<Category> categoryList =  categoryService.list(queryWrapper);
 			List<Long> categoryIdList = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
 			annotationParm.setCategoryIdList(categoryIdList);
-			List<AnnotationCountByCategory>  countList = annotationService.getCategoryCount(annotationParm);
+			List<AnnotationCountByCategory>  countList = annotationMapper.getCategoryCount(annotationParm);
 			if(CollectionUtils.isNotEmpty(countList)){
 				for(AnnotationCountByCategory annotationCount:countList){
 					Long categoryId = annotationCount.getCategoryId();

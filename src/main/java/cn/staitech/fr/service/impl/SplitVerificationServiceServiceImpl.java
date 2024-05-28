@@ -73,9 +73,9 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		int detailType = req.getDetailType();
 		
 		////2024.05.28新增合并标签查询过滤
-		QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
+		QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("del_flag", 1);
-		List<Category> categoryList =  categoryService.list();
+		List<Category> categoryList =  categoryService.list(queryWrapper);
 		List<Long> categoryIdList = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
 		
 		

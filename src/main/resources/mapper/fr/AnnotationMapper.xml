@@ -509,7 +509,7 @@
 	        </foreach>
         </if>
         <if test="categoryIdList != null and categoryIdList.size() > 0">
-               AND t.category_id not in
+               AND category_id not in
                <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">
                    #{item}
                </foreach>
