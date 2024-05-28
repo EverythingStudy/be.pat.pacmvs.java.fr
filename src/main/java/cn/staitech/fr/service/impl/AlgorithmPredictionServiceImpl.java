@@ -311,6 +311,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			//查询
 			QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
 			queryWrapper.eq("del_flag", 1);
+			queryWrapper.eq("organization_id", organizationId);
 			List<Category> categoryList =  categoryService.list(queryWrapper);
 			List<Long> categoryIdList = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
 			annotationParm.setCategoryIdList(categoryIdList);
