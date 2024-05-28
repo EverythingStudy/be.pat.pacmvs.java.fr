@@ -154,6 +154,8 @@ public class CommonJsonParser {
             annotation.setCategoryId(categoryId);
             annotation.setAnnotationType(annotationType.toUpperCase());
             annotation.setCellType(properties.getCell_type());
+            JsonNode node2 = geometry.get("type");
+            annotation.setLocationType(node2.asText());
             return annotation;
         } else {
             log.error("Expected an object, but got a non-object node: " + element);

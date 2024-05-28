@@ -27,7 +27,7 @@
         left join tb_image ti on fs.image_id = ti.image_id
         left join sys_user su on fs.initiate_by=su.user_id
         <where>
-            fs.special_id = #{specialId} and fs.process_flag = '2'
+            fs.special_id = #{specialId} and fs.process_flag = '2' and fc.del_flag = '0'
             <if test="fileName != null and fileName != ''">
                 and ti.file_name like concat('%',#{fileName},'%')
             </if>

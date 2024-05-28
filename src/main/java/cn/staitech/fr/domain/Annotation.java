@@ -172,6 +172,9 @@ public class Annotation implements Serializable {
 
     @TableField(exist = false)
     private List<Long> singleSlideIdList;
+    
+    @TableField(exist = false)
+    private List<Long> categoryIdList;
 
     @TableField(exist = false)
     private String cellType;

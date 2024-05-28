@@ -973,11 +973,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
     @Override
-    public List<AnnotationCountByCategory> getCategoryCount(Long slideId) {
-        return annotationMapper.getCategoryCount(slideId);
-    }
-
-    @Override
     public List<BatchResult> batch(List<ViewAddIn> list) throws Exception {
         String traceId = UUID.randomUUID().toString();
 

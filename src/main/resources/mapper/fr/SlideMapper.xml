@@ -243,6 +243,7 @@
         left join tb_image ti on fs.image_id = ti.image_id
         <where>
             fs.special_id = #{specialId}
+            and fc.del_flag = '0'
             <if test="imageName != null and imageName != ''">
                 and ti.image_name like concat('%',#{imageName},'%')
             </if>

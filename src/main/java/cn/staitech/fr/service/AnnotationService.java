@@ -44,8 +44,6 @@ public interface AnnotationService extends IService<Annotation> {
 
     List<BatchResult> batch(List<ViewAddIn> list) throws Exception;
     
-    List<AnnotationCountByCategory> getCategoryCount(Long slideId);
-
     Boolean undo(HistoryDTO dto);
 
     Boolean redo(HistoryDTO dto);
