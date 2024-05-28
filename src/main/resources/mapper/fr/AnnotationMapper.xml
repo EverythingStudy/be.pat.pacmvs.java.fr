@@ -550,6 +550,7 @@
         single_slide_id = #{singleSlideId}
         <if test="contour != null">
             AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = 'f'
+            AND ST_Contains ( contour40000, st_geomfromgeojson(#{contour}) ) = 't'
         </if>
     </delete>
 
