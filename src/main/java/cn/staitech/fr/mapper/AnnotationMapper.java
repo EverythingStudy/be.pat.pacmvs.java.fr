@@ -78,6 +78,9 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     int batchDeleteBySsIds(Map<String,Object> parm);
 
     Annotation stEnvelope(Annotation annotation);
+
+    Annotation stContains(Annotation annotation);
+
 }
 
 

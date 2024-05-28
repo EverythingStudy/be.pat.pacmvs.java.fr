@@ -134,7 +134,7 @@
             "contour2500"     geometry ( GEOMETRY ),
             "contour10000"    geometry ( GEOMETRY ),
             "contour40000"    geometry ( GEOMETRY ),
-            "contour5000"    geometry ( GEOMETRY ),
+            "contour5000"     geometry ( GEOMETRY ),
             "location_type"   VARCHAR(100) COLLATE "pg_catalog"."default",
             "annotation_type" VARCHAR(50) COLLATE "pg_catalog"."default",
             "create_by"       INT8,
@@ -145,8 +145,8 @@
             "single_slide_id" INT8,
             "single"          INT2          DEFAULT 1,
             "contour_type"    INT8          DEFAULT 4,
-            "structure_size"    INT2,
-            "cell_type"    VARCHAR(50) COLLATE "pg_catalog"."default",
+            "structure_size"  INT2,
+            "cell_type"       VARCHAR(50) COLLATE "pg_catalog"."default",
             "id"              VARCHAR(500) COLLATE "pg_catalog"."default",
             CONSTRAINT "fr_ai_annotation_${sequenceNumber}_pkey" PRIMARY KEY ("annotation_id")
         );
@@ -343,11 +343,11 @@
                 AND ST_Intersects(st_geomfromgeojson(#{contour}),contour${magnification})
             </if>
             <if test="categoryIdList != null and categoryIdList.size() > 0">
-               AND category_id not in
-               <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">
-                   #{item}
-               </foreach>
-        </if>
+                AND category_id not in
+                <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
         </where>
     </select>
 
@@ -371,15 +371,15 @@
         CASE
         ${magnification}
         WHEN '5000' THEN
-            CASE
-            structure_size
-            WHEN 2 THEN
-                ST_AsGeoJSON(contour10000)
-            WHEN 3 THEN
-                ST_AsGeoJSON(contour5000)
-            ELSE NULL END
+        CASE
+        structure_size
+        WHEN 2 THEN
+        ST_AsGeoJSON(contour10000)
+        WHEN 3 THEN
+        ST_AsGeoJSON(contour5000)
+        ELSE NULL END
         ELSE
-            ST_AsGeoJSON(contour${magnification})
+        ST_AsGeoJSON(contour${magnification})
         END AS contour,
         single_slide_id,
         contour_type,
@@ -469,21 +469,23 @@
         GROUP BY category_id
     </select>
 
-    <select id="getCategoryCount" parameterType="cn.staitech.fr.domain.Annotation"	resultType="cn.staitech.fr.vo.annotation.AnnotationCountByCategory">
+    <select id="getCategoryCount" parameterType="cn.staitech.fr.domain.Annotation"
+            resultType="cn.staitech.fr.vo.annotation.AnnotationCountByCategory">
         select t.category_id, count(1) total_count
         from fr_annotation t
         where t.slide_id = #{slideId}
-          and t.contour_type = 2
-		<if test="categoryIdList != null and categoryIdList.size() > 0">
-               AND t.category_id not in
-               <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">
-                   #{item}
-               </foreach>
-        </if>	          
+        and t.contour_type = 2
+        <if test="categoryIdList != null and categoryIdList.size() > 0">
+            AND t.category_id not in
+            <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
         GROUP BY t.category_id
     </select>
 
-    <select id="getAnnoListByParm" parameterType="cn.staitech.fr.domain.Annotation" resultType="cn.staitech.fr.domain.Annotation">
+    <select id="getAnnoListByParm" parameterType="cn.staitech.fr.domain.Annotation"
+            resultType="cn.staitech.fr.domain.Annotation">
         SELECT
         annotation_id,
         area,
@@ -503,16 +505,16 @@
         FROM fr_annotation
         WHERE contour_type = 2
         <if test="slideIdList != null and slideIdList.size() > 0">
-         	AND slide_id in
-	        <foreach collection="slideIdList" item="item" index="index" open="(" separator="," close=")">
-	            #{item}
-	        </foreach>
+            AND slide_id in
+            <foreach collection="slideIdList" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </if>
         <if test="categoryIdList != null and categoryIdList.size() > 0">
-               AND category_id not in
-               <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">
-                   #{item}
-               </foreach>
+            AND category_id not in
+            <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
         </if>
     </select>
 
@@ -550,11 +552,11 @@
             AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = 'f'
         </if>
     </delete>
-    
+
     <!-- 批量删除方法 -->
-    <delete id="batchDeleteBySsIds" parameterType="map" >
-        DELETE 
-        FROM 
+    <delete id="batchDeleteBySsIds" parameterType="map">
+        DELETE
+        FROM
         fr_ai_annotation_${sequenceNumber}
         WHERE annotation_id IN
         <foreach item="annotationId" index="index" collection="list" open="(" separator="," close=")">
@@ -565,14 +567,13 @@
     <select id="getArea" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
         select ST_Perimeter(st_geomfromgeojson(#{contour})) as perimeter,
-               ST_Area(st_geomfromgeojson(#{contour})) as area
+               ST_Area(st_geomfromgeojson(#{contour}))      as area
     </select>
 
     <select id="getOrganArea" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
-        SELECT
-        ST_Area(ST_Collect(contour40000)) AS area,
-        ST_Perimeter(ST_Collect(contour40000)) AS perimeter
+        SELECT ST_Area(ST_Collect(contour40000))      AS area,
+               ST_Perimeter(ST_Collect(contour40000)) AS perimeter
         from fr_annotation
         where single_slide_id = #{singleSlideId}
           and contour_type = 3
@@ -617,12 +618,13 @@
     </select>
 
     <select id="stEnvelope" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
-        SELECT
-            st_asgeojson ( ST_Envelope ( contour40000 ) ) as contourPolygon
-        FROM
-            fr_annotation
-        WHERE
-            annotation_id = #{annotationId}
+        SELECT st_asgeojson(ST_Envelope(contour40000)) as contourPolygon
+        FROM fr_annotation
+        WHERE annotation_id = #{annotationId}
+    </select>
+
+    <select id="stContains" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT ST_Contains(st_geomfromgeojson(#{collectContour}), st_geomfromgeojson(#{contour})) as Results
     </select>
 
 </mapper>
