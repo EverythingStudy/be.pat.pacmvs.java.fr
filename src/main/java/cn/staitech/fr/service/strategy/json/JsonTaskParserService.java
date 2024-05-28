@@ -3,15 +3,18 @@ package cn.staitech.fr.service.strategy.json;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
+import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.JsonFileService;
 import cn.staitech.fr.service.JsonTaskService;
 import cn.staitech.fr.service.SingleSlideService;
 import cn.staitech.fr.service.SlideService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -63,6 +66,10 @@ public class JsonTaskParserService {
 
     @Resource
     private CommonJsonParser commonJsonParser;
+
+
+    @Autowired
+    private AiForecastService aiForecastService;
 
     public void input(String input) {
         JSONObject jsonObject = JSON.parseObject(input);
@@ -146,6 +153,10 @@ public class JsonTaskParserService {
 	//            log.error("deleteAiAnnotation error:{}", e.getMessage());
 	//        }
 	        log.info("------------------------------------------------------5");
+            //删除原有指标
+            LambdaQueryWrapper<AiForecast> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(AiForecast::getSingleSlideId,jsonTask.getSingleId());
+            aiForecastService.remove(wrapper);
 	        // 指标计算
 	        parser.alculationIndicators(jsonTask);
 	        log.info("------------------------------------------------------6");
