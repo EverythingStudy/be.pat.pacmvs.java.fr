@@ -24,6 +24,7 @@ import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.Category;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.WaxBlockInfo;
 import cn.staitech.fr.domain.in.ResultCorrectionIn;
@@ -32,6 +33,7 @@ import cn.staitech.fr.domain.out.CategoryChild;
 import cn.staitech.fr.domain.out.SplitVerificationOut;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SlideMapper;
+import cn.staitech.fr.service.CategoryService;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.SplitVerificationService;
 import cn.staitech.fr.service.WaxBlockInfoService;
@@ -59,6 +61,9 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 
 	@Resource
 	private WaxBlockInfoService waxBlockInfoService;
+	
+	@Resource
+    private CategoryService categoryService;
 
 	@Override
 	public PageResponse<SplitVerificationOut>  getList(SplitVerificationQueryIn req) {
@@ -66,17 +71,25 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		PageResponse<SplitVerificationOut> pageResponse = new PageResponse<>();
 		//查看切片明细  0：否  1：是
 		int detailType = req.getDetailType();
+		
+		////2024.05.28新增合并标签查询过滤
+		QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("del_flag", 1);
+		List<Category> categoryList =  categoryService.list();
+		List<Long> categoryIdList = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
+		
+		
 		if(detailType == 0){
-			pageResponse = SplitVerificationCount(req,organizationId);
+			pageResponse = SplitVerificationCount(req,organizationId,categoryIdList);
 		}else{
-			pageResponse =  SplitVerificationDetailCount(req,organizationId);
+			pageResponse =  SplitVerificationDetailCount(req,organizationId,categoryIdList);
 		}
 
 		return pageResponse;
 	}
 
 	//非明细统计
-	private  PageResponse<SplitVerificationOut> SplitVerificationCount(SplitVerificationQueryIn req,Long organizationId){
+	private  PageResponse<SplitVerificationOut> SplitVerificationCount(SplitVerificationQueryIn req,Long organizationId,List<Long> categoryIdList){
 		PageResponse<SplitVerificationOut> pageResponse = new PageResponse<>();
 		String reqAnimalCode = req.getAnimalCode();
 		//只看核对异常数据  0：全部  1：只看异常数据
@@ -110,6 +123,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		}
 
 		Long reqCategoryId = req.getCategoryId();
+		
+		
 		if(null != reqCategoryId){
 			Annotation annotation = new Annotation();
 			annotation.setCategoryId(reqCategoryId);
@@ -133,6 +148,9 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			//轮廓类型 1：矩形 ,2：标注轮廓 3:精细轮廓
 			annotation.setContourType(2L);
 			annotation.setMagnification(40000L);
+			if(CollectionUtils.isNotEmpty(categoryIdList)){
+				annotation.setCategoryIdList(categoryIdList);
+			}
 			List<Annotation> annoList = annotationMapper.selectListBy(annotation);
 			List<Long> annoSlideIdList = annoList.stream().map(Annotation::getSlideId).collect(Collectors.toList());
 			if(CollectionUtils.isNotEmpty(annoSlideIdList)){
@@ -149,7 +167,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			
 		}
 
-
+		
+		
 
 		List<Slide> slideList = slideService.list(queryWrapper);
 		
@@ -231,25 +250,6 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 					Map<String, Long> waxCategoryMap = new HashMap<String, Long>();
 					for(Slide slidePer:animalSlideList){
 						//切图结果==》按照动物编号统计汇总
-						//List<WaxBlockInfo> waxinfoList = waxBlockInfoService.getWaxBlockInfoList(slidePer.getSlideId(), slidePer.getWaxCode(),slidePer.getGenderFlag());
-						//处理蜡块信息
-						/*if(CollectionUtils.isNotEmpty(waxinfoList)){
-							for(WaxBlockInfo info:waxinfoList){
-								String organName = info.getOrganName();
-								Integer organNumber = info.getOrganNumber();
-								if(waxCategoryMap.isEmpty()){
-									waxCategoryMap.put(organName, organNumber.longValue());
-								}else{
-									if(waxCategoryMap.containsKey(organName)){
-										Long hasOrganNumber = waxCategoryMap.get(organName);
-										waxCategoryMap.put(organName, hasOrganNumber+organNumber.longValue());
-									}else{
-										waxCategoryMap.put(organName, organNumber.longValue());
-									}
-								}
-
-							}
-						}*/
 						String waxCodeGenderKey = fetchGroupKey(slidePer.getWaxCode(),slidePer.getGenderFlag());
 						waxCategoryMap = specialWaxCategoryCountMap.get(waxCodeGenderKey);
 						if(null == waxCategoryMap || waxCategoryMap.isEmpty()){
@@ -273,8 +273,10 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 
 					//切图脏器信息==》按照切片脏器统计汇总
 					List<Long> annoSlideIdList = animalSlideList.stream().map(Slide::getSlideId).collect(Collectors.toList());
-					List<Annotation>  annoList = annotationMapper.getAnnoListByParm(annoSlideIdList);
-//					Map<Long, Long> categoryCountGroupedBycategory = annoList.stream().filter(anno -> Objects.nonNull(anno.getCategoryId())).collect(Collectors.groupingBy(Annotation::getCategoryId, Collectors.counting()));
+					Annotation annotationQuery = new Annotation();
+					annotationQuery.setSlideIdList(annoSlideIdList);
+					annotationQuery.setCategoryIdList(categoryIdList);
+					List<Annotation>  annoList = annotationMapper.getAnnoListByParm(annotationQuery);
 					Map<Long, Long> categoryCountGroupedBycategory = annoList.stream().collect(Collectors.groupingBy(Annotation::getCategoryId, Collectors.counting()));
 					//AI 切图数据处理
 					Map<String, Long> annoCategoryMap = new HashMap<String, Long>();
@@ -429,7 +431,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 
 
 	//明细统计
-	private  PageResponse<SplitVerificationOut> SplitVerificationDetailCount(SplitVerificationQueryIn req,Long organizationId){
+	private  PageResponse<SplitVerificationOut> SplitVerificationDetailCount(SplitVerificationQueryIn req,Long organizationId,List<Long> categoryIdList){
 		//查找符合条件的AI
 		Long categoryId = req.getCategoryId();
 		if(null != categoryId){
@@ -452,6 +454,9 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 				annotation.setSlideIdList(slideIdList);
 			}
 			annotation.setMagnification(40000L);
+			if(CollectionUtils.isNotEmpty(categoryIdList)){
+				annotation.setCategoryIdList(categoryIdList);
+			}
 			List<Annotation> annoList = annotationMapper.selectListBy(annotation);
 			List<Long> annoSlideIdList = annoList.stream().map(Annotation::getSlideId).collect(Collectors.toList());
 			if(CollectionUtils.isNotEmpty(annoSlideIdList)){
@@ -485,6 +490,9 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 				queryAnno.setSlideId(slideId);
 				queryAnno.setContourType(2L);
 				queryAnno.setMagnification(40000L);
+				if(CollectionUtils.isNotEmpty(categoryIdList)){
+					queryAnno.setCategoryIdList(categoryIdList);
+				}
 				List<Annotation>  annoList = annotationMapper.selectListBy(queryAnno);
 				Map<Long, Long> categoryCountGroupedBycategory = annoList.stream().collect(Collectors.groupingBy(Annotation::getCategoryId, Collectors.counting()));
 				//AI 切图数据处理

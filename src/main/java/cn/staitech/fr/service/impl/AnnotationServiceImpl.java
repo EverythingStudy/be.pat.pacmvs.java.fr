@@ -973,8 +973,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
     @Override
-    public List<AnnotationCountByCategory> getCategoryCount(Long slideId) {
-        return annotationMapper.getCategoryCount(slideId);
+    public List<AnnotationCountByCategory> getCategoryCount(Annotation annotation) {
+        return annotationMapper.getCategoryCount(annotation);
     }
 
     @Override

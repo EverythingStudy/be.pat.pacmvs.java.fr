@@ -57,9 +57,9 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     List<Annotation> selectCategoryList(Annotation annotation);
 
-    List<AnnotationCountByCategory> getCategoryCount(Long slideId);
+    List<AnnotationCountByCategory> getCategoryCount(Annotation annotation);
 
-    List<Annotation> getAnnoListByParm(List<Long> slideIdList);
+    List<Annotation> getAnnoListByParm(Annotation annotation);
 
     Annotation collectGeometry(Long singleSlideId);
 

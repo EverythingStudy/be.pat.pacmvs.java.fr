@@ -342,6 +342,12 @@
             <if test="contour != null">
                 AND ST_Intersects(st_geomfromgeojson(#{contour}),contour${magnification})
             </if>
+            <if test="categoryIdList != null and categoryIdList.size() > 0">
+               AND category_id not in
+               <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">
+                   #{item}
+               </foreach>
+        </if>
         </where>
     </select>
 
@@ -463,16 +469,21 @@
         GROUP BY category_id
     </select>
 
-    <select id="getCategoryCount" parameterType="java.lang.Long"
-            resultType="cn.staitech.fr.vo.annotation.AnnotationCountByCategory">
+    <select id="getCategoryCount" parameterType="cn.staitech.fr.domain.Annotation"	resultType="cn.staitech.fr.vo.annotation.AnnotationCountByCategory">
         select t.category_id, count(1) total_count
         from fr_annotation t
         where t.slide_id = #{slideId}
           and t.contour_type = 2
+		<if test="categoryIdList != null and categoryIdList.size() > 0">
+               AND t.category_id not in
+               <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">
+                   #{item}
+               </foreach>
+        </if>	          
         GROUP BY t.category_id
     </select>
 
-    <select id="getAnnoListByParm" resultType="cn.staitech.fr.domain.Annotation">
+    <select id="getAnnoListByParm" parameterType="cn.staitech.fr.domain.Annotation" resultType="cn.staitech.fr.domain.Annotation">
         SELECT
         annotation_id,
         area,
@@ -490,11 +501,19 @@
         id
         <!-- ,contour -->
         FROM fr_annotation
-        WHERE slide_id in
-        <foreach collection="list" item="item" index="index" open="(" separator="," close=")">
-            #{item}
-        </foreach>
-        and contour_type = 2
+        WHERE contour_type = 2
+        <if test="slideIdList != null and slideIdList.size() > 0">
+         	AND slide_id in
+	        <foreach collection="slideIdList" item="item" index="index" open="(" separator="," close=")">
+	            #{item}
+	        </foreach>
+        </if>
+        <if test="categoryIdList != null and categoryIdList.size() > 0">
+               AND t.category_id not in
+               <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">
+                   #{item}
+               </foreach>
+        </if>
     </select>
 
     <select id="collectGeometry" parameterType="long" resultMap="BaseResultMap">

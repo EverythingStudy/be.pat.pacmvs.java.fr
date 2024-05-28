@@ -29,6 +29,8 @@ import cn.staitech.common.redis.service.RedisService;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.Category;
 import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
@@ -37,11 +39,12 @@ import cn.staitech.fr.domain.in.AlgorithmAnnIn;
 import cn.staitech.fr.domain.in.StartPredictionIn;
 import cn.staitech.fr.domain.out.AlgorithmImageOut;
 import cn.staitech.fr.feign.PythonOrganRecognitionService;
-import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.service.AlgorithmPredictionService;
+import cn.staitech.fr.service.AnnotationService;
+import cn.staitech.fr.service.CategoryService;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.WaxBlockInfoService;
 import cn.staitech.fr.vo.annotation.AnnotationCountByCategory;
@@ -69,7 +72,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	private SlideMapper slideMapper;
 
 	@Resource
-	private AnnotationMapper annotationMapper;
+	private AnnotationService annotationService;
 
 	@Resource
 	private WaxBlockInfoService waxBlockInfoService;
@@ -85,6 +88,9 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 
 	@Resource
 	private PythonOrganRecognitionService pythonService;
+	
+	@Resource
+    private CategoryService categoryService;
 
 
 	@SuppressWarnings("rawtypes")
@@ -300,8 +306,15 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			//查询所属切片AI脏器信息
 			Map<String,Integer> slideCountMap = new HashMap<String, Integer>();
 			int slideCountSize = 0;
-
-			List<AnnotationCountByCategory>  countList = annotationMapper.getCategoryCount(slideId);
+			Annotation annotationParm = new Annotation();
+			annotationParm.setSlideId(slideId);
+			//查询
+			QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
+			queryWrapper.eq("del_flag", 1);
+			List<Category> categoryList =  categoryService.list();
+			List<Long> categoryIdList = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
+			annotationParm.setCategoryIdList(categoryIdList);
+			List<AnnotationCountByCategory>  countList = annotationService.getCategoryCount(annotationParm);
 			if(CollectionUtils.isNotEmpty(countList)){
 				for(AnnotationCountByCategory annotationCount:countList){
 					Long categoryId = annotationCount.getCategoryId();
