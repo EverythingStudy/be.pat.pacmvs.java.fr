@@ -5,6 +5,9 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+
+import com.baomidou.mybatisplus.annotation.TableField;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -50,4 +53,7 @@ public class MatrixReviewListIn extends PageRequest {
 
     @ApiModelProperty(value = "排序方式：asc-升序；desc-降序")
     private String sortType;
+    
+    @ApiModelProperty(value = "标签列表")
+    private List<Long> categoryIdList;
 }

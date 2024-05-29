@@ -26,6 +26,7 @@ import cn.staitech.fr.mapper.DiagnosisMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
+import cn.staitech.fr.service.CategoryService;
 import cn.staitech.fr.service.MatrixReviewService;
 import cn.staitech.fr.utils.DateUtils;
 import cn.staitech.fr.utils.ExportPdfUtils;
@@ -34,6 +35,7 @@ import cn.staitech.fr.utils.MathUtils;
 import cn.staitech.fr.vo.annotation.AiAlgorithm;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.deepoove.poi.data.PictureRenderData;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -90,6 +92,9 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
     @Resource
     private AiForecastMapper aiForecastMapper;
+    
+    @Resource
+    private CategoryService categoryService;
 
 
     @Value("${waxPath}")
@@ -441,78 +446,86 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
 
     @Override
-	public R algorithm(AlgorithmIn req) {
-        log.info("ai算法预测接口开始：");
-		Long organizationId  = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
-		//Long organizationId  = 1L;
-		Long specialId = req.getSpecialId();
-		MatrixReviewListIn mrl = new MatrixReviewListIn();
-		mrl.setSpecialId(specialId);
-		//0未预测、1预测成功、2预测失败、3预测中
-//		mrl.setForecastStatus("0");
-		List<String> forecastStatusList = new ArrayList<>(Arrays.asList("0", "2"));
-		mrl.setForecastStatusList(forecastStatusList);
-		List<MatrixReviewListOut> singleSlideList = slideMapper.getMatrixReview(mrl);
-		if (CollectionUtils.isEmpty(singleSlideList)) {
-			return R.ok();
-		}
+    public R algorithm(AlgorithmIn req) {
+    	log.info("ai算法预测接口开始：");
+    	Long organizationId  = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+    	//Long organizationId  = 1L;
+    	Long specialId = req.getSpecialId();
+    	MatrixReviewListIn mrl = new MatrixReviewListIn();
+    	mrl.setSpecialId(specialId);
+    	//0未预测、1预测成功、2预测失败、3预测中
+    	//		mrl.setForecastStatus("0");
+    	List<String> forecastStatusList = new ArrayList<>(Arrays.asList("0", "2"));
+    	mrl.setForecastStatusList(forecastStatusList);
 
-		//请求算法处理
-		if(CollectionUtils.isNotEmpty(singleSlideList)){
-		    //修改算法执行时间
-            List<Long> collect = singleSlideList.stream().map(MatrixReviewListOut::getSingleId).collect(Collectors.toList());
-            LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
-            wrapper.in(SingleSlide::getSingleId,collect);
-            SingleSlide singleSlide = new SingleSlide();
-            singleSlide.setStartTime(new Date());
-            singleSlideMapper.update(singleSlide,wrapper);
-            for(MatrixReviewListOut matrixReviewListOut:singleSlideList){
-				Long singleId = matrixReviewListOut.getSingleId();
-				Long slideId = matrixReviewListOut.getSlideId();
-				String imageUrl = matrixReviewListOut.getImageUrl();
-				Long categoryId = matrixReviewListOut.getCategoryId();
-				String organName = matrixReviewListOut.getOrganName();
-				String aiImageUrl = matrixReviewListOut.getImageUrl();
-				Long imageId = matrixReviewListOut.getImageId();
-				String organizatinName = geNumber(organizationId);
-				if(null != slideId && StringUtils.isNotEmpty(imageUrl)){
-					if(imageUrl.toLowerCase().endsWith("svs") && !organName.equals("盲肠-回肠-直肠-结肠")){
-						//请求算法接口
-						try {
-							log.info("AI算法请求内容是singleId:{},slideId:{},organizationId:{},imageUrl:{},algorithm_name:{}", singleId,slideId,organizationId,imageUrl,CommonConstant.ALGORITHM_MODEL_NAME);
-							AiAlgorithm aiAlgorithm = new AiAlgorithm(singleId, slideId, categoryId, aiImageUrl, imageId);
-							//BeanUtils.copyProperties(matrixReviewListOut, aiAlgorithm);
-							aiAlgorithm.setAlgorithm_name(CommonConstant.ALGORITHM_MODEL_NAME);
-							aiAlgorithm.setOrganizationName(organizatinName);
-							aiAlgorithm.setOrganizationId(organizationId);
-							aiAlgorithm.setSpecialId(specialId);
-							log.info("AI算法请求完整数据{}", JSONUtil.toJsonStr(aiAlgorithm));
-							String body = pythonService.algorithm(aiAlgorithm);
-							log.info("AI算法请求返回数据{}", JSONUtil.toJsonStr(body));
-							JSONObject jsonObject = new JSONObject(body);
-							Integer code = jsonObject.getInt("code");
-							if (code.equals(200)) {
-								//修改当前slide分析状态为进行中
-								SingleSlide slide = new SingleSlide();
-								slide.setSingleId(singleId);
-								//0未预测、1预测成功、2预测失败、3预测中
-								slide.setForecastStatus("3");
-								singleSlideMapper.updateById(slide);
-							}
-						} catch (Exception e) {
-							e.printStackTrace();
-							log.error("AI算法请求失败,切片id是{}",slideId);
-						}finally {
+    	//2024.05.28新增合并标签查询过滤
+    	QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
+	    	queryWrapper.eq("del_flag", 1);
+	    	queryWrapper.eq("organization_id", organizationId);
+    	List<Category> categoryList =  categoryService.list(queryWrapper);
+    	List<Long> categoryIdList = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
+    	mrl.setCategoryIdList(categoryIdList);
+    	List<MatrixReviewListOut> singleSlideList = slideMapper.getMatrixReview(mrl);
+    	if (CollectionUtils.isEmpty(singleSlideList)) {
+    		return R.ok();
+    	}
 
-						}
-					}else{
-						log.error("AI算法请求失败,切片id是{},图片非svs格式",slideId);
-					}
-				}
-			}
-		}
-		return R.ok();
-	}
+    	//请求算法处理
+    	if(CollectionUtils.isNotEmpty(singleSlideList)){
+    		//修改算法执行时间
+    		List<Long> collect = singleSlideList.stream().map(MatrixReviewListOut::getSingleId).collect(Collectors.toList());
+    		LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
+    		wrapper.in(SingleSlide::getSingleId,collect);
+    		SingleSlide singleSlide = new SingleSlide();
+    		singleSlide.setStartTime(new Date());
+    		singleSlideMapper.update(singleSlide,wrapper);
+    		for(MatrixReviewListOut matrixReviewListOut:singleSlideList){
+    			Long singleId = matrixReviewListOut.getSingleId();
+    			Long slideId = matrixReviewListOut.getSlideId();
+    			String imageUrl = matrixReviewListOut.getImageUrl();
+    			Long categoryId = matrixReviewListOut.getCategoryId();
+    			String organName = matrixReviewListOut.getOrganName();
+    			String aiImageUrl = matrixReviewListOut.getImageUrl();
+    			Long imageId = matrixReviewListOut.getImageId();
+    			String organizatinName = geNumber(organizationId);
+    			if(null != slideId && StringUtils.isNotEmpty(imageUrl)){
+    				if(imageUrl.toLowerCase().endsWith("svs") && !organName.equals("盲肠-回肠-直肠-结肠")){
+    					//请求算法接口
+    					try {
+    						log.info("AI算法请求内容是singleId:{},slideId:{},organizationId:{},imageUrl:{},algorithm_name:{}", singleId,slideId,organizationId,imageUrl,CommonConstant.ALGORITHM_MODEL_NAME);
+    						AiAlgorithm aiAlgorithm = new AiAlgorithm(singleId, slideId, categoryId, aiImageUrl, imageId);
+    						//BeanUtils.copyProperties(matrixReviewListOut, aiAlgorithm);
+    						aiAlgorithm.setAlgorithm_name(CommonConstant.ALGORITHM_MODEL_NAME);
+    						aiAlgorithm.setOrganizationName(organizatinName);
+    						aiAlgorithm.setOrganizationId(organizationId);
+    						aiAlgorithm.setSpecialId(specialId);
+    						log.info("AI算法请求完整数据{}", JSONUtil.toJsonStr(aiAlgorithm));
+    						String body = pythonService.algorithm(aiAlgorithm);
+    						log.info("AI算法请求返回数据{}", JSONUtil.toJsonStr(body));
+    						JSONObject jsonObject = new JSONObject(body);
+    						Integer code = jsonObject.getInt("code");
+    						if (code.equals(200)) {
+    							//修改当前slide分析状态为进行中
+    							SingleSlide slide = new SingleSlide();
+    							slide.setSingleId(singleId);
+    							//0未预测、1预测成功、2预测失败、3预测中
+    							slide.setForecastStatus("3");
+    							singleSlideMapper.updateById(slide);
+    						}
+    					} catch (Exception e) {
+    						e.printStackTrace();
+    						log.error("AI算法请求失败,切片id是{}",slideId);
+    					}finally {
+
+    					}
+    				}else{
+    					log.error("AI算法请求失败,切片id是{},图片非svs格式",slideId);
+    				}
+    			}
+    		}
+    	}
+    	return R.ok();
+    }
 	
 	public  String geNumber(Long organizationId) {
 		NumberFormat formatter = NumberFormat.getNumberInstance();

@@ -260,7 +260,12 @@
             <if test="categoryId != null and categoryId != ''">
                 and ss.category_id =#{categoryId}
             </if>
-
+            <if test="categoryIdList != null and categoryIdList.size() > 0">
+                AND ss.category_id not in
+                <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
             <if test="forecastStatus != null and forecastStatus != ''">
                 and ss.forecast_status =#{forecastStatus}
             </if>
