@@ -460,7 +460,7 @@ public class CommonJsonParser {
      */
     public BigDecimal getProportion(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
         BigDecimal proportion;
-        if (null == bigDecimal1 || null == bigDecimal2) {
+        if (null == bigDecimal1 || null == bigDecimal2 || bigDecimal1.compareTo(BigDecimal.ZERO) == 0 ||  bigDecimal2.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
         
