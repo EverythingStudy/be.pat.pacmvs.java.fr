@@ -487,7 +487,6 @@ public class CommonJsonParser {
         annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
         annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
         return annotationMapper.countDucts(annotation);
-
     }
 
 
