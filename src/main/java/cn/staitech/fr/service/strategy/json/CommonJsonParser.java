@@ -139,6 +139,7 @@ public class CommonJsonParser {
             if (null != geometry625) {
                 annotation.setContour625(geometry625.toString());
             }
+            //
             if (null != geometry0) {
                 annotation.setContour5000(geometry0.toString());
             }
