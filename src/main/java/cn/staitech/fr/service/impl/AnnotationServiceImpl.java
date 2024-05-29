@@ -275,6 +275,13 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             annotation.setContour(String.valueOf(req.getGeometry()));
         }
         annotation.setFiligreeContour(true);
+        Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+        QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("del_flag", 1);
+        queryWrapper.eq("organization_id", organizationId);
+        List<Category> categoryList =  categoryMapper.selectList(queryWrapper);
+        List<Long> categoryIdLists = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
+        annotation.setCategoryIdLists(categoryIdLists);
         // 查询精细轮廓
         List<Annotation> selfAnnoList = annotationMapper.selectListBy(annotation);
         List<Features> annoList1 = getFeaturesList(selfAnnoList);
