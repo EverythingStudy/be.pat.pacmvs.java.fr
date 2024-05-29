@@ -186,7 +186,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             features.setGeometry(JSONObject.parseObject(annotation.getContour()));
             features.setId(null);
             features.setType("Feature");
-            String s1 = JSONObject.toJSONString(getProperties(annotation),SerializerFeature.PrettyFormat);
+            String s1 = JSONObject.toJSONString(getProperties(annotation), SerializerFeature.PrettyFormat);
             JSONObject jsonObject = JSONObject.parseObject(s1);
             features.setProperties(jsonObject);
             featuresList.add(features);
@@ -243,10 +243,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             if (createUser == null) {
                 createUser = userMapper.selectById(annotation.getCreateBy());
                 if (createUser != null) {
-                    userMap.put(createUser.getUserId(), createUser);
+                    userMap.put(annotation.getCreateBy(), createUser);
+                } else {
+                    userMap.put(annotation.getCreateBy(), new User());
                 }
             }
-            if (createUser != null) {
+            if (createUser != null&& createUser.getUserId() != null) {
                 properties.setA9(createUser.getUserName());
             }
         }
@@ -255,10 +257,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             if (updateUser == null) {
                 updateUser = userMapper.selectById(annotation.getUpdateBy());
                 if (updateUser != null) {
-                    userMap.put(updateUser.getUserId(), updateUser);
+                    userMap.put(annotation.getUpdateBy(), updateUser);
+                } else {
+                    userMap.put(annotation.getUpdateBy(), new User());
                 }
             }
-            if (updateUser != null) {
+            if (updateUser != null && updateUser.getUserId() != null) {
                 properties.setA10(updateUser.getUserName());
             }
         }
@@ -279,7 +283,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("del_flag", 1);
         queryWrapper.eq("organization_id", organizationId);
-        List<Category> categoryList =  categoryMapper.selectList(queryWrapper);
+        List<Category> categoryList = categoryMapper.selectList(queryWrapper);
         List<Long> categoryIdLists = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
         annotation.setCategoryIdLists(categoryIdLists);
         // 查询精细轮廓
@@ -304,7 +308,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         List<Features> list = new ArrayList<>();
         Annotation annotation = new Annotation();
         BeanUtils.copyProperties(req, annotation);
-        if(req.getMagnification() == 5000){
+        if (req.getMagnification() == 5000) {
             annotation.setMagnifications(10000L);
         } else {
             annotation.setMagnifications(req.getMagnification());
@@ -313,16 +317,16 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             annotation.setContour(String.valueOf(req.getGeometry()));
         }
         SingleSlide singleSlide = singleSlideMapper.selectById(req.getSingleSlideId());
-        if(singleSlide == null){
+        if (singleSlide == null) {
             return new ArrayList<>();
         }
         Slide slide = slideMapper.selectById(singleSlide.getSlideId());
-        if(slide == null){
+        if (slide == null) {
             return new ArrayList<>();
         }
         LambdaQueryWrapper<SpecialAnnotationRel> queryWrapper = new LambdaQueryWrapper<SpecialAnnotationRel>().eq(SpecialAnnotationRel::getSpecialId, slide.getSpecialId());
         SpecialAnnotationRel specialAnnotationRel = specialAnnotationRelMapper.selectOne(queryWrapper);
-        if(specialAnnotationRel == null){
+        if (specialAnnotationRel == null) {
             return new ArrayList<>();
         }
         annotation.setSequenceNumber(specialAnnotationRel.getSequenceNumber());
@@ -910,7 +914,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             String per = String.valueOf(Double.parseDouble(annotationArea.getPerimeter()) * resolutions);
             annotation.setPerimeter(per);
         }
-        if(annotation.getSingleSlideId() == null){
+        if (annotation.getSingleSlideId() == null) {
             // 更新矩形轮廓
             Annotation annotationPolygon = annotationMapper.stEnvelope(annotations);
             annotationBys.setContourPolygon(annotationPolygon.getContourPolygon());
@@ -1369,6 +1373,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     /**
      * 批量保存
+     *
      * @param annotation
      * @param batchSize
      */
