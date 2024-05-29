@@ -12,6 +12,8 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -232,7 +234,18 @@ public class JsonTaskParserService {
             jsonTask.setImageId(jsonObject.containsKey("imageId") ? Long.parseLong(jsonObject.get("imageId").toString()) : 0L);
             jsonTask.setSingleId(jsonObject.containsKey("singleId") ? Long.parseLong(jsonObject.get("singleId").toString()) : 0L);
             jsonTask.setOrganizationId(jsonObject.containsKey("organizationId") ? Long.parseLong(jsonObject.get("organizationId").toString()) : 0L);
-            jsonTask.setStructureTime(jsonObject.containsKey("elapsed_time") ? Long.parseLong(jsonObject.get("elapsed_time").toString()) : 0L);
+            //算法结构化时间处理
+            Long structureTime = 0L;
+            if(jsonObject.containsKey("elapsed_time")){
+            	Object eTimeObj = jsonObject.get("elapsed_time");
+            	if(null != eTimeObj){
+            		String eTimeStr = (String) eTimeObj;
+            		if(StringUtils.isNotEmpty(eTimeStr)){
+            			structureTime = (long)(Double.parseDouble(eTimeStr));
+            		}
+            	}
+            }
+            jsonTask.setStructureTime(structureTime);
             jsonTask.setCode(jsonObject.containsKey("code") ? jsonObject.get("code").toString() : "");
             jsonTask.setMsg(jsonObject.containsKey("msg") ? jsonObject.get("msg").toString() : "");
             jsonTask.setData(jsonObject.containsKey("data") ? jsonObject.get("data").toString() : "");
