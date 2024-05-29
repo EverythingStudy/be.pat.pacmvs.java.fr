@@ -456,13 +456,13 @@ public class CommonJsonParser {
      *
      * @param bigDecimal1
      * @param bigDecimal2
-     * @return 脏器面积-10³平方微米
      */
     public BigDecimal getProportion(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
         BigDecimal proportion;
         if (null == bigDecimal1 || null == bigDecimal2) {
             return BigDecimal.ZERO;
         }
+        
         proportion = bigDecimal1.divide(bigDecimal2).setScale(3, RoundingMode.HALF_UP);
         return proportion;
     }
@@ -487,6 +487,30 @@ public class CommonJsonParser {
         annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
         annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
         return annotationMapper.countDucts(annotation);
+    }
+    
+    /**
+     * 
+     *
+     * @param bigDecimal
+     */
+    public BigDecimal getBigDecimalValue(BigDecimal bigDecimal) {
+        if (null == bigDecimal) {
+            return BigDecimal.ZERO;
+        }
+        return bigDecimal;
+    }
+    
+    /**
+     * 
+     *
+     * @param Integer
+     */
+    public Integer getIntegerValue(Integer intValue) {
+        if (null == intValue) {
+            return 0;
+        }
+        return intValue;
     }
 
 

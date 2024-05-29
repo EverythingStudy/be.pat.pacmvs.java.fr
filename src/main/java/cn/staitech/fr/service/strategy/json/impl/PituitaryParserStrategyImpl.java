@@ -58,12 +58,16 @@ public class PituitaryParserStrategyImpl extends AbstractCustomParserStrategy {
 
 		// 神经部面积 A 平方毫米 若多个数据则相加输出
 		BigDecimal pituitaryA = commonJsonParser.getOrganArea(jsonTask, "10607F").getStructureAreaNum();
+		pituitaryA = commonJsonParser.getBigDecimalValue(pituitaryA);
 		// 中间部面积 B 平方毫米 若多个数据则相加输出
 		BigDecimal pituitaryB = commonJsonParser.getOrganArea(jsonTask, "106081").getStructureAreaNum();
+		pituitaryB = commonJsonParser.getBigDecimalValue(pituitaryB);
 		// 远侧部面积 C 平方毫米 若多个数据则相加输出
 		BigDecimal pituitaryC = commonJsonParser.getOrganArea(jsonTask, "106083").getStructureAreaNum();
+		pituitaryC = commonJsonParser.getBigDecimalValue(pituitaryC);
 		// 红细胞面积 D 平方毫米 数据相加输出
 		BigDecimal pituitaryD = commonJsonParser.getOrganArea(jsonTask, "106004").getStructureAreaNum();
+		pituitaryD = commonJsonParser.getBigDecimalValue(pituitaryD);
 		// 胸骨面积 ==>组织轮廓面积H
 //		BigDecimal pituitaryH = commonJsonParser.getOrganArea(jsonTask, "106111").getStructureAreaNum();
 		 String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
