@@ -141,6 +141,10 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		indicatorResultsMap.put("胸骨面积", new IndicatorAddIn("Sternum area", String.valueOf(bigDecimalH), "平方毫米", "0"));
 		
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+		
+		Map<String, IndicatorAddIn> indicatorRMap = new HashMap<>();
+		indicatorRMap.put("骨髓腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA), "平方毫米", "1"));
+		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorRMap);
 	}
 
 	@Override
