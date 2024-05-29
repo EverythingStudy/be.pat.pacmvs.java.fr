@@ -177,6 +177,9 @@ public class Annotation implements Serializable {
     private List<Long> categoryIdList;
 
     @TableField(exist = false)
+    private List<Long> categoryIdLists;
+
+    @TableField(exist = false)
     private String cellType;
 
     @Override
