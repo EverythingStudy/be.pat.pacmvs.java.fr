@@ -100,13 +100,13 @@ public class CommonJsonParser {
                 log.info("geometry625解析失败");
                 return null;
             }
-//            JsonNode geometry0 = element.get("geometry0");
-//            // geometry转换成JSONObject
-//            JSONObject jsonObject0 = JSONObject.parseObject(JSONObject.toJSONString(geometry0));
-//            if (null == jsonObject0) {
-//                log.info("geometry0解析失败");
-//                return null;
-//            }
+            JsonNode geometry0 = element.get("geometry0");
+            // geometry转换成JSONObject
+            JSONObject jsonObject0 = JSONObject.parseObject(JSONObject.toJSONString(geometry0));
+            if (null == jsonObject0) {
+                log.info("geometry0解析失败");
+                return null;
+            }
             String labelCode = properties.getLabel_code();
             if (StringUtils.isEmpty(labelCode)) {
                 log.info("labelCode为空");
