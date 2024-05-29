@@ -216,6 +216,7 @@
           and fs.special_id = #{specialId}
           and fs.group_code = #{groupCode}
           and faf.quantitative_indicators= #{quantitativeIndicators}
+          and faf.struct_type = #{structType}
           and fs.gender_flag = #{genderFlag}
         group by faf.forecast_id;
 

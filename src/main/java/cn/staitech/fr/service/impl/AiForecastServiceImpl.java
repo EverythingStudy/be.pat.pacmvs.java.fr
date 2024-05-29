@@ -182,7 +182,7 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
                 //范围数据
                 if (StringUtils.isNotEmpty(special.getControlGroup())&& !CommonConstant.SINGLE_RESULT.equals(aiForecast.getQuantitativeIndicators())) {
 
-                    setReferenceScope(special, singleSlideId, exportAiListVO, categorys,slide.getGenderFlag());
+                    setReferenceScope(special, singleSlideId, exportAiListVO, categorys,slide.getGenderFlag(),structType);
 
                 }
                 resp.add(exportAiListVO);
@@ -199,8 +199,9 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
      * @param categorys
      * @param genderFlag
      */
-    private void setReferenceScope(Special special, Long singleId, AiForecastListOut exportAiListVO, Map<Long, Long> categorys, String genderFlag) {
-        List<BigDecimal> dataList= singleSlideMapper.getReferenceScope(exportAiListVO.getQuantitativeIndicators(),categorys.get(singleId), special.getSpecialId(), special.getControlGroup(),genderFlag);
+    private void setReferenceScope(Special special, Long singleId, AiForecastListOut exportAiListVO, Map<Long, Long> categorys, String genderFlag,String structType) {
+        List<BigDecimal> dataList= singleSlideMapper.getReferenceScope(exportAiListVO.getQuantitativeIndicators(),categorys.get(singleId), special.getSpecialId(),
+                special.getControlGroup(),genderFlag,structType);
         if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(dataList)){
             BigDecimal bigDecimal = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
             log.info("平均值"+ bigDecimal);

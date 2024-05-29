@@ -530,7 +530,8 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
      * @param genderFlag
      */
     private void setReferenceScope(Special special, Long singleId, ExportAiListVO exportAiListVO, Map<Long, Long> categorys, String genderFlag) {
-        List<BigDecimal> dataList= singleSlideMapper.getReferenceScope(exportAiListVO.getQuantitativeIndicators(),categorys.get(singleId), special.getSpecialId(), special.getControlGroup(),genderFlag);
+        List<BigDecimal> dataList= singleSlideMapper.getReferenceScope(exportAiListVO.getQuantitativeIndicators(),categorys.get(singleId), special.getSpecialId(),
+                special.getControlGroup(),genderFlag,CommonConstant.NUMBER_0);
         if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(dataList)){
             BigDecimal bigDecimal = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
             log.info("平均值"+ bigDecimal);
