@@ -13,6 +13,7 @@ import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.in.AlgorithmAnnIn;
 import cn.staitech.fr.service.AlgorithmPredictionService;
 import cn.staitech.fr.service.ImageService;
+import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,8 @@ public class AlgorithmCallBackController {
     
     @Resource
     private AlgorithmPredictionService algorithmPredictionService;
-
+    @Resource
+    private JsonTaskParserService jsonTaskParserService;
     
     @SuppressWarnings("rawtypes")
 	@ApiOperation(value = "脏器识别回调")
@@ -47,5 +49,16 @@ public class AlgorithmCallBackController {
         algorithmPredictionService.recognition(algorithmAnnIn);
 		return R.ok();
 	}
+    
+    
+//    @SuppressWarnings("rawtypes")
+//	@ApiOperation(value = "脏器识别回调")
+//	@PostMapping("/test")
+//	public R test(@Validated @RequestBody String  str) {
+//		log.info("脏器识别算法回调专题,完整数据是：{}",str);
+//		 jsonTaskParserService.input(str);
+//		// 多线程处理
+//		return R.ok();
+//	}
     
 }
