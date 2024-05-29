@@ -378,18 +378,19 @@
         update_time,
         slide_id,
         id,
-        CASE
-        ${magnification}
+        CASE ${magnification}
         WHEN '5000' THEN
-        CASE
-        structure_size
-        WHEN 2 THEN
-        ST_AsGeoJSON(contour10000)
-        WHEN 3 THEN
-        ST_AsGeoJSON(contour5000)
-        ELSE NULL END
+                CASE
+                    structure_size
+                WHEN 2 THEN
+                    ST_AsGeoJSON(contour10000)
+                WHEN 3 THEN
+                    case when contour5000 is null then
+                        ST_AsGeoJSON(contour10000)
+                        else ST_AsGeoJSON(contour5000) end
+                ELSE NULL END
         ELSE
-        ST_AsGeoJSON(contour${magnification})
+            ST_AsGeoJSON(contour${magnification})
         END AS contour,
         single_slide_id,
         contour_type,
