@@ -4,7 +4,6 @@ import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,36 +59,42 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		//        骨髓腔面积	A	平方毫米	若输出结果为多个则相加
 		Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "14E00E");
 		BigDecimal bigDecimalA = annotation.getStructureAreaNum();
+		bigDecimalA = commonJsonParser.getBigDecimalValue(bigDecimalA);
 
 		//        红系细胞核数量	B	个	无
 		Integer mucosaCountB = commonJsonParser.getOrganAreaCount(jsonTask, "14E011");
+		mucosaCountB = commonJsonParser.getIntegerValue(mucosaCountB);
 		//        粒系细胞数量	C	个	无
 		Integer mucosaCountC = commonJsonParser.getOrganAreaCount(jsonTask, "14E01A");
+		mucosaCountC = commonJsonParser.getIntegerValue(mucosaCountC);
 		//        巨核系细胞数量	D	个	无
 		Integer mucosaCountD = commonJsonParser.getOrganAreaCount(jsonTask, "14E022");
+		mucosaCountD = commonJsonParser.getIntegerValue(mucosaCountD);
 
 		//        红细胞面积	E	103平方微米	若输出结果为多个则相加
 		Annotation annotationE  = commonJsonParser.getOrganArea(jsonTask, "14E004");
 		BigDecimal bigDecimalE = annotationE.getStructureAreaNum();
+		bigDecimalE = commonJsonParser.getBigDecimalValue(bigDecimalE);
 		String bigDecimalEStr = areaUtils.convertToSquareMicrometer(bigDecimalE.toString());
 		bigDecimalE = new BigDecimal(bigDecimalEStr);
 		//        脂肪细胞面积	F	103平方微米	若输出结果为多个则相加
 		Annotation annotationF  = commonJsonParser.getOrganArea(jsonTask, "14E012");
 		BigDecimal bigDecimalF_1 = annotationF.getStructureAreaNum();
+		bigDecimalF_1 = commonJsonParser.getBigDecimalValue(bigDecimalF_1);
+		
 		BigDecimal bigDecimalF = annotationF.getStructureAreaNum();
+		bigDecimalF = commonJsonParser.getBigDecimalValue(bigDecimalF);
 		String bigDecimalFStr = areaUtils.convertToSquareMicrometer(annotationF.getStructureAreaNum().toString());
 		//bigDecimalF = bigDecimalF.multiply(new BigDecimal("0.001"));
 		bigDecimalF = new BigDecimal(bigDecimalFStr);
 		//        骨质面积	G	103平方微米	 负样本，辅助得到骨髓腔，若输出结果为多个则相加
 		Annotation annotationG  = commonJsonParser.getOrganArea(jsonTask, "14E00F");
 		BigDecimal bigDecimalG = annotationG.getStructureAreaNum();
-//		BigDecimal bigDecimalGM = bigDecimalG.multiply(new BigDecimal("0.001"));
+		bigDecimalG = commonJsonParser.getBigDecimalValue(bigDecimalG);
 		String bigDecimalGStr = areaUtils.convertToSquareMicrometer(bigDecimalG.toString());
 		BigDecimal bigDecimalGM = new BigDecimal(bigDecimalGStr);
 
 		//        组织轮廓面积	H	平方毫米	无
-//		Annotation annotationH  = commonJsonParser.getOrganArea(jsonTask, "14E111");
-//		BigDecimal bigDecimalH = annotationH.getStructureAreaNum();
 		BigDecimal bigDecimalH = BigDecimal.ZERO;
 		String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
 		bigDecimalH = new BigDecimal(slideArea);
@@ -99,7 +103,7 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		//		骨髓腔面积	1	平方毫米	Bone marrow area	1=A-G
 		BigDecimal BigDecimalA_G = bigDecimalA.subtract(bigDecimalG);
 		//		粒红比	2	无	Myelocyte:erythropoiesis ratio	2=C/B
-		BigDecimal BigDecimalC_B = new BigDecimal(mucosaCountC).divide(new BigDecimal(mucosaCountB)).setScale(3,RoundingMode.HALF_UP);
+		BigDecimal BigDecimalC_B = commonJsonParser.getProportion(new BigDecimal(mucosaCountC), new BigDecimal(mucosaCountB));
 		//		红细胞面积占比	3	%	Erythrocyte area%	3=E/(A-G)
 		BigDecimal bigDecimalA_G = bigDecimalA.subtract(bigDecimalG);
 		BigDecimal BigDecimalE_A_G = commonJsonParser.getProportion(bigDecimalE, bigDecimalA_G);

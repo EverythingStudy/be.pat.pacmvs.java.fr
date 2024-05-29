@@ -55,19 +55,24 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 
 		// 黄体数量 A 个
 		Integer mucosaCountA = commonJsonParser.getOrganAreaCount(jsonTask, "1240CA");
+		mucosaCountA = commonJsonParser.getIntegerValue(mucosaCountA);
 		// 黄体面积（全片） C 平方毫米
 		Annotation annotationC  = commonJsonParser.getOrganArea(jsonTask, "1240CA");
 		BigDecimal bigDecimalC = annotationC.getStructureAreaNum();
+		bigDecimalC = commonJsonParser.getBigDecimalValue(bigDecimalC);
 		// 卵泡数量 D 个
 		Integer mucosaCountD = commonJsonParser.getOrganAreaCount(jsonTask, "1240CB");
+		mucosaCountD = commonJsonParser.getIntegerValue(mucosaCountD);
 		// 卵泡面积（全片） F 平方毫米
 		Annotation annotationF  = commonJsonParser.getOrganArea(jsonTask, "1240CA");
 		BigDecimal bigDecimalF = annotationF.getStructureAreaNum();
+		bigDecimalF = commonJsonParser.getBigDecimalValue(bigDecimalF);
 		// 血管面积 H 平方微米
 //		Annotation annotationH  = commonJsonParser.getOrganArea(jsonTask, "124003");
 //		BigDecimal bigDecimalH = annotationH.getStructureAreaNum();
 //		bigDecimalH = bigDecimalH.multiply(new BigDecimal("0.001"));
 		BigDecimal bigDecimalH  =  commonJsonParser.getOrganAreaMicron(jsonTask, "124003");
+		bigDecimalH = commonJsonParser.getBigDecimalValue(bigDecimalH);
 		//TODO 血管外红细胞面积 I 平方微米
 		BigDecimal bigDecimalI = BigDecimal.ZERO;
 		//TODO 血管内红细胞面积 J 平方微米
@@ -82,8 +87,8 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		indicatorResultsMap.put("卵泡数量", new IndicatorAddIn("Follicle numbers", String.valueOf(mucosaCountD), "个", "0"));
 		indicatorResultsMap.put("卵泡面积（全片）", new IndicatorAddIn("Follicle area", String.valueOf(bigDecimalF), "平方毫米", "0"));
 		//TODO
-//		indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", String.valueOf(bigDecimalI), "平方微米", "0"));
-//		indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", String.valueOf(bigDecimalJ), "平方微米", "0"));
+		indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", String.valueOf(bigDecimalI), "平方微米", "0"));
+		indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", String.valueOf(bigDecimalJ), "平方微米", "0"));
 		indicatorResultsMap.put("血管面积", new IndicatorAddIn("Vessel area", String.valueOf(bigDecimalH), "平方微米", "0"));
 		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", slideArea, "平方毫米", "1"));
 		

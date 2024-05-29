@@ -55,11 +55,13 @@ public class SciaticNerveParserStrategyImpl extends AbstractCustomParserStrategy
 
 		//神经纤维束面积	1	10³平方微米	Nerve fiber bundles area	1=A
 		BigDecimal pituitaryA = commonJsonParser.getOrganArea(jsonTask, "1400BB").getStructureAreaNum();
+		pituitaryA = commonJsonParser.getBigDecimalValue(pituitaryA);
 		String accurateArea = areaUtils.convertToSquareMicrometer(pituitaryA.toString());
+		
 
 		//神经外膜结缔组织面积 B 平方毫米
 		BigDecimal bigDecimalB = commonJsonParser.getOrganArea(jsonTask, "1400BA").getStructureAreaNum();
-
+		bigDecimalB = commonJsonParser.getBigDecimalValue(bigDecimalB);
 		//结缔组织面积	2	平方毫米	Connective tissue area	2=B-A
 		
 		BigDecimal BigDecimalB_A = bigDecimalB.subtract(pituitaryA);
