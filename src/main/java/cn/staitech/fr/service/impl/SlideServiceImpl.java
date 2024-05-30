@@ -261,16 +261,17 @@ implements SlideService {
 				queryAnnowrapper.in("slide_id",slideIdList);
 				List<Annotation> annoList = annotationMapper.selectList(queryAnnowrapper);
 				if(CollectionUtils.isNotEmpty(annoList)){
+					List<Long> annoIdList = annoList.stream().map(Annotation::getAnnotationId).collect(Collectors.toList());
 					//数据处理
 					// 如果待删除的singleSlideId少于或等于batchSize，则直接一次性删除
-					if (CollectionUtils.isNotEmpty(slideIdList)) {
-						if (slideIdList.size() <= batchSize) {
-							annotationMapper.deleteBatchIds(slideIdList);
+					if (CollectionUtils.isNotEmpty(annoIdList)) {
+						if (annoIdList.size() <= batchSize) {
+							annotationMapper.deleteBatchIds(annoIdList);
 						}else{
 							// 分批次删除，每次处理batchSize条
-							for (int i = 0; i < slideIdList.size(); i += batchSize) {
-								int end = Math.min(i + batchSize, slideIdList.size()); // 防止数组越界
-								List<Long> idsBatch = slideIdList.subList(i, end); // 获取当前批次的ID
+							for (int i = 0; i < annoIdList.size(); i += batchSize) {
+								int end = Math.min(i + batchSize, annoIdList.size()); // 防止数组越界
+								List<Long> idsBatch = annoIdList.subList(i, end); // 获取当前批次的ID
 								annotationMapper.deleteBatchIds(idsBatch);
 							}
 						}
