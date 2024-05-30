@@ -48,13 +48,13 @@ public class StomachParserStrategyImpl extends AbstractCustomParserStrategy {
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("大鼠胃结构指标计算：");
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "110023").getStructureAreaNum();
+        //BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "110023").getStructureAreaNum();
         BigDecimal organArea1 = commonJsonParser.getOrganAreaMicron(jsonTask, "11012E");
         BigDecimal organArea2 = commonJsonParser.getOrganArea(jsonTask, "110035").getStructureAreaNum();
         BigDecimal organArea3 = commonJsonParser.getOrganAreaMicron(jsonTask, "11012F");
         BigDecimal organArea4 = commonJsonParser.getOrganArea(jsonTask, "110024").getStructureAreaNum();
 
-        indicatorResultsMap.put("前胃肌层", new IndicatorAddIn("Forestomach Muscularis area", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        //indicatorResultsMap.put("前胃肌层", new IndicatorAddIn("Forestomach Muscularis area", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("前胃角质层面积", new IndicatorAddIn("Stratum Corneum area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("腺胃黏膜上皮+固有层面积", new IndicatorAddIn("Glandular area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("前胃有核层面积", new IndicatorAddIn("Nucleated cell laye area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
