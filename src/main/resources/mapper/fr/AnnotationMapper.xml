@@ -568,7 +568,11 @@
         single_slide_id = #{singleSlideId}
         <if test="contour != null">
             AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = 'f'
-            OR ST_Contains ( contour40000, st_geomfromgeojson(#{contour}) ) = 't'
+            <if test="contourList != null and contourList.size() > 0">
+                <foreach collection="contourList" item="item" index="index">
+                    OR ST_Contains ( contour40000,st_geomfromgeojson(#{item})) = 't'
+                </foreach>
+            </if>
         </if>
     </delete>
 
@@ -645,5 +649,15 @@
     <select id="stContains" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
         SELECT ST_Contains(st_geomfromgeojson(#{collectContour}), st_geomfromgeojson(#{contour})) as Results
     </select>
+
+    <select id="selectAnnotationIsValid" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT st_asgeojson(contour40000) as contour
+        FROM fr_annotation
+        where contour_type = 3
+          and ST_IsValid(contour40000) = 't'
+          and single_slide_id = #{singleSlideId}
+    </select>
+
+
 
 </mapper>

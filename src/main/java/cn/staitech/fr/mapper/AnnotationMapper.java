@@ -81,6 +81,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     Annotation stContains(Annotation annotation);
 
+    List<Annotation> selectAnnotationIsValid(Annotation annotation);
+
 }
 
 

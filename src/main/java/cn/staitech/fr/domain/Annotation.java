@@ -180,6 +180,9 @@ public class Annotation implements Serializable {
     private List<Long> categoryIdLists;
 
     @TableField(exist = false)
+    private List<String> contourList;
+
+    @TableField(exist = false)
     private String cellType;
 
     @Override
