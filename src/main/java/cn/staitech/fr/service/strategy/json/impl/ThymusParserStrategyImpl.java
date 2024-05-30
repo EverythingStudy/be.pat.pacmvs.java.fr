@@ -64,9 +64,15 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal organArea = getOrganArea(jsonTask, "14403D").getStructureAreaNum();
         BigDecimal organArea2 = getOrganArea(jsonTask, "14403E").getStructureAreaNum();
         BigDecimal organArea3 = getOrganArea(jsonTask, "145004").getStructureAreaNum();
-        indicatorResultsMap.put("皮质面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("红细胞", new IndicatorAddIn("", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        if (!organArea.equals(BigDecimal.ZERO)){
+            indicatorResultsMap.put("皮质面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        }
+        if (!organArea2.equals(BigDecimal.ZERO)){
+            indicatorResultsMap.put("髓质面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        }
+        if (!organArea3.equals(BigDecimal.ZERO)){
+            indicatorResultsMap.put("红细胞", new IndicatorAddIn("", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        }
         indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("胸腺面积", new IndicatorAddIn("Thymus Gland area%", singleSlide.getArea(), "平方毫米",CommonConstant.NUMBER_0));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);

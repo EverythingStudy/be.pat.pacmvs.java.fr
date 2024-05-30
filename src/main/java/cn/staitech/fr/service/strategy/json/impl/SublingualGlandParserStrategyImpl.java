@@ -61,12 +61,17 @@ public class SublingualGlandParserStrategyImpl extends AbstractCustomParserStrat
         BigDecimal organArea = getOrganArea(jsonTask, "10A06F",unit).getStructureAreaNum();
         BigDecimal organArea2 = getOrganArea(jsonTask, "10A06D").getStructureAreaNum();
         Integer count = getOrganAreaCount(jsonTask, "10A06D");
-        indicatorResultsMap.put("导管面积（全片）", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("腺泡面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("腺泡数量", new IndicatorAddIn("", String.valueOf(count), "个", CommonConstant.NUMBER_1));
+        if (!organArea.equals(BigDecimal.ZERO)){
+            indicatorResultsMap.put("导管面积（全片）", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        }
+        if (!organArea2.equals(BigDecimal.ZERO)){
+            indicatorResultsMap.put("腺泡面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        }
+        if (count!=0){
+            indicatorResultsMap.put("腺泡数量", new IndicatorAddIn("", String.valueOf(count), "个", CommonConstant.NUMBER_1));
+        }
         indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("舌下腺面积", new IndicatorAddIn("Sublingual Gland area%", singleSlide.getArea(), "平方毫米",CommonConstant.NUMBER_0));
-
         indicatorResultsMap.put("导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT,CommonConstant.NUMBER_1));
         indicatorResultsMap.put("导管内腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT,CommonConstant.NUMBER_1));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
