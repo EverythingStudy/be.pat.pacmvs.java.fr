@@ -60,5 +60,6 @@ public class StomachParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("前胃有核层面积", new IndicatorAddIn("Nucleated cell laye area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("腺胃肌层面积", new IndicatorAddIn("Glandular Muscularis area", organArea4.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        //aiForecastService.addOutIndicators(jsonTask.getSingleId(), indicatorResultsMap);
     }
 }

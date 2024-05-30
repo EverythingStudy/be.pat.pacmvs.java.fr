@@ -57,6 +57,7 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
         indicatorResultsMap.put("腺上皮面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("腺腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        //aiForecastService.addOutIndicators(jsonTask.getSingleId(), indicatorResultsMap);
 
 
 

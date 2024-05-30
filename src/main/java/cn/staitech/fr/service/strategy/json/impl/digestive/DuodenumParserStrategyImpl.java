@@ -60,5 +60,6 @@ public class DuodenumParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("肌层", new IndicatorAddIn("Muscular layer", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("黏膜上皮+固有层", new IndicatorAddIn("Mucosal epithelium+lamina propria", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        //aiForecastService.addOutIndicators(jsonTask.getSingleId(), indicatorResultsMap);
     }
 }

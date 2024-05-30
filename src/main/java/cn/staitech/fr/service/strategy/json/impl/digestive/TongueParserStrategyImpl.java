@@ -65,6 +65,7 @@ public class TongueParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("颗粒层+棘层+基底细胞层面积", new IndicatorAddIn("Nucleated cell layer area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("固有层+肌层面积", new IndicatorAddIn("Lamina propria and Muscularis area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        //aiForecastService.addOutIndicators(jsonTask.getSingleId(), indicatorResultsMap);
 
     }
 }
