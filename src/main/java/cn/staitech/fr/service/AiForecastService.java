@@ -19,6 +19,8 @@ public interface AiForecastService extends IService<AiForecast> {
 
     void addAiForecast(Long singleSlideId, Map<String, IndicatorAddIn> indicatorResultsMap);
 
+    void addOutIndicators(Long singleSlideId, Map<String, IndicatorAddIn> indicatorResultsMap);
+
     List<AiForecast> selectList(Long singleSlideId);
 
 

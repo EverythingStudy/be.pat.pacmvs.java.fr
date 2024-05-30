@@ -125,6 +125,43 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
         }
     }
 
+    /**
+     * 新增输出指标
+     * @param singleSlideId
+     * @param indicatorResultsMap
+     */
+    @Override
+    public void addOutIndicators(Long singleSlideId, Map<String, IndicatorAddIn> indicatorResultsMap) {
+        List<AiForecast> aiForecasts = new ArrayList<>();
+        for (Map.Entry<String, IndicatorAddIn> entry : indicatorResultsMap.entrySet()) {
+            // 指标名称
+            String indicatorCode = entry.getKey();
+            // 指标信息
+            IndicatorAddIn indicator = entry.getValue();
+
+            AiForecast forecast = new AiForecast();
+            forecast.setSingleSlideId(singleSlideId);
+            forecast.setQuantitativeIndicators(indicatorCode);
+            forecast.setQuantitativeIndicatorsEn(indicator.getEnglishName());
+            forecast.setResults(indicator.getResult());
+            forecast.setUnit(indicator.getUnit());
+            forecast.setCreateTime(DateUtil.now());
+
+            if (StringUtils.isNotEmpty(indicator.getStructType())) {
+                if("0.000".equals(indicator.getResult())){
+                    continue;
+                }
+                forecast.setStructType(indicator.getStructType());
+            }
+
+            aiForecasts.add(forecast);
+        }
+        // 批量插入
+        if (!CollectionUtils.isEmpty(aiForecasts)) {
+            this.saveBatch(aiForecasts);
+        }
+    }
+
 
     @Override
     public List<AiForecast> selectList(Long singleSlideId) {

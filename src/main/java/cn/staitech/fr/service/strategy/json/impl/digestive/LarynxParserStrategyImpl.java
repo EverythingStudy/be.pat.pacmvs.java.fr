@@ -63,5 +63,6 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("黏膜上皮面积", new IndicatorAddIn("Muscular layer", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("腺体面积", new IndicatorAddIn("Glandular area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        //aiForecastService.addOutIndicators(jsonTask.getSingleId(), indicatorResultsMap);
     }
 }

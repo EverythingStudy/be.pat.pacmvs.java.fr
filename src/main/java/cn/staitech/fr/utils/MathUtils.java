@@ -12,7 +12,8 @@ import java.math.RoundingMode;
 public class MathUtils {
     public static void main(String[] args) {
         //BigDecimal[] data={new BigDecimal("211"),new BigDecimal("275"),new BigDecimal("334"),new BigDecimal("383"),new BigDecimal("426")};
-        BigDecimal[] data = {new BigDecimal("23.6"),new BigDecimal("999999999.213")};
+        /*BigDecimal[] data = {new BigDecimal("23.6"),new BigDecimal("999999999.213")};
+
 
         //保留小数位
         int scale = 1000;
@@ -26,7 +27,12 @@ public class MathUtils {
         System.out.println("总体方差" + variance);
 
         BigDecimal sqrt = sqrt(variance, scale);
-        System.out.println("总体标准差" + sqrt);
+        System.out.println("总体标准差" + sqrt);*/
+        BigDecimal[] data = {new BigDecimal("0.000"),new BigDecimal("0.000")};
+        BigDecimal sd=new BigDecimal("0.000");
+        BigDecimal sd2=new BigDecimal("0.000");
+        System.out.println(BigDecimal.ZERO.setScale(3, RoundingMode.HALF_UP));
+        System.out.println(sd2.compareTo(BigDecimal.ZERO));
 
     }
 
@@ -119,7 +125,7 @@ public class MathUtils {
      * @return 总体标准差
      */
     public static BigDecimal sqrt(BigDecimal value, int scale) {
-        if(BigDecimal.ZERO.equals(value)){
+        if(BigDecimal.ZERO.compareTo(value)==0){
             return BigDecimal.ZERO;
         }
         BigDecimal num2 = BigDecimal.valueOf(2);
