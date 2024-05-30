@@ -5,6 +5,7 @@ import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
+import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
@@ -34,7 +35,9 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 	@Resource
 	private CommonJsonParser commonJsonParser;
 	@Resource
-    private AreaUtils areaUtils;
+	private AreaUtils areaUtils;
+	@Resource
+	private AiForecastService aiForecastService;
 
 	@PostConstruct
 	public void init() {
@@ -63,9 +66,9 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		//空腔周长	B	毫米
 		BigDecimal bigDecimalB =  BigDecimal.ZERO;
 		if(null !=annotation.getPerimeter()){
-			 bigDecimalB =  new BigDecimal(annotation.getPerimeter());
+			bigDecimalB =  new BigDecimal(annotation.getPerimeter());
 		}
-		
+
 		BigDecimal bigDecimalC = BigDecimal.ZERO;
 		BigDecimal bigDecimalD = BigDecimal.ZERO;
 
@@ -79,19 +82,34 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 
 
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-		indicatorResultsMap.put("空腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA), "10³平方微米", "1"));
-		indicatorResultsMap.put("空腔周长", new IndicatorAddIn("", String.valueOf(bigDecimalB), "毫米", "1"));
-		indicatorResultsMap.put("组织轮廓周长", new IndicatorAddIn("", String.valueOf(bigDecimalC), "毫米", "1"));
-		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDecimalD), "10³平方微米", "1"));
+		if(bigDecimalA.compareTo(BigDecimal.ZERO) != 0){
+			indicatorResultsMap.put("空腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA), "10³平方微米", "1"));
+		}
 
+		if(bigDecimalB.compareTo(BigDecimal.ZERO) != 0){
+			indicatorResultsMap.put("空腔周长", new IndicatorAddIn("", String.valueOf(bigDecimalB), "毫米", "1"));
+		}
+
+		if(bigDecimalC.compareTo(BigDecimal.ZERO) != 0){
+			indicatorResultsMap.put("组织轮廓周长", new IndicatorAddIn("", String.valueOf(bigDecimalC), "毫米", "1"));
+		}
+
+		if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0){
+			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDecimalD), "10³平方微米", "1"));
+		}
 		//1=D-A
-		indicatorResultsMap.put("主动脉壁面积", new IndicatorAddIn("Aorta wall area", String.valueOf(bigDecimalD.subtract(bigDecimalA)), "10³平方微米", "0"));
+		if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0 && bigDecimalA.compareTo(BigDecimal.ZERO) != 0){
+			indicatorResultsMap.put("主动脉壁面积", new IndicatorAddIn("Aorta wall area", String.valueOf(bigDecimalD.subtract(bigDecimalA)), "10³平方微米", "0"));
+		}
 		//2=2*（D-A）/(B+C)
-		BigDecimal  bigDecimalDA = bigDecimalD.subtract(bigDecimalA);
-		BigDecimal  bigDecimalBC = bigDecimalB.add(bigDecimalC);
-		BigDecimal  bigDecimal2 = new BigDecimal(2);
-		BigDecimal mal =  bigDecimal2.multiply(commonJsonParser.getProportion(bigDecimalDA, bigDecimalBC));
-		indicatorResultsMap.put("主动脉壁平均厚度", new IndicatorAddIn("Average thickness of aorta wall", String.valueOf(mal), "平方毫米", "0"));
+		/*if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0 && bigDecimalA.compareTo(BigDecimal.ZERO) != 0&& bigDecimalB.compareTo(BigDecimal.ZERO) != 0&& bigDecimalC.compareTo(BigDecimal.ZERO) != 0){
+			BigDecimal  bigDecimalDA = bigDecimalD.subtract(bigDecimalA);
+			BigDecimal  bigDecimalBC = bigDecimalB.add(bigDecimalC);
+			BigDecimal  bigDecimal2 = new BigDecimal(2);
+			BigDecimal mal =  bigDecimal2.multiply(commonJsonParser.getProportion(bigDecimalDA, bigDecimalBC));
+			indicatorResultsMap.put("主动脉壁平均厚度", new IndicatorAddIn("Average thickness of aorta wall", String.valueOf(mal), "平方毫米", "0"));
+		}*/
+		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 	}
 
 	@Override

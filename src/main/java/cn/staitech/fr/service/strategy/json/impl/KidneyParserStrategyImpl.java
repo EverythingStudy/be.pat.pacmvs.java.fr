@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,7 +61,9 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         Integer count = getOrganAreaCount(jsonTask, "11B031");
-        indicatorResultsMap.put("肾小管数量", new IndicatorAddIn("", String.valueOf(count), "个", CommonConstant.NUMBER_1));
+        if (count!=0){
+            indicatorResultsMap.put("肾小管数量", new IndicatorAddIn("", String.valueOf(count), "个", CommonConstant.NUMBER_1));
+        }
         indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("肾脏面积", new IndicatorAddIn("Renal area%", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_0));
 
