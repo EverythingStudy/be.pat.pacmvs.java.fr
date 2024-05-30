@@ -378,17 +378,24 @@
         update_time,
         slide_id,
         id,
-        CASE ${magnification}
+        CASE
+            ${magnification}
         WHEN '5000' THEN
-                CASE
-                    structure_size
-                WHEN 2 THEN
+            CASE
+                structure_size
+            WHEN 2 THEN
+                ST_AsGeoJSON(contour10000)
+            WHEN 3 THEN
+                case
+                    cell_type
+                when 'cell' then
+                    ST_AsGeoJSON(contour5000)
+                else
                     ST_AsGeoJSON(contour10000)
-                WHEN 3 THEN
-                    case when contour5000 is null then
-                        ST_AsGeoJSON(contour10000)
-                        else ST_AsGeoJSON(contour5000) end
-                ELSE NULL END
+                end
+            ELSE
+                NULL
+            END
         ELSE
             ST_AsGeoJSON(contour${magnification})
         END AS contour,
@@ -561,7 +568,7 @@
         single_slide_id = #{singleSlideId}
         <if test="contour != null">
             AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = 'f'
-            AND ST_Contains ( contour40000, st_geomfromgeojson(#{contour}) ) = 't'
+            OR ST_Contains ( contour40000, st_geomfromgeojson(#{contour}) ) = 't'
         </if>
     </delete>
 
