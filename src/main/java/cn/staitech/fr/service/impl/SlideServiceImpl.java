@@ -141,7 +141,7 @@ implements SlideService {
 
 	private Slide getExtInfo(String fileName, Slide slide, Long specialId) {
 		String[] s = fileName.split(" ");
-		if (s.length != 3) {
+		if (s.length < 3) {
 			log.info("切片文件名格式错误：" + fileName);
 			slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
 			slide.setProcessFlag(4);
