@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component("Pituitary")
 public class PituitaryParserStrategyImpl extends AbstractCustomParserStrategy {
 	@Resource
-    private AreaUtils areaUtils;
+	private AreaUtils areaUtils;
 	@Resource
 	private AiForecastService aiForecastService;
 	@Resource
@@ -69,10 +69,10 @@ public class PituitaryParserStrategyImpl extends AbstractCustomParserStrategy {
 		BigDecimal pituitaryD = commonJsonParser.getOrganArea(jsonTask, "106004").getStructureAreaNum();
 		pituitaryD = commonJsonParser.getBigDecimalValue(pituitaryD);
 		// 胸骨面积 ==>组织轮廓面积H
-//		BigDecimal pituitaryH = commonJsonParser.getOrganArea(jsonTask, "106111").getStructureAreaNum();
-		 String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
-		 BigDecimal pituitaryH = BigDecimal.ZERO;
-		 pituitaryH = new BigDecimal(slideArea);
+		//		BigDecimal pituitaryH = commonJsonParser.getOrganArea(jsonTask, "106111").getStructureAreaNum();
+		String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+		BigDecimal pituitaryH = BigDecimal.ZERO;
+		pituitaryH = new BigDecimal(slideArea);
 		// 神经部细胞核数量 E 个 无
 		Integer mucosaCountE = commonJsonParser.getOrganAreaCount(jsonTask, "106080");
 		// 中间部细胞核数量 F 个 无
@@ -81,39 +81,71 @@ public class PituitaryParserStrategyImpl extends AbstractCustomParserStrategy {
 		Integer mucosaCountG = commonJsonParser.getOrganAreaCount(jsonTask, "106084");
 
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-		indicatorResultsMap.put("神经部面积", new IndicatorAddIn("", String.valueOf(pituitaryA), "平方毫米", "1"));
-		indicatorResultsMap.put("中间部面积", new IndicatorAddIn("", String.valueOf(pituitaryB), "平方毫米", "1"));
-		indicatorResultsMap.put("远侧部面积", new IndicatorAddIn("", String.valueOf(pituitaryC), "平方毫米", "1"));
-		indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", String.valueOf(pituitaryD), "平方毫米", "1"));
-		indicatorResultsMap.put("垂体面积", new IndicatorAddIn("", String.valueOf(pituitaryH), "平方毫米", "0"));
 
-		indicatorResultsMap.put("神经部细胞核数量", new IndicatorAddIn("", String.valueOf(mucosaCountE), "个", "1"));
-		indicatorResultsMap.put("中间部细胞核数量", new IndicatorAddIn("", String.valueOf(mucosaCountF), "个", "1"));
-		indicatorResultsMap.put("远侧部细胞核数量", new IndicatorAddIn("", String.valueOf(mucosaCountG), "个", "1"));
+		if(pituitaryA.compareTo(BigDecimal.ZERO) != 0) {
+			indicatorResultsMap.put("神经部面积", new IndicatorAddIn("", String.valueOf(pituitaryA), "平方毫米", "1"));
+		}
+		if(pituitaryB.compareTo(BigDecimal.ZERO) != 0) {
+			indicatorResultsMap.put("中间部面积", new IndicatorAddIn("", String.valueOf(pituitaryB), "平方毫米", "1"));
+		}
+		if(pituitaryC.compareTo(BigDecimal.ZERO) != 0) {
+			indicatorResultsMap.put("远侧部面积", new IndicatorAddIn("", String.valueOf(pituitaryC), "平方毫米", "1"));
+		}
+		if(pituitaryD.compareTo(BigDecimal.ZERO) != 0) {
+			indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", String.valueOf(pituitaryD), "平方毫米", "1"));
+		}
+		if(pituitaryH.compareTo(BigDecimal.ZERO) != 0) {
+			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(pituitaryH), "平方毫米", "1"));
+			indicatorResultsMap.put("垂体面积", new IndicatorAddIn("Pituitary gland area", String.valueOf(pituitaryH), "平方毫米", "0"));
+		}
+
+		if(mucosaCountE > 0){
+			indicatorResultsMap.put("神经部细胞核数量", new IndicatorAddIn("", String.valueOf(mucosaCountE), "个", "1"));
+		}
+		if(mucosaCountF > 0){
+			indicatorResultsMap.put("中间部细胞核数量", new IndicatorAddIn("", String.valueOf(mucosaCountF), "个", "1"));
+		}
+		if(mucosaCountG > 0){
+			indicatorResultsMap.put("远侧部细胞核数量", new IndicatorAddIn("", String.valueOf(mucosaCountG), "个", "1"));
+		}
 
 		//		神经部面积占比	1	%	Pars nervosa area%	1=A/H
-		BigDecimal pituitaryA_H = commonJsonParser.getProportion(pituitaryA, pituitaryH);
-		indicatorResultsMap.put("神经部面积占比", new IndicatorAddIn("Pars nervosa area%", String.valueOf(pituitaryA_H), "%", "0"));
+		if(pituitaryA.compareTo(BigDecimal.ZERO) != 0 && pituitaryH.compareTo(BigDecimal.ZERO) != 0){
+			BigDecimal pituitaryA_H = commonJsonParser.getProportion(pituitaryA, pituitaryH);
+			indicatorResultsMap.put("神经部面积占比", new IndicatorAddIn("Pars nervosa area%", String.valueOf(pituitaryA_H), "%", "0"));
+		}
 		//				中间部面积占比	2	%	Pars intermedia area%	2=B/H
-		BigDecimal pituitaryB_H =  commonJsonParser.getProportion(pituitaryB, pituitaryH);
-		indicatorResultsMap.put("中间部面积占比", new IndicatorAddIn("Pars intermedia area%", String.valueOf(pituitaryB_H), "%", "0"));
+		if(pituitaryB.compareTo(BigDecimal.ZERO) != 0 && pituitaryH.compareTo(BigDecimal.ZERO) != 0){
+			BigDecimal pituitaryB_H =  commonJsonParser.getProportion(pituitaryB, pituitaryH);
+			indicatorResultsMap.put("中间部面积占比", new IndicatorAddIn("Pars intermedia area%", String.valueOf(pituitaryB_H), "%", "0"));
+		}
 		//				远侧部面积占比	3	%	Pars distalis area%	3=C/H
-		BigDecimal pituitaryC_H = commonJsonParser.getProportion(pituitaryC, pituitaryH);
-		indicatorResultsMap.put("远侧部面积占比", new IndicatorAddIn("Pars distalis area%", String.valueOf(pituitaryC_H), "%", "0"));
+		if(pituitaryC.compareTo(BigDecimal.ZERO) != 0 && pituitaryH.compareTo(BigDecimal.ZERO) != 0){
+			BigDecimal pituitaryC_H = commonJsonParser.getProportion(pituitaryC, pituitaryH);
+			indicatorResultsMap.put("远侧部面积占比", new IndicatorAddIn("Pars distalis area%", String.valueOf(pituitaryC_H), "%", "0"));
+		}
 		//		
 		//				红细胞面积占比	4	%	Erythrocyte area%	4=D/H
-		BigDecimal pituitaryD_H = commonJsonParser.getProportion(pituitaryD, pituitaryH); 
-		indicatorResultsMap.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", String.valueOf(pituitaryD_H), "%", "0"));
+		if(pituitaryD.compareTo(BigDecimal.ZERO) != 0 && pituitaryH.compareTo(BigDecimal.ZERO) != 0){
+			BigDecimal pituitaryD_H = commonJsonParser.getProportion(pituitaryD, pituitaryH); 
+			indicatorResultsMap.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", String.valueOf(pituitaryD_H), "%", "0"));
+		}
 		//				神经部细胞核密度	5	个/平方毫米	Nucleus density of pars nervosa	5=E/A
-		BigDecimal pituitaryE_A = commonJsonParser.getProportion(new BigDecimal(mucosaCountE), pituitaryA); 
-		indicatorResultsMap.put("神经部细胞核密度", new IndicatorAddIn("Erythrocyte area pars nervosa", String.valueOf(pituitaryE_A), "个/平方毫米", "0"));
+		if(pituitaryA.compareTo(BigDecimal.ZERO) != 0 && mucosaCountE != 0){
+			BigDecimal pituitaryE_A = commonJsonParser.getProportion(new BigDecimal(mucosaCountE), pituitaryA); 
+			indicatorResultsMap.put("神经部细胞核密度", new IndicatorAddIn("Erythrocyte area pars nervosa", String.valueOf(pituitaryE_A), "个/平方毫米", "0"));
+		}
 		//		
 		//				中间部细胞核密度	6	个/平方毫米	Nucleus density of pars intermedia	6=F/B
-		BigDecimal pituitaryF_B = commonJsonParser.getProportion(new BigDecimal(mucosaCountF), pituitaryB); 
-		indicatorResultsMap.put("中间部细胞核密度", new IndicatorAddIn("Nucleus density of pars intermedi", String.valueOf(pituitaryF_B), "个/平方毫米", "0"));
+		if(mucosaCountF != 0 && pituitaryB.compareTo(BigDecimal.ZERO) != 0){
+			BigDecimal pituitaryF_B = commonJsonParser.getProportion(new BigDecimal(mucosaCountF), pituitaryB); 
+			indicatorResultsMap.put("中间部细胞核密度", new IndicatorAddIn("Nucleus density of pars intermedi", String.valueOf(pituitaryF_B), "个/平方毫米", "0"));
+		}
 		//				远侧部细胞核密度	7	个/平方毫米	Nucleus density of 7=G/C
-		BigDecimal pituitaryG_C = commonJsonParser.getProportion(new BigDecimal(mucosaCountG), pituitaryC); 
-		indicatorResultsMap.put("远侧部细胞核密度", new IndicatorAddIn("Nucleus density of pars distalis", String.valueOf(pituitaryG_C), "个/平方毫米", "0"));
+		if(mucosaCountG != 0 && pituitaryC.compareTo(BigDecimal.ZERO) != 0){
+			BigDecimal pituitaryG_C = commonJsonParser.getProportion(new BigDecimal(mucosaCountG), pituitaryC); 
+			indicatorResultsMap.put("远侧部细胞核密度", new IndicatorAddIn("Nucleus density of pars distalis", String.valueOf(pituitaryG_C), "个/平方毫米", "0"));
+		}
 
 
 

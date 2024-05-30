@@ -36,7 +36,7 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy 
 	@Resource
 	private CommonJsonParser commonJsonParser;
 	@Resource
-    private AreaUtils areaUtils;
+	private AreaUtils areaUtils;
 
 	@PostConstruct
 	public void init() {
@@ -70,15 +70,24 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy 
 			areaDecimalB  = new BigDecimal(area);
 		}
 
-		
+
 
 		//主细胞核密度 1=A/B
 		BigDecimal bigDecimaE = commonJsonParser.getProportion(new BigDecimal(mucosaCountA), areaDecimalB);
-		
+
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-		indicatorResultsMap.put("主细胞核数", new IndicatorAddIn("", String.valueOf(mucosaCountA), "个", "1"));
-		indicatorResultsMap.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", String.valueOf(areaDecimalB), "10³平方微米", "0"));
-		indicatorResultsMap.put("主细胞核密度", new IndicatorAddIn("Nucleus density of chief cell", String.valueOf(bigDecimaE), "10³平方微米", "0"));
+
+		if(mucosaCountA > 0){
+			indicatorResultsMap.put("主细胞核数", new IndicatorAddIn("", String.valueOf(mucosaCountA), "个", "1"));
+		}
+		if(areaDecimalB.compareTo(BigDecimal.ZERO) != 0) {
+			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(areaDecimalB), "10³平方微米", "1"));
+			indicatorResultsMap.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", String.valueOf(areaDecimalB), "10³平方微米", "0"));
+		}
+
+		if(bigDecimaE.compareTo(BigDecimal.ZERO) != 0) {
+			indicatorResultsMap.put("主细胞核密度", new IndicatorAddIn("Nucleus density of chief cell", String.valueOf(bigDecimaE), "10³平方微米", "0"));
+		}
 
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 	}
