@@ -9,6 +9,8 @@ import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -97,7 +99,9 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		//        组织轮廓面积	H	平方毫米	无
 		BigDecimal bigDecimalH = BigDecimal.ZERO;
 		String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
-		bigDecimalH = new BigDecimal(slideArea);
+		if(StringUtils.isNotEmpty(slideArea)){
+			bigDecimalH = new BigDecimal(slideArea);
+		}
 
 		//开始计算
 		//		骨髓腔面积	1	平方毫米	Bone marrow area	1=A-G
