@@ -49,6 +49,10 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     @DS("slave")
     Annotation selectById(Annotation annotation);
 
+    Annotation selectByIds(Long annotationId);
+
+    Annotation aiSelectById(Annotation annotation);
+
     int deleteById(Annotation annotation);
 
     List<Annotation> selectInList(MarkingMerge req);
@@ -82,6 +86,12 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     Annotation stContains(Annotation annotation);
 
     List<Annotation> selectAnnotationIsValid(Annotation annotation);
+
+    Annotation stClosestPoint(Annotation annotation);
+
+    Annotation stDistance(Annotation annotation);
+
+    Annotation avgDistance(Annotation annotation);
 
 }
 

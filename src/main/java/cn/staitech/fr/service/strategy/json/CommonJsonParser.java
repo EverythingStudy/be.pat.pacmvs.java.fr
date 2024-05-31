@@ -372,7 +372,7 @@ public class CommonJsonParser {
                 annotation.setStructurePerimeterNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(structure.getPerimeter());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
+                annotation.setStructurePerimeterNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
         }
         return annotation;
@@ -468,7 +468,8 @@ public class CommonJsonParser {
             return BigDecimal.ZERO;
         }
         
-        proportion = bigDecimal1.divide(bigDecimal2).setScale(3, RoundingMode.HALF_UP);
+//        proportion = bigDecimal1.divide(bigDecimal2).setScale(3, RoundingMode.HALF_UP);
+        proportion = bigDecimal1.divide(bigDecimal2,3,RoundingMode.HALF_UP);
         return proportion;
     }
 

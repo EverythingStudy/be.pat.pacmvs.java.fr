@@ -50,10 +50,11 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
             Integer areaCountE = areaUtils.getOrganAreaCount(jsonTask, "11E036");// E 黏膜上皮细胞核数量
 
             // 算法输出指标
-             resultsMap.put("膀胱腔面积", createIndicator(organAreaA.toString(), SQ_MM));
-             resultsMap.put("黏膜上皮面积", createIndicator(organAreaC.toString(), SQ_MM));
-             resultsMap.put("黏膜固有层+黏膜下层面积", createIndicator(organAreaD.toString(), SQ_MM));
-             resultsMap.put("黏液腺细胞核数量", createIndicator(areaCountE.toString(), SQ_MM));
+            resultsMap.put("膀胱腔面积", createIndicator(organAreaA, SQ_MM));
+            resultsMap.put("组织轮廓面积", createIndicator(accurateAreaB, SQ_MM));
+            resultsMap.put("黏膜上皮面积", createIndicator(organAreaC, SQ_MM));
+            resultsMap.put("黏膜固有层+黏膜下层面积", createIndicator(organAreaD, SQ_MM));
+            resultsMap.put("黏膜上皮细胞核数量", createIndicator(areaCountE, PIECE));
 
             // 计算指标
             String result = getArea(accurateAreaB, organAreaA);
