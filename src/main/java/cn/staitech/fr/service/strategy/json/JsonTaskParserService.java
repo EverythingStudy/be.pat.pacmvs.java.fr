@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json;
 
+import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
@@ -20,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -123,7 +126,20 @@ public class JsonTaskParserService {
 
 
         log.info("+++parser2:{}", parser);
-
+        //判断json数据目录是否存在
+        for (JsonFile jsonFile : jsonFileList) {
+        	 String fileUrl = jsonFile.getFileUrl();
+        	 File file = new File(fileUrl);
+             if (!file.exists()) {
+            	 log.info("AI预测切片id:{},算法名称标识:{},目录不存在，地址{}", jsonTask.getSingleId(),jsonTask.getAlgorithmCode(),fileUrl);
+            	 SingleSlide singleSlide = new SingleSlide();
+                 singleSlide.setSingleId(jsonTask.getSingleId());
+                 //0未预测、1预测成功、2预测失败、3预测中
+                 singleSlide.setForecastStatus("2");
+                 singleSlideService.updateById(singleSlide);
+                 return;
+             }
+        }
         Annotation annotation = getAnnotation(jsonTask);
         annotationMapper.deleteAiAnnotation(annotation);
 
