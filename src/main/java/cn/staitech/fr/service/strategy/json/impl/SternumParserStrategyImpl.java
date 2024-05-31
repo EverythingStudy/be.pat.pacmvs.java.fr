@@ -143,29 +143,28 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 
 		//算法保存
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-		if(bigDecimalA.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("骨髓腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA), "平方毫米", "1"));
-		}
-		if(mucosaCountB != 0) {
-			indicatorResultsMap.put("红系细胞核数量", new IndicatorAddIn("", String.valueOf(mucosaCountB), "个", "1"));
-		}
-		if(mucosaCountC != 0) {
-			indicatorResultsMap.put("粒系细胞数量", new IndicatorAddIn("", String.valueOf(mucosaCountC), "个", "1"));
-		}
-		if(mucosaCountD != 0) {
-			indicatorResultsMap.put("巨核系细胞数量", new IndicatorAddIn("", String.valueOf(mucosaCountD), "个", "1"));
-		}
+		//		if(bigDecimalA.compareTo(BigDecimal.ZERO) != 0) {
+		indicatorResultsMap.put("骨髓腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA), "平方毫米", "1"));
+		//		}
+		//		if(mucosaCountB != 0) {
+		indicatorResultsMap.put("红系细胞核数量", new IndicatorAddIn("", String.valueOf(mucosaCountB), "个", "1"));
+		//		}
+		//		if(mucosaCountC != 0) {
+		indicatorResultsMap.put("粒系细胞数量", new IndicatorAddIn("", String.valueOf(mucosaCountC), "个", "1"));
+		//		}
+		//		if(mucosaCountD != 0) {
+		indicatorResultsMap.put("巨核系细胞数量", new IndicatorAddIn("", String.valueOf(mucosaCountD), "个", "1"));
+		//		}
 
-		if(bigDecimalE.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalE), "10³平方微米", "1"));
-		}
-		if(bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("脂肪细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalF), "10³平方微米", "1"));
-		}
-		if(bigDecimalGM.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("骨质面积", new IndicatorAddIn("", String.valueOf(bigDecimalGM), "10³平方微米", "1"));
-		}
-		//indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDecimalH), "平方毫米", "1"));
+		//		if(bigDecimalE.compareTo(BigDecimal.ZERO) != 0) {
+		indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalE), "10³平方微米", "1"));
+		//		}
+		//		if(bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
+		indicatorResultsMap.put("脂肪细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalF), "10³平方微米", "1"));
+		//		}
+		//		if(bigDecimalGM.compareTo(BigDecimal.ZERO) != 0) {
+		indicatorResultsMap.put("骨质面积", new IndicatorAddIn("", String.valueOf(bigDecimalGM), "10³平方微米", "1"));
+		//		}
 
 		//AI指标保存
 		if(BigDecimalA_G.compareTo(BigDecimal.ZERO) != 0) {
@@ -190,17 +189,16 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 			indicatorResultsMap.put("巨核系细胞密度", new IndicatorAddIn("Density of megakaryocyte", String.valueOf(bigDecimalD_A_G), "个/平方毫米", "0"));
 		}
 		if(bigDecimalH.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDecimalH), "平方毫米", "1"));
 			indicatorResultsMap.put("胸骨面积", new IndicatorAddIn("Sternum area", String.valueOf(bigDecimalH), "平方毫米", "0"));
 		}
 
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 
 		Map<String, IndicatorAddIn> indicatorRMap = new HashMap<>();
-		if(bigDecimalA.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorRMap.put("骨髓腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA), "平方毫米", "1"));
-			aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorRMap);
-		}
+		//		if(bigDecimalA.compareTo(BigDecimal.ZERO) != 0) {
+		indicatorRMap.put("骨髓腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA), "平方毫米", "1"));
+		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorRMap);
+		//		}
 	}
 
 	@Override

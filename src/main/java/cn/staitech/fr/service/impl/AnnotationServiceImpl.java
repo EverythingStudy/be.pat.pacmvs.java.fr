@@ -1419,13 +1419,18 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Annotation annotation = new Annotation();
         annotation.setContourOne(contourOne);
         annotation.setContourTwo(contourTwo);
+        // 计算两个图形之间最短距离的两个点
         Annotation annotationDistance = annotationMapper.stClosestPoint(annotation);
         annotationDistanceOut.setContourTypeOne(JSONObject.parseObject(annotationDistance.getContourOne()));
         annotationDistanceOut.setContourTypeTwo(JSONObject.parseObject(annotationDistance.getContourTwo()));
+        // 计算两个图形之间的最短距离
         Annotation annotationMinDistance = annotationMapper.stDistance(annotation);
-        annotationDistanceOut.setMinDistance(annotationMinDistance.getMinDistance());
+        Double minDistance = Double.parseDouble(String.format("%.3f", annotationMinDistance.getMinDistance()));
+        annotationDistanceOut.setMinDistance(minDistance);
+        // 计算两个图形之间的平均距离
         Annotation annotationAvgDistance = annotationMapper.avgDistance(annotation);
-        annotationDistanceOut.setMeanDistance(annotationAvgDistance.getMeanDistance());
+        Double meanDistance = Double.parseDouble(String.format("%.3f", annotationAvgDistance.getMeanDistance()));
+        annotationDistanceOut.setMeanDistance(meanDistance);
         return annotationDistanceOut;
     }
 

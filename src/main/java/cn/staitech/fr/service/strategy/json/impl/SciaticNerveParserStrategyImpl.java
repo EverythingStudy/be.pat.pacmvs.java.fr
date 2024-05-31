@@ -60,7 +60,7 @@ public class SciaticNerveParserStrategyImpl extends AbstractCustomParserStrategy
 			pituitaryA = commonJsonParser.getBigDecimalValue(pituitaryA);
 			String accurateArea = areaUtils.convertToSquareMicrometer(pituitaryA.toString());
 			//神经纤维束面积	1	10³平方微米	Nerve fiber bundles area	1=A
-			indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("", accurateArea, "10³平方微米", "1"));
+//			indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("", accurateArea, "10³平方微米", "1"));
 			indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("Nerve fiber bundles area", accurateArea, "10³平方微米", "0"));
 		}
 

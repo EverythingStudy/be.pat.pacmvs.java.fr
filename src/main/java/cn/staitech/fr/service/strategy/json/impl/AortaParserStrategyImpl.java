@@ -82,21 +82,21 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 
 
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-		if(bigDecimalA.compareTo(BigDecimal.ZERO) != 0){
-			indicatorResultsMap.put("空腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA), "10³平方微米", "1"));
-		}
+		//		if(bigDecimalA.compareTo(BigDecimal.ZERO) != 0){
+		indicatorResultsMap.put("空腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA), "10³平方微米", "1"));
+		//		}
 
-		if(bigDecimalB.compareTo(BigDecimal.ZERO) != 0){
-			indicatorResultsMap.put("空腔周长", new IndicatorAddIn("", String.valueOf(bigDecimalB), "毫米", "1"));
-		}
+		//		if(bigDecimalB.compareTo(BigDecimal.ZERO) != 0){
+		indicatorResultsMap.put("空腔周长", new IndicatorAddIn("", String.valueOf(bigDecimalB), "毫米", "1"));
+		//		}
 
-		if(bigDecimalC.compareTo(BigDecimal.ZERO) != 0){
-			indicatorResultsMap.put("组织轮廓周长", new IndicatorAddIn("", String.valueOf(bigDecimalC), "毫米", "1"));
-		}
+		//		if(bigDecimalC.compareTo(BigDecimal.ZERO) != 0){
+		indicatorResultsMap.put("组织轮廓周长", new IndicatorAddIn("", String.valueOf(bigDecimalC), "毫米", "1"));
+		//		}
 
-		if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0){
-			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDecimalD), "10³平方微米", "1"));
-		}
+		//		if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0){
+		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDecimalD), "10³平方微米", "1"));
+		//		}
 		//1=D-A
 		if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0 && bigDecimalA.compareTo(BigDecimal.ZERO) != 0){
 			indicatorResultsMap.put("主动脉壁面积", new IndicatorAddIn("Aorta wall area", String.valueOf(bigDecimalD.subtract(bigDecimalA)), "10³平方微米", "0"));

@@ -73,7 +73,7 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
         if (!organArea3.equals(BigDecimal.ZERO)){
             indicatorResultsMap.put("红细胞", new IndicatorAddIn("", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         }
-        indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
+        //indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("胸腺面积", new IndicatorAddIn("Thymus Gland area%", singleSlide.getArea(), "平方毫米",CommonConstant.NUMBER_0));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }

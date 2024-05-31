@@ -76,6 +76,8 @@ public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("颗粒层+棘层+基底层面积", new IndicatorAddIn("Granular layer+spinous layer+basal layer", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("黏膜固有层+黏膜肌层+黏膜下层面积", new IndicatorAddIn("Mucosal lamina propria+mucosal muscle layer+submucosal submucosal area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("肌层面积", new IndicatorAddIn("Muscle layer area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("Organizational contour area", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
+
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
         //aiForecastService.addOutIndicators(jsonTask.getSingleId(), indicatorResultsMap);
 

@@ -77,11 +77,11 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy 
 
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-		if(mucosaCountA > 0){
+//		if(mucosaCountA > 0){
 			indicatorResultsMap.put("主细胞核数", new IndicatorAddIn("", String.valueOf(mucosaCountA), "个", "1"));
-		}
+//		}
 		if(areaDecimalB.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(areaDecimalB), "10³平方微米", "1"));
+//			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(areaDecimalB), "10³平方微米", "1"));
 			indicatorResultsMap.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", String.valueOf(areaDecimalB), "10³平方微米", "0"));
 		}
 

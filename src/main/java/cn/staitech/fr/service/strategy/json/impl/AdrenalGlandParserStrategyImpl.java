@@ -63,22 +63,12 @@ public class AdrenalGlandParserStrategyImpl extends AbstractCustomParserStrategy
         BigDecimal organArea2 = getOrganArea(jsonTask, "10103E").getStructureAreaNum();
         Integer count = getOrganAreaCount(jsonTask, "10103D");
         Integer count1 = getOrganAreaCount(jsonTask, "10103E");
-        if (!organArea.equals(BigDecimal.ZERO)){
-            indicatorResultsMap.put("皮质面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        }
-        if (!organArea1.equals(BigDecimal.ZERO)){
-            indicatorResultsMap.put("红细胞面积（全片）", new IndicatorAddIn("", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        }
-        if (!organArea2.equals(BigDecimal.ZERO)){
-            indicatorResultsMap.put("髓质面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        }
-        if (count!=0){
-            indicatorResultsMap.put("皮质细胞核数量", new IndicatorAddIn("", String.valueOf(count), "个", CommonConstant.NUMBER_1));
-        }
-        if (count1!=0){
-            indicatorResultsMap.put("髓质细胞核数量", new IndicatorAddIn("", String.valueOf(count1), "个", CommonConstant.NUMBER_1));
-        }
-        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("皮质面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("红细胞面积（全片）", new IndicatorAddIn("", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("皮质细胞核数量", new IndicatorAddIn("", String.valueOf(count), "个", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("髓质细胞核数量", new IndicatorAddIn("", String.valueOf(count1), "个", CommonConstant.NUMBER_1));
+        //indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("肾上腺面积", new IndicatorAddIn("Adrenal gland area%", singleSlide.getArea(), "平方毫米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }

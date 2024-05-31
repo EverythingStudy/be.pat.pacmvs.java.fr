@@ -86,47 +86,47 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 		if(mucosaCountA > 0){
 			indicatorResultsMap.put("黄体数量", new IndicatorAddIn("Corpus luteum numbers", String.valueOf(mucosaCountA), "个", "0"));
-			indicatorResultsMap.put("黄体数量", new IndicatorAddIn("", String.valueOf(mucosaCountA), "个", "1"));
+			//			indicatorResultsMap.put("黄体数量", new IndicatorAddIn("", String.valueOf(mucosaCountA), "个", "1"));
 		}
 		if(bigDecimalC.compareTo(BigDecimal.ZERO) != 0) {
 			indicatorResultsMap.put("黄体面积（全片）", new IndicatorAddIn("Corpus luteum area(all)", String.valueOf(bigDecimalC), "平方毫米", "0"));
-			indicatorResultsMap.put("黄体面积（全片）", new IndicatorAddIn("", String.valueOf(bigDecimalC), "平方毫米", "1"));
+			//			indicatorResultsMap.put("黄体面积（全片）", new IndicatorAddIn("", String.valueOf(bigDecimalC), "平方毫米", "1"));
 		}
 		if(mucosaCountD > 0){
 			indicatorResultsMap.put("卵泡数量", new IndicatorAddIn("Follicle numbers", String.valueOf(mucosaCountD), "个", "0"));
-			indicatorResultsMap.put("卵泡数量", new IndicatorAddIn("", String.valueOf(mucosaCountD), "个", "1"));
+			//			indicatorResultsMap.put("卵泡数量", new IndicatorAddIn("", String.valueOf(mucosaCountD), "个", "1"));
 		}
-		
-		if(bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("卵泡面积（全片）", new IndicatorAddIn("", String.valueOf(bigDecimalF), "平方毫米", "1"));
-		}
-		
-		if(bigDecimalH.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("血管面积", new IndicatorAddIn("", String.valueOf(bigDecimalH), "平方微米", "1"));
-		}
-		
-		if(bigDecimalI.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalI), "平方微米", "1"));
-		}
-		if(bigDecimalJ.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalJ), "平方微米", "1"));
-		}
+
+		//		if(bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
+		indicatorResultsMap.put("卵泡面积（全片）", new IndicatorAddIn("", String.valueOf(bigDecimalF), "平方毫米", "1"));
+		//		}
+
+		//		if(bigDecimalH.compareTo(BigDecimal.ZERO) != 0) {
+		indicatorResultsMap.put("血管面积", new IndicatorAddIn("", String.valueOf(bigDecimalH), "平方微米", "1"));
+		//		}
+
+		//		if(bigDecimalI.compareTo(BigDecimal.ZERO) != 0) {
+		indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalI), "平方微米", "1"));
+		//		}
+		//		if(bigDecimalJ.compareTo(BigDecimal.ZERO) != 0) {
+		indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalJ), "平方微米", "1"));
+		//		}
 		/*
 		if(bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
 			indicatorResultsMap.put("卵泡面积（全片）", new IndicatorAddIn("Follicle area", String.valueOf(bigDecimalF), "平方毫米", "0"));
 		}
-		
+
 		if(bigDecimalH.compareTo(BigDecimal.ZERO) != 0) {
 			indicatorResultsMap.put("血管面积", new IndicatorAddIn("Vessel area", String.valueOf(bigDecimalH), "平方微米", "0"));
 		}
-		
+
 		if(bigDecimalI.compareTo(BigDecimal.ZERO) != 0) {
 			indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", String.valueOf(bigDecimalI), "平方微米", "0"));
 		}
 		if(bigDecimalJ.compareTo(BigDecimal.ZERO) != 0) {
 			indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", String.valueOf(bigDecimalJ), "平方微米", "0"));
 		}
-		*/
+		 */
 		if(StringUtils.isNotEmpty(slideArea)) {
 			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", slideArea, "平方毫米", "1"));
 		}
