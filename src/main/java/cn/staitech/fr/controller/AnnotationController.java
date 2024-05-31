@@ -11,10 +11,7 @@ import cn.staitech.fr.vo.annotation.AnnotationById;
 import cn.staitech.fr.vo.annotation.AnnotationSelectList;
 import cn.staitech.fr.vo.annotation.MarkingMerge;
 import cn.staitech.fr.vo.geojson.Features;
-import cn.staitech.fr.vo.geojson.in.RoiIn;
-import cn.staitech.fr.vo.geojson.in.UpdateOperationIn;
-import cn.staitech.fr.vo.geojson.in.ViewAddIn;
-import cn.staitech.fr.vo.geojson.in.ViewAddInList;
+import cn.staitech.fr.vo.geojson.in.*;
 import cn.staitech.fr.vo.geojson.out.BatchResult;
 import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiImplicitParam;
@@ -37,14 +34,11 @@ public class AnnotationController {
     @Resource
     private AnnotationMapper annotationMapper;
 
-    @PostMapping("/intersects")
-    public R<String> intersects(@RequestBody ViewAddIn res)  {
-        Annotation annotation = annotationMapper.collectGeometry(133L);
-        annotation.setContour(String.valueOf(res.getGeometry()));
-        Annotation annotationBy = annotationMapper.intersectsGeometry(annotation);
-        // annotationBy.getIntersectsResults()=t代表true,f代表false
-        // 结果等于true表示当前ai轮廓在精细轮廓中(可插入数据库),反之相反
-        return R.ok(annotationBy.getIntersectsResults());
+
+    @PostMapping("/getDistance")
+    public R<Annotation> getDistance(@RequestBody DistanceGet res)  {
+        Annotation annotation = annotationService.getDistance(res);
+        return R.ok(annotation);
     }
 
 

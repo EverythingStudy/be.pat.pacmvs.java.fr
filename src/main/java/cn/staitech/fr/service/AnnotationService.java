@@ -8,6 +8,7 @@ import cn.staitech.fr.vo.annotation.AnnotationCountByCategory;
 import cn.staitech.fr.vo.annotation.AnnotationSelectList;
 import cn.staitech.fr.vo.annotation.MarkingMerge;
 import cn.staitech.fr.vo.geojson.Features;
+import cn.staitech.fr.vo.geojson.in.DistanceGet;
 import cn.staitech.fr.vo.geojson.in.RoiIn;
 import cn.staitech.fr.vo.geojson.in.UpdateOperationIn;
 import cn.staitech.fr.vo.geojson.in.ViewAddIn;
@@ -60,4 +61,6 @@ public interface AnnotationService extends IService<Annotation> {
      * @param batchSize
      */
     void batchProcessAndSave(Annotation annotation, int batchSize);
+
+    Annotation getDistance(DistanceGet distanceGet);
 }

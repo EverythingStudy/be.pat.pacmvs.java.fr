@@ -289,6 +289,60 @@
         where annotation_id = #{annotationId}
     </select>
 
+    <select id="selectByIds" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        select annotation_id,
+               area,
+               perimeter,
+               description,
+               category_id,
+               location_type,
+               annotation_type,
+               create_by,
+               create_time,
+               update_by,
+               update_time,
+               slide_id,
+               id,
+               contour_type,
+               single_slide_id,
+               single,
+               ST_AsGeoJSON(contour40000) AS contour,
+               ST_AsGeoJSON(contour40000) AS contour40000,
+               ST_AsGeoJSON(contour10000) AS contour10000,
+               ST_AsGeoJSON(contour2500)  AS contour2500,
+               ST_AsGeoJSON(contour625)   AS contour625
+        from fr_annotation
+        where annotation_id = #{annotationId}
+    </select>
+
+    <select id="aiSelectById" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        select annotation_id,
+               area,
+               perimeter,
+               description,
+               category_id,
+               location_type,
+               annotation_type,
+               create_by,
+               create_time,
+               update_by,
+               update_time,
+               slide_id,
+               id,
+               contour_type,
+               single_slide_id,
+               single,
+               ST_AsGeoJSON(contour40000) AS contour,
+               ST_AsGeoJSON(contour40000) AS contour40000,
+               ST_AsGeoJSON(contour10000) AS contour10000,
+               ST_AsGeoJSON(contour2500)  AS contour2500,
+               ST_AsGeoJSON(contour625)   AS contour625
+        from fr_ai_annotation_${sequenceNumber}
+        where annotation_id = #{annotationId}
+    </select>
+
     <select id="selectListBy" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
         select
@@ -657,6 +711,19 @@
           and ST_IsValid(contour40000) = 't'
           and single_slide_id = #{singleSlideId}
     </select>
+
+    <select id="stClosestPoint" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT
+            st_asgeojson ( st_closestpoint ( st_geomfromgeojson ( #{contourOne} ), st_geomfromgeojson ( #{contourTwo} ) ) ) AS contourOne,
+            st_asgeojson ( st_closestpoint ( st_geomfromgeojson ( #{contourTwo} ), st_geomfromgeojson ( #{contourOne} ) ) ) AS contourTwo
+    </select>
+
+
+    <select id="stDistance" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT
+            ST_Distance ( st_geomfromgeojson ( #{contourOne} ), st_geomfromgeojson ( #{contourTwo} ) ) AS minDistance
+    </select>
+
 
 
 

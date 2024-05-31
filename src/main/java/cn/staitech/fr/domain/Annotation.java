@@ -185,6 +185,18 @@ public class Annotation implements Serializable {
     @TableField(exist = false)
     private String cellType;
 
+    @TableField(exist = false)
+    private String contourOne;
+
+    @TableField(exist = false)
+    private String contourTwo;
+
+    @TableField(exist = false)
+    private Double meanDistance;
+
+    @TableField(exist = false)
+    private Double minDistance;
+
     @Override
     public boolean equals(Object that) {
         if (this == that) {
