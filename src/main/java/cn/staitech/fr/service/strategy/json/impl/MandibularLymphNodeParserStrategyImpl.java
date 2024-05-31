@@ -78,9 +78,10 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
 
-        indicatorResultsMap.put("生发中心数量", new IndicatorAddIn("Number of germinal center", germinalCenterCount.toString(), "个"));
+        indicatorResultsMap.put("生发中心数量", new IndicatorAddIn("Number of germinal center", germinalCenterCount.toString(), "个", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("生发中心面积（全片）", new IndicatorAddIn("Number of germinal center", germinalCenterArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("髓质面积", new IndicatorAddIn("Medulla area", medullaArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+
         indicatorResultsMap.put("淋巴结面积", new IndicatorAddIn("Lymph node area", accurateArea, "平方毫米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
