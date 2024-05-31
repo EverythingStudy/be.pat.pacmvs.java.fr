@@ -85,7 +85,7 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
     protected IndicatorAddIn createIndicator(Object result, String unit) {
         if (result instanceof BigDecimal) {
             BigDecimal roundedResult = ((BigDecimal) result).setScale(3, RoundingMode.HALF_UP);
-            return new IndicatorAddIn(String.valueOf(roundedResult), unit, CommonConstant.NUMBER_1);
+            return new IndicatorAddIn("", String.valueOf(roundedResult), unit, CommonConstant.NUMBER_1);
         }
         return new IndicatorAddIn("", String.valueOf(result), unit, CommonConstant.NUMBER_1);
     }
