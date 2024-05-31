@@ -10,10 +10,10 @@ import javax.validation.constraints.NotNull;
 public class DistanceGet {
 
 
-    @ApiModelProperty(value = "标注id")
+    @ApiModelProperty(value = "标注id", required = true)
     private Long annotationIdOne;
 
-    @ApiModelProperty(value = "标注id")
+    @ApiModelProperty(value = "标注id", required = true)
     private Long annotationIdTwo;
 
     @ApiModelProperty(value = "标注类型")
@@ -28,7 +28,7 @@ public class DistanceGet {
     @ApiModelProperty(value = "轮廓类型")
     private Long contourTypeTwo;
 
-    @ApiModelProperty(value = "专题id")
+    @ApiModelProperty(value = "专题id", required = true)
     private Long specialId;
 
 
