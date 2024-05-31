@@ -46,7 +46,7 @@ public class ParotidGlandParserStrategyImpl extends AbstractCustomParserStrategy
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// D组织轮廓
 
         // 算法输出指标
-        resultsMap.put("腺泡细胞核数量", createIndicator(areaCountA.toString(), PIECE));
+        resultsMap.put("腺泡细胞核数量", createIndicator(areaCountA, PIECE));
         resultsMap.put("导管面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaB.toString()), SQ_UM_THOUSAND));
         resultsMap.put("髓质面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaC.toString()), SQ_UM_THOUSAND));
 
