@@ -25,9 +25,11 @@ import cn.staitech.fr.vo.annotation.MarkingMerge;
 import cn.staitech.fr.vo.geojson.Features;
 import cn.staitech.fr.vo.geojson.Properties;
 import cn.staitech.fr.vo.geojson.PropertiesBriefly;
+import cn.staitech.fr.vo.geojson.in.DistanceGet;
 import cn.staitech.fr.vo.geojson.in.RoiIn;
 import cn.staitech.fr.vo.geojson.in.UpdateOperationIn;
 import cn.staitech.fr.vo.geojson.in.ViewAddIn;
+import cn.staitech.fr.vo.geojson.out.AnnotationDistanceOut;
 import cn.staitech.fr.vo.geojson.out.BatchResult;
 import cn.staitech.fr.vo.measure.BroadcastVO;
 import cn.staitech.system.api.domain.SysUser;
@@ -405,6 +407,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1, category.getCategoryAbbreviation(), special.getSpecialName());
             AlgorithmAnnIn algorithmAnnIn = new AlgorithmAnnIn();
             algorithmAnnIn.setSlideId(slide.getSlideId());
+            algorithmAnnIn.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
             algorithmPredictionService.recognition(algorithmAnnIn);
             // 切图完成后更新切片状态
             if (slide.getProcessFlag() != 2) {
@@ -587,6 +590,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             asyncTask.generateThumbnail(annotationBy.getSlideId(), annotationBy.getCategoryId(), image.getImageUrl(), contourList, type, category.getCategoryAbbreviation(), special.getSpecialName());
             AlgorithmAnnIn algorithmAnnIn = new AlgorithmAnnIn();
             algorithmAnnIn.setSlideId(slide.getSlideId());
+            algorithmAnnIn.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
             algorithmPredictionService.recognition(algorithmAnnIn);
         }
         String traceId = req.getTraceId();
@@ -738,6 +742,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                 asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourListAfter, 1, categoryAbbreviation, special.getSpecialName());
                 AlgorithmAnnIn algorithmAnnIn = new AlgorithmAnnIn();
                 algorithmAnnIn.setSlideId(slide.getSlideId());
+                algorithmAnnIn.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
                 algorithmPredictionService.recognition(algorithmAnnIn);
             }
         }
@@ -937,6 +942,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             asyncTask.generateThumbnail(annotation.getSlideId(), annotation.getCategoryId(), image.getImageUrl(), contourList, 1, category.getCategoryAbbreviation(), special.getSpecialName());
             AlgorithmAnnIn algorithmAnnIn = new AlgorithmAnnIn();
             algorithmAnnIn.setSlideId(slide.getSlideId());
+            algorithmAnnIn.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
             algorithmPredictionService.recognition(algorithmAnnIn);
         }
         {
@@ -1400,6 +1406,58 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                 log.error("Error occurred while processing batch: " + e.getMessage(), e);
             }
         }
+    }
+
+
+    @Override
+    public AnnotationDistanceOut getDistance(DistanceGet req){
+        AnnotationDistanceOut annotationDistanceOut = new AnnotationDistanceOut();
+        LambdaQueryWrapper<SpecialAnnotationRel> queryWrapper = new LambdaQueryWrapper<SpecialAnnotationRel>().eq(SpecialAnnotationRel::getSpecialId, req.getSpecialId());
+        SpecialAnnotationRel specialAnnotationRel = specialAnnotationRelMapper.selectOne(queryWrapper);
+        String contourOne = selectContour(req.getAnnotationIdOne(),req.getAnnotationTypeOne(),req.getContourTypeOne(),specialAnnotationRel.getSequenceNumber());
+        String contourTwo = selectContour(req.getAnnotationIdTwo(),req.getAnnotationTypeTwo(),req.getContourTypeTwo(),specialAnnotationRel.getSequenceNumber());
+        Annotation annotation = new Annotation();
+        annotation.setContourOne(contourOne);
+        annotation.setContourTwo(contourTwo);
+        Annotation annotationDistance = annotationMapper.stClosestPoint(annotation);
+        annotationDistanceOut.setContourTypeOne(JSONObject.parseObject(annotationDistance.getContourOne()));
+        annotationDistanceOut.setContourTypeTwo(JSONObject.parseObject(annotationDistance.getContourTwo()));
+        Annotation annotationMinDistance = annotationMapper.stDistance(annotation);
+        annotationDistanceOut.setMinDistance(annotationMinDistance.getMinDistance());
+        Annotation annotationAvgDistance = annotationMapper.avgDistance(annotation);
+        annotationDistanceOut.setMeanDistance(annotationAvgDistance.getMeanDistance());
+        return annotationDistanceOut;
+    }
+
+
+    @Resource
+    private MeasureMapper measureMapper;
+
+
+
+    private String selectContour(Long annotationId,String annotationType,Long contourType,Long sequenceNumber) {
+        String contour = null;
+        if(Objects.equals(annotationType, "Draw")){
+            // 根据主键查询fr_annotation表中详情信息
+            contour = annotationMapper.selectByIds(annotationId).getContour();
+        } else if (Objects.equals(annotationType, "Measure")) {
+            // 根据主键查询fr_measure表中信息
+            contour = measureMapper.selectById(annotationId).getContour();
+        }else{
+            if(contourType == 3){
+                // 根据主键查询fr_annotation表中详情信息
+                contour = annotationMapper.selectByIds(annotationId).getContour();
+            }else{
+                // 查询fr_ai_annotation表中信息
+                Annotation annotation = new Annotation();
+                annotation.setAnnotationId(annotationId);
+                annotation.setSequenceNumber(sequenceNumber);
+                contour = annotationMapper.aiSelectById(annotation).getContour();
+            }
+        }
+        return contour;
+
+
     }
 
 }

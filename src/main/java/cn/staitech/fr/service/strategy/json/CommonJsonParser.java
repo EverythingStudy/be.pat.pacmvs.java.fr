@@ -468,7 +468,8 @@ public class CommonJsonParser {
             return BigDecimal.ZERO;
         }
         
-        proportion = bigDecimal1.divide(bigDecimal2).setScale(3, RoundingMode.HALF_UP);
+//        proportion = bigDecimal1.divide(bigDecimal2).setScale(3, RoundingMode.HALF_UP);
+        proportion = bigDecimal1.divide(bigDecimal2,3,RoundingMode.HALF_UP);
         return proportion;
     }
 
