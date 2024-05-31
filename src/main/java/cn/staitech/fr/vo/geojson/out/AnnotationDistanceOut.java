@@ -1,15 +1,16 @@
 package cn.staitech.fr.vo.geojson.out;
 
+import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
 public class AnnotationDistanceOut {
     @ApiModelProperty(value = "轮廓点一")
-    private String contourTypeOne;
+    private JSONObject contourTypeOne;
 
     @ApiModelProperty(value = "轮廓点二")
-    private String contourTypeTwo;
+    private JSONObject contourTypeTwo;
 
     @ApiModelProperty(value = "平均间距")
     private Double meanDistance;

@@ -12,6 +12,7 @@ import cn.staitech.fr.vo.annotation.AnnotationSelectList;
 import cn.staitech.fr.vo.annotation.MarkingMerge;
 import cn.staitech.fr.vo.geojson.Features;
 import cn.staitech.fr.vo.geojson.in.*;
+import cn.staitech.fr.vo.geojson.out.AnnotationDistanceOut;
 import cn.staitech.fr.vo.geojson.out.BatchResult;
 import com.alibaba.fastjson.JSONObject;
 import io.swagger.annotations.ApiImplicitParam;
@@ -36,9 +37,9 @@ public class AnnotationController {
 
 
     @PostMapping("/getDistance")
-    public R<Annotation> getDistance(@RequestBody DistanceGet res)  {
-        Annotation annotation = annotationService.getDistance(res);
-        return R.ok(annotation);
+    @ApiOperation(value = "获取间距")
+    public R<AnnotationDistanceOut> getDistance(@RequestBody DistanceGet res)  {
+        return R.ok(annotationService.getDistance(res));
     }
 
 

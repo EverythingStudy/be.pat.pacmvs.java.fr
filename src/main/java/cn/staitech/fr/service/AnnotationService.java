@@ -12,6 +12,7 @@ import cn.staitech.fr.vo.geojson.in.DistanceGet;
 import cn.staitech.fr.vo.geojson.in.RoiIn;
 import cn.staitech.fr.vo.geojson.in.UpdateOperationIn;
 import cn.staitech.fr.vo.geojson.in.ViewAddIn;
+import cn.staitech.fr.vo.geojson.out.AnnotationDistanceOut;
 import cn.staitech.fr.vo.geojson.out.BatchResult;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -62,5 +63,5 @@ public interface AnnotationService extends IService<Annotation> {
      */
     void batchProcessAndSave(Annotation annotation, int batchSize);
 
-    Annotation getDistance(DistanceGet distanceGet);
+    AnnotationDistanceOut getDistance(DistanceGet distanceGet);
 }

@@ -1410,7 +1410,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
 
     @Override
-    public Annotation getDistance(DistanceGet req){
+    public AnnotationDistanceOut getDistance(DistanceGet req){
         AnnotationDistanceOut annotationDistanceOut = new AnnotationDistanceOut();
         LambdaQueryWrapper<SpecialAnnotationRel> queryWrapper = new LambdaQueryWrapper<SpecialAnnotationRel>().eq(SpecialAnnotationRel::getSpecialId, req.getSpecialId());
         SpecialAnnotationRel specialAnnotationRel = specialAnnotationRelMapper.selectOne(queryWrapper);
@@ -1420,11 +1420,13 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setContourOne(contourOne);
         annotation.setContourTwo(contourTwo);
         Annotation annotationDistance = annotationMapper.stClosestPoint(annotation);
-        annotationDistanceOut.setContourTypeOne(annotationDistance.getContourOne());
-        annotationDistanceOut.setContourTypeTwo(annotationDistance.getContourTwo());
+        annotationDistanceOut.setContourTypeOne(JSONObject.parseObject(annotationDistance.getContourOne()));
+        annotationDistanceOut.setContourTypeTwo(JSONObject.parseObject(annotationDistance.getContourTwo()));
         Annotation annotationMinDistance = annotationMapper.stDistance(annotation);
         annotationDistanceOut.setMinDistance(annotationMinDistance.getMinDistance());
-        return new Annotation();
+        Annotation annotationAvgDistance = annotationMapper.avgDistance(annotation);
+        annotationDistanceOut.setMeanDistance(annotationAvgDistance.getMeanDistance());
+        return annotationDistanceOut;
     }
 
 

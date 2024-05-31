@@ -91,6 +91,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     Annotation stDistance(Annotation annotation);
 
+    Annotation avgDistance(Annotation annotation);
+
 }
 
 
