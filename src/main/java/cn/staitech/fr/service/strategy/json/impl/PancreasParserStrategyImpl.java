@@ -84,34 +84,23 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
         Integer count1 = getOrganAreaCount(jsonTask, "105077");
         Integer count2 = getOrganAreaCount(jsonTask, "10506F");
         Integer count3 = getOrganAreaCount(jsonTask, "105078");
-        if (!organArea.equals(BigDecimal.ZERO)){
             indicatorResultsMap.put("酶原颗粒面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        }
-        if (!organArea1.equals(BigDecimal.ZERO)){
             indicatorResultsMap.put("胰岛面积（全片）", new IndicatorAddIn("", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        }
-        if (!organArea2.equals(BigDecimal.ZERO)){
+
             indicatorResultsMap.put("间质面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        }
-        if (!organArea3.equals(BigDecimal.ZERO)){
+
             indicatorResultsMap.put("导管面积（全片）", new IndicatorAddIn("", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        }
-        if (!organArea4.equals(BigDecimal.ZERO)){
+
             indicatorResultsMap.put("血管面积", new IndicatorAddIn("", organArea4.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        }
-        if (count!=0){
+
             indicatorResultsMap.put("上皮细胞核数量", new IndicatorAddIn("", String.valueOf(count), "个", CommonConstant.NUMBER_1));
-        }
-        if (count1!=0){
+
             indicatorResultsMap.put("胰岛数量", new IndicatorAddIn("", String.valueOf(count1), "个", CommonConstant.NUMBER_1));
-        }
-        if (count2!=0){
+
             indicatorResultsMap.put("导管数量", new IndicatorAddIn("", String.valueOf(count2), "个", CommonConstant.NUMBER_1));
-        }
-        if (count3!=0){
+
             indicatorResultsMap.put("胰岛细胞核数量（全片）", new IndicatorAddIn("", String.valueOf(count3), "个", CommonConstant.NUMBER_1));
-        }
-        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
+        //indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("胰腺面积", new IndicatorAddIn("Pancreas area%", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_0));
 
         indicatorResultsMap.put("胰岛面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT,CommonConstant.NUMBER_1));
