@@ -48,7 +48,7 @@ public class ParotidGlandParserStrategyImpl extends AbstractCustomParserStrategy
         // 算法输出指标
         resultsMap.put("腺泡细胞核数量", createIndicator(areaCountA, PIECE));
         resultsMap.put("导管面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaB.toString()), SQ_UM_THOUSAND));
-        resultsMap.put("髓质面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaC.toString()), SQ_UM_THOUSAND));
+        resultsMap.put("血管面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaC.toString()), SQ_UM_THOUSAND));
 
         // 计算指标
         BigDecimal nucleusResult = getNucleusResult(areaCountA, slideArea);// A/D
