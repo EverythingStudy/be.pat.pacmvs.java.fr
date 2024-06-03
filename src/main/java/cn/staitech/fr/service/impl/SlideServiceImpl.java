@@ -182,6 +182,10 @@ implements SlideService {
 	@Override
 	public R deleteAll(Long specialId,Long slideId) {
 		log.info("删除全部切片接口开始：");
+		boolean allDel = true;
+		if(ObjectUtil.isNotEmpty(slideId)){
+			allDel = false;
+		}
 		//fr_slide 切片删除
 		QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq(ObjectUtil.isNotEmpty(specialId),"special_id",specialId);
@@ -190,6 +194,18 @@ implements SlideService {
 		queryWrapper.eq("del_flag",CommonConstant.NUMBER_0);
 		List<Slide> slideList = list(queryWrapper);
 		if(CollectionUtils.isNotEmpty(slideList)){
+			//2024.06.03 如果是全部删除，需要校验下当前数据中数据有切图中的数据
+			//processFlag 处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
+			List<Integer> processFlags = slideList.stream().map(Slide::getProcessFlag).distinct().collect(Collectors.toList()); // 收集结果到新的List中
+			if(CollectionUtils.isNotEmpty(processFlags) && processFlags.contains(1)){
+				if(allDel){
+					//全部删除
+					return R.fail(MessageSource.M("SLIDE.ALL.DELETE.MSG"));
+				}else{
+					//单个删除
+					return R.fail(MessageSource.M("SLIDE.ONE.DELETE.MSG"));
+				}
+			}
 			//当前专题
 			UpdateWrapper<Slide> updateWrapper = new UpdateWrapper<>();
 			updateWrapper.eq(ObjectUtil.isNotEmpty(specialId),"special_id", specialId);
