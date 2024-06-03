@@ -55,10 +55,10 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
 
         // 算法输出指标
         resultsMap.put("生精小管面积（全片）", createIndicator(organAreaB, SQ_MM));
-        resultsMap.put("生精小管周长（单个）", createIndicator(perimeterC, MM));
         resultsMap.put("生精小管数量", createIndicator(areaCountD, PIECE));
         resultsMap.put("间质细胞核数量", createIndicator(areaCountH, PIECE));
-        resultsMap.put("血管面积", createIndicator(organAreaI, SQ_MM));
+        //resultsMap.put("血管面积", createIndicator(organAreaI, SQ_MM));
+        resultsMap.put("生精小管周长（单个）", createDefaultIndicator());
         resultsMap.put("生精小管面积（单个）", createDefaultIndicator());// A生精小管面积（单个）
         resultsMap.put("生精小管内腔面积（单个）", createDefaultIndicator());// E生精小管内腔面积（单个）
 
