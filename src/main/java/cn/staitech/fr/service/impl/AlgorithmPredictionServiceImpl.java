@@ -255,9 +255,9 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		Special special = specialMapper.selectById(slideInfo.getSpecialId());
 		Long organizationId = special.getOrganizationId();
 
-		//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
+		//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败  4：禁止切图）
 		int processFlag = slide.getProcessFlag();
-		if(processFlag == 3){
+		if(processFlag == 3 || processFlag == 4){
 			//更新checkStatus
 			Slide updateSlide = new Slide();
 			updateSlide.setSlideId(slideId);
