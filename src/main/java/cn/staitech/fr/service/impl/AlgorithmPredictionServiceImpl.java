@@ -220,21 +220,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 
 
 	public void checkSlide(Slide slide) {
-		//启动时间
-		Date initiateTime =slide.getInitiateTime();
-		Date currentTime = DateUtil.date();
-		if(null != initiateTime){
-			Image image = imageMapper.selectById(slide.getImageId());
-			// Calculate the difference in milliseconds
-			Long diffInMilliseconds = currentTime.getTime() - initiateTime.getTime();
-			// Convert the difference to seconds
-			double diffInSeconds = diffInMilliseconds.doubleValue() / 1000L;
-			String imageSize = "";
-			if(StringUtils.isNotEmpty(image.getSize())){
-				imageSize = String.format("%.2f", Long.parseLong(image.getSize()) / (1024.0 * 1024.0)) + "MB";
-			}
-			log.info("AI统脏器识别算法耗时统计,slideId:{},imageId:{},切片名称：{},切片大小：{},开始时间：{},结束时间：{},总共历时：{}秒", slide.getSlideId(),slide.getImageId(),image.getImageName(),imageSize,DateUtil.format(slide.getInitiateTime(), "yyyy-MM-dd HH:mm:ss") ,DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss"),diffInSeconds);
-		}
 		//切片名称解析，0：成功；1：失败
 		String analyzeStatus = slide.getAnalyzeStatus();
 		if(StringUtils.isNotEmpty(analyzeStatus) && analyzeStatus.equals("1")){
@@ -404,7 +389,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			//模糊匹配
 			if (organName.contains(slideOrganName)) {
 				//数量相等
-				if (organNumber == slideOrganNumber) {
+				if (organNumber <= slideOrganNumber) {
 					containsValue = true;
 					break;
 				}

@@ -113,13 +113,15 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 		indicatorResultsMap.put("脊髓面积（单个）", new IndicatorAddIn("Sternum area", String.valueOf(BigDecimalA_add_B), "平方毫米", "0"));*/
 		
 //        indicatorResultsMap.put("乳腺腺泡/导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+		String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+		
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 		indicatorResultsMap.put("灰质面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT , CommonConstant.NUMBER_1));
 		indicatorResultsMap.put("白质面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT , CommonConstant.NUMBER_1));
 		indicatorResultsMap.put("中央管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT , CommonConstant.NUMBER_1));
 		indicatorResultsMap.put("室管膜细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT , CommonConstant.NUMBER_1));
 		indicatorResultsMap.put("红细胞面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT , CommonConstant.NUMBER_1));
-
+		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", slideArea, "平方毫米", "1"));
 
 		
 		//AI指标保存
