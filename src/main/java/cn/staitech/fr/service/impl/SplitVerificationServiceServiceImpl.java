@@ -25,6 +25,7 @@ import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.Category;
+import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.WaxBlockInfo;
 import cn.staitech.fr.domain.in.ResultCorrectionIn;
@@ -61,9 +62,9 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 
 	@Resource
 	private WaxBlockInfoService waxBlockInfoService;
-	
+
 	@Resource
-    private CategoryService categoryService;
+	private CategoryService categoryService;
 
 	@Override
 	public PageResponse<SplitVerificationOut>  getList(SplitVerificationQueryIn req) {
@@ -71,15 +72,15 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		PageResponse<SplitVerificationOut> pageResponse = new PageResponse<>();
 		//查看切片明细  0：否  1：是
 		int detailType = req.getDetailType();
-		
+
 		////2024.05.28新增合并标签查询过滤
 		QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq("del_flag", 1);
 		queryWrapper.eq("organization_id", organizationId);
 		List<Category> categoryList =  categoryService.list(queryWrapper);
 		List<Long> categoryIdList = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
-		
-		
+
+
 		if(detailType == 0){
 			pageResponse = SplitVerificationCount(req,organizationId,categoryIdList);
 		}else{
@@ -124,8 +125,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		}
 
 		Long reqCategoryId = req.getCategoryId();
-		
-		
+
+
 		if(null != reqCategoryId){
 			Annotation annotation = new Annotation();
 			annotation.setCategoryId(reqCategoryId);
@@ -159,29 +160,29 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			}
 			String oCategory = organizationId.toString()+reqCategoryId.toString();
 			String categoryName = MapConstant.getCategory(oCategory);
-//			queryWrapper.like("organs",categoryName);
-			
+			//			queryWrapper.like("organs",categoryName);
+
 			queryWrapper.like("organs", categoryName);
 			if(CollectionUtils.isNotEmpty(annoSlideIdList)){
 				queryWrapper.or().in("slide_id", annoSlideIdList);
 			}
-			
+
 		}
 
-		
-		
+
+
 
 		List<Slide> slideList = slideService.list(queryWrapper);
-		
+
 		//TODO 查询当前专题下蜡块信息
 		List<WaxBlockInfo> specialWaxinfoList = waxBlockInfoService.getSpecialWaxBlockInfoList(req.getSpecialId());
 		//蜡块分组处理
 		Map<String, List<WaxBlockInfo>> specialWaxinfoGroupMap = specialWaxinfoList.stream().collect(Collectors.groupingBy(d -> fetchGroupKey(d.getWaxCode(),d.getGenderFlag())));
 
-		
+
 
 		Map<String,Map<String, Long>> specialWaxCategoryCountMap = new HashMap<>();
-		
+
 		for (Map.Entry<String, List<WaxBlockInfo>> entry : specialWaxinfoGroupMap.entrySet()) {
 			String waxCodegetGender = entry.getKey();
 			List<WaxBlockInfo> wbiList = entry.getValue();
@@ -202,12 +203,12 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 					}
 				}
 			}
-			
+
 			//汇总专题蜡块信息
 			specialWaxCategoryCountMap.put(waxCodegetGender, specialWaxCategoryMap);
 		}
-		
-		
+
+
 		//动物编号处理
 		if(CollectionUtils.isNotEmpty(slideList)){
 			//获取所有动物号
@@ -224,8 +225,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 			List<Slide> animalAllSlideList = slideService.list(animalQueryWrapper);
 			//分组处理
 			Map<String, List<Slide>> groupAnimalSlide = animalAllSlideList.stream().collect(Collectors.groupingBy(Slide::getAnimalCode));
-			
-			
+
+
 			for(Slide slide:slideList){
 				String animalCode = slide.getAnimalCode();
 				/*//查询当前专题下当前动物编号的所有切片
@@ -247,7 +248,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 					if(null != checkMap && checkMap.containsKey(3)){
 						allCheckStatus = 1;
 					}
-					
+
 					Map<String, Long> waxCategoryMap = new HashMap<String, Long>();
 					for(Slide slidePer:animalSlideList){
 						//切图结果==》按照动物编号统计汇总
@@ -292,7 +293,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 								annoCategoryMap.put(categoryFullName, categoryCount);
 							}
 						}
-						
+
 						if(null != annoCategoryMap && !annoCategoryMap.isEmpty()){
 							annoCategoryMap = annoCategoryMap.entrySet().stream()
 									.sorted(Map.Entry.comparingByKey())
@@ -311,11 +312,11 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 					SplitVerificationOut svOut = new SplitVerificationOut();
 					svOut.setAnimalCode(animalCode);
 					svOut.setProcessFlag(allCheckStatus);
-//					svOut.setWaxOrgan(waxCategoryMap);
+					//					svOut.setWaxOrgan(waxCategoryMap);
 					svOut.setWaxOrgan(getCategoryNumber(waxCategoryMap, annoCategoryMap,null));
 					svOut.setAnnoOrgan(getCategoryNumber(annoCategoryMap, waxCategoryMap,null));
 					//TODO v0.27   标签颜色处理
-					
+
 					dataList.add(svOut);
 				}
 			}
@@ -370,7 +371,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		}
 		return pageResponse;
 	}
-	
+
 	//颜色处理
 	private List<CategoryChild> getCategoryNumber(Map<String, Long> frontCategoryMap,Map<String, Long> backCategoryMap,Integer checkStatus){
 		List<CategoryChild> list = new ArrayList<>();
@@ -410,8 +411,8 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		}
 		return list;
 	}
-	
-	
+
+
 	//模糊匹配，判断是否包括该脏器
 	private boolean containsOrgan(String categoryName,Long categoryNumber,Map<String, Long> backCategoryMap){
 		boolean containsValue  = false;
@@ -510,7 +511,7 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 						}
 					}
 				}
-				
+
 
 				//切片蜡片信息汇总
 				//查询当前专题下当前动物编号的所有切片
@@ -526,12 +527,15 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 						waxCategoryMap.put(organName, organNumber.longValue());
 					}
 				}
-				
-//				out.setWaxOrgan(waxCategoryMap);
-//				out.setAnnoOrgan(annoCategoryMap);
-				
-				out.setWaxOrgan(getCategoryNumber(waxCategoryMap, annoCategoryMap,out.getCheckStatus()));
-				out.setAnnoOrgan(getCategoryNumber(annoCategoryMap, waxCategoryMap,out.getCheckStatus()));
+
+				//				out.setWaxOrgan(waxCategoryMap);
+				//				out.setAnnoOrgan(annoCategoryMap);
+				List<CategoryChild> waxOrganList = getCategoryNumber(waxCategoryMap, annoCategoryMap,out.getCheckStatus());
+				List<CategoryChild> annoOrganList = getCategoryNumber(annoCategoryMap, waxCategoryMap,out.getCheckStatus());
+				//重新处理下颜色（针对数量不相等的情况）
+				List<List<CategoryChild>> buildeList = getCategoryColourNumber(waxOrganList, annoOrganList);
+				out.setWaxOrgan(buildeList.get(0));
+				out.setAnnoOrgan(buildeList.get(1));
 			}
 		}
 		pageResponse.setTotal(page.getTotal());
@@ -546,13 +550,70 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 		return pageResponse;
 	}
 
+
+	//颜色再次处理
+	private List<List<CategoryChild>> getCategoryColourNumber(List<CategoryChild> waxOrganList ,List<CategoryChild> annoOrganList ){
+		List<List<CategoryChild>> list = new ArrayList<>();
+
+		Map<String, Long>  waxMap = new HashMap<>();
+		if(CollectionUtils.isNotEmpty(waxOrganList)){
+			waxMap= waxOrganList.stream().collect(Collectors.toMap(CategoryChild::getCategoryName, CategoryChild::getCategoryNumber));
+		}
+
+		Map<String, Long>  annoMap = new HashMap<>();
+		if(CollectionUtils.isNotEmpty(waxOrganList)){
+			annoMap= annoOrganList.stream().collect(Collectors.toMap(CategoryChild::getCategoryName, CategoryChild::getCategoryNumber));
+		}
+
+		if(CollectionUtils.isNotEmpty(waxOrganList)){
+			for(CategoryChild categoryChild:waxOrganList){
+				String categoryName= categoryChild.getCategoryName();
+				Long categoryNumber = categoryChild.getCategoryNumber();
+				int categoryColour = categoryChild.getCategoryColour();
+				//标签颜色 0：黑色 1：红色  2:黄色
+				if(categoryColour == 0){
+					//去anno里查询数量是否相同，不相同则修改颜色为3
+					if(annoMap.containsKey(categoryName)){
+						Long annoNumber = annoMap.get(categoryName);
+						if(!categoryNumber.equals(annoNumber)){
+							categoryChild.setCategoryColour(3);
+						}
+					}
+				}
+			}
+		}
+		
+		list.add(waxOrganList);
+		
+		if(CollectionUtils.isNotEmpty(annoOrganList)){
+			for(CategoryChild categoryChild:annoOrganList){
+				String categoryName= categoryChild.getCategoryName();
+				Long categoryNumber = categoryChild.getCategoryNumber();
+				int categoryColour = categoryChild.getCategoryColour();
+				//标签颜色 0：黑色 1：红色  2:黄色
+				if(categoryColour == 0){
+					//去waxMap里查询数量是否相同，不相同则修改颜色为3
+					if(waxMap.containsKey(categoryName)){
+						Long annoNumber = waxMap.get(categoryName);
+						if(!categoryNumber.equals(annoNumber)){
+							categoryChild.setCategoryColour(3);
+						}
+					}
+				}
+			}
+		}
+		
+		list.add(annoOrganList);
+		return list;
+	}
+
 	private String fetchGroupKey(String waxCode ,String gender) {
 		if(StringUtils.isNotEmpty(gender)){
-			 return waxCode + "_" + gender;
+			return waxCode + "_" + gender;
 		}
-        return waxCode;
-    }
-	
+		return waxCode;
+	}
+
 	@Override
 	public void updateResult(ResultCorrectionIn req) {
 		Long slideId = req.getSlideId();
