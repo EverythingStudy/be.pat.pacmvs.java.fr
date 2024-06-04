@@ -492,6 +492,13 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     				if(imageUrl.toLowerCase().endsWith("svs") && !organName.equals("盲肠-回肠-直肠-结肠")){
     					//请求算法接口
     					try {
+    						//修改当前slide分析状态为进行中
+							SingleSlide slide = new SingleSlide();
+							slide.setSingleId(singleId);
+							//0未预测、1预测成功、2预测失败、3预测中
+							slide.setForecastStatus("3");
+							singleSlideMapper.updateById(slide);
+							
     						log.info("AI算法请求内容是singleId:{},slideId:{},organizationId:{},imageUrl:{},algorithm_name:{}", singleId,slideId,organizationId,imageUrl,CommonConstant.ALGORITHM_MODEL_NAME);
     						AiAlgorithm aiAlgorithm = new AiAlgorithm(singleId, slideId, categoryId, aiImageUrl, imageId);
     						//BeanUtils.copyProperties(matrixReviewListOut, aiAlgorithm);
@@ -504,13 +511,13 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     						log.info("AI算法请求返回数据{}", JSONUtil.toJsonStr(body));
     						JSONObject jsonObject = new JSONObject(body);
     						Integer code = jsonObject.getInt("code");
-    						if (code.equals(200)) {
+    						if (!code.equals(200)) {
     							//修改当前slide分析状态为进行中
-    							SingleSlide slide = new SingleSlide();
-    							slide.setSingleId(singleId);
+    							SingleSlide slideVo = new SingleSlide();
+    							slideVo.setSingleId(singleId);
     							//0未预测、1预测成功、2预测失败、3预测中
-    							slide.setForecastStatus("3");
-    							singleSlideMapper.updateById(slide);
+    							slideVo.setForecastStatus("2");
+    							singleSlideMapper.updateById(slideVo);
     						}
     					} catch (Exception e) {
     						e.printStackTrace();
