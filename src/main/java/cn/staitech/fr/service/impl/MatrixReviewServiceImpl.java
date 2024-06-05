@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.json.JSONUtil;
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
@@ -155,7 +156,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             return resp;
         }
         Map<Long, Map<Long, Long>> map = singleOrganNumbers.stream().collect(Collectors.groupingBy(SingleOrganNumber::getSlideId, Collectors.toMap(SingleOrganNumber::getCategoryId, SingleOrganNumber::getOrganNumber)));
-        waxList = waxList.stream().peek(p -> p.setOrganNumber(map.get(p.getSlideId()).get(p.getCategoryId()))).collect(Collectors.toList());
+        waxList = waxList.stream().peek(p -> p.setOrganNumber(ObjectUtil.isEmpty(map.get(p.getSlideId())) ? 0L : map.get(p.getSlideId()).get(p.getCategoryId()))).collect(Collectors.toList());
         resp.setTotal(page.getTotal());
         resp.setList(waxList);
         resp.setPages(page.getPages());

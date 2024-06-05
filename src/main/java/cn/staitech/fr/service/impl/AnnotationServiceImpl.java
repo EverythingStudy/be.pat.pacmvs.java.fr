@@ -280,7 +280,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (req.getGeometry() != null) {
             annotation.setContour(String.valueOf(req.getGeometry()));
         }
-        annotation.setFiligreeContour(true);
+//        annotation.setFiligreeContour(true);
         Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
         QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("del_flag", 1);
@@ -289,11 +289,11 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         List<Long> categoryIdLists = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
         annotation.setCategoryIdLists(categoryIdLists);
         // 查询精细轮廓
-        List<Annotation> selfAnnoList = annotationMapper.selectListBy(annotation);
-        List<Features> annoList1 = getFeaturesList(selfAnnoList);
-        if (CollectionUtils.isNotEmpty(annoList1)) {
-            list.addAll(annoList1);
-        }
+//        List<Annotation> selfAnnoList = annotationMapper.selectListBy(annotation);
+//        List<Features> annoList1 = getFeaturesList(selfAnnoList);
+//        if (CollectionUtils.isNotEmpty(annoList1)) {
+//            list.addAll(annoList1);
+//        }
         annotation.setFiligreeContour(false);
         annotation.setMagnification(40000L);
         // 查询普通轮廓
@@ -312,6 +312,15 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         BeanUtils.copyProperties(req, annotation);
         if (req.getMagnification() == 5000) {
             annotation.setMagnifications(10000L);
+            // 查询红细胞的结构，再10X-20X之间不显示
+            List<String> structureList = Arrays.asList("14C004","14E004","15C004","11E004","145004","101004","105004","106004","107004","132004","13D004","139004","124004","10B004");
+            LambdaQueryWrapper<PathologicalIndicatorCategory> CategoryLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            CategoryLambdaQueryWrapper.eq(PathologicalIndicatorCategory::getDelFlag,"0")
+                    .eq(PathologicalIndicatorCategory::getOrganizationId,SecurityUtils.getLoginUser().getSysUser().getOrganizationId())
+                    .in(PathologicalIndicatorCategory::getStructureId,structureList);
+            List<PathologicalIndicatorCategory> pathologicalIndicatorCategories = pathologicalIndicatorCategoryMapper.selectList(CategoryLambdaQueryWrapper);
+            List<Long> categoryIdList = pathologicalIndicatorCategories.stream().map(PathologicalIndicatorCategory::getCategoryId).collect(Collectors.toList());
+            annotation.setCategoryIdList(categoryIdList);
         } else {
             annotation.setMagnifications(req.getMagnification());
         }
