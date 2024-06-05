@@ -312,6 +312,15 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         BeanUtils.copyProperties(req, annotation);
         if (req.getMagnification() == 5000) {
             annotation.setMagnifications(10000L);
+            // 查询红细胞的结构，再10X-20X之间不显示
+            List<String> structureList = Arrays.asList("14C004","14E004","15C004","11E004","145004","101004","105004","106004","107004","132004","13D004","139004","124004","10B004");
+            LambdaQueryWrapper<PathologicalIndicatorCategory> CategoryLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            CategoryLambdaQueryWrapper.eq(PathologicalIndicatorCategory::getDelFlag,"0")
+                    .eq(PathologicalIndicatorCategory::getOrganizationId,SecurityUtils.getLoginUser().getSysUser().getOrganizationId())
+                    .in(PathologicalIndicatorCategory::getStructureId,structureList);
+            List<PathologicalIndicatorCategory> pathologicalIndicatorCategories = pathologicalIndicatorCategoryMapper.selectList(CategoryLambdaQueryWrapper);
+            List<Long> categoryIdList = pathologicalIndicatorCategories.stream().map(PathologicalIndicatorCategory::getCategoryId).collect(Collectors.toList());
+            annotation.setCategoryIdList(categoryIdList);
         } else {
             annotation.setMagnifications(req.getMagnification());
         }

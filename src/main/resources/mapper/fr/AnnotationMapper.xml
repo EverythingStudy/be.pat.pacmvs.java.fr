@@ -471,6 +471,12 @@
                     #{structureSize}
                 </foreach>
             </if>
+            <if test="categoryIdList != null and categoryIdList.size > 0">
+                AND category_id not in
+                <foreach collection="categoryIdList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
             <if test="singleSlideIdList != null and singleSlideIdList.size > 0">
                 AND single_slide_id in
                 <foreach collection="singleSlideIdList" item="singleSlideId" open="(" separator="," close=")">
