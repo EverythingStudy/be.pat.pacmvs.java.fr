@@ -86,6 +86,7 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
         //indicatorResultsMap.put("视网膜面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("视网膜面积", new IndicatorAddIn("Retina area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_0));
         indicatorResultsMap.put("视网膜周长", new IndicatorAddIn("", organPerimeter.setScale(3, RoundingMode.HALF_UP).toString(), "毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("视网膜周长(单个)", createDefaultIndicator());
         //indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("Nerve fiber bundles area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_0));
         indicatorResultsMap.put("神经外膜结缔组织面积", new IndicatorAddIn("", organArea4.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
