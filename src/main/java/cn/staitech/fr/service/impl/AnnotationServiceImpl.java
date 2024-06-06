@@ -1412,7 +1412,21 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                 annotationMapper.batchSave(annotation1);
             } catch (Exception e) {
                 // 处理异常，例如记录日志
-                log.error("Error occurred while processing batch: " + e.getMessage(), e);
+                List<Annotation> annotationList = new ArrayList<>();
+                for(Annotation annotationBy:batch){
+                    try {
+                        annotationMapper.stIsValidAnnotation(annotationBy);
+                        annotationList.add(annotationBy);
+                    } catch (Exception a) {
+                        log.error("Error occurred while processing batch: " + e.getMessage(), e);
+                    }
+                }
+                annotation1.setList(annotationList);
+                try{
+                    annotationMapper.batchSave(annotation1);
+                } catch (Exception a) {
+                    log.error("Error occurred while processing batch: " + e.getMessage(), e);
+                }
             }
         }
     }

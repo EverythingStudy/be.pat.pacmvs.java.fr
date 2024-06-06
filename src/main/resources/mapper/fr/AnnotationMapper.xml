@@ -620,6 +620,16 @@
         select ST_IsValid(st_geomfromgeojson(#{contour})) as results
     </select>
 
+
+    <select id="stIsValidAnnotation" parameterType="cn.staitech.fr.domain.Annotation"
+            resultType="cn.staitech.fr.domain.Annotation">
+        select ST_IsValid(st_geomfromgeojson(#{contour40000})) as results40000,
+               ST_IsValid(st_geomfromgeojson(#{contour10000})) as results10000,
+               ST_IsValid(st_geomfromgeojson(#{contour2500})) as results2500,
+               ST_IsValid(st_geomfromgeojson(#{contour625})) as results625
+
+    </select>
+
     <delete id="deleteAiAnnotation" parameterType="cn.staitech.fr.domain.Annotation">
         delete
         FROM
