@@ -280,7 +280,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (req.getGeometry() != null) {
             annotation.setContour(String.valueOf(req.getGeometry()));
         }
-        annotation.setFiligreeContour(true);
+//        annotation.setFiligreeContour(true);
         Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
         QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("del_flag", 1);
@@ -289,11 +289,11 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         List<Long> categoryIdLists = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
         annotation.setCategoryIdLists(categoryIdLists);
         // 查询精细轮廓
-        List<Annotation> selfAnnoList = annotationMapper.selectListBy(annotation);
-        List<Features> annoList1 = getFeaturesList(selfAnnoList);
-        if (CollectionUtils.isNotEmpty(annoList1)) {
-            list.addAll(annoList1);
-        }
+//        List<Annotation> selfAnnoList = annotationMapper.selectListBy(annotation);
+//        List<Features> annoList1 = getFeaturesList(selfAnnoList);
+//        if (CollectionUtils.isNotEmpty(annoList1)) {
+//            list.addAll(annoList1);
+//        }
         annotation.setFiligreeContour(false);
         annotation.setMagnification(40000L);
         // 查询普通轮廓
@@ -1412,7 +1412,21 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                 annotationMapper.batchSave(annotation1);
             } catch (Exception e) {
                 // 处理异常，例如记录日志
-                log.error("Error occurred while processing batch: " + e.getMessage(), e);
+                List<Annotation> annotationList = new ArrayList<>();
+                for(Annotation annotationBy:batch){
+                    try {
+                        annotationMapper.stIsValidAnnotation(annotationBy);
+                        annotationList.add(annotationBy);
+                    } catch (Exception a) {
+                        log.error("Error occurred while processing batch: " + e.getMessage(), e);
+                    }
+                }
+                annotation1.setList(annotationList);
+                try{
+                    annotationMapper.batchSave(annotation1);
+                } catch (Exception a) {
+                    log.error("Error occurred while processing batch: " + e.getMessage(), e);
+                }
             }
         }
     }

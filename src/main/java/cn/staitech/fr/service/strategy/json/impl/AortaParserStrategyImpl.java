@@ -57,8 +57,8 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		//空腔面积 A 10³平方微米
 		Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "15D113");
 		BigDecimal bigDecimalA = BigDecimal.ZERO;
-		if(null !=annotation.getArea()){
-			String bigDecimalAStr = areaUtils.convertToSquareMicrometer(annotation.getArea());
+		if(null !=annotation.getStructureAreaNum()){
+			String bigDecimalAStr = areaUtils.convertToSquareMicrometer(annotation.getStructureAreaNum().toString());
 			bigDecimalA =  new BigDecimal(bigDecimalAStr);
 		}
 
@@ -89,6 +89,8 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		//		if(bigDecimalB.compareTo(BigDecimal.ZERO) != 0){
 		indicatorResultsMap.put("空腔周长", new IndicatorAddIn("", String.valueOf(bigDecimalB), "毫米", "1"));
 		//		}
+
+		indicatorResultsMap.put("空腔周长(单个)", createDefaultIndicator());
 
 		//		if(bigDecimalC.compareTo(BigDecimal.ZERO) != 0){
 		indicatorResultsMap.put("组织轮廓周长", new IndicatorAddIn("", String.valueOf(bigDecimalC), "毫米", "1"));

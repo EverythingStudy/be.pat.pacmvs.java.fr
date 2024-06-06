@@ -247,9 +247,9 @@ public class CommonJsonParser {
                 Annotation annotation2 = annotationMapper.stIsValid(annotation3);
                 if (ObjectUtil.equals(annotation2.getResults(), "t")) {
                     // 查询有效精细轮廓列表
-                    List<Annotation> annotationType3 = annotationMapper.selectAnnotationIsValid(annotation);
-                    List<String> contourList = annotationType3.stream().map(Annotation::getContour).collect(Collectors.toList());
-                    annotation3.setContourList(contourList);
+//                    List<Annotation> annotationType3 = annotationMapper.selectAnnotationIsValid(annotation);
+//                    List<String> contourList = annotationType3.stream().map(Annotation::getContour).collect(Collectors.toList());
+//                    annotation3.setContourList(contourList);
                     annotation3.setSequenceNumber(sequenceNumber);
                     annotation3.setSingleSlideId(jsonTask.getSingleId());
                     annotationMapper.deleteAiAnnotation(annotation3);
