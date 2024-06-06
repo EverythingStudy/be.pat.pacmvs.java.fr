@@ -74,9 +74,13 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             }
             double resolutions = Double.parseDouble(image.getResolutionX());
             double areas = (Double.parseDouble(annotationBy.getArea()) * resolutions * resolutions) * 0.000001;
-            String area = String.format("%.3f", areas);
+            BigDecimal bd1 = new BigDecimal(Double.toString(areas));
+            bd1 = bd1.setScale(3, RoundingMode.HALF_UP);
+            String area = bd1.toPlainString();
             double perimeters = (Double.parseDouble(annotationBy.getArea()) * resolutions) * 0.001;
-            String perimeter = String.format("%.3f", perimeters);
+            BigDecimal bd = new BigDecimal(Double.toString(perimeters));
+            bd = bd.setScale(3, RoundingMode.HALF_UP);
+            String perimeter = bd.toPlainString();
             annotationBy.setArea(area);
             SingleSlide singleSlide = new SingleSlide();
             singleSlide.setSingleId(singleSlideId);
