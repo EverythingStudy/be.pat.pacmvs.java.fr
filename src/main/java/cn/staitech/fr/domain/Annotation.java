@@ -197,6 +197,19 @@ public class Annotation implements Serializable {
     @TableField(exist = false)
     private Double minDistance;
 
+    @TableField(exist = false)
+    private String results40000;
+
+    @TableField(exist = false)
+    private String results10000;
+
+    @TableField(exist = false)
+    private String results2500;
+
+    @TableField(exist = false)
+    private String results625;
+
+
     @Override
     public boolean equals(Object that) {
         if (this == that) {

@@ -64,13 +64,13 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         //        血管面积	C	103平方微米	若多个数据则相加输出
         BigDecimal vesselArea = commonJsonParser.getOrganAreaMicron(jsonTask, "107003");
         //        血管内红细胞面积	D	平方微米	若多个数据则相加输出 (查询血管内红细胞面积)
-        BigDecimal intravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, "107003", "107004", true).getStructureAreaNum();
+        //        BigDecimal intravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, "107003", "107004", true).getStructureAreaNum();
         //        血管外红细胞面积	E	平方微米	若多个数据则相加输出 (查询血管外红细胞面积)
-        BigDecimal extravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, "107003", "107004", false).getStructureAreaNum();
+        //        BigDecimal extravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, "107003", "107004", false).getStructureAreaNum();
         //        肥大细胞数量	F	个
         Integer densityOfMastCells = commonJsonParser.getOrganAreaCount(jsonTask, "10708D");
         //        滤泡上皮细胞核数量（单个）	G	个	单个甲状腺滤泡内细胞核数量
-        Integer nucleusOfFollicular = commonJsonParser.getOrganAreaCount(jsonTask, "107089");
+        //        Integer nucleusOfFollicular = commonJsonParser.getOrganAreaCount(jsonTask, "107089");
         //       组织轮廓面积	H	平方毫米	若多个数据则相加输出(H:精细轮廓总面积（甲状腺）-平方毫米  )
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
@@ -103,10 +103,10 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         indicatorResultsMap.put("甲状腺滤泡面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("甲状腺滤泡腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("血管面积", new IndicatorAddIn("Vessel area%", vesselArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular erythrocyte area", intravascularErythrocyteArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular erythrocyte area", extravascularErythrocyteArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        // indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular erythrocyte area", intravascularErythrocyteArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        // indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular erythrocyte area", extravascularErythrocyteArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("肥大细胞数量", new IndicatorAddIn("Density of mast cells", densityOfMastCells.toString(), "个", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("滤泡上皮细胞核数量（单个）", new IndicatorAddIn("Nucleus density of follicular cell (per)", nucleusOfFollicular.toString(), "个", CommonConstant.NUMBER_1));
+        // indicatorResultsMap.put("滤泡上皮细胞核数量（单个）", new IndicatorAddIn("Nucleus density of follicular cell (per)", nucleusOfFollicular.toString(), "个", CommonConstant.NUMBER_1));
 
         indicatorResultsMap.put("甲状腺面积", new IndicatorAddIn("Thyroid gland area", accurateArea, "平方毫米"));
         indicatorResultsMap.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", parathyroidGlandArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米"));

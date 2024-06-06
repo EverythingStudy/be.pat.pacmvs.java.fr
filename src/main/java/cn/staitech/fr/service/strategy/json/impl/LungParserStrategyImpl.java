@@ -45,7 +45,7 @@ public class LungParserStrategyImpl extends AbstractCustomParserStrategy {
 
 
         //肺泡上皮细胞核数量
-        Double density = count / Double.parseDouble(accurateArea);
+//        Double density = count / Double.parseDouble(accurateArea);
 
         // 查询支气管面积
         BigDecimal bronchiArea = commonJsonParser.getOrganArea(jsonTask, "14C002").getStructureAreaNum();
@@ -63,7 +63,7 @@ public class LungParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("肺脏面积", new IndicatorAddIn("Lung area", accurateArea, "平方毫米"));
 
 
-        indicatorResultsMap.put("肺泡上皮细胞核密度", new IndicatorAddIn("Nucleus density of alveolar epithelial cell", String.valueOf(density), "个/平方毫米"));
+//        indicatorResultsMap.put("肺泡上皮细胞核密度", new IndicatorAddIn("Nucleus density of alveolar epithelial cell", String.valueOf(density), "个/平方毫米"));
 
         indicatorResultsMap.put("支气管面积", new IndicatorAddIn("支气管面积", String.valueOf(bronchiArea), "平方毫米", CommonConstant.NUMBER_1));
 //        indicatorResultsMap.put("血管面积", new IndicatorAddIn("血管面积", String.valueOf(vesselArea), "平方毫米", CommonConstant.NUMBER_1));
