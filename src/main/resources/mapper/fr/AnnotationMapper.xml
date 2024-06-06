@@ -621,18 +621,19 @@
     </select>
 
     <delete id="deleteAiAnnotation" parameterType="cn.staitech.fr.domain.Annotation">
-        DELETE
+        delete
         FROM
         fr_ai_annotation_${sequenceNumber}
         WHERE
         single_slide_id = #{singleSlideId}
         <if test="contour != null">
             AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = 'f'
-            <if test="contourList != null and contourList.size() > 0">
-                <foreach collection="contourList" item="item" index="index">
-                    OR ST_Contains ( contour40000,st_geomfromgeojson(#{item})) = 't'
-                </foreach>
-            </if>
+    <!-- <if test="contourList != null and contourList.size() > 0">
+        <foreach collection="contourList" item="item" index="index">
+            OR ST_Contains ( contour40000,st_geomfromgeojson(#{item})) = 't'
+        </foreach>
+    </if>
+    -->
         </if>
     </delete>
 
