@@ -57,8 +57,8 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		//空腔面积 A 10³平方微米
 		Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "15D113");
 		BigDecimal bigDecimalA = BigDecimal.ZERO;
-		if(null !=annotation.getArea()){
-			String bigDecimalAStr = areaUtils.convertToSquareMicrometer(annotation.getArea());
+		if(null !=annotation.getStructureAreaNum()){
+			String bigDecimalAStr = areaUtils.convertToSquareMicrometer(annotation.getStructureAreaNum().toString());
 			bigDecimalA =  new BigDecimal(bigDecimalAStr);
 		}
 
