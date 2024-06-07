@@ -580,6 +580,16 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 						}
 					}
 				}
+				
+				if(categoryColour == 1){
+					//去anno里查询数量是否相同，如果蜡块信息表数量少于anno数量，算正常
+					if(annoMap.containsKey(categoryName)){
+						Long annoNumber = annoMap.get(categoryName);
+						if(categoryNumber <= annoNumber){
+							categoryChild.setCategoryColour(0);
+						}
+					}
+				}
 			}
 		}
 		
@@ -594,9 +604,19 @@ public class SplitVerificationServiceServiceImpl implements SplitVerificationSer
 				if(categoryColour == 0){
 					//去waxMap里查询数量是否相同，不相同则修改颜色为3
 					if(waxMap.containsKey(categoryName)){
-						Long annoNumber = waxMap.get(categoryName);
-						if(!categoryNumber.equals(annoNumber)){
+						Long waxNumber = waxMap.get(categoryName);
+						if(!categoryNumber.equals(waxNumber)){
 							categoryChild.setCategoryColour(3);
+						}
+					}
+				}
+				
+				if(categoryColour == 1){
+					//去anno里查询数量是否相同，如果蜡块信息表数量少于anno数量，算正常
+					if(waxMap.containsKey(categoryName)){
+						Long waxNumber = waxMap.get(categoryName);
+						if(waxNumber <= categoryNumber){
+							categoryChild.setCategoryColour(0);
 						}
 					}
 				}
