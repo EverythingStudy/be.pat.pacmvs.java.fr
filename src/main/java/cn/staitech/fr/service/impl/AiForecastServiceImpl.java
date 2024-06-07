@@ -77,7 +77,7 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             BigDecimal bd1 = new BigDecimal(Double.toString(areas));
             bd1 = bd1.setScale(3, RoundingMode.HALF_UP);
             String area = bd1.toPlainString();
-            double perimeters = (Double.parseDouble(annotationBy.getArea()) * resolutions) * 0.001;
+            double perimeters = (Double.parseDouble(annotationBy.getPerimeter()) * resolutions) * 0.001;
             BigDecimal bd = new BigDecimal(Double.toString(perimeters));
             bd = bd.setScale(3, RoundingMode.HALF_UP);
             String perimeter = bd.toPlainString();
