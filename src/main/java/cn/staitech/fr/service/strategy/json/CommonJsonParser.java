@@ -443,17 +443,9 @@ public class CommonJsonParser {
         if (null == structure || StringUtils.isEmpty(structure.getArea())) {
             return BigDecimal.ZERO;
         }
-
-        // 查询切片缩放
-        BigDecimal resolutionNum = new BigDecimal("0.262");
-        String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
-        if (StringUtils.isNotEmpty(resolution)) {
-            resolutionNum = new BigDecimal(resolution);
-        }
-
         // 计算面积
         BigDecimal structureAreaNum = new BigDecimal(structure.getArea());
-        return structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.001));
+        return structureAreaNum.multiply(new BigDecimal(0.001));
     }
 
     /**
