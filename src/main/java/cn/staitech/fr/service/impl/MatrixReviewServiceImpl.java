@@ -496,8 +496,8 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 							//修改当前slide分析状态为进行中
 							SingleSlide slide = new SingleSlide();
 							slide.setSingleId(singleId);
-							//0未预测、1预测成功、2预测失败、3预测中
-							slide.setForecastStatus("3");
+							//精轮廓 0未预测、1预测成功、2预测失败、3预测中
+							slide.setAiStatusFine(3);
 							singleSlideMapper.updateById(slide);
 
 							log.info("AI算法请求内容是singleId:{},slideId:{},organizationId:{},imageUrl:{},algorithm_name:{}", singleId,slideId,organizationId,imageUrl,CommonConstant.ALGORITHM_MODEL_NAME);
@@ -521,6 +521,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 								slideVo.setSingleId(singleId);
 								//0未预测、1预测成功、2预测失败、3预测中
 								slideVo.setForecastStatus("1");
+								slideVo.setAiStatusFine(1);
 								singleSlideMapper.updateById(slideVo);
 							}else{
 								if (!statusList.contains(code)) {
