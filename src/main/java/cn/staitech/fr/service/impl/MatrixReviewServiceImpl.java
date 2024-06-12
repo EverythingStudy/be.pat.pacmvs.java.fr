@@ -512,7 +512,10 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     						log.info("AI算法请求返回数据{}", JSONUtil.toJsonStr(body));
     						JSONObject jsonObject = new JSONObject(body);
     						Integer code = jsonObject.getInt("code");
-    						if (!code.equals(200) && !code.equals(40001)) {
+    						List<Integer> statusList = new ArrayList<>();
+    						statusList.add(200);//成功的
+    						statusList.add(40001);//算法接口不存在
+    						if (!statusList.contains(code)) {
     							//修改当前slide分析状态为进行中
     							SingleSlide slideVo = new SingleSlide();
     							slideVo.setSingleId(singleId);
