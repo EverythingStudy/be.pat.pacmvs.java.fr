@@ -509,9 +509,9 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     						aiAlgorithm.setSpecialId(specialId);
     						log.info("AI算法请求完整数据{}", JSONUtil.toJsonStr(aiAlgorithm));
     						String body = pythonService.algorithm(aiAlgorithm);
-    						log.info("AI算法请求返回数据{}", JSONUtil.toJsonStr(body));
     						JSONObject jsonObject = new JSONObject(body);
     						Integer code = jsonObject.getInt("code");
+    						log.info("AI算法请求完整数据:{},AI算法请求返回数据:{},code:{}", JSONUtil.toJsonStr(aiAlgorithm), JSONUtil.toJsonStr(body),code);
     						List<Integer> statusList = new ArrayList<>();
     						statusList.add(200);//成功的
     						statusList.add(40001);//算法接口不存在
@@ -522,6 +522,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     							//0未预测、1预测成功、2预测失败、3预测中
     							slideVo.setForecastStatus("2");
     							singleSlideMapper.updateById(slideVo);
+    							log.info("AI算法请求失败，状态列表：{},修改状态信息：{}", statusList.toString(),JSONUtil.toJsonStr(slideVo));
     						}
     					} catch (Exception e) {
     						e.printStackTrace();
