@@ -381,6 +381,7 @@
         ss.category_id,
         ss.forecast_status,
         ss.diagnosis_status,
+        ss.ai_status_fine,
         ss.description,
         fc.organ_en,
         fc.organ_name,
