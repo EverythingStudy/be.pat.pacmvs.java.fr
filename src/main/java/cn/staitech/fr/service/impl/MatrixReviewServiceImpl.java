@@ -458,6 +458,9 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 		//		mrl.setForecastStatus("0");
 		List<String> forecastStatusList = new ArrayList<>(Arrays.asList("0", "2"));
 		mrl.setForecastStatusList(forecastStatusList);
+		
+		List<Integer> aiStatusFineList = new ArrayList<>(Arrays.asList(0, 2));
+		mrl.setAiStatusFineList(aiStatusFineList);
 
 		//2024.05.28新增合并标签查询过滤
 		QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
@@ -493,13 +496,16 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 					if(imageUrl.toLowerCase().endsWith("svs") && !organName.equals("盲肠-回肠-直肠-结肠")){
 						//请求算法接口
 						try {
-							//修改当前slide分析状态为进行中
-							SingleSlide slide = new SingleSlide();
-							slide.setSingleId(singleId);
-							//精轮廓 0未预测、1预测成功、2预测失败、3预测中
-							slide.setAiStatusFine(3);
-							singleSlideMapper.updateById(slide);
-
+							//判断当前数据精细轮廓是否预测成功，如果成功的话，不需要修改预测状态
+							SingleSlide hisSingleslide = singleSlideMapper.selectById(singleId);
+							if(null != hisSingleslide.getAiStatusFine() && hisSingleslide.getAiStatusFine() != 1){
+								//修改当前slide分析状态为进行中
+								SingleSlide slide = new SingleSlide();
+								slide.setSingleId(singleId);
+								//精轮廓 0未预测、1预测成功、2预测失败、3预测中
+								slide.setAiStatusFine(3);
+								singleSlideMapper.updateById(slide);
+							}
 							log.info("AI算法请求内容是singleId:{},slideId:{},organizationId:{},imageUrl:{},algorithm_name:{}", singleId,slideId,organizationId,imageUrl,CommonConstant.ALGORITHM_MODEL_NAME);
 							AiAlgorithm aiAlgorithm = new AiAlgorithm(singleId, slideId, categoryId, aiImageUrl, imageId);
 							//BeanUtils.copyProperties(matrixReviewListOut, aiAlgorithm);

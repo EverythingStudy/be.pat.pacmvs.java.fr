@@ -271,10 +271,15 @@
                 and ss.forecast_status =#{forecastStatus}
             </if>
             <if test="forecastStatusList != null and forecastStatusList.size>0">
-                AND ss.forecast_status in
+                AND ( ss.forecast_status in
                 <foreach collection="forecastStatusList" item="item" open="(" separator="," close=")">
                     #{item}
                 </foreach>
+                or ss.ai_status_fine in
+                 <foreach collection="aiStatusFineList" item="item" open="(" separator="," close=")">
+                    #{item}
+               	 </foreach>
+                )
             </if>
             <if test="diagnosisStatus != null and diagnosisStatus != ''">
                 and ss.diagnosis_status =#{diagnosisStatus}
