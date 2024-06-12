@@ -448,7 +448,7 @@
 
 
     <select id="selectRespData" resultType="cn.staitech.fr.domain.out.OrgansData">
-        select fss.single_id,fss.slide_id,fss.thumb_url, fss.category_id, ti.file_name, fss.forecast_status, fss.diagnosis_status,if(fss.ai_status_fine =1 ,'1','0') aiStatusFine
+        select fss.single_id,fss.slide_id,fss.thumb_url, fss.category_id, ti.file_name, fss.forecast_status, fss.diagnosis_status,fss.ai_status_fine
         from fr_single_slide fss
                  left join fr_slide fs on fss.slide_id = fs.slide_id
                  left join tb_image ti on fs.image_id = ti.image_id
