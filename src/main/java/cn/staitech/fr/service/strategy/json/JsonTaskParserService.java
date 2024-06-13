@@ -1,19 +1,13 @@
 package cn.staitech.fr.service.strategy.json;
 
-import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
-import cn.staitech.fr.service.AiForecastService;
-import cn.staitech.fr.service.JsonFileService;
-import cn.staitech.fr.service.JsonTaskService;
-import cn.staitech.fr.service.SingleSlideService;
-import cn.staitech.fr.service.SlideService;
+import cn.staitech.fr.service.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,12 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.*;
 
 /**
  * @author: wangfeng
@@ -128,17 +120,17 @@ public class JsonTaskParserService {
         log.info("+++parser2:{}", parser);
         //判断json数据目录是否存在
         for (JsonFile jsonFile : jsonFileList) {
-        	 String fileUrl = jsonFile.getFileUrl();
-        	 File file = new File(fileUrl);
-             if (!file.exists()) {
-            	 log.info("AI预测切片id:{},算法名称标识:{},目录不存在，地址{}", jsonTask.getSingleId(),jsonTask.getAlgorithmCode(),fileUrl);
-            	 SingleSlide singleSlide = new SingleSlide();
-                 singleSlide.setSingleId(jsonTask.getSingleId());
-                 //0未预测、1预测成功、2预测失败、3预测中
-                 singleSlide.setForecastStatus("2");
-                 singleSlideService.updateById(singleSlide);
-                 return;
-             }
+            String fileUrl = jsonFile.getFileUrl();
+            File file = new File(fileUrl);
+            if (!file.exists()) {
+                log.info("AI预测切片id:{},算法名称标识:{},目录不存在，地址{}", jsonTask.getSingleId(), jsonTask.getAlgorithmCode(), fileUrl);
+                SingleSlide singleSlide = new SingleSlide();
+                singleSlide.setSingleId(jsonTask.getSingleId());
+                //0未预测、1预测成功、2预测失败、3预测中
+                singleSlide.setForecastStatus("2");
+                singleSlideService.updateById(singleSlide);
+                return;
+            }
         }
         Annotation annotation = getAnnotation(jsonTask);
         annotationMapper.deleteAiAnnotation(annotation);
@@ -147,40 +139,49 @@ public class JsonTaskParserService {
         jsonTask.setStatus(1);
         jsonTaskService.updateById(jsonTask);
 
-        try{
-	        for (JsonFile jsonFile : jsonFileList) {
-	            ParserStrategy finalParser = parser;
-
-	            log.info("Json文件解析开始:{} {} {} {}",System.currentTimeMillis() , jsonTask.getTaskId(), jsonFile.getFileUrl(), finalParser.getClass().getName());
+        try {
+            ParserStrategy finalParser = parser;
+            boolean b = finalParser.checkJson(jsonTask, jsonFileList);
+            if (!b) {
+                log.info("AI预测切片id:{},算法名称标识:{},JSON校验失败!", jsonTask.getSingleId(), jsonTask.getAlgorithmCode());
+                SingleSlide singleSlide = new SingleSlide();
+                singleSlide.setSingleId(jsonTask.getSingleId());
+                //0未预测、1预测成功、2预测失败、3预测中
+                singleSlide.setForecastStatus("2");
+                singleSlideService.updateById(singleSlide);
+                return;
+            }
+            for (JsonFile jsonFile : jsonFileList) {
+                log.info("Json文件解析开始:{} {} {} {}", System.currentTimeMillis(), jsonTask.getTaskId(), jsonFile.getFileUrl(), finalParser.getClass().getName());
                 jsonFile.setStartTime(new Date());
                 jsonFileService.updateById(jsonFile);
 
-	            finalParser.parseJson(jsonTask, jsonFile);
-	            // commonJsonParser.parseJson(jsonTask, jsonFile);
+                finalParser.parseJson(jsonTask, jsonFile);
+                // commonJsonParser.parseJson(jsonTask, jsonFile);
 
-                log.info("Json文件解析结束:{} {} {} {}",System.currentTimeMillis() , jsonTask.getTaskId(), jsonFile.getFileUrl(), finalParser.getClass().getName());
+                log.info("Json文件解析结束:{} {} {} {}", System.currentTimeMillis(), jsonTask.getTaskId(), jsonFile.getFileUrl(), finalParser.getClass().getName());
                 jsonFile.setEndTime(new Date());
                 jsonFileService.updateById(jsonFile);
-	        }
+            }
 
-	//        annotation.setContour("1");
-	//        try {
-	//            annotationMapper.deleteAiAnnotation(annotation);
-	//        } catch (Exception e) {
-	//            log.error("deleteAiAnnotation error:------------------------------------------------------4");
-	//            log.error("deleteAiAnnotation error:{}", e.getMessage());
-	//        }
-	        log.info("------------------------------------------------------5");
+            //        annotation.setContour("1");
+            //        try {
+            //            annotationMapper.deleteAiAnnotation(annotation);
+            //        } catch (Exception e) {
+            //            log.error("deleteAiAnnotation error:------------------------------------------------------4");
+            //            log.error("deleteAiAnnotation error:{}", e.getMessage());
+            //        }
+            log.info("------------------------------------------------------5");
             //删除原有指标
             LambdaQueryWrapper<AiForecast> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(AiForecast::getSingleSlideId,jsonTask.getSingleId());
+            wrapper.eq(AiForecast::getSingleSlideId, jsonTask.getSingleId());
             aiForecastService.remove(wrapper);
-	        // 指标计算
-	        parser.alculationIndicators(jsonTask);
-	        log.info("------------------------------------------------------6");
-        }catch(Exception e){
-        	 log.info("------------------------------------------------------7");
-        	e.printStackTrace();
+            // 指标计算
+            parser.alculationIndicators(jsonTask);
+            log.info("------------------------------------------------------6");
+        } catch (Exception e) {
+            log.info("------------------------------------------------------7");
+            e.printStackTrace();
         }
         // 修改任务状态
         jsonTask.setStatus(2);
@@ -252,14 +253,14 @@ public class JsonTaskParserService {
             jsonTask.setOrganizationId(jsonObject.containsKey("organizationId") ? Long.parseLong(jsonObject.get("organizationId").toString()) : 0L);
             //算法结构化时间处理
             Long structureTime = 0L;
-            if(jsonObject.containsKey("elapsed_time")){
-            	Object eTimeObj = jsonObject.get("elapsed_time");
-            	if(null != eTimeObj){
-            		String eTimeStr = (String) eTimeObj;
-            		if(StringUtils.isNotEmpty(eTimeStr)){
-            			structureTime = (long)(Double.parseDouble(eTimeStr));
-            		}
-            	}
+            if (jsonObject.containsKey("elapsed_time")) {
+                Object eTimeObj = jsonObject.get("elapsed_time");
+                if (null != eTimeObj) {
+                    String eTimeStr = (String) eTimeObj;
+                    if (StringUtils.isNotEmpty(eTimeStr)) {
+                        structureTime = (long) (Double.parseDouble(eTimeStr));
+                    }
+                }
             }
             jsonTask.setStructureTime(structureTime);
             jsonTask.setCode(jsonObject.containsKey("code") ? jsonObject.get("code").toString() : "");

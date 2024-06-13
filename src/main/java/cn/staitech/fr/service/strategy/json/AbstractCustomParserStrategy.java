@@ -7,8 +7,10 @@ import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 /**
  * @author mugw
@@ -21,6 +23,7 @@ import java.math.RoundingMode;
 public abstract class AbstractCustomParserStrategy implements CustomParserStrategy{
 
     private CommonJsonParser commonJsonParser;
+    private CommonJsonCheck commonJsonCheck;
 
     // 指标单位
     protected static final String PIECE = "个";
@@ -33,6 +36,11 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         commonJsonParser.parseJson(jsonTask, jsonFileS);
+    }
+
+    @Override
+    public boolean checkJson(JsonTask jsonTask, List<JsonFile> jsonFileList) {
+        return commonJsonCheck.checkJson(jsonTask, jsonFileList);
     }
 
     /**
