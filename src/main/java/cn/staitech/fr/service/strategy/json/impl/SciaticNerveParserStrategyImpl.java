@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+
+import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import org.springframework.stereotype.Component;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -30,9 +32,12 @@ public class SciaticNerveParserStrategyImpl extends AbstractCustomParserStrategy
 	private CommonJsonParser commonJsonParser;
 	@Resource
 	private AreaUtils areaUtils;
+	@Resource
+	private CommonJsonCheck commonJsonCheck;
 	@PostConstruct
 	public void init() {
 		setCommonJsonParser(commonJsonParser);
+		setCommonJsonCheck(commonJsonCheck);
 		log.info("SciaticNerveParserStrategyImpl init");
 	}
 

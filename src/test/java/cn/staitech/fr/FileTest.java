@@ -111,36 +111,36 @@ public class FileTest {
         String content = "{\n" +
                 "  \"code\": \"200\",\n" +
                 "  \"msg\": \"\",\n" +
-                "  \"algorithmCode\": \"Thyroid_gland\",\n" +
-                "  \"imageId\":10924,\n" +
-                "  \"slideId\":115,\n" +
-                "  \"singleId\":154,\n" +
+                "  \"algorithmCode\": \"Kidney\",\n" +
+                "  \"imageId\":11010,\n" +
+                "  \"slideId\":186,\n" +
+                "  \"singleId\":328,\n" +
                 "  \"organizationId\":1,\n" +
                 "  \"data\": [\n" +
                 "    {\n" +
                 "      \"structureName\": \"cell1\",\n" +
-                "      \"fileUrl\": \"D:/2.0-20240510/FeatureCollection/ST20Rf-PD-TG-320-1-000016/10708A.json\"\n" +
+                "      \"fileUrl\": \"C:/Users/Administrator/Desktop/11B-v1.0/11B02D.json\"\n" +
                 "    },\n" +
                 "    {\n" +
                 "      \"structureName\": \"cell2\",\n" +
-                "      \"fileUrl\": \"D:/2.0-20240510/FeatureCollection/ST20Rf-PD-TG-320-1-000016/10708D.json\"\n" +
+                "      \"fileUrl\": \"C:/Users/Administrator/Desktop/11B-v1.0/11B02E.json\"\n" +
                 "    },\n" +
                 "    {\n" +
                 "      \"structureName\": \"cell3\",\n" +
-                "      \"fileUrl\": \"D:/2.0-20240510/FeatureCollection/ST20Rf-PD-TG-320-1-000016/107003.json\"\n" +
+                "      \"fileUrl\": \"C:/Users/Administrator/Desktop/11B-v1.0/11B02F.json\"\n" +
                 "    },\n" +
                 "    {\n" +
                 "      \"structureName\": \"cell4\",\n" +
-                "      \"fileUrl\": \"D:/2.0-20240510/FeatureCollection/ST20Rf-PD-TG-320-1-000016/107004.json\"\n" +
+                "      \"fileUrl\": \"C:/Users/Administrator/Desktop/11B-v1.0/11B03D.json\"\n" +
                 "    },\n" +
                 "    {\n" +
                 "      \"structureName\": \"cell5\",\n" +
-                "      \"fileUrl\": \"D:/2.0-20240510/FeatureCollection/ST20Rf-PD-TG-320-1-000016/107088.json\"\n" +
-                "    },\n" +
-                "    {\n" +
-                "      \"structureName\": \"cell6\",\n" +
-                "      \"fileUrl\": \"D:/2.0-20240510/FeatureCollection/ST20Rf-PD-TG-320-1-000016/107089.json\"\n" +
+                "      \"fileUrl\": \"C:/Users/Administrator/Desktop/11B-v1.0/11B031.json\"\n" +
                 "    }\n" +
+//                "    {\n" +
+//                "      \"structureName\": \"cell6\",\n" +
+//                "      \"fileUrl\": \"D:/2.0-20240510/FeatureCollection/ST20Rf-PD-TG-320-1-000016/107089.json\"\n" +
+//                "    }\n" +
                 "  ]\n" +
                 "}\n" +
                 "\n";

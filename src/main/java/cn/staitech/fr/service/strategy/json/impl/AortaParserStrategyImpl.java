@@ -7,6 +7,7 @@ import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
+import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -38,10 +39,12 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 	private AreaUtils areaUtils;
 	@Resource
 	private AiForecastService aiForecastService;
-
+	@Resource
+	private CommonJsonCheck commonJsonCheck;
 	@PostConstruct
 	public void init() {
 		setCommonJsonParser(commonJsonParser);
+		setCommonJsonCheck(commonJsonCheck);
 		log.info("AortaParserStrategyImpl init");
 	}
 

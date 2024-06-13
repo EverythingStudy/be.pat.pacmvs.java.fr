@@ -7,6 +7,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
@@ -38,10 +39,12 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 	private CommonJsonParser commonJsonParser;
 	@Resource
 	private AreaUtils areaUtils;
-
+	@Resource
+	private CommonJsonCheck commonJsonCheck;
 	@PostConstruct
 	public void init() {
 		setCommonJsonParser(commonJsonParser);
+		setCommonJsonCheck(commonJsonCheck);
 		log.info("OvariesOviductParserStrategyImpl init");
 	}
 
