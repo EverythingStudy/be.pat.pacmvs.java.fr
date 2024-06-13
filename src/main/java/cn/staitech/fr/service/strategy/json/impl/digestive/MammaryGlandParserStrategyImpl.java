@@ -28,7 +28,7 @@ import java.util.Map;
  * @desc 乳腺-皮肤
  */
 @Slf4j
-@Component("D66_Integument_and_Mammary_gland")
+@Component("IntegumentMammaryGland")
 public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Resource
@@ -151,6 +151,6 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
 
     @Override
     public String getAlgorithmCode() {
-        return "D66_Integument_and_Mammary_gland";
+        return "IntegumentMammaryGland";
     }
 }
