@@ -38,6 +38,9 @@ public class MatrixReviewListIn extends PageRequest {
 
     @ApiModelProperty(value = "0未预测、1预测成功、2预测失败、3预测中;ai预测字典标识符：ai_forecast_type")
     private String forecastStatus;
+    
+    @ApiModelProperty(value = "0未预测、1预测成功、2预测失败、3预测中;")
+    private List<Integer> aiStatusFineList;
 
     @ApiModelProperty(value = "人工诊断状态 0：未诊断；1：已诊断;字典标识符：diagnosis_status")
     private String diagnosisStatus;

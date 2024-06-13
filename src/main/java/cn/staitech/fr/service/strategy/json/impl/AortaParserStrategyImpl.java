@@ -61,12 +61,12 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 			String bigDecimalAStr = areaUtils.convertToSquareMicrometer(annotation.getStructureAreaNum().toString());
 			bigDecimalA =  new BigDecimal(bigDecimalAStr);
 		}
-
+		
 
 		//空腔周长	B	毫米
 		BigDecimal bigDecimalB =  BigDecimal.ZERO;
-		if(null !=annotation.getPerimeter()){
-			bigDecimalB =  new BigDecimal(annotation.getPerimeter());
+		if(null != annotation.getStructurePerimeterNum()){
+			bigDecimalB =  annotation.getStructurePerimeterNum();
 		}
 
 		BigDecimal bigDecimalC = BigDecimal.ZERO;
