@@ -149,8 +149,18 @@ public class JsonTaskParserService {
 		jsonTaskService.updateById(jsonTask);
 
 		try{
+			ParserStrategy finalParser = parser;
+			boolean b = finalParser.checkJson(jsonTask, jsonFileList);
+			if (!b) {
+				log.info("AI预测切片id:{},算法名称标识:{},JSON校验失败!", jsonTask.getSingleId(), jsonTask.getAlgorithmCode());
+				SingleSlide singleSlide = new SingleSlide();
+				singleSlide.setSingleId(jsonTask.getSingleId());
+				//0未预测、1预测成功、2预测失败、3预测中
+				singleSlide.setForecastStatus("2");
+				singleSlideService.updateById(singleSlide);
+				return;
+			}
 			for (JsonFile jsonFile : jsonFileList) {
-				ParserStrategy finalParser = parser;
 
 				log.info("Json文件解析开始:{} {} {} {}",System.currentTimeMillis() , jsonTask.getTaskId(), jsonFile.getFileUrl(), finalParser.getClass().getName());
 				jsonFile.setStartTime(new Date());
