@@ -22,7 +22,7 @@ import java.util.Map;
  * @Description: Json Parser 大鼠脑干（合并）、大鼠小脑(合并）
  */
 @Slf4j
-@Component("D63_Cerebellum_and_Brain_stem")
+@Component("CerebellumBrainStem")
 public class CerebellumParserStrategyImpl implements ParserStrategy {
 
     @Resource

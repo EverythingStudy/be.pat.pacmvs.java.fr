@@ -23,7 +23,7 @@ import java.util.Map;
  * @date 2024/5/13 10:06:53
  */
 @Slf4j
-@Service("D65_Eye_and_Optic_nerve")
+@Service("EyeOpticNerve")
 public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Resource
@@ -96,6 +96,6 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
 
     @Override
     public String getAlgorithmCode() {
-        return "D65_Eye_and_Optic_nerve";
+        return "EyeOpticNerve";
     }
 }
