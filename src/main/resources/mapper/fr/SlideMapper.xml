@@ -271,10 +271,15 @@
                 and ss.forecast_status =#{forecastStatus}
             </if>
             <if test="forecastStatusList != null and forecastStatusList.size>0">
-                AND ss.forecast_status in
+                AND ( ss.forecast_status in
                 <foreach collection="forecastStatusList" item="item" open="(" separator="," close=")">
                     #{item}
                 </foreach>
+                or ss.ai_status_fine in
+                 <foreach collection="aiStatusFineList" item="item" open="(" separator="," close=")">
+                    #{item}
+               	 </foreach>
+                )
             </if>
             <if test="diagnosisStatus != null and diagnosisStatus != ''">
                 and ss.diagnosis_status =#{diagnosisStatus}
@@ -381,6 +386,7 @@
         ss.category_id,
         ss.forecast_status,
         ss.diagnosis_status,
+        ss.ai_status_fine,
         ss.description,
         fc.organ_en,
         fc.organ_name,
@@ -448,7 +454,7 @@
 
 
     <select id="selectRespData" resultType="cn.staitech.fr.domain.out.OrgansData">
-        select fss.single_id,fss.slide_id,fss.thumb_url, fss.category_id, ti.file_name, fss.forecast_status, fss.diagnosis_status
+        select fss.single_id,fss.slide_id,fss.thumb_url, fss.category_id, ti.file_name, fss.forecast_status, fss.diagnosis_status,fss.ai_status_fine
         from fr_single_slide fss
                  left join fr_slide fs on fss.slide_id = fs.slide_id
                  left join tb_image ti on fs.image_id = ti.image_id

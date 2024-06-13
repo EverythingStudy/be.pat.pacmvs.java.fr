@@ -61,12 +61,12 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 			String bigDecimalAStr = areaUtils.convertToSquareMicrometer(annotation.getStructureAreaNum().toString());
 			bigDecimalA =  new BigDecimal(bigDecimalAStr);
 		}
-
+		
 
 		//空腔周长	B	毫米
 		BigDecimal bigDecimalB =  BigDecimal.ZERO;
-		if(null !=annotation.getPerimeter()){
-			bigDecimalB =  new BigDecimal(annotation.getPerimeter());
+		if(null != annotation.getStructurePerimeterNum()){
+			bigDecimalB =  annotation.getStructurePerimeterNum();
 		}
 
 		BigDecimal bigDecimalC = BigDecimal.ZERO;
@@ -87,10 +87,10 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		//		}
 
 		//		if(bigDecimalB.compareTo(BigDecimal.ZERO) != 0){
-		indicatorResultsMap.put("空腔周长", new IndicatorAddIn("", String.valueOf(bigDecimalB), "毫米", "1"));
+//		indicatorResultsMap.put("空腔周长", new IndicatorAddIn("", String.valueOf(bigDecimalB), "毫米", "1"));
 		//		}
 
-		indicatorResultsMap.put("空腔周长(单个)", createDefaultIndicator());
+//		indicatorResultsMap.put("空腔周长(单个)", createDefaultIndicator());
 
 		//		if(bigDecimalC.compareTo(BigDecimal.ZERO) != 0){
 		indicatorResultsMap.put("组织轮廓周长", new IndicatorAddIn("", String.valueOf(bigDecimalC), "毫米", "1"));

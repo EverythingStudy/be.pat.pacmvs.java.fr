@@ -280,20 +280,11 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (req.getGeometry() != null) {
             annotation.setContour(String.valueOf(req.getGeometry()));
         }
-        annotation.setFiligreeContour(true);
         Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
         QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("del_flag", 1);
         queryWrapper.eq("organization_id", organizationId);
         List<Category> categoryList = categoryMapper.selectList(queryWrapper);
-        List<Long> categoryIdLists = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
-        annotation.setCategoryIdLists(categoryIdLists);
-        // 查询精细轮廓
-        List<Annotation> selfAnnoList = annotationMapper.selectListBy(annotation);
-        List<Features> annoList1 = getFeaturesList(selfAnnoList);
-        if (CollectionUtils.isNotEmpty(annoList1)) {
-            list.addAll(annoList1);
-        }
         annotation.setFiligreeContour(false);
         annotation.setMagnification(40000L);
         // 查询普通轮廓
@@ -301,6 +292,19 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         List<Features> annoList = getFeaturesList(annotationList);
         if (CollectionUtils.isNotEmpty(annoList)) {
             list.addAll(annoList);
+        }
+        annotation.setFiligreeContour(true);
+        // 精细轮廓不显示眼球-视神经
+        QueryWrapper<Category> categoryQueryWrapper = new QueryWrapper<>();
+        categoryQueryWrapper.eq("organ_id", "7B");
+        List<Category> categoryLists = categoryMapper.selectList(categoryQueryWrapper);
+        categoryList.addAll(categoryLists);
+        List<Long> categoryIdLists = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
+        annotation.setCategoryIdLists(categoryIdLists);
+        List<Annotation> selfAnnoList = annotationMapper.selectListBy(annotation);
+        List<Features> annoList1 = getFeaturesList(selfAnnoList);
+        if (CollectionUtils.isNotEmpty(annoList1)) {
+            list.addAll(annoList1);
         }
         return list;
     }
