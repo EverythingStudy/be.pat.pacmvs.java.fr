@@ -7,6 +7,7 @@ import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
+import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,10 +33,12 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
     private AiForecastService aiForecastService;
     @Resource
     private CommonJsonParser commonJsonParser;
-
+    @Resource
+    private CommonJsonCheck commonJsonCheck;
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
+        setCommonJsonCheck(commonJsonCheck);
         log.debug("ThymusParserStrategyImpl init");
     }
 

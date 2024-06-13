@@ -8,6 +8,7 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import org.springframework.stereotype.Component;
 
 import cn.staitech.fr.domain.JsonTask;
@@ -35,10 +36,12 @@ public class PituitaryParserStrategyImpl extends AbstractCustomParserStrategy {
 	private AiForecastService aiForecastService;
 	@Resource
 	private CommonJsonParser commonJsonParser;
-
+	@Resource
+	private CommonJsonCheck commonJsonCheck;
 	@PostConstruct
 	public void init() {
 		setCommonJsonParser(commonJsonParser);
+		setCommonJsonCheck(commonJsonCheck);
 		log.info("PituitaryParserStrategyImpl init");
 	}
 
