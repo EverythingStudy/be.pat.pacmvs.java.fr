@@ -7,6 +7,7 @@ import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
+import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,7 +24,7 @@ import java.util.Map;
  * @Description: Json Parser 大鼠脑干（合并）、大鼠小脑(合并）
  */
 @Slf4j
-@Component("CerebellumBrainStem")
+@Component("D63_Cerebellum_and_Brain_stem")
 public class CerebellumParserStrategyImpl implements ParserStrategy {
 
     @Resource
@@ -33,10 +35,16 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
     private AiForecastService aiForecastService;
     @Resource
     private CommonJsonParser commonJsonParser;
-
+    @Resource
+    private CommonJsonCheck commonJsonCheck;
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         commonJsonParser.parseJson(jsonTask, jsonFileS);
+    }
+
+    @Override
+    public boolean checkJson(JsonTask jsonTask, List<JsonFile> jsonFileList) {
+        return commonJsonCheck.checkJson(jsonTask, jsonFileList);
     }
 
     @Override

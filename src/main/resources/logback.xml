@@ -84,7 +84,9 @@
 
     <!-- 系统模块日志级别控制  -->
     <!--    <logger name="cn.staitech" level="info" />-->
-    <logger name="cn.staitech" level="info"/>
+    <logger name="cn.staitech" level="debug"/>
+    <logger name="cn.staitech.fr.mapper.AnnotationMapper" level="OFF"/>
+    <logger name="cn.staitech.fr.service.impl.AnnotationServiceImpl" level="OFF"/>
     <!-- Spring日志级别控制  -->
     <!--	<logger name="org.springframework" level="warn" />-->
     <logger name="org.springframework" level="info"/>

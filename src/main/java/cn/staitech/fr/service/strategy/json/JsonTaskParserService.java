@@ -1,19 +1,13 @@
 package cn.staitech.fr.service.strategy.json;
 
-import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
-import cn.staitech.fr.service.AiForecastService;
-import cn.staitech.fr.service.JsonFileService;
-import cn.staitech.fr.service.JsonTaskService;
-import cn.staitech.fr.service.SingleSlideService;
-import cn.staitech.fr.service.SlideService;
+import cn.staitech.fr.service.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
-
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,12 +15,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.*;
 
 /**
  * @author: wangfeng
@@ -133,7 +125,7 @@ public class JsonTaskParserService {
 			log.info("AI预测切片id:{},算法名称标识:{},当前标签无法解析", jsonTask.getSingleId(),jsonTask.getAlgorithmCode());
 			return;
 		}
-		
+
 		log.info("+++parser2:{}", parser);
 		//判断json数据目录是否存在
 		for (JsonFile jsonFile : jsonFileList) {
@@ -157,8 +149,18 @@ public class JsonTaskParserService {
 		jsonTaskService.updateById(jsonTask);
 
 		try{
+			ParserStrategy finalParser = parser;
+			boolean b = finalParser.checkJson(jsonTask, jsonFileList);
+			if (!b) {
+				log.info("AI预测切片id:{},算法名称标识:{},JSON校验失败!", jsonTask.getSingleId(), jsonTask.getAlgorithmCode());
+				SingleSlide singleSlide = new SingleSlide();
+				singleSlide.setSingleId(jsonTask.getSingleId());
+				//0未预测、1预测成功、2预测失败、3预测中
+				singleSlide.setForecastStatus("2");
+				singleSlideService.updateById(singleSlide);
+				return;
+			}
 			for (JsonFile jsonFile : jsonFileList) {
-				ParserStrategy finalParser = parser;
 
 				log.info("Json文件解析开始:{} {} {} {}",System.currentTimeMillis() , jsonTask.getTaskId(), jsonFile.getFileUrl(), finalParser.getClass().getName());
 				jsonFile.setStartTime(new Date());

@@ -69,7 +69,6 @@ public class TracheaParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("气管腔面积", new IndicatorAddIn("气管腔面积", String.valueOf(organArea), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("黏膜上皮层面积", new IndicatorAddIn("黏膜上皮层面积", String.valueOf(mucosaArea), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("黏膜上皮层周长", new IndicatorAddIn("黏膜上皮层周长", String.valueOf(mucosaPerimeter), "毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("黏膜上皮层周长(单个)", createDefaultIndicator());
         indicatorResultsMap.put("黏膜上皮细胞核数量", new IndicatorAddIn("黏膜上皮细胞核数量", String.valueOf(mucosaCount), "个", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("软骨面积", new IndicatorAddIn("软骨面积", String.valueOf(cartilageArea), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("组织轮廓面积", accurateArea, "平方毫米", CommonConstant.NUMBER_1));

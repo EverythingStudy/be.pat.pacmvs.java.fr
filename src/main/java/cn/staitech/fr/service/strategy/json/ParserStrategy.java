@@ -3,6 +3,8 @@ package cn.staitech.fr.service.strategy.json;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 
+import java.util.List;
+
 /**
  * @author: wangfeng
  * @create: 2024-05-10 14:09:01
@@ -18,6 +20,8 @@ public interface ParserStrategy {
      * @param jsonFile
      */
     void parseJson(JsonTask jsonTask, JsonFile jsonFile);
+
+    boolean checkJson(JsonTask jsonTask, List<JsonFile> jsonFileList);
 
     /**
      * 指标计算

@@ -59,4 +59,7 @@ public class MatrixReviewListIn extends PageRequest {
     
     @ApiModelProperty(value = "标签列表")
     private List<Long> categoryIdList;
+
+    @ApiModelProperty(value = "AI精细轮廓：0未预测、1预测成功、2预测失败、3预测中;")
+    private String aiStatusFine;
 }

@@ -86,7 +86,7 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy 
 		}
 
 		if(bigDecimaE.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("主细胞核密度", new IndicatorAddIn("Nucleus density of chief cell", String.valueOf(bigDecimaE), "10³平方微米", "0"));
+			indicatorResultsMap.put("主细胞核密度", new IndicatorAddIn("Nucleus density of chief cell", String.valueOf(bigDecimaE), "个/10³平方微米", "0"));
 		}
 
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
