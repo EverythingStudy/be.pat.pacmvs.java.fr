@@ -77,4 +77,7 @@ public class MatrixReviewListOut {
     @ApiModelProperty(value = "图像路径")
     private String imageUrl;
 
+    @ApiModelProperty(value = "AI精细轮廓：0未预测、1预测成功、2预测失败、3预测中;")
+    private String aiStatusFine;
+
 }
