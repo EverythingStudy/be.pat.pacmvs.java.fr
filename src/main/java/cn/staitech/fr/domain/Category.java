@@ -89,6 +89,9 @@ public class Category implements Serializable {
     @ApiModelProperty(name = "delFlag" , value = "删除标志")
     private String delFlag;
 
+    
+    @ApiModelProperty(name = "algorithmSupportStatus" , value = "算法是否支持(0:支持，1:不支持)")
+    private Integer algorithmSupportStatus;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

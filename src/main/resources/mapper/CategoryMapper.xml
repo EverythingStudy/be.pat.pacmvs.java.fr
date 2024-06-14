@@ -13,11 +13,12 @@
             <result property="chromaticValue" column="chromatic_value" jdbcType="VARCHAR"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
             <result property="createBy" column="create_by" jdbcType="BIGINT"/>
+            <result property="algorithmSupportStatus" column="algorithm_support_status" jdbcType="INTEGER"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         category_id,species,organ_name,
         category_full_name,category_abbreviation,chromatic_value,
-        create_time,create_by
+        create_time,create_by,algorithm_support_status
     </sql>
 </mapper>

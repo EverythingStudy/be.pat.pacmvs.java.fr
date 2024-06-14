@@ -464,9 +464,12 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
 		//2024.05.28新增合并标签查询过滤
 		QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq("del_flag", 1);
 		queryWrapper.eq("organization_id", organizationId);
+		queryWrapper.eq("del_flag", 1);
+		//2024.06.14 算法是否支持(0:支持，1:不支持)
+		queryWrapper.or().eq("algorithm_support_status", 1);
 		List<Category> categoryList =  categoryService.list(queryWrapper);
+		
 		List<Long> categoryIdList = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
 		mrl.setCategoryIdList(categoryIdList);
 		List<MatrixReviewListOut> singleSlideList = slideMapper.getMatrixReview(mrl);
