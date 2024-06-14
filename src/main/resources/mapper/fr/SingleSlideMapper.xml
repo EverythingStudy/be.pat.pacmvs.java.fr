@@ -47,7 +47,7 @@
                 </if>
             </if>
         </where>
-        order by fs.initiate_time desc
+        order by fs.initiate_time desc,ss.single_id asc
     </select>
     <select id="selectNumber" resultType="cn.staitech.fr.domain.SingleOrganNumber">
         select count(*) as organ_number, category_id, slide_id
