@@ -277,7 +277,7 @@ public class JsonTaskParserService {
 			log.info("json-task-parser-service解析任务元数据异常:{}", e);
 			e.printStackTrace();
 		}finally {
-			return null;
+			return jsonTask;
 		}
 	}
 
