@@ -2,6 +2,7 @@ package cn.staitech.fr.utils;
 
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,8 @@ public class AreaUtils {
     private AnnotationMapper annotationMapper;
     @Resource
     private SingleSlideMapper singleSlideMapper;
+    @Resource
+    private CommonJsonParser commonJsonParser;
 
     /**
      * 获取组织轮廓面积
@@ -76,31 +79,8 @@ public class AreaUtils {
      * @return 脏器面积-平方毫米
      */
     public BigDecimal getOrganArea(JsonTask jsonTask,String structureId) {
-        // 查询所有未被删除且登录机构相同的数据
-        Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
-        // 定位表
-        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
-
-        // 脏器轮廓信息
-        Annotation annotation = new Annotation();
-        annotation.setSequenceNumber(sequenceNumber);
-        annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
-        annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
-        Annotation structure = annotationMapper.getStructureArea(annotation);
-        if(null == structure || StringUtils.isEmpty(structure.getArea())){
-            return BigDecimal.ZERO;
-        }
-
-        // 查询切片缩放
-        BigDecimal resolutionNum = new BigDecimal("0.262");
-        String resolution = singleSlideMapper.getImageId(jsonTask.getSlideId());
-        if (StringUtils.isNotEmpty(resolution)) {
-            resolutionNum = new BigDecimal(resolution);
-        }
-
-        // 计算面积
-        BigDecimal structureAreaNum = new BigDecimal(structure.getArea());
-        return structureAreaNum.multiply(resolutionNum).multiply(resolutionNum).multiply(new BigDecimal(0.000001));
+        Annotation annotation = commonJsonParser.getOrganArea(jsonTask, structureId);
+        return annotation.getStructureAreaNum();
     }
 
     /**
