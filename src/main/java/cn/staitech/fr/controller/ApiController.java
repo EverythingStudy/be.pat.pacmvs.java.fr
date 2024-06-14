@@ -31,6 +31,8 @@ public class ApiController {
     @ApiOperation(value = "py任务结果")
     @PostMapping("/pyResult")
     public void pyResult(@RequestBody Map params) {
-        parkDataProducer.sendMessage(JSONUtil.toJsonStr(params));
+    	String retData = JSONUtil.toJsonStr(params);
+    	log.info("Ai回调数据: " + retData);
+        parkDataProducer.sendMessage(retData);
     }
 }

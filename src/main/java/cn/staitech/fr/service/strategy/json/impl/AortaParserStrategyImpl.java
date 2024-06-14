@@ -90,7 +90,7 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		//		}
 
 		//		if(bigDecimalB.compareTo(BigDecimal.ZERO) != 0){
-//		indicatorResultsMap.put("空腔周长", new IndicatorAddIn("", String.valueOf(bigDecimalB), "毫米", "1"));
+		indicatorResultsMap.put("空腔周长", new IndicatorAddIn("", String.valueOf(bigDecimalB), "毫米", "1"));
 		//		}
 
 //		indicatorResultsMap.put("空腔周长(单个)", createDefaultIndicator());

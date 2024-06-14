@@ -475,6 +475,7 @@
                  left join fr_category fc on fss.category_id = fc.category_id
                  left join fr_slide fs on fs.slide_id = fss.slide_id
         where fs.special_id = #{specialId}
+          and fc.del_flag = '0'
           and fc.category_id is not null
         group by fss.category_id, fc.organ_name, fc.organ_en
     </select>
