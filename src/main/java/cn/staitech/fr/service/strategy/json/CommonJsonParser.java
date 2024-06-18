@@ -464,6 +464,16 @@ public class CommonJsonParser {
         proportion = proportion.multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP);
         return proportion;
     }
+    
+    
+    public BigDecimal getProportionMultiply(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
+        BigDecimal proportion;
+        if (null == bigDecimal1 || null == bigDecimal2 || bigDecimal1.compareTo(BigDecimal.ZERO) == 0 ||  bigDecimal2.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        proportion = bigDecimal1.divide(bigDecimal2,3,RoundingMode.HALF_UP);
+        return proportion;
+    }
 
     /**
      * 取脏器轮廓数量

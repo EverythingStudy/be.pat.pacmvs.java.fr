@@ -76,7 +76,7 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy 
 
 
 		//主细胞核密度 1=A/B
-		BigDecimal bigDecimaE = commonJsonParser.getProportion(new BigDecimal(mucosaCountA), areaDecimalB);
+		BigDecimal bigDecimaE = commonJsonParser.getProportionMultiply(new BigDecimal(mucosaCountA), areaDecimalB);
 
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
