@@ -692,7 +692,8 @@
             resultMap="BaseResultMap">
         SELECT
         sum(cast(area as float8)) AS area,
-        sum(cast(perimeter as float8)) AS perimeter
+        sum(cast(perimeter as float8)) AS perimeter,
+        count(annotation_id) as count
         from fr_ai_annotation_${sequenceNumber}
         where category_id = #{categoryId}
         <if test="singleSlideId != null">

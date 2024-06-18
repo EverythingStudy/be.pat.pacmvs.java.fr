@@ -420,8 +420,8 @@ public class CommonJsonParser {
             }
         }
         // 查询数量
-        Annotation annotationCount = annotationMapper.getInsideOrOutsideCount(annotation);
-        annotations.setCount(annotationCount.getCount());
+//        Annotation annotationCount = annotationMapper.getInsideOrOutsideCount(annotation);
+//        annotations.setCount(annotationCount.getCount());
         return annotation;
     }
 
