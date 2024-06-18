@@ -403,6 +403,7 @@ public class CommonJsonParser {
         }
         annotation.setInsideOrOutside(InsideOrOutside);
         annotation.setCategoryId(pathologicalMap.get(structureIds));
+        // 查询面积和周长
         Annotation annotations = annotationMapper.getInsideOrOutside(annotation);
         if (null != annotations) {
             if (StringUtils.isEmpty(annotations.getArea())) {
@@ -415,9 +416,12 @@ public class CommonJsonParser {
                 annotation.setStructurePerimeterNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(annotations.getPerimeter());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
+                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
         }
+        // 查询数量
+        Annotation annotationCount = annotationMapper.getInsideOrOutsideCount(annotation);
+        annotations.setCount(annotationCount.getCount());
         return annotation;
     }
 

@@ -209,6 +209,9 @@ public class Annotation implements Serializable {
     @TableField(exist = false)
     private String results625;
 
+    @TableField(exist = false)
+    private Integer count;
+
 
     @Override
     public boolean equals(Object that) {

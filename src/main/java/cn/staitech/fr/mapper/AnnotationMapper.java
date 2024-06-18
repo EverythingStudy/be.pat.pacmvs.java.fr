@@ -79,6 +79,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     Annotation getInsideOrOutside(Annotation annotation);
 
+    Annotation getInsideOrOutsideCount(Annotation annotation);
+
     Annotation collectAiGeometry(Annotation annotation);
     
     int batchDeleteBySsIds(Map<String,Object> parm);

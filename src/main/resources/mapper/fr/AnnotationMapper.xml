@@ -703,6 +703,19 @@
         </if>
     </select>
 
+    <select id="getInsideOrOutsideCount" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT
+            count(annotation_id) as count
+        from fr_ai_annotation_${sequenceNumber}
+        where category_id = #{categoryId}
+        <if test="singleSlideId != null">
+            AND single_slide_id = #{singleSlideId}
+        </if>
+        <if test="contour != null">
+            AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = #{insideOrOutside}
+        </if>
+    </select>
 
     <select id="collectAiGeometry" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
         SELECT st_asgeojson(ST_Collect(contour40000)) as collectContour
