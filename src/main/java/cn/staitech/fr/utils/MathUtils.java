@@ -1,14 +1,20 @@
 package cn.staitech.fr.utils;
 
+import cn.hutool.core.collection.CollectionUtil;
+import lombok.extern.slf4j.Slf4j;
+
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @Author wudi
  * @Date 2024/5/21 15:00
  * @desc
  */
+@Slf4j
 public class MathUtils {
     public static void main(String[] args) {
         //BigDecimal[] data={new BigDecimal("211"),new BigDecimal("275"),new BigDecimal("334"),new BigDecimal("383"),new BigDecimal("426")};
@@ -28,11 +34,15 @@ public class MathUtils {
 
         BigDecimal sqrt = sqrt(variance, scale);
         System.out.println("总体标准差" + sqrt);*/
-        BigDecimal[] data = {new BigDecimal("0.000"),new BigDecimal("0.000")};
-        BigDecimal sd=new BigDecimal("0.000");
-        BigDecimal sd2=new BigDecimal("0.000");
-        System.out.println(BigDecimal.ZERO.setScale(3, RoundingMode.HALF_UP));
-        System.out.println(sd2.compareTo(BigDecimal.ZERO));
+        //BigDecimal[] data = {new BigDecimal("0.000"),new BigDecimal("0.000")};
+        //BigDecimal sd=new BigDecimal("0.000");
+        //BigDecimal sd2=new BigDecimal("0.000");
+        //System.out.println(BigDecimal.ZERO.setScale(3, RoundingMode.HALF_UP));
+        //System.out.println(sd2.compareTo(BigDecimal.ZERO));
+        List<BigDecimal> list = new ArrayList<>();
+        list.add(new BigDecimal("1.234"));
+        String confidenceInterval = getConfidenceInterval(list);
+        System.out.println(confidenceInterval);
 
     }
 
@@ -51,7 +61,7 @@ public class MathUtils {
         }
 
         BigDecimal sum = sum(data, scale);
-        return sum.divide(new BigDecimal(data.length), new MathContext(scale, RoundingMode.HALF_UP));
+        return sum.divide(new BigDecimal(data.length),scale, RoundingMode.HALF_UP);
         // return  sum .divide(new BigDecimal( data.length),scale,BigDecimal.ROUND_HALF_UP);
     }
 
@@ -102,7 +112,7 @@ public class MathUtils {
             sum = sum.add(num);
         }
         //return sum.divide(new BigDecimal(data.length),scale,BigDecimal.ROUND_HALF_UP);
-        return sum.divide(new BigDecimal(data.length), new MathContext(scale, RoundingMode.HALF_UP));
+        return sum.divide(new BigDecimal(data.length), scale, RoundingMode.HALF_UP);
     }
 
     /**
@@ -142,4 +152,46 @@ public class MathUtils {
 
         return deviation;
     }
+
+
+    /**
+     *
+     * @param ave 平均值
+     * @param deviation 方差
+     * @return
+     */
+    public static String getConfidenceInterval(BigDecimal  ave, BigDecimal deviation){
+        //正态分布(下限)
+        BigDecimal subtract2 = ave.subtract(new BigDecimal(1.96).multiply(deviation)).setScale(3, RoundingMode.UP);
+        //正态分布(上限)
+        BigDecimal add2 = ave.add(new BigDecimal(1.96).multiply(deviation)).setScale(3, RoundingMode.UP);
+        return subtract2 + "-" + add2;
+    }
+
+
+    /**
+     *
+     * @param dataList
+     * @return 返回指标结果
+     */
+    public static String getConfidenceInterval(List<BigDecimal> dataList){
+        if(CollectionUtil.isNotEmpty(dataList)){
+            BigDecimal bigDecimal = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
+            log.info("平均值"+ bigDecimal);
+            BigDecimal variance = MathUtils.variance(dataList.toArray(new BigDecimal[dataList.size()]), 3);
+            log.info("总体方差" + variance);
+            BigDecimal sqrt = MathUtils.sqrt(variance, 3);
+            log.info("总体标准差" + sqrt);
+
+            //正态分布(下限)
+            BigDecimal subtract2 = bigDecimal.subtract(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
+            //正态分布(上限)
+            BigDecimal add2 = bigDecimal.add(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
+            return bigDecimal+"±"+sqrt+";"+subtract2 + "-" + add2;
+        }else{
+            return 0.000+"±"+0.000+";"+0.000 + "-" + 0.000;
+        }
+
+    }
+
 }
