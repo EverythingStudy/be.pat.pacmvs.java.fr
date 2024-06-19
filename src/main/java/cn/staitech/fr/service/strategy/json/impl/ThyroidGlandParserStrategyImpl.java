@@ -134,29 +134,30 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         indicatorResultsMap.put("甲状腺滤泡上皮面积占比（单个）", new IndicatorAddIn("Thyroid follicular epithelium area%(per)", accurateArea, "%"));
 
         // H-I
-        BigDecimal hSubtractI = new BigDecimal(accurateArea).subtract(parathyroidGlandArea);
+        BigDecimal hSubtractI = new BigDecimal(accurateArea).subtract(parathyroidGlandArea).setScale(4, RoundingMode.HALF_UP);
 
         //        血管面积占比	4	%	Vessel area%	4=C/(H-I) 	运算前注意统一单位
-        BigDecimal vesselAreaRate = vesselArea.divide(hSubtractI);
-        indicatorResultsMap.put("血管面积占比", new IndicatorAddIn("Vessel area", vesselAreaRate.toString(), "%"));
+        String vesselAreaRate = vesselArea.divide(hSubtractI).setScale(3, RoundingMode.HALF_UP).toString();
+        indicatorResultsMap.put("血管面积占比", new IndicatorAddIn("Vessel area", vesselAreaRate, "%"));
 
         //        血管内红细胞面积占比	5	%	Intravascular erythrocyte area%	5=D/(H-I) 	运算前注意统一单位
-        BigDecimal intravascularErythrocyteAreaRate = intravascularErythrocyteArea.divide(hSubtractI);
-        indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular erythrocyte area%", intravascularErythrocyteAreaRate.toString(), "%"));
+        String intravascularErythrocyteAreaRate = intravascularErythrocyteArea.divide(hSubtractI).setScale(3, RoundingMode.HALF_UP).toString();
+        indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular erythrocyte area%", intravascularErythrocyteAreaRate, "%"));
 
         //        血管外红细胞面积占比	6	%	Extravascular erythrocyte area%	6=E/(H-I) 	运算前注意统一单位
-        BigDecimal extravascularErythrocyteAreaRate = extravascularErythrocyteArea.divide(hSubtractI);
-        indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", extravascularErythrocyteAreaRate.toString(), "%"));
+        String extravascularErythrocyteAreaRate = extravascularErythrocyteArea.divide(hSubtractI).setScale(3, RoundingMode.HALF_UP).toString();
+        indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", extravascularErythrocyteAreaRate, "%"));
 
         //        肥大细胞密度	7	个/平方毫米	Density of mast cells	7=F/(H-I) 	运算前注意统一单位
-        BigDecimal densityOfMastCellsRate = new BigDecimal(densityOfMastCells).divide(hSubtractI);
-        indicatorResultsMap.put("肥大细胞密度", new IndicatorAddIn("Density of mast cells", densityOfMastCellsRate.toString(), "个/平方毫米"));
+        String densityOfMastCellsRate = new BigDecimal(densityOfMastCells).divide(hSubtractI).setScale(3, RoundingMode.HALF_UP).toString();
+        indicatorResultsMap.put("肥大细胞密度", new IndicatorAddIn("Density of mast cells", densityOfMastCellsRate, "个/平方毫米"));
 
         // TODO 滤泡上皮细胞核密度（单个）	8	个/103平方微米	Nucleus density of follicular cell (per)	8=G/(A-B) 	以95%置信区间和均数±标准差呈现
         indicatorResultsMap.put("滤泡上皮细胞核密度（单个）", new IndicatorAddIn("Nucleus density of follicular cell (per)", accurateArea, "个/10³平方微米"));
 
         // H 甲状腺面积	9	平方毫米	Thyroid gland area	9=H	当前甲状腺面积是甲状腺和甲状旁腺的面积总和
         indicatorResultsMap.put("甲状腺面积", new IndicatorAddIn("Thyroid gland area", accurateArea, "平方毫米"));
+
         // I 甲状旁腺面积	10	103平方微米	Parathyroid gland area	10=I
         indicatorResultsMap.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", parathyroidGlandArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
