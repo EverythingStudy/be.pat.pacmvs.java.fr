@@ -36,6 +36,7 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
     protected static final String PERCENTAGE = "%";
     protected static final String MM_PIECE = "个/毫米";
     protected static final String A = "3.141";
+    protected static final String NOT = "无";
 
 
 
