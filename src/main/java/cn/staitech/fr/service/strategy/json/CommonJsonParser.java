@@ -410,6 +410,46 @@ public class CommonJsonParser {
     }
 
 
+
+    public void setAnnotationBy(JsonTask jsonTask, String structureId, String structureIds, List<Map<String,Object>> dynamicMap) {
+        if(dynamicMap.size() > 0) {
+            String ares = null;
+            String perimeter = null;
+            String count = null;
+
+            for (Map<String, Object> i : dynamicMap) {
+                if ("area".equals(i.get("type"))) {
+                    ares = String.valueOf(i.get("name"));
+                }
+                if ("area".equals(i.get("perimeter"))) {
+                    perimeter = String.valueOf(i.get("name"));
+                }
+                if ("area".equals(i.get("count"))) {
+                    count = String.valueOf(i.get("name"));
+                }
+            }
+            List<Annotation> annotationList1 = getStructureContourList(jsonTask, structureId);
+            for (Annotation i : annotationList1) {
+                Annotation annotationBy = getInsideOrOutside(jsonTask, i.getContour(), structureIds, true);
+                DynamicData dynamicData = new DynamicData();
+                if (ares != null) {
+                    dynamicData.setDynamicKey(ares);
+                    dynamicData.setDynamicValue(String.valueOf(annotationBy.getStructureAreaNum()));
+                }
+                if (perimeter != null) {
+                    dynamicData.setDynamicKey(perimeter);
+                    dynamicData.setDynamicValue(String.valueOf(annotationBy.getStructurePerimeterNum()));
+                }
+                if (count != null) {
+                    dynamicData.setDynamicKey(count);
+                    dynamicData.setDynamicValue(String.valueOf(annotationBy.getCount()));
+                }
+                // sql更新表中信息
+            }
+        }
+    }
+
+
     public Annotation getContourInsideOrOutside(JsonTask jsonTask, String contour, String structureIds, Boolean InsideOrOutside) {
         // 查询所有未被删除且登录机构相同的数据
         Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());

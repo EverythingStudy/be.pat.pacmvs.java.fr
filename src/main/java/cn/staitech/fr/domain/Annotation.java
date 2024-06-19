@@ -1,5 +1,6 @@
 package cn.staitech.fr.domain;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -211,6 +212,19 @@ public class Annotation implements Serializable {
 
     @TableField(exist = false)
     private Integer count;
+
+    @TableField(exist = false)
+    private String dynamicData;
+
+    public Object getDynamicDataList() {
+        return JSON.parseObject(dynamicData);
+    }
+
+    @TableField(exist = false)
+    private Object dynamicDataList;
+
+
+
 
 
     @Override

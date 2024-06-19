@@ -24,6 +24,7 @@
         <result property="contour2500" column="contour2500" jdbcType="OTHER"/>
         <result property="contour625" column="contour625" jdbcType="OTHER"/>
         <result property="contourType" column="contour_type" jdbcType="BIGINT"/>
+        <result property="dynamicData" column="dynamic_data"  jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -504,15 +505,19 @@
         update_time,
         slide_id,
         id,
-        contour40000 as contour,
+        contour40000 as contour1,
         single_slide_id,
         contour_type,
         cell_type,
-        single
+        single,
+        dynamic_data
         from fr_ai_annotation_${sequenceNumber}
         <where>
             <if test="singleSlideId != null">
                 single_slide_id = #{singleSlideId}
+            </if>
+            <if test="annotationId != null">
+                AND annotation_id = #{annotationId}
             </if>
             <if test="categoryId != null">
                 AND category_id = #{categoryId}
