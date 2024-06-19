@@ -99,7 +99,6 @@ private AreaUtils areaUtils;
         // 黏膜上皮层平均厚度
         BigDecimal multiplyArea2 = mucosaArea.multiply(BigDecimal.valueOf(2)).setScale(3, BigDecimal.ROUND_HALF_UP);
 
-        String area = areaUtils.convertToSquareMicrometer(singleSlide.getArea());
         BigDecimal averageThicknessOfMucosalEpithelium = multiplyArea2.divide(mucosaPerimeter, 3, RoundingMode.HALF_UP);
 
         // 黏膜上皮细胞核密度

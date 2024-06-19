@@ -492,6 +492,8 @@
         annotation_id,
         area,
         perimeter,
+        area as structureAreaNum,
+        perimeter as structurePerimeterNum,
         description,
         category_id,
         location_type,

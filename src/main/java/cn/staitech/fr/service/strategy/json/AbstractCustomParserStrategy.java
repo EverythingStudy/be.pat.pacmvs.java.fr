@@ -32,6 +32,7 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
     protected static final String SQ_UM = "平方微米";
     protected static final String SQ_MM_PIECE = "个/平方毫米";
     protected static final String SQ_UM_THOUSAND = "10³平方微米";
+    protected static final String PERCENTAGE = "%";
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
