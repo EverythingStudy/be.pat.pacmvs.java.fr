@@ -26,6 +26,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     List<Annotation> aiSelectListBy(Annotation annotation);
 
+    List<Annotation> aiSelectList(Annotation annotation);
+
     Annotation mergeContour(Annotation annotation);
 
     Annotation selectContourType(Annotation annotation);

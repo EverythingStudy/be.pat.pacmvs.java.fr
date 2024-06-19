@@ -486,6 +486,38 @@
         </where>
     </select>
 
+    <select id="aiSelectList" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        select
+        annotation_id,
+        area,
+        perimeter,
+        description,
+        category_id,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        slide_id,
+        id,
+        contour40000 as contour,
+        single_slide_id,
+        contour_type,
+        cell_type,
+        single
+        from fr_ai_annotation_${sequenceNumber}
+        <where>
+            <if test="singleSlideId != null">
+                single_slide_id = #{singleSlideId}
+            </if>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+        </where>
+    </select>
+
     <select id="mergeContour" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
         <if test="operation != null and operation == 'UNION'">

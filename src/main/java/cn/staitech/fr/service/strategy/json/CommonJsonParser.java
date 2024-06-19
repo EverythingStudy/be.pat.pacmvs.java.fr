@@ -404,6 +404,35 @@ public class CommonJsonParser {
         annotation.setInsideOrOutside(InsideOrOutside);
         annotation.setCategoryId(pathologicalMap.get(structureIds));
         // 查询面积和周长
+
+        return getAnnotationMessage(annotation);
+    }
+
+
+    public Annotation getContourInsideOrOutside(JsonTask jsonTask, String contour, String structureIds, Boolean InsideOrOutside) {
+        // 查询所有未被删除且登录机构相同的数据
+        Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
+        // 定位表
+        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
+
+        // 脏器轮廓信息
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(sequenceNumber);
+
+        annotation.setContour(contour);
+        // 校验轮廓的合理性
+        String result = annotationMapper.stIsValid(annotation).getResults();
+        if (Objects.equals(result, "f")) {
+            return new Annotation();
+        }
+        annotation.setInsideOrOutside(InsideOrOutside);
+        annotation.setCategoryId(pathologicalMap.get(structureIds));
+        // 查询面积和周长
+        return getAnnotationMessage(annotation);
+    }
+
+
+    public Annotation getAnnotationMessage(Annotation annotation) {
         Annotation annotations = annotationMapper.getInsideOrOutside(annotation);
         if (null != annotations) {
             if (StringUtils.isEmpty(annotations.getArea())) {
@@ -419,11 +448,19 @@ public class CommonJsonParser {
                 annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
         }
-        // 查询数量
-//        Annotation annotationCount = annotationMapper.getInsideOrOutsideCount(annotation);
-//        annotations.setCount(annotationCount.getCount());
         return annotation;
     }
+
+    public List<Annotation> getStructureContourList(JsonTask jsonTask, String structureId) {
+        Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
+        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(sequenceNumber);
+        annotation.setSingleSlideId(jsonTask.getSingleId());
+        annotation.setCategoryId(pathologicalMap.get(structureId));
+        return annotationMapper.aiSelectList(annotation);
+    }
+
 
     /**
      * 获取脏器轮廓面积（micron）
