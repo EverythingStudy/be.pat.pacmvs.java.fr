@@ -2,6 +2,7 @@ package cn.staitech.fr.service.strategy.json.impl.intestines;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
@@ -12,12 +13,15 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,6 +89,43 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         // 组织轮廓
         BigDecimal tissueArea = new BigDecimal(area);
 
+        // 腺上皮面积占比（单个）	3	%	Acinar epithelial area% (per)	3=A/(A+C) 以95%置信区间和均数±标准差呈现
+        // 腺泡上皮细胞核密度（单个）	4	个/平方毫米	Nucleus density of acinar epithelium (per)	4=E/A	以95%置信区间和均数±标准差呈现
+        List<Annotation> structureContourList = commonJsonParser.getStructureContourList(jsonTask, "12B074");
+        List<BigDecimal> lists = new ArrayList<>();
+        List<BigDecimal> listNum = new ArrayList<>();
+
+        if (CollectionUtils.isNotEmpty(structureContourList)) {
+            for (Annotation annotation : structureContourList) {
+                // A 腺上皮面积（单个）	A	平方毫米	单个腺上皮面积
+                BigDecimal structureAreaNum = annotation.getStructureAreaNum();
+
+                // C 腺腔面积（单个）	C	平方毫米	单个腺上皮内所有腺腔面积
+                Annotation contourInsideOrOutside = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "12B0E9", true);
+                Annotation contourInsideOrOutside2 = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "12B0ED", true);
+
+                BigDecimal structureAreaNum1 = contourInsideOrOutside.getStructureAreaNum();// 面积
+                // A+C
+                BigDecimal add = structureAreaNum.add(structureAreaNum1);
+                if (add.compareTo(BigDecimal.ZERO) != 0) {
+                    // 3=A/(A+C)
+                    lists.add(structureAreaNum.divide(add, 4, RoundingMode.HALF_UP));
+                }
+
+                // E
+                Integer count = contourInsideOrOutside2.getCount();
+                if (add.compareTo(BigDecimal.ZERO) != 0) {
+                    // 4=E/A
+                    BigDecimal divide = new BigDecimal(count).divide(structureAreaNum, 4, RoundingMode.HALF_UP);
+                    listNum.add(divide);
+                }
+
+            }
+        }
+
+        String confidenceInterval = MathUtils.getConfidenceInterval(lists);
+        String confidenceInterval1 = MathUtils.getConfidenceInterval(listNum);
+
         // 算法输出指标 -------------------------------------------------------------
         // 腺上皮面积（单个）A 平方毫米 单个腺上皮面积
         map.put("腺上皮面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
@@ -106,13 +147,11 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         // 腺上皮面积（全片）B 平方毫米 若多个数据则相加输出
         map.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", colonArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_0));
 
-        // TODO 腺上皮面积占比（单个）	3	%	Acinar epithelial area% (per)	3=A/(A+C) 以95%置信区间和均数±标准差呈现
-        String acinarEpithelialareaPerRate = "";
-        map.put("腺上皮面积占比（单个）", new IndicatorAddIn("Acinar epithelial area% (per)", acinarEpithelialareaPerRate, "%"));
+        // 腺上皮面积占比（单个）	3	%	Acinar epithelial area% (per)	3=A/(A+C) 以95%置信区间和均数±标准差呈现
+        map.put("腺上皮面积占比（单个）", new IndicatorAddIn("Acinar epithelial area% (per)", confidenceInterval, "%"));
 
-        // TODO 腺泡上皮细胞核密度（单个）	4	个/平方毫米	Nucleus density of acinar epithelium (per)	4=E/A 以95%置信区间和均数±标准差呈现
-        String nucleusDensityOfAcinarEpithelialareaPerRate = "";
-        map.put("腺泡上皮细胞核密度（单个）", new IndicatorAddIn("Nucleus density of acinar epithelium (per)", nucleusDensityOfAcinarEpithelialareaPerRate, "个/平方毫米"));
+        // 腺泡上皮细胞核密度（单个）	4	个/平方毫米	Nucleus density of acinar epithelium (per)	4=E/A 以95%置信区间和均数±标准差呈现
+        map.put("腺泡上皮细胞核密度（单个）", new IndicatorAddIn("Nucleus density of acinar epithelium (per)", confidenceInterval1, "个/平方毫米"));
 
         // 间质和肌层面积占比	5	%	Mesenchyme and muscular area%	5=(F-B-D)/F
         String mesenchymeAndMuscularAreaRate = tissueArea.subtract(colonArea).subtract(areaNum2).divide(tissueArea).setScale(3, RoundingMode.HALF_UP).toString();

@@ -191,9 +191,9 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         // 毛囊面积（单个）	3	103平方微米	Hair follicle area（per）	3=C	以95%置信区间和均数±标准差呈现
         List<Annotation> skinStructureContourList = commonJsonParser.getStructureContourList(jsonTask, "121098");
         List<BigDecimal> skinLists = new ArrayList<>();
-        if (cn.staitech.common.core.utils.StringUtils.isNotEmpty(skinStructureContourList)) {
+        if (CollectionUtil.isNotEmpty(skinStructureContourList)) {
             for (Annotation annotation : skinStructureContourList) {
-                // 默认平方毫米
+                // 默认平方毫米 转 103平方微米
                 BigDecimal areaNum = annotation.getStructureAreaNum().multiply(new BigDecimal(1000));
                 skinLists.add(areaNum);
             }
