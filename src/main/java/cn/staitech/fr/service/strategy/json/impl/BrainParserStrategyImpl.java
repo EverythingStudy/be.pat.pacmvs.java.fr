@@ -95,15 +95,15 @@ public class BrainParserStrategyImpl implements ParserStrategy {
 
         // 产品呈现指标 -------------------------------------------------------------
         // 脉络丛面积占比	1	%	Choroid Plexus area %	1=A/D	无
-        BigDecimal choroidPlexusAreaRate = choroidOPlexusAreaAnnotation.getStructureAreaNum().divide(new BigDecimal(accurateArea));
+        BigDecimal choroidPlexusAreaRate = choroidOPlexusAreaAnnotation.getStructureAreaNum().divide(new BigDecimal(accurateArea)).setScale(3, RoundingMode.HALF_UP);
         indicatorResultsMap.put("脉络丛面积占比", new IndicatorAddIn("Choroid Plexus area %", choroidPlexusAreaRate.toString(), "%"));
 
         // 血管外红细胞面积占比	2	%	Extravascular Erythrocyte area%	2=B/D	无
-        BigDecimal extravascularErythrocyteAreaRate = extravascularErythrocyteArea.divide(new BigDecimal(accurateArea));
+        BigDecimal extravascularErythrocyteAreaRate = extravascularErythrocyteArea.divide(new BigDecimal(accurateArea)).setScale(3, RoundingMode.HALF_UP);
         indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular Erythrocyte area%", extravascularErythrocyteAreaRate.toString(), "%"));
 
         // 血管内红细胞面积占比	3	%	Intravascular Erythrocyte area%	3=C/D	无
-        BigDecimal intravascularErythrocyteAreaRate = intravascularErythrocyteArea.divide(new BigDecimal(accurateArea));
+        BigDecimal intravascularErythrocyteAreaRate = intravascularErythrocyteArea.divide(new BigDecimal(accurateArea)).setScale(3, RoundingMode.HALF_UP);
         indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", intravascularErythrocyteAreaRate.toString(), "%"));
 
         // D 大脑面积	4	平方毫米	Brain area	4=D	无
