@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl.digestive;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
@@ -131,7 +132,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
 
         List<Annotation> structureContourList = commonJsonParser.getStructureContourList(jsonTask, "12306C");
         List<BigDecimal> lists = new ArrayList<>();
-        if (cn.staitech.common.core.utils.StringUtils.isNotEmpty(structureContourList)) {
+        if (CollectionUtil.isNotEmpty(structureContourList)) {
             for (Annotation annotation : structureContourList) {
                 //G
                 BigDecimal structureAreaNum = annotation.getStructureAreaNum();

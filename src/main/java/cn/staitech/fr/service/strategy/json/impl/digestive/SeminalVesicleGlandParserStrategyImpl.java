@@ -1,6 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl.digestive;
 
-import cn.staitech.common.core.utils.StringUtils;
+import cn.hutool.core.collection.CollectionUtil;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
@@ -67,7 +67,7 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
         List<Annotation> structureContourList = commonJsonParser.getStructureContourList(jsonTask, "12D074");
         List<BigDecimal> lists = new ArrayList<>();
         List<BigDecimal> listNum = new ArrayList<>();
-        if (StringUtils.isNotEmpty(structureContourList)) {
+        if (CollectionUtil.isNotEmpty(structureContourList)) {
             for (Annotation annotation : structureContourList) {
                 //A
                 BigDecimal structureAreaNum = annotation.getStructureAreaNum();
