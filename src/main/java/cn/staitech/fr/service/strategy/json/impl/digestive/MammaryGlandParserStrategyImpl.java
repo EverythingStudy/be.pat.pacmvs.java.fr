@@ -171,7 +171,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("表皮基底层+棘层+颗粒层面积", new IndicatorAddIn("Area of basal layer+spinous layer+granular layer of epidermis", organArea4.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
 
         // 毛囊面积（单个）	C	103平方微米	单个毛囊面积输出
-        map.put("毛囊面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1, CommonConstant.NUMBER_1));
+        map.put("毛囊面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
 
         // 毛囊数量	D	个	无
         map.put("毛囊数量", new IndicatorAddIn("Number of mucous sacs", areaCount.toString(), "个", CommonConstant.NUMBER_1));
@@ -185,8 +185,19 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         // 毛囊面积（全片）	H	平方毫米	无
         map.put("毛囊面积（全片）", new IndicatorAddIn("Mucous sac area (all)", organAreaH.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
 
-
         // 产品呈现指标 皮肤 -------------------------------------------------------------
+        // TODO 毛囊面积（单个）	3	103平方微米	Hair follicle area（per）	3=C	以95%置信区间和均数±标准差呈现
+        List<Annotation> skinStructureContourList = commonJsonParser.getStructureContourList(jsonTask, "121098");
+        List<BigDecimal> skinLists = new ArrayList<>();
+        if (cn.staitech.common.core.utils.StringUtils.isNotEmpty(skinStructureContourList)) {
+            for (Annotation annotation : skinStructureContourList) {
+                //G
+                BigDecimal areaNum = annotation.getStructureAreaNum();
+                skinLists.add(areaNum);
+            }
+        }
+        String confidenceHairFollicleArea = MathUtils.getConfidenceInterval(lists);
+
         // 产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
         // 表皮角质层面积占比	1	%	Stratum corneum area%	1=A/G
         String stratumCorneumAreaRate = organArea3.divide(organAreaB).setScale(3, RoundingMode.HALF_UP).toString();
@@ -197,8 +208,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("表皮基底层+棘层+颗粒层面积占比", new IndicatorAddIn("Nucleated cell layer area%", nucleatedCellLayerAreaRate, "%"));
 
         // TODO 毛囊面积（单个）	3	103平方微米	Hair follicle area（per）	3=C	以95%置信区间和均数±标准差呈现
-        String hairFollicleAreaPerRate = "";
-        map.put("毛囊面积（单个）", new IndicatorAddIn("Hair follicle area（per）", hairFollicleAreaPerRate, ""));
+        map.put("毛囊面积（单个）", new IndicatorAddIn("Hair follicle area（per）", confidenceHairFollicleArea, ""));
 
         // 毛囊密度	4	个/平方毫米	Density of hair follicles 	4=D/G
         map.put("毛囊密度", new IndicatorAddIn("Mucous sac density", divide.toString(), "个/平方毫米"));
