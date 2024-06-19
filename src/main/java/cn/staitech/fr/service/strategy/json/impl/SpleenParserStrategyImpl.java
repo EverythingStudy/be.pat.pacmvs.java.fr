@@ -39,6 +39,7 @@ public class SpleenParserStrategyImpl implements ParserStrategy {
     private CommonJsonParser commonJsonParser;
     @Resource
     private CommonJsonCheck commonJsonCheck;
+
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         commonJsonParser.parseJson(jsonTask, jsonFileS);
@@ -78,6 +79,7 @@ public class SpleenParserStrategyImpl implements ParserStrategy {
         //        组织轮廓面积	F	平方毫米(H:精细轮廓总面积（脾脏）-平方毫米)
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
+        BigDecimal accurateAreaDecimal = new BigDecimal(accurateArea);
         //        边缘区面积	G	平方毫米	数据相加输出（算法直接输出）(WORD无数据，JSON有数据！)
         BigDecimal marginalZoneArea = commonJsonParser.getOrganArea(jsonTask, "14504A").getStructureAreaNum();
         //        红髓	H	平方毫米	算法直接输出 (WORD无数据，JSON有数据！)
@@ -92,13 +94,48 @@ public class SpleenParserStrategyImpl implements ParserStrategy {
         //        动脉周围淋巴鞘面积占比	6	%	Periarterial lymphatic sheath area%	6=（B-C）/F	包含淋巴滤泡
         //        脾脏面积	7	平方毫米	Spleen area	7=F
 
+        // 算法输出指标 -------------------------------------------------------------
+        // A
         indicatorResultsMap.put("白髓面积", new IndicatorAddIn("White pulp area", whitePulpArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        // B
         indicatorResultsMap.put("动脉周围淋巴鞘面积", new IndicatorAddIn("Periarterial lymphatic sheath area", periarterialLymphaticSheathArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        // C
         indicatorResultsMap.put("中央动脉面积", new IndicatorAddIn("Central artery area", centralArteryArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        // D
         indicatorResultsMap.put("含铁血黄素面积", new IndicatorAddIn("Hemosiderin area", hemosiderinArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        // E
         indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("Marginal zone area", erythrocyteArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        // G
         indicatorResultsMap.put("边缘区面积", new IndicatorAddIn("Marginal zone area", marginalZoneArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        // H
         indicatorResultsMap.put("红髓面积", new IndicatorAddIn("Red pulp", redPulpArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+
+        // 产品呈现指标 -------------------------------------------------------------
+        // 白髓面积占比	1	%	White pulp area%	1=A/F
+        String whitePulpAreaRate = whitePulpArea.divide(accurateAreaDecimal).toString();
+        indicatorResultsMap.put("白髓面积占比", new IndicatorAddIn("White pulp area%", whitePulpAreaRate, "%"));
+
+        // 含铁血黄素面积占比	2	%	White pulp area%%	2=D/F
+        String hemosiderinAreaRate = hemosiderinArea.divide(accurateAreaDecimal).toString();
+        indicatorResultsMap.put("含铁血黄素面积占比", new IndicatorAddIn("Hemosiderin area%", hemosiderinAreaRate, "%"));
+
+        // 红髓面积占比	3	%	Red pulp area%	3=H/F
+        String redPulpAreaRate = redPulpArea.divide(accurateAreaDecimal).toString();
+        indicatorResultsMap.put("红髓面积占比", new IndicatorAddIn("Red pulp area%", redPulpAreaRate, "%"));
+
+        // 红细胞面积占比	4	%	Erythrocyte area%	4=E/F
+        String erythrocyteAreaRate = erythrocyteArea.divide(accurateAreaDecimal).toString();
+        indicatorResultsMap.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", erythrocyteAreaRate, "%"));
+
+        // 边缘区面积占比	5	%	Marginal zone area%	5=G/F
+        String marginalZoneAreaRate = marginalZoneArea.divide(accurateAreaDecimal).toString();
+        indicatorResultsMap.put("边缘区面积占比", new IndicatorAddIn("Marginal zone area", marginalZoneAreaRate, "%"));
+
+        // 动脉周围淋巴鞘面积占比	6	%	Periarterial lymphatic sheath area%	6=（B-C）/F	包含淋巴滤泡
+        String periarterialLymphaticSheathAreaRate = periarterialLymphaticSheathArea.subtract(centralArteryArea).divide(accurateAreaDecimal).toString();
+        indicatorResultsMap.put("动脉周围淋巴鞘面积占比", new IndicatorAddIn("Periarterial lymphatic sheath area%", periarterialLymphaticSheathAreaRate, "%"));
+
+        // F
         indicatorResultsMap.put("脾脏面积", new IndicatorAddIn("Spleen area", accurateArea, "平方毫米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
