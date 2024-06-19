@@ -2,6 +2,7 @@ package cn.staitech.fr.service.strategy.json.impl.digestive;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -12,6 +13,7 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -20,7 +22,9 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,6 +46,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
     private CommonJsonParser commonJsonParser;
     @Resource
     private CommonJsonCheck commonJsonCheck;
+
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -94,8 +99,11 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         BigDecimal organAreaA = commonJsonParser.getOrganArea(jsonTask, "123005").getStructureAreaNum();
         //皮肤B
         BigDecimal organAreaB = commonJsonParser.getOrganArea(jsonTask, "1230C3").getStructureAreaNum();
+        //D乳腺腺泡/导管面积（全片）
         BigDecimal organArea1 = commonJsonParser.getOrganArea(jsonTask, "12306C").getStructureAreaNum();
+        //f结缔组织面积
         BigDecimal organArea2 = commonJsonParser.getOrganArea(jsonTask, "12303F").getStructureAreaNum();
+        //I结缔组织面积
         Integer organAreaCount2 = commonJsonParser.getOrganAreaCount(jsonTask, "1230C7");
         // 表皮角质层面积
         BigDecimal organArea3 = commonJsonParser.getOrganArea(jsonTask, "121096").getStructureAreaNum();
@@ -123,7 +131,42 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         }
 
         indicatorResultsMap.put("乳腺腺泡和导管数量", new IndicatorAddIn("Number of acinus and ducts", organAreaCount.toString(), "个"));
+        BigDecimal subtract = h.subtract(organAreaA).subtract(organAreaB);
+        if (subtract.compareTo(BigDecimal.ZERO) == 0) {
+            indicatorResultsMap.put("乳腺腺泡和导管面积占比", new IndicatorAddIn("Acinus and ducts area%", "0.000", "%"));
+            indicatorResultsMap.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", "0.000", "%"));
+
+        } else {
+            BigDecimal divide2 = organArea1.divide(subtract, 3, RoundingMode.HALF_UP);
+            indicatorResultsMap.put("乳腺腺泡和导管面积占比", new IndicatorAddIn("Acinus and ducts area%", divide2.toString(), "%"));
+            BigDecimal subtract1 = organArea2.subtract(organArea1);
+            indicatorResultsMap.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", subtract1.divide(subtract,3,RoundingMode.HALF_UP).toString(), "%"));
+
+        }
+
+        List<Annotation> structureContourList = commonJsonParser.getStructureContourList(jsonTask, "12306C");
+        List<BigDecimal> lists = new ArrayList<>();
+        if (cn.staitech.common.core.utils.StringUtils.isNotEmpty(structureContourList)) {
+            for (Annotation annotation : structureContourList) {
+                //G
+                BigDecimal structureAreaNum = annotation.getStructureAreaNum();
+                Annotation contourInsideOrOutside = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "1230C7", true);
+                //E
+                Integer count = contourInsideOrOutside.getCount();//数量
+
+                if (structureAreaNum.compareTo(BigDecimal.ZERO) != 0) {
+                    BigDecimal multiply = structureAreaNum.multiply(new BigDecimal(1000));
+                    lists.add(new BigDecimal(count).divide(multiply, 4, RoundingMode.HALF_UP));
+                }
+
+            }
+        }
+        String confidenceInterval = MathUtils.getConfidenceInterval(lists);
+        indicatorResultsMap.put("腺泡或导管细胞核密度（单个）", new IndicatorAddIn("Nucleus density of acinus or ducts （per）", confidenceInterval, "个/10³平方微米"));
+        BigDecimal divide2 = new BigDecimal(organAreaCount2).divide(organArea1, 3, RoundingMode.HALF_UP);
+        indicatorResultsMap.put("乳腺细胞核密度（全片）", new IndicatorAddIn("Nucleus density of mammary gland（all）", divide2.toString(), "个/平方毫米"));
         indicatorResultsMap.put("乳腺面积", new IndicatorAddIn("Mammary gland area", h.subtract(organAreaA).subtract(organAreaB).setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米"));
+
         indicatorResultsMap.put("淋巴结面积", new IndicatorAddIn("Lymph node area", organAreaA.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("皮肤面积", new IndicatorAddIn("Skin area", organAreaB.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("乳腺腺泡/导管面积（全片）", new IndicatorAddIn("Breast acinar/ductal area (all)", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));

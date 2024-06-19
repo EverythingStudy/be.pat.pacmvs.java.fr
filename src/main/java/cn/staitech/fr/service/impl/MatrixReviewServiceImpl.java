@@ -352,7 +352,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 			LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
 			wrapper.in(SingleSlide::getSingleId,ids);
 			List<SingleSlide> singleSlides = singleSlideMapper.selectList(wrapper);
-			categorys=  singleSlides.stream().collect(Collectors.toMap(SingleSlide::getSingleId,SingleSlide::getCategoryId));
+			categorys =  singleSlides.stream().collect(Collectors.toMap(SingleSlide::getSingleId,SingleSlide::getCategoryId));
 		}
 		for (Long id : ids) {
 			ExportAiVO exportVO = singleSlideMapper.getExportAiVO(id);
