@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
@@ -11,12 +12,15 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +90,43 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         String accurateArea = singleSlide.getArea();
         BigDecimal accurateAreaDecimal = new BigDecimal(accurateArea);
 
+        // 胆管密度（单个）	4	个/103平方微米	Density of bile duct (per)	4=E/A	单个为单个门管区  以95%置信区间和均数±标准差呈现
+        // 胆管面积占比（单个）	5	%	Bile duct area%    (per)	5=F/A	单个为单个门管区  以95%置信区间和均数±标准差呈现； 运算前统一单位
+        List<Annotation> structureContourList = commonJsonParser.getStructureContourList(jsonTask, "112145");
+        List<BigDecimal> lists = new ArrayList<>();
+        List<BigDecimal> listNum = new ArrayList<>();
+
+        if (CollectionUtils.isNotEmpty(structureContourList)) {
+            for (Annotation annotation : structureContourList) {
+                // A 门管区面积（单个）	A	103平方微米	单个门管区面积
+                BigDecimal structureAreaNum = annotation.getStructureAreaNum().multiply(new BigDecimal(1000));
+
+                Annotation contourInsideOrOutside = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "11214A", true);
+
+                // E 胆管数量（单个门管区）	E	个	单个门管区内胆管数量
+                Integer count = contourInsideOrOutside.getCount();
+
+                // F 胆管面积（单个门管区）	F	103平方微米	若单个门管区内有多个胆管，则相加输出
+                BigDecimal structureAreaNum1 = contourInsideOrOutside.getStructureAreaNum();
+
+                // 4=E/A
+                if (structureAreaNum.compareTo(BigDecimal.ZERO) != 0) {
+                    listNum.add(new BigDecimal(count).divide(structureAreaNum, 4, RoundingMode.HALF_UP));
+                }
+
+                // 5=F/A
+                if (structureAreaNum.compareTo(BigDecimal.ZERO) != 0) {
+                    BigDecimal divide = structureAreaNum1.divide(structureAreaNum, 4, RoundingMode.HALF_UP);
+                    lists.add(divide);
+                }
+
+            }
+        }
+
+        String confidenceInterval = MathUtils.getConfidenceInterval(lists);
+        String confidenceInterval1 = MathUtils.getConfidenceInterval(listNum);
+
+
         //        产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
         //        肝脏面积	1	平方毫米	Liver area	1=H
         //        静脉面积占比	2	%	Vein area%	2=(B+C)/H	运算前注意统一单位
@@ -126,13 +167,13 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         String density = new BigDecimal(nucleusCount).divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).toString();
         indicatorResultsMap.put("肝细胞核密度", new IndicatorAddIn("Nucleus density of hepatocyte", density, "个/平方毫米"));
 
-        // TODO  胆管密度（单个）	4	个/103平方微米	Density of bile duct (per)	4=E/A	单个为单个门管区  以95%置信区间和均数±标准差呈现
+        // 胆管密度（单个）	4	个/103平方微米	Density of bile duct (per)	4=E/A	单个为单个门管区  以95%置信区间和均数±标准差呈现
         String densityOfBileDuctPerRate = "";// = new BigDecimal(bileDuctCount).divide()
-        indicatorResultsMap.put("胆管密度（单个）", new IndicatorAddIn("Density of bile duct (per)", densityOfBileDuctPerRate, "个/10³平方毫米"));
+        indicatorResultsMap.put("胆管密度（单个）", new IndicatorAddIn("Density of bile duct (per)", confidenceInterval, "个/10³平方毫米"));
 
-        // TODO 胆管面积占比（单个）	5	%	Bile duct area%    (per)	5=F/A	单个为单个门管区  以95%置信区间和均数±标准差呈现； 运算前统一单位
+        // 胆管面积占比（单个）	5	%	Bile duct area%    (per)	5=F/A	单个为单个门管区  以95%置信区间和均数±标准差呈现； 运算前统一单位
         String bileDuctAreaRate = "";
-        indicatorResultsMap.put("胆管面积占比（单个）", new IndicatorAddIn("Bile duct area", bileDuctAreaRate, "%"));
+        indicatorResultsMap.put("胆管面积占比（单个）", new IndicatorAddIn("Bile duct area", confidenceInterval1, "%"));
 
         // 窦内细胞核密度	6	个/平方毫米	Nucleus density of Sinus cell	6=G/H
         String nucleusDensityOfSinusCellRate = new BigDecimal(sinusNnucleusCount).divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).toString();

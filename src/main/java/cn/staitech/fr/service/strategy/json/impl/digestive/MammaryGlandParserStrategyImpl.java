@@ -198,7 +198,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
                 skinLists.add(areaNum);
             }
         }
-        String confidenceHairFollicleArea = MathUtils.getConfidenceInterval(lists);
+        String confidenceHairFollicleArea = MathUtils.getConfidenceInterval(skinLists);
 
         // 产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
         // 表皮角质层面积占比	1	%	Stratum corneum area%	1=A/G
