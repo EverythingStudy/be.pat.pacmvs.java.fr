@@ -25,6 +25,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -504,6 +505,15 @@ public class CommonJsonParser {
         proportion = bigDecimal1.divide(bigDecimal2,3,RoundingMode.HALF_UP);
         proportion = proportion.multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP);
         return proportion;
+    }
+
+    public BigDecimal sqrt(BigDecimal number) {
+        // 将BigDecimal转换为double进行开方
+        double doubleValue = number.doubleValue();
+        double sqrtValue = Math.sqrt(doubleValue);
+        // 根据所需的精度，将double结果转换回BigDecimal
+        MathContext mc = new MathContext(3, RoundingMode.HALF_UP);
+        return new BigDecimal(sqrtValue, mc);
     }
     
     

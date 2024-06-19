@@ -28,11 +28,16 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
     // 指标单位
     protected static final String PIECE = "个";
     protected static final String MM = "毫米";
+    protected static final String UM = "微米";
     protected static final String SQ_MM = "平方毫米";
     protected static final String SQ_UM = "平方微米";
     protected static final String SQ_MM_PIECE = "个/平方毫米";
     protected static final String SQ_UM_THOUSAND = "10³平方微米";
     protected static final String PERCENTAGE = "%";
+    protected static final String MM_PIECE = "个/毫米";
+    protected static final String A = "3.141";
+
+
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {

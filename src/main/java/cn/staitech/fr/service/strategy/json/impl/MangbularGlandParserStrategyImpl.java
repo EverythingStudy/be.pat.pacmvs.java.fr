@@ -97,6 +97,7 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
         // 算法输出指标
         resultsMap.put("颗粒管（红色）数量", createIndicator(organAreaCountA, PIECE));
         resultsMap.put("黏液腺细胞核数量", createIndicator(organAreaCountB, PIECE));
+        resultsMap.put("颗粒管内细胞核数量（单个）", createDefaultIndicator());
         resultsMap.put("有血管壁的血管面积", createIndicator(organAreaD, SQ_MM));
         resultsMap.put("有血管壁的血管数量", createIndicator(organAreaCountE, PIECE));
         resultsMap.put("红细胞面积", createIndicator(organAreaF, SQ_MM));
