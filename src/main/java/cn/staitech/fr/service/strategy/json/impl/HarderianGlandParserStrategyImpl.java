@@ -126,6 +126,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         // B 腺泡细胞核数量（单个）	B	个	单个腺泡内数据相加输出
         Annotation annotationByB = new Annotation();
         annotationByB.setCountName("腺泡细胞核数量（单个）");
+        annotationByB.setCountUnit("个");
         commonJsonParser.putAnnotationDynamicData(jsonTask, "10206D", "10206E", annotationByB);
 
         // 算法输出指标 -------------------------------------------------------------

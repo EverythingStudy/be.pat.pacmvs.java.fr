@@ -48,8 +48,6 @@ public class CommonJsonParser {
     @Resource
     private CategoryMapper categoryMapper;
     @Resource
-    private SingleSlideMapper singleSlideMapper;
-    @Resource
     private AnnotationService annotationService;
 
     private static Annotation handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask) {

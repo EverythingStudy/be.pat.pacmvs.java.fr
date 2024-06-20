@@ -125,11 +125,13 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         // 腺腔面积（单个）	C	平方毫米	单个腺上皮内所有腺腔面积
         Annotation annotationByC = new Annotation();
         annotationByC.setAreaName("腺腔面积（单个）");
+        annotationByC.setAreaUnit("平方毫米");
         commonJsonParser.putAnnotationDynamicData(jsonTask, "12B074", "12B0E9", annotationByC);
 
         // 腺上皮细胞核数量（单个）	E	个	单个腺上皮细胞核数量
         Annotation annotationByE = new Annotation();
         annotationByE.setCountName("腺上皮细胞核数量（单个）");
+        annotationByE.setCountUnit("个");
         commonJsonParser.putAnnotationDynamicData(jsonTask, "12B074", "12B0ED", annotationByE);
 
         // 算法输出指标 -------------------------------------------------------------
