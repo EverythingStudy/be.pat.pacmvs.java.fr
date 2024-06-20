@@ -63,7 +63,20 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
 
         indicatorResultsMap.put("腺腔面积（全片）", new IndicatorAddIn("Glandular cavity area (all)", organArea1.toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("腺上皮面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+
+        Annotation annotationBy = new Annotation();
+        annotationBy.setAreaName("腺腔面积（单个）");
+        annotationBy.setAreaUnit("平方毫米");
+        commonJsonParser.putAnnotationDynamicData(jsonTask,"12D074","12D0E9",annotationBy);
         indicatorResultsMap.put("腺腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+
+        Annotation annotationBy2 = new Annotation();
+        annotationBy2.setCountName("腺上皮细胞核数量（单个）");
+        commonJsonParser.putAnnotationDynamicData(jsonTask,"12D074","12D0ED",annotationBy2);
+        indicatorResultsMap.put("腺上皮细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+
+
+
         List<Annotation> structureContourList = commonJsonParser.getStructureContourList(jsonTask, "12D074");
         List<BigDecimal> lists = new ArrayList<>();
         List<BigDecimal> listNum = new ArrayList<>();

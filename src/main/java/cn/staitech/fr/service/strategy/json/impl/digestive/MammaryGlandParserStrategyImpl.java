@@ -162,6 +162,10 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("乳腺细胞核数量（全片）", new IndicatorAddIn("Number of breast cell nuclei (all)", organAreaCount2.toString(), "个", CommonConstant.NUMBER_1));
         map.put("乳腺腺泡/导管面积（单个）", new IndicatorAddIn());
 
+        map.put("乳腺细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        Annotation annotationBy = new Annotation();
+        annotationBy.setCountName("乳腺细胞核数量（单个）");
+        commonJsonParser.putAnnotationDynamicData(jsonTask,"12306C","1230C7",annotationBy);
 
         // 算法输出指标 皮肤 -------------------------------------------------------------
         // 算法输出指标	指标代码（仅限本文档）	单位（保留小数点后三位）	备注
