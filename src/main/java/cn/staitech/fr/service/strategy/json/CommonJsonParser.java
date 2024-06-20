@@ -444,9 +444,6 @@ public class CommonJsonParser {
             }
     }
 
-    @Resource
-    private AreaUtils areaUtils;
-
     /**
      *
      * @param jsonTask
@@ -465,7 +462,9 @@ public class CommonJsonParser {
             if (annotation.getAreaName() != null) {
                 dynamicData.setName(annotation.getAreaName());
                 if(type == 1){
-                    dynamicData.setData(String.valueOf(areaUtils.convertToSquareMicrometer(annotationBy.getStructureAreaNum().toString())));
+
+
+                    dynamicData.setData(String.valueOf(convertToSquareMicrometer(annotationBy.getStructureAreaNum().toString())));
                 }
                 dynamicData.setUnit(annotation.getAreaUnit());
                 dynamicDataList.add(dynamicData);
@@ -488,6 +487,16 @@ public class CommonJsonParser {
             i.setDynamicData(jsonObject.toString());
             annotationMapper.aiUpdateById(i);
         }
+    }
+
+
+    public String convertToSquareMicrometer(String str){
+        BigDecimal result = BigDecimal.ZERO;
+        if (!StringUtils.isEmpty(str)) {
+            BigDecimal areaNum = new BigDecimal(str).multiply(BigDecimal.valueOf(1000));
+            result = areaNum.setScale(3, BigDecimal.ROUND_HALF_UP);
+        }
+        return result.toString();
     }
 
 

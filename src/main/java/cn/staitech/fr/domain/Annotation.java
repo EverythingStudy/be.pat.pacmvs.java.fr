@@ -239,7 +239,7 @@ public class Annotation implements Serializable {
     private String perimeterUnit;
 
     @TableField(exist = false)
-    private String countUnit;
+    private String countUnit = "个";
 
 
 
