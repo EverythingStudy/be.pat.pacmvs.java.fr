@@ -18,6 +18,9 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 肺脏
+ */
 @Slf4j
 @Service("Lung")
 public class LungParserStrategyImpl extends AbstractCustomParserStrategy {
@@ -75,18 +78,18 @@ public class LungParserStrategyImpl extends AbstractCustomParserStrategy {
         // 血管外红细胞面积占比
         BigDecimal extravascularErythrocyteAreas = commonJsonParser.getProportion(extravascularErythrocyteArea, BigDecimal.valueOf(Long.parseLong(accurateArea)));
 
-        indicatorResultsMap.put("支气管面积", new IndicatorAddIn("支气管面积", String.valueOf(bronchiArea), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("血管面积", new IndicatorAddIn("血管面积", String.valueOf(vesselArea), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("血管内红细胞面积", String.valueOf(intravascularErythrocyteArea), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("血管外红细胞面积", String.valueOf(extravascularErythrocyteArea), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("肺泡上皮细胞核数量", new IndicatorAddIn("肺泡上皮细胞核数量", String.valueOf(count), "个", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("支气管面积", new IndicatorAddIn("支气管面积", String.valueOf(bronchiArea), SQ_MM, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("血管面积", new IndicatorAddIn("血管面积", String.valueOf(vesselArea), SQ_MM, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("血管内红细胞面积", String.valueOf(intravascularErythrocyteArea), SQ_MM, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("血管外红细胞面积", String.valueOf(extravascularErythrocyteArea), SQ_MM, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("肺泡上皮细胞核数量", new IndicatorAddIn("肺泡上皮细胞核数量", String.valueOf(count), PIECE, CommonConstant.NUMBER_1));
 
-        indicatorResultsMap.put("支气管面积占比", new IndicatorAddIn("Bronchi area%", String.valueOf(bronchiAreas), "%"));
-        indicatorResultsMap.put("血管面积占比", new IndicatorAddIn("Vessel area%", String.valueOf(vesselAreas), "%"));
-        indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular erythrocyte area%", String.valueOf(intravascularErythrocyteAreas), "%"));
-        indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", String.valueOf(extravascularErythrocyteAreas), "%"));
-        indicatorResultsMap.put("肺泡上皮细胞核密度", new IndicatorAddIn("Nucleus density of alveolar epithelial cell", String.valueOf(density), "个/平方毫米"));
-        indicatorResultsMap.put("肺脏面积", new IndicatorAddIn("Lung area", accurateArea, "平方毫米"));
+        indicatorResultsMap.put("支气管面积占比", new IndicatorAddIn("Bronchi area%", String.valueOf(bronchiAreas), PERCENTAGE));
+        indicatorResultsMap.put("血管面积占比", new IndicatorAddIn("Vessel area%", String.valueOf(vesselAreas), PERCENTAGE));
+        indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular erythrocyte area%", String.valueOf(intravascularErythrocyteAreas), PERCENTAGE));
+        indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", String.valueOf(extravascularErythrocyteAreas), PERCENTAGE));
+        indicatorResultsMap.put("肺泡上皮细胞核密度", new IndicatorAddIn("Nucleus density of alveolar epithelial cell", String.valueOf(density), SQ_MM_PIECE));
+        indicatorResultsMap.put("肺脏面积", new IndicatorAddIn("Lung area", accurateArea, SQ_MM));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }

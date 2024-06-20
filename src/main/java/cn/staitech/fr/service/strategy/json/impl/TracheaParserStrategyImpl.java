@@ -45,6 +45,7 @@ public class TracheaParserStrategyImpl extends AbstractCustomParserStrategy {
 
 
 /**
+ * 气管
     结构	编码
     气管腔	14D007
     黏膜上皮层	14D035
@@ -109,17 +110,17 @@ private AreaUtils areaUtils;
 
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-        indicatorResultsMap.put("气管腔面积", new IndicatorAddIn("气管腔面积", String.valueOf(organArea), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("黏膜上皮层面积", new IndicatorAddIn("黏膜上皮层面积", String.valueOf(mucosaArea), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("黏膜上皮层周长", new IndicatorAddIn("黏膜上皮层周长", String.valueOf(mucosaPerimeter), "毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("黏膜上皮细胞核数量", new IndicatorAddIn("黏膜上皮细胞核数量", String.valueOf(mucosaCount), "个", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("软骨面积", new IndicatorAddIn("软骨面积", String.valueOf(cartilageArea), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("组织轮廓面积", accurateArea, "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("气管腔面积", new IndicatorAddIn("气管腔面积", String.valueOf(organArea), SQ_MM, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("黏膜上皮层面积", new IndicatorAddIn("黏膜上皮层面积", String.valueOf(mucosaArea), SQ_MM, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("黏膜上皮层周长", new IndicatorAddIn("黏膜上皮层周长", String.valueOf(mucosaPerimeter), MM, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("黏膜上皮细胞核数量", new IndicatorAddIn("黏膜上皮细胞核数量", String.valueOf(mucosaCount), PIECE, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("软骨面积", new IndicatorAddIn("软骨面积", String.valueOf(cartilageArea), SQ_MM, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("组织轮廓面积", accurateArea, SQ_MM, CommonConstant.NUMBER_1));
 
-        indicatorResultsMap.put("黏膜上皮层平均厚度", new IndicatorAddIn("Average thickness of mucosal epithelium", areaUtils.convertToSquareMicrometer(String.valueOf(averageThicknessOfMucosalEpithelium)), "微米"));
-        indicatorResultsMap.put("黏膜上皮细胞核密度", new IndicatorAddIn("Nucleus density of mucosal epithelium", String.valueOf(nucleusDensityOfMucosalEpithelium), "个/平方毫米"));
-        indicatorResultsMap.put("软骨面积占比", new IndicatorAddIn("Cartilage area%", String.valueOf(cartilageAreas), "%"));
-        indicatorResultsMap.put("气管面积", new IndicatorAddIn("Tracheal area", String.valueOf(areaNum), "平方毫米"));
+        indicatorResultsMap.put("黏膜上皮层平均厚度", new IndicatorAddIn("Average thickness of mucosal epithelium", areaUtils.convertToSquareMicrometer(String.valueOf(averageThicknessOfMucosalEpithelium)), UM));
+        indicatorResultsMap.put("黏膜上皮细胞核密度", new IndicatorAddIn("Nucleus density of mucosal epithelium", String.valueOf(nucleusDensityOfMucosalEpithelium), SQ_MM_PIECE));
+        indicatorResultsMap.put("软骨面积占比", new IndicatorAddIn("Cartilage area%", String.valueOf(cartilageAreas), PERCENTAGE));
+        indicatorResultsMap.put("气管面积", new IndicatorAddIn("Tracheal area", String.valueOf(areaNum), SQ_MM));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 

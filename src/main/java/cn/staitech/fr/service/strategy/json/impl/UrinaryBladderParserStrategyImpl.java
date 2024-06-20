@@ -117,7 +117,7 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
             // 产品呈现指标
             resultsMap.put("黏膜上皮面积占比", createNameIndicator("Mucosa epithelium area %", mucosaEpitheliumArea, PERCENTAGE));
             resultsMap.put("黏膜固有层和黏膜下层面积占比", createNameIndicator("Lamina propria and submucosa area %", laminaPropriaAndSubmucosaArea, PERCENTAGE));
-            resultsMap.put("黏膜上皮细胞核密度", createNameIndicator("Nucleus density of mucosal epithelial nucleus", nucleusDensityOfMucosalEpithelialNucleus, PIECE));
+            resultsMap.put("黏膜上皮细胞核密度", createNameIndicator("Nucleus density of mucosal epithelial nucleus", nucleusDensityOfMucosalEpithelialNucleus, SQ_MM_PIECE));
             resultsMap.put("血管面积占比", createNameIndicator("Vessel area %", vesselArea, PERCENTAGE));
             resultsMap.put("血管外红细胞面积占比", createNameIndicator("Extravascular erythrocyte area%", extravascularErythrocyteArea, PERCENTAGE));
             resultsMap.put("血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", intravascularErythrocyteArea, PERCENTAGE));

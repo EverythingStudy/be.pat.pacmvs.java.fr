@@ -59,6 +59,11 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal organAreaJ = BigDecimal.valueOf(Long.parseLong(slideAreaJ));
         // todo F生精细胞核数量（单个）
         // todo G支持细胞核数量（单个）
+        Annotation annotationBy = new Annotation();
+        annotationBy.setCountName("生精细胞核数量（单个）");
+        commonJsonParser.putAnnotationDynamicData(jsonTask,"12E0FA","12E0FC",annotationBy);
+        annotationBy.setCountName("支持细胞核数量（单个）");
+        commonJsonParser.putAnnotationDynamicData(jsonTask,"12E0FA","12E0FD",annotationBy);
 
         // 算法输出指标
         resultsMap.put("生精小管面积（单个）", createDefaultIndicator());// A生精小管面积（单个）
@@ -73,7 +78,6 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
 
 
 
-
         // 计算指标
         BigDecimal densityResult = getDensityResult(areaCountD, slideAreaJ);
 
@@ -83,7 +87,8 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         List<BigDecimal> list1 = new ArrayList<>();
         List<Annotation> annotationList1 = commonJsonParser.getStructureContourList(jsonTask,"12E0FA");
         for (Annotation annotation1 : annotationList1) {
-            list1.add(annotation1.getStructureAreaNum());
+            BigDecimal area = BigDecimal.valueOf(Long.parseLong(areaUtils.convertToSquareMicrometer(String.valueOf(annotation1.getStructureAreaNum()))));
+            list1.add(area);
         }
         String seminiferousTubulesAreaSingle = MathUtils.getConfidenceInterval(list1);
         // 生精小管厚度（单个）
@@ -92,8 +97,8 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
             Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12E0FB", true);
             BigDecimal sqrt1 = commonJsonParser.sqrt(i.getStructurePerimeterNum().divide(BigDecimal.valueOf(Long.parseLong(A)), 3, RoundingMode.HALF_UP));
             BigDecimal sqrt2 = commonJsonParser.sqrt(annotation2.getStructurePerimeterNum().divide(BigDecimal.valueOf(Long.parseLong(A)), 3, RoundingMode.HALF_UP));
-
-            list2.add(sqrt1.divide(sqrt2, 3, RoundingMode.HALF_UP));
+            BigDecimal res = areaUtils.convertToUm(sqrt1.divide(sqrt2, 3, RoundingMode.HALF_UP));
+            list2.add(res);
         }
         String averageThicknessOfSpermatogenicTubules = MathUtils.getConfidenceInterval(list2);
         // 生精细胞核密度（单个）
@@ -135,7 +140,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         resultsMap.put("生精小管面积（全片）", createNameIndicator("Seminiferous tubules area (all)", organAreaB, SQ_MM));
         resultsMap.put("生精小管面积占比", createNameIndicator("Seminiferous tubules area%", seminiferousTubulesArea, PERCENTAGE));
         resultsMap.put("生精小管面积（单个）", createNameIndicator("Seminiferous tubules area (per)", seminiferousTubulesAreaSingle, SQ_UM_THOUSAND));
-        resultsMap.put("生精小管密度", createNameIndicator("Density of seminiferous tubules", densityResult, SQ_UM_THOUSAND));
+        resultsMap.put("生精小管密度", createNameIndicator("Density of seminiferous tubules", densityResult, SQ_MM_PIECE));
         resultsMap.put("生精小管厚度（单个）", createNameIndicator("Average thickness of spermatogenic tubules (per)", averageThicknessOfSpermatogenicTubules, UM));
         resultsMap.put("生精细胞核密度（单个）", createNameIndicator("Nucleus density of Spermatogenic cells (per)", nucleusDensityOfSpermatogenicCells, MM_PIECE));
         resultsMap.put("支持细胞核密度（单个）", createNameIndicator("Nucleus density of Sertoli (per)", nucleusDensityOfSupportCells, MM_PIECE));

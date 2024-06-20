@@ -104,7 +104,7 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
         resultsMap.put("血管内红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaE.toString()), SQ_UM));
 
         // 产品呈现指标
-        resultsMap.put("肌纤维面积(单个)", createNameIndicator("Muscle fiber area (per)", MuscleFiberArea, SQ_UM_THOUSAND));
+        resultsMap.put("肌纤维面积(单个)", createNameIndicator("Muscle fiber area (per)", MuscleFiberArea, SQ_MM));
         resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area %", mesenchymeArea, PERCENTAGE));
         resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE));
         resultsMap.put("血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", vesselInErythrocyteArea, PERCENTAGE));

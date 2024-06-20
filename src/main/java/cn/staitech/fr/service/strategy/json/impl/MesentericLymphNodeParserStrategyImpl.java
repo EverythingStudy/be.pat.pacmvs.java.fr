@@ -79,11 +79,11 @@ public class MesentericLymphNodeParserStrategyImpl extends AbstractCustomParserS
         resultsMap.put("髓质面积", createIndicator(organAreaC, SQ_MM));
 
         // 产品呈现指标
-        resultsMap.put("淋巴结面积", createNameIndicator("Submadibular gland area", slideArea, SQ_MM));
         resultsMap.put("生发中心数量", createNameIndicator("Number of germinal center", areaCountA, PIECE));
         resultsMap.put("生发中心占比", createNameIndicator("Germinal center area%", germinalCenterArea, PERCENTAGE));
         resultsMap.put("髓质占比", createNameIndicator("Medulla area%", medullaArea, PERCENTAGE));
         resultsMap.put("皮质和副皮质占比", createNameIndicator("Cortex and paracortex area%", cortexAndParacortexArea, PERCENTAGE));
+        resultsMap.put("淋巴结面积", createNameIndicator("Submadibular gland area", slideArea, SQ_MM));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }
 

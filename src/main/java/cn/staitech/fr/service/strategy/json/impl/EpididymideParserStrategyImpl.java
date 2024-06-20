@@ -95,12 +95,14 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         // todo H黏膜上皮细胞核数量（单个）
 
         // 算法输出指标
+        resultsMap.put("输出小管/附睾管黏膜上皮面积（单个）", createDefaultIndicator());// A输出小管/附睾管黏膜上皮面积（单个）
         resultsMap.put("输出小管/附睾管黏膜上皮面积（全片）", createIndicator(organAreaB, SQ_MM));
+        resultsMap.put("输出小管/附睾管黏膜上皮周长（单个）", createDefaultIndicator());
         resultsMap.put("输出小管/附睾管管腔面积（全片）", createIndicator(organAreaE, SQ_MM));
         resultsMap.put("精子面积（全片）", createIndicator(organAreaG, SQ_MM));
         resultsMap.put("血管面积", createIndicator(organAreaI, SQ_MM));
-        resultsMap.put("输出小管/附睾管黏膜上皮周长（单个）", createDefaultIndicator());
-        resultsMap.put("输出小管/附睾管黏膜上皮面积（单个）", createDefaultIndicator());// A输出小管/附睾管黏膜上皮面积（单个）
+
+
         resultsMap.put("输出小管/附睾管管腔面积（单个）", createDefaultIndicator());// D输出小管/附睾管管腔面积（单个）
         resultsMap.put("精子面积（单个）", createDefaultIndicator());// F精子面积（单个）
 

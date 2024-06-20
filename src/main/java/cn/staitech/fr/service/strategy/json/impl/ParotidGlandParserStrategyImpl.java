@@ -84,10 +84,11 @@ public class ParotidGlandParserStrategyImpl extends AbstractCustomParserStrategy
         BigDecimal ductsArea = commonJsonParser.getProportion(organAreaB, ares);
 
         // 产品呈现指标
-        resultsMap.put("腮腺面积", createNameIndicator("Parotid gland area", slideArea, SQ_MM));
+        resultsMap.put("腺泡细胞核密度", createNameIndicator("Nucleus density of acinar cell", nucleusResult, SQ_MM_PIECE));
         resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE));
         resultsMap.put("导管面积占比", createNameIndicator("Ducts area%", ductsArea, PERCENTAGE));
-        resultsMap.put("腺泡细胞核密度", createNameIndicator("Nucleus density of acinar cell", nucleusResult, SQ_MM_PIECE));
+        resultsMap.put("腮腺面积", createNameIndicator("Parotid gland area", slideArea, SQ_MM));
+
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }
