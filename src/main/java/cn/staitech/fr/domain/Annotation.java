@@ -223,6 +223,15 @@ public class Annotation implements Serializable {
     @TableField(exist = false)
     private Object dynamicDataList;
 
+    @TableField(exist = false)
+    private String areaName;
+
+    @TableField(exist = false)
+    private String perimeterName;
+
+    @TableField(exist = false)
+    private String countName;
+
 
 
 

@@ -410,43 +410,26 @@ public class CommonJsonParser {
     }
 
 
-
-    public void setAnnotationBy(JsonTask jsonTask, String structureId, String structureIds, List<Map<String,Object>> dynamicMap) {
-        if(dynamicMap.size() > 0) {
-            String ares = null;
-            String perimeter = null;
-            String count = null;
-
-            for (Map<String, Object> i : dynamicMap) {
-                if ("area".equals(i.get("type"))) {
-                    ares = String.valueOf(i.get("name"));
-                }
-                if ("area".equals(i.get("perimeter"))) {
-                    perimeter = String.valueOf(i.get("name"));
-                }
-                if ("area".equals(i.get("count"))) {
-                    count = String.valueOf(i.get("name"));
-                }
-            }
+    public void putAnnotationDynamicData(JsonTask jsonTask, String structureId, String structureIds, Annotation annotation) {
             List<Annotation> annotationList1 = getStructureContourList(jsonTask, structureId);
             for (Annotation i : annotationList1) {
                 Annotation annotationBy = getInsideOrOutside(jsonTask, i.getContour(), structureIds, true);
                 DynamicData dynamicData = new DynamicData();
-                if (ares != null) {
-                    dynamicData.setDynamicKey(ares);
+                if (annotation.getAreaName() != null) {
+                    dynamicData.setDynamicKey(annotation.getAreaName());
                     dynamicData.setDynamicValue(String.valueOf(annotationBy.getStructureAreaNum()));
                 }
-                if (perimeter != null) {
-                    dynamicData.setDynamicKey(perimeter);
+                if (annotation.getPerimeterName() != null) {
+                    dynamicData.setDynamicKey(annotation.getPerimeterName());
                     dynamicData.setDynamicValue(String.valueOf(annotationBy.getStructurePerimeterNum()));
                 }
-                if (count != null) {
-                    dynamicData.setDynamicKey(count);
+                if (annotation.getCountName() != null) {
+                    dynamicData.setDynamicKey(annotation.getCountName());
                     dynamicData.setDynamicValue(String.valueOf(annotationBy.getCount()));
                 }
                 // sql更新表中信息
             }
-        }
+
     }
 
 
@@ -538,11 +521,11 @@ public class CommonJsonParser {
      */
     public BigDecimal getProportion(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
         BigDecimal proportion;
-        if (null == bigDecimal1 || null == bigDecimal2 || bigDecimal1.compareTo(BigDecimal.ZERO) == 0 ||  bigDecimal2.compareTo(BigDecimal.ZERO) == 0) {
+        if (null == bigDecimal1 || null == bigDecimal2 || bigDecimal1.compareTo(BigDecimal.ZERO) == 0 || bigDecimal2.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
-        
-        proportion = bigDecimal1.divide(bigDecimal2,3,RoundingMode.HALF_UP);
+
+        proportion = bigDecimal1.divide(bigDecimal2, 3, RoundingMode.HALF_UP);
         proportion = proportion.multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP);
         return proportion;
     }
@@ -555,14 +538,14 @@ public class CommonJsonParser {
         MathContext mc = new MathContext(3, RoundingMode.HALF_UP);
         return new BigDecimal(sqrtValue, mc);
     }
-    
-    
+
+
     public BigDecimal getProportionMultiply(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
         BigDecimal proportion;
-        if (null == bigDecimal1 || null == bigDecimal2 || bigDecimal1.compareTo(BigDecimal.ZERO) == 0 ||  bigDecimal2.compareTo(BigDecimal.ZERO) == 0) {
+        if (null == bigDecimal1 || null == bigDecimal2 || bigDecimal1.compareTo(BigDecimal.ZERO) == 0 || bigDecimal2.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
-        proportion = bigDecimal1.divide(bigDecimal2,3,RoundingMode.HALF_UP);
+        proportion = bigDecimal1.divide(bigDecimal2, 3, RoundingMode.HALF_UP);
         return proportion;
     }
 
@@ -587,10 +570,8 @@ public class CommonJsonParser {
         annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
         return annotationMapper.countDucts(annotation);
     }
-    
+
     /**
-     * 
-     *
      * @param bigDecimal
      */
     public BigDecimal getBigDecimalValue(BigDecimal bigDecimal) {
@@ -599,10 +580,8 @@ public class CommonJsonParser {
         }
         return bigDecimal;
     }
-    
+
     /**
-     * 
-     *
      * @param Integer
      */
     public Integer getIntegerValue(Integer intValue) {
