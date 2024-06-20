@@ -123,8 +123,15 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
         String confidenceInterval = MathUtils.getConfidenceInterval(listNum);
 
+        // B 腺泡细胞核数量（单个）	B	个	单个腺泡内数据相加输出
+        Annotation annotationByB = new Annotation();
+        annotationByB.setCountName("腺泡细胞核数量（单个）");
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "10206D", "10206E", annotationByB);
+
         // 算法输出指标 -------------------------------------------------------------
+        // A
         map.put("腺泡面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        // B
         map.put("腺泡细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         // C
         map.put("色素面积", new IndicatorAddIn("Pigment area", pigmentArea.toString(), "平方毫米", CommonConstant.NUMBER_1));

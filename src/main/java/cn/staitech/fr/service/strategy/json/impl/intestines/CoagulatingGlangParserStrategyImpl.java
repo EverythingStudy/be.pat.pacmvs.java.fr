@@ -63,7 +63,7 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
      */
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        log.info("标计算开始-大鼠凝固腺结");
+        log.info("标计算开始-大鼠凝固腺");
         Map<String, IndicatorAddIn> map = new HashMap<>();
 
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
@@ -80,10 +80,6 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
 
         // 腺上皮面积（全片）
         BigDecimal colonArea = commonJsonParser.getOrganArea(jsonTask, "12B074").getStructureAreaNum();
-        // 腺腔面积（单个）
-        // BigDecimal areaNum = commonJsonParser.getOrganArea(jsonTask, "12B0E9").getStructureAreaNum();
-        // 腺上皮细胞核数量（单个）
-        // Integer areaCount = commonJsonParser.getOrganAreaCount(jsonTask, "12B0ED");
         // 腺腔面积（全片）
         BigDecimal areaNum2 = commonJsonParser.getInsideOrOutside(jsonTask, "12B074", "12B0E9", true).getStructureAreaNum();
         // 组织轮廓
@@ -126,6 +122,16 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         String confidenceInterval = MathUtils.getConfidenceInterval(lists);
         String confidenceInterval1 = MathUtils.getConfidenceInterval(listNum);
 
+        // 腺腔面积（单个）	C	平方毫米	单个腺上皮内所有腺腔面积
+        Annotation annotationByC = new Annotation();
+        annotationByC.setAreaName("腺腔面积（单个）");
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "12B074", "12B0E9", annotationByC);
+
+        // 腺上皮细胞核数量（单个）	E	个	单个腺上皮细胞核数量
+        Annotation annotationByE = new Annotation();
+        annotationByE.setCountName("腺上皮细胞核数量（单个）");
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "12B074", "12B0ED", annotationByE);
+
         // 算法输出指标 -------------------------------------------------------------
         // 腺上皮面积（单个）A 平方毫米 单个腺上皮面积
         map.put("腺上皮面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
@@ -159,6 +165,6 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
 
-        log.info("标计算结束-大鼠凝固腺结");
+        log.info("标计算结束-大鼠凝固腺");
     }
 }

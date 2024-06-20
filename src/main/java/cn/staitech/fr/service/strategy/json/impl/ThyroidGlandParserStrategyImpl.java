@@ -148,7 +148,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
 
         // B
         Annotation annotationByB = new Annotation();
-        annotationByB.setCountName("甲状腺滤泡腔面积（单个）");
+        annotationByB.setAreaName("甲状腺滤泡腔面积（单个）");
         commonJsonParser.putAnnotationDynamicData(jsonTask, "107088", "10708A", annotationByB);
         // G
         Annotation annotationByG = new Annotation();

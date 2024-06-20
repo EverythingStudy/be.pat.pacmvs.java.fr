@@ -56,8 +56,8 @@ public class LiverParserStrategyImpl implements ParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        log.info("大鼠肝脏指标计算开始…… {}", jsonTask);
-        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        log.info("指标计算开始-大鼠肝脏");
+        Map<String, IndicatorAddIn> map = new HashMap<>();
 
         //        肝脏
 
@@ -141,45 +141,55 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         //        窦内细胞核密度	6	个/平方毫米	Nucleus density of Sinus cell	6=G/H
 
         // 算法输出指标 -------------------------------------------------------------
+
+        // 胆管数量（单个门管区）	E	个	单个门管区内胆管数量
+        // 胆管面积（单个门管区）	F	103平方微米	若单个门管区内有多个胆管，则相加输出
+        Annotation annotationBy = new Annotation();
+        annotationBy.setCountName("胆管数量（单个门管区）");
+        annotationBy.setAreaName("胆管面积（单个门管区）");
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "112145", "11214A", annotationBy);
+
         // A
-        indicatorResultsMap.put("门管区面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        map.put("门管区面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         // B
-        indicatorResultsMap.put("中央静脉面积", new IndicatorAddIn("central veins area", centralVeinsArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        map.put("中央静脉面积", new IndicatorAddIn("central veins area", centralVeinsArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         // C
-        indicatorResultsMap.put("大静脉面积", new IndicatorAddIn("vena cava area", venaCavaArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        map.put("大静脉面积", new IndicatorAddIn("vena cava area", venaCavaArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         // D
-        indicatorResultsMap.put("肝细胞核数量", new IndicatorAddIn("Nucleus count of hepatocyte", nucleusCount.toString(), "个", CommonConstant.NUMBER_1));
+        map.put("肝细胞核数量", new IndicatorAddIn("Nucleus count of hepatocyte", nucleusCount.toString(), "个", CommonConstant.NUMBER_1));
         // E
-        indicatorResultsMap.put("胆管数量（单个门管区）", new IndicatorAddIn("bile duct count", bileDuctCount.toString(), "个", CommonConstant.NUMBER_1));
+        map.put("胆管数量（单个门管区）", new IndicatorAddIn("bile duct count", bileDuctCount.toString(), "个", CommonConstant.NUMBER_1));
         // F
-        indicatorResultsMap.put("胆管面积（单个门管区）", new IndicatorAddIn("", bileDuctArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        map.put("胆管面积（单个门管区）", new IndicatorAddIn("", bileDuctArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         // G
-        indicatorResultsMap.put("窦内细胞核数量", new IndicatorAddIn("Sinus nucleus count", sinusNnucleusCount.toString(), "个", CommonConstant.NUMBER_1));
+        map.put("窦内细胞核数量", new IndicatorAddIn("Sinus nucleus count", sinusNnucleusCount.toString(), "个", CommonConstant.NUMBER_1));
 
         // 产品呈现指标 -------------------------------------------------------------
         // H 肝脏面积	1	平方毫米	Liver area	1=H
-        indicatorResultsMap.put("肝脏面积", new IndicatorAddIn("Liver area", accurateArea, "平方毫米"));
+        map.put("肝脏面积", new IndicatorAddIn("Liver area", accurateArea, "平方毫米"));
 
         // 静脉面积占比	2	%	Vein area%	2=(B+C)/H	运算前注意统一单位
         String accurateAreaDecimalRate = centralVeinsArea.add(venaCavaArea).divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).toString();
-        indicatorResultsMap.put("静脉面积占比", new IndicatorAddIn("Vein area%", accurateAreaDecimalRate, "%"));
+        map.put("静脉面积占比", new IndicatorAddIn("Vein area%", accurateAreaDecimalRate, "%"));
 
         // 肝细胞核密度	3	个/平方毫米	Nucleus density of hepatocyte	3=D/H
         String density = new BigDecimal(nucleusCount).divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).toString();
-        indicatorResultsMap.put("肝细胞核密度", new IndicatorAddIn("Nucleus density of hepatocyte", density, "个/平方毫米"));
+        map.put("肝细胞核密度", new IndicatorAddIn("Nucleus density of hepatocyte", density, "个/平方毫米"));
 
         // 胆管密度（单个）	4	个/103平方微米	Density of bile duct (per)	4=E/A	单个为单个门管区  以95%置信区间和均数±标准差呈现
         String densityOfBileDuctPerRate = "";// = new BigDecimal(bileDuctCount).divide()
-        indicatorResultsMap.put("胆管密度（单个）", new IndicatorAddIn("Density of bile duct (per)", confidenceInterval, "个/10³平方毫米"));
+        map.put("胆管密度（单个）", new IndicatorAddIn("Density of bile duct (per)", confidenceInterval, "个/10³平方毫米"));
 
         // 胆管面积占比（单个）	5	%	Bile duct area%    (per)	5=F/A	单个为单个门管区  以95%置信区间和均数±标准差呈现； 运算前统一单位
         String bileDuctAreaRate = "";
-        indicatorResultsMap.put("胆管面积占比（单个）", new IndicatorAddIn("Bile duct area", confidenceInterval1, "%"));
+        map.put("胆管面积占比（单个）", new IndicatorAddIn("Bile duct area", confidenceInterval1, "%"));
 
         // 窦内细胞核密度	6	个/平方毫米	Nucleus density of Sinus cell	6=G/H
         String nucleusDensityOfSinusCellRate = new BigDecimal(sinusNnucleusCount).divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).toString();
-        indicatorResultsMap.put("窦内细胞核密度", new IndicatorAddIn("Nucleus density of Sinus cell", nucleusDensityOfSinusCellRate, "个/平方毫米"));
+        map.put("窦内细胞核密度", new IndicatorAddIn("Nucleus density of Sinus cell", nucleusDensityOfSinusCellRate, "个/平方毫米"));
 
-        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
+
+        log.info("指标计算结束-大鼠肝脏");
     }
 }
