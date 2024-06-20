@@ -83,7 +83,7 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
                 }
                 //e
                 Integer count = contourInsideOrOutside2.getCount();
-                if(add.compareTo(BigDecimal.ZERO)!=0){
+                if(structureAreaNum.compareTo(BigDecimal.ZERO)!=0){
                     BigDecimal divide = new BigDecimal(count).divide(structureAreaNum, 4, RoundingMode.HALF_UP);
                     listNum.add(divide);
 
