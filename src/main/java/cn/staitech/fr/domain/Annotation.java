@@ -232,6 +232,17 @@ public class Annotation implements Serializable {
     @TableField(exist = false)
     private String countName;
 
+    @TableField(exist = false)
+    private String areaUnit;
+
+    @TableField(exist = false)
+    private String perimeterUnit;
+
+    @TableField(exist = false)
+    private String countUnit;
+
+
+
 
 
 

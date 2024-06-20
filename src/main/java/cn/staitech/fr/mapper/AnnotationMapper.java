@@ -99,6 +99,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     Annotation avgDistance(Annotation annotation);
 
+    int aiUpdateById(Annotation annotation);
+
 }
 
 

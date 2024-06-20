@@ -5,7 +5,9 @@ import lombok.Data;
 @Data
 public class DynamicData {
 
-    private String dynamicKey;
+    private String name;
 
-    private String dynamicValue;
+    private String data;
+
+    private String unit;
 }

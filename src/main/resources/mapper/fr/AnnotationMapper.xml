@@ -811,4 +811,14 @@
     </select>
 
 
+    <update id="aiUpdateById" parameterType="cn.staitech.fr.domain.Annotation" useGeneratedKeys="true"
+            keyProperty="annotationId">
+        update fr_ai_annotation_${sequenceNumber}
+        <set>
+            <if test="dynamicData != null">dynamic_data = #{dynamicData}</if>
+        </set>
+        where annotation_id = #{annotationId}
+    </update>
+
+
 </mapper>
