@@ -76,13 +76,13 @@ public class RectumParserStrategyImpl implements ParserStrategy {
         // 组织轮廓	116111
 
         // 肠腔面积
-        BigDecimal colonArea = commonJsonParser.getOrganArea(jsonTask, "118156").getStructureAreaNum();
+        BigDecimal colonArea = commonJsonParser.getOrganArea(jsonTask, "116156").getStructureAreaNum();
         // 黏膜层面积
-        BigDecimal areaNum = commonJsonParser.getOrganArea(jsonTask, "118008").getStructureAreaNum();
+        BigDecimal areaNum = commonJsonParser.getOrganArea(jsonTask, "116008").getStructureAreaNum();
         // 黏膜下层面积
-        BigDecimal areaNum2 = commonJsonParser.getOrganArea(jsonTask, "118009").getStructureAreaNum();
+        BigDecimal areaNum2 = commonJsonParser.getOrganArea(jsonTask, "116009").getStructureAreaNum();
         // 肌层面积
-        BigDecimal areaNum3 = commonJsonParser.getOrganArea(jsonTask, "11800C").getStructureAreaNum();
+        BigDecimal areaNum3 = commonJsonParser.getOrganArea(jsonTask, "11600C").getStructureAreaNum();
         // 组织轮廓面积
         BigDecimal areaNum4 = new BigDecimal(area);
         // 直肠面积 E-A
@@ -92,6 +92,12 @@ public class RectumParserStrategyImpl implements ParserStrategy {
         }
 
         // 算法输出指标 -------------------------------------------------------------
+        // 算法输出指标	指标代码（仅限本文档）	单位（保留小数点后三位）	备注
+        // 肠腔面积	A	平方毫米
+        // 黏膜层面积	B	平方毫米	以C型或双层环状输出
+        // 黏膜下层面积	C	平方毫米	以C型或双层环状输出
+        // 肌层面积	D	平方毫米	以C型或双层环状输出
+        // 组织轮廓面积	E	平方毫米	无
 
         // 肠腔面积	A	平方毫米
         map.put("肠腔面积", new IndicatorAddIn("Intestinal cavity area", colonArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
@@ -108,6 +114,12 @@ public class RectumParserStrategyImpl implements ParserStrategy {
         map.put("组织轮廓面积", new IndicatorAddIn("Tissue area", areaNum4.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
 
         // 产品呈现指标 -------------------------------------------------------------
+        // 产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
+        // 黏膜层面积占比	1	%	Mucosal area%	1=B/（E-A）	无
+        // 黏膜下层面积占比	2	%	Submucosal area%	2=C/（E-A）	无
+        // 肌层面积占比	3	%	Muscular area%	3=D/（E-A）	无
+        // 直肠面积	4	平方毫米	Rectum area	4=E-A	无
+
         // 黏膜层面积占比	1	%	Mucosal area%	1=B/（E-A）	无
         String mucosalAreaRate = areaNum.divide(eSubtractA).setScale(3, RoundingMode.HALF_UP).toString();
         map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", mucosalAreaRate, "%"));
