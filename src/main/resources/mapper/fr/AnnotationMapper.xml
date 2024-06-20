@@ -149,6 +149,7 @@
             "structure_size"  INT2,
             "cell_type"       VARCHAR(50) COLLATE "pg_catalog"."default",
             "id"              VARCHAR(500) COLLATE "pg_catalog"."default",
+            "dynamic_data"    VARCHAR(1000) COLLATE "pg_catalog"."default",
             CONSTRAINT "fr_ai_annotation_${sequenceNumber}_pkey" PRIMARY KEY ("annotation_id")
         );
 
@@ -457,7 +458,8 @@
         single_slide_id,
         contour_type,
         cell_type,
-        single
+        single,
+        dynamic_data
         from fr_ai_annotation_${sequenceNumber}
         <where>
             <if test="singleSlideId != null">
@@ -509,8 +511,7 @@
         single_slide_id,
         contour_type,
         cell_type,
-        single,
-        dynamic_data
+        single
         from fr_ai_annotation_${sequenceNumber}
         <where>
             <if test="singleSlideId != null">

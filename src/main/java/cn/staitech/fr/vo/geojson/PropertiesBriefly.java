@@ -67,6 +67,8 @@ public class PropertiesBriefly {
     
     private String A29;
 
+    private Object A30;
+
 
     public String getA0() {
         return A0;

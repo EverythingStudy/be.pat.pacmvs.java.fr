@@ -211,6 +211,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         properties.setA29(annotation.getCellType());
         properties.setA28(annotation.getContourType());
         properties.setA27(annotation.getSingle());
+        properties.setA30(annotation.getDynamicDataList());
         if (annotation.getSingle() == 1 && (annotation.getContourType() == 2 || annotation.getContourType() == 4)) {
             if (annotation.getCategoryId() != null) {
                 PathologicalIndicatorCategory pathologicalIndicatorCategory = pathologicalIndicatorCategoryHashMap.get(annotation.getCategoryId());

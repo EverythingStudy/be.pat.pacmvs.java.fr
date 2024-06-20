@@ -94,7 +94,6 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
         BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "10B125");// I颗粒管（红色）面积（全片）
         Annotation annotationBy = new Annotation();
         annotationBy.setCountName("颗粒管内细胞核数量（单个）");
-        annotationBy.setCountUnit("个");
         commonJsonParser.putAnnotationDynamicData(jsonTask,"10B125","10B126",annotationBy);
         // 算法输出指标
         resultsMap.put("颗粒管（红色）数量", createIndicator(organAreaCountA, PIECE));
