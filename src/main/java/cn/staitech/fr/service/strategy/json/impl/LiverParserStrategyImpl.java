@@ -60,7 +60,8 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
         //        肝脏
-        //
+
+        // 结构编码 -------------------------------------------------------------
         //        结构	编码
         //        门管区	112145
         //        中央静脉	112146

@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
@@ -11,12 +12,15 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,10 +56,11 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        log.info("大鼠甲状腺指标计算开始");
+        log.info("指标计算开始-大鼠甲状腺");
         Map<String, IndicatorAddIn> map = new HashMap<>();
         //        甲状腺
-        //
+
+        // 结构编码 -------------------------------------------------------------
         //        结构	编码
         //        甲状腺滤泡	107088
         //        甲状腺滤泡腔	10708A
@@ -86,28 +91,69 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         //        甲状旁腺组织轮廓面积	I	103平方微米	若多个数据则相加输出(I:甲状旁腺组织轮廓面积-平方毫米)
         BigDecimal parathyroidGlandArea = commonJsonParser.getOrganAreaMicron(jsonTask, "108111");
 
-        //        产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
-        //        甲状腺滤泡面积（单个）	1	103平方微米	Thyroid follicle area (per)	1=A	以95%置信区间和均数±标准差呈现
-        //        甲状腺滤泡腔面积（单个）	2	103平方微米	Thyroid follicular lumen area (per)	2=B	以95%置信区间和均数±标准差呈现
-        //        甲状腺滤泡上皮面积占比（单个）	3	%	Thyroid follicular epithelium area%(per)	3=(A-B)/A	以95%置信区间和均数±标准差呈现
-        //        血管面积占比	4	%	Vessel area%	4=C/(H-I) 	运算前注意统一单位
-        //        血管内红细胞面积占比	5	%	Intravascular erythrocyte area%	5=D/(H-I) 	运算前注意统一单位
-        //        血管外红细胞面积占比	6	%	Extravascular erythrocyte area%	6=E/(H-I) 	运算前注意统一单位
-        //        肥大细胞密度	7	个/平方毫米	Density of mast cells	7=F/(H-I) 	运算前注意统一单位
-        //        滤泡上皮细胞核密度（单个）	8	个/103平方微米	Nucleus density of follicular cell (per)	8=G/(A-B) 	以95%置信区间和均数±标准差呈现
-        //        甲状腺面积	9	平方毫米	Thyroid gland area	9=H	当前甲状腺面积是甲状腺和甲状旁腺的面积总和
-        //        甲状旁腺面积	10	103平方微米	Parathyroid gland area	10=I
+        // 计算置信区间和均数±标准差呈现  -------------------------------------------------------------
+        // 甲状腺滤泡面积（单个）	1	103平方微米	Thyroid follicle area (per)	1=A	以95%置信区间和均数±标准差呈现
+        List<BigDecimal> list1 = new ArrayList<>();
 
-        //        // I:甲状旁腺组织轮廓面积-平方毫米
-        //        BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "108111");
-        //
-        //        // 若甲状腺轮廓面积里包括了甲状旁腺，计算时需要用H-I，若甲状旁腺和甲状腺是分开单独识别的，则只需要H
-        //        if (new BigDecimal(accurateArea).compareTo(BigDecimal.ZERO) > 0
-        //                && organArea.compareTo(BigDecimal.ZERO) > 0) {
-        //            // H-I
-        //            BigDecimal areaNum = new BigDecimal(accurateArea).subtract(organArea);
-        //            accurateArea = areaNum.toString();
-        //        }
+        // 甲状腺滤泡腔面积（单个）	2	103平方微米	Thyroid follicular lumen area (per)	2=B	以95%置信区间和均数±标准差呈现
+        List<BigDecimal> list2 = new ArrayList<>();
+
+        // 甲状腺滤泡上皮面积占比（单个）	3	%	Thyroid follicular epithelium area%(per)	3=(A-B)/A	以95%置信区间和均数±标准差呈现
+        List<BigDecimal> list3 = new ArrayList<>();
+
+        // 滤泡上皮细胞核密度（单个）	8	个/103平方微米	Nucleus density of follicular cell (per)	8=G/(A-B) 	以95%置信区间和均数±标准差呈现
+        List<BigDecimal> list8 = new ArrayList<>();
+
+        List<Annotation> structureContourList = commonJsonParser.getStructureContourList(jsonTask, "107088");
+
+        if (CollectionUtils.isNotEmpty(structureContourList)) {
+            for (Annotation annotation : structureContourList) {
+
+                // 甲状腺滤泡面积（单个）	A	103平方微米	单个甲状腺滤泡（107088）面积
+                BigDecimal structureAreaNumA = annotation.getStructureAreaNum().multiply(new BigDecimal(1000));
+
+                list1.add(structureAreaNumA);
+
+                // 甲状腺滤泡内 滤泡腔
+                Annotation contourInsideOrOutsideB = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "10708A", true);
+                // 甲状腺滤泡内 滤泡上皮细胞核
+                Annotation contourInsideOrOutsideG = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "107089", true);
+
+                // 甲状腺滤泡腔面积（单个）	B	103平方微米	若单个甲状腺滤泡内有多个滤泡腔，则相加输出 (true在里面）
+                BigDecimal structureAreaNumB = contourInsideOrOutsideB.getStructureAreaNum().multiply(new BigDecimal(1000));
+                list2.add(structureAreaNumB);
+
+                // A-B
+                BigDecimal subtractAB = structureAreaNumA.subtract(structureAreaNumB);
+
+                // G 滤泡上皮细胞核数量（单个）	G	个	单个甲状腺滤泡内细胞核数量
+                Integer count = contourInsideOrOutsideG.getCount();
+
+                // 3=(A-B)/A 甲状腺滤泡上皮面积占比（单个）	3	%	Thyroid follicular epithelium area%(per)	3=(A-B)/A	以95%置信区间和均数±标准差呈现
+                if (structureAreaNumA.compareTo(BigDecimal.ZERO) != 0) {
+                    list3.add(subtractAB.divide(structureAreaNumA, 4, RoundingMode.HALF_UP));
+                }
+
+                // 滤泡上皮细胞核密度（单个）	8	个/103平方微米	Nucleus density of follicular cell (per)	8=G/(A-B) 	以95%置信区间和均数±标准差呈现
+                if (subtractAB.compareTo(BigDecimal.ZERO) != 0) {
+                    list8.add(new BigDecimal(count).divide(subtractAB, 4, RoundingMode.HALF_UP));
+                }
+            }
+        }
+
+        String confidenceInterval1 = MathUtils.getConfidenceInterval(list1);
+        String confidenceInterval2 = MathUtils.getConfidenceInterval(list2);
+        String confidenceInterval3 = MathUtils.getConfidenceInterval(list3);
+        String confidenceInterval8 = MathUtils.getConfidenceInterval(list8);
+
+        // B
+        Annotation annotationByB = new Annotation();
+        annotationByB.setCountName("甲状腺滤泡腔面积（单个）");
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "107088", "10708A", annotationByB);
+        // G
+        Annotation annotationByG = new Annotation();
+        annotationByG.setCountName("滤泡上皮细胞核数量（单个）");
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "107088", "107089", annotationByG);
 
         // A
         map.put("甲状腺滤泡面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
@@ -122,16 +168,15 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         // F
         map.put("肥大细胞数量", new IndicatorAddIn("Density of mast cells", densityOfMastCells.toString(), "个", CommonConstant.NUMBER_1));
         // G
-        // map.put("滤泡上皮细胞核数量（单个）", new IndicatorAddIn("Nucleus density of follicular cell (per)", nucleusOfFollicular.toString(), "个", CommonConstant.NUMBER_1));
         map.put("滤泡上皮细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
 
         // 产品呈现指标 -------------------------------------------------------------
-        // TODO 甲状腺滤泡面积（单个）	1	103平方微米	Thyroid follicle area (per)	1=A	以95%置信区间和均数±标准差呈现
-        map.put("甲状腺滤泡面积（单个）", new IndicatorAddIn("Thyroid follicle area (per)", accurateArea, "10³平方微米"));
-        // TODO 甲状腺滤泡腔面积（单个）	2	103平方微米	Thyroid follicular lumen area (per)	2=B	以95%置信区间和均数±标准差呈现
-        map.put("甲状腺滤泡腔面积（单个）", new IndicatorAddIn("Thyroid follicular lumen area (per)", accurateArea, "10³平方微米"));
-        // TODO 甲状腺滤泡上皮面积占比（单个）	3	%	Thyroid follicular epithelium area%(per)	3=(A-B)/A	以95%置信区间和均数±标准差呈现
-        map.put("甲状腺滤泡上皮面积占比（单个）", new IndicatorAddIn("Thyroid follicular epithelium area%(per)", accurateArea, "%"));
+        // 甲状腺滤泡面积（单个）	1	103平方微米	Thyroid follicle area (per)	1=A	以95%置信区间和均数±标准差呈现
+        map.put("甲状腺滤泡面积（单个）", new IndicatorAddIn("Thyroid follicle area (per)", confidenceInterval1, "10³平方微米"));
+        // 甲状腺滤泡腔面积（单个）	2	103平方微米	Thyroid follicular lumen area (per)	2=B	以95%置信区间和均数±标准差呈现
+        map.put("甲状腺滤泡腔面积（单个）", new IndicatorAddIn("Thyroid follicular lumen area (per)", confidenceInterval2, "10³平方微米"));
+        // 甲状腺滤泡上皮面积占比（单个）	3	%	Thyroid follicular epithelium area%(per)	3=(A-B)/A	以95%置信区间和均数±标准差呈现
+        map.put("甲状腺滤泡上皮面积占比（单个）", new IndicatorAddIn("Thyroid follicular epithelium area%(per)", confidenceInterval3, "%"));
 
         // H-I
         BigDecimal hSubtractI = new BigDecimal(accurateArea).subtract(parathyroidGlandArea).setScale(4, RoundingMode.HALF_UP);
@@ -152,8 +197,8 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         String densityOfMastCellsRate = new BigDecimal(densityOfMastCells).divide(hSubtractI).setScale(3, RoundingMode.HALF_UP).toString();
         map.put("肥大细胞密度", new IndicatorAddIn("Density of mast cells", densityOfMastCellsRate, "个/平方毫米"));
 
-        // TODO 滤泡上皮细胞核密度（单个）	8	个/103平方微米	Nucleus density of follicular cell (per)	8=G/(A-B) 	以95%置信区间和均数±标准差呈现
-        map.put("滤泡上皮细胞核密度（单个）", new IndicatorAddIn("Nucleus density of follicular cell (per)", accurateArea, "个/10³平方微米"));
+        // 滤泡上皮细胞核密度（单个）	8	个/103平方微米	Nucleus density of follicular cell (per)	8=G/(A-B) 	以95%置信区间和均数±标准差呈现
+        map.put("滤泡上皮细胞核密度（单个）", new IndicatorAddIn("Nucleus density of follicular cell (per)", confidenceInterval8, "个/10³平方微米"));
 
         // H 甲状腺面积	9	平方毫米	Thyroid gland area	9=H	当前甲状腺面积是甲状腺和甲状旁腺的面积总和
         map.put("甲状腺面积", new IndicatorAddIn("Thyroid gland area", accurateArea, "平方毫米"));
@@ -161,5 +206,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         // I 甲状旁腺面积	10	103平方微米	Parathyroid gland area	10=I
         map.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", parathyroidGlandArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
+
+        log.info("指标计算结束-大鼠甲状腺");
     }
 }
