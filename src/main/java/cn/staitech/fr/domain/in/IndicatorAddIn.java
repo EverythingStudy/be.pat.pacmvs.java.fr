@@ -1,8 +1,8 @@
 package cn.staitech.fr.domain.in;
 
+import cn.staitech.fr.constant.CommonConstant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * 指标信息类
@@ -22,6 +22,11 @@ public class IndicatorAddIn {
 
     private String structType;
 
+    public IndicatorAddIn() {
+        this.result = CommonConstant.SINGLE_RESULT;
+        this.structType = CommonConstant.NUMBER_1;
+    }
+
     public IndicatorAddIn(String englishName, String result, String unit) {
         this.englishName = englishName;
         this.result = result;
@@ -32,4 +37,5 @@ public class IndicatorAddIn {
         this.result = result;
         this.structType = structType;
     }
+
 }

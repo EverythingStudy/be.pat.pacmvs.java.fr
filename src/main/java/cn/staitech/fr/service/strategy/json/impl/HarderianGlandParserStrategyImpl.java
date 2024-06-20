@@ -130,9 +130,9 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
         // 算法输出指标 -------------------------------------------------------------
         // A
-        map.put("腺泡面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        map.put("腺泡面积（单个）", new IndicatorAddIn());
         // B
-        map.put("腺泡细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        map.put("腺泡细胞核数量（单个）", new IndicatorAddIn());
         // C
         map.put("色素面积", new IndicatorAddIn("Pigment area", pigmentArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         // E

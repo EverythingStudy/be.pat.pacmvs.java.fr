@@ -156,9 +156,9 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         commonJsonParser.putAnnotationDynamicData(jsonTask, "107088", "107089", annotationByG);
 
         // A
-        map.put("甲状腺滤泡面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        map.put("甲状腺滤泡面积（单个）", new IndicatorAddIn());
         // B
-        map.put("甲状腺滤泡腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        map.put("甲状腺滤泡腔面积（单个）", new IndicatorAddIn());
         // C
         map.put("血管面积", new IndicatorAddIn("Vessel area%", vesselArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         // D
@@ -168,7 +168,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         // F
         map.put("肥大细胞数量", new IndicatorAddIn("Density of mast cells", densityOfMastCells.toString(), "个", CommonConstant.NUMBER_1));
         // G
-        map.put("滤泡上皮细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        map.put("滤泡上皮细胞核数量（单个）", new IndicatorAddIn());
 
         // 产品呈现指标 -------------------------------------------------------------
         // 甲状腺滤泡面积（单个）	1	103平方微米	Thyroid follicle area (per)	1=A	以95%置信区间和均数±标准差呈现

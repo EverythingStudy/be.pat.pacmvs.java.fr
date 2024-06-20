@@ -150,7 +150,7 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         commonJsonParser.putAnnotationDynamicData(jsonTask, "112145", "11214A", annotationBy);
 
         // A
-        map.put("门管区面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        map.put("门管区面积（单个）", new IndicatorAddIn());
         // B
         map.put("中央静脉面积", new IndicatorAddIn("central veins area", centralVeinsArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         // C

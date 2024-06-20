@@ -134,16 +134,16 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
 
         // 算法输出指标 -------------------------------------------------------------
         // 腺上皮面积（单个）A 平方毫米 单个腺上皮面积
-        map.put("腺上皮面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        map.put("腺上皮面积（单个）", new IndicatorAddIn());
 
         // 腺腔面积（单个）C 平方毫米 单个腺上皮内所有腺腔面积
-        map.put("腺腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        map.put("腺腔面积（单个）", new IndicatorAddIn());
 
         // 腺腔面积（全片）D 平方毫米 若多个数据则相加输出
         map.put("腺腔面积（全片）", new IndicatorAddIn("Gland cavity area (all)", areaNum2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
 
         // 腺上皮细胞核数量（单个）E 个 单个腺上皮细胞核数量
-        map.put("腺上皮细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        map.put("腺上皮细胞核数量（单个）", new IndicatorAddIn());
 
         // 产品呈现指标 -------------------------------------------------------------
         // F 组织轮廓的面积 凝固腺面积	1	平方毫米	Coagulating gland area	1=F
