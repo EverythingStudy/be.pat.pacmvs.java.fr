@@ -91,7 +91,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         BigDecimal organAreaG = areaUtils.getOrganArea(jsonTask, "12F0F7");// G精子面积（全片）
         BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "12F003");// I血管面积
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// J组织轮廓面积
-        BigDecimal organAreaJ = BigDecimal.valueOf(Long.parseLong(slideArea));
+        BigDecimal organAreaJ = BigDecimal.valueOf(Double.parseDouble(slideArea));
         // todo H黏膜上皮细胞核数量（单个）
 
         // 算法输出指标
@@ -117,7 +117,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         List<Annotation> annotationList1 = commonJsonParser.getStructureContourList(jsonTask,"12F0F5");
         for(Annotation i : annotationList1){
             Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
-            list1.add(organAreaJ.subtract(i.getStructureAreaNum().divide(annotation2.getStructureAreaNum(), 3, RoundingMode.HALF_UP)));
+            list1.add(organAreaJ.subtract(commonJsonParser.bigDecimalDivideCheck(i.getStructureAreaNum(),annotation2.getStructureAreaNum())));
         }
         String mucosalAreaPer = MathUtils.getConfidenceInterval(list1);
 
@@ -126,7 +126,8 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         List<Annotation> annotationList2 = commonJsonParser.getStructureContourList(jsonTask,"12F0F4");
         for(Annotation i : annotationList2){
             Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12F0F7", true);
-            list2.add(i.getStructureAreaNum().divide(annotation2.getStructureAreaNum(), 3, RoundingMode.HALF_UP));
+            BigDecimal res = commonJsonParser.bigDecimalDivideCheck(i.getStructureAreaNum(),annotation2.getStructureAreaNum());
+            list2.add(res);
         }
         String spermAreaPer = MathUtils.getConfidenceInterval(list2);
         // 精子面积占比（全片）
@@ -135,7 +136,8 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         List<BigDecimal> list3 = new ArrayList<>();
         for(Annotation i : annotationList1){
             Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12F0F6", true);
-            list3.add(BigDecimal.valueOf(annotation2.getCount()).divide(i.getStructurePerimeterNum(), 3, RoundingMode.HALF_UP));
+            BigDecimal res = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()), i.getStructurePerimeterNum());
+            list3.add(res);
         }
         String mucosalCellDensity = MathUtils.getConfidenceInterval(list3);
         // 血管相对面积
@@ -144,9 +146,11 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         List<BigDecimal> list4 = new ArrayList<>();
         for(Annotation i : annotationList1){
             Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
-            BigDecimal sqrt1 = commonJsonParser.sqrt(i.getStructurePerimeterNum().divide(BigDecimal.valueOf(Long.parseLong(A)), 3, RoundingMode.HALF_UP));
-            BigDecimal sqrt2 = commonJsonParser.sqrt(annotation2.getStructurePerimeterNum().divide(BigDecimal.valueOf(Long.parseLong(A)), 3, RoundingMode.HALF_UP));
-            list4.add(sqrt1.divide(sqrt2, 3, RoundingMode.HALF_UP));
+            BigDecimal sqrtI = commonJsonParser.bigDecimalDivideCheck(i.getStructurePerimeterNum(), BigDecimal.valueOf(Double.parseDouble(A)));
+            BigDecimal sqrt1 = commonJsonParser.sqrt(sqrtI);
+            BigDecimal sqrtAnnotation = commonJsonParser.bigDecimalDivideCheck(annotation2.getStructurePerimeterNum(), BigDecimal.valueOf(Double.parseDouble(A)));
+            BigDecimal sqrt2 = commonJsonParser.sqrt(sqrtAnnotation);
+            list4.add(sqrt1.subtract(sqrt2));
         }
         String mucosalThickness = MathUtils.getConfidenceInterval(list4);
 

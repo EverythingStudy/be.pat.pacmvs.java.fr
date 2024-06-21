@@ -603,6 +603,14 @@ public class CommonJsonParser {
         return proportion;
     }
 
+
+    public BigDecimal bigDecimalDivideCheck(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
+        if (null == bigDecimal1 || null == bigDecimal2 || bigDecimal1.compareTo(BigDecimal.ZERO) == 0 || bigDecimal2.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        return bigDecimal1.divide(bigDecimal2, 3, RoundingMode.HALF_UP);
+    }
+
     public BigDecimal sqrt(BigDecimal number) {
         // 将BigDecimal转换为double进行开方
         double doubleValue = number.doubleValue();

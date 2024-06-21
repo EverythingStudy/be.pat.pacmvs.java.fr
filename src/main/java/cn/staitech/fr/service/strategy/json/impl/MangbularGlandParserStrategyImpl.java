@@ -90,7 +90,7 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
         Integer organAreaCountE = areaUtils.getOrganAreaCount(jsonTask, "10B003");// E有血管壁的血管数量
         BigDecimal organAreaF = areaUtils.getOrganArea(jsonTask, "10B004");// F红细胞面积
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId()); // H组织轮廓
-        BigDecimal organAreaH = BigDecimal.valueOf(Long.parseLong(slideArea));
+        BigDecimal organAreaH = BigDecimal.valueOf(Double.parseDouble(slideArea));
         BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "10B125");// I颗粒管（红色）面积（全片）
         Annotation annotationBy = new Annotation();
         annotationBy.setCountName("颗粒管内细胞核数量（单个）");
@@ -114,7 +114,7 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
         List<BigDecimal> list = new ArrayList<>();
         for (Annotation annotation : annotationList) {
             Annotation annotation1 = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "10B126", true);
-            BigDecimal granularConvolutedTubule = BigDecimal.valueOf(annotation1.getCount()).divide(annotation.getStructureAreaNum(), 3, RoundingMode.HALF_UP);
+            BigDecimal granularConvolutedTubule = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation1.getCount()),annotation.getStructureAreaNum());
             list.add(granularConvolutedTubule);
         }
         String granularConvolutedTubules = MathUtils.getConfidenceInterval(list);
@@ -143,7 +143,7 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
      * @return organAreaCount/slideArea结果
      */
     private BigDecimal getDensityResult(Integer organAreaCount, String slideArea) {
-        return (0 == organAreaCount) ? BigDecimal.ZERO : new BigDecimal(organAreaCount).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP);
+        return (0 == organAreaCount) ? BigDecimal.ZERO : commonJsonParser.bigDecimalDivideCheck(new BigDecimal(organAreaCount),new BigDecimal(slideArea));
     }
 
     @Override

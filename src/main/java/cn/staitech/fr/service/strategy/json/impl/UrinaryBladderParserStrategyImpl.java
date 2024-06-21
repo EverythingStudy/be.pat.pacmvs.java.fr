@@ -78,7 +78,7 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
             // 获取各种指标
             BigDecimal organAreaA = areaUtils.getOrganArea(jsonTask, "11E034");// A 膀胱腔面积
             String accurateAreaB = areaUtils.getFineContourArea(jsonTask.getSingleId()); // B 组织轮廓面积
-            BigDecimal organAreaB = BigDecimal.valueOf(Long.parseLong(accurateAreaB));
+            BigDecimal organAreaB = BigDecimal.valueOf(Double.parseDouble(accurateAreaB));
             BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask, "11E035");// C 黏膜上皮面积
             BigDecimal organAreaD = areaUtils.getOrganArea(jsonTask, "11E037");// D 黏膜固有层+黏膜下层面积
             Integer areaCountE = areaUtils.getOrganAreaCount(jsonTask, "11E036");// E 黏膜上皮细胞核数量
@@ -105,7 +105,7 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
             // 黏膜固有层和黏膜下层面积占比
             BigDecimal laminaPropriaAndSubmucosaArea = commonJsonParser.getProportion(organAreaD, organAreaB.subtract(organAreaA));
             // 黏膜上皮细胞核密度
-            BigDecimal nucleusDensityOfMucosalEpithelialNucleus = BigDecimal.valueOf(areaCountE).divide(organAreaC, 3, RoundingMode.HALF_UP);
+            BigDecimal nucleusDensityOfMucosalEpithelialNucleus = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(areaCountE),organAreaC);
             // 血管面积占比
             BigDecimal vesselArea = commonJsonParser.getProportion(organAreaF, organAreaB.subtract(organAreaA));
             // 血管外红细胞面积占比

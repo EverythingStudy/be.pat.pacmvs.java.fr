@@ -77,7 +77,7 @@ public class ParotidGlandParserStrategyImpl extends AbstractCustomParserStrategy
         BigDecimal nucleusResult = getNucleusResult(areaCountA, slideArea);// A/D
 
 
-        BigDecimal ares = BigDecimal.valueOf(Long.valueOf(areaUtils.convertToSquareMicrometer(slideArea)));
+        BigDecimal ares = BigDecimal.valueOf(Double.parseDouble(areaUtils.convertToSquareMicrometer(slideArea)));
         // 血管面积占比
         BigDecimal vesselArea = commonJsonParser.getProportion(organAreaC, ares);
         // 导管面积占比

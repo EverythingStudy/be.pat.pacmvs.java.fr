@@ -56,7 +56,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         Integer areaCountH = areaUtils.getOrganAreaCount(jsonTask, "12E0FE");// H间质细胞核数量
         BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "12E003");// I血管面积
         String slideAreaJ = areaUtils.getFineContourArea(jsonTask.getSingleId());// J组织轮廓
-        BigDecimal organAreaJ = BigDecimal.valueOf(Long.parseLong(slideAreaJ));
+        BigDecimal organAreaJ = BigDecimal.valueOf(Double.parseDouble(slideAreaJ));
         // todo F生精细胞核数量（单个）
         // todo G支持细胞核数量（单个）
         Annotation annotationBy = new Annotation();
@@ -64,6 +64,8 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         commonJsonParser.putAnnotationDynamicData(jsonTask,"12E0FA","12E0FC",annotationBy);
         annotationBy.setCountName("支持细胞核数量（单个）");
         commonJsonParser.putAnnotationDynamicData(jsonTask,"12E0FA","12E0FD",annotationBy);
+        annotationBy.setAreaName("生精小管内腔面积（单个）");
+        commonJsonParser.putAnnotationDynamicData(jsonTask,"12E0FA","12E0FB",annotationBy,1);
 
         // 算法输出指标
         resultsMap.put("生精小管面积（单个）", createDefaultIndicator());// A生精小管面积（单个）
@@ -87,7 +89,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         List<BigDecimal> list1 = new ArrayList<>();
         List<Annotation> annotationList1 = commonJsonParser.getStructureContourList(jsonTask,"12E0FA");
         for (Annotation annotation1 : annotationList1) {
-            BigDecimal area = BigDecimal.valueOf(Long.parseLong(areaUtils.convertToSquareMicrometer(String.valueOf(annotation1.getStructureAreaNum()))));
+            BigDecimal area = BigDecimal.valueOf(Double.parseDouble(areaUtils.convertToSquareMicrometer(String.valueOf(annotation1.getStructureAreaNum()))));
             list1.add(area);
         }
         String seminiferousTubulesAreaSingle = MathUtils.getConfidenceInterval(list1);
@@ -95,9 +97,9 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         List<BigDecimal> list2 = new ArrayList<>();
         for (Annotation i : annotationList1) {
             Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12E0FB", true);
-            BigDecimal sqrt1 = commonJsonParser.sqrt(i.getStructurePerimeterNum().divide(BigDecimal.valueOf(Long.parseLong(A)), 3, RoundingMode.HALF_UP));
-            BigDecimal sqrt2 = commonJsonParser.sqrt(annotation2.getStructurePerimeterNum().divide(BigDecimal.valueOf(Long.parseLong(A)), 3, RoundingMode.HALF_UP));
-            BigDecimal res = areaUtils.convertToUm(sqrt1.divide(sqrt2, 3, RoundingMode.HALF_UP));
+            BigDecimal sqrt1 = commonJsonParser.sqrt(commonJsonParser.bigDecimalDivideCheck(i.getStructurePerimeterNum(),BigDecimal.valueOf(Double.parseDouble(A))));
+            BigDecimal sqrt2 = commonJsonParser.sqrt(commonJsonParser.bigDecimalDivideCheck(annotation2.getStructurePerimeterNum(),BigDecimal.valueOf(Double.parseDouble(A))));
+            BigDecimal res = areaUtils.convertToUm(sqrt1.subtract(sqrt2));
             list2.add(res);
         }
         String averageThicknessOfSpermatogenicTubules = MathUtils.getConfidenceInterval(list2);
@@ -105,14 +107,14 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         List<BigDecimal> list3 = new ArrayList<>();
         for (Annotation i : annotationList1) {
             Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12E0FC", true);
-            list3.add(BigDecimal.valueOf(annotation2.getCount()).divide(i.getStructurePerimeterNum(), 3, RoundingMode.HALF_UP));
+            list3.add(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()),i.getStructurePerimeterNum()));
         }
         String nucleusDensityOfSpermatogenicCells = MathUtils.getConfidenceInterval(list3);
         // 支持细胞核密度（单个）
         List<BigDecimal> list4 = new ArrayList<>();
         for (Annotation i : annotationList1) {
             Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12E0FD", true);
-            list4.add(BigDecimal.valueOf(annotation2.getCount()).divide(i.getStructurePerimeterNum(), 3, RoundingMode.HALF_UP));
+            list4.add(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()),i.getStructurePerimeterNum()));
 
         }
         String nucleusDensityOfSupportCells = MathUtils.getConfidenceInterval(list4);
@@ -122,7 +124,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         for (Annotation i : annotationList1) {
             Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12E0FC", true);
             Annotation annotation3 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12E0FD", true);
-            list5.add(BigDecimal.valueOf(annotation2.getCount()).divide(BigDecimal.valueOf(annotation3.getCount()), 3, RoundingMode.HALF_UP));
+            list5.add(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()),BigDecimal.valueOf(annotation3.getCount())));
         }
         String nucleusDensityOfSpermatogenicCellsSupportCells = MathUtils.getConfidenceInterval(list5);
         // 血管面积占比
@@ -162,7 +164,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         if (areaCountBD.compareTo(BigDecimal.ZERO) == 0 || slideAreaBD.compareTo(BigDecimal.ZERO) == 0) {
             densityResult = BigDecimal.ZERO;
         } else {
-            densityResult = areaCountBD.divide(slideAreaBD, 3, RoundingMode.HALF_UP);// D/J
+            densityResult = commonJsonParser.bigDecimalDivideCheck(areaCountBD, slideAreaBD);
         }
         return densityResult;
     }

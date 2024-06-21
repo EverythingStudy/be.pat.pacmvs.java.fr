@@ -67,16 +67,16 @@ public class LungParserStrategyImpl extends AbstractCustomParserStrategy {
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
         // 支气管面积占比
-        BigDecimal bronchiAreas = commonJsonParser.getProportion(bronchiArea, BigDecimal.valueOf(Long.parseLong(accurateArea)));
+        BigDecimal bronchiAreas = commonJsonParser.getProportion(bronchiArea, BigDecimal.valueOf(Double.parseDouble(accurateArea)));
 
         // 血管面积占比
-        BigDecimal vesselAreas = commonJsonParser.getProportion(vesselArea, BigDecimal.valueOf(Long.parseLong(accurateArea)));
+        BigDecimal vesselAreas = commonJsonParser.getProportion(vesselArea, BigDecimal.valueOf(Double.parseDouble(accurateArea)));
 
         // 血管内红细胞面积占比
-        BigDecimal intravascularErythrocyteAreas = commonJsonParser.getProportion(intravascularErythrocyteArea, BigDecimal.valueOf(Long.parseLong(accurateArea)));
+        BigDecimal intravascularErythrocyteAreas = commonJsonParser.getProportion(intravascularErythrocyteArea, BigDecimal.valueOf(Double.parseDouble(accurateArea)));
 
         // 血管外红细胞面积占比
-        BigDecimal extravascularErythrocyteAreas = commonJsonParser.getProportion(extravascularErythrocyteArea, BigDecimal.valueOf(Long.parseLong(accurateArea)));
+        BigDecimal extravascularErythrocyteAreas = commonJsonParser.getProportion(extravascularErythrocyteArea, BigDecimal.valueOf(Double.parseDouble(accurateArea)));
 
         indicatorResultsMap.put("支气管面积", new IndicatorAddIn("支气管面积", String.valueOf(bronchiArea), SQ_MM, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("血管面积", new IndicatorAddIn("血管面积", String.valueOf(vesselArea), SQ_MM, CommonConstant.NUMBER_1));
