@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,15 +74,17 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		BigDecimal bigDecimalF = annotationF.getStructureAreaNum();
 		bigDecimalF = commonJsonParser.getBigDecimalValue(bigDecimalF);
 		// 血管面积 H 平方微米
-		//		Annotation annotationH  = commonJsonParser.getOrganArea(jsonTask, "124003");
-		//		BigDecimal bigDecimalH = annotationH.getStructureAreaNum();
-		//		bigDecimalH = bigDecimalH.multiply(new BigDecimal("0.001"));
 		BigDecimal bigDecimalH  =  commonJsonParser.getOrganAreaMicron(jsonTask, "124003");
 		bigDecimalH = commonJsonParser.getBigDecimalValue(bigDecimalH);
+		bigDecimalH = bigDecimalH.setScale(3, RoundingMode.HALF_UP);
+
 		//TODO 血管外红细胞面积 I 平方微米
 		BigDecimal bigDecimalI = BigDecimal.ZERO;
+		bigDecimalI = commonJsonParser.getInsideOrOutside(jsonTask, "124003", "124004", false).getStructureAreaNum();
 		//TODO 血管内红细胞面积 J 平方微米
 		BigDecimal bigDecimalJ = BigDecimal.ZERO;
+		bigDecimalJ = commonJsonParser.getInsideOrOutside(jsonTask, "124003", "124004", false).getStructureAreaNum();
+
 		// 组织轮廓面积 E 平方毫米
 		String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
 
@@ -109,10 +112,10 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		//		}
 
 		//		if(bigDecimalI.compareTo(BigDecimal.ZERO) != 0) {
-		indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalI), "平方微米", "1"));
+		indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("",areaUtils.convertToMicrometer(bigDecimalI.toString()), "平方微米", "1"));
 		//		}
 		//		if(bigDecimalJ.compareTo(BigDecimal.ZERO) != 0) {
-		indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalJ), "平方微米", "1"));
+		indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("", areaUtils.convertToMicrometer(bigDecimalJ.toString()), "平方微米", "1"));
 		//		}
 		/*
 		if(bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
