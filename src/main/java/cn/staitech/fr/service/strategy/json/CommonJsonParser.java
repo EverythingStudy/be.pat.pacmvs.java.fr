@@ -413,7 +413,7 @@ public class CommonJsonParser {
         Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
         List<Annotation> annotationList1 = getStructureContourList(jsonTask, structureId);
         for (Annotation i : annotationList1) {
-            Annotation annotationBy = getInsideOrOutside(jsonTask, i.getContour(), structureIds, true);
+            Annotation annotationBy = getContourInsideOrOutside(jsonTask, i.getContour(), structureIds, true);
             List<DynamicData> dynamicDataList = new ArrayList<>();
             DynamicData dynamicData = new DynamicData();
             if (annotation.getAreaName() != null) {
@@ -533,19 +533,19 @@ public class CommonJsonParser {
         Annotation annotations = annotationMapper.getInsideOrOutside(annotation);
         if (null != annotations) {
             if (StringUtils.isEmpty(annotations.getArea())) {
-                annotation.setStructureAreaNum(BigDecimal.ZERO);
+                annotations.setStructureAreaNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(annotations.getArea());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
+                annotations.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
             if (StringUtils.isEmpty(annotations.getPerimeter())) {
-                annotation.setStructurePerimeterNum(BigDecimal.ZERO);
+                annotations.setStructurePerimeterNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(annotations.getPerimeter());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.001")).setScale(3, BigDecimal.ROUND_HALF_UP));
+                annotations.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
         }
-        return annotation;
+        return annotations;
     }
 
     public List<Annotation> getStructureContourList(JsonTask jsonTask, String structureId) {
