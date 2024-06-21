@@ -62,7 +62,7 @@ public class TongueParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal organArea1 = commonJsonParser.getOrganAreaMicron(jsonTask, "10D12F");
         BigDecimal organArea2 = commonJsonParser.getOrganArea(jsonTask, "10D01C").getStructureAreaNum();
         BigDecimal bigDecimal = new BigDecimal(singleSlide.getArea());
-        if(bigDecimal.compareTo(BigDecimal.ZERO)== 0){
+        if(bigDecimal.signum() == 0){
             indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum corneum area%", "0.000", "%"));
             indicatorResultsMap.put("颗粒层+棘层+基底细胞层面积占比", new IndicatorAddIn("Nucleated cell layer area%", "0.000", "%"));
             indicatorResultsMap.put("固有层和肌层面积占比", new IndicatorAddIn("Lamina propria and Muscularis area%", "0.000", "%"));

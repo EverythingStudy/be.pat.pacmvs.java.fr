@@ -72,7 +72,7 @@ public class StomachParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("腺胃黏膜上皮+固有层面积", new IndicatorAddIn("Glandular area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("前胃有核层面积", new IndicatorAddIn("Nucleated cell laye area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("腺胃肌层面积", new IndicatorAddIn("Glandular Muscularis area", organArea4.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        if(organArea5.compareTo(BigDecimal.ZERO)==0){
+        if(organArea5.signum() == 0){
             indicatorResultsMap.put("前胃肌层面积占比", new IndicatorAddIn("Forestomach Muscularis area%","0.000", "%"));
             indicatorResultsMap.put("前胃角质层面积占比", new IndicatorAddIn("Stratum Corneum  area%","0.000", "%"));
             indicatorResultsMap.put("前胃有核层面积占比", new IndicatorAddIn("Nucleated cell laye area%","0.000", "%"));
@@ -84,7 +84,7 @@ public class StomachParserStrategyImpl extends AbstractCustomParserStrategy {
             indicatorResultsMap.put("前胃有核层面积占比", new IndicatorAddIn("Nucleated cell laye area%",organArea3.divide(multiply,3,RoundingMode.HALF_UP).toString(), "%"));
 
         }
-        if(organArea6.compareTo(BigDecimal.ZERO)==0){
+        if(organArea6.signum() == 0){
             indicatorResultsMap.put("腺胃肌层面积占比", new IndicatorAddIn("Glandular Muscularis area%","0.000", "%"));
             indicatorResultsMap.put("腺胃黏膜上皮+固有层面积占比", new IndicatorAddIn("Glandular area%","0.000", "%"));
 

@@ -63,7 +63,7 @@ public class DuodenumParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal organArea1 = commonJsonParser.getOrganArea(jsonTask, "11901E").getStructureAreaNum();
         //C
         String area = singleSlide.getArea();
-        if(new BigDecimal(area).compareTo(BigDecimal.ZERO)== 0){
+        if(new BigDecimal(area).signum() == 0){
             indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscular area%", area, "%"));
             indicatorResultsMap.put("黏膜上皮和固有层面积占比", new IndicatorAddIn("Mucosal epithelium and lamina propria area%", area, "%"));
         }else{

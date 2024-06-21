@@ -68,7 +68,7 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("喉面积", new IndicatorAddIn("Larynx area", singleSlide.getArea(), "平方毫米"));
         indicatorResultsMap.put("黏膜上皮面积", new IndicatorAddIn("Muscular layer", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("腺体面积", new IndicatorAddIn("Glandular area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        if(bigDecimal.compareTo(BigDecimal.ZERO)== 0){
+        if(bigDecimal.signum() == 0){
             indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", "0.000", "%"));
             indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", "0.000", "%"));
         }else{

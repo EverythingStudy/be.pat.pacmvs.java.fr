@@ -86,7 +86,7 @@ public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("Organizational contour area", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
         //f-a
         BigDecimal subtract = bigDecimal.subtract(area);
-        if(subtract.compareTo(BigDecimal.ZERO)== 0){
+        if(subtract.signum() == 0){
             indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum Corneum area%", "0.000", "%"));
             indicatorResultsMap.put("颗粒层+棘层+基底层面积占比", new IndicatorAddIn("Nucleated cell layer area%", "0.000", "%"));
             indicatorResultsMap.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", new IndicatorAddIn("Subepithelium area %", "0.000", "%"));

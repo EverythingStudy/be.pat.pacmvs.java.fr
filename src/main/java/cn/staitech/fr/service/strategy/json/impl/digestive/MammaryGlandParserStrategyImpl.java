@@ -118,7 +118,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
 
         map.put("乳腺腺泡和导管数量", new IndicatorAddIn("Number of acinus and ducts", organAreaCount.toString(), "个"));
         BigDecimal subtract = h.subtract(organAreaA).subtract(organAreaB);
-        if (subtract.compareTo(BigDecimal.ZERO) == 0) {
+        if (subtract.signum() == 0) {
             map.put("乳腺腺泡和导管面积占比", new IndicatorAddIn("Acinus and ducts area%", "0.000", "%"));
             map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", "0.000", "%"));
 
@@ -140,7 +140,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
                 //E
                 Integer count = contourInsideOrOutside.getCount();//数量
 
-                if (structureAreaNum.compareTo(BigDecimal.ZERO) != 0) {
+                if (structureAreaNum.signum() != 0) {
                     BigDecimal multiply = structureAreaNum.multiply(new BigDecimal(1000));
                     lists.add(new BigDecimal(count).divide(multiply, 4, RoundingMode.HALF_UP));
                 }

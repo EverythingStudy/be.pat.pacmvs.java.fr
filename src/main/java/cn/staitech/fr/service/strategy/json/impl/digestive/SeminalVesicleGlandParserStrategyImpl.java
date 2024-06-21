@@ -90,13 +90,13 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
                 //c
                 BigDecimal structureAreaNum1 = contourInsideOrOutside.getStructureAreaNum();// 面积
                 BigDecimal add = structureAreaNum.add(structureAreaNum1);
-                if(add.compareTo(BigDecimal.ZERO)!=0){
+                if(add.signum() != 0){
 
                     lists.add(structureAreaNum.divide(add,4, RoundingMode.HALF_UP));
                 }
                 //e
                 Integer count = contourInsideOrOutside2.getCount();
-                if(structureAreaNum.compareTo(BigDecimal.ZERO)!=0){
+                if(structureAreaNum.signum() != 0){
                     BigDecimal divide = new BigDecimal(count).divide(structureAreaNum, 4, RoundingMode.HALF_UP);
                     listNum.add(divide);
 
@@ -112,7 +112,7 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
         indicatorResultsMap.put("腺上皮面积占比（单个）", new IndicatorAddIn("Acinar epithelial area% (per)", confidenceInterval, "%"));
         indicatorResultsMap.put("腺泡上皮细胞核密度（单个）", new IndicatorAddIn("Nucleus density of acinar epithelium (per)", confidenceInterval1, "个/平方毫米"));
         BigDecimal bigDecimal = new BigDecimal(singleSlide.getArea());
-        if(bigDecimal.compareTo(BigDecimal.ZERO)==0){
+        if(bigDecimal.signum() == 0){
             indicatorResultsMap.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", "0", "%"));
         }else{
             BigDecimal divide = (bigDecimal.subtract(organArea).subtract(organArea1)).divide(bigDecimal, 3, RoundingMode.HALF_UP);
