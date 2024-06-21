@@ -68,9 +68,9 @@ public class TongueParserStrategyImpl extends AbstractCustomParserStrategy {
             indicatorResultsMap.put("固有层和肌层面积占比", new IndicatorAddIn("Lamina propria and Muscularis area%", "0.000", "%"));
         }else{
             BigDecimal multiply = bigDecimal.multiply(new BigDecimal("1000"));
-            indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum corneum area%", organArea.divide(multiply,3,RoundingMode.HALF_UP).toString(),"%"));
-            indicatorResultsMap.put("颗粒层+棘层+基底细胞层面积占比", new IndicatorAddIn("Nucleated cell layer area%", organArea1.divide(multiply,3,RoundingMode.HALF_UP).toString(), "%"));
-            indicatorResultsMap.put("固有层和肌层面积占比", new IndicatorAddIn("Lamina propria and Muscularis area%", organArea2.divide(bigDecimal,3,RoundingMode.HALF_UP).toString(), "%"));
+            indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum corneum area%", organArea.divide(multiply,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(),"%"));
+            indicatorResultsMap.put("颗粒层+棘层+基底细胞层面积占比", new IndicatorAddIn("Nucleated cell layer area%", organArea1.divide(multiply,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            indicatorResultsMap.put("固有层和肌层面积占比", new IndicatorAddIn("Lamina propria and Muscularis area%", organArea2.divide(bigDecimal,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
         }
 
         indicatorResultsMap.put("舌面积", new IndicatorAddIn("Tongue area", singleSlide.getArea(), "平方毫米"));

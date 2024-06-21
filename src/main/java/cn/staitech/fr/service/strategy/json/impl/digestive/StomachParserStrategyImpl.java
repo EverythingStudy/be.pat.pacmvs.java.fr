@@ -78,10 +78,10 @@ public class StomachParserStrategyImpl extends AbstractCustomParserStrategy {
             indicatorResultsMap.put("前胃有核层面积占比", new IndicatorAddIn("Nucleated cell laye area%","0.000", "%"));
 
         }else{
-            indicatorResultsMap.put("前胃肌层面积占比", new IndicatorAddIn("Forestomach Muscularis area%",organArea.divide(organArea5,3,RoundingMode.HALF_UP).toString(), "%"));
+            indicatorResultsMap.put("前胃肌层面积占比", new IndicatorAddIn("Forestomach Muscularis area%",organArea.divide(organArea5,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
             BigDecimal multiply = organArea5.multiply(new BigDecimal("1000"));
-            indicatorResultsMap.put("前胃角质层面积占比", new IndicatorAddIn("Stratum Corneum  area%",organArea1.divide(multiply,3,RoundingMode.HALF_UP).toString(), "%"));
-            indicatorResultsMap.put("前胃有核层面积占比", new IndicatorAddIn("Nucleated cell laye area%",organArea3.divide(multiply,3,RoundingMode.HALF_UP).toString(), "%"));
+            indicatorResultsMap.put("前胃角质层面积占比", new IndicatorAddIn("Stratum Corneum  area%",organArea1.divide(multiply,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            indicatorResultsMap.put("前胃有核层面积占比", new IndicatorAddIn("Nucleated cell laye area%",organArea3.divide(multiply,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
 
         }
         if(organArea6.signum() == 0){
@@ -89,8 +89,8 @@ public class StomachParserStrategyImpl extends AbstractCustomParserStrategy {
             indicatorResultsMap.put("腺胃黏膜上皮+固有层面积占比", new IndicatorAddIn("Glandular area%","0.000", "%"));
 
         }else{
-            indicatorResultsMap.put("腺胃肌层面积占比", new IndicatorAddIn("Glandular Muscularis area%",organArea4.divide(organArea6,3,RoundingMode.HALF_UP).toString(), "%"));
-            indicatorResultsMap.put("腺胃黏膜上皮+固有层面积占比", new IndicatorAddIn("Glandular area%",organArea2.divide(organArea6,3,RoundingMode.HALF_UP).toString(), "%"));
+            indicatorResultsMap.put("腺胃肌层面积占比", new IndicatorAddIn("Glandular Muscularis area%",organArea4.divide(organArea6,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            indicatorResultsMap.put("腺胃黏膜上皮+固有层面积占比", new IndicatorAddIn("Glandular area%",organArea2.divide(organArea6,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
 
         }
         indicatorResultsMap.put("前胃面积", new IndicatorAddIn("Forestomach area",organArea5.setScale(3,RoundingMode.HALF_UP).toString(), "平方毫米"));

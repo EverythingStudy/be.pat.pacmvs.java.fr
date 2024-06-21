@@ -92,7 +92,7 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
                 BigDecimal add = structureAreaNum.add(structureAreaNum1);
                 if(add.signum() != 0){
 
-                    lists.add(structureAreaNum.divide(add,4, RoundingMode.HALF_UP));
+                    lists.add(structureAreaNum.divide(add).multiply(new BigDecimal(100)).setScale(6, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(4));
                 }
                 //e
                 Integer count = contourInsideOrOutside2.getCount();
@@ -115,7 +115,7 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
         if(bigDecimal.signum() == 0){
             indicatorResultsMap.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", "0", "%"));
         }else{
-            BigDecimal divide = (bigDecimal.subtract(organArea).subtract(organArea1)).divide(bigDecimal, 3, RoundingMode.HALF_UP);
+            BigDecimal divide = (bigDecimal.subtract(organArea).subtract(organArea1)).divide(bigDecimal, 5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
             indicatorResultsMap.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", divide.toString(), "%"));
 
         }

@@ -72,8 +72,8 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
             indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", "0.000", "%"));
             indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", "0.000", "%"));
         }else{
-            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", organArea.divide(bigDecimal,3, RoundingMode.HALF_UP).toString(), "%"));
-            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", organArea1.divide(bigDecimal,3, RoundingMode.HALF_UP).toString(), "%"));
+            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", organArea.divide(bigDecimal,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", organArea1.divide(bigDecimal,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
 
         }
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);

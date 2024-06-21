@@ -67,8 +67,8 @@ public class DuodenumParserStrategyImpl extends AbstractCustomParserStrategy {
             indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscular area%", area, "%"));
             indicatorResultsMap.put("黏膜上皮和固有层面积占比", new IndicatorAddIn("Mucosal epithelium and lamina propria area%", area, "%"));
         }else{
-            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscular area%", organArea.divide(new BigDecimal(area), 3, RoundingMode.HALF_UP).toString(), "%"));
-            indicatorResultsMap.put("黏膜上皮和固有层面积占比", new IndicatorAddIn("Mucosal epithelium and lamina propria area%", organArea1.divide(new BigDecimal(area), 3, RoundingMode.HALF_UP).toString(), "%"));
+            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscular area%", organArea.divide(new BigDecimal(area),5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            indicatorResultsMap.put("黏膜上皮和固有层面积占比", new IndicatorAddIn("Mucosal epithelium and lamina propria area%", organArea1.divide(new BigDecimal(area),5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
 
         }
         indicatorResultsMap.put("十二指肠面积", new IndicatorAddIn("Duodenum area", singleSlide.getArea(), "平方毫米"));

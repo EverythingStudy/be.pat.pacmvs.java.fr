@@ -123,10 +123,10 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
             map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", "0.000", "%"));
 
         } else {
-            BigDecimal divide2 = organArea1.divide(subtract, 3, RoundingMode.HALF_UP);
+            BigDecimal divide2 = organArea1.divide(subtract, 5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
             map.put("乳腺腺泡和导管面积占比", new IndicatorAddIn("Acinus and ducts area%", divide2.toString(), "%"));
             BigDecimal subtract1 = organArea2.subtract(organArea1);
-            map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", subtract1.divide(subtract, 3, RoundingMode.HALF_UP).toString(), "%"));
+            map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", subtract1.divide(subtract, 5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
 
         }
 

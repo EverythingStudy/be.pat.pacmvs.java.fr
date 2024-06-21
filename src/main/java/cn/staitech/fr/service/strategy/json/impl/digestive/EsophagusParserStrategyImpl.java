@@ -59,7 +59,7 @@ public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        log.info("食管结构指标米面积计算开始：");
+        log.info("食管结构指标面积计算开始：");
         //组织轮廓面积
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         BigDecimal bigDecimal = new BigDecimal(0);
@@ -94,10 +94,10 @@ public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy {
 
         }else{
             BigDecimal multiply = subtract.multiply(new BigDecimal("1000"));
-            indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum Corneum area%", organArea.divide(multiply,3, RoundingMode.HALF_UP).toString(), "%"));
-            indicatorResultsMap.put("颗粒层+棘层+基底层面积占比", new IndicatorAddIn("Nucleated cell layer area%", organArea1.divide(multiply,3, RoundingMode.HALF_UP).toString(), "%"));
-            indicatorResultsMap.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", new IndicatorAddIn("Subepithelium area %", organArea2.divide(multiply,3, RoundingMode.HALF_UP).toString(), "%"));
-            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscularis area%", organArea3.divide(subtract,3, RoundingMode.HALF_UP).toString(), "%"));
+            indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum Corneum area%", organArea.divide(multiply,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            indicatorResultsMap.put("颗粒层+棘层+基底层面积占比", new IndicatorAddIn("Nucleated cell layer area%", organArea1.divide(multiply,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            indicatorResultsMap.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", new IndicatorAddIn("Subepithelium area %", organArea2.divide(multiply,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscularis area%", organArea3.divide(subtract,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
 
         }
         indicatorResultsMap.put("食管面积", new IndicatorAddIn("Tissue contour area", bigDecimal.subtract(area).setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米"));
