@@ -507,7 +507,7 @@
         update_time,
         slide_id,
         id,
-        contour40000 as contour1,
+        st_asgeojson(contour40000) as contour,
         single_slide_id,
         contour_type,
         cell_type,
@@ -733,7 +733,7 @@
         SELECT
         sum(cast(area as float8)) AS area,
         sum(cast(perimeter as float8)) AS perimeter,
-        count(annotation_id) as count
+        count(annotation_id) as "count"
         from fr_ai_annotation_${sequenceNumber}
         where category_id = #{categoryId}
         <if test="singleSlideId != null">

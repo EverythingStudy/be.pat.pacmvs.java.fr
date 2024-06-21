@@ -211,7 +211,7 @@ public class Annotation implements Serializable {
     private String results625;
 
     @TableField(exist = false)
-    private Integer count;
+    private Integer count = 0;
 
     @TableField(exist = false)
     private String dynamicData;
