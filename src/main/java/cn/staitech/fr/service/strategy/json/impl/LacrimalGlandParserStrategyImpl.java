@@ -117,7 +117,7 @@ public class LacrimalGlandParserStrategyImpl implements ParserStrategy {
 
         // 产品呈现指标 -------------------------------------------------------------
         //         导管占比	1	无	Duct area%	1=A/F
-        BigDecimal ductDivideSingleSlideArea = ductArea.divide(new BigDecimal(singleSlide.getArea()), 3, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100"));
+        BigDecimal ductDivideSingleSlideArea = ductArea.divide(new BigDecimal(singleSlide.getArea()), 3, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3);
         map.put("导管占比", new IndicatorAddIn("Duct area%", ductDivideSingleSlideArea.toString(), "无"));
 
         // 腺泡细胞核密度 2 个 / 平方毫米 Nucleus density of acinus 2 = B / (F - E)
@@ -125,15 +125,15 @@ public class LacrimalGlandParserStrategyImpl implements ParserStrategy {
         map.put("腺泡细胞核密度", new IndicatorAddIn("Nucleus density of acinus", nucleusDensityOfAcinus.toString(), "个/平方毫米"));
 
         // 上皮顶部胞质占比 3 无 Epithelial apex cytoplasm area % 3 = D / F
-        BigDecimal epithelialApexCytoplasmRate = epithelialApexCytoplasmArea.divide(new BigDecimal(singleSlide.getArea()), 3, BigDecimal.ROUND_HALF_UP);
+        BigDecimal epithelialApexCytoplasmRate = epithelialApexCytoplasmArea.divide(new BigDecimal(singleSlide.getArea()), 3, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3);
         map.put("上皮顶部胞质占比", new IndicatorAddIn("Epithelial apex cytoplasm area %", epithelialApexCytoplasmRate.toString(), "无"));
 
         // 间质占比 4 无 Mesenchyme area % 4 = E / F
-        BigDecimal mesenchymeAreaRate = mesenchymeArea.divide(new BigDecimal(singleSlide.getArea()), 3, BigDecimal.ROUND_HALF_UP);
+        BigDecimal mesenchymeAreaRate = mesenchymeArea.divide(new BigDecimal(singleSlide.getArea()), 3, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3);
         map.put("间质占比", new IndicatorAddIn("Mesenchyme area %", mesenchymeAreaRate.toString(), "无"));
 
         // 腺泡占比 5 无 Acinus area % 5 = (F - E) / F
-        BigDecimal acinusAreaRate = new BigDecimal(singleSlide.getArea()).subtract(mesenchymeArea).divide(new BigDecimal(singleSlide.getArea()), 3, BigDecimal.ROUND_HALF_UP);
+        BigDecimal acinusAreaRate = new BigDecimal(singleSlide.getArea()).subtract(mesenchymeArea).divide(new BigDecimal(singleSlide.getArea()), 3, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3);
         map.put("腺泡占比", new IndicatorAddIn("Acinus area %", acinusAreaRate.toString(), "无"));
 
         // 腺泡细胞核面积（单个）6 平方微米 Acinar nucleus area (per) 6 = C 以95 % 置信区间和均数±标准差呈现

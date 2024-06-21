@@ -149,7 +149,7 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         annotationBy.setCountUnit("个");
         annotationBy.setAreaName("胆管面积（单个门管区）");
         annotationBy.setAreaUnit("10³平方微米");
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "112145", "11214A", annotationBy,1);
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "112145", "11214A", annotationBy, 1);
 
         // A
         map.put("门管区面积（单个）", new IndicatorAddIn());
@@ -171,7 +171,7 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         map.put("肝脏面积", new IndicatorAddIn("Liver area", accurateArea, "平方毫米"));
 
         // 静脉面积占比	2	%	Vein area%	2=(B+C)/H	运算前注意统一单位
-        String accurateAreaDecimalRate = centralVeinsArea.add(venaCavaArea).divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).toString();
+        String accurateAreaDecimalRate = centralVeinsArea.add(venaCavaArea).divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
         map.put("静脉面积占比", new IndicatorAddIn("Vein area%", accurateAreaDecimalRate, "%"));
 
         // 肝细胞核密度	3	个/平方毫米	Nucleus density of hepatocyte	3=D/H
@@ -184,7 +184,7 @@ public class LiverParserStrategyImpl implements ParserStrategy {
 
         // 胆管面积占比（单个）	5	%	Bile duct area%    (per)	5=F/A	单个为单个门管区  以95%置信区间和均数±标准差呈现； 运算前统一单位
         String bileDuctAreaRate = "";
-        map.put("胆管面积占比（单个）", new IndicatorAddIn("Bile duct area", confidenceInterval1, "%"));
+        map.put("胆管面积占比（单个）", new IndicatorAddIn("Bile duct area", new BigDecimal(confidenceInterval1).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
 
         // 窦内细胞核密度	6	个/平方毫米	Nucleus density of Sinus cell	6=G/H
         String nucleusDensityOfSinusCellRate = new BigDecimal(sinusNnucleusCount).divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).toString();

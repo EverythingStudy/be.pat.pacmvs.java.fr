@@ -101,15 +101,15 @@ public class InguinalLymphNodeParserStrategyImpl implements ParserStrategy {
         map.put("生发中心数量", new IndicatorAddIn("Number of germinal center", germinalCenterCount.toString(), "个"));
 
         // 生发中心占比	2	%	Germinal center area%	2=B/D
-        String germinalCenterAreaRate = germinalCenterArea.divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).toString();
+        String germinalCenterAreaRate = germinalCenterArea.divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
         map.put("生发中心占比", new IndicatorAddIn("Germinal center area%", germinalCenterAreaRate, "%"));
 
         // 髓质占比	3	%	Medulla area%	3=C/D
-        String medullaAreaRate = medullaArea.divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).toString();
+        String medullaAreaRate = medullaArea.divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
         map.put("髓质占比", new IndicatorAddIn("Medulla area%", medullaAreaRate, "%"));
 
         // 皮质和副皮质占比	4	%	Cortex and paracortex area%	4=（D-C）/D
-        String cortexAndParacortexAreaRate = accurateAreaDecimal.subtract(medullaArea).divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).toString();
+        String cortexAndParacortexAreaRate = accurateAreaDecimal.subtract(medullaArea).divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
         map.put("皮质和副皮质占比", new IndicatorAddIn("Cortex and paracortex area%", cortexAndParacortexAreaRate, "%"));
 
         // D 淋巴结面积	5	平方毫米	Lymph node area	5=D

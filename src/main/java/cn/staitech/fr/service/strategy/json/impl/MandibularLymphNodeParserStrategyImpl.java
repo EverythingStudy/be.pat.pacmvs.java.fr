@@ -53,8 +53,8 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        log.info("颌下淋巴结指标计算开始…… {}", jsonTask);
-        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        log.info("指标计算开始-颌下淋巴结");
+        Map<String, IndicatorAddIn> map = new HashMap<>();
 
         //        颌下淋巴结
         //
@@ -91,31 +91,33 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
 
         // 算法输出指标 -------------------------------------------------------------
         // B
-        indicatorResultsMap.put("生发中心面积（全片）", new IndicatorAddIn("Number of germinal center", germinalCenterArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("生发中心面积（全片）", new IndicatorAddIn("Number of germinal center", germinalCenterArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         // C
-        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("Medulla area", medullaArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("髓质面积", new IndicatorAddIn("Medulla area", medullaArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         // 产品呈现指标 -------------------------------------------------------------
 
 
         // A
-        indicatorResultsMap.put("生发中心数量", new IndicatorAddIn("Number of germinal center", germinalCenterCount.toString(), "个"));
+        map.put("生发中心数量", new IndicatorAddIn("Number of germinal center", germinalCenterCount.toString(), "个"));
 
         //  生发中心占比	2	%	Germinal center area%	2=B/D
-        String germinalCenterAreaRate = germinalCenterArea.divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).toString();
-        indicatorResultsMap.put("生发中心占比", new IndicatorAddIn("Germinal center area%", germinalCenterAreaRate, "%"));
+        String germinalCenterAreaRate = germinalCenterArea.divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+        map.put("生发中心占比", new IndicatorAddIn("Germinal center area%", germinalCenterAreaRate, "%"));
 
         //  髓质占比	3	%	Medulla area%	3=C/D
-        String medullaAreaRate = medullaArea.divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).toString();
-        indicatorResultsMap.put("髓质占比", new IndicatorAddIn("Medulla area%", medullaAreaRate, "%"));
+        String medullaAreaRate = medullaArea.divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+        map.put("髓质占比", new IndicatorAddIn("Medulla area%", medullaAreaRate, "%"));
 
         //  皮质和副皮质占比	4	%	Cortex and paracortex area%	4=（D-C）/D
-        String cortexAndParacortexAreaRate = accurateAreaDecimal.subtract(medullaArea).divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).toString();
-        indicatorResultsMap.put("皮质和副皮质占比", new IndicatorAddIn("Cortex and paracortex area%", cortexAndParacortexAreaRate, "%"));
+        String cortexAndParacortexAreaRate = accurateAreaDecimal.subtract(medullaArea).divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+        map.put("皮质和副皮质占比", new IndicatorAddIn("Cortex and paracortex area%", cortexAndParacortexAreaRate, "%"));
 
         // D
-        indicatorResultsMap.put("淋巴结面积", new IndicatorAddIn("Lymph node area", accurateArea, "平方毫米"));
+        map.put("淋巴结面积", new IndicatorAddIn("Lymph node area", accurateArea, "平方毫米"));
 
-        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
+
+        log.info("指标计算结束-颌下淋巴结");
     }
 
 }
