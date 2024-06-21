@@ -583,7 +583,7 @@ public class CommonJsonParser {
         }
         // 计算面积
         BigDecimal structureAreaNum = new BigDecimal(structure.getArea());
-        return structureAreaNum.multiply(new BigDecimal(0.001));
+        return structureAreaNum.multiply(new BigDecimal(0.001)).setScale(3, RoundingMode.HALF_UP);
     }
 
     /**
