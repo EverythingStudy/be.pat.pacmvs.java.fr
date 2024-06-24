@@ -159,10 +159,12 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         map.put("大静脉面积", new IndicatorAddIn("vena cava area", venaCavaArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         // D
         map.put("肝细胞核数量", new IndicatorAddIn("Nucleus count of hepatocyte", nucleusCount.toString(), "个", CommonConstant.NUMBER_1));
-        // E
-        map.put("胆管数量（单个门管区）", new IndicatorAddIn("bile duct count", bileDuctCount.toString(), "个", CommonConstant.NUMBER_1));
-        // F
-        map.put("胆管面积（单个门管区）", new IndicatorAddIn("", bileDuctArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        // E TODO
+        // map.put("胆管数量（单个门管区）", new IndicatorAddIn("bile duct count", bileDuctCount.toString(), "个", CommonConstant.NUMBER_1));
+        map.put("胆管数量（单个门管区）", new IndicatorAddIn());
+        // F TODO
+        // map.put("胆管面积（单个门管区）", new IndicatorAddIn("", bileDuctArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        map.put("胆管面积（单个门管区）", new IndicatorAddIn());
         // G
         map.put("窦内细胞核数量", new IndicatorAddIn("Sinus nucleus count", sinusNnucleusCount.toString(), "个", CommonConstant.NUMBER_1));
 
@@ -174,7 +176,7 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         String accurateAreaDecimalRate = centralVeinsArea.add(venaCavaArea).divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
         map.put("静脉面积占比", new IndicatorAddIn("Vein area%", accurateAreaDecimalRate, "%"));
 
-        // 肝细胞核密度	3	个/平方毫米	Nucleus density of hepatocyte	3=D/H
+        // TODO 肝细胞核密度	3	个/平方毫米	Nucleus density of hepatocyte	3=D/H
         String density = new BigDecimal(nucleusCount).divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).toString();
         map.put("肝细胞核密度", new IndicatorAddIn("Nucleus density of hepatocyte", density, "个/平方毫米"));
 
