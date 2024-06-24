@@ -511,7 +511,8 @@
         single_slide_id,
         contour_type,
         cell_type,
-        single
+        single,
+        dynamic_data
         from fr_ai_annotation_${sequenceNumber}
         <where>
             <if test="singleSlideId != null">
