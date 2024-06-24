@@ -57,6 +57,8 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
      * 产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
      * 晶状体面积	1	平方毫米	Crystalline lens area	1=A
      * 视网膜面积	3	平方毫米	Retina area	3=C
+     * 睫状体-虹膜面积	2	103平方微米	Ciliary body-Iris area	2=B
+     * 视网膜平均厚度	4	毫米	Average thickness of retina	4=2C/D
      * <p>
      * <p>
      * <p>
@@ -70,6 +72,7 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
      * <p>
      * 产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后3位）	English	计算方式	备注
      * 神经纤维束面积	1	平方毫米	Nerve fiber bundles area	1=A	无
+     * 神经外膜面积	2	103平方微米	Epineurium area	2=B-A	即神经外膜结缔组织面积
      *
      * @param jsonTask
      */
@@ -81,7 +84,7 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
         BigDecimal organArea1 = getOrganArea(jsonTask, "15F102", BigDecimal.valueOf(1000)).getStructureAreaNum();
         BigDecimal organArea2 = getOrganArea(jsonTask, "15F103").getStructureAreaNum();
         BigDecimal organPerimeter = getOrganArea(jsonTask, "15F103").getStructurePerimeterNum();
-        BigDecimal organArea3 = getOrganArea(jsonTask, "13F0BB", BigDecimal.valueOf(1000)).getStructureAreaNum();
+        BigDecimal organArea3 = getOrganArea(jsonTask, "13F0BB").getStructureAreaNum();
         BigDecimal organArea4 = getOrganArea(jsonTask, "13F0BA").getStructureAreaNum();
         //indicatorResultsMap.put("晶状体面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("晶状体面积", new IndicatorAddIn("Crystalline lens area", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_0));
@@ -93,7 +96,18 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
         indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("Nerve fiber bundles area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_0));
         indicatorResultsMap.put("神经外膜结缔组织面积", new IndicatorAddIn("", organArea4.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
 
+        BigDecimal A = getOrganArea(jsonTask, "13F0BB",new BigDecimal(1000)).getStructureAreaNum();
+        BigDecimal B = getOrganArea(jsonTask, "13F0BA",new BigDecimal(1000)).getStructureAreaNum();
+        indicatorResultsMap.put("神经外膜面积", new IndicatorAddIn("Epineurium area", B.subtract(A).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+
+        BigDecimal C = organArea2;
+        BigDecimal D = organPerimeter;
+        BigDecimal b = BigDecimal.ZERO;
+        if (D.compareTo(BigDecimal.ZERO) != 0 && C.compareTo(BigDecimal.ZERO) != 0){
+            b = C.multiply(BigDecimal.valueOf(2)).divide(D, 3, RoundingMode.HALF_UP);
+        }
+        indicatorResultsMap.put("视网膜平均厚度", new IndicatorAddIn("Average thickness of retina", b.toString(), "毫米", CommonConstant.NUMBER_1));
     }
 
     @Override

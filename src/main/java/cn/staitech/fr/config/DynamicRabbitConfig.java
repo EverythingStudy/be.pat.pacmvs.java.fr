@@ -23,7 +23,7 @@ import java.util.Map;
 public class DynamicRabbitConfig {
     @Value("${queues.algoMsg:algo.message.queue}")
     private String ALGO_MSG_QUEUE;
-    @Value("${queues.algoMsgRetry:algo.message.retry.queue}")
+    @Value("${queues.algoMsgRetry1:algo.message.retry.queue}")
     private String ALGO_MSG_RETRY_QUEUE;
 
     private final ConnectionFactory connectionFactory;

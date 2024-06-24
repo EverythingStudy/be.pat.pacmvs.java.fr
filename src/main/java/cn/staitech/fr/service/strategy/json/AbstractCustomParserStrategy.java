@@ -5,6 +5,7 @@ import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
+import cn.staitech.fr.utils.MathUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -59,6 +60,18 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
      */
     protected Annotation getOrganArea(JsonTask jsonTask, String structureId) {
         return commonJsonParser.getOrganArea(jsonTask,structureId);
+    }
+
+    protected Annotation getInsideOrOutside(JsonTask jsonTask, String structureId, String structureIds, Boolean InsideOrOutside){
+        return commonJsonParser.getInsideOrOutside(jsonTask,structureId,structureIds,InsideOrOutside);
+    }
+
+    protected List<Annotation> getStructureContourList(JsonTask jsonTask, String structureId){
+        return commonJsonParser.getStructureContourList(jsonTask,structureId);
+    }
+
+    protected Annotation getContourInsideOrOutside(JsonTask jsonTask, String contour, String structureIds, Boolean InsideOrOutside){
+        return commonJsonParser.getContourInsideOrOutside(jsonTask,contour,structureIds,InsideOrOutside);
     }
 
     protected Annotation getOrganArea(JsonTask jsonTask, String structureId,BigDecimal unit) {
@@ -119,6 +132,11 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
             return new IndicatorAddIn(enName, String.valueOf(roundedResult), unit, CommonConstant.NUMBER_0);
         }
         return new IndicatorAddIn(enName, String.valueOf(result), unit, CommonConstant.NUMBER_0);
+    }
+
+    protected IndicatorAddIn createComplexIndicator(List<BigDecimal> dataList,String enName,String unit,String type) {
+        String result = MathUtils.getConfidenceInterval(dataList);
+        return new IndicatorAddIn(enName, result, unit,type);
     }
 
 }
