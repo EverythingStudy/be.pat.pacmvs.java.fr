@@ -92,7 +92,7 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
                 BigDecimal add = structureAreaNum.add(structureAreaNum1);
                 if(add.signum() != 0){
 
-                    lists.add(structureAreaNum.divide(add).multiply(new BigDecimal(100)).setScale(6, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(4));
+                    lists.add(structureAreaNum.divide(add,6,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(4));
                 }
                 //e
                 Integer count = contourInsideOrOutside2.getCount();
