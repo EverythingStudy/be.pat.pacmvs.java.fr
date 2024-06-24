@@ -24,6 +24,7 @@
         <result property="contour2500" column="contour2500" jdbcType="OTHER"/>
         <result property="contour625" column="contour625" jdbcType="OTHER"/>
         <result property="contourType" column="contour_type" jdbcType="BIGINT"/>
+        <result property="dynamicData" column="dynamic_data"  jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -148,6 +149,7 @@
             "structure_size"  INT2,
             "cell_type"       VARCHAR(50) COLLATE "pg_catalog"."default",
             "id"              VARCHAR(500) COLLATE "pg_catalog"."default",
+            "dynamic_data"    VARCHAR(1000) COLLATE "pg_catalog"."default",
             CONSTRAINT "fr_ai_annotation_${sequenceNumber}_pkey" PRIMARY KEY ("annotation_id")
         );
 
@@ -456,7 +458,8 @@
         single_slide_id,
         contour_type,
         cell_type,
-        single
+        single,
+        dynamic_data
         from fr_ai_annotation_${sequenceNumber}
         <where>
             <if test="singleSlideId != null">
@@ -482,6 +485,44 @@
                 <foreach collection="singleSlideIdList" item="singleSlideId" open="(" separator="," close=")">
                     #{singleSlideId}
                 </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="aiSelectList" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        select
+        annotation_id,
+        area,
+        perimeter,
+        area as structureAreaNum,
+        perimeter as structurePerimeterNum,
+        description,
+        category_id,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        slide_id,
+        id,
+        st_asgeojson(contour40000) as contour,
+        single_slide_id,
+        contour_type,
+        cell_type,
+        single,
+        dynamic_data
+        from fr_ai_annotation_${sequenceNumber}
+        <where>
+            <if test="singleSlideId != null">
+                single_slide_id = #{singleSlideId}
+            </if>
+            <if test="annotationId != null">
+                AND annotation_id = #{annotationId}
+            </if>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
             </if>
         </where>
     </select>
@@ -692,7 +733,8 @@
             resultMap="BaseResultMap">
         SELECT
         sum(cast(area as float8)) AS area,
-        sum(cast(perimeter as float8)) AS perimeter
+        sum(cast(perimeter as float8)) AS perimeter,
+        count(annotation_id) as count
         from fr_ai_annotation_${sequenceNumber}
         where category_id = #{categoryId}
         <if test="singleSlideId != null">
@@ -703,6 +745,19 @@
         </if>
     </select>
 
+    <select id="getInsideOrOutsideCount" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT
+            count(annotation_id) as count
+        from fr_ai_annotation_${sequenceNumber}
+        where category_id = #{categoryId}
+        <if test="singleSlideId != null">
+            AND single_slide_id = #{singleSlideId}
+        </if>
+        <if test="contour != null">
+            AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = #{insideOrOutside}
+        </if>
+    </select>
 
     <select id="collectAiGeometry" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
         SELECT st_asgeojson(ST_Collect(contour40000)) as collectContour
@@ -756,6 +811,16 @@
                 )
             SELECT * FROM point_distances;
     </select>
+
+
+    <update id="aiUpdateById" parameterType="cn.staitech.fr.domain.Annotation" useGeneratedKeys="true"
+            keyProperty="annotationId">
+        update fr_ai_annotation_${sequenceNumber}
+        <set>
+            <if test="dynamicData != null">dynamic_data = #{dynamicData}</if>
+        </set>
+        where annotation_id = #{annotationId}
+    </update>
 
 
 </mapper>

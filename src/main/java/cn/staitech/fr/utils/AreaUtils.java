@@ -72,6 +72,25 @@ public class AreaUtils {
         return result.toString();
     }
 
+
+    public String convertToUm(String str) {
+        BigDecimal result = BigDecimal.ZERO;
+        if (!StringUtils.isEmpty(str)) {
+            BigDecimal areaNum = new BigDecimal(str).multiply(BigDecimal.valueOf(0.001));
+            result = areaNum.setScale(3, BigDecimal.ROUND_HALF_UP);
+        }
+        return result.toString();
+    }
+
+    public BigDecimal convertToUm(BigDecimal str) {
+        BigDecimal result = BigDecimal.ZERO;
+        if (str != null) {
+            BigDecimal areaNum = str.multiply(BigDecimal.valueOf(0.001));
+            result = areaNum.setScale(3, BigDecimal.ROUND_HALF_UP);
+        }
+        return result;
+    }
+
     /**
      * 获取脏器轮廓面积
      * @param jsonTask jsonTask

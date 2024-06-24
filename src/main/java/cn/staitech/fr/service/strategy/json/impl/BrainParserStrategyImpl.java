@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,11 +68,11 @@ public class BrainParserStrategyImpl implements ParserStrategy {
         Annotation choroidOPlexusAreaAnnotation = commonJsonParser.getOrganArea(jsonTask, "13209C");
         //          TODO:需先判断血管与红细胞的关系，再进行面积计算，本期暂不计算
         //        血管外红细胞面积	B	103平方微米	无 (查询血管外红细胞面积)
-        //        BigDecimal extravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, "132003", "132004", false).getStructureAreaNum();
-        //        extravascularErythrocyteArea = extravascularErythrocyteArea.multiply(new BigDecimal(0.001));
+        BigDecimal extravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, "132003", "132004", false).getStructureAreaNum();
+        extravascularErythrocyteArea = extravascularErythrocyteArea.multiply(new BigDecimal(0.001));
 
         //        血管内红细胞面积	C	平方毫米	无 (查询血管内红细胞面积)
-        //        BigDecimal intravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, "132003", "132004", true).getStructureAreaNum();
+        BigDecimal intravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, "132003", "132004", true).getStructureAreaNum();
         //        大脑面积	D	平方毫米	无
 
         //        产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后3位）	English	计算方式	备注
@@ -83,9 +85,28 @@ public class BrainParserStrategyImpl implements ParserStrategy {
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
 
+        // 算法输出指标 -------------------------------------------------------------
+        // A
         indicatorResultsMap.put("脉络丛面积", new IndicatorAddIn("Choroid Plexus area", choroidOPlexusAreaAnnotation.getStructureAreaNum().toString(), "平方毫米", CommonConstant.NUMBER_1));
-        // indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", extravascularErythrocyteArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
-        // indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", intravascularErythrocyteArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        // B
+        indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", extravascularErythrocyteArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        // C
+        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", intravascularErythrocyteArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+
+        // 产品呈现指标 -------------------------------------------------------------
+        // 脉络丛面积占比	1	%	Choroid Plexus area %	1=A/D	无
+        BigDecimal choroidPlexusAreaRate = choroidOPlexusAreaAnnotation.getStructureAreaNum().divide(new BigDecimal(accurateArea)).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
+        indicatorResultsMap.put("脉络丛面积占比", new IndicatorAddIn("Choroid Plexus area %", choroidPlexusAreaRate.toString(), "%"));
+
+        // 血管外红细胞面积占比	2	%	Extravascular Erythrocyte area%	2=B/D	无
+        BigDecimal extravascularErythrocyteAreaRate = extravascularErythrocyteArea.divide(new BigDecimal(accurateArea)).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
+        indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular Erythrocyte area%", extravascularErythrocyteAreaRate.toString(), "%"));
+
+        // 血管内红细胞面积占比	3	%	Intravascular Erythrocyte area%	3=C/D	无
+        BigDecimal intravascularErythrocyteAreaRate = intravascularErythrocyteArea.divide(new BigDecimal(accurateArea)).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
+        indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", intravascularErythrocyteAreaRate.toString(), "%"));
+
+        // D 大脑面积	4	平方毫米	Brain area	4=D	无
         indicatorResultsMap.put("大脑面积", new IndicatorAddIn("Brain area", accurateArea, "平方毫米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);

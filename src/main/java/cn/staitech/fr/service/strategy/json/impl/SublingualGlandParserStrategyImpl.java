@@ -9,6 +9,7 @@ import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -56,6 +57,13 @@ public class SublingualGlandParserStrategyImpl extends AbstractCustomParserStrat
      * 腺泡数量	E	个
      * 组织轮廓	F	平方毫米	若多个数据则相加输出
      *
+     * 产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
+     * 舌下腺面积	1	平方毫米	Sublingual gland area	1=F
+     * 导管上皮面积占比（单个）	2	%	Duct epithelium area% (per)	2=(A-C)/A	以95%置信区间和均数±标准差呈现；运算前注意统一单位
+     * 导管面积占比（全片）	3	%	Ducts area% (all)	3=B/F	运算前注意统一单位
+     * 腺泡面积占比	4	%	Acinus area%	4=D/F
+     * 腺泡平均面积	5	103平方微米	Average area of acinus	5=D/E
+     *
      * @param jsonTask
      */
     @Override
@@ -75,6 +83,22 @@ public class SublingualGlandParserStrategyImpl extends AbstractCustomParserStrat
         indicatorResultsMap.put("舌下腺面积", new IndicatorAddIn("Sublingual Gland area%", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_0));
         indicatorResultsMap.put("导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("导管内腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+
+        indicatorResultsMap.put("导管面积占比（全片）", new IndicatorAddIn("Ducts area% (all)", commonJsonParser.getProportion(organArea, new BigDecimal(singleSlide.getArea())).toString(), "%", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("腺泡面积占比", new IndicatorAddIn("Acinus area%", commonJsonParser.getProportion(organArea2, new BigDecimal(singleSlide.getArea())).toString(), "%", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("腺泡平均面积", new IndicatorAddIn("Average area of acinus", commonJsonParser.getProportionMultiply(organArea2, new BigDecimal(count)).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+
+        List<Annotation> as = getStructureContourList(jsonTask, "10A06F");
+        List<BigDecimal> dataList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(as)){
+            for (Annotation a : as){
+                Annotation temp = getContourInsideOrOutside(jsonTask,a.getContour(),"10A121",true);
+                BigDecimal sub = a.getStructureAreaNum().subtract(temp.getStructureAreaNum());
+                dataList.add(commonJsonParser.getProportion(sub, temp.getStructureAreaNum()));
+            }
+        }
+        indicatorResultsMap.put("导管上皮面积占比（单个）", createComplexIndicator(dataList, "Duct epithelium area% (per)", "%", CommonConstant.NUMBER_0));
+
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 

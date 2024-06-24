@@ -1,5 +1,6 @@
 package cn.staitech.fr.domain;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -208,6 +209,42 @@ public class Annotation implements Serializable {
 
     @TableField(exist = false)
     private String results625;
+
+    @TableField(exist = false)
+    private Integer count = 0;
+
+    @TableField(exist = false)
+    private String dynamicData;
+
+    public Object getDynamicDataList() {
+        return JSON.parseObject(dynamicData);
+    }
+
+    @TableField(exist = false)
+    private Object dynamicDataList;
+
+    @TableField(exist = false)
+    private String areaName;
+
+    @TableField(exist = false)
+    private String perimeterName;
+
+    @TableField(exist = false)
+    private String countName;
+
+    @TableField(exist = false)
+    private String areaUnit;
+
+    @TableField(exist = false)
+    private String perimeterUnit;
+
+    @TableField(exist = false)
+    private String countUnit = "个";
+
+
+
+
+
 
 
     @Override

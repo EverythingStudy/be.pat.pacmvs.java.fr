@@ -212,10 +212,17 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
                 } else {
                     SpecialAnnotationRel pAnnoRel = userPARList.get(0);
                     Long currentSequenceNumber = pAnnoRel.getSequenceNumber();
+                    if(null == currentSequenceNumber) {
+                    	synchronized (this) {
+                            Long sequenceNumber = 1L;
+                            cacheSpecialAnnotationRel = generateTable(cacheSpecialAnnotationRel, specialId, userId, sequenceNumber);
+                            return cacheSpecialAnnotationRel;
+                        }
+                    }
                     //查下当前表的项目个数和记录条数，如果可以用继续，如果不可以就新建表
                     Annotation queryAnnotation = new Annotation();
                     queryAnnotation.setSequenceNumber(currentSequenceNumber);
-
+                    
                     Integer totalProjects = specialAnnotationRelMapper.selectTableSpecialCount(queryAnnotation);
                     Integer totalRecords = annotationMapper.selectTableRecordCount(queryAnnotation);
                     if (totalProjects >= CommonConstant.PROJECT_NUMBER_LIMIT || totalRecords >= CommonConstant.TABLE_RECORD_LIMIT) {

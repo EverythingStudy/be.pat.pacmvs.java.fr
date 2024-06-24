@@ -352,7 +352,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 			LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
 			wrapper.in(SingleSlide::getSingleId,ids);
 			List<SingleSlide> singleSlides = singleSlideMapper.selectList(wrapper);
-			categorys=  singleSlides.stream().collect(Collectors.toMap(SingleSlide::getSingleId,SingleSlide::getCategoryId));
+			categorys =  singleSlides.stream().collect(Collectors.toMap(SingleSlide::getSingleId,SingleSlide::getCategoryId));
 		}
 		for (Long id : ids) {
 			ExportAiVO exportVO = singleSlideMapper.getExportAiVO(id);
@@ -584,10 +584,10 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 			BigDecimal sqrt = MathUtils.sqrt(variance, 3);
 			log.info("总体标准差" + sqrt);
 			//平均值-标准差
-			BigDecimal subtract = bigDecimal.subtract(sqrt).setScale(3, RoundingMode.UP);
+			//BigDecimal subtract = bigDecimal.subtract(sqrt).setScale(3, RoundingMode.UP);
 			//平均值+标准差
-			BigDecimal add = bigDecimal.add(sqrt).setScale(3, RoundingMode.UP);
-			exportAiListVO.setAverageValue(subtract+"-"+add);
+			//BigDecimal add = bigDecimal.add(sqrt).setScale(3, RoundingMode.UP);
+			exportAiListVO.setAverageValue(bigDecimal+"±"+sqrt);
 
 			//正态分布(下限)
 			BigDecimal subtract2 = bigDecimal.subtract(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);

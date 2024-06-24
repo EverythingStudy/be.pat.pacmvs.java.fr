@@ -6,7 +6,9 @@ import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AnnotationService;
+import cn.staitech.fr.utils.AreaUtils;
 import cn.staitech.fr.vo.geojson.Properties;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -25,6 +27,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,8 +48,6 @@ public class CommonJsonParser {
     private ImageMapper imageMapper;
     @Resource
     private CategoryMapper categoryMapper;
-    @Resource
-    private SingleSlideMapper singleSlideMapper;
     @Resource
     private AnnotationService annotationService;
 
@@ -320,12 +321,18 @@ public class CommonJsonParser {
      * @param organizationId 机构id
      * @return 指标的结构ID和类别ID
      */
+    Map<Long,Map<String, Long>> pathologicalHasMap = new HashMap<>();
     public Map<String, Long> getPathologicalMap(Long organizationId) {
-        LambdaQueryWrapper<PathologicalIndicatorCategory> CategoryQueryWrapper = new LambdaQueryWrapper<>();
-        CategoryQueryWrapper.eq(PathologicalIndicatorCategory::getDelFlag, 0).eq(PathologicalIndicatorCategory::getOrganizationId, organizationId);
-        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(CategoryQueryWrapper);
-
-        return list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+        Map<String, Long> pathlogicalMap = pathologicalHasMap.get(organizationId);
+        if(pathlogicalMap== null){
+            LambdaQueryWrapper<PathologicalIndicatorCategory> CategoryQueryWrapper = new LambdaQueryWrapper<>();
+            CategoryQueryWrapper.eq(PathologicalIndicatorCategory::getDelFlag, 0).eq(PathologicalIndicatorCategory::getOrganizationId, organizationId);
+            List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(CategoryQueryWrapper);
+            pathlogicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+            pathologicalHasMap.put(organizationId, pathlogicalMap);
+            return pathlogicalMap;
+        }
+        return pathlogicalMap;
     }
 
 
@@ -335,11 +342,21 @@ public class CommonJsonParser {
      * @param specialId 专题ID
      * @return 表后缀
      */
+
+    HashMap<Long, Long> sequenceNumberMap = new HashMap<>();
+
     public Long getSequenceNumber(Long specialId) {
-        LambdaQueryWrapper<SpecialAnnotationRel> SpecialQueryWrapper = new LambdaQueryWrapper<>();
-        SpecialQueryWrapper.eq(SpecialAnnotationRel::getSpecialId, specialId);
-        SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(SpecialQueryWrapper);
-        return annotationRel.getSequenceNumber();
+        Long sequenceNumber = sequenceNumberMap.get(specialId);
+        if (ObjectUtil.isEmpty(sequenceNumber)) {
+            LambdaQueryWrapper<SpecialAnnotationRel> SpecialQueryWrapper = new LambdaQueryWrapper<>();
+            SpecialQueryWrapper.eq(SpecialAnnotationRel::getSpecialId, specialId);
+            SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(SpecialQueryWrapper);
+            sequenceNumberMap.put(specialId, annotationRel.getSequenceNumber());
+            return annotationRel.getSequenceNumber();
+        }
+        return sequenceNumber;
+
+
     }
 
     /**
@@ -403,23 +420,200 @@ public class CommonJsonParser {
         }
         annotation.setInsideOrOutside(InsideOrOutside);
         annotation.setCategoryId(pathologicalMap.get(structureIds));
+        // 查询面积和周长
+
+        return getAnnotationMessage(annotation);
+    }
+
+
+    public Annotation getContourInsideOrOutside(JsonTask jsonTask, String contour, String structureIds, Boolean InsideOrOutside) {
+        // 查询所有未被删除且登录机构相同的数据
+        Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
+        // 定位表
+        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
+
+        // 脏器轮廓信息
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(sequenceNumber);
+
+        annotation.setContour(contour);
+        // 校验轮廓的合理性
+        String result = annotationMapper.stIsValid(annotation).getResults();
+        if (Objects.equals(result, "f")) {
+            return new Annotation();
+        }
+        annotation.setInsideOrOutside(InsideOrOutside);
+        annotation.setCategoryId(pathologicalMap.get(structureIds));
+        // 查询面积和周长
+        return getAnnotationMessage(annotation);
+    }
+
+
+    public void putAnnotationDynamicData(JsonTask jsonTask, String structureId, String structureIds, Annotation annotation) {
+        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
+        List<Annotation> annotationList1 = getStructureContourList(jsonTask, structureId);
+        for (Annotation i : annotationList1) {
+            Annotation annotationBy = getContourInsideOrOutside(jsonTask, i.getContour(), structureIds, true);
+            DynamicData dynamicData = new DynamicData();
+            // 判断每个元素的data
+            List<String> list = new ArrayList<>();
+            JSONArray jsonArray = new JSONArray();
+            if (i.getDynamicDataList() != null) {
+                JSONObject jsonObject = JSONObject.parseObject(i.getDynamicDataList().toString());
+                if (jsonObject.getJSONArray("dynamicData") != null) {
+                    jsonArray = jsonObject.getJSONArray("dynamicData");
+                    for (int j = 0; j < jsonArray.size(); j++) {
+                        JSONObject jsonObject1 = jsonArray.getJSONObject(j);
+                        list.add(jsonObject1.getString("name"));
+                    }
+                }
+            }
+            if (annotation.getAreaName() != null) {
+                dynamicData.setName(annotation.getAreaName());
+                dynamicData.setData(annotationBy.getStructureAreaNum().toString());
+                dynamicData.setUnit(annotation.getAreaUnit());
+                jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
+            }
+            if (annotation.getPerimeterName() != null) {
+                dynamicData.setName(annotation.getPerimeterName());
+                dynamicData.setData(String.valueOf(annotationBy.getStructurePerimeterNum()));
+                dynamicData.setUnit(annotation.getPerimeterUnit());
+                jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
+            }
+            if (annotation.getCountName() != null) {
+                dynamicData.setName(annotation.getCountName());
+                dynamicData.setData(String.valueOf(annotationBy.getCount()));
+                dynamicData.setUnit(annotation.getCountUnit());
+                jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
+            }
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("dynamicData", jsonArray);
+            i.setSequenceNumber(sequenceNumber);
+            i.setDynamicData(jsonObject.toString());
+            annotationMapper.aiUpdateById(i);
+        }
+    }
+
+    /**
+     * @param jsonTask
+     * @param structureId
+     * @param structureIds
+     * @param annotation
+     * @param type         1：面积转10（3）平方微米  2:平方微米
+     */
+    public void putAnnotationDynamicData(JsonTask jsonTask, String structureId, String structureIds, Annotation annotation, Integer type) {
+        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
+        List<Annotation> annotationList1 = getStructureContourList(jsonTask, structureId);
+        for (Annotation i : annotationList1) {
+            Annotation annotationBy = getContourInsideOrOutside(jsonTask, i.getContour(), structureIds, true);
+            DynamicData dynamicData = new DynamicData();
+            // 判断每个元素的data
+            List<String> list = new ArrayList<>();
+            JSONArray jsonArray = null;
+            if (i.getDynamicDataList() != null) {
+                JSONObject jsonObject = JSONObject.parseObject(i.getDynamicDataList().toString());
+                if (jsonObject.getJSONArray("dynamicData") != null) {
+                    jsonArray = jsonObject.getJSONArray("dynamicData");
+                    for (int j = 0; j < jsonArray.size(); j++) {
+                        JSONObject jsonObject1 = jsonArray.getJSONObject(j);
+                        list.add(jsonObject1.getString("name"));
+                    }
+                }
+            }
+            if (annotation.getAreaName() != null) {
+                dynamicData.setName(annotation.getAreaName());
+                if (type == 1) {
+                    dynamicData.setData(String.valueOf(convertToSquareMicrometer(annotationBy.getStructureAreaNum().toString())));
+                } else if (type == 2) {
+                    dynamicData.setData(String.valueOf(convertToMicrometer(annotationBy.getStructureAreaNum().toString())));
+                }
+                dynamicData.setUnit(annotation.getAreaUnit());
+                jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
+            }
+            if (annotation.getPerimeterName() != null) {
+                dynamicData.setName(annotation.getPerimeterName());
+                dynamicData.setData(String.valueOf(annotationBy.getStructurePerimeterNum()));
+                dynamicData.setUnit(annotation.getPerimeterUnit());
+                jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
+            }
+            if (annotation.getCountName() != null) {
+                dynamicData.setName(annotation.getCountName());
+                dynamicData.setData(String.valueOf(annotationBy.getCount()));
+                dynamicData.setUnit(annotation.getCountUnit());
+                jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
+            }
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("dynamicData", jsonArray);
+            i.setSequenceNumber(sequenceNumber);
+            i.setDynamicData(jsonObject.toString());
+            annotationMapper.aiUpdateById(i);
+
+        }
+    }
+
+    public JSONArray updateDynamicDataList(List<String> nameList, JSONArray jsonArray, DynamicData dynamicData) {
+        if (nameList.contains(dynamicData.getName())) {
+            for (int j = 0; j < jsonArray.size(); j++) {
+                JSONObject jsonObject1 = jsonArray.getJSONObject(j);
+                if (Objects.equals(jsonObject1.getString("name"), dynamicData.getName())) {
+                    jsonObject1.put("data", dynamicData.getData());
+                }
+            }
+        } else {
+            jsonArray.add(dynamicData);
+        }
+        return jsonArray;
+    }
+
+
+    public String convertToMicrometer(String str) {
+        BigDecimal result = BigDecimal.ZERO;
+        if (!StringUtils.isEmpty(str)) {
+            BigDecimal areaNum = new BigDecimal(str).multiply(BigDecimal.valueOf(1000000));
+            result = areaNum.setScale(3, BigDecimal.ROUND_HALF_UP);
+        }
+        return result.toString();
+    }
+
+    public String convertToSquareMicrometer(String str) {
+        BigDecimal result = BigDecimal.ZERO;
+        if (!StringUtils.isEmpty(str)) {
+            BigDecimal areaNum = new BigDecimal(str).multiply(BigDecimal.valueOf(1000));
+            result = areaNum.setScale(3, BigDecimal.ROUND_HALF_UP);
+        }
+        return result.toString();
+    }
+
+
+    public Annotation getAnnotationMessage(Annotation annotation) {
         Annotation annotations = annotationMapper.getInsideOrOutside(annotation);
         if (null != annotations) {
             if (StringUtils.isEmpty(annotations.getArea())) {
-                annotation.setStructureAreaNum(BigDecimal.ZERO);
+                annotations.setStructureAreaNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(annotations.getArea());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
+                annotations.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
             if (StringUtils.isEmpty(annotations.getPerimeter())) {
-                annotation.setStructurePerimeterNum(BigDecimal.ZERO);
+                annotations.setStructurePerimeterNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(annotations.getPerimeter());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
+                annotations.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
         }
-        return annotation;
+        return annotations;
     }
+
+    public List<Annotation> getStructureContourList(JsonTask jsonTask, String structureId) {
+        Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
+        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(sequenceNumber);
+        annotation.setSingleSlideId(jsonTask.getSingleId());
+        annotation.setCategoryId(pathologicalMap.get(structureId));
+        return annotationMapper.aiSelectList(annotation);
+    }
+
 
     /**
      * 获取脏器轮廓面积（micron）
@@ -445,7 +639,7 @@ public class CommonJsonParser {
         }
         // 计算面积
         BigDecimal structureAreaNum = new BigDecimal(structure.getArea());
-        return structureAreaNum.multiply(new BigDecimal(0.001));
+        return structureAreaNum.multiply(new BigDecimal(0.001)).setScale(3, RoundingMode.HALF_UP);
     }
 
     /**
@@ -456,22 +650,39 @@ public class CommonJsonParser {
      */
     public BigDecimal getProportion(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
         BigDecimal proportion;
-        if (null == bigDecimal1 || null == bigDecimal2 || bigDecimal1.compareTo(BigDecimal.ZERO) == 0 ||  bigDecimal2.compareTo(BigDecimal.ZERO) == 0) {
+        if (null == bigDecimal1 || null == bigDecimal2 || bigDecimal1.compareTo(BigDecimal.ZERO) == 0 || bigDecimal2.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
-        
-        proportion = bigDecimal1.divide(bigDecimal2,3,RoundingMode.HALF_UP);
+
+        proportion = bigDecimal1.divide(bigDecimal2, 3, RoundingMode.HALF_UP);
         proportion = proportion.multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP);
         return proportion;
     }
-    
-    
-    public BigDecimal getProportionMultiply(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
-        BigDecimal proportion;
-        if (null == bigDecimal1 || null == bigDecimal2 || bigDecimal1.compareTo(BigDecimal.ZERO) == 0 ||  bigDecimal2.compareTo(BigDecimal.ZERO) == 0) {
+
+
+    public BigDecimal bigDecimalDivideCheck(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
+        if (null == bigDecimal1 || null == bigDecimal2 || bigDecimal1.compareTo(BigDecimal.ZERO) == 0 || bigDecimal2.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
-        proportion = bigDecimal1.divide(bigDecimal2,3,RoundingMode.HALF_UP);
+        return bigDecimal1.divide(bigDecimal2, 3, RoundingMode.HALF_UP);
+    }
+
+    public BigDecimal sqrt(BigDecimal number) {
+        // 将BigDecimal转换为double进行开方
+        double doubleValue = number.doubleValue();
+        double sqrtValue = Math.sqrt(doubleValue);
+        // 根据所需的精度，将double结果转换回BigDecimal
+        MathContext mc = new MathContext(3, RoundingMode.HALF_UP);
+        return new BigDecimal(sqrtValue, mc);
+    }
+
+
+    public BigDecimal getProportionMultiply(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
+        BigDecimal proportion;
+        if (null == bigDecimal1 || null == bigDecimal2 || bigDecimal1.compareTo(BigDecimal.ZERO) == 0 || bigDecimal2.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        proportion = bigDecimal1.divide(bigDecimal2, 3, RoundingMode.HALF_UP);
         return proportion;
     }
 
@@ -496,10 +707,8 @@ public class CommonJsonParser {
         annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
         return annotationMapper.countDucts(annotation);
     }
-    
+
     /**
-     * 
-     *
      * @param bigDecimal
      */
     public BigDecimal getBigDecimalValue(BigDecimal bigDecimal) {
@@ -508,10 +717,8 @@ public class CommonJsonParser {
         }
         return bigDecimal;
     }
-    
+
     /**
-     * 
-     *
      * @param Integer
      */
     public Integer getIntegerValue(Integer intValue) {

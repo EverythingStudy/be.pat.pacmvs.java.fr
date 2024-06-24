@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ public class InguinalLymphNodeParserStrategyImpl implements ParserStrategy {
     private CommonJsonParser commonJsonParser;
     @Resource
     private CommonJsonCheck commonJsonCheck;
+
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         commonJsonParser.parseJson(jsonTask, jsonFileS);
@@ -50,6 +52,8 @@ public class InguinalLymphNodeParserStrategyImpl implements ParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
+        log.info("指标计算开始-腹股沟淋巴结");
+
         //        腹股沟淋巴结
         //
         //        结构	编码
@@ -72,8 +76,8 @@ public class InguinalLymphNodeParserStrategyImpl implements ParserStrategy {
         //        皮质和副皮质占比	4	%	Cortex and paracortex area%	4=（D-C）/D
         //        淋巴结面积	5	平方毫米	Lymph node area	5=D
 
-        log.info("腹股沟淋巴结指标计算开始…… {}", jsonTask);
-        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+
+        Map<String, IndicatorAddIn> map = new HashMap<>();
 
         // 生发中心数量	1	个	 Number of germinal center	1=A  147051
         Integer germinalCenterCount = commonJsonParser.getOrganAreaCount(jsonTask, "147051");
@@ -84,12 +88,34 @@ public class InguinalLymphNodeParserStrategyImpl implements ParserStrategy {
         // 5=D:淋巴结面积-平方毫米
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         String accurateArea = singleSlide.getArea();
+        BigDecimal accurateAreaDecimal = new BigDecimal(accurateArea);
 
-        indicatorResultsMap.put("生发中心数量", new IndicatorAddIn("Number of germinal center", germinalCenterCount.toString(), "个"));
-        indicatorResultsMap.put("生发中心面积（全片）", new IndicatorAddIn("Number of germinal center", germinalCenterArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("Medulla area", medullaArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("淋巴结面积", new IndicatorAddIn("Lymph node area", accurateArea, "平方毫米"));
+        // 算法输出指标 -------------------------------------------------------------
+        // B
+        map.put("生发中心面积（全片）", new IndicatorAddIn("Number of germinal center", germinalCenterArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        // C
+        map.put("髓质面积", new IndicatorAddIn("Medulla area", medullaArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
 
-        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        // 产品呈现指标 -------------------------------------------------------------
+        // A 生发中心数量	1	个	 Number of germinal center	1=A
+        map.put("生发中心数量", new IndicatorAddIn("Number of germinal center", germinalCenterCount.toString(), "个"));
+
+        // 生发中心占比	2	%	Germinal center area%	2=B/D
+        String germinalCenterAreaRate = germinalCenterArea.divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+        map.put("生发中心占比", new IndicatorAddIn("Germinal center area%", germinalCenterAreaRate, "%"));
+
+        // 髓质占比	3	%	Medulla area%	3=C/D
+        String medullaAreaRate = medullaArea.divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+        map.put("髓质占比", new IndicatorAddIn("Medulla area%", medullaAreaRate, "%"));
+
+        // 皮质和副皮质占比	4	%	Cortex and paracortex area%	4=（D-C）/D
+        String cortexAndParacortexAreaRate = accurateAreaDecimal.subtract(medullaArea).divide(accurateAreaDecimal).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+        map.put("皮质和副皮质占比", new IndicatorAddIn("Cortex and paracortex area%", cortexAndParacortexAreaRate, "%"));
+
+        // D 淋巴结面积	5	平方毫米	Lymph node area	5=D
+        map.put("淋巴结面积", new IndicatorAddIn("Lymph node area", accurateArea, "平方毫米"));
+
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
+        log.info("指标计算结束-腹股沟淋巴结");
     }
 }

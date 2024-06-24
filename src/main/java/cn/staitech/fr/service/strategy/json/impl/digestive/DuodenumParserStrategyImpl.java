@@ -39,6 +39,7 @@ public class DuodenumParserStrategyImpl extends AbstractCustomParserStrategy {
     private CommonJsonParser commonJsonParser;
     @Resource
     private CommonJsonCheck commonJsonCheck;
+
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -56,9 +57,20 @@ public class DuodenumParserStrategyImpl extends AbstractCustomParserStrategy {
         log.info("十二指肠结构面积计算：");
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+        //B肌层
         BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "11900C").getStructureAreaNum();
+        //A黏膜上皮+固有层
         BigDecimal organArea1 = commonJsonParser.getOrganArea(jsonTask, "11901E").getStructureAreaNum();
+        //C
+        String area = singleSlide.getArea();
+        if(new BigDecimal(area).signum() == 0){
+            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscular area%", area, "%"));
+            indicatorResultsMap.put("黏膜上皮和固有层面积占比", new IndicatorAddIn("Mucosal epithelium and lamina propria area%", area, "%"));
+        }else{
+            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscular area%", organArea.divide(new BigDecimal(area),5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            indicatorResultsMap.put("黏膜上皮和固有层面积占比", new IndicatorAddIn("Mucosal epithelium and lamina propria area%", organArea1.divide(new BigDecimal(area),5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
 
+        }
         indicatorResultsMap.put("十二指肠面积", new IndicatorAddIn("Duodenum area", singleSlide.getArea(), "平方毫米"));
         indicatorResultsMap.put("肌层", new IndicatorAddIn("Muscular layer", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("黏膜上皮+固有层", new IndicatorAddIn("Mucosal epithelium+lamina propria", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));

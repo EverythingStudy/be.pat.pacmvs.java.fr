@@ -107,13 +107,13 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 			indicatorResultsMap.put("主动脉壁面积", new IndicatorAddIn("Aorta wall area", String.valueOf(bigDecimalD.subtract(bigDecimalA)), "10³平方微米", "0"));
 		}
 		//2=2*（D-A）/(B+C)
-		/*if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0 && bigDecimalA.compareTo(BigDecimal.ZERO) != 0&& bigDecimalB.compareTo(BigDecimal.ZERO) != 0&& bigDecimalC.compareTo(BigDecimal.ZERO) != 0){
+		if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0 && bigDecimalA.compareTo(BigDecimal.ZERO) != 0&& bigDecimalB.compareTo(BigDecimal.ZERO) != 0&& bigDecimalC.compareTo(BigDecimal.ZERO) != 0){
 			BigDecimal  bigDecimalDA = bigDecimalD.subtract(bigDecimalA);
 			BigDecimal  bigDecimalBC = bigDecimalB.add(bigDecimalC);
 			BigDecimal  bigDecimal2 = new BigDecimal(2);
 			BigDecimal mal =  bigDecimal2.multiply(commonJsonParser.getProportion(bigDecimalDA, bigDecimalBC));
 			indicatorResultsMap.put("主动脉壁平均厚度", new IndicatorAddIn("Average thickness of aorta wall", String.valueOf(mal), "平方毫米", "0"));
-		}*/
+		}
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 	}
 

@@ -26,6 +26,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     List<Annotation> aiSelectListBy(Annotation annotation);
 
+    List<Annotation> aiSelectList(Annotation annotation);
+
     Annotation mergeContour(Annotation annotation);
 
     Annotation selectContourType(Annotation annotation);
@@ -79,6 +81,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     Annotation getInsideOrOutside(Annotation annotation);
 
+    Annotation getInsideOrOutsideCount(Annotation annotation);
+
     Annotation collectAiGeometry(Annotation annotation);
     
     int batchDeleteBySsIds(Map<String,Object> parm);
@@ -94,6 +98,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     Annotation stDistance(Annotation annotation);
 
     Annotation avgDistance(Annotation annotation);
+
+    int aiUpdateById(Annotation annotation);
 
 }
 

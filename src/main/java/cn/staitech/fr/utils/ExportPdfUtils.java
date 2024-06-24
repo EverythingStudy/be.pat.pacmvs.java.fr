@@ -50,6 +50,7 @@ public class ExportPdfUtils {
         //获取模板文件流
         InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(CommonConstant.WROD_PATH);
         FileOutputStream os = new FileOutputStream(outFile);
+
         //ClassPathResource classPathResource = new ClassPathResource("templete/人工诊断报告.docx");
         //InputStream inputStream = classPathResource.getInputStream();
         assert inputStream != null;

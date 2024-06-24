@@ -118,10 +118,10 @@ public class PituitaryParserStrategyImpl extends AbstractCustomParserStrategy {
 			indicatorResultsMap.put("神经部面积占比", new IndicatorAddIn("Pars nervosa area%", String.valueOf(pituitaryA_H), "%", "0"));
 		}
 		//				中间部面积占比	2	%	Pars intermedia area%	2=B/H
-		/*if(pituitaryB.compareTo(BigDecimal.ZERO) != 0 && pituitaryH.compareTo(BigDecimal.ZERO) != 0){
+		if(pituitaryB.compareTo(BigDecimal.ZERO) != 0 && pituitaryH.compareTo(BigDecimal.ZERO) != 0){
 			BigDecimal pituitaryB_H =  commonJsonParser.getProportion(pituitaryB, pituitaryH);
 			indicatorResultsMap.put("中间部面积占比", new IndicatorAddIn("Pars intermedia area%", String.valueOf(pituitaryB_H), "%", "0"));
-		}*/
+		}
 		//				远侧部面积占比	3	%	Pars distalis area%	3=C/H
 		if(pituitaryC.compareTo(BigDecimal.ZERO) != 0 && pituitaryH.compareTo(BigDecimal.ZERO) != 0){
 			BigDecimal pituitaryC_H = commonJsonParser.getProportion(pituitaryC, pituitaryH);

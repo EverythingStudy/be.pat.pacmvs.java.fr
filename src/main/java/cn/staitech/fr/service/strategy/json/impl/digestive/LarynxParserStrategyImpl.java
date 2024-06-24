@@ -59,12 +59,23 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
 
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+        //a
         BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "10E035").getStructureAreaNum();
+        //b
         BigDecimal organArea1 = commonJsonParser.getOrganArea(jsonTask, "10E133").getStructureAreaNum();
-
+        //c
+        BigDecimal bigDecimal = new BigDecimal(singleSlide.getArea());
         indicatorResultsMap.put("喉面积", new IndicatorAddIn("Larynx area", singleSlide.getArea(), "平方毫米"));
         indicatorResultsMap.put("黏膜上皮面积", new IndicatorAddIn("Muscular layer", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("腺体面积", new IndicatorAddIn("Glandular area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        if(bigDecimal.signum() == 0){
+            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", "0.000", "%"));
+            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", "0.000", "%"));
+        }else{
+            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", organArea.divide(bigDecimal,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", organArea1.divide(bigDecimal,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+
+        }
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
         //aiForecastService.addOutIndicators(jsonTask.getSingleId(), indicatorResultsMap);
     }
