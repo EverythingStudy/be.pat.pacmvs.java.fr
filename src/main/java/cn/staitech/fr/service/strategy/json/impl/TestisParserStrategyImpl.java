@@ -78,7 +78,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         resultsMap.put("生精细胞核数量（单个）", createDefaultIndicator());
         resultsMap.put("支持细胞核数量（单个）", createDefaultIndicator());
         resultsMap.put("间质细胞核数量", createIndicator(areaCountH, PIECE));
-        resultsMap.put("血管面积", createIndicator(organAreaI, SQ_MM));
+//        resultsMap.put("血管面积", createIndicator(organAreaI, SQ_MM));
 
 
 
