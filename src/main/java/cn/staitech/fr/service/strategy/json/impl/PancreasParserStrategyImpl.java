@@ -134,7 +134,8 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal O = new BigDecimal(singleSlide.getArea());
         String result = "";
         if (count != 0) {
-            result = commonJsonParser.getProportion(new BigDecimal(count), O.subtract(organArea1).subtract(organArea2)).setScale(3, RoundingMode.HALF_UP).toString();
+            BigDecimal t = O.subtract(organArea1).subtract(organArea2);
+            result =  BigDecimal.valueOf(Long.valueOf(count)).divide(t, 3, RoundingMode.HALF_UP).toString();
         }
         indicatorResultsMap.put("上皮细胞核密度", new IndicatorAddIn("Nucleus density of  epithelial cell", result, "个/平方毫米", CommonConstant.NUMBER_0));
         result = "0.000";
@@ -179,7 +180,7 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("腺泡面积占比", new IndicatorAddIn("Pancreatic acinus area%", result, "%", CommonConstant.NUMBER_0));
         result = "0.000";
         if (count3 != 0 && !organArea1.equals(BigDecimal.ZERO)) {
-            result = commonJsonParser.getProportion(BigDecimal.valueOf(count3), organArea1).toString();
+            result = BigDecimal.valueOf(count3).divide(organArea1, 3, RoundingMode.HALF_UP).toString();
         }
         indicatorResultsMap.put("胰岛细胞核密度（全片）", new IndicatorAddIn("Nucleus density of pancreatic islet（all）", result, "个/平方毫米", CommonConstant.NUMBER_0));
         List<Annotation> annotationList = getStructureContourList(jsonTask, "105077");
@@ -189,7 +190,7 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
                 String contour = annotation.getContour();
                 Annotation temp = getContourInsideOrOutside(jsonTask, contour, "105078", true);
                 if (annotation.getStructureAreaNum().compareTo(BigDecimal.ZERO) > 0 && temp.getCount() != 0) {
-                    dataList.add(commonJsonParser.getProportion(BigDecimal.valueOf(temp.getCount()), annotation.getStructureAreaNum().multiply(BigDecimal.valueOf(1000))));
+                    dataList.add(BigDecimal.valueOf(temp.getCount()).divide((annotation.getStructureAreaNum().multiply(BigDecimal.valueOf(1000)))));
                 }
             }
         }
@@ -201,7 +202,7 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
                 String contour = annotation.getContour();
                 Annotation temp = getContourInsideOrOutside(jsonTask, contour, "10507B", true);
                 if (annotation.getStructureAreaNum().compareTo(BigDecimal.ZERO) > 0 && temp.getCount() != 0) {
-                    dataList.add(commonJsonParser.getProportion(BigDecimal.valueOf(temp.getCount()), annotation.getStructureAreaNum().multiply(BigDecimal.valueOf(1000))));
+                    dataList.add(BigDecimal.valueOf(temp.getCount()).divide(annotation.getStructureAreaNum().multiply(BigDecimal.valueOf(1000))));
                 }
             }
         }
