@@ -107,17 +107,18 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         resultsMap.put("精子面积（单个）", createDefaultIndicator());// F精子面积（单个）
 
         // 产品呈现指标
+        BigDecimal one = new BigDecimal("1");
 
         // 输出小管和附睾管面积占比（全片）
         BigDecimal erythrocyteArea = commonJsonParser.getProportionMultiply(organAreaB, organAreaJ);
         // 间质面积占比
-        BigDecimal mucosalArea = organAreaJ.subtract(erythrocyteArea);
+        BigDecimal mucosalArea = one.subtract(erythrocyteArea);
         // 黏膜上皮面积占比（单个）
         List<BigDecimal> list1 = new ArrayList<>();
         List<Annotation> annotationList1 = commonJsonParser.getStructureContourList(jsonTask,"12F0F5");
         for(Annotation i : annotationList1){
             Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
-            list1.add(organAreaJ.subtract(commonJsonParser.bigDecimalDivideCheck(i.getStructureAreaNum(),annotation2.getStructureAreaNum())));
+            list1.add(one.subtract(commonJsonParser.bigDecimalDivideCheck(i.getStructureAreaNum(),annotation2.getStructureAreaNum())));
         }
         String mucosalAreaPer = MathUtils.getConfidenceInterval(list1);
 
