@@ -83,7 +83,7 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		bigDecimalI = commonJsonParser.getInsideOrOutside(jsonTask, "124003", "124004", false).getStructureAreaNum();
 		//TODO 血管内红细胞面积 J 平方微米
 		BigDecimal bigDecimalJ = BigDecimal.ZERO;
-		bigDecimalJ = commonJsonParser.getInsideOrOutside(jsonTask, "124003", "124004", false).getStructureAreaNum();
+		bigDecimalJ = commonJsonParser.getInsideOrOutside(jsonTask, "124003", "124004", true).getStructureAreaNum();
 
 		// 组织轮廓面积 E 平方毫米
 		String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());

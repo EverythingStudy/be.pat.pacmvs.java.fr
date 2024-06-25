@@ -107,17 +107,24 @@ public class ColonParserStrategyImpl implements ParserStrategy {
 
         // 产品呈现指标 -------------------------------------------------------------
         // 产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
-        // 黏膜层面积占比	1	%	Mucosal area%	1=B/（E-A）	无
-        String mucosalAreaRate = areaNum.divide(eSubtractA).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
-        map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", mucosalAreaRate, "%"));
 
-        // 黏膜下层面积占比	2	%	Submucosal area%	2=C/（E-A）	无
-        String submucosalAreaRate = areaNum2.divide(eSubtractA).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
-        map.put("黏膜下层面积占比", new IndicatorAddIn("Submucosal area%", submucosalAreaRate, "%"));
+        if (eSubtractA.compareTo(BigDecimal.ZERO) != 0) {
+            // 黏膜层面积占比	1	%	Mucosal area%	1=B/（E-A）	无
+            String mucosalAreaRate = areaNum.divide(eSubtractA, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", mucosalAreaRate, "%"));
 
-        // 肌层面积占比	3	%	Muscular area%	3=D/（E-A）	无
-        String muscularAreaRate = areaNum3.divide(eSubtractA).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
-        map.put("肌层面积占比", new IndicatorAddIn("Muscular area%", muscularAreaRate, "%"));
+            // 黏膜下层面积占比	2	%	Submucosal area%	2=C/（E-A）	无
+            String submucosalAreaRate = areaNum2.divide(eSubtractA, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            map.put("黏膜下层面积占比", new IndicatorAddIn("Submucosal area%", submucosalAreaRate, "%"));
+
+            // 肌层面积占比	3	%	Muscular area%	3=D/（E-A）	无
+            String muscularAreaRate = areaNum3.divide(eSubtractA, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            map.put("肌层面积占比", new IndicatorAddIn("Muscular area%", muscularAreaRate, "%"));
+        } else {
+            map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", "0.000", "%"));
+            map.put("黏膜下层面积占比", new IndicatorAddIn("Submucosal area%", "0.000", "%"));
+            map.put("肌层面积占比", new IndicatorAddIn("Muscular area%", "0.000", "%"));
+        }
 
         // 结肠面积	4	平方毫米	Colon area	4=E-A	无
         map.put("结肠面积", new IndicatorAddIn("Colon area", eSubtractA.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_0));

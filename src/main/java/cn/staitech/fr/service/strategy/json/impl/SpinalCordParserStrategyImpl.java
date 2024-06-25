@@ -116,6 +116,11 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 		indicatorResultsMap.put("脊髓面积（单个）", new IndicatorAddIn("Sternum area", String.valueOf(BigDecimalA_add_B), "平方毫米", "0"));*/
 		
 //        indicatorResultsMap.put("乳腺腺泡/导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        Annotation annotationBy = new Annotation();
+        annotationBy.setCountName("室管膜细胞核数量（单个）");
+        annotationBy.setCountUnit("个");
+        commonJsonParser.putAnnotationDynamicData(jsonTask,"1390B4","1390B5",annotationBy);
+		
 		String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
 		
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
