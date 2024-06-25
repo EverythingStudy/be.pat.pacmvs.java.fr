@@ -109,7 +109,9 @@ public class LacrimalGlandParserStrategyImpl implements ParserStrategy {
         // B
         map.put("腺泡细胞核数量", new IndicatorAddIn("Nucleus counts of acinus", nucleusCount.toString(), "个", CommonConstant.NUMBER_1));
         // C
-        map.put("腺泡细胞核面积（单个）", new IndicatorAddIn());
+        // map.put("腺泡细胞核面积（单个）", new IndicatorAddIn());
+        map.put("腺泡细胞核面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+
         // D
         map.put("上皮顶部胞质面积", new IndicatorAddIn("Epithelial apex cytoplasm area", epithelialApexCytoplasmArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         // E
