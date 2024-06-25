@@ -509,7 +509,7 @@ public class CommonJsonParser {
             DynamicData dynamicData = new DynamicData();
             // 判断每个元素的data
             List<String> list = new ArrayList<>();
-            JSONArray jsonArray = null;
+            JSONArray jsonArray = new JSONArray();
             if (i.getDynamicDataList() != null) {
                 JSONObject jsonObject = JSONObject.parseObject(i.getDynamicDataList().toString());
                 if (jsonObject.getJSONArray("dynamicData") != null) {

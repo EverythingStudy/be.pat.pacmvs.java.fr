@@ -116,23 +116,31 @@ public class IleumParserStrategyImpl implements ParserStrategy {
 
         // 产品呈现指标 -------------------------------------------------------------
         // 产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
-        // 黏膜层面积占比	1	%	Mucosal area%	1=B/（F-A）
-        String mucosalAreaRate = areaNumB.divide(subtractFA).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
-        map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", mucosalAreaRate, "%"));
 
-        // 黏膜下层面积占比
-        // 2	%	Submucosal area%	2=C/（F-A）
-        String submucosalAreaRate = areaNumC.divide(subtractFA).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
-        map.put("黏膜下层面积占比", new IndicatorAddIn("Submucosal area%", submucosalAreaRate, "%"));
+        if (subtractFA.compareTo(BigDecimal.ZERO) != 0) {
+            // 黏膜层面积占比	1	%	Mucosal area%	1=B/（F-A）
+            String mucosalAreaRate = areaNumB.divide(subtractFA, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", mucosalAreaRate, "%"));
 
-        // 肌层面积占比
-        // 3	%	Muscular area%	3=D/（F-A）
-        String muscularAreaRate = areaNumD.divide(subtractFA).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
-        map.put("肌层面积占比", new IndicatorAddIn("Muscular area%", muscularAreaRate, "%"));
+            // 黏膜下层面积占比
+            // 2	%	Submucosal area%	2=C/（F-A）
+            String submucosalAreaRate = areaNumC.divide(subtractFA, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            map.put("黏膜下层面积占比", new IndicatorAddIn("Submucosal area%", submucosalAreaRate, "%"));
 
-        // 淋巴小结面积占比	4	%	Lymphatic nodule area%	4=E/（F-A）
-        String lymphaticNoduleAreaRate = areaNumE.divide(subtractFA).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
-        map.put("淋巴小结面积占比", new IndicatorAddIn("Lymphatic nodule area%", lymphaticNoduleAreaRate, "%"));
+            // 肌层面积占比
+            // 3	%	Muscular area%	3=D/（F-A）
+            String muscularAreaRate = areaNumD.divide(subtractFA, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            map.put("肌层面积占比", new IndicatorAddIn("Muscular area%", muscularAreaRate, "%"));
+
+            // 淋巴小结面积占比	4	%	Lymphatic nodule area%	4=E/（F-A）
+            String lymphaticNoduleAreaRate = areaNumE.divide(subtractFA, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            map.put("淋巴小结面积占比", new IndicatorAddIn("Lymphatic nodule area%", lymphaticNoduleAreaRate, "%"));
+        } else {
+            map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", "0.000", "%"));
+            map.put("黏膜下层面积占比", new IndicatorAddIn("Submucosal area%", "0.000", "%"));
+            map.put("肌层面积占比", new IndicatorAddIn("Muscular area%", "0.000", "%"));
+            map.put("淋巴小结面积占比", new IndicatorAddIn("Lymphatic nodule area%", "0.000", "%"));
+        }
 
         // 回肠面积	5	平方毫米	Ileum area	5=F-A
         map.put("回肠面积", new IndicatorAddIn("Ileum area", subtractFA.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_0));
