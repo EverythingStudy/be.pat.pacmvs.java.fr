@@ -98,7 +98,7 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
 
         BigDecimal A = getOrganArea(jsonTask, "13F0BB",new BigDecimal(1000)).getStructureAreaNum();
         BigDecimal B = getOrganArea(jsonTask, "13F0BA",new BigDecimal(1000)).getStructureAreaNum();
-        indicatorResultsMap.put("神经外膜面积", new IndicatorAddIn("Epineurium area", B.subtract(A).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("神经外膜面积", new IndicatorAddIn("Epineurium area", B.subtract(A).toString(), "10³平方微米", CommonConstant.NUMBER_0));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 
         BigDecimal C = organArea2;
@@ -107,7 +107,7 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
         if (D.compareTo(BigDecimal.ZERO) != 0 && C.compareTo(BigDecimal.ZERO) != 0){
             b = C.multiply(BigDecimal.valueOf(2)).divide(D, 3, RoundingMode.HALF_UP);
         }
-        indicatorResultsMap.put("视网膜平均厚度", new IndicatorAddIn("Average thickness of retina", b.toString(), "毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("视网膜平均厚度", new IndicatorAddIn("Average thickness of retina", b.toString(), "毫米", CommonConstant.NUMBER_0));
     }
 
     @Override
