@@ -105,7 +105,8 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
                 BigDecimal add = structureAreaNum.add(structureAreaNum1);
                 if (add.compareTo(BigDecimal.ZERO) != 0) {
                     // 3=A/(A+C)
-                    lists.add(structureAreaNum.divide(add, 4, RoundingMode.HALF_UP));
+                    lists.add(structureAreaNum.divide(add, 4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3));
+                    // new BigDecimal(confidenceInterval).multiply(new BigDecimal(100)).setScale(3).toString()
                 }
 
                 // E
@@ -156,14 +157,18 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         map.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", colonArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_0));
 
         // 腺上皮面积占比（单个）	3	%	Acinar epithelial area% (per)	3=A/(A+C) 以95%置信区间和均数±标准差呈现
-        map.put("腺上皮面积占比（单个）", new IndicatorAddIn("Acinar epithelial area% (per)", new BigDecimal(confidenceInterval).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+        map.put("腺上皮面积占比（单个）", new IndicatorAddIn("Acinar epithelial area% (per)", confidenceInterval, "%"));
 
         // 腺泡上皮细胞核密度（单个）	4	个/平方毫米	Nucleus density of acinar epithelium (per)	4=E/A 以95%置信区间和均数±标准差呈现
         map.put("腺泡上皮细胞核密度（单个）", new IndicatorAddIn("Nucleus density of acinar epithelium (per)", confidenceInterval1, "个/平方毫米"));
 
         // 间质和肌层面积占比	5	%	Mesenchyme and muscular area%	5=(F-B-D)/F
-        String mesenchymeAndMuscularAreaRate = tissueArea.subtract(colonArea).subtract(areaNum2).divide(tissueArea).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
-        map.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", mesenchymeAndMuscularAreaRate, "%"));
+        if (tissueArea.compareTo(BigDecimal.ZERO) != 0) {
+            String mesenchymeAndMuscularAreaRate = tissueArea.subtract(colonArea).subtract(areaNum2).divide(tissueArea, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            map.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", mesenchymeAndMuscularAreaRate, "%"));
+        } else {
+            map.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", "0.000", "%"));
+        }
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
 
