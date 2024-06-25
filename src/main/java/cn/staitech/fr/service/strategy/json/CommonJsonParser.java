@@ -597,8 +597,8 @@ public class CommonJsonParser {
             if (StringUtils.isEmpty(annotations.getPerimeter())) {
                 annotations.setStructurePerimeterNum(BigDecimal.ZERO);
             } else {
-                BigDecimal structureAreaNum = new BigDecimal(annotations.getPerimeter());
-                annotations.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.001")).setScale(3, BigDecimal.ROUND_HALF_UP));
+                BigDecimal structurePerimeterNum = new BigDecimal(annotations.getPerimeter());
+                annotations.setStructurePerimeterNum(structurePerimeterNum.multiply(new BigDecimal("0.001")).setScale(3, BigDecimal.ROUND_HALF_UP));
             }
         }
         return annotations;
