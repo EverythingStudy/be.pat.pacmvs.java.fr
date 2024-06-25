@@ -130,12 +130,12 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
 
             // 分子层红细胞面积占比	2	%	Molecular level erythrocyte area%	2=B/C	无
             String molecularLevelErythrocyteAreaRate = new BigDecimal(molecularLevelerythrocyteArea).divide(accurateAreaDecimal, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
-            map.put("", new IndicatorAddIn("Molecular level erythrocyte area%", molecularLevelErythrocyteAreaRate, "%"));
+            map.put("分子层红细胞面积占比", new IndicatorAddIn("Molecular level erythrocyte area%", molecularLevelErythrocyteAreaRate, "%"));
         } else {
             map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", "0.000", "%"));
             map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", "0.000", "%"));
             map.put("颗粒细胞层和浦肯野细胞层面积占比", new IndicatorAddIn("Granulocyte and Purkinje cell layer area %", "0.000", "%"));
-            map.put("", new IndicatorAddIn("Molecular level erythrocyte area%", "0.000", "%"));
+            map.put("分子层红细胞面积占比", new IndicatorAddIn("Molecular level erythrocyte area%", "0.000", "%"));
         }
 
         // C 小脑和脑干面积	3	平方毫米	Cerebellum and Brainstem area	3=C	此组织面积为小脑＋脑干面积
