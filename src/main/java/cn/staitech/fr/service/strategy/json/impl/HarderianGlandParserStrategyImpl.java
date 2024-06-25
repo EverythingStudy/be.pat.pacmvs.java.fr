@@ -136,7 +136,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         // B
         map.put("腺泡细胞核数量（单个）", new IndicatorAddIn());
         // C
-        map.put("色素面积", new IndicatorAddIn("Pigment area", pigmentArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        // map.put("色素面积", new IndicatorAddIn("Pigment area", pigmentArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         // E
         map.put("腺泡面积（全片）", new IndicatorAddIn("Acinus area (all)", acinusArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         // F
@@ -151,10 +151,10 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
             //  色素面积占比 3 % Pigment area % 3 = C / D
             BigDecimal pigmentDivideArea = pigmentArea.divide(accurateAreaBigDecimal, 3, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3);
-            map.put("色素面积占比", new IndicatorAddIn("Pigment area %", pigmentDivideArea.toString(), "%"));
+            // map.put("色素面积占比", new IndicatorAddIn("Pigment area %", pigmentDivideArea.toString(), "%"));
         } else {
             map.put("腺泡面积占比（全片）", new IndicatorAddIn("Acinus area %（all）", "0.000", "%"));
-            map.put("色素面积占比", new IndicatorAddIn("Pigment area %", "0.000", "%"));
+            // map.put("色素面积占比", new IndicatorAddIn("Pigment area %", "0.000", "%"));
         }
 
         // 腺泡细胞核密度(单个) 2 个 / 103 平方微米 Nucleus density of acinus(per) 2 = B / A 95 % 置信区间和均数±标准差

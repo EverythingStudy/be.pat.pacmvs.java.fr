@@ -217,16 +217,16 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
 
             // 皮脂腺面积占比	6	%	Sebaceous glands area%	6=E/G	运算前注意统一单位
             String sebaceousGlandsAreaRate = organAreaE.divide(organAreaB, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
-            map.put("", new IndicatorAddIn("Sebaceous glands area%", sebaceousGlandsAreaRate, "%"));
+            map.put("皮脂腺面积占比", new IndicatorAddIn("Sebaceous glands area%", sebaceousGlandsAreaRate, "%"));
 
             // 毛囊面积占比	7	%	Hair follicles area%	7=H/G
             String hairFolliclesAreaRate = organAreaH.divide(organAreaB, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
-            map.put("", new IndicatorAddIn("Hair follicles area%", hairFolliclesAreaRate, "%"));
+            map.put("毛囊面积占比", new IndicatorAddIn("Hair follicles area%", hairFolliclesAreaRate, "%"));
         } else {
             map.put("表皮角质层面积占比", new IndicatorAddIn("Stratum corneum area%", "0.000", "%"));
             map.put("表皮基底层+棘层+颗粒层面积占比", new IndicatorAddIn("Nucleated cell layer area%", "0.000", "%"));
-            map.put("", new IndicatorAddIn("Sebaceous glands area%", "0.000", "%"));
-            map.put("", new IndicatorAddIn("Hair follicles area%", "0.000", "%"));
+            map.put("皮脂腺面积占比", new IndicatorAddIn("Sebaceous glands area%", "0.000", "%"));
+            map.put("毛囊面积占比", new IndicatorAddIn("Hair follicles area%", "0.000", "%"));
         }
 
         // 毛囊面积（单个）	3	103平方微米	Hair follicle area（per）	3=C	以95%置信区间和均数±标准差呈现
