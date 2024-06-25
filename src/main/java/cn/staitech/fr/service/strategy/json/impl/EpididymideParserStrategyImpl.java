@@ -109,7 +109,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         // 产品呈现指标
 
         // 输出小管和附睾管面积占比（全片）
-        BigDecimal erythrocyteArea = commonJsonParser.getProportion(organAreaB, organAreaJ);
+        BigDecimal erythrocyteArea = commonJsonParser.getProportionMultiply(organAreaB, organAreaJ);
         // 间质面积占比
         BigDecimal mucosalArea = organAreaJ.subtract(erythrocyteArea);
         // 黏膜上皮面积占比（单个）
