@@ -89,28 +89,28 @@ public class BrainParserStrategyImpl implements ParserStrategy {
         // 算法输出指标 -------------------------------------------------------------
         // A
         indicatorResultsMap.put("脉络丛面积", new IndicatorAddIn("Choroid Plexus area", choroidOPlexusAreaAnnotation.getStructureAreaNum().toString(), "平方毫米", CommonConstant.NUMBER_1));
-        // B
-        indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", extravascularErythrocyteArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
-        // C
-        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", intravascularErythrocyteArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+//        // B
+//        indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", extravascularErythrocyteArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+//        // C
+//        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", intravascularErythrocyteArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
 
         // 产品呈现指标 -------------------------------------------------------------
         if (accurateAreaBigDecimal.compareTo(BigDecimal.ZERO) != 0) {
             // 脉络丛面积占比	1	%	Choroid Plexus area %	1=A/D	无
-            BigDecimal choroidPlexusAreaRate = choroidOPlexusAreaAnnotation.getStructureAreaNum().divide(accurateAreaBigDecimal, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
+            BigDecimal choroidPlexusAreaRate = choroidOPlexusAreaAnnotation.getStructureAreaNum().divide(accurateAreaBigDecimal, 6, RoundingMode.HALF_UP).setScale(6, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
             indicatorResultsMap.put("脉络丛面积占比", new IndicatorAddIn("Choroid Plexus area %", choroidPlexusAreaRate.toString(), "%"));
 
-            // 血管外红细胞面积占比	2	%	Extravascular Erythrocyte area%	2=B/D	无
-            BigDecimal extravascularErythrocyteAreaRate = extravascularErythrocyteArea.divide(accurateAreaBigDecimal, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
-            indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular Erythrocyte area%", extravascularErythrocyteAreaRate.toString(), "%"));
-
-            // 血管内红细胞面积占比	3	%	Intravascular Erythrocyte area%	3=C/D	无
-            BigDecimal intravascularErythrocyteAreaRate = intravascularErythrocyteArea.divide(accurateAreaBigDecimal, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
-            indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", intravascularErythrocyteAreaRate.toString(), "%"));
+//            // 血管外红细胞面积占比	2	%	Extravascular Erythrocyte area%	2=B/D	无
+//            BigDecimal extravascularErythrocyteAreaRate = extravascularErythrocyteArea.divide(accurateAreaBigDecimal, 6, RoundingMode.HALF_UP).setScale(6, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
+//            indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular Erythrocyte area%", extravascularErythrocyteAreaRate.toString(), "%"));
+//
+//            // 血管内红细胞面积占比	3	%	Intravascular Erythrocyte area%	3=C/D	无
+//            BigDecimal intravascularErythrocyteAreaRate = intravascularErythrocyteArea.divide(accurateAreaBigDecimal, 6, RoundingMode.HALF_UP).setScale(6, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
+//            indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", intravascularErythrocyteAreaRate.toString(), "%"));
         } else {
             indicatorResultsMap.put("脉络丛面积占比", new IndicatorAddIn("Choroid Plexus area %", "0.000", "%"));
-            indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular Erythrocyte area%", "0.000", "%"));
-            indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", "0.000", "%"));
+//            indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular Erythrocyte area%", "0.000", "%"));
+//            indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", "0.000", "%"));
         }
 
 
