@@ -62,9 +62,10 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		//组织轮廓:	14E111
 
 		//        骨髓腔面积	A	平方毫米	若输出结果为多个则相加
-		Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "14E00E");
-		BigDecimal bigDecimalA = annotation.getStructureAreaNum();
-		bigDecimalA = commonJsonParser.getBigDecimalValue(bigDecimalA);
+//		Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "14E00E");
+//		BigDecimal bigDecimalA = annotation.getStructureAreaNum();
+//		bigDecimalA = commonJsonParser.getBigDecimalValue(bigDecimalA);
+		BigDecimal bigDecimalA = new BigDecimal("0");
 
 		//        红系细胞核数量	B	个	无
 		Integer mucosaCountB = commonJsonParser.getOrganAreaCount(jsonTask, "14E011");
@@ -166,8 +167,8 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		//		if(bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
 		indicatorResultsMap.put("脂肪细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalF), "10³平方微米", "1"));
 		//		}
-		//		if(bigDecimalGM.compareTo(BigDecimal.ZERO) != 0) {
-		//		indicatorResultsMap.put("骨质面积", new IndicatorAddIn("", String.valueOf(bigDecimalGM), "10³平方微米", "1"));
+//				if(bigDecimalGM.compareTo(BigDecimal.ZERO) != 0) {
+				indicatorResultsMap.put("骨质面积", new IndicatorAddIn("", String.valueOf(bigDecimalGM), "10³平方微米", "1"));
 		//		}
 
 		//AI指标保存

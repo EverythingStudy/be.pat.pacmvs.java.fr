@@ -72,7 +72,7 @@ public class MesentericLymphNodeParserStrategyImpl extends AbstractCustomParserS
         // 髓质占比
         BigDecimal medullaArea = commonJsonParser.getProportion(organAreaC, organAreaD);
         // 皮质和副皮质占比
-        BigDecimal cortexAndParacortexArea = commonJsonParser.getProportionMultiply(organAreaD.subtract(organAreaC), organAreaD);
+        BigDecimal cortexAndParacortexArea = commonJsonParser.getProportion(organAreaD.subtract(organAreaC), organAreaD);
 
         // 算法输出指标
         resultsMap.put("生发中心面积（全片）", createIndicator(organAreaB, SQ_MM));
