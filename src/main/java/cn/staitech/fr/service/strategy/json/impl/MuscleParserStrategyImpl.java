@@ -86,7 +86,7 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
         // 血管面积占比
         BigDecimal vesselArea = commonJsonParser.getProportion(organAreaC, organF);
         // 血管内红细胞面积占比
-        BigDecimal vesselInErythrocyteArea = commonJsonParser.getProportion(organAreaE, organF);
+        BigDecimal vesselInErythrocyteArea = commonJsonParser.getProportion(commonJsonParser.getBigDecimalValue(organAreaE), organF);
         // 血管外红细胞面积占比
         BigDecimal vesselOutErythrocyteArea = commonJsonParser.getProportion(commonJsonParser.getBigDecimalValue(organAreaD.subtract(organAreaE)), organF);
 

@@ -136,7 +136,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         // 间质面积占比
         BigDecimal interstitialArea = commonJsonParser.getProportion(organAreaJ.subtract(organAreaB), organAreaJ);
         // 间质细胞核密度
-        BigDecimal interstitialCellNucleiDensity = commonJsonParser.getProportionMultiply(BigDecimal.valueOf(areaCountH), organAreaJ);
+        BigDecimal interstitialCellNucleiDensity = commonJsonParser.getProportion(BigDecimal.valueOf(areaCountH), organAreaJ);
 
 
         // 产品呈现指标

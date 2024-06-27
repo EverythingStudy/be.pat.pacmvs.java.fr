@@ -89,6 +89,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         BigDecimal perimeterC = annotation.getStructurePerimeterNum();
         BigDecimal organAreaE = areaUtils.getOrganArea(jsonTask, "12F0F4");// E输出小管/附睾管管腔面积（全片）
         BigDecimal organAreaG = areaUtils.getOrganArea(jsonTask, "12F0F7");// G精子面积（全片）
+        Integer organAreaH = areaUtils.getOrganAreaCount(jsonTask, "12F0F7");// G精子面积（全片）
         BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "12F003");// I血管面积
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// J组织轮廓面积
         BigDecimal organAreaJ = BigDecimal.valueOf(Double.parseDouble(slideArea));
@@ -101,8 +102,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         resultsMap.put("输出小管/附睾管管腔面积（全片）", createIndicator(organAreaE, SQ_MM));
         resultsMap.put("精子面积（全片）", createIndicator(organAreaG, SQ_MM));
         resultsMap.put("血管面积", createIndicator(organAreaI, SQ_MM));
-
-
+        resultsMap.put("黏膜上皮细胞核数量（单个）", createIndicator(organAreaH, PIECE));
         resultsMap.put("输出小管/附睾管管腔面积（单个）", createDefaultIndicator());// D输出小管/附睾管管腔面积（单个）
         resultsMap.put("精子面积（单个）", createDefaultIndicator());// F精子面积（单个）
 

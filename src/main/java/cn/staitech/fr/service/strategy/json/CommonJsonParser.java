@@ -383,13 +383,13 @@ public class CommonJsonParser {
                 annotation.setStructureAreaNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(structure.getArea());
-                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
+                annotation.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")));
             }
             if (StringUtils.isEmpty(structure.getPerimeter())) {
                 annotation.setStructurePerimeterNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(structure.getPerimeter());
-                annotation.setStructurePerimeterNum(structureAreaNum.multiply(new BigDecimal("0.001")).setScale(3, BigDecimal.ROUND_HALF_UP));
+                annotation.setStructurePerimeterNum(structureAreaNum.multiply(new BigDecimal("0.001")));
             }
         }
         return annotation;
