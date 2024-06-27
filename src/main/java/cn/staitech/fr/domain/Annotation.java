@@ -239,6 +239,12 @@ public class Annotation implements Serializable {
     private String perimeterUnit;
 
     @TableField(exist = false)
+    private String areaValue;
+
+    @TableField(exist = false)
+    private String perimeterValue;
+
+    @TableField(exist = false)
     private String countUnit = "个";
 
 

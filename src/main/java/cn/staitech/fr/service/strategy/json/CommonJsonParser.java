@@ -321,10 +321,11 @@ public class CommonJsonParser {
      * @param organizationId 机构id
      * @return 指标的结构ID和类别ID
      */
-    Map<Long,Map<String, Long>> pathologicalHasMap = new HashMap<>();
+    Map<Long, Map<String, Long>> pathologicalHasMap = new HashMap<>();
+
     public Map<String, Long> getPathologicalMap(Long organizationId) {
         Map<String, Long> pathlogicalMap = pathologicalHasMap.get(organizationId);
-        if(pathlogicalMap== null){
+        if (pathlogicalMap == null) {
             LambdaQueryWrapper<PathologicalIndicatorCategory> CategoryQueryWrapper = new LambdaQueryWrapper<>();
             CategoryQueryWrapper.eq(PathologicalIndicatorCategory::getDelFlag, 0).eq(PathologicalIndicatorCategory::getOrganizationId, organizationId);
             List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(CategoryQueryWrapper);
@@ -551,10 +552,8 @@ public class CommonJsonParser {
     }
 
 
-
-
-     //  1：面积转10（3）平方微米  2:平方微米 3:平方毫米
-    public void putSingleAnnotationDynamicData(JsonTask jsonTask, String structureId,  Annotation annotation, Integer type) {
+    //  1：面积转10（3）平方微米  2:平方微米 3:平方毫米
+    public void putSingleAnnotationDynamicData(JsonTask jsonTask, String structureId, Annotation annotation, Integer type) {
         Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
         // 查询出单个标注
         List<Annotation> annotationList1 = getStructureContourList(jsonTask, structureId);
@@ -607,7 +606,41 @@ public class CommonJsonParser {
     }
 
 
-
+    public void putAnnotationDynamicDataBy(JsonTask jsonTask, Annotation annotation) {
+        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
+        DynamicData dynamicData = new DynamicData();
+        // 判断每个元素的data
+        List<String> list = new ArrayList<>();
+        JSONArray jsonArray = new JSONArray();
+        if (annotation.getDynamicDataList() != null) {
+            JSONObject jsonObject = JSONObject.parseObject(annotation.getDynamicDataList().toString());
+            if (jsonObject.getJSONArray("dynamicData") != null) {
+                jsonArray = jsonObject.getJSONArray("dynamicData");
+                for (int j = 0; j < jsonArray.size(); j++) {
+                    JSONObject jsonObject1 = jsonArray.getJSONObject(j);
+                    list.add(jsonObject1.getString("name"));
+                }
+            }
+        }
+        if (annotation.getAreaName() != null) {
+            dynamicData.setName(annotation.getAreaName());
+            dynamicData.setData(String.valueOf(annotation.getAreaValue()));
+            dynamicData.setUnit(annotation.getAreaUnit());
+            jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
+        }
+        if (annotation.getPerimeterName() != null) {
+            dynamicData.setName(annotation.getPerimeterName());
+            dynamicData.setData(String.valueOf(annotation.getPerimeterValue()));
+            dynamicData.setUnit(annotation.getPerimeterUnit());
+            jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
+        }
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("dynamicData", jsonArray);
+        annotation.setSequenceNumber(sequenceNumber);
+        annotation.setDynamicData(jsonObject.toString());
+        annotationMapper.aiUpdateById(annotation);
+//        }
+    }
 
 
     public JSONArray updateDynamicDataList(List<String> nameList, JSONArray jsonArray, DynamicData dynamicData) {
@@ -778,7 +811,7 @@ public class CommonJsonParser {
     }
 
     /**
-     * @param Integer
+     * @param
      */
     public Integer getIntegerValue(Integer intValue) {
         if (null == intValue) {
