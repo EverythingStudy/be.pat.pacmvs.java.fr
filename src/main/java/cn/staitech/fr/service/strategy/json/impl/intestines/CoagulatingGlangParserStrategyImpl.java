@@ -82,7 +82,6 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         BigDecimal colonArea = commonJsonParser.getOrganArea(jsonTask, "12B074").getStructureAreaNum();
         // D 腺腔面积（全片）
         BigDecimal areaNum2 = commonJsonParser.getOrganArea(jsonTask, "12B0E9").getStructureAreaNum();
-        //BigDecimal areaNum2 = commonJsonParser.getInsideOrOutside(jsonTask, "12B074", "12B0E9", true).getStructureAreaNum();
         // 组织轮廓
         BigDecimal tissueArea = new BigDecimal(area);
 
@@ -106,15 +105,14 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
                 BigDecimal add = structureAreaNum.add(structureAreaNum1);
                 if (add.compareTo(BigDecimal.ZERO) != 0) {
                     // 3=A/(A+C)
-                    lists.add(structureAreaNum.divide(add, 4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3));
-                    // new BigDecimal(confidenceInterval).multiply(new BigDecimal(100)).setScale(3).toString()
+                    lists.add(structureAreaNum.divide(add, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(10));
                 }
 
                 // E
                 Integer count = contourInsideOrOutside2.getCount();
                 if (add.compareTo(BigDecimal.ZERO) != 0) {
                     // 4=E/A
-                    BigDecimal divide = new BigDecimal(count).divide(structureAreaNum, 4, RoundingMode.HALF_UP);
+                    BigDecimal divide = new BigDecimal(count).divide(structureAreaNum, 10, RoundingMode.HALF_UP);
                     listNum.add(divide);
                 }
 

@@ -123,10 +123,10 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
             map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", "0.000", "%"));
 
         } else {
-            BigDecimal divide2 = organArea1.divide(subtract, 5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
+            BigDecimal divide2 = organArea1.divide(subtract, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
             map.put("乳腺腺泡和导管面积占比", new IndicatorAddIn("Acinus and ducts area%", divide2.toString(), "%"));
             BigDecimal subtract1 = organArea2.subtract(organArea1);
-            map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", subtract1.divide(subtract, 5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", subtract1.divide(subtract, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
 
         }
 
@@ -142,7 +142,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
 
                 if (structureAreaNum.signum() != 0) {
                     BigDecimal multiply = structureAreaNum.multiply(new BigDecimal(1000));
-                    lists.add(new BigDecimal(count).divide(multiply, 4, RoundingMode.HALF_UP));
+                    lists.add(new BigDecimal(count).divide(multiply, 10, RoundingMode.HALF_UP));
                 }
 
             }
@@ -156,10 +156,15 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("淋巴结面积", new IndicatorAddIn("Lymph node area", organAreaA.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         // 皮肤面积	G	平方毫米	此数据使用乳腺中皮肤数据 (乳腺皮肤公用)
         map.put("皮肤面积", new IndicatorAddIn("Skin area", organAreaB.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("乳腺腺泡/导管数量", new IndicatorAddIn("Number of acinus and ducts", organAreaCount.toString(), "个",CommonConstant.NUMBER_1));
         map.put("乳腺腺泡/导管面积（全片）", new IndicatorAddIn("Breast acinar/ductal area (all)", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         map.put("结缔组织面积", new IndicatorAddIn("Connective tissue area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         map.put("组织轮廓面积", new IndicatorAddIn("Organizational contour area", h.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         map.put("乳腺细胞核数量（全片）", new IndicatorAddIn("Number of breast cell nuclei (all)", organAreaCount2.toString(), "个", CommonConstant.NUMBER_1));
+        Annotation annotation1 = new Annotation();
+        annotation1.setAreaName("乳腺腺泡/导管面积（单个）");
+        annotation1.setAreaUnit("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12306C",annotation1,1);
         map.put("乳腺腺泡/导管面积（单个）", new IndicatorAddIn());
 
         map.put("乳腺细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
@@ -176,6 +181,11 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("表皮基底层+棘层+颗粒层面积", new IndicatorAddIn("Area of basal layer+spinous layer+granular layer of epidermis", organArea4.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
 
         // 毛囊面积（单个）	C	103平方微米	单个毛囊面积输出
+        //  1：面积转10（3）平方微米  2:平方微米 （默认平方毫米）
+        Annotation annotationC = new Annotation();
+        annotationC.setCountName("毛囊面积（单个）");
+        annotationC.setCountUnit("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "121098", annotationC, 1);
         map.put("毛囊面积（单个）", new IndicatorAddIn());
 
         // 毛囊数量	D	个	无
@@ -239,6 +249,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("皮脂腺密度", new IndicatorAddIn("Sebaceous gland density", divide1.toString(), "个/平方毫米"));
 
         // 皮肤面积	8	平方毫米	Skin area	8=G  此数据使用乳腺中皮肤数据
+        map.put("皮肤面积", new IndicatorAddIn("Skin area", organAreaB.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
 

@@ -58,28 +58,42 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		//组织轮廓	15D111  D   10³平方微米
 
 		//空腔面积 A 10³平方微米
-		Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "15D113");
+		// Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "15D113");
+		//平方毫米
+		BigDecimal organAreaA = getOrganArea(jsonTask, "15D113").getStructureAreaNum();
+		BigDecimal organPerimeterNumP = getOrganArea(jsonTask, "15D113").getStructurePerimeterNum();
+		
+		//平方毫米
 		BigDecimal bigDecimalA = BigDecimal.ZERO;
-		if(null !=annotation.getStructureAreaNum()){
-			String bigDecimalAStr = areaUtils.convertToSquareMicrometer(annotation.getStructureAreaNum().toString());
+		//平方微米
+		BigDecimal bigDecimalA_2 = BigDecimal.ZERO;
+		
+		if(null !=organAreaA){
+			String bigDecimalAStr = areaUtils.convertToSquareMicrometer(organAreaA.toString());
+			//非10³平方微米 ，普通的平方微米
+			String bigDecimalASecondStr = areaUtils.convertToMicrometer(organAreaA.toString());
 			bigDecimalA =  new BigDecimal(bigDecimalAStr);
+			bigDecimalA_2 =  new BigDecimal(bigDecimalASecondStr);
 		}
 		
 
 		//空腔周长	B	毫米
 		BigDecimal bigDecimalB =  BigDecimal.ZERO;
-		if(null != annotation.getStructurePerimeterNum()){
-			bigDecimalB =  annotation.getStructurePerimeterNum();
+		if(null != organPerimeterNumP){
+			bigDecimalB =  organPerimeterNumP;
 		}
 
 		BigDecimal bigDecimalC = BigDecimal.ZERO;
 		BigDecimal bigDecimalD = BigDecimal.ZERO;
-
+		BigDecimal bigDecimalD_2 = BigDecimal.ZERO;
 		//组织轮廓面积 D 10³平方微米
 		SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
 		if (StringUtils.isNotEmpty(singleSlide.getArea())) {
 			String area = areaUtils.convertToSquareMicrometer(singleSlide.getArea());
+			//非10³平方微米 ，普通的平方微米
+			String area2 = areaUtils.convertToMicrometer(singleSlide.getArea());
 			bigDecimalD = new BigDecimal(area);
+			bigDecimalD_2 = new BigDecimal(area2);
 			bigDecimalC =  new BigDecimal(singleSlide.getPerimeter());
 		}
 
@@ -108,11 +122,12 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		}
 		//2=2*（D-A）/(B+C)
 		if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0 && bigDecimalA.compareTo(BigDecimal.ZERO) != 0&& bigDecimalB.compareTo(BigDecimal.ZERO) != 0&& bigDecimalC.compareTo(BigDecimal.ZERO) != 0){
-			BigDecimal  bigDecimalDA = bigDecimalD.subtract(bigDecimalA);
-			BigDecimal  bigDecimalBC = bigDecimalB.add(bigDecimalC);
+			BigDecimal  bigDecimalDA = bigDecimalD_2.subtract(bigDecimalA_2);
+			//毫米转微米
+			BigDecimal  bigDecimalBC = bigDecimalB.add(bigDecimalC).multiply(new BigDecimal("1000"));
 			BigDecimal  bigDecimal2 = new BigDecimal(2);
 			BigDecimal mal =  bigDecimal2.multiply(commonJsonParser.getProportionMultiply(bigDecimalDA, bigDecimalBC));
-			indicatorResultsMap.put("主动脉壁平均厚度", new IndicatorAddIn("Average thickness of aorta wall", String.valueOf(mal), "平方毫米", "0"));
+			indicatorResultsMap.put("主动脉壁平均厚度", new IndicatorAddIn("Average thickness of aorta wall", String.valueOf(mal), "微米", "0"));
 		}
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 	}

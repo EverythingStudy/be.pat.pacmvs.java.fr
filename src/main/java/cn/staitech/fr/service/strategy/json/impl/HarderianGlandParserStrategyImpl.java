@@ -115,7 +115,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
                 // 2=B/A
                 if (structureAreaNum.compareTo(BigDecimal.ZERO) != 0) {
-                    BigDecimal divide = new BigDecimal(count).divide(structureAreaNum, 4, RoundingMode.HALF_UP);
+                    BigDecimal divide = new BigDecimal(count).divide(structureAreaNum, 10, RoundingMode.HALF_UP);
                     listNum.add(divide);
                 }
 
@@ -125,10 +125,16 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         String confidenceInterval = MathUtils.getConfidenceInterval(listNum);
 
         // B 腺泡细胞核数量（单个）	B	个	单个腺泡内数据相加输出
-        Annotation annotationByB = new Annotation();
-        annotationByB.setCountName("腺泡细胞核数量（单个）");
-        annotationByB.setCountUnit("个");
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "10206D", "10206E", annotationByB);
+        Annotation annotationB = new Annotation();
+        annotationB.setCountName("腺泡细胞核数量（单个）");
+        annotationB.setCountUnit("个");
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "10206D", "10206E", annotationB);
+
+        //  1：面积转10（3）平方微米  2:平方微米 （默认平方毫米）
+        Annotation annotationC = new Annotation();
+        annotationC.setCountName("腺泡面积（单个）");
+        annotationC.setCountUnit("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "10206D", annotationC, 1);
 
         // 算法输出指标 -------------------------------------------------------------
         // A
@@ -146,11 +152,11 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         if (accurateAreaBigDecimal.compareTo(BigDecimal.ZERO) != 0) {
             //   腺泡面积占比（全片）	1	%	Acinus area%（all）	1=E/D
             // 保留两位小数，并进行四舍五入
-            BigDecimal acinusDivideArea = acinusArea.divide(accurateAreaBigDecimal, 3, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3);
+            BigDecimal acinusDivideArea = acinusArea.divide(accurateAreaBigDecimal, 10, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3);
             map.put("腺泡面积占比（全片）", new IndicatorAddIn("Acinus area %（all）", acinusDivideArea.toString(), "%"));
 
             //  色素面积占比 3 % Pigment area % 3 = C / D
-            BigDecimal pigmentDivideArea = pigmentArea.divide(accurateAreaBigDecimal, 3, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3);
+            BigDecimal pigmentDivideArea = pigmentArea.divide(accurateAreaBigDecimal, 10, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3);
             // map.put("色素面积占比", new IndicatorAddIn("Pigment area %", pigmentDivideArea.toString(), "%"));
         } else {
             map.put("腺泡面积占比（全片）", new IndicatorAddIn("Acinus area %（all）", "0.000", "%"));
@@ -162,7 +168,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
 
         // 腺泡细胞核密度（全片）4 个 / 平方毫米 Nucleus density of acinus (all) 4 = F / E
-        BigDecimal nucleusCountDivideacinusArea = new BigDecimal(nucleusCount).divide(acinusArea, 3, BigDecimal.ROUND_HALF_UP);
+        BigDecimal nucleusCountDivideacinusArea = new BigDecimal(nucleusCount).divide(acinusArea, 10, BigDecimal.ROUND_HALF_UP);
         map.put("腺泡细胞核密度（全片）", new IndicatorAddIn("Nucleus density of acinus (all)", nucleusCountDivideacinusArea.toString(), "个/平方毫米"));
 
         // D

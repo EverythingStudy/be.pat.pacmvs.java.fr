@@ -134,13 +134,13 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
 
                 // 3=(A-B)/A 甲状腺滤泡上皮面积占比（单个）	3	%	Thyroid follicular epithelium area%(per)	3=(A-B)/A	以95%置信区间和均数±标准差呈现
                 if (structureAreaNumA.compareTo(BigDecimal.ZERO) != 0) {
-                    list3.add(subtractAB.divide(structureAreaNumA, 4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3));
+                    list3.add(subtractAB.divide(structureAreaNumA, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(10));
                     //  new BigDecimal(confidenceInterval3).multiply(new BigDecimal(100)).setScale(3).toString()
                 }
 
                 // 滤泡上皮细胞核密度（单个）	8	个/103平方微米	Nucleus density of follicular cell (per)	8=G/(A-B) 	以95%置信区间和均数±标准差呈现
                 if (subtractAB.compareTo(BigDecimal.ZERO) != 0) {
-                    list8.add(new BigDecimal(count).divide(subtractAB, 4, RoundingMode.HALF_UP));
+                    list8.add(new BigDecimal(count).divide(subtractAB, 10, RoundingMode.HALF_UP));
                 }
             }
         }
@@ -162,6 +162,11 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         commonJsonParser.putAnnotationDynamicData(jsonTask, "107088", "107089", annotationByG);
 
         // A
+        //  1：面积转10（3）平方微米  2:平方微米 （默认平方毫米）
+        Annotation annotationC = new Annotation();
+        annotationC.setCountName("甲状腺滤泡面积（单个）");
+        annotationC.setCountUnit("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "107088", annotationC, 1);
         map.put("甲状腺滤泡面积（单个）", new IndicatorAddIn());
         // B
         map.put("甲状腺滤泡腔面积（单个）", new IndicatorAddIn());

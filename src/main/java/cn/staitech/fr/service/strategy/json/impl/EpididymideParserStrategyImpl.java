@@ -89,10 +89,32 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         BigDecimal perimeterC = annotation.getStructurePerimeterNum();
         BigDecimal organAreaE = areaUtils.getOrganArea(jsonTask, "12F0F4");// E输出小管/附睾管管腔面积（全片）
         BigDecimal organAreaG = areaUtils.getOrganArea(jsonTask, "12F0F7");// G精子面积（全片）
+        Integer organAreaH = areaUtils.getOrganAreaCount(jsonTask, "12F0F7");// G精子面积（全片）
         BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "12F003");// I血管面积
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// J组织轮廓面积
         BigDecimal organAreaJ = BigDecimal.valueOf(Double.parseDouble(slideArea));
         // todo H黏膜上皮细胞核数量（单个）
+
+        Annotation annotationBy = new Annotation();
+        annotationBy.setAreaName("输出小管/附睾管黏膜上皮面积（单个）");
+        annotationBy.setAreaUnit("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12F0F5",annotationBy,1);
+        annotationBy.setAreaName(null);
+        annotationBy.setAreaUnit(null);
+        annotationBy.setPerimeterUnit("输出小管/附睾管黏膜上皮周长（单个）");
+        annotationBy.setPerimeterUnit("毫米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12F0F5",annotationBy,3);
+
+        Annotation annotationBy1 = new Annotation();
+        annotationBy1.setAreaName("输出小管/附睾管管腔面积（单个）");
+        annotationBy1.setAreaUnit("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12F0F4",annotationBy1,1);
+
+
+        Annotation annotationBy2 = new Annotation();
+        annotationBy2.setAreaName("精子面积（单个）");
+        annotationBy2.setAreaUnit("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12F0F7",annotationBy2,1);
 
         // 算法输出指标
         resultsMap.put("输出小管/附睾管黏膜上皮面积（单个）", createDefaultIndicator());// A输出小管/附睾管黏膜上皮面积（单个）
@@ -100,9 +122,8 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         resultsMap.put("输出小管/附睾管黏膜上皮周长（单个）", createDefaultIndicator());
         resultsMap.put("输出小管/附睾管管腔面积（全片）", createIndicator(organAreaE, SQ_MM));
         resultsMap.put("精子面积（全片）", createIndicator(organAreaG, SQ_MM));
-        resultsMap.put("血管面积", createIndicator(organAreaI, SQ_MM));
-
-
+        resultsMap.put("血管面积", createIndicator(organAreaI.setScale(3, RoundingMode.HALF_UP), SQ_MM));
+        resultsMap.put("黏膜上皮细胞核数量（单个）", createIndicator(organAreaH, PIECE));
         resultsMap.put("输出小管/附睾管管腔面积（单个）", createDefaultIndicator());// D输出小管/附睾管管腔面积（单个）
         resultsMap.put("精子面积（单个）", createDefaultIndicator());// F精子面积（单个）
 
@@ -164,7 +185,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         resultsMap.put("血管相对面积", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE));
         resultsMap.put("黏膜上皮厚度（单个）", createNameIndicator("Average thickness of mucosal epithelium (per)", mucosalThickness, UM));
 
-        resultsMap.put("附睾面积", createNameIndicator("Epididymal area", new BigDecimal(slideArea), SQ_MM));
+        resultsMap.put("附睾面积", createNameIndicator("Epididymal area", new BigDecimal(slideArea).setScale(3, RoundingMode.HALF_UP), SQ_MM));
 
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(),  resultsMap);

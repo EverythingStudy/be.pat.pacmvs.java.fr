@@ -63,20 +63,25 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		Integer mucosaCountA = commonJsonParser.getOrganAreaCount(jsonTask, "1240CA");
 		mucosaCountA = commonJsonParser.getIntegerValue(mucosaCountA);
 		// 黄体面积（全片） C 平方毫米
-		Annotation annotationC  = commonJsonParser.getOrganArea(jsonTask, "1240CA");
-		BigDecimal bigDecimalC = annotationC.getStructureAreaNum();
-		bigDecimalC = commonJsonParser.getBigDecimalValue(bigDecimalC);
+//		Annotation annotationC  = commonJsonParser.getOrganArea(jsonTask, "1240CA");
+//		BigDecimal bigDecimalC = annotationC.getStructureAreaNum();
+//		bigDecimalC = commonJsonParser.getBigDecimalValue(bigDecimalC);
+		BigDecimal bigDecimalC = getOrganArea(jsonTask, "1240CA").getStructureAreaNum();
+		bigDecimalC = bigDecimalC.setScale(3, RoundingMode.HALF_UP);
 		// 卵泡数量 D 个
 		Integer mucosaCountD = commonJsonParser.getOrganAreaCount(jsonTask, "1240CB");
 		mucosaCountD = commonJsonParser.getIntegerValue(mucosaCountD);
 		// 卵泡面积（全片） F 平方毫米
-		Annotation annotationF  = commonJsonParser.getOrganArea(jsonTask, "1240CA");
-		BigDecimal bigDecimalF = annotationF.getStructureAreaNum();
-		bigDecimalF = commonJsonParser.getBigDecimalValue(bigDecimalF);
+//		Annotation annotationF  = commonJsonParser.getOrganArea(jsonTask, "1240CB");
+//		BigDecimal bigDecimalF = annotationF.getStructureAreaNum();
+//		bigDecimalF = commonJsonParser.getBigDecimalValue(bigDecimalF);
+		BigDecimal bigDecimalF =  getOrganArea(jsonTask, "1240CB").getStructureAreaNum();
+		bigDecimalF = bigDecimalF.setScale(3, RoundingMode.HALF_UP);
 		// 血管面积 H 平方微米
-		BigDecimal bigDecimalH  =  commonJsonParser.getOrganAreaMicron(jsonTask, "124003");
+		/*BigDecimal bigDecimalH  =  commonJsonParser.getOrganAreaMicron(jsonTask, "124003");
 		bigDecimalH = commonJsonParser.getBigDecimalValue(bigDecimalH);
-		bigDecimalH = bigDecimalH.setScale(3, RoundingMode.HALF_UP);
+		bigDecimalH = bigDecimalH.setScale(3, RoundingMode.HALF_UP);*/
+		BigDecimal bigDecimalH = getOrganArea(jsonTask, "124003", BigDecimal.valueOf(1000)).getStructureAreaNum();
 
 		//TODO 血管外红细胞面积 I 平方微米
 		BigDecimal bigDecimalI = BigDecimal.ZERO;
@@ -117,7 +122,7 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		//		if(bigDecimalJ.compareTo(BigDecimal.ZERO) != 0) {
 		indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("", areaUtils.convertToMicrometer(bigDecimalJ.toString()), "平方微米", "1"));
 		//		}
-		/*
+		
 		if(bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
 			indicatorResultsMap.put("卵泡面积（全片）", new IndicatorAddIn("Follicle area", String.valueOf(bigDecimalF), "平方毫米", "0"));
 		}
@@ -132,7 +137,7 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		if(bigDecimalJ.compareTo(BigDecimal.ZERO) != 0) {
 			indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", String.valueOf(bigDecimalJ), "平方微米", "0"));
 		}
-		 */
+		 
 		if(StringUtils.isNotEmpty(slideArea)) {
 			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", slideArea, "平方毫米", "1"));
 		}
