@@ -87,7 +87,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
 
         Integer count = getOrganAreaCount(jsonTask, "11B031");
         indicatorResultsMap.put("肾小管数量", new IndicatorAddIn("", String.valueOf(count), "个", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("肾皮质面积", new IndicatorAddIn(b11B03D.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("肾皮质面积", new IndicatorAddIn("",b11B03D.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
 
         //indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("肾脏面积", new IndicatorAddIn("Renal area%", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_0));
@@ -150,7 +150,17 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationBy.setAreaName("球内红细胞面积（单个）");
         annotationBy.setAreaUnit("平方微米");
         commonJsonParser.putAnnotationDynamicData(jsonTask,"11B02D","11B02F",annotationBy,2);
+        annotationBy.setCountName(null);
+        annotationBy.setAreaName("肾小球面积（单个）");
+        annotationBy.setAreaUnit("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"11B02D",annotationBy,1);
+        annotationBy.setCountName(null);
+        annotationBy.setAreaName("肾小管面积（单个）");
+        annotationBy.setAreaUnit("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"11B031",annotationBy,1);
+
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+
     }
 
     @Override

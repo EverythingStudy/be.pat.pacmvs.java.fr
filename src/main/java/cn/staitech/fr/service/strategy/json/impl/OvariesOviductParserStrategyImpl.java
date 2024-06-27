@@ -63,16 +63,20 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		Integer mucosaCountA = commonJsonParser.getOrganAreaCount(jsonTask, "1240CA");
 		mucosaCountA = commonJsonParser.getIntegerValue(mucosaCountA);
 		// 黄体面积（全片） C 平方毫米
-		Annotation annotationC  = commonJsonParser.getOrganArea(jsonTask, "1240CA");
-		BigDecimal bigDecimalC = annotationC.getStructureAreaNum();
-		bigDecimalC = commonJsonParser.getBigDecimalValue(bigDecimalC);
+//		Annotation annotationC  = commonJsonParser.getOrganArea(jsonTask, "1240CA");
+//		BigDecimal bigDecimalC = annotationC.getStructureAreaNum();
+//		bigDecimalC = commonJsonParser.getBigDecimalValue(bigDecimalC);
+		BigDecimal bigDecimalC = getOrganArea(jsonTask, "1240CA").getStructureAreaNum();
+		bigDecimalC = bigDecimalC.setScale(3, RoundingMode.HALF_UP);
 		// 卵泡数量 D 个
 		Integer mucosaCountD = commonJsonParser.getOrganAreaCount(jsonTask, "1240CB");
 		mucosaCountD = commonJsonParser.getIntegerValue(mucosaCountD);
 		// 卵泡面积（全片） F 平方毫米
-		Annotation annotationF  = commonJsonParser.getOrganArea(jsonTask, "1240CB");
-		BigDecimal bigDecimalF = annotationF.getStructureAreaNum();
-		bigDecimalF = commonJsonParser.getBigDecimalValue(bigDecimalF);
+//		Annotation annotationF  = commonJsonParser.getOrganArea(jsonTask, "1240CB");
+//		BigDecimal bigDecimalF = annotationF.getStructureAreaNum();
+//		bigDecimalF = commonJsonParser.getBigDecimalValue(bigDecimalF);
+		BigDecimal bigDecimalF =  getOrganArea(jsonTask, "1240CB").getStructureAreaNum();
+		bigDecimalF = bigDecimalF.setScale(3, RoundingMode.HALF_UP);
 		// 血管面积 H 平方微米
 		/*BigDecimal bigDecimalH  =  commonJsonParser.getOrganAreaMicron(jsonTask, "124003");
 		bigDecimalH = commonJsonParser.getBigDecimalValue(bigDecimalH);

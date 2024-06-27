@@ -60,16 +60,24 @@ public class PituitaryParserStrategyImpl extends AbstractCustomParserStrategy {
 		// 组织轮廓 :106111
 
 		// 神经部面积 A 平方毫米 若多个数据则相加输出
-		BigDecimal pituitaryA = commonJsonParser.getOrganArea(jsonTask, "10607F").getStructureAreaNum();
+		//BigDecimal pituitaryA = commonJsonParser.getOrganArea(jsonTask, "10607F").getStructureAreaNum();
+		BigDecimal pituitaryA = getOrganArea(jsonTask, "10607F").getStructureAreaNum();
+		pituitaryA =  pituitaryA.setScale(3, RoundingMode.HALF_UP);
 		pituitaryA = commonJsonParser.getBigDecimalValue(pituitaryA);
 		// 中间部面积 B 平方毫米 若多个数据则相加输出
-		BigDecimal pituitaryB = commonJsonParser.getOrganArea(jsonTask, "106081").getStructureAreaNum();
+//		BigDecimal pituitaryB = commonJsonParser.getOrganArea(jsonTask, "106081").getStructureAreaNum();
+		BigDecimal pituitaryB = getOrganArea(jsonTask, "106081").getStructureAreaNum();
+		pituitaryB =  pituitaryB.setScale(3, RoundingMode.HALF_UP);
 		pituitaryB = commonJsonParser.getBigDecimalValue(pituitaryB);
 		// 远侧部面积 C 平方毫米 若多个数据则相加输出
-		BigDecimal pituitaryC = commonJsonParser.getOrganArea(jsonTask, "106083").getStructureAreaNum();
+//		BigDecimal pituitaryC = commonJsonParser.getOrganArea(jsonTask, "106083").getStructureAreaNum();
+		BigDecimal pituitaryC = getOrganArea(jsonTask, "106083").getStructureAreaNum();
+		pituitaryC =  pituitaryC.setScale(3, RoundingMode.HALF_UP);
 		pituitaryC = commonJsonParser.getBigDecimalValue(pituitaryC);
 		// 红细胞面积 D 平方毫米 数据相加输出
-		BigDecimal pituitaryD = commonJsonParser.getOrganArea(jsonTask, "106004").getStructureAreaNum();
+//		BigDecimal pituitaryD = commonJsonParser.getOrganArea(jsonTask, "106004").getStructureAreaNum();
+		BigDecimal pituitaryD = getOrganArea(jsonTask, "106004").getStructureAreaNum();
+		pituitaryD =  pituitaryD.setScale(3, RoundingMode.HALF_UP);
 		pituitaryD = commonJsonParser.getBigDecimalValue(pituitaryD);
 		// 胸骨面积 ==>组织轮廓面积H
 		//		BigDecimal pituitaryH = commonJsonParser.getOrganArea(jsonTask, "106111").getStructureAreaNum();

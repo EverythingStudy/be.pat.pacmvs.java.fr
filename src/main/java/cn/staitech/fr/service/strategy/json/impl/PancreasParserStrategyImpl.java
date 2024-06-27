@@ -110,6 +110,8 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
         //血管外红细胞
         Annotation annotationOuter = getInsideOrOutside(jsonTask, "105003", "105004", false);
 
+        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("", annotationInner.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("", annotationOuter.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("酶原颗粒面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("胰岛面积（全片）", new IndicatorAddIn("", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
 
@@ -131,6 +133,8 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
 
         indicatorResultsMap.put("胰岛面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("胰岛细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("导管细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         BigDecimal O = new BigDecimal(singleSlide.getArea());
         String result = "";
         if (count != 0) {
@@ -212,6 +216,13 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
         commonJsonParser.putAnnotationDynamicData(jsonTask,"105077","105078",annotationBy);
         annotationBy.setCountName("导管细胞核数量（单个）");
         commonJsonParser.putAnnotationDynamicData(jsonTask,"10506F","10507B",annotationBy);
+        annotationBy.setCountName(null);
+        annotationBy.setAreaName("胰岛面积（单个）");
+        annotationBy.setAreaUnit("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"105077",annotationBy,1);annotationBy.setCountName(null);
+        annotationBy.setAreaName("导管面积（单个）");
+        annotationBy.setAreaUnit("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"10506F",annotationBy,1);
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 

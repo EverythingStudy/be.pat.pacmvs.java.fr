@@ -86,7 +86,6 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
         Annotation annotation1 = commonJsonParser.getInsideOrOutside(jsonTask, "14403E", "14403F", false);
         BigDecimal organArea5 = annotation1.getStructureAreaNum();
         indicatorResultsMap.put("髓质外结缔组织面积", new IndicatorAddIn("", organArea5.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("皮质面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("髓质面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         //indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
@@ -100,11 +99,13 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("皮质占比", new IndicatorAddIn("Cortex area%", String.valueOf(b1), "%", CommonConstant.NUMBER_0));
         BigDecimal b2 = BigDecimal.ZERO;
         BigDecimal b3 = BigDecimal.ZERO;
+        BigDecimal A = BigDecimal.ZERO;
         if (organArea2.compareTo(BigDecimal.ZERO) != 0 && F.compareTo(BigDecimal.ZERO) != 0) {
             b2 = commonJsonParser.getProportion(organArea2, F);
-            BigDecimal temp = organArea2.add(organArea4);
-            b3 = commonJsonParser.getProportion(F.subtract(temp), organArea2.subtract(organArea4));
+            A = organArea2.add(organArea4);
+            b3 = commonJsonParser.getProportion(F.subtract(A), organArea2);
         }
+        indicatorResultsMap.put("皮质面积", new IndicatorAddIn("", A.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("髓质占比", new IndicatorAddIn("Medulla area%", String.valueOf(b2), "%", CommonConstant.NUMBER_0));
         indicatorResultsMap.put("皮髓比", new IndicatorAddIn("Cortex:medulla ratio", String.valueOf(b3), "%", CommonConstant.NUMBER_0));
 
