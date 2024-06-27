@@ -130,7 +130,6 @@ public class JejunumParserStrategyImpl implements ParserStrategy {
         map.put("空肠面积", new IndicatorAddIn("Jejunum area", DecimalUtils.setScale3(subtractEA), "平方毫米", CommonConstant.NUMBER_0));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
-
         log.info("指标计算结束-大鼠空肠");
     }
 }
