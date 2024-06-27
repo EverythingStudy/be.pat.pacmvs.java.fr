@@ -524,9 +524,9 @@ public class CommonJsonParser {
             if (annotation.getAreaName() != null) {
                 dynamicData.setName(annotation.getAreaName());
                 if (type == 1) {
-                    dynamicData.setData(String.valueOf(convertToSquareMicrometer(annotationBy.getStructureAreaNum().toString())));
+                    dynamicData.setData(convertToSquareMicrometer(String.valueOf(annotationBy.getStructureAreaNum())));
                 } else if (type == 2) {
-                    dynamicData.setData(String.valueOf(convertToMicrometer(annotationBy.getStructureAreaNum().toString())));
+                    dynamicData.setData(String.valueOf(convertToMicrometer(annotationBy.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString())));
                 }
                 dynamicData.setUnit(annotation.getAreaUnit());
                 jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
@@ -579,7 +579,7 @@ public class CommonJsonParser {
                 } else if (type == 2) {
                     dynamicData.setData(String.valueOf(convertToMicrometer(i.getStructureAreaNum().toString())));
                 } else if (type == 3) {
-                    dynamicData.setData(String.valueOf(i.getStructureAreaNum()));
+                    dynamicData.setData(String.valueOf(i.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP)));
                 }
                 dynamicData.setUnit(annotation.getAreaUnit());
                 jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
@@ -684,13 +684,13 @@ public class CommonJsonParser {
                 annotations.setStructureAreaNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(annotations.getArea());
-                annotations.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")).setScale(3, BigDecimal.ROUND_HALF_UP));
+                annotations.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")));
             }
             if (StringUtils.isEmpty(annotations.getPerimeter())) {
                 annotations.setStructurePerimeterNum(BigDecimal.ZERO);
             } else {
                 BigDecimal structurePerimeterNum = new BigDecimal(annotations.getPerimeter());
-                annotations.setStructurePerimeterNum(structurePerimeterNum.multiply(new BigDecimal("0.001")).setScale(3, BigDecimal.ROUND_HALF_UP));
+                annotations.setStructurePerimeterNum(structurePerimeterNum.multiply(new BigDecimal("0.001")));
             }
         }
         return annotations;
