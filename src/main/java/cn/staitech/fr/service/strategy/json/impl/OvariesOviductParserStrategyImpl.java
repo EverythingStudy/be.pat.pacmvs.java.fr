@@ -70,13 +70,14 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		Integer mucosaCountD = commonJsonParser.getOrganAreaCount(jsonTask, "1240CB");
 		mucosaCountD = commonJsonParser.getIntegerValue(mucosaCountD);
 		// 卵泡面积（全片） F 平方毫米
-		Annotation annotationF  = commonJsonParser.getOrganArea(jsonTask, "1240CA");
+		Annotation annotationF  = commonJsonParser.getOrganArea(jsonTask, "1240CB");
 		BigDecimal bigDecimalF = annotationF.getStructureAreaNum();
 		bigDecimalF = commonJsonParser.getBigDecimalValue(bigDecimalF);
 		// 血管面积 H 平方微米
-		BigDecimal bigDecimalH  =  commonJsonParser.getOrganAreaMicron(jsonTask, "124003");
+		/*BigDecimal bigDecimalH  =  commonJsonParser.getOrganAreaMicron(jsonTask, "124003");
 		bigDecimalH = commonJsonParser.getBigDecimalValue(bigDecimalH);
-		bigDecimalH = bigDecimalH.setScale(3, RoundingMode.HALF_UP);
+		bigDecimalH = bigDecimalH.setScale(3, RoundingMode.HALF_UP);*/
+		BigDecimal bigDecimalH = getOrganArea(jsonTask, "124003", BigDecimal.valueOf(1000)).getStructureAreaNum();
 
 		//TODO 血管外红细胞面积 I 平方微米
 		BigDecimal bigDecimalI = BigDecimal.ZERO;
