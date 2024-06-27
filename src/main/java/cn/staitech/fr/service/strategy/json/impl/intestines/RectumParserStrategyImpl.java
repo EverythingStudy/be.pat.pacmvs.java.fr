@@ -122,15 +122,15 @@ public class RectumParserStrategyImpl implements ParserStrategy {
 
         if (eSubtractA.compareTo(BigDecimal.ZERO) != 0) {
             // 黏膜层面积占比	1	%	Mucosal area%	1=B/（E-A）	无
-            String mucosalAreaRate = areaNum.divide(eSubtractA, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            String mucosalAreaRate = areaNum.divide(eSubtractA, 9, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
             map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", mucosalAreaRate, "%"));
 
             // 黏膜下层面积占比	2	%	Submucosal area%	2=C/（E-A）	无
-            String submucosalAreaRate = areaNum2.divide(eSubtractA, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            String submucosalAreaRate = areaNum2.divide(eSubtractA, 9, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
             map.put("黏膜下层面积占比", new IndicatorAddIn("Submucosal area%", submucosalAreaRate, "%"));
 
             // 肌层面积占比	3	%	Muscular area%	3=D/（E-A）	无
-            String muscularAreaRate = areaNum3.divide(eSubtractA, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            String muscularAreaRate = areaNum3.divide(eSubtractA, 9, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
             map.put("肌层面积占比", new IndicatorAddIn("Muscular area%", muscularAreaRate, "%"));
         } else {
             map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", "0.000", "%"));

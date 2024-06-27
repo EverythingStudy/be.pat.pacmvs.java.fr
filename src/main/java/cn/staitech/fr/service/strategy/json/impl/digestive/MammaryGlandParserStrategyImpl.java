@@ -123,10 +123,10 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
             map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", "0.000", "%"));
 
         } else {
-            BigDecimal divide2 = organArea1.divide(subtract, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
+            BigDecimal divide2 = organArea1.divide(subtract, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP);
             map.put("乳腺腺泡和导管面积占比", new IndicatorAddIn("Acinus and ducts area%", divide2.toString(), "%"));
             BigDecimal subtract1 = organArea2.subtract(organArea1);
-            map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", subtract1.divide(subtract, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", subtract1.divide(subtract, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString(), "%"));
 
         }
 
@@ -156,7 +156,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("淋巴结面积", new IndicatorAddIn("Lymph node area", organAreaA.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         // 皮肤面积	G	平方毫米	此数据使用乳腺中皮肤数据 (乳腺皮肤公用)
         map.put("皮肤面积", new IndicatorAddIn("Skin area", organAreaB.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        map.put("乳腺腺泡/导管数量", new IndicatorAddIn("Number of acinus and ducts", organAreaCount.toString(), "个",CommonConstant.NUMBER_1));
+        map.put("乳腺腺泡/导管数量", new IndicatorAddIn("Number of acinus and ducts", organAreaCount.toString(), "个", CommonConstant.NUMBER_1));
         map.put("乳腺腺泡/导管面积（全片）", new IndicatorAddIn("Breast acinar/ductal area (all)", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         map.put("结缔组织面积", new IndicatorAddIn("Connective tissue area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         map.put("组织轮廓面积", new IndicatorAddIn("Organizational contour area", h.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
@@ -164,7 +164,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         Annotation annotation1 = new Annotation();
         annotation1.setAreaName("乳腺腺泡/导管面积（单个）");
         annotation1.setAreaUnit("10³平方微米");
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12306C",annotation1,1);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12306C", annotation1, 1);
         map.put("乳腺腺泡/导管面积（单个）", new IndicatorAddIn());
 
         map.put("乳腺细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
@@ -218,19 +218,19 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
 
         if (organAreaB.compareTo(BigDecimal.ZERO) != 0) {
             // 表皮角质层面积占比	1	%	Stratum corneum area%	1=A/G
-            String stratumCorneumAreaRate = organArea3.divide(organAreaB, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            String stratumCorneumAreaRate = organArea3.divide(organAreaB, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
             map.put("表皮角质层面积占比", new IndicatorAddIn("Stratum corneum area%", stratumCorneumAreaRate, "%"));
 
             // 表皮基底层+棘层+颗粒层面积占比	2	%	 Nucleated cell layer area%	2=B/G
-            String nucleatedCellLayerAreaRate = organArea4.divide(organAreaB, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            String nucleatedCellLayerAreaRate = organArea4.divide(organAreaB, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
             map.put("表皮基底层+棘层+颗粒层面积占比", new IndicatorAddIn("Nucleated cell layer area%", nucleatedCellLayerAreaRate, "%"));
 
             // 皮脂腺面积占比	6	%	Sebaceous glands area%	6=E/G	运算前注意统一单位
-            String sebaceousGlandsAreaRate = organAreaE.divide(organAreaB, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            String sebaceousGlandsAreaRate = organAreaE.divide(organAreaB, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
             map.put("皮脂腺面积占比", new IndicatorAddIn("Sebaceous glands area%", sebaceousGlandsAreaRate, "%"));
 
             // 毛囊面积占比	7	%	Hair follicles area%	7=H/G
-            String hairFolliclesAreaRate = organAreaH.divide(organAreaB, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            String hairFolliclesAreaRate = organAreaH.divide(organAreaB, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
             map.put("毛囊面积占比", new IndicatorAddIn("Hair follicles area%", hairFolliclesAreaRate, "%"));
         } else {
             map.put("表皮角质层面积占比", new IndicatorAddIn("Stratum corneum area%", "0.000", "%"));

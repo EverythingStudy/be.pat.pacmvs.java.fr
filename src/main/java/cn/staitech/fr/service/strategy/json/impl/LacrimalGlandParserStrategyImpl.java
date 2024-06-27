@@ -127,19 +127,19 @@ public class LacrimalGlandParserStrategyImpl implements ParserStrategy {
 
         if (singleSlideBigDecimal.compareTo(BigDecimal.ZERO) != 0) {
             //         导管占比	1	无	Duct area%	1=A/F
-            BigDecimal ductDivideSingleSlideArea = ductArea.divide(singleSlideBigDecimal, 9, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3);
+            BigDecimal ductDivideSingleSlideArea = ductArea.divide(singleSlideBigDecimal, 9, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3, BigDecimal.ROUND_HALF_UP);
             map.put("导管占比", new IndicatorAddIn("Duct area%", ductDivideSingleSlideArea.toString(), "%"));
 
             // 上皮顶部胞质占比 3 无 Epithelial apex cytoplasm area % 3 = D / F
-            BigDecimal epithelialApexCytoplasmRate = epithelialApexCytoplasmArea.divide(singleSlideBigDecimal, 9, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3);
+            BigDecimal epithelialApexCytoplasmRate = epithelialApexCytoplasmArea.divide(singleSlideBigDecimal, 9, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3, BigDecimal.ROUND_HALF_UP);
             map.put("上皮顶部胞质占比", new IndicatorAddIn("Epithelial apex cytoplasm area %", epithelialApexCytoplasmRate.toString(), "%"));
 
             // 间质占比 4 无 Mesenchyme area % 4 = E / F
-            BigDecimal mesenchymeAreaRate = mesenchymeArea.divide(singleSlideBigDecimal, 9, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3);
+            BigDecimal mesenchymeAreaRate = mesenchymeArea.divide(singleSlideBigDecimal, 9, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3, BigDecimal.ROUND_HALF_UP);
             map.put("间质占比", new IndicatorAddIn("Mesenchyme area %", mesenchymeAreaRate.toString(), "%"));
 
             // 腺泡占比 5 无 Acinus area % 5 = (F - E) / F
-            BigDecimal acinusAreaRate = singleSlideBigDecimal.subtract(mesenchymeArea).divide(singleSlideBigDecimal, 9, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3);
+            BigDecimal acinusAreaRate = singleSlideBigDecimal.subtract(mesenchymeArea).divide(singleSlideBigDecimal, 9, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3, BigDecimal.ROUND_HALF_UP);
             map.put("腺泡占比", new IndicatorAddIn("Acinus area %", acinusAreaRate.toString(), "%"));
         } else {
             map.put("导管占比", new IndicatorAddIn("Duct area%", "0.000", "%"));

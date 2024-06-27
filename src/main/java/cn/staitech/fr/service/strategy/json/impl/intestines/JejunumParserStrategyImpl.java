@@ -113,15 +113,15 @@ public class JejunumParserStrategyImpl implements ParserStrategy {
 
         if (subtractEA.compareTo(BigDecimal.ZERO) != 0) {
             // 黏膜层面积占比	1	%	Mucosal area%	1=B/（E-A）
-            String mucosalAreaRate = areaNumB.divide(subtractEA, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            String mucosalAreaRate = areaNumB.divide(subtractEA, 3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
             map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", mucosalAreaRate, "%"));
 
             // 黏膜下层面积占比	2	%	Submucosal area%	2=C/（E-A）
-            String submucosalAreaRate = areaNumC.divide(subtractEA, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            String submucosalAreaRate = areaNumC.divide(subtractEA, 3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
             map.put("黏膜下层面积占比", new IndicatorAddIn("Submucosal area%", submucosalAreaRate, "%"));
 
             // 肌层面积占比	3	%	Muscular area%	3=D/（E-A）
-            String muscularAreaRate = areaNumD.divide(subtractEA, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            String muscularAreaRate = areaNumD.divide(subtractEA, 3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
             map.put("肌层面积占比", new IndicatorAddIn("Muscular area%", muscularAreaRate, "%"));
         } else {
             map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", "0.000", "%"));

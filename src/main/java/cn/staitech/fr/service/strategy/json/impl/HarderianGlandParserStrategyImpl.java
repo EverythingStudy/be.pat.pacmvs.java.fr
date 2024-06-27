@@ -152,11 +152,11 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         if (accurateAreaBigDecimal.compareTo(BigDecimal.ZERO) != 0) {
             //   腺泡面积占比（全片）	1	%	Acinus area%（all）	1=E/D
             // 保留两位小数，并进行四舍五入
-            BigDecimal acinusDivideArea = acinusArea.divide(accurateAreaBigDecimal, 10, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3);
+            BigDecimal acinusDivideArea = acinusArea.divide(accurateAreaBigDecimal, 10, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3, BigDecimal.ROUND_HALF_UP);
             map.put("腺泡面积占比（全片）", new IndicatorAddIn("Acinus area %（all）", acinusDivideArea.toString(), "%"));
 
             //  色素面积占比 3 % Pigment area % 3 = C / D
-            BigDecimal pigmentDivideArea = pigmentArea.divide(accurateAreaBigDecimal, 10, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3);
+            BigDecimal pigmentDivideArea = pigmentArea.divide(accurateAreaBigDecimal, 10, BigDecimal.ROUND_HALF_UP).multiply(new BigDecimal("100")).setScale(3, BigDecimal.ROUND_HALF_UP);
             // map.put("色素面积占比", new IndicatorAddIn("Pigment area %", pigmentDivideArea.toString(), "%"));
         } else {
             map.put("腺泡面积占比（全片）", new IndicatorAddIn("Acinus area %（all）", "0.000", "%"));

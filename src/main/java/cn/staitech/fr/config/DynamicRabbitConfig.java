@@ -19,7 +19,7 @@ import java.util.Map;
  * @date 2024/5/16 14:14:12
  */
 
-@Configuration
+//@Configuration
 public class DynamicRabbitConfig {
     @Value("${queues.algoMsg:algo.message.queue}")
     private String ALGO_MSG_QUEUE;

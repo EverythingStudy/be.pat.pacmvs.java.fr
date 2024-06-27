@@ -100,12 +100,13 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
                 Annotation contourInsideOrOutside = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "12B0E9", true);
                 Annotation contourInsideOrOutside2 = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "12B0ED", true);
 
-                BigDecimal structureAreaNum1 = contourInsideOrOutside.getStructureAreaNum();// 面积
+                // 面积
+                BigDecimal structureAreaNum1 = contourInsideOrOutside.getStructureAreaNum();
                 // A+C
                 BigDecimal add = structureAreaNum.add(structureAreaNum1);
                 if (add.compareTo(BigDecimal.ZERO) != 0) {
                     // 3=A/(A+C)
-                    lists.add(structureAreaNum.divide(add, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(10));
+                    lists.add(structureAreaNum.divide(add, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(10, RoundingMode.HALF_UP));
                 }
 
                 // E
@@ -163,7 +164,7 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
 
         // 间质和肌层面积占比	5	%	Mesenchyme and muscular area%	5=(F-B-D)/F
         if (tissueArea.compareTo(BigDecimal.ZERO) != 0) {
-            String mesenchymeAndMuscularAreaRate = tissueArea.subtract(colonArea).subtract(areaNum2).divide(tissueArea, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            String mesenchymeAndMuscularAreaRate = tissueArea.subtract(colonArea).subtract(areaNum2).divide(tissueArea, 3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
             map.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", mesenchymeAndMuscularAreaRate, "%"));
         } else {
             map.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", "0.000", "%"));
