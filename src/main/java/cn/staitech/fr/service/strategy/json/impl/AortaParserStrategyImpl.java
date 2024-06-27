@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,7 +81,7 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		//空腔周长	B	毫米
 		BigDecimal bigDecimalB =  BigDecimal.ZERO;
 		if(null != organPerimeterNumP){
-			bigDecimalB =  organPerimeterNumP;
+			bigDecimalB =  organPerimeterNumP.setScale(3, RoundingMode.HALF_UP);
 		}
 
 		BigDecimal bigDecimalC = BigDecimal.ZERO;

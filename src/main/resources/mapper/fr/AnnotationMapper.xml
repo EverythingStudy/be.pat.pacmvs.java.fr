@@ -821,6 +821,42 @@
         </set>
         where annotation_id = #{annotationId}
     </update>
+    
+    <select id="getSpinalCordAnno" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        select
+        annotation_id,
+        area,
+        perimeter,
+        description,
+        category_id,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        slide_id,
+        id,
+        contour_type,
+        <!-- ST_AsGeoJSON(contour${magnification}) as contour, -->
+         ST_AsGeoJSON(contour40000) AS contour,
+         ST_AsGeoJSON(contour40000) AS contour40000,
+         ST_AsGeoJSON(contour10000) AS contour10000,
+         ST_AsGeoJSON(contour2500)  AS contour2500,
+         ST_AsGeoJSON(contour625)   AS contour625,
+        single_slide_id,
+        single
+        from fr_annotation
+        <where>
+            <if test="singleSlideId != null">
+                AND single_slide_id = #{singleSlideId}
+            </if>
+            <if test="contourType != null">
+                AND contour_type = #{contourType}
+            </if>
+        </where>
+    </select>
 
 
 </mapper>
