@@ -553,7 +553,7 @@ public class CommonJsonParser {
 
 
 
-     //  1：面积转10（3）平方微米  2:平方微米
+     //  1：面积转10（3）平方微米  2:平方微米 3:平方毫米
     public void putSingleAnnotationDynamicData(JsonTask jsonTask, String structureId,  Annotation annotation, Integer type) {
         Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
         // 查询出单个标注
@@ -579,6 +579,8 @@ public class CommonJsonParser {
                     dynamicData.setData(String.valueOf(convertToSquareMicrometer(i.getStructureAreaNum().toString())));
                 } else if (type == 2) {
                     dynamicData.setData(String.valueOf(convertToMicrometer(i.getStructureAreaNum().toString())));
+                } else if (type == 3) {
+                    dynamicData.setData(String.valueOf(i.getStructureAreaNum()));
                 }
                 dynamicData.setUnit(annotation.getAreaUnit());
                 jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
@@ -590,6 +592,8 @@ public class CommonJsonParser {
                     dynamicData.setData(String.valueOf(convertToSquareMicrometer(i.getStructurePerimeterNum().toString())));
                 } else if (type == 2) {
                     dynamicData.setData(String.valueOf(convertToMicrometer(i.getStructurePerimeterNum().toString())));
+                } else if (type == 3) {
+                    dynamicData.setData(String.valueOf(i.getStructureAreaNum()));
                 }
                 dynamicData.setUnit(annotation.getPerimeterUnit());
                 jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
