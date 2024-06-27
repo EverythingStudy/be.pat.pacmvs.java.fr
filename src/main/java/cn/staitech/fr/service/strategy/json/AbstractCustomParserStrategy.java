@@ -78,7 +78,8 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
         Annotation annotation = commonJsonParser.getOrganArea(jsonTask,structureId);
         BigDecimal bigDecimal = annotation.getStructureAreaNum();
         if (bigDecimal!=null){
-            annotation.setStructureAreaNum(bigDecimal.multiply(unit));
+        	bigDecimal = bigDecimal.multiply(unit).setScale(3, RoundingMode.HALF_UP);
+            annotation.setStructureAreaNum(bigDecimal);
         }
         return annotation;
     }
