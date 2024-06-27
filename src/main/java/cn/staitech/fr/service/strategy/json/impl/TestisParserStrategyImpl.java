@@ -69,7 +69,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationBy.setAreaUnit("10³平方微米");
         commonJsonParser.putAnnotationDynamicData(jsonTask,"12E0FA","12E0FB",annotationBy,1);
         annotationBy.setAreaName("生精小管面积（单个）");
-        annotationBy.setAreaName("10³平方微米");
+        annotationBy.setAreaUnit("10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12E0FA",annotationBy,1);
         annotationBy.setAreaName(null);
         annotationBy.setAreaUnit(null);
