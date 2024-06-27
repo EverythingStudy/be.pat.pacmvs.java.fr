@@ -64,6 +64,11 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
         BigDecimal organArea1 = commonJsonParser.getOrganArea(jsonTask, "12D0E9").getStructureAreaNum();
 
         indicatorResultsMap.put("腺腔面积（全片）", new IndicatorAddIn("Glandular cavity area (all)", organArea1.toString(), "平方毫米", CommonConstant.NUMBER_1));
+
+        Annotation annotation1 = new Annotation();
+        annotation1.setAreaName("腺上皮面积（单个）");
+        annotation1.setAreaUnit("平方毫米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12D074",annotation1,3);
         indicatorResultsMap.put("腺上皮面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
 
         Annotation annotationBy = new Annotation();

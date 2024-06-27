@@ -161,6 +161,10 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("结缔组织面积", new IndicatorAddIn("Connective tissue area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         map.put("组织轮廓面积", new IndicatorAddIn("Organizational contour area", h.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         map.put("乳腺细胞核数量（全片）", new IndicatorAddIn("Number of breast cell nuclei (all)", organAreaCount2.toString(), "个", CommonConstant.NUMBER_1));
+        Annotation annotation1 = new Annotation();
+        annotation1.setAreaName("乳腺腺泡/导管面积（单个）");
+        annotation1.setAreaUnit("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12306C",annotation1,1);
         map.put("乳腺腺泡/导管面积（单个）", new IndicatorAddIn());
 
         map.put("乳腺细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
