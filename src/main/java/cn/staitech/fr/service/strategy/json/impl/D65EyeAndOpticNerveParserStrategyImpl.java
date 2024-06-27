@@ -88,6 +88,7 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
         BigDecimal organArea4 = getOrganArea(jsonTask, "13F0BA").getStructureAreaNum();
         //indicatorResultsMap.put("晶状体面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("晶状体面积", new IndicatorAddIn("Crystalline lens area", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_0));
+        //todo 精度丢失
         indicatorResultsMap.put("睫状体-虹膜面积", new IndicatorAddIn("", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         //indicatorResultsMap.put("视网膜面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("视网膜面积", new IndicatorAddIn("Retina area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_0));

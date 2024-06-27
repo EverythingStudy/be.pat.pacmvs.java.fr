@@ -74,13 +74,13 @@ public class AdrenalGlandParserStrategyImpl extends AbstractCustomParserStrategy
         BigDecimal organArea = getOrganArea(jsonTask, "10103D").getStructureAreaNum();
         BigDecimal organArea1 = getOrganArea(jsonTask, "101004").getStructureAreaNum();
         BigDecimal organArea2 = getOrganArea(jsonTask, "10103E").getStructureAreaNum();
-        Integer count = getOrganAreaCount(jsonTask, "10103D");
-        Integer count1 = getOrganAreaCount(jsonTask, "10103E");
+        Integer C = getInsideOrOutside(jsonTask, "10103D", "101068", true).getCount();
+        Integer D = getInsideOrOutside(jsonTask, "10103E", "101068", true).getCount();
         indicatorResultsMap.put("皮质面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("红细胞面积（全片）", new IndicatorAddIn("", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("髓质面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("皮质细胞核数量", new IndicatorAddIn("", String.valueOf(count), "个", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("髓质细胞核数量", new IndicatorAddIn("", String.valueOf(count1), "个", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("皮质细胞核数量", new IndicatorAddIn("", String.valueOf(C), "个", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("髓质细胞核数量", new IndicatorAddIn("", String.valueOf(D), "个", CommonConstant.NUMBER_1));
         //indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("肾上腺面积", new IndicatorAddIn("Adrenal gland area%", singleSlide.getArea(), "平方毫米"));
         BigDecimal F = new BigDecimal(singleSlide.getArea());
@@ -101,14 +101,14 @@ public class AdrenalGlandParserStrategyImpl extends AbstractCustomParserStrategy
         }
         indicatorResultsMap.put("皮髓比", new IndicatorAddIn("Cortex:Medulla ratio", String.valueOf(b3), "%", CommonConstant.NUMBER_0));
         BigDecimal b4 = BigDecimal.ZERO;
-        if (count != 0 && organArea.compareTo(BigDecimal.ZERO) != 0) {
-            BigDecimal temp = new BigDecimal(count);
+        if (C != 0 && organArea.compareTo(BigDecimal.ZERO) != 0) {
+            BigDecimal temp = new BigDecimal(C);
             b4 = temp.divide(organArea,3,RoundingMode.HALF_UP);
         }
         indicatorResultsMap.put("皮质细胞核密度", new IndicatorAddIn("Nucleus density of adrenal cortex", String.valueOf(b4), "个/平方毫米", CommonConstant.NUMBER_0));
         BigDecimal b5 = BigDecimal.ZERO;
-        if (count1 != 0 && organArea2.compareTo(BigDecimal.ZERO) != 0) {
-            BigDecimal temp = new BigDecimal(count1);
+        if (D != 0 && organArea2.compareTo(BigDecimal.ZERO) != 0) {
+            BigDecimal temp = new BigDecimal(D);
             b5 = temp.divide(organArea2,3,RoundingMode.HALF_UP);
         }
         indicatorResultsMap.put("髓质细胞核密度", new IndicatorAddIn("Nucleus density of adrenal medulla", String.valueOf(b5), "个/平方毫米", CommonConstant.NUMBER_0));
