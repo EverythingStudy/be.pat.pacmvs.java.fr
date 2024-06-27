@@ -117,7 +117,7 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		//		if(bigDecimalJ.compareTo(BigDecimal.ZERO) != 0) {
 		indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("", areaUtils.convertToMicrometer(bigDecimalJ.toString()), "平方微米", "1"));
 		//		}
-		/*
+		
 		if(bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
 			indicatorResultsMap.put("卵泡面积（全片）", new IndicatorAddIn("Follicle area", String.valueOf(bigDecimalF), "平方毫米", "0"));
 		}
@@ -132,7 +132,7 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		if(bigDecimalJ.compareTo(BigDecimal.ZERO) != 0) {
 			indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", String.valueOf(bigDecimalJ), "平方微米", "0"));
 		}
-		 */
+		 
 		if(StringUtils.isNotEmpty(slideArea)) {
 			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", slideArea, "平方毫米", "1"));
 		}
