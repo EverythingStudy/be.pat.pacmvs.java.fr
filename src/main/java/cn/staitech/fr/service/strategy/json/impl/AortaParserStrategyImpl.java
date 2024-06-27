@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,14 +59,20 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		//组织轮廓	15D111  D   10³平方微米
 
 		//空腔面积 A 10³平方微米
-		Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "15D113");
+		// Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "15D113");
+		//平方毫米
+		BigDecimal organAreaA = getOrganArea(jsonTask, "15D113").getStructureAreaNum();
+		BigDecimal organPerimeterNumP = getOrganArea(jsonTask, "15D113").getStructurePerimeterNum();
+		
+		//平方毫米
 		BigDecimal bigDecimalA = BigDecimal.ZERO;
+		//平方微米
 		BigDecimal bigDecimalA_2 = BigDecimal.ZERO;
-		if(null !=annotation.getStructureAreaNum()){
-			String bigDecimalAStr = areaUtils.convertToSquareMicrometer(annotation.getStructureAreaNum().toString());
+		
+		if(null !=organAreaA){
+			String bigDecimalAStr = areaUtils.convertToSquareMicrometer(organAreaA.toString());
 			//非10³平方微米 ，普通的平方微米
-			String bigDecimalASecondStr = areaUtils.convertToMicrometer(annotation.getStructureAreaNum().toString());
-
+			String bigDecimalASecondStr = areaUtils.convertToMicrometer(organAreaA.toString());
 			bigDecimalA =  new BigDecimal(bigDecimalAStr);
 			bigDecimalA_2 =  new BigDecimal(bigDecimalASecondStr);
 		}
@@ -73,8 +80,8 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 
 		//空腔周长	B	毫米
 		BigDecimal bigDecimalB =  BigDecimal.ZERO;
-		if(null != annotation.getStructurePerimeterNum()){
-			bigDecimalB =  annotation.getStructurePerimeterNum();
+		if(null != organPerimeterNumP){
+			bigDecimalB =  organPerimeterNumP.setScale(3, RoundingMode.HALF_UP);
 		}
 
 		BigDecimal bigDecimalC = BigDecimal.ZERO;

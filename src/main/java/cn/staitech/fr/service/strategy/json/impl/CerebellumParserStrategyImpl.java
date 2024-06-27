@@ -116,20 +116,20 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
         if (accurateAreaDecimal.compareTo(BigDecimal.ZERO) != 0) {
             // 脑干
             // 血管外红细胞面积占比	1	%	Extravascular erythrocyte area%	1=B/C	无
-            String extravascularErythrocyteAreaRate = extravascularErythrocyteArea.divide(accurateAreaDecimal, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            String extravascularErythrocyteAreaRate = extravascularErythrocyteArea.divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
             map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", extravascularErythrocyteAreaRate, "%"));
 
             // 血管内红细胞面积	2	%	Intravascular Erythrocyte area%	2=A/C	无
-            String intravascularErythrocyteAreaRate = intravascularErythrocyteArea.divide(accurateAreaDecimal, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            String intravascularErythrocyteAreaRate = intravascularErythrocyteArea.divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
             map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", intravascularErythrocyteAreaRate, "%"));
 
             // 小脑
             // 颗粒细胞层和浦肯野细胞层面积占比	1	%	Granulocyte and Purkinje cell layer area % 	1=A/C	无
-            String granulocyteAndPurkinjeCellLayerAreaRate = new BigDecimal(granulocyteAndPurkinjeArea).divide(accurateAreaDecimal, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            String granulocyteAndPurkinjeCellLayerAreaRate = new BigDecimal(granulocyteAndPurkinjeArea).divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
             map.put("颗粒细胞层和浦肯野细胞层面积占比", new IndicatorAddIn("Granulocyte and Purkinje cell layer area %", granulocyteAndPurkinjeCellLayerAreaRate, "%"));
 
             // 分子层红细胞面积占比	2	%	Molecular level erythrocyte area%	2=B/C	无
-            String molecularLevelErythrocyteAreaRate = new BigDecimal(molecularLevelerythrocyteArea).divide(accurateAreaDecimal, 3, RoundingMode.HALF_UP).setScale(3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
+            String molecularLevelErythrocyteAreaRate = new BigDecimal(molecularLevelerythrocyteArea).divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
             map.put("分子层红细胞面积占比", new IndicatorAddIn("Molecular level erythrocyte area%", molecularLevelErythrocyteAreaRate, "%"));
         } else {
             map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", "0.000", "%"));

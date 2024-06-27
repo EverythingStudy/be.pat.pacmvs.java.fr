@@ -148,8 +148,8 @@ public class MathUtils {
             cnt++;
         }
         //deviation = deviation.setScale(scale, BigDecimal.ROUND_HALF_UP);
-        deviation = deviation.round(new MathContext(scale, RoundingMode.HALF_UP));
-
+        //deviation = deviation.round(new MathContext(scale, RoundingMode.HALF_UP));
+        deviation= deviation.setScale(scale, RoundingMode.HALF_UP);
         return deviation;
     }
 

@@ -11,6 +11,7 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import cn.staitech.fr.utils.DecimalUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -96,22 +97,21 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
         map.put("髓质面积", new IndicatorAddIn("Medulla area", medullaArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         // 产品呈现指标 -------------------------------------------------------------
 
-
         // A
         map.put("生发中心数量", new IndicatorAddIn("Number of germinal center", germinalCenterCount.toString(), "个"));
 
         if (accurateAreaDecimal.compareTo(BigDecimal.ZERO) != 0) {
             //  生发中心占比	2	%	Germinal center area%	2=B/D
-            String germinalCenterAreaRate = germinalCenterArea.divide(accurateAreaDecimal, 6, RoundingMode.HALF_UP).setScale(6, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
-            map.put("生发中心占比", new IndicatorAddIn("Germinal center area%", germinalCenterAreaRate, "%"));
+            BigDecimal germinalCenterAreaRateDecimal = germinalCenterArea.divide(accurateAreaDecimal, 6, RoundingMode.HALF_UP);
+            map.put("生发中心占比", new IndicatorAddIn("Germinal center area%", DecimalUtils.percentScale3(germinalCenterAreaRateDecimal), "%"));
 
             //  髓质占比	3	%	Medulla area%	3=C/D
-            String medullaAreaRate = medullaArea.divide(accurateAreaDecimal, 6, RoundingMode.HALF_UP).setScale(6, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
-            map.put("髓质占比", new IndicatorAddIn("Medulla area%", medullaAreaRate, "%"));
+            BigDecimal medullaAreaRateDecimal = medullaArea.divide(accurateAreaDecimal, 6, RoundingMode.HALF_UP);
+            map.put("髓质占比", new IndicatorAddIn("Medulla area%", DecimalUtils.percentScale3(medullaAreaRateDecimal), "%"));
 
             //  皮质和副皮质占比	4	%	Cortex and paracortex area%	4=（D-C）/D
-            String cortexAndParacortexAreaRate = accurateAreaDecimal.subtract(medullaArea).divide(accurateAreaDecimal, 6, RoundingMode.HALF_UP).setScale(6, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString();
-            map.put("皮质和副皮质占比", new IndicatorAddIn("Cortex and paracortex area%", cortexAndParacortexAreaRate, "%"));
+            BigDecimal cortexAndParacortexAreaRateDecimal = accurateAreaDecimal.subtract(medullaArea).divide(accurateAreaDecimal, 6, RoundingMode.HALF_UP);
+            map.put("皮质和副皮质占比", new IndicatorAddIn("Cortex and paracortex area%", DecimalUtils.percentScale3(cortexAndParacortexAreaRateDecimal), "%"));
         } else {
             map.put("生发中心占比", new IndicatorAddIn("Germinal center area%", "0.000", "%"));
             map.put("髓质占比", new IndicatorAddIn("Medulla area%", "0.000", "%"));
@@ -119,11 +119,9 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
         }
 
         // D
-        map.put("淋巴结面积", new IndicatorAddIn("Lymph node area", accurateArea, "平方毫米"));
+        map.put("淋巴结面积", new IndicatorAddIn("Lymph node area", DecimalUtils.setScale3(accurateAreaDecimal), "平方毫米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
-
         log.info("指标计算结束-颌下淋巴结");
     }
-
 }

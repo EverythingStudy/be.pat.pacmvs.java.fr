@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,15 +76,15 @@ public class MesentericLymphNodeParserStrategyImpl extends AbstractCustomParserS
         BigDecimal cortexAndParacortexArea = commonJsonParser.getProportion(organAreaD.subtract(organAreaC), organAreaD);
 
         // 算法输出指标
-        resultsMap.put("生发中心面积（全片）", createIndicator(organAreaB, SQ_MM));
-        resultsMap.put("髓质面积", createIndicator(organAreaC, SQ_MM));
+        resultsMap.put("生发中心面积（全片）", createIndicator(organAreaB.setScale(3, RoundingMode.HALF_UP), SQ_MM));
+        resultsMap.put("髓质面积", createIndicator(organAreaC.setScale(3, RoundingMode.HALF_UP), SQ_MM));
 
         // 产品呈现指标
         resultsMap.put("生发中心数量", createNameIndicator("Number of germinal center", areaCountA, PIECE));
         resultsMap.put("生发中心占比", createNameIndicator("Germinal center area%", germinalCenterArea, PERCENTAGE));
         resultsMap.put("髓质占比", createNameIndicator("Medulla area%", medullaArea, PERCENTAGE));
         resultsMap.put("皮质和副皮质占比", createNameIndicator("Cortex and paracortex area%", cortexAndParacortexArea, PERCENTAGE));
-        resultsMap.put("淋巴结面积", createNameIndicator("Submadibular gland area", slideArea, SQ_MM));
+        resultsMap.put("淋巴结面积", createNameIndicator("Submadibular gland area", organAreaD.setScale(3, RoundingMode.HALF_UP), SQ_MM));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }
 

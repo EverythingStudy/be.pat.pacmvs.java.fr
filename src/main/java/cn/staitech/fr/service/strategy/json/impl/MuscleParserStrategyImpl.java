@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,6 +96,11 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
         List<BigDecimal> annotationAreaList = annotationList.stream().map(Annotation::getStructureAreaNum).collect(Collectors.toList());
         String MuscleFiberArea = MathUtils.getConfidenceInterval(annotationAreaList);
 
+        Annotation annotation1 = new Annotation();
+        annotation1.setAreaName("肌纤维面积（单个）");
+        annotation1.setAreaUnit("平方毫米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"15C02A",annotation1,3);
+
 
         // 算法输出指标
         resultsMap.put("肌纤维面积（单个）", createDefaultIndicator());// A肌纤维面积（单个）
@@ -107,8 +113,8 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
         resultsMap.put("肌纤维面积(单个)", createNameIndicator("Muscle fiber area (per)", MuscleFiberArea, SQ_MM));
         resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area %", mesenchymeArea, PERCENTAGE));
         resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE));
-        resultsMap.put("血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", vesselInErythrocyteArea, PERCENTAGE));
-        resultsMap.put("血管外红细胞面积占比", createNameIndicator("Extravascular erythrocyte area%", vesselOutErythrocyteArea, PERCENTAGE));
+        resultsMap.put("血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", vesselInErythrocyteArea.setScale(3, RoundingMode.UP), PERCENTAGE));
+        resultsMap.put("血管外红细胞面积占比", createNameIndicator("Extravascular erythrocyte area%", vesselOutErythrocyteArea.setScale(3, RoundingMode.UP), PERCENTAGE));
         resultsMap.put("骨骼肌面积", createNameIndicator("Skeletal muscle area", areaUtils.convertToSquareMicrometer(slideArea), SQ_UM_THOUSAND));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }

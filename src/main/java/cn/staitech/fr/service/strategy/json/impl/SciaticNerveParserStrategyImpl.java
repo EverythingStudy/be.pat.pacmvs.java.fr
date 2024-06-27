@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -60,8 +61,10 @@ public class SciaticNerveParserStrategyImpl extends AbstractCustomParserStrategy
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
 		//神经纤维束面积	1	10³平方微米	Nerve fiber bundles area	1=A
-		BigDecimal pituitaryA = commonJsonParser.getOrganArea(jsonTask, "1400BB").getStructureAreaNum();
+//		BigDecimal pituitaryA = commonJsonParser.getOrganArea(jsonTask, "1400BB").getStructureAreaNum();
+		 BigDecimal pituitaryA = getOrganArea(jsonTask, "1400BB").getStructureAreaNum();
 		if(null != pituitaryA){
+			pituitaryA = pituitaryA.setScale(3, RoundingMode.HALF_UP);
 			pituitaryA = commonJsonParser.getBigDecimalValue(pituitaryA);
 			String accurateArea = areaUtils.convertToSquareMicrometer(pituitaryA.toString());
 			//神经纤维束面积	1	10³平方微米	Nerve fiber bundles area	1=A
@@ -71,8 +74,10 @@ public class SciaticNerveParserStrategyImpl extends AbstractCustomParserStrategy
 
 
 		//神经外膜结缔组织面积 B 平方毫米
-		BigDecimal bigDecimalB = commonJsonParser.getOrganArea(jsonTask, "1400BA").getStructureAreaNum();
+//		BigDecimal bigDecimalB = commonJsonParser.getOrganArea(jsonTask, "1400BA").getStructureAreaNum();
+		BigDecimal bigDecimalB = getOrganArea(jsonTask, "1400BA").getStructureAreaNum();
 		if(null != bigDecimalB){
+			bigDecimalB = bigDecimalB.setScale(3, RoundingMode.HALF_UP);
 			bigDecimalB = commonJsonParser.getBigDecimalValue(bigDecimalB);
 			indicatorResultsMap.put("神经外膜结缔组织面积", new IndicatorAddIn("", String.valueOf(bigDecimalB), "平方毫米", "1"));
 			

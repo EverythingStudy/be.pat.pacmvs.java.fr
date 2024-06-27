@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -78,24 +79,34 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		mucosaCountD = commonJsonParser.getIntegerValue(mucosaCountD);
 
 		//        红细胞面积	E	10³平方微米	若输出结果为多个则相加
-		Annotation annotationE  = commonJsonParser.getOrganArea(jsonTask, "14E004");
-		BigDecimal bigDecimalE = annotationE.getStructureAreaNum();
+//		Annotation annotationE  = commonJsonParser.getOrganArea(jsonTask, "14E004");
+//		BigDecimal bigDecimalE = annotationE.getStructureAreaNum();
+		BigDecimal bigDecimalE = getOrganArea(jsonTask, "14E004").getStructureAreaNum();
 		bigDecimalE = commonJsonParser.getBigDecimalValue(bigDecimalE);
+		bigDecimalE = bigDecimalE.setScale(6, RoundingMode.HALF_UP);
 		String bigDecimalEStr = areaUtils.convertToSquareMicrometer(bigDecimalE.toString());
 		bigDecimalE = new BigDecimal(bigDecimalEStr);
 		//        脂肪细胞面积	F	10³平方微米	若输出结果为多个则相加
-		Annotation annotationF  = commonJsonParser.getOrganArea(jsonTask, "14E012");
-		BigDecimal bigDecimalF_1 = annotationF.getStructureAreaNum();
+//		Annotation annotationF  = commonJsonParser.getOrganArea(jsonTask, "14E012");
+//		BigDecimal bigDecimalF_1 = annotationF.getStructureAreaNum();
+//		bigDecimalF_1 = commonJsonParser.getBigDecimalValue(bigDecimalF_1);
+//		BigDecimal bigDecimalF = annotationF.getStructureAreaNum();
+//		bigDecimalF = commonJsonParser.getBigDecimalValue(bigDecimalF);
+//		String bigDecimalFStr = areaUtils.convertToSquareMicrometer(annotationF.getStructureAreaNum().toString());
+//		bigDecimalF = new BigDecimal(bigDecimalFStr);
+		
+		BigDecimal bigDecimalF_1 = getOrganArea(jsonTask, "14E012").getStructureAreaNum();
 		bigDecimalF_1 = commonJsonParser.getBigDecimalValue(bigDecimalF_1);
-
-		BigDecimal bigDecimalF = annotationF.getStructureAreaNum();
-		bigDecimalF = commonJsonParser.getBigDecimalValue(bigDecimalF);
-		String bigDecimalFStr = areaUtils.convertToSquareMicrometer(annotationF.getStructureAreaNum().toString());
-		//bigDecimalF = bigDecimalF.multiply(new BigDecimal("0.001"));
-		bigDecimalF = new BigDecimal(bigDecimalFStr);
+		String bigDecimalFStr = areaUtils.convertToSquareMicrometer(bigDecimalF_1.toString());
+		BigDecimal bigDecimalF = new BigDecimal(bigDecimalFStr);
+		
 		//        骨质面积	G	10³平方微米	 负样本，辅助得到骨髓腔，若输出结果为多个则相加
-		Annotation annotationG  = commonJsonParser.getOrganArea(jsonTask, "14E00F");
+		/*Annotation annotationG  = commonJsonParser.getOrganArea(jsonTask, "14E00F");
 		BigDecimal bigDecimalG = annotationG.getStructureAreaNum();
+		bigDecimalG = commonJsonParser.getBigDecimalValue(bigDecimalG);
+		String bigDecimalGStr = areaUtils.convertToSquareMicrometer(bigDecimalG.toString());
+		BigDecimal bigDecimalGM = new BigDecimal(bigDecimalGStr);*/
+		BigDecimal bigDecimalG = getOrganArea(jsonTask, "14E00F").getStructureAreaNum();
 		bigDecimalG = commonJsonParser.getBigDecimalValue(bigDecimalG);
 		String bigDecimalGStr = areaUtils.convertToSquareMicrometer(bigDecimalG.toString());
 		BigDecimal bigDecimalGM = new BigDecimal(bigDecimalGStr);

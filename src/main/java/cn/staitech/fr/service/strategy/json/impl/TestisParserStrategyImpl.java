@@ -68,17 +68,29 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationBy.setAreaName("生精小管内腔面积（单个）");
         annotationBy.setAreaUnit("10³平方微米");
         commonJsonParser.putAnnotationDynamicData(jsonTask,"12E0FA","12E0FB",annotationBy,1);
+        annotationBy.setAreaName("生精小管面积（单个）");
+        annotationBy.setAreaName("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12E0FA",annotationBy,1);
+        annotationBy.setAreaName(null);
+        annotationBy.setAreaUnit(null);
+        annotationBy.setPerimeterName("生精小管周长（单个）");
+        annotationBy.setPerimeterUnit("毫米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12E0FA",annotationBy,3);
+        Annotation annotationBy1 = new Annotation();
+        annotationBy1.setAreaName("生精小管内腔面积（单个）");
+        annotationBy1.setAreaName("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12E0FB",annotationBy1,1);
 
         // 算法输出指标
         resultsMap.put("生精小管面积（单个）", createDefaultIndicator());// A生精小管面积（单个）
-        resultsMap.put("生精小管面积（全片）", createIndicator(organAreaB, SQ_MM));
+        resultsMap.put("生精小管面积（全片）", createIndicator(organAreaB.setScale(3, RoundingMode.HALF_UP), SQ_MM));
         resultsMap.put("生精小管周长（单个）", createDefaultIndicator());
         resultsMap.put("生精小管数量", createIndicator(areaCountD, PIECE));
         resultsMap.put("生精小管内腔面积（单个）", createDefaultIndicator());// E生精小管内腔面积（单个）
         resultsMap.put("生精细胞核数量（单个）", createDefaultIndicator());
         resultsMap.put("支持细胞核数量（单个）", createDefaultIndicator());
         resultsMap.put("间质细胞核数量", createIndicator(areaCountH, PIECE));
-//        resultsMap.put("血管面积", createIndicator(organAreaI, SQ_MM));
+//        resultsMap.put("血管面积", createIndicator(organAreaI.setScale(3, RoundingMode.HALF_UP), SQ_MM));
 
 
 
@@ -140,11 +152,11 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
 
 
         // 产品呈现指标
-        resultsMap.put("睾丸面积", createNameIndicator("Testicular area", slideAreaJ, SQ_MM));
-        resultsMap.put("生精小管面积（全片）", createNameIndicator("Seminiferous tubules area (all)", organAreaB, SQ_MM));
+        resultsMap.put("睾丸面积", createNameIndicator("Testicular area", organAreaJ.setScale(3, RoundingMode.HALF_UP), SQ_MM));
+        resultsMap.put("生精小管面积（全片）", createNameIndicator("Seminiferous tubules area (all)", organAreaB.setScale(3, RoundingMode.HALF_UP), SQ_MM));
         resultsMap.put("生精小管面积占比", createNameIndicator("Seminiferous tubules area%", seminiferousTubulesArea, PERCENTAGE));
         resultsMap.put("生精小管面积（单个）", createNameIndicator("Seminiferous tubules area (per)", seminiferousTubulesAreaSingle, SQ_UM_THOUSAND));
-        resultsMap.put("生精小管密度", createNameIndicator("Density of seminiferous tubules", densityResult, SQ_MM_PIECE));
+        resultsMap.put("生精小管密度", createNameIndicator("Density of seminiferous tubules", densityResult.setScale(3, RoundingMode.HALF_UP), SQ_MM_PIECE));
         resultsMap.put("生精小管厚度（单个）", createNameIndicator("Average thickness of spermatogenic tubules (per)", averageThicknessOfSpermatogenicTubules, UM));
         resultsMap.put("生精细胞核密度（单个）", createNameIndicator("Nucleus density of Spermatogenic cells (per)", nucleusDensityOfSpermatogenicCells, MM_PIECE));
         resultsMap.put("支持细胞核密度（单个）", createNameIndicator("Nucleus density of Sertoli (per)", nucleusDensityOfSupportCells, MM_PIECE));
