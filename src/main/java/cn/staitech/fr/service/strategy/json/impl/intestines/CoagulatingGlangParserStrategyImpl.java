@@ -82,7 +82,6 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         BigDecimal colonArea = commonJsonParser.getOrganArea(jsonTask, "12B074").getStructureAreaNum();
         // D 腺腔面积（全片）
         BigDecimal areaNum2 = commonJsonParser.getOrganArea(jsonTask, "12B0E9").getStructureAreaNum();
-        //BigDecimal areaNum2 = commonJsonParser.getInsideOrOutside(jsonTask, "12B074", "12B0E9", true).getStructureAreaNum();
         // 组织轮廓
         BigDecimal tissueArea = new BigDecimal(area);
 
