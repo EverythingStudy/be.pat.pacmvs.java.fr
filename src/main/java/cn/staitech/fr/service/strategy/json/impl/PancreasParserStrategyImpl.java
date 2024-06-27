@@ -194,7 +194,7 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
                 String contour = annotation.getContour();
                 Annotation temp = getContourInsideOrOutside(jsonTask, contour, "105078", true);
                 if (annotation.getStructureAreaNum().compareTo(BigDecimal.ZERO) > 0 && temp.getCount() != 0) {
-                    dataList.add(BigDecimal.valueOf(temp.getCount()).divide((annotation.getStructureAreaNum().multiply(BigDecimal.valueOf(1000)))));
+                    dataList.add(BigDecimal.valueOf(temp.getCount()).divide((annotation.getStructureAreaNum().multiply(BigDecimal.valueOf(1000))),3, RoundingMode.HALF_UP));
                 }
             }
         }
@@ -206,7 +206,7 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
                 String contour = annotation.getContour();
                 Annotation temp = getContourInsideOrOutside(jsonTask, contour, "10507B", true);
                 if (annotation.getStructureAreaNum().compareTo(BigDecimal.ZERO) > 0 && temp.getCount() != 0) {
-                    dataList.add(BigDecimal.valueOf(temp.getCount()).divide(annotation.getStructureAreaNum().multiply(BigDecimal.valueOf(1000))));
+                    dataList.add(BigDecimal.valueOf(temp.getCount()).divide(annotation.getStructureAreaNum().multiply(BigDecimal.valueOf(1000)),3, RoundingMode.HALF_UP));
                 }
             }
         }
@@ -219,7 +219,8 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationBy.setCountName(null);
         annotationBy.setAreaName("胰岛面积（单个）");
         annotationBy.setAreaUnit("10³平方微米");
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"105077",annotationBy,1);annotationBy.setCountName(null);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"105077",annotationBy,1);
+        annotationBy.setCountName(null);
         annotationBy.setAreaName("导管面积（单个）");
         annotationBy.setAreaUnit("10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"10506F",annotationBy,1);
