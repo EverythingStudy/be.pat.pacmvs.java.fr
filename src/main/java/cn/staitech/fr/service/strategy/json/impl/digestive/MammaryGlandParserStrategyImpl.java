@@ -177,6 +177,11 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("表皮基底层+棘层+颗粒层面积", new IndicatorAddIn("Area of basal layer+spinous layer+granular layer of epidermis", organArea4.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
 
         // 毛囊面积（单个）	C	103平方微米	单个毛囊面积输出
+        //  1：面积转10（3）平方微米  2:平方微米 （默认平方毫米）
+        Annotation annotationC = new Annotation();
+        annotationC.setCountName("毛囊面积（单个）");
+        annotationC.setCountUnit("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "121098", annotationC, 1);
         map.put("毛囊面积（单个）", new IndicatorAddIn());
 
         // 毛囊数量	D	个	无
