@@ -13,6 +13,7 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import cn.staitech.fr.utils.DecimalUtils;
 import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -106,17 +107,16 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
                 BigDecimal add = structureAreaNum.add(structureAreaNum1);
                 if (add.compareTo(BigDecimal.ZERO) != 0) {
                     // 3=A/(A+C)
-                    lists.add(structureAreaNum.divide(add, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(10, RoundingMode.HALF_UP));
+                    lists.add(structureAreaNum.divide(add, 7, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(7, RoundingMode.HALF_UP));
                 }
 
                 // E
                 Integer count = contourInsideOrOutside2.getCount();
                 if (add.compareTo(BigDecimal.ZERO) != 0) {
                     // 4=E/A
-                    BigDecimal divide = new BigDecimal(count).divide(structureAreaNum, 10, RoundingMode.HALF_UP);
+                    BigDecimal divide = new BigDecimal(count).divide(structureAreaNum, 7, RoundingMode.HALF_UP);
                     listNum.add(divide);
                 }
-
             }
         }
 
@@ -143,18 +143,18 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         map.put("腺腔面积（单个）", new IndicatorAddIn());
 
         // 腺腔面积（全片）D 平方毫米 若多个数据则相加输出
-        map.put("腺腔面积（全片）", new IndicatorAddIn("Gland cavity area (all)", areaNum2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("腺腔面积（全片）", new IndicatorAddIn("Gland cavity area (all)", DecimalUtils.setScale3(areaNum2), "平方毫米", CommonConstant.NUMBER_1));
 
         // 腺上皮细胞核数量（单个）E 个 单个腺上皮细胞核数量
         map.put("腺上皮细胞核数量（单个）", new IndicatorAddIn());
 
         // 产品呈现指标 -------------------------------------------------------------
         // F 组织轮廓的面积 凝固腺面积	1	平方毫米	Coagulating gland area	1=F
-        map.put("凝固腺面积", new IndicatorAddIn("Coagulating gland area", tissueArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_0));
+        map.put("凝固腺面积", new IndicatorAddIn("Coagulating gland area", DecimalUtils.setScale3(tissueArea), "平方毫米", CommonConstant.NUMBER_0));
 
         //        腺上皮面积（全片）	2	平方毫米	Acinar epithelial area (all)	2=B
         // 腺上皮面积（全片）B 平方毫米 若多个数据则相加输出
-        map.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", colonArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_0));
+        map.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", DecimalUtils.setScale3(colonArea), "平方毫米", CommonConstant.NUMBER_0));
 
         // 腺上皮面积占比（单个）	3	%	Acinar epithelial area% (per)	3=A/(A+C) 以95%置信区间和均数±标准差呈现
         map.put("腺上皮面积占比（单个）", new IndicatorAddIn("Acinar epithelial area% (per)", confidenceInterval, "%"));
@@ -164,14 +164,13 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
 
         // 间质和肌层面积占比	5	%	Mesenchyme and muscular area%	5=(F-B-D)/F
         if (tissueArea.compareTo(BigDecimal.ZERO) != 0) {
-            String mesenchymeAndMuscularAreaRate = tissueArea.subtract(colonArea).subtract(areaNum2).divide(tissueArea, 3, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
-            map.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", mesenchymeAndMuscularAreaRate, "%"));
+            BigDecimal mesenchymeAndMuscularAreaRate = tissueArea.subtract(colonArea).subtract(areaNum2).divide(tissueArea, 7, RoundingMode.HALF_UP);
+            map.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", DecimalUtils.percentScale3(mesenchymeAndMuscularAreaRate), "%"));
         } else {
             map.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", "0.000", "%"));
         }
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
-
         log.info("标计算结束-大鼠凝固腺");
     }
 }
