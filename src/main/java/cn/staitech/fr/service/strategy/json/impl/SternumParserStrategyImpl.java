@@ -179,7 +179,7 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		indicatorResultsMap.put("脂肪细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalF), "10³平方微米", "1"));
 		//		}
 //				if(bigDecimalGM.compareTo(BigDecimal.ZERO) != 0) {
-				indicatorResultsMap.put("骨质面积", new IndicatorAddIn("", String.valueOf(bigDecimalGM), "10³平方微米", "1"));
+//				indicatorResultsMap.put("骨质面积", new IndicatorAddIn("", String.valueOf(bigDecimalGM), "10³平方微米", "1"));
 		//		}
 
 		//AI指标保存

@@ -81,6 +81,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     Annotation getInsideOrOutside(Annotation annotation);
 
+    List<Annotation> getInsideOrOutsideList(Annotation annotation);
+
     Annotation getInsideOrOutsideCount(Annotation annotation);
 
     Annotation collectAiGeometry(Annotation annotation);

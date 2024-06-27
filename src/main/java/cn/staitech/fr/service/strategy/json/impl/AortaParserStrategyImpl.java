@@ -101,21 +101,21 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 		//		if(bigDecimalA.compareTo(BigDecimal.ZERO) != 0){
-		indicatorResultsMap.put("空腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA), "10³平方微米", "1"));
+		indicatorResultsMap.put("空腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA.setScale(3, RoundingMode.HALF_UP)), "10³平方微米", "1"));
 		//		}
 
 		//		if(bigDecimalB.compareTo(BigDecimal.ZERO) != 0){
-		indicatorResultsMap.put("空腔周长", new IndicatorAddIn("", String.valueOf(bigDecimalB), "毫米", "1"));
+		indicatorResultsMap.put("空腔周长", new IndicatorAddIn("", String.valueOf(bigDecimalB.setScale(3, RoundingMode.HALF_UP)), "毫米", "1"));
 		//		}
 
 //		indicatorResultsMap.put("空腔周长(单个)", createDefaultIndicator());
 
 		//		if(bigDecimalC.compareTo(BigDecimal.ZERO) != 0){
-		indicatorResultsMap.put("组织轮廓周长", new IndicatorAddIn("", String.valueOf(bigDecimalC), "毫米", "1"));
+		indicatorResultsMap.put("组织轮廓周长", new IndicatorAddIn("", String.valueOf(bigDecimalC.setScale(3, RoundingMode.HALF_UP)), "毫米", "1"));
 		//		}
 
 		//		if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0){
-		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDecimalD), "10³平方微米", "1"));
+		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDecimalD.setScale(3, RoundingMode.HALF_UP)), "10³平方微米", "1"));
 		//		}
 		//1=D-A
 		if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0 && bigDecimalA.compareTo(BigDecimal.ZERO) != 0){
@@ -125,7 +125,8 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0 && bigDecimalA.compareTo(BigDecimal.ZERO) != 0&& bigDecimalB.compareTo(BigDecimal.ZERO) != 0&& bigDecimalC.compareTo(BigDecimal.ZERO) != 0){
 			BigDecimal  bigDecimalDA = bigDecimalD_2.subtract(bigDecimalA_2);
 			//毫米转微米
-			BigDecimal  bigDecimalBC = bigDecimalB.add(bigDecimalC).multiply(new BigDecimal("1000"));
+			BigDecimal  bigDecimalBC = bigDecimalB.add(bigDecimalC);
+			bigDecimalBC= bigDecimalBC.multiply(new BigDecimal("1000"));
 			BigDecimal  bigDecimal2 = new BigDecimal(2);
 			BigDecimal mal =  bigDecimal2.multiply(commonJsonParser.getProportionMultiply(bigDecimalDA, bigDecimalBC));
 			indicatorResultsMap.put("主动脉壁平均厚度", new IndicatorAddIn("Average thickness of aorta wall", String.valueOf(mal), "微米", "0"));

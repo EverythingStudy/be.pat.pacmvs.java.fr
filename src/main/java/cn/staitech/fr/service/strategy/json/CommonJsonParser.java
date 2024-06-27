@@ -443,6 +443,7 @@ public class CommonJsonParser {
         if (Objects.equals(result, "f")) {
             return new Annotation();
         }
+        annotation.setSingleSlideId(jsonTask.getSingleId());
         annotation.setInsideOrOutside(InsideOrOutside);
         annotation.setCategoryId(pathologicalMap.get(structureIds));
         // 查询面积和周长
