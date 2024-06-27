@@ -112,13 +112,12 @@ public class LiverParserStrategyImpl implements ParserStrategy {
 
                 // 4=E/A
                 if (structureAreaNum.compareTo(BigDecimal.ZERO) != 0) {
-                    listNum.add(new BigDecimal(count).divide(structureAreaNum, 4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3));
-                    // new BigDecimal(confidenceInterval1).multiply(new BigDecimal(100)).setScale(3).toString()
+                    listNum.add(new BigDecimal(count).divide(structureAreaNum, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(10));
                 }
 
                 // 5=F/A
                 if (structureAreaNum.compareTo(BigDecimal.ZERO) != 0) {
-                    BigDecimal divide = structureAreaNum1.divide(structureAreaNum, 4, RoundingMode.HALF_UP);
+                    BigDecimal divide = structureAreaNum1.divide(structureAreaNum, 10, RoundingMode.HALF_UP);
                     lists.add(divide);
                 }
 

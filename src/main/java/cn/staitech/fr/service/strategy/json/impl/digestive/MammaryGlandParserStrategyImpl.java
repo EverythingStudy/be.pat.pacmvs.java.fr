@@ -123,10 +123,10 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
             map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", "0.000", "%"));
 
         } else {
-            BigDecimal divide2 = organArea1.divide(subtract, 5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
+            BigDecimal divide2 = organArea1.divide(subtract, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
             map.put("乳腺腺泡和导管面积占比", new IndicatorAddIn("Acinus and ducts area%", divide2.toString(), "%"));
             BigDecimal subtract1 = organArea2.subtract(organArea1);
-            map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", subtract1.divide(subtract, 5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", subtract1.divide(subtract, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
 
         }
 
@@ -142,7 +142,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
 
                 if (structureAreaNum.signum() != 0) {
                     BigDecimal multiply = structureAreaNum.multiply(new BigDecimal(1000));
-                    lists.add(new BigDecimal(count).divide(multiply, 4, RoundingMode.HALF_UP));
+                    lists.add(new BigDecimal(count).divide(multiply, 10, RoundingMode.HALF_UP));
                 }
 
             }
@@ -239,6 +239,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("皮脂腺密度", new IndicatorAddIn("Sebaceous gland density", divide1.toString(), "个/平方毫米"));
 
         // 皮肤面积	8	平方毫米	Skin area	8=G  此数据使用乳腺中皮肤数据
+        map.put("皮肤面积", new IndicatorAddIn("Skin area", organAreaB.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
 

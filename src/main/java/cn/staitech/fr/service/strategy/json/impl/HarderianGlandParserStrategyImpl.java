@@ -115,7 +115,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
                 // 2=B/A
                 if (structureAreaNum.compareTo(BigDecimal.ZERO) != 0) {
-                    BigDecimal divide = new BigDecimal(count).divide(structureAreaNum, 4, RoundingMode.HALF_UP);
+                    BigDecimal divide = new BigDecimal(count).divide(structureAreaNum, 10, RoundingMode.HALF_UP);
                     listNum.add(divide);
                 }
 
