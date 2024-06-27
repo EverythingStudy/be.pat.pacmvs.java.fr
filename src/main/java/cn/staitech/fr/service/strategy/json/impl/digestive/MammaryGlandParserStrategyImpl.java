@@ -156,6 +156,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("淋巴结面积", new IndicatorAddIn("Lymph node area", organAreaA.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         // 皮肤面积	G	平方毫米	此数据使用乳腺中皮肤数据 (乳腺皮肤公用)
         map.put("皮肤面积", new IndicatorAddIn("Skin area", organAreaB.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("乳腺腺泡/导管数量", new IndicatorAddIn("Number of acinus and ducts", organAreaCount.toString(), "个",CommonConstant.NUMBER_1));
         map.put("乳腺腺泡/导管面积（全片）", new IndicatorAddIn("Breast acinar/ductal area (all)", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         map.put("结缔组织面积", new IndicatorAddIn("Connective tissue area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         map.put("组织轮廓面积", new IndicatorAddIn("Organizational contour area", h.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
