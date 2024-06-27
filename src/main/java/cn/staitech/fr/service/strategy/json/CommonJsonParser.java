@@ -592,7 +592,7 @@ public class CommonJsonParser {
                 } else if (type == 2) {
                     dynamicData.setData(String.valueOf(convertToMicrometer(i.getStructurePerimeterNum().toString())));
                 } else if (type == 3) {
-                    dynamicData.setData(String.valueOf(i.getStructureAreaNum()));
+                    dynamicData.setData(String.valueOf(i.getStructurePerimeterNum().setScale(3, RoundingMode.HALF_UP)));
                 }
                 dynamicData.setUnit(annotation.getPerimeterUnit());
                 jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
