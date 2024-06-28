@@ -650,9 +650,6 @@
         WHERE single_slide_id = #{singleSlideId}
           AND category_id = #{categoryId}
           AND contour_type = 3
-        <if test="contour != null">
-            AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = #{insideOrOutside}
-        </if>
     </select>
 
     <select id="intersectsGeometry" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
