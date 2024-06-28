@@ -101,18 +101,18 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
                 Annotation contourInsideOrOutside = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "12B0E9", true);
                 Annotation contourInsideOrOutside2 = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "12B0ED", true);
 
-                // 面积
+                // 面积 C
                 BigDecimal structureAreaNum1 = contourInsideOrOutside.getStructureAreaNum();
                 // A+C
-                BigDecimal add = structureAreaNum.add(structureAreaNum1);
-                if (add.compareTo(BigDecimal.ZERO) != 0) {
+                BigDecimal addAC = structureAreaNum.add(structureAreaNum1);
+                if (addAC.compareTo(BigDecimal.ZERO) != 0) {
                     // 3=A/(A+C)
-                    lists.add(structureAreaNum.divide(add, 7, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(7, RoundingMode.HALF_UP));
+                    lists.add(structureAreaNum.divide(addAC, 7, RoundingMode.HALF_UP));
                 }
 
                 // E
                 Integer count = contourInsideOrOutside2.getCount();
-                if (add.compareTo(BigDecimal.ZERO) != 0) {
+                if (addAC.compareTo(BigDecimal.ZERO) != 0) {
                     // 4=E/A
                     BigDecimal divide = new BigDecimal(count).divide(structureAreaNum, 7, RoundingMode.HALF_UP);
                     listNum.add(divide);
@@ -161,7 +161,6 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
 
         // 腺泡上皮细胞核密度（单个）	4	个/平方毫米	Nucleus density of acinar epithelium (per)	4=E/A 以95%置信区间和均数±标准差呈现
         map.put("腺泡上皮细胞核密度（单个）", new IndicatorAddIn("Nucleus density of acinar epithelium (per)", confidenceInterval1, "个/平方毫米"));
-
 
         if (tissueArea.compareTo(BigDecimal.ZERO) != 0) {
             // 间质和肌层面积占比	5	%	Mesenchyme and muscular area%	5=(F-B-D)/F

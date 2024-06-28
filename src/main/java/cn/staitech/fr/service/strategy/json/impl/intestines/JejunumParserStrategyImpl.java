@@ -67,7 +67,6 @@ public class JejunumParserStrategyImpl implements ParserStrategy {
         String area = ObjectUtil.isNotEmpty(singleSlide) ? singleSlide.getArea() : "0";
         area = ObjectUtil.isEmpty(area) ? "0" : area;
 
-        // 结构编码 -------------------------------------------------------------
         // 肠腔	118156
         // 黏膜层	118008
         // 黏膜下层 	118009
@@ -87,7 +86,7 @@ public class JejunumParserStrategyImpl implements ParserStrategy {
         // 结肠面积
         BigDecimal subtractEA = new BigDecimal(0);
         if (tissueArea.compareTo(BigDecimal.ZERO) != 0) {
-            subtractEA = tissueArea.subtract(colonArea).setScale(3, RoundingMode.HALF_UP);
+            subtractEA = tissueArea.subtract(colonArea).setScale(7, RoundingMode.HALF_UP);
         }
 
         // 算法输出指标 -------------------------------------------------------------
@@ -109,15 +108,15 @@ public class JejunumParserStrategyImpl implements ParserStrategy {
         // 产品呈现指标 -------------------------------------------------------------
         if (subtractEA.compareTo(BigDecimal.ZERO) != 0) {
             // 黏膜层面积占比	1	%	Mucosal area%	1=B/（E-A）
-            BigDecimal mucosalAreaRateDecimal = areaNumB.divide(subtractEA, 3, RoundingMode.HALF_UP);
+            BigDecimal mucosalAreaRateDecimal = areaNumB.divide(subtractEA, 7, RoundingMode.HALF_UP);
             map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", DecimalUtils.percentScale3(mucosalAreaRateDecimal), "%"));
 
             // 黏膜下层面积占比	2	%	Submucosal area%	2=C/（E-A）
-            BigDecimal submucosalAreaRateDecimal = areaNumC.divide(subtractEA, 3, RoundingMode.HALF_UP);
+            BigDecimal submucosalAreaRateDecimal = areaNumC.divide(subtractEA, 7, RoundingMode.HALF_UP);
             map.put("黏膜下层面积占比", new IndicatorAddIn("Submucosal area%", DecimalUtils.percentScale3(submucosalAreaRateDecimal), "%"));
 
             // 肌层面积占比	3	%	Muscular area%	3=D/（E-A）
-            BigDecimal muscularAreaRateDecimal = areaNumD.divide(subtractEA, 3, RoundingMode.HALF_UP);
+            BigDecimal muscularAreaRateDecimal = areaNumD.divide(subtractEA, 7, RoundingMode.HALF_UP);
             map.put("肌层面积占比", new IndicatorAddIn("Muscular area%", DecimalUtils.percentScale3(muscularAreaRateDecimal), "%"));
         } else {
             map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", "0.000", "%"));

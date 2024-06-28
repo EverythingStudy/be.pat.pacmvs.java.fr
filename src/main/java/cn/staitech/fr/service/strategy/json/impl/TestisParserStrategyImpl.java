@@ -142,7 +142,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         }
         String nucleusDensityOfSpermatogenicCellsSupportCells = MathUtils.getConfidenceInterval(list5);
         // 血管面积占比
-        BigDecimal vesselArea = commonJsonParser.getProportion(organAreaI, organAreaJ);
+//        BigDecimal vesselArea = commonJsonParser.getProportion(organAreaI, organAreaJ);
         // 间质细胞核：生精小管
         BigDecimal interstitialCellNuclei = BigDecimal.valueOf(areaCountH / areaCountD).setScale(3, RoundingMode.HALF_UP);
         // 间质面积占比
@@ -161,7 +161,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         resultsMap.put("生精细胞核密度（单个）", createNameIndicator("Nucleus density of Spermatogenic cells (per)", nucleusDensityOfSpermatogenicCells, MM_PIECE));
         resultsMap.put("支持细胞核密度（单个）", createNameIndicator("Nucleus density of Sertoli (per)", nucleusDensityOfSupportCells, MM_PIECE));
         resultsMap.put("生精细胞核：支持细胞核（单个）", createNameIndicator("Spermatogenic nucleus:  Sertoli nucleus ratio (per)", nucleusDensityOfSpermatogenicCellsSupportCells, NOT));
-        resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE));
+//        resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE));
         resultsMap.put("间质细胞核：生精小管", createNameIndicator("Leydig nucleus: seminiferous tubules ratio", interstitialCellNuclei, NOT));
         resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area%", interstitialArea, PERCENTAGE));
         resultsMap.put("间质细胞核密度", createNameIndicator("Nucleus density of leydig cells", interstitialCellNucleiDensity, SQ_MM_PIECE));

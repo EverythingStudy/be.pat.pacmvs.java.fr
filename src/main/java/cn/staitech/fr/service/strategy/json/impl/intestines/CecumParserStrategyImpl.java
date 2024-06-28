@@ -62,8 +62,6 @@ public class CecumParserStrategyImpl implements ParserStrategy {
         log.info("指标计算开始-大鼠盲肠");
         Map<String, IndicatorAddIn> map = new HashMap<>();
 
-        // 结构编码 -------------------------------------------------------------
-        // 结构	编码
         // 肠腔	114156
         // 黏膜层	114008
         // 黏膜下层 	114009
@@ -91,7 +89,7 @@ public class CecumParserStrategyImpl implements ParserStrategy {
         // 盲肠面积
         BigDecimal subtractFA = new BigDecimal(0);
         if (tissueArea.compareTo(BigDecimal.ZERO) != 0) {
-            subtractFA = tissueArea.subtract(colonArea).setScale(3, RoundingMode.HALF_UP);
+            subtractFA = tissueArea.subtract(colonArea).setScale(7, RoundingMode.HALF_UP);
         }
 
         // 算法输出指标 -------------------------------------------------------------

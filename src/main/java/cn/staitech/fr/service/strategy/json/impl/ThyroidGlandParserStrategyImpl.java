@@ -62,8 +62,6 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         log.info("指标计算开始-大鼠甲状腺");
         Map<String, IndicatorAddIn> map = new HashMap<>();
         //        甲状腺
-
-        // 结构编码 -------------------------------------------------------------
         // 甲状腺滤泡	107088
         // 甲状腺滤泡腔	10708A
         // 血管	107003
@@ -186,12 +184,12 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         // 甲状腺滤泡上皮面积占比（单个）	3	%	Thyroid follicular epithelium area%(per)	3=(A-B)/A	以95%置信区间和均数±标准差呈现
         map.put("甲状腺滤泡上皮面积占比（单个）", new IndicatorAddIn("Thyroid follicular epithelium area%(per)", confidenceInterval3, "%"));
 
-        // H-I
-        BigDecimal hSubtractI = accurateAreaDecimal.subtract(parathyroidGlandArea).setScale(7, RoundingMode.HALF_UP);
+        // H-I 转平方毫米
+        BigDecimal hSubtractI = accurateAreaDecimal.subtract(parathyroidGlandArea.multiply(new BigDecimal(1000))).setScale(7, RoundingMode.HALF_UP);
 
         //        血管面积占比	4	%	Vessel area%	4=C/(H-I) 	运算前注意统一单位
         if (hSubtractI.compareTo(BigDecimal.ZERO) != 0) {
-            BigDecimal vesselAreaRate = vesselArea.divide(hSubtractI, 7, RoundingMode.HALF_UP);
+            BigDecimal vesselAreaRate = vesselArea.multiply(new BigDecimal(1000)).divide(hSubtractI, 7, RoundingMode.HALF_UP);
             map.put("血管面积占比", new IndicatorAddIn("Vessel area", DecimalUtils.percentScale3(vesselAreaRate), "%"));
 
             //        血管内红细胞面积占比	5	%	Intravascular erythrocyte area%	5=D/(H-I) 	运算前注意统一单位
@@ -220,7 +218,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
 
         // 甲状旁腺组织轮廓面积	I	103平方微米	若多个数据则相加输出
         // 甲状旁腺面积	10	103平方微米	Parathyroid gland area	10=I
-        map.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", DecimalUtils.setScale3(parathyroidGlandArea.multiply(new BigDecimal(1000))), "10³平方微米"));
+        map.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", DecimalUtils.setScale3(parathyroidGlandArea), "10³平方微米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
         log.info("指标计算结束-大鼠甲状腺");
     }

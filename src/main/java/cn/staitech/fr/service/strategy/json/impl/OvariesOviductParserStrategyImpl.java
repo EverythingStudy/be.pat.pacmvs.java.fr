@@ -82,13 +82,27 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		bigDecimalH = commonJsonParser.getBigDecimalValue(bigDecimalH);
 		bigDecimalH = bigDecimalH.setScale(3, RoundingMode.HALF_UP);*/
 		BigDecimal bigDecimalH = getOrganArea(jsonTask, "124003", BigDecimal.valueOf(1000)).getStructureAreaNum();
-
+		//平方毫米转平方微米
+		if(null != bigDecimalH){
+			String bigDecimalASecondStr = areaUtils.convertToMicrometer(bigDecimalH.toString());
+			bigDecimalH = new BigDecimal(bigDecimalASecondStr);
+		}
 		//TODO 血管外红细胞面积 I 平方微米
 		BigDecimal bigDecimalI = BigDecimal.ZERO;
 		bigDecimalI = commonJsonParser.getInsideOrOutside(jsonTask, "124003", "124004", false).getStructureAreaNum();
+		//平方毫米转平方微米
+		if(null != bigDecimalI){
+			String bigDecimalASecondStr = areaUtils.convertToMicrometer(bigDecimalI.toString());
+			bigDecimalI = new BigDecimal(bigDecimalASecondStr);
+		}
 		//TODO 血管内红细胞面积 J 平方微米
 		BigDecimal bigDecimalJ = BigDecimal.ZERO;
 		bigDecimalJ = commonJsonParser.getInsideOrOutside(jsonTask, "124003", "124004", true).getStructureAreaNum();
+		//平方毫米转平方微米
+		if(null != bigDecimalJ){
+			String bigDecimalASecondStr = areaUtils.convertToMicrometer(bigDecimalJ.toString());
+			bigDecimalJ = new BigDecimal(bigDecimalASecondStr);
+		}
 
 		// 组织轮廓面积 E 平方毫米
 		String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());

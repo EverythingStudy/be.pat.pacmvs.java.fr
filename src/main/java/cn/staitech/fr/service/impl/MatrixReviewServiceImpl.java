@@ -372,6 +372,9 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 				for (AiForecast aiForecast : aiForecasts) {
 					ExportAiListVO exportAiListVO = new ExportAiListVO();
 					BeanUtils.copyProperties(aiForecast, exportAiListVO);
+					if(new BigDecimal(aiForecast.getResults()).compareTo(BigDecimal.ZERO)<0){
+						exportAiListVO.setResults("?");
+					}
 					//范围数据
 					if(StringUtils.isNotEmpty(special.getControlGroup())){
 						String genderFlag=singleSlideMapper.getGender(id);
@@ -399,7 +402,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 			String s = waxPath + "AI" + File.separator + exportVO.getFileName() + "+" + exportVO.getOrganName() + CommonConstant.WROD_FILE;
 			File file = new File(waxPath + "AI" + File.separator);
 			if(!file.exists()&&!file.isDirectory()){
-				file.mkdir();
+				file.mkdirs();
 			}
 			//生成word
 			ExportPdfUtils.exportAiFile(s, exportVO);
@@ -591,6 +594,9 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
 			//正态分布(下限)
 			BigDecimal subtract2 = bigDecimal.subtract(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
+			if(subtract2.compareTo(BigDecimal.ZERO)<0){
+				subtract2=BigDecimal.ZERO.setScale(3);
+			}
 			//正态分布(上限)
 			BigDecimal add2 = bigDecimal.add(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
 			exportAiListVO.setNormalDistribution(subtract2+"-"+add2);

@@ -79,7 +79,7 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal organAreaD = areaUtils.getOrganArea(jsonTask, "15C004");// D红细胞面积
         Annotation annotation = commonJsonParser.getInsideOrOutside(jsonTask, "15C003", "15C004", true);
         BigDecimal organAreaE = annotation.getStructureAreaNum();// E血管内红细胞面积
-        String slideArea = areaUtils.convertToSquareMicrometer(areaUtils.getFineContourArea(jsonTask.getSingleId()));// F精细轮廓总面积
+        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// F精细轮廓总面积
 
         BigDecimal organF = BigDecimal.valueOf(Double.parseDouble(slideArea));
         // 间质面积占比
