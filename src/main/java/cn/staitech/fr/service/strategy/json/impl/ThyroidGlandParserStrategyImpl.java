@@ -5,6 +5,7 @@ import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
+import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
@@ -46,6 +47,8 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
     private CommonJsonCheck commonJsonCheck;
     @Resource
     private AreaUtils areaUtils;
+    @Resource
+    private AnnotationMapper annotationMapper;
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
@@ -88,8 +91,12 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         String accurateArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
         BigDecimal accurateAreaDecimal = new BigDecimal(accurateArea);
 
-        //        甲状旁腺组织轮廓面积	I	103平方微米	若多个数据则相加输出(I:甲状旁腺组织轮廓面积-平方毫米)
-        BigDecimal parathyroidGlandArea = commonJsonParser.getOrganAreaMicron(jsonTask, "108111");
+        // 甲状旁腺组织轮廓面积	I	103平方微米	若多个数据则相加输出(I:甲状旁腺组织轮廓面积-平方毫米)
+        Annotation annotationI = new Annotation();
+        annotationI.setSingleSlideId(jsonTask.getSingleId());
+        annotationI.setCategoryId(commonJsonParser.getPathologicalMap(jsonTask.getOrganizationId()).get("108111"));
+        // 查询轮廓内的轮廓总面积->平方微米|getSpinalCordAnno() 查询精细轮廓列表
+        BigDecimal parathyroidGlandArea = new BigDecimal(annotationMapper.stUnionContourArea(annotationI).getArea());
 
         // 计算置信区间和均数±标准差呈现  -------------------------------------------------------------
         // 甲状腺滤泡面积（单个）	1	103平方微米	Thyroid follicle area (per)	1=A	以95%置信区间和均数±标准差呈现
@@ -185,7 +192,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         map.put("甲状腺滤泡上皮面积占比（单个）", new IndicatorAddIn("Thyroid follicular epithelium area%(per)", confidenceInterval3, "%"));
 
         // H-I 转平方毫米
-        BigDecimal hSubtractI = accurateAreaDecimal.subtract(parathyroidGlandArea.multiply(new BigDecimal(1000))).setScale(7, RoundingMode.HALF_UP);
+        BigDecimal hSubtractI = accurateAreaDecimal.subtract(parathyroidGlandArea).setScale(7, RoundingMode.HALF_UP);
 
         //        血管面积占比	4	%	Vessel area%	4=C/(H-I) 	运算前注意统一单位
         if (hSubtractI.compareTo(BigDecimal.ZERO) != 0) {
@@ -218,7 +225,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
 
         // 甲状旁腺组织轮廓面积	I	103平方微米	若多个数据则相加输出
         // 甲状旁腺面积	10	103平方微米	Parathyroid gland area	10=I
-        map.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", DecimalUtils.setScale3(parathyroidGlandArea), "10³平方微米"));
+        map.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", parathyroidGlandArea.divide(new BigDecimal(1000), 3, RoundingMode.HALF_UP).toString(), "10³平方微米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
         log.info("指标计算结束-大鼠甲状腺");
     }
