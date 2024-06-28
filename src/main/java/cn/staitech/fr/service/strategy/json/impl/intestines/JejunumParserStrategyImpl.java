@@ -61,7 +61,6 @@ public class JejunumParserStrategyImpl implements ParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("指标计算开始-大鼠空肠");
-
         Map<String, IndicatorAddIn> map = new HashMap<>();
 
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
