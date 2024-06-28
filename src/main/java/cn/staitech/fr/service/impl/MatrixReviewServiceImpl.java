@@ -402,7 +402,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 			String s = waxPath + "AI" + File.separator + exportVO.getFileName() + "+" + exportVO.getOrganName() + CommonConstant.WROD_FILE;
 			File file = new File(waxPath + "AI" + File.separator);
 			if(!file.exists()&&!file.isDirectory()){
-				file.mkdir();
+				file.mkdirs();
 			}
 			//生成word
 			ExportPdfUtils.exportAiFile(s, exportVO);
