@@ -69,6 +69,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     Annotation collectGeometry(Long singleSlideId);
 
+    Annotation stUnionContour(Annotation annotation);
+
     Annotation intersectsGeometry(Annotation annotation);
 
     Integer countDucts(Annotation annotation1);
@@ -104,7 +106,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     int aiUpdateById(Annotation annotation);
     
     List<Annotation> getSpinalCordAnno(Annotation annotation);
-    
+
+    Annotation stMakeValid(Annotation annotation);
 
 }
 
