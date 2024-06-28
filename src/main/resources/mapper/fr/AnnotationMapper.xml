@@ -884,7 +884,6 @@
         slide_id,
         id,
         contour_type,
-        <!-- ST_AsGeoJSON(contour${magnification}) as contour, -->
          ST_AsGeoJSON(contour40000) AS contour,
          ST_AsGeoJSON(contour40000) AS contour40000,
          ST_AsGeoJSON(contour10000) AS contour10000,
@@ -899,6 +898,9 @@
             </if>
             <if test="contourType != null">
                 AND contour_type = #{contourType}
+            </if>
+            <if test="category_id != null">
+                AND category_id = #{categoryId}
             </if>
         </where>
     </select>
