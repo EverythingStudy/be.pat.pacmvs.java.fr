@@ -4,7 +4,6 @@ import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
@@ -65,7 +64,6 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("指标计算开始-哈氏腺");
-
         Map<String, IndicatorAddIn> map = new HashMap<>();
 
         //        哈氏腺
@@ -82,7 +80,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
         //        腺泡细胞核数量（单个）	B	个	单个腺泡内数据相加输出
         //        色素面积	C	平方毫米	数据相加输出
-        BigDecimal pigmentArea = commonJsonParser.getOrganArea(jsonTask, "102071").getStructureAreaNum();
+        // BigDecimal pigmentArea = commonJsonParser.getOrganArea(jsonTask, "102071").getStructureAreaNum();
         //        组织轮廓面积	D	平方毫米
         //        腺泡面积（全片）	E	平方毫米	数据相加输出
         BigDecimal acinusArea = commonJsonParser.getOrganArea(jsonTask, "10206D").getStructureAreaNum();
@@ -97,8 +95,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         //  哈氏腺面积	5	平方毫米	Harderian gland
         //  area	5=D
 
-        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        String accurateArea = singleSlide.getArea();
+        String accurateArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
         BigDecimal accurateAreaBigDecimal = new BigDecimal(accurateArea);
 
         // 腺泡列表
@@ -116,10 +113,9 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
                 // 2=B/A
                 if (structureAreaNum.compareTo(BigDecimal.ZERO) != 0) {
-                    BigDecimal divide = new BigDecimal(count).divide(structureAreaNum, 10, RoundingMode.HALF_UP);
+                    BigDecimal divide = new BigDecimal(count).divide(structureAreaNum, 7, RoundingMode.HALF_UP);
                     listNum.add(divide);
                 }
-
             }
         }
 
@@ -145,14 +141,13 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         // C
         // map.put("色素面积", new IndicatorAddIn("Pigment area", pigmentArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
         // E
-        map.put("腺泡面积（全片）", new IndicatorAddIn("Acinus area (all)", acinusArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("腺泡面积（全片）", new IndicatorAddIn("Acinus area (all)", DecimalUtils.setScale3(acinusArea), "平方毫米", CommonConstant.NUMBER_1));
         // F
         map.put("腺泡细胞核数量（全片）", new IndicatorAddIn("Nucleus counts of acinus (all)", nucleusCount.toString(), "个", CommonConstant.NUMBER_1));
 
         // 产品呈现指标 -------------------------------------------------------------
         if (accurateAreaBigDecimal.compareTo(BigDecimal.ZERO) != 0) {
             //   腺泡面积占比（全片）	1	%	Acinus area%（all）	1=E/D
-            // 保留两位小数，并进行四舍五入
             BigDecimal acinusDivideArea = acinusArea.divide(accurateAreaBigDecimal, 7, BigDecimal.ROUND_HALF_UP);
             map.put("腺泡面积占比（全片）", new IndicatorAddIn("Acinus area %（all）", DecimalUtils.percentScale3(acinusDivideArea), "%"));
 
@@ -168,11 +163,11 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         map.put("腺泡细胞核密度(单个)", new IndicatorAddIn("Nucleus density of acinus(per)", confidenceInterval, "个/10³平方微米"));
 
         // 腺泡细胞核密度（全片）4 个 / 平方毫米 Nucleus density of acinus (all) 4 = F / E
-        BigDecimal nucleusCountDivideacinusArea = new BigDecimal(nucleusCount).divide(acinusArea, 10, BigDecimal.ROUND_HALF_UP);
-        map.put("腺泡细胞核密度（全片）", new IndicatorAddIn("Nucleus density of acinus (all)", nucleusCountDivideacinusArea.toString(), "个/平方毫米"));
+        BigDecimal nucleusCountDivideacinusArea = new BigDecimal(nucleusCount).divide(acinusArea, 7, BigDecimal.ROUND_HALF_UP);
+        map.put("腺泡细胞核密度（全片）", new IndicatorAddIn("Nucleus density of acinus (all)", DecimalUtils.setScale3(nucleusCountDivideacinusArea), "个/平方毫米"));
 
         // D
-        map.put("哈氏腺面积", new IndicatorAddIn("Acinus area", accurateArea, "平方毫米"));
+        map.put("哈氏腺面积", new IndicatorAddIn("Acinus area", DecimalUtils.setScale3(accurateAreaBigDecimal), "平方毫米"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
         log.info("指标计算结束-哈氏腺");

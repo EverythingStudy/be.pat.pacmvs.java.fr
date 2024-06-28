@@ -1,10 +1,8 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.constant.CommonConstant;
-import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
@@ -66,7 +64,7 @@ public class BrainParserStrategyImpl implements ParserStrategy {
 
         // 算法输出指标	指标代码（仅限本文档）	单位（保留小数点后3位）	备注
         // 脉络丛面积	A	平方毫米	无
-        Annotation choroidOPlexusAreaAnnotation = commonJsonParser.getOrganArea(jsonTask, "13209C");
+        BigDecimal choroidOPlexusAreaAnnotation = commonJsonParser.getOrganArea(jsonTask, "13209C").getStructureAreaNum();
         // 血管外红细胞面积	B	103平方微米	无 (查询血管外红细胞面积)
         // BigDecimal extravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, "132003", "132004", false).getStructureAreaNum();
         // extravascularErythrocyteArea = extravascularErythrocyteArea.multiply(new BigDecimal(0.001));
@@ -82,13 +80,12 @@ public class BrainParserStrategyImpl implements ParserStrategy {
         // 大脑面积	4	平方毫米	Brain area	4=D	无
 
         // D:精细轮廓总面积（大鼠大脑）- 平方毫米
-        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        String accurateArea = singleSlide.getArea();
+        String accurateArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
         BigDecimal accurateAreaBigDecimal = new BigDecimal(accurateArea);
 
         // 算法输出指标 -------------------------------------------------------------
         // A
-        map.put("脉络丛面积", new IndicatorAddIn("Choroid Plexus area", choroidOPlexusAreaAnnotation.getStructureAreaNum().toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("脉络丛面积", new IndicatorAddIn("Choroid Plexus area", DecimalUtils.setScale3(choroidOPlexusAreaAnnotation), "平方毫米", CommonConstant.NUMBER_1));
         // // B
         // map.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", extravascularErythrocyteArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
         // // C
@@ -97,7 +94,7 @@ public class BrainParserStrategyImpl implements ParserStrategy {
         // 产品呈现指标 -------------------------------------------------------------
         if (accurateAreaBigDecimal.compareTo(BigDecimal.ZERO) != 0) {
             // 脉络丛面积占比	1	%	Choroid Plexus area %	1=A/D	无
-            BigDecimal choroidPlexusAreaRate = choroidOPlexusAreaAnnotation.getStructureAreaNum().divide(accurateAreaBigDecimal, 6, RoundingMode.HALF_UP);
+            BigDecimal choroidPlexusAreaRate = choroidOPlexusAreaAnnotation.divide(accurateAreaBigDecimal, 7, RoundingMode.HALF_UP);
             map.put("脉络丛面积占比", new IndicatorAddIn("Choroid Plexus area %", DecimalUtils.percentScale3(choroidPlexusAreaRate), "%"));
 
             // 血管外红细胞面积占比	2	%	Extravascular Erythrocyte area%	2=B/D	无
@@ -114,7 +111,7 @@ public class BrainParserStrategyImpl implements ParserStrategy {
         }
 
         // D 大脑面积	4	平方毫米	Brain area	4=D	无
-        map.put("大脑面积", new IndicatorAddIn("Brain area", accurateArea, "平方毫米"));
+        map.put("大脑面积", new IndicatorAddIn("Brain area", DecimalUtils.setScale3(accurateAreaBigDecimal), "平方毫米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
     }
 }

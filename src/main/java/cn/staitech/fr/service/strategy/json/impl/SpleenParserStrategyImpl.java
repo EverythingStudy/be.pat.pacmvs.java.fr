@@ -3,7 +3,6 @@ package cn.staitech.fr.service.strategy.json.impl;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
@@ -11,6 +10,7 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import cn.staitech.fr.utils.DecimalUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -54,12 +54,9 @@ public class SpleenParserStrategyImpl implements ParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("指标计算开始-大鼠脾脏");
-
         Map<String, IndicatorAddIn> map = new HashMap<>();
 
         //        脾脏
-        //
-        //        结构	编码
         //        白髓	145047
         //        动脉周围淋巴鞘	145045
         //        中央动脉	145048
@@ -80,8 +77,7 @@ public class SpleenParserStrategyImpl implements ParserStrategy {
         //        红细胞面积	E	平方毫米	数据相加输出
         BigDecimal erythrocyteArea = commonJsonParser.getOrganArea(jsonTask, "145004").getStructureAreaNum();
         //        组织轮廓面积	F	平方毫米(H:精细轮廓总面积（脾脏）-平方毫米)
-        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        String accurateArea = singleSlide.getArea();
+        String accurateArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
         BigDecimal accurateAreaDecimal = new BigDecimal(accurateArea);
         //        边缘区面积	G	平方毫米	数据相加输出（算法直接输出）(WORD无数据，JSON有数据！)
         BigDecimal marginalZoneArea = commonJsonParser.getOrganArea(jsonTask, "14504A").getStructureAreaNum();
@@ -99,45 +95,45 @@ public class SpleenParserStrategyImpl implements ParserStrategy {
 
         // 算法输出指标 -------------------------------------------------------------
         // A
-        map.put("白髓面积", new IndicatorAddIn("White pulp area", whitePulpArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("白髓面积", new IndicatorAddIn("White pulp area", DecimalUtils.setScale3(whitePulpArea), "平方毫米", CommonConstant.NUMBER_1));
         // B
-        map.put("动脉周围淋巴鞘面积", new IndicatorAddIn("Periarterial lymphatic sheath area", periarterialLymphaticSheathArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("动脉周围淋巴鞘面积", new IndicatorAddIn("Periarterial lymphatic sheath area", DecimalUtils.setScale3(periarterialLymphaticSheathArea), "平方毫米", CommonConstant.NUMBER_1));
         // C
-        map.put("中央动脉面积", new IndicatorAddIn("Central artery area", centralArteryArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("中央动脉面积", new IndicatorAddIn("Central artery area", DecimalUtils.setScale3(centralArteryArea), "平方毫米", CommonConstant.NUMBER_1));
         // D
-        map.put("含铁血黄素面积", new IndicatorAddIn("Hemosiderin area", hemosiderinArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("含铁血黄素面积", new IndicatorAddIn("Hemosiderin area", DecimalUtils.setScale3(hemosiderinArea), "平方毫米", CommonConstant.NUMBER_1));
         // E
-        map.put("红细胞面积", new IndicatorAddIn("Marginal zone area", erythrocyteArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("红细胞面积", new IndicatorAddIn("Marginal zone area", DecimalUtils.setScale3(erythrocyteArea), "平方毫米", CommonConstant.NUMBER_1));
         // G
-        map.put("边缘区面积", new IndicatorAddIn("Marginal zone area", marginalZoneArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("边缘区面积", new IndicatorAddIn("Marginal zone area", DecimalUtils.setScale3(marginalZoneArea), "平方毫米", CommonConstant.NUMBER_1));
         // H
-        map.put("红髓面积", new IndicatorAddIn("Red pulp", redPulpArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("红髓面积", new IndicatorAddIn("Red pulp", DecimalUtils.setScale3(redPulpArea), "平方毫米", CommonConstant.NUMBER_1));
 
         // 产品呈现指标 -------------------------------------------------------------
         if (accurateAreaDecimal.compareTo(BigDecimal.ZERO) != 0) {
             // 白髓面积占比	1	%	White pulp area%	1=A/F
-            String whitePulpAreaRate = whitePulpArea.divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
-            map.put("白髓面积占比", new IndicatorAddIn("White pulp area%", whitePulpAreaRate, "%"));
+            BigDecimal whitePulpAreaRate = whitePulpArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+            map.put("白髓面积占比", new IndicatorAddIn("White pulp area%", DecimalUtils.percentScale3(whitePulpAreaRate), "%"));
 
             // 含铁血黄素面积占比	2	%	White pulp area%%	2=D/F
-            String hemosiderinAreaRate = hemosiderinArea.divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
-            map.put("含铁血黄素面积占比", new IndicatorAddIn("Hemosiderin area%", hemosiderinAreaRate, "%"));
+            BigDecimal hemosiderinAreaRate = hemosiderinArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+            map.put("含铁血黄素面积占比", new IndicatorAddIn("Hemosiderin area%", DecimalUtils.percentScale3(hemosiderinAreaRate), "%"));
 
             // 红髓面积占比	3	%	Red pulp area%	3=H/F
-            String redPulpAreaRate = redPulpArea.divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
-            map.put("红髓面积占比", new IndicatorAddIn("Red pulp area%", redPulpAreaRate, "%"));
+            BigDecimal redPulpAreaRate = redPulpArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+            map.put("红髓面积占比", new IndicatorAddIn("Red pulp area%", DecimalUtils.percentScale3(redPulpAreaRate), "%"));
 
             // 红细胞面积占比	4	%	Erythrocyte area%	4=E/F
-            String erythrocyteAreaRate = erythrocyteArea.divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
-            map.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", erythrocyteAreaRate, "%"));
+            BigDecimal erythrocyteAreaRate = erythrocyteArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+            map.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", DecimalUtils.percentScale3(erythrocyteAreaRate), "%"));
 
             // 边缘区面积占比	5	%	Marginal zone area%	5=G/F
-            String marginalZoneAreaRate = marginalZoneArea.divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
-            map.put("边缘区面积占比", new IndicatorAddIn("Marginal zone area", marginalZoneAreaRate, "%"));
+            BigDecimal marginalZoneAreaRate = marginalZoneArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+            map.put("边缘区面积占比", new IndicatorAddIn("Marginal zone area", DecimalUtils.percentScale3(marginalZoneAreaRate), "%"));
 
             // 动脉周围淋巴鞘面积占比	6	%	Periarterial lymphatic sheath area%	6=（B-C）/F	包含淋巴滤泡
-            String periarterialLymphaticSheathAreaRate = periarterialLymphaticSheathArea.subtract(centralArteryArea).divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
-            map.put("动脉周围淋巴鞘面积占比", new IndicatorAddIn("Periarterial lymphatic sheath area%", periarterialLymphaticSheathAreaRate, "%"));
+            BigDecimal periarterialLymphaticSheathAreaRate = periarterialLymphaticSheathArea.subtract(centralArteryArea).divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+            map.put("动脉周围淋巴鞘面积占比", new IndicatorAddIn("Periarterial lymphatic sheath area%", DecimalUtils.percentScale3(periarterialLymphaticSheathAreaRate), "%"));
         } else {
             map.put("白髓面积占比", new IndicatorAddIn("White pulp area%", "0.000", "%"));
             map.put("含铁血黄素面积占比", new IndicatorAddIn("Hemosiderin area%", "0.000", "%"));
@@ -148,9 +144,8 @@ public class SpleenParserStrategyImpl implements ParserStrategy {
         }
 
         // F
-        map.put("脾脏面积", new IndicatorAddIn("Spleen area", accurateArea, "平方毫米"));
+        map.put("脾脏面积", new IndicatorAddIn("Spleen area", DecimalUtils.setScale3(accurateAreaDecimal), "平方毫米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
-
         log.info("指标计算结束-大鼠脾脏");
     }
 }

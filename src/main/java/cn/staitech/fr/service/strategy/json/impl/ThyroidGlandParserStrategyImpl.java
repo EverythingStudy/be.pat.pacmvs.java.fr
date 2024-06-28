@@ -4,7 +4,6 @@ import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
@@ -88,8 +87,9 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         //        滤泡上皮细胞核数量（单个）	G	个	单个甲状腺滤泡内细胞核数量
         Integer nucleusOfFollicular = commonJsonParser.getOrganAreaCount(jsonTask, "107089");
         //       组织轮廓面积	H	平方毫米	若多个数据则相加输出(H:精细轮廓总面积（甲状腺）-平方毫米  )
-        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        String accurateArea = singleSlide.getArea();
+        String accurateArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
+        BigDecimal accurateAreaDecimal = new BigDecimal(accurateArea);
+
         //        甲状旁腺组织轮廓面积	I	103平方微米	若多个数据则相加输出(I:甲状旁腺组织轮廓面积-平方毫米)
         BigDecimal parathyroidGlandArea = commonJsonParser.getOrganAreaMicron(jsonTask, "108111");
 
@@ -187,7 +187,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         map.put("甲状腺滤泡上皮面积占比（单个）", new IndicatorAddIn("Thyroid follicular epithelium area%(per)", confidenceInterval3, "%"));
 
         // H-I
-        BigDecimal hSubtractI = new BigDecimal(accurateArea).subtract(parathyroidGlandArea).setScale(7, RoundingMode.HALF_UP);
+        BigDecimal hSubtractI = accurateAreaDecimal.subtract(parathyroidGlandArea).setScale(7, RoundingMode.HALF_UP);
 
         //        血管面积占比	4	%	Vessel area%	4=C/(H-I) 	运算前注意统一单位
         if (hSubtractI.compareTo(BigDecimal.ZERO) != 0) {
@@ -216,7 +216,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         map.put("滤泡上皮细胞核密度（单个）", new IndicatorAddIn("Nucleus density of follicular cell (per)", confidenceInterval8, "个/10³平方微米"));
 
         // H 甲状腺面积	9	平方毫米	Thyroid gland area	9=H	当前甲状腺面积是甲状腺和甲状旁腺的面积总和
-        map.put("甲状腺面积", new IndicatorAddIn("Thyroid gland area", accurateArea, "平方毫米"));
+        map.put("甲状腺面积", new IndicatorAddIn("Thyroid gland area", DecimalUtils.setScale3(accurateAreaDecimal), "平方毫米"));
 
         // 甲状旁腺组织轮廓面积	I	103平方微米	若多个数据则相加输出
         // 甲状旁腺面积	10	103平方微米	Parathyroid gland area	10=I

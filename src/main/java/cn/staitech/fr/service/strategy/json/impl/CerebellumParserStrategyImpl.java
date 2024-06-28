@@ -11,6 +11,7 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import cn.staitech.fr.utils.DecimalUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -69,7 +70,6 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
         BigDecimal extravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, "13D003", "13D004", false).getStructureAreaNum();
 
         //        组织面积	C	平方毫米	此组织面积为小脑＋脑干面积
-
         //        产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后3位）	English	计算方式	备注
         //        血管外红细胞面积占比	1	%	Extravascular erythrocyte area%	1=B/C	无
         //        血管内红细胞面积	2	%	Intravascular Erythrocyte area%	2=A/C	无
@@ -93,44 +93,42 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
         //        小脑和脑干面积	3	平方毫米	Cerebellum and Brainstem area	3=C	此组织面积为小脑＋脑干面积
 
         // String erythrocyteArea = commonJsonParser.getOrganArea(jsonTask, "13D004").getStructureAreaNum().toString();
-        String molecularLevelerythrocyteArea = commonJsonParser.getOrganArea(jsonTask, "13E0A9").getStructureAreaNum().toString();
-        String granulocyteAndPurkinjeArea = commonJsonParser.getOrganArea(jsonTask, "13E0A5").getStructureAreaNum().toString();
-
+        BigDecimal molecularLevelerythrocyteArea = commonJsonParser.getOrganArea(jsonTask, "13E0A9").getStructureAreaNum();
+        BigDecimal granulocyteAndPurkinjeArea = commonJsonParser.getOrganArea(jsonTask, "13E0A5").getStructureAreaNum();
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         BigDecimal accurateAreaDecimal = new BigDecimal(singleSlide.getArea());
 
         // 算法输出指标 -------------------------------------------------------------
         // 脑干
         // A
-        map.put("血管内红细胞面积", new IndicatorAddIn("Extravascular erythrocyte area", intravascularErythrocyteArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("血管内红细胞面积", new IndicatorAddIn("Extravascular erythrocyte area", DecimalUtils.setScale3(intravascularErythrocyteArea), "平方毫米", CommonConstant.NUMBER_1));
         // B
-        map.put("血管外红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", extravascularErythrocyteArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("血管外红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", DecimalUtils.setScale3(extravascularErythrocyteArea), "平方毫米", CommonConstant.NUMBER_1));
         // 小脑
         // A
-        map.put("颗粒细胞层＋浦肯野细胞层面积", new IndicatorAddIn("Granulocyte and Purkinje cell layer area", granulocyteAndPurkinjeArea, "平方毫米", CommonConstant.NUMBER_1));
+        map.put("颗粒细胞层＋浦肯野细胞层面积", new IndicatorAddIn("Granulocyte and Purkinje cell layer area", DecimalUtils.setScale3(granulocyteAndPurkinjeArea), "平方毫米", CommonConstant.NUMBER_1));
         // B
-        map.put("分子层红细胞面积", new IndicatorAddIn("erythrocyte area", molecularLevelerythrocyteArea, "平方毫米", CommonConstant.NUMBER_1));
+        map.put("分子层红细胞面积", new IndicatorAddIn("erythrocyte area", DecimalUtils.setScale3(molecularLevelerythrocyteArea), "平方毫米", CommonConstant.NUMBER_1));
 
         // 产品呈现指标 -------------------------------------------------------------
-
         if (accurateAreaDecimal.compareTo(BigDecimal.ZERO) != 0) {
             // 脑干
             // 血管外红细胞面积占比	1	%	Extravascular erythrocyte area%	1=B/C	无
-            String extravascularErythrocyteAreaRate = extravascularErythrocyteArea.divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
-            map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", extravascularErythrocyteAreaRate, "%"));
+            BigDecimal extravascularErythrocyteAreaRate = extravascularErythrocyteArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+            map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", DecimalUtils.percentScale3(extravascularErythrocyteAreaRate), "%"));
 
             // 血管内红细胞面积	2	%	Intravascular Erythrocyte area%	2=A/C	无
-            String intravascularErythrocyteAreaRate = intravascularErythrocyteArea.divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
-            map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", intravascularErythrocyteAreaRate, "%"));
+            BigDecimal intravascularErythrocyteAreaRate = intravascularErythrocyteArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+            map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", DecimalUtils.percentScale3(intravascularErythrocyteAreaRate), "%"));
 
             // 小脑
             // 颗粒细胞层和浦肯野细胞层面积占比	1	%	Granulocyte and Purkinje cell layer area % 	1=A/C	无
-            String granulocyteAndPurkinjeCellLayerAreaRate = new BigDecimal(granulocyteAndPurkinjeArea).divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
-            map.put("颗粒细胞层和浦肯野细胞层面积占比", new IndicatorAddIn("Granulocyte and Purkinje cell layer area %", granulocyteAndPurkinjeCellLayerAreaRate, "%"));
+            BigDecimal granulocyteAndPurkinjeCellLayerAreaRate = granulocyteAndPurkinjeArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+            map.put("颗粒细胞层和浦肯野细胞层面积占比", new IndicatorAddIn("Granulocyte and Purkinje cell layer area %", DecimalUtils.percentScale3(granulocyteAndPurkinjeCellLayerAreaRate), "%"));
 
             // 分子层红细胞面积占比	2	%	Molecular level erythrocyte area%	2=B/C	无
-            String molecularLevelErythrocyteAreaRate = new BigDecimal(molecularLevelerythrocyteArea).divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
-            map.put("分子层红细胞面积占比", new IndicatorAddIn("Molecular level erythrocyte area%", molecularLevelErythrocyteAreaRate, "%"));
+            BigDecimal molecularLevelErythrocyteAreaRate = molecularLevelerythrocyteArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+            map.put("分子层红细胞面积占比", new IndicatorAddIn("Molecular level erythrocyte area%", DecimalUtils.percentScale3(molecularLevelErythrocyteAreaRate), "%"));
         } else {
             map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", "0.000", "%"));
             map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", "0.000", "%"));
@@ -139,10 +137,8 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
         }
 
         // C 小脑和脑干面积	3	平方毫米	Cerebellum and Brainstem area	3=C	此组织面积为小脑＋脑干面积
-        map.put("小脑和脑干面积", new IndicatorAddIn("Cerebellum and Brainstem area", accurateAreaDecimal.toString(), "平方毫米"));
-
+        map.put("小脑和脑干面积", new IndicatorAddIn("Cerebellum and Brainstem area", DecimalUtils.setScale3(accurateAreaDecimal), "平方毫米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
-
         log.info("指标计算结束-大鼠脑干（合并）、大鼠小脑(合并）");
     }
 }

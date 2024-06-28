@@ -91,7 +91,7 @@ public class IleumParserStrategyImpl implements ParserStrategy {
         // 回肠面积
         BigDecimal subtractFA = new BigDecimal(0);
         if (tissueArea.compareTo(BigDecimal.ZERO) != 0) {
-            subtractFA = tissueArea.subtract(colonArea).setScale(3, RoundingMode.HALF_UP);
+            subtractFA = tissueArea.subtract(colonArea).setScale(7, RoundingMode.HALF_UP);
         }
 
         // 算法输出指标 -------------------------------------------------------------

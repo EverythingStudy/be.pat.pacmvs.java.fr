@@ -92,9 +92,9 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
 
         // 算法输出指标 -------------------------------------------------------------
         // B
-        map.put("生发中心面积（全片）", new IndicatorAddIn("Number of germinal center", germinalCenterArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("生发中心面积（全片）", new IndicatorAddIn("Number of germinal center", DecimalUtils.setScale3(germinalCenterArea), "平方毫米", CommonConstant.NUMBER_1));
         // C
-        map.put("髓质面积", new IndicatorAddIn("Medulla area", medullaArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
+        map.put("髓质面积", new IndicatorAddIn("Medulla area", DecimalUtils.setScale3(medullaArea), "平方毫米", CommonConstant.NUMBER_1));
         // 产品呈现指标 -------------------------------------------------------------
 
         // A
@@ -120,7 +120,6 @@ public class MandibularLymphNodeParserStrategyImpl implements ParserStrategy {
 
         // D
         map.put("淋巴结面积", new IndicatorAddIn("Lymph node area", DecimalUtils.setScale3(accurateAreaDecimal), "平方毫米"));
-
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
         log.info("指标计算结束-颌下淋巴结");
     }

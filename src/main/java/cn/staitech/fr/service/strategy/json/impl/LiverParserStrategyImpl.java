@@ -63,7 +63,6 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         //        肝脏
 
         // 结构编码 -------------------------------------------------------------
-        //        结构	编码
         //        门管区	112145
         //        中央静脉	112146
         //        大静脉	112147
@@ -76,9 +75,9 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         //        算法输出指标	指标代码（仅限本文档）	单位（保留小数点后三位）	备注
         //        门管区面积（单个）	A	103平方微米	单个门管区面积
         //        中央静脉面积	B	103平方微米	若多个数据则相加输出
-        BigDecimal centralVeinsArea = commonJsonParser.getOrganAreaMicron(jsonTask, "112147").multiply(new BigDecimal(1000)).setScale(3, RoundingMode.HALF_UP);
+        BigDecimal centralVeinsArea = commonJsonParser.getOrganAreaMicron(jsonTask, "112147").multiply(new BigDecimal(1000));
         //        大静脉面积	C	103平方微米	若多个数据则相加输出
-        BigDecimal venaCavaArea = commonJsonParser.getOrganAreaMicron(jsonTask, "112146").multiply(new BigDecimal(1000)).setScale(3, RoundingMode.HALF_UP);
+        BigDecimal venaCavaArea = commonJsonParser.getOrganAreaMicron(jsonTask, "112146").multiply(new BigDecimal(1000));
         //        肝细胞核数量	D	个(肝细胞核数量 D 个 肝细胞核	112149)
         Integer nucleusCount = commonJsonParser.getOrganAreaCount(jsonTask, "112149");
         //        窦内细胞核数量	G	个
@@ -98,7 +97,6 @@ public class LiverParserStrategyImpl implements ParserStrategy {
             for (Annotation annotation : structureContourList) {
                 // A 门管区面积（单个）	A	103平方微米	单个门管区面积
                 BigDecimal structureAreaNum = annotation.getStructureAreaNum().multiply(new BigDecimal(1000));
-
                 Annotation contourInsideOrOutside = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "11214A", true);
 
                 // E 胆管数量（单个门管区）	E	个	单个门管区内胆管数量
@@ -123,7 +121,6 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         String confidenceInterval = MathUtils.getConfidenceInterval(lists);
         String confidenceInterval1 = MathUtils.getConfidenceInterval(listNum);
 
-
         //        产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
         //        肝脏面积	1	平方毫米	Liver area	1=H
         //        静脉面积占比	2	%	Vein area%	2=(B+C)/H	运算前注意统一单位
@@ -146,9 +143,9 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "112145", annotationC, 1);
         map.put("门管区面积（单个）", new IndicatorAddIn());
         // B
-        map.put("中央静脉面积", new IndicatorAddIn("central veins area", centralVeinsArea.toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        map.put("中央静脉面积", new IndicatorAddIn("central veins area", DecimalUtils.setScale3(centralVeinsArea), "10³平方微米", CommonConstant.NUMBER_1));
         // C
-        map.put("大静脉面积", new IndicatorAddIn("vena cava area", venaCavaArea.toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        map.put("大静脉面积", new IndicatorAddIn("vena cava area", DecimalUtils.setScale3(venaCavaArea), "10³平方微米", CommonConstant.NUMBER_1));
         // D
         map.put("肝细胞核数量", new IndicatorAddIn("Nucleus count of hepatocyte", nucleusCount.toString(), "个", CommonConstant.NUMBER_1));
 
@@ -175,18 +172,17 @@ public class LiverParserStrategyImpl implements ParserStrategy {
 
         if (accurateAreaDecimal.compareTo(BigDecimal.ZERO) != 0) {
             // 静脉面积占比	2	%	Vein area%	2=(B+C)/H	运算前注意统一单位  （10³平方微米/平方毫米）
-            String accurateAreaDecimalRate = centralVeinsArea.add(venaCavaArea)
-                    .divide(accurateAreaDecimal.multiply(new BigDecimal(1000)), 10, RoundingMode.HALF_UP)
-                    .multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
-            map.put("静脉面积占比", new IndicatorAddIn("Vein area%", accurateAreaDecimalRate, "%"));
+            BigDecimal accurateAreaDecimalRate = centralVeinsArea.add(venaCavaArea)
+                    .divide(accurateAreaDecimal.multiply(new BigDecimal(1000)), 7, RoundingMode.HALF_UP);
+            map.put("静脉面积占比", new IndicatorAddIn("Vein area%", DecimalUtils.percentScale3(accurateAreaDecimalRate), "%"));
 
             // 肝细胞核密度	3	个/平方毫米	Nucleus density of hepatocyte	3=D/H
-            BigDecimal density = new BigDecimal(nucleusCount).divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP);
-            map.put("肝细胞核密度", new IndicatorAddIn("Nucleus density of hepatocyte", DecimalUtils.setScale3(density), "个/平方毫米"));
+            BigDecimal density = new BigDecimal(nucleusCount).divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+            map.put("肝细胞核密度", new IndicatorAddIn("Nucleus density of hepatocyte", DecimalUtils.percentScale3(density), "个/平方毫米"));
 
             // 窦内细胞核密度	6	个/平方毫米	Nucleus density of Sinus cell	6=G/H
-            BigDecimal nucleusDensityOfSinusCellRate = new BigDecimal(sinusNnucleusCount).divide(accurateAreaDecimal, 10, RoundingMode.HALF_UP);
-            map.put("窦内细胞核密度", new IndicatorAddIn("Nucleus density of Sinus cell", DecimalUtils.setScale3(nucleusDensityOfSinusCellRate), "个/平方毫米"));
+            BigDecimal nucleusDensityOfSinusCellRate = new BigDecimal(sinusNnucleusCount).divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+            map.put("窦内细胞核密度", new IndicatorAddIn("Nucleus density of Sinus cell", DecimalUtils.percentScale3(nucleusDensityOfSinusCellRate), "个/平方毫米"));
         } else {
             map.put("静脉面积占比", new IndicatorAddIn("Vein area%", "0.000", "%"));
             map.put("肝细胞核密度", new IndicatorAddIn("Nucleus density of hepatocyte", "0.000", "个/平方毫米"));

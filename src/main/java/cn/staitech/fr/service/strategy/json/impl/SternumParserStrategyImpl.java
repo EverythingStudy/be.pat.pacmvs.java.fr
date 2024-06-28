@@ -173,10 +173,10 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 		//		}
 
 		//		if(bigDecimalE.compareTo(BigDecimal.ZERO) != 0) {
-		indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalE), "10³平方微米", "1"));
+		indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalE.setScale(3, RoundingMode.HALF_UP)), "10³平方微米", "1"));
 		//		}
 		//		if(bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
-		indicatorResultsMap.put("脂肪细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalF), "10³平方微米", "1"));
+		indicatorResultsMap.put("脂肪细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalF.setScale(3, RoundingMode.HALF_UP)), "10³平方微米", "1"));
 		//		}
 //				if(bigDecimalGM.compareTo(BigDecimal.ZERO) != 0) {
 //				indicatorResultsMap.put("骨质面积", new IndicatorAddIn("", String.valueOf(bigDecimalGM), "10³平方微米", "1"));
@@ -184,28 +184,28 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 
 		//AI指标保存
 		if(BigDecimalA_G.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("骨髓腔面积", new IndicatorAddIn("Bone marrow area", String.valueOf(BigDecimalA_G), "平方毫米", "0"));
+			indicatorResultsMap.put("骨髓腔面积", new IndicatorAddIn("Bone marrow area", String.valueOf(BigDecimalA_G.setScale(3, RoundingMode.HALF_UP)), "平方毫米", "0"));
 		}
 		if(BigDecimalC_B.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("粒红比", new IndicatorAddIn("Myelocyte:erythropoiesis ratio", String.valueOf(BigDecimalC_B), "无", "0"));
+			indicatorResultsMap.put("粒红比", new IndicatorAddIn("Myelocyte:erythropoiesis ratio", String.valueOf(BigDecimalC_B.setScale(3, RoundingMode.HALF_UP)), "无", "0"));
 		}
 		if(BigDecimalE_A_G.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", String.valueOf(BigDecimalE_A_G), "%", "0"));
+			indicatorResultsMap.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", String.valueOf(BigDecimalE_A_G.setScale(3, RoundingMode.HALF_UP)), "%", "0"));
 		}
 		if(bigDecimalF_A_G.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("脂肪细胞面积占比", new IndicatorAddIn("", String.valueOf(bigDecimalF_A_G), "%", "0"));
+			indicatorResultsMap.put("脂肪细胞面积占比", new IndicatorAddIn("", String.valueOf(bigDecimalF_A_G.setScale(3, RoundingMode.HALF_UP)), "%", "0"));
 		}
 		if(bigDecimalC_A_G.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("粒系细胞密度", new IndicatorAddIn("Density of myelocyte", String.valueOf(bigDecimalC_A_G), "个/平方毫米", "0"));
+			indicatorResultsMap.put("粒系细胞密度", new IndicatorAddIn("Density of myelocyte", String.valueOf(bigDecimalC_A_G.setScale(3, RoundingMode.HALF_UP)), "个/平方毫米", "0"));
 		}
 		if(bigDecimalB_A_G.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("红系细胞核密度", new IndicatorAddIn("Nucleus density of erythropoiesis", String.valueOf(bigDecimalB_A_G), "个/平方毫米", "0"));
+			indicatorResultsMap.put("红系细胞核密度", new IndicatorAddIn("Nucleus density of erythropoiesis", String.valueOf(bigDecimalB_A_G.setScale(3, RoundingMode.HALF_UP)), "个/平方毫米", "0"));
 		}
 		if(bigDecimalD_A_G.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("巨核系细胞密度", new IndicatorAddIn("Density of megakaryocyte", String.valueOf(bigDecimalD_A_G), "个/平方毫米", "0"));
+			indicatorResultsMap.put("巨核系细胞密度", new IndicatorAddIn("Density of megakaryocyte", String.valueOf(bigDecimalD_A_G.setScale(3, RoundingMode.HALF_UP)), "个/平方毫米", "0"));
 		}
 		if(bigDecimalH.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("胸骨面积", new IndicatorAddIn("Sternum area", String.valueOf(bigDecimalH), "平方毫米", "0"));
+			indicatorResultsMap.put("胸骨面积", new IndicatorAddIn("Sternum area", String.valueOf(bigDecimalH.setScale(3, RoundingMode.HALF_UP)), "平方毫米", "0"));
 		}
 
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);

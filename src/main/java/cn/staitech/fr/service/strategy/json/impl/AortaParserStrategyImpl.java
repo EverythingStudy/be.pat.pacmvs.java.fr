@@ -129,7 +129,7 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 			bigDecimalBC= bigDecimalBC.multiply(new BigDecimal("1000"));
 			BigDecimal  bigDecimal2 = new BigDecimal(2);
 			BigDecimal mal =  bigDecimal2.multiply(commonJsonParser.getProportionMultiply(bigDecimalDA, bigDecimalBC));
-			indicatorResultsMap.put("主动脉壁平均厚度", new IndicatorAddIn("Average thickness of aorta wall", String.valueOf(mal), "微米", "0"));
+			indicatorResultsMap.put("主动脉壁平均厚度", new IndicatorAddIn("Average thickness of aorta wall", String.valueOf(mal.setScale(3, RoundingMode.HALF_UP)), "微米", "0"));
 		}
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 	}
