@@ -220,6 +220,9 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             for (AiForecast aiForecast : aiForecasts) {
                 AiForecastListOut exportAiListVO = new AiForecastListOut();
                 BeanUtils.copyProperties(aiForecast, exportAiListVO);
+                if(new BigDecimal(aiForecast.getResults()).compareTo(BigDecimal.ZERO)<0){
+                    exportAiListVO.setResults("?");
+                }
                 //范围数据
                 if (StringUtils.isNotEmpty(special.getControlGroup())&& !CommonConstant.SINGLE_RESULT.equals(aiForecast.getQuantitativeIndicators())) {
 
@@ -258,6 +261,9 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
 
             //正态分布(下限)
             BigDecimal subtract2 = bigDecimal.subtract(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
+            if(subtract2.compareTo(BigDecimal.ZERO)<0){
+                subtract2=BigDecimal.ZERO.setScale(3);
+            }
             //正态分布(上限)
             BigDecimal add2 = bigDecimal.add(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
             exportAiListVO.setNormalDistribution(subtract2+"-"+add2);
