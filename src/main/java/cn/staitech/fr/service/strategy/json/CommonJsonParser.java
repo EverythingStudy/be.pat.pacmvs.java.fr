@@ -256,7 +256,24 @@ public class CommonJsonParser {
                     annotationMapper.deleteAiAnnotation(annotation3);
                 }
             }
-
+            if (Objects.equals(jsonTask.getAlgorithmCode(), "Thyroid_gland")) {
+                Annotation annotation1 = new Annotation();
+                annotation1.setMagnification(40000L);
+                annotation1.setFiligreeContour(true);
+                annotation1.setCategoryId(pathologicalMap.get("108111"));
+                annotation1.setSingleSlideId(jsonTask.getSingleId());
+                List<Annotation> annotationLists = annotationMapper.selectListBy(annotation1);
+                Annotation annotation4 = annotationMapper.collectGeometry(jsonTask.getSingleId());
+                if (CollectionUtil.isNotEmpty(annotationLists)) {
+                    annotation4.setContour(annotation4.getCollectContour());
+                    Annotation annotation2 = annotationMapper.stIsValid(annotation4);
+                    if (ObjectUtil.equals(annotation2.getResults(), "t")) {
+                        annotation3.setSequenceNumber(sequenceNumber);
+                        annotation3.setSingleSlideId(jsonTask.getSingleId());
+                        annotationMapper.deleteAiAnnotation(annotation3);
+                    }
+                }
+            }
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
@@ -421,7 +438,7 @@ public class CommonJsonParser {
             String result1 = annotationMapper.stIsValid(annotation1).getResults();
             if (Objects.equals(result1, "t")) {
                 annotation.setContour(annotation1.getContour());
-            }else{
+            } else {
                 return new Annotation();
             }
         }
@@ -451,7 +468,7 @@ public class CommonJsonParser {
             String result1 = annotationMapper.stIsValid(annotation1).getResults();
             if (Objects.equals(result1, "t")) {
                 annotation.setContour(annotation1.getContour());
-            }else{
+            } else {
                 return new Annotation();
             }
         }
@@ -500,7 +517,7 @@ public class CommonJsonParser {
                 dynamicData.setUnit(annotation.getCountUnit());
                 jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
             }
-            if(jsonArray.size() > 0){
+            if (jsonArray.size() > 0) {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("dynamicData", jsonArray);
                 i.setSequenceNumber(sequenceNumber);
@@ -558,7 +575,7 @@ public class CommonJsonParser {
                 dynamicData.setUnit(annotation.getCountUnit());
                 jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
             }
-            if(jsonArray.size() > 0){
+            if (jsonArray.size() > 0) {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("dynamicData", jsonArray);
                 i.setSequenceNumber(sequenceNumber);
@@ -614,7 +631,7 @@ public class CommonJsonParser {
                 dynamicData.setUnit(annotation.getPerimeterUnit());
                 jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
             }
-            if(jsonArray.size() > 0){
+            if (jsonArray.size() > 0) {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("dynamicData", jsonArray);
                 i.setSequenceNumber(sequenceNumber);
@@ -653,7 +670,7 @@ public class CommonJsonParser {
             dynamicData.setUnit(annotation.getPerimeterUnit());
             jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
         }
-        if(jsonArray.size() > 0){
+        if (jsonArray.size() > 0) {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("dynamicData", jsonArray);
             annotation.setSequenceNumber(sequenceNumber);
@@ -777,6 +794,14 @@ public class CommonJsonParser {
             return BigDecimal.ZERO;
         }
         return bigDecimal1.divide(bigDecimal2, 3, RoundingMode.HALF_UP);
+    }
+
+
+    public BigDecimal bigDecimalDivideChecks(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
+        if (null == bigDecimal1 || null == bigDecimal2 || bigDecimal1.compareTo(BigDecimal.ZERO) == 0 || bigDecimal2.compareTo(BigDecimal.ZERO) == 0) {
+            return BigDecimal.ZERO;
+        }
+        return bigDecimal1.divide(bigDecimal2,9,RoundingMode.HALF_UP);
     }
 
     public BigDecimal sqrt(BigDecimal number) {
