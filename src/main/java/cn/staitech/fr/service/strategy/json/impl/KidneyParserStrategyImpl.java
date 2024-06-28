@@ -81,21 +81,23 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         //Integer count = getOrganAreaCount(jsonTask, "11B03D");
         Annotation a11B03D = getOrganArea(jsonTask, "11B03D");
-        Annotation a11B111 = getOrganArea(jsonTask, "11B111");
+        //Annotation a11B111 = getOrganArea(jsonTask, "11B111");
         BigDecimal b11B03D =  a11B03D.getStructureAreaNum();
-        BigDecimal b11B111 =  a11B111.getStructureAreaNum();
+        BigDecimal b11B111 =  new BigDecimal(singleSlide.getArea());
 
         Integer count = getOrganAreaCount(jsonTask, "11B031");
         indicatorResultsMap.put("肾小管数量", new IndicatorAddIn("", String.valueOf(count), "个", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("肾皮质面积", new IndicatorAddIn("",b11B03D.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
 
-        //indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("肾脏面积", new IndicatorAddIn("Renal area%", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_0));
 
         indicatorResultsMap.put("肾小球面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("球内红细胞面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("球内细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("肾小管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        indicatorResultsMap.clear();
         List<Annotation> bs = getStructureContourList(jsonTask, "11B02D");
         List<BigDecimal> bsb = bs.stream().map(annotation -> {
             BigDecimal temp = annotation.getStructureAreaNum();
@@ -103,7 +105,8 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         }).collect(Collectors.toList());
         indicatorResultsMap.put("肾小球面积（单个）", createComplexIndicator(bsb, "Glomerulus area (per)", "10³平方微米", CommonConstant.NUMBER_0));
         List<BigDecimal> cb = new ArrayList<>();
-        for (Annotation annotation : bs){
+        List<Annotation> bs1 = getStructureContourList(jsonTask, "11B02D");
+        for (Annotation annotation : bs1){
             Annotation temp = getContourInsideOrOutside(jsonTask,annotation.getContour(),"11B02E",true);
             Integer c = temp.getCount();
             if (c != null && c > 0) {
@@ -127,7 +130,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("球内红细胞面积（单个）", createComplexIndicator(db, "Erythrocyte of glomerulus area% (per)", "个/平方毫米", CommonConstant.NUMBER_0));
         List<Annotation> f = getStructureContourList(jsonTask, "11B031");
         if (CollectionUtils.isNotEmpty(f)){
-            List<BigDecimal> fb = bs.stream().map(annotation -> {
+            List<BigDecimal> fb = f.stream().map(annotation -> {
                 BigDecimal temp = annotation.getStructureAreaNum();
                 return temp.multiply(BigDecimal.valueOf(1000));
             }).collect(Collectors.toList());

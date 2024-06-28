@@ -99,9 +99,12 @@ public class SublingualGlandParserStrategyImpl extends AbstractCustomParserStrat
         }
         indicatorResultsMap.put("导管上皮面积占比（单个）", createComplexIndicator(dataList, "Duct epithelium area% (per)", "%", CommonConstant.NUMBER_0));
         Annotation annotationBy = new Annotation();
-        annotationBy.setCountName("导管面积（单个）");
+        annotationBy.setAreaName("导管面积（单个）");
         annotationBy.setAreaUnit("10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"10A06F",annotationBy,1);
+        annotationBy.setAreaName("导管内腔面积（单个）");
+        annotationBy.setAreaUnit("平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"10A121",annotationBy,2);
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 
