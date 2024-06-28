@@ -85,11 +85,11 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy 
 //		}
 		if(areaDecimalB.compareTo(BigDecimal.ZERO) != 0) {
 //			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(areaDecimalB), "10³平方微米", "1"));
-			indicatorResultsMap.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", String.valueOf(areaDecimalB), "10³平方微米", "0"));
+			indicatorResultsMap.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", String.valueOf(areaDecimalB.setScale(3, RoundingMode.HALF_UP)), "10³平方微米", "0"));
 		}
 
 		if(bigDecimaE.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("主细胞核密度", new IndicatorAddIn("Nucleus density of chief cell", String.valueOf(bigDecimaE), "个/10³平方微米", "0"));
+			indicatorResultsMap.put("主细胞核密度", new IndicatorAddIn("Nucleus density of chief cell", String.valueOf(bigDecimaE.setScale(3, RoundingMode.HALF_UP)), "个/10³平方微米", "0"));
 		}
 
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);

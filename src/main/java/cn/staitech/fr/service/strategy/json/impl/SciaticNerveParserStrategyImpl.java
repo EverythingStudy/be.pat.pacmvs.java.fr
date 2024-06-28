@@ -65,7 +65,7 @@ public class SciaticNerveParserStrategyImpl extends AbstractCustomParserStrategy
 		 BigDecimal pituitaryA = getOrganArea(jsonTask, "1400BB").getStructureAreaNum();
 		if(null != pituitaryA){
 //			pituitaryA = pituitaryA.setScale(3, RoundingMode.HALF_UP);
-			pituitaryA = commonJsonParser.getBigDecimalValue(pituitaryA);
+			pituitaryA = commonJsonParser.getBigDecimalValue(pituitaryA).setScale(3, RoundingMode.HALF_UP);
 			String accurateArea = areaUtils.convertToSquareMicrometer(pituitaryA.toString());
 			//神经纤维束面积	1	10³平方微米	Nerve fiber bundles area	1=A
 //			indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("", accurateArea, "10³平方微米", "1"));
@@ -79,13 +79,13 @@ public class SciaticNerveParserStrategyImpl extends AbstractCustomParserStrategy
 		if(null != bigDecimalB){
 			bigDecimalB = bigDecimalB.setScale(3, RoundingMode.HALF_UP);
 			bigDecimalB = commonJsonParser.getBigDecimalValue(bigDecimalB);
-			indicatorResultsMap.put("神经外膜结缔组织面积", new IndicatorAddIn("", String.valueOf(bigDecimalB), "平方毫米", "1"));
+			indicatorResultsMap.put("神经外膜结缔组织面积", new IndicatorAddIn("", String.valueOf(bigDecimalB.setScale(3, RoundingMode.HALF_UP)), "平方毫米", "1"));
 			
 		}
 		//结缔组织面积	2	平方毫米	Connective tissue area	2=B-A
 		if(bigDecimalB.compareTo(BigDecimal.ZERO) != 0 && pituitaryA.compareTo(BigDecimal.ZERO) != 0){
 			BigDecimal BigDecimalB_A = bigDecimalB.subtract(pituitaryA);
-			indicatorResultsMap.put("结缔组织面积", new IndicatorAddIn("Connective tissue area", String.valueOf(BigDecimalB_A), "平方毫米", "0"));
+			indicatorResultsMap.put("结缔组织面积", new IndicatorAddIn("Connective tissue area", String.valueOf(BigDecimalB_A.setScale(3, RoundingMode.HALF_UP)), "平方毫米", "0"));
 		}
 
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
