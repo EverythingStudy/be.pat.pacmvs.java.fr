@@ -220,12 +220,12 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             for (AiForecast aiForecast : aiForecasts) {
                 AiForecastListOut exportAiListVO = new AiForecastListOut();
                 BeanUtils.copyProperties(aiForecast, exportAiListVO);
-                if(new BigDecimal(aiForecast.getResults()).compareTo(BigDecimal.ZERO)<0){
-                    exportAiListVO.setResults("?");
-                }
+
                 //范围数据
                 if (StringUtils.isNotEmpty(special.getControlGroup())&& !CommonConstant.SINGLE_RESULT.equals(aiForecast.getQuantitativeIndicators())) {
-
+                    if(new BigDecimal(aiForecast.getResults()).compareTo(BigDecimal.ZERO)<0){
+                        exportAiListVO.setResults("?");
+                    }
                     setReferenceScope(special, singleSlideId, exportAiListVO, categorys,slide.getGenderFlag(),structType);
 
                 }
