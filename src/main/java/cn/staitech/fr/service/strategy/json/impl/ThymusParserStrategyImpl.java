@@ -105,7 +105,7 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
             A = organArea2.add(organArea4);
             b3 = commonJsonParser.getProportion(F.subtract(A), organArea2);
         }
-        indicatorResultsMap.put("皮质面积", new IndicatorAddIn("", A.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("皮质面积", new IndicatorAddIn("", F.subtract(A).setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("髓质占比", new IndicatorAddIn("Medulla area%", String.valueOf(b2), "%", CommonConstant.NUMBER_0));
         indicatorResultsMap.put("皮髓比", new IndicatorAddIn("Cortex:medulla ratio", String.valueOf(b3), "%", CommonConstant.NUMBER_0));
 

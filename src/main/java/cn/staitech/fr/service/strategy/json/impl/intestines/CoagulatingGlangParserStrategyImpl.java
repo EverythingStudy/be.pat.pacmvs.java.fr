@@ -162,8 +162,9 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         // 腺泡上皮细胞核密度（单个）	4	个/平方毫米	Nucleus density of acinar epithelium (per)	4=E/A 以95%置信区间和均数±标准差呈现
         map.put("腺泡上皮细胞核密度（单个）", new IndicatorAddIn("Nucleus density of acinar epithelium (per)", confidenceInterval1, "个/平方毫米"));
 
-        // 间质和肌层面积占比	5	%	Mesenchyme and muscular area%	5=(F-B-D)/F
+
         if (tissueArea.compareTo(BigDecimal.ZERO) != 0) {
+            // 间质和肌层面积占比	5	%	Mesenchyme and muscular area%	5=(F-B-D)/F
             BigDecimal mesenchymeAndMuscularAreaRate = tissueArea.subtract(colonArea).subtract(areaNum2).divide(tissueArea, 7, RoundingMode.HALF_UP);
             map.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", DecimalUtils.percentScale3(mesenchymeAndMuscularAreaRate), "%"));
         } else {
