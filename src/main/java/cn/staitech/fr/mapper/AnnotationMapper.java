@@ -69,7 +69,7 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
     Annotation collectGeometry(Long singleSlideId);
 
-    Annotation stUnionContour(Annotation annotation);
+    Annotation stUnionContourArea(Annotation annotation);
 
     Annotation intersectsGeometry(Annotation annotation);
 
