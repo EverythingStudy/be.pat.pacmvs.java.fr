@@ -110,7 +110,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         // 生精小管厚度（单个）
         List<BigDecimal> list2 = new ArrayList<>();
         for (Annotation i : annotationList1) {
-            Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12E0FB", true);
+            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12E0FB", true);
             BigDecimal sqrt1 = commonJsonParser.sqrt(commonJsonParser.bigDecimalDivideCheck(i.getStructurePerimeterNum(),BigDecimal.valueOf(Double.parseDouble(A))));
             BigDecimal sqrt2 = commonJsonParser.sqrt(commonJsonParser.bigDecimalDivideCheck(annotation2.getStructurePerimeterNum(),BigDecimal.valueOf(Double.parseDouble(A))));
             BigDecimal res = areaUtils.convertToUm(sqrt1.subtract(sqrt2));
@@ -120,14 +120,14 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         // 生精细胞核密度（单个）
         List<BigDecimal> list3 = new ArrayList<>();
         for (Annotation i : annotationList1) {
-            Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12E0FC", true);
+            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12E0FC", true);
             list3.add(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()),i.getStructurePerimeterNum()));
         }
         String nucleusDensityOfSpermatogenicCells = MathUtils.getConfidenceInterval(list3);
         // 支持细胞核密度（单个）
         List<BigDecimal> list4 = new ArrayList<>();
         for (Annotation i : annotationList1) {
-            Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12E0FD", true);
+            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12E0FD", true);
             list4.add(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()),i.getStructurePerimeterNum()));
 
         }
@@ -136,8 +136,8 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         // 生精细胞核：支持细胞核（单个）
         List<BigDecimal> list5 = new ArrayList<>();
         for (Annotation i : annotationList1) {
-            Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12E0FC", true);
-            Annotation annotation3 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12E0FD", true);
+            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12E0FC", true);
+            Annotation annotation3 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12E0FD", true);
             list5.add(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()),BigDecimal.valueOf(annotation3.getCount())));
         }
         String nucleusDensityOfSpermatogenicCellsSupportCells = MathUtils.getConfidenceInterval(list5);

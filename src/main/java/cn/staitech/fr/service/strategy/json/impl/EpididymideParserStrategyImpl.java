@@ -138,7 +138,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         List<BigDecimal> list1 = new ArrayList<>();
         List<Annotation> annotationList1 = commonJsonParser.getStructureContourList(jsonTask,"12F0F5");
         for(Annotation i : annotationList1){
-            Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
+            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
             list1.add(one.subtract(commonJsonParser.bigDecimalDivideCheck(i.getStructureAreaNum(),annotation2.getStructureAreaNum())));
         }
         String mucosalAreaPer = MathUtils.getConfidenceInterval(list1);
@@ -147,7 +147,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         List<BigDecimal> list2 = new ArrayList<>();
         List<Annotation> annotationList2 = commonJsonParser.getStructureContourList(jsonTask,"12F0F4");
         for(Annotation i : annotationList2){
-            Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12F0F7", true);
+            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F7", true);
             BigDecimal res = commonJsonParser.bigDecimalDivideCheck(i.getStructureAreaNum(),annotation2.getStructureAreaNum());
             list2.add(res);
         }
@@ -157,7 +157,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         // 黏膜上皮细胞核密度（单个）
         List<BigDecimal> list3 = new ArrayList<>();
         for(Annotation i : annotationList1){
-            Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12F0F6", true);
+            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F6", true);
             BigDecimal res = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()), i.getStructurePerimeterNum());
             list3.add(res);
         }
@@ -167,7 +167,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         //黏膜上皮厚度（单个）
         List<BigDecimal> list4 = new ArrayList<>();
         for(Annotation i : annotationList1){
-            Annotation annotation2 = commonJsonParser.getInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
+            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
             BigDecimal sqrtI = commonJsonParser.bigDecimalDivideCheck(i.getStructurePerimeterNum(), BigDecimal.valueOf(Double.parseDouble(A)));
             BigDecimal sqrt1 = commonJsonParser.sqrt(sqrtI);
             BigDecimal sqrtAnnotation = commonJsonParser.bigDecimalDivideCheck(annotation2.getStructurePerimeterNum(), BigDecimal.valueOf(Double.parseDouble(A)));
