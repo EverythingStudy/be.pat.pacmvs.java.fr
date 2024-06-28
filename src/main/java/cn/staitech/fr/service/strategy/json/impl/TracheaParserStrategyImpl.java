@@ -100,7 +100,7 @@ private AreaUtils areaUtils;
         // 黏膜上皮层平均厚度
         BigDecimal multiplyArea2 = mucosaArea.multiply(BigDecimal.valueOf(2)).setScale(3, BigDecimal.ROUND_HALF_UP);
 
-        BigDecimal averageThicknessOfMucosalEpithelium = multiplyArea2.divide(mucosaPerimeter);
+        BigDecimal averageThicknessOfMucosalEpithelium = multiplyArea2.divide(mucosaPerimeter,6,RoundingMode.HALF_UP);
 
         // 黏膜上皮细胞核密度
         Double nucleusDensityOfMucosalEpithelium = mucosaCount / Double.parseDouble(String.valueOf(mucosaArea));
@@ -118,7 +118,7 @@ private AreaUtils areaUtils;
         indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("组织轮廓面积", areaNum.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
 
         indicatorResultsMap.put("黏膜上皮层平均厚度", new IndicatorAddIn("Average thickness of mucosal epithelium", areaUtils.convertToSquareMicrometer(String.valueOf(averageThicknessOfMucosalEpithelium)), UM));
-        indicatorResultsMap.put("黏膜上皮细胞核密度", new IndicatorAddIn("Nucleus density of mucosal epithelium", String.valueOf(nucleusDensityOfMucosalEpithelium), SQ_MM_PIECE));
+        indicatorResultsMap.put("黏膜上皮细胞核密度", new IndicatorAddIn("Nucleus density of mucosal epithelium", String.valueOf(BigDecimal.valueOf(nucleusDensityOfMucosalEpithelium).setScale(3, RoundingMode.HALF_UP)), SQ_MM_PIECE));
         indicatorResultsMap.put("软骨面积占比", new IndicatorAddIn("Cartilage area%", String.valueOf(cartilageAreas.setScale(3, RoundingMode.HALF_UP)), PERCENTAGE));
         indicatorResultsMap.put("气管面积", new IndicatorAddIn("Tracheal area", String.valueOf(areaNum.setScale(3, RoundingMode.HALF_UP)), SQ_MM));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
