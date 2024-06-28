@@ -68,7 +68,6 @@ public class IleumParserStrategyImpl implements ParserStrategy {
         String area = ObjectUtil.isNotEmpty(singleSlide) ? singleSlide.getArea() : "0";
         area = ObjectUtil.isEmpty(area) ? "0" : area;
 
-        // 结构编码 -------------------------------------------------------------
         // 肠腔	117156
         // 黏膜层	117008
         // 黏膜下层 	117009

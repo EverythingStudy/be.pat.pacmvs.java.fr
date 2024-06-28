@@ -713,7 +713,7 @@ public class CommonJsonParser {
      *
      * @param jsonTask    jsonTask
      * @param structureId 结构ID
-     * @return 脏器面积-10³平方微米
+     * @return 脏器面积10³平方微米
      */
     public BigDecimal getOrganAreaMicron(JsonTask jsonTask, String structureId) {
         // 查询所有未被删除且登录机构相同的数据

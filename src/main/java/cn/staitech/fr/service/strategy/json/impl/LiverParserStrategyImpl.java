@@ -4,7 +4,6 @@ import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
@@ -61,8 +60,6 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         Map<String, IndicatorAddIn> map = new HashMap<>();
 
         //        肝脏
-
-        // 结构编码 -------------------------------------------------------------
         //        门管区	112145
         //        中央静脉	112146
         //        大静脉	112147
@@ -75,16 +72,15 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         //        算法输出指标	指标代码（仅限本文档）	单位（保留小数点后三位）	备注
         //        门管区面积（单个）	A	103平方微米	单个门管区面积
         //        中央静脉面积	B	103平方微米	若多个数据则相加输出
-        BigDecimal centralVeinsArea = commonJsonParser.getOrganAreaMicron(jsonTask, "112147").multiply(new BigDecimal(1000));
+        BigDecimal centralVeinsArea = commonJsonParser.getOrganAreaMicron(jsonTask, "112147");
         //        大静脉面积	C	103平方微米	若多个数据则相加输出
-        BigDecimal venaCavaArea = commonJsonParser.getOrganAreaMicron(jsonTask, "112146").multiply(new BigDecimal(1000));
+        BigDecimal venaCavaArea = commonJsonParser.getOrganAreaMicron(jsonTask, "112146");
         //        肝细胞核数量	D	个(肝细胞核数量 D 个 肝细胞核	112149)
         Integer nucleusCount = commonJsonParser.getOrganAreaCount(jsonTask, "112149");
         //        窦内细胞核数量	G	个
         Integer sinusNnucleusCount = commonJsonParser.getOrganAreaCount(jsonTask, "11214D");
         //        组织轮廓面积	H	平方毫米	若多个数据则相加输出 (H:精细轮廓总面积（肝脏面积）-平方毫米)
-        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        String accurateArea = singleSlide.getArea();
+        String accurateArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
         BigDecimal accurateAreaDecimal = new BigDecimal(accurateArea);
 
         // 胆管密度（单个）	4	个/103平方微米	Density of bile duct (per)	4=E/A	单个为单个门管区  以95%置信区间和均数±标准差呈现
@@ -168,7 +164,7 @@ public class LiverParserStrategyImpl implements ParserStrategy {
 
         // 产品呈现指标 -------------------------------------------------------------
         // H 肝脏面积	1	平方毫米	Liver area	1=H
-        map.put("肝脏面积", new IndicatorAddIn("Liver area", accurateArea, "平方毫米"));
+        map.put("肝脏面积", new IndicatorAddIn("Liver area", DecimalUtils.setScale3(accurateAreaDecimal), "平方毫米"));
 
         if (accurateAreaDecimal.compareTo(BigDecimal.ZERO) != 0) {
             // 静脉面积占比	2	%	Vein area%	2=(B+C)/H	运算前注意统一单位  （10³平方微米/平方毫米）
