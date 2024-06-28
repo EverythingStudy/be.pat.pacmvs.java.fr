@@ -75,11 +75,11 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             double resolutions = Double.parseDouble(image.getResolutionX());
             double areas = (Double.parseDouble(annotationBy.getArea()) * resolutions * resolutions) * 0.000001;
             BigDecimal bd1 = new BigDecimal(Double.toString(areas));
-            bd1 = bd1.setScale(3, RoundingMode.HALF_UP);
+            bd1 = bd1.setScale(9, RoundingMode.HALF_UP);
             String area = bd1.toPlainString();
             double perimeters = (Double.parseDouble(annotationBy.getPerimeter()) * resolutions) * 0.001;
             BigDecimal bd = new BigDecimal(Double.toString(perimeters));
-            bd = bd.setScale(3, RoundingMode.HALF_UP);
+            bd = bd.setScale(9, RoundingMode.HALF_UP);
             String perimeter = bd.toPlainString();
             annotationBy.setArea(area);
             SingleSlide singleSlide = new SingleSlide();
@@ -220,9 +220,12 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             for (AiForecast aiForecast : aiForecasts) {
                 AiForecastListOut exportAiListVO = new AiForecastListOut();
                 BeanUtils.copyProperties(aiForecast, exportAiListVO);
+
                 //范围数据
                 if (StringUtils.isNotEmpty(special.getControlGroup())&& !CommonConstant.SINGLE_RESULT.equals(aiForecast.getQuantitativeIndicators())) {
-
+                    if(new BigDecimal(aiForecast.getResults()).compareTo(BigDecimal.ZERO)<0){
+                        exportAiListVO.setResults("?");
+                    }
                     setReferenceScope(special, singleSlideId, exportAiListVO, categorys,slide.getGenderFlag(),structType);
 
                 }
@@ -258,6 +261,9 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
 
             //正态分布(下限)
             BigDecimal subtract2 = bigDecimal.subtract(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
+            if(subtract2.compareTo(BigDecimal.ZERO)<0){
+                subtract2=BigDecimal.ZERO.setScale(3);
+            }
             //正态分布(上限)
             BigDecimal add2 = bigDecimal.add(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
             exportAiListVO.setNormalDistribution(subtract2+"-"+add2);

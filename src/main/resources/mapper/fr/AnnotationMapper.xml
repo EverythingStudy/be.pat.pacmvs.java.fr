@@ -644,6 +644,14 @@
           AND contour_type = 3
     </select>
 
+    <select id="stUnionContourArea" parameterType="long" resultMap="BaseResultMap">
+        SELECT st_area(st_asgeojson(st_union(contour40000))) as area
+        FROM fr_annotation
+        WHERE single_slide_id = #{singleSlideId}
+          AND category_id = #{categoryId}
+          AND contour_type = 3
+    </select>
+
     <select id="intersectsGeometry" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
         SELECT ST_Intersects(st_geomfromgeojson(#{collectContour}), st_geomfromgeojson(#{contour})) as intersectsResults
     </select>
@@ -873,7 +881,6 @@
         slide_id,
         id,
         contour_type,
-        <!-- ST_AsGeoJSON(contour${magnification}) as contour, -->
          ST_AsGeoJSON(contour40000) AS contour,
          ST_AsGeoJSON(contour40000) AS contour40000,
          ST_AsGeoJSON(contour10000) AS contour10000,
@@ -889,7 +896,15 @@
             <if test="contourType != null">
                 AND contour_type = #{contourType}
             </if>
+            <if test="category_id != null">
+                AND category_id = #{categoryId}
+            </if>
         </where>
+    </select>
+
+
+    <select id="stMakeValid" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT st_asgeojson(ST_MakeValid ( st_geomfromgeojson ( #{contour} ) ) ) AS contour
     </select>
 
 

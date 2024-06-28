@@ -2,12 +2,15 @@ package cn.staitech.fr.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @Author wudi
@@ -149,7 +152,8 @@ public class MathUtils {
         }
         //deviation = deviation.setScale(scale, BigDecimal.ROUND_HALF_UP);
         //deviation = deviation.round(new MathContext(scale, RoundingMode.HALF_UP));
-        deviation= deviation.setScale(scale, RoundingMode.HALF_UP);
+        deviation=
+                deviation.setScale(scale, RoundingMode.HALF_UP);
         return deviation;
     }
 
@@ -175,6 +179,12 @@ public class MathUtils {
      * @return 返回指标结果
      */
     public static String getConfidenceInterval(List<BigDecimal> dataList){
+        List<BigDecimal> objects = new ArrayList<>();
+        objects.add(BigDecimal.ZERO);
+        //筛掉为零的
+        if(CollectionUtil.isNotEmpty(dataList)){
+            dataList.removeAll(objects);
+        }
         if(CollectionUtil.isNotEmpty(dataList)){
             BigDecimal bigDecimal = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
             log.info("平均值"+ bigDecimal);
@@ -185,6 +195,9 @@ public class MathUtils {
 
             //正态分布(下限)
             BigDecimal subtract2 = bigDecimal.subtract(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
+            if(subtract2.compareTo(BigDecimal.ZERO)<0){
+                subtract2=BigDecimal.ZERO.setScale(3);
+            }
             //正态分布(上限)
             BigDecimal add2 = bigDecimal.add(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
             return bigDecimal+"±"+sqrt+";"+subtract2 + "-" + add2;

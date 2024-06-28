@@ -417,7 +417,13 @@ public class CommonJsonParser {
         // 校验轮廓的合理性
         String result = annotationMapper.stIsValid(annotation).getResults();
         if (Objects.equals(result, "f")) {
-            return new Annotation();
+            Annotation annotation1 = annotationMapper.stMakeValid(annotation);
+            String result1 = annotationMapper.stIsValid(annotation1).getResults();
+            if (Objects.equals(result1, "t")) {
+                annotation.setContour(annotation1.getContour());
+            }else{
+                return new Annotation();
+            }
         }
         annotation.setInsideOrOutside(InsideOrOutside);
         annotation.setCategoryId(pathologicalMap.get(structureIds));
@@ -441,7 +447,13 @@ public class CommonJsonParser {
         // 校验轮廓的合理性
         String result = annotationMapper.stIsValid(annotation).getResults();
         if (Objects.equals(result, "f")) {
-            return new Annotation();
+            Annotation annotation1 = annotationMapper.stMakeValid(annotation);
+            String result1 = annotationMapper.stIsValid(annotation1).getResults();
+            if (Objects.equals(result1, "t")) {
+                annotation.setContour(annotation1.getContour());
+            }else{
+                return new Annotation();
+            }
         }
         annotation.setSingleSlideId(jsonTask.getSingleId());
         annotation.setInsideOrOutside(InsideOrOutside);
@@ -488,11 +500,13 @@ public class CommonJsonParser {
                 dynamicData.setUnit(annotation.getCountUnit());
                 jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
             }
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("dynamicData", jsonArray);
-            i.setSequenceNumber(sequenceNumber);
-            i.setDynamicData(jsonObject.toString());
-            annotationMapper.aiUpdateById(i);
+            if(jsonArray.size() > 0){
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("dynamicData", jsonArray);
+                i.setSequenceNumber(sequenceNumber);
+                i.setDynamicData(jsonObject.toString());
+                annotationMapper.aiUpdateById(i);
+            }
         }
     }
 
@@ -544,11 +558,13 @@ public class CommonJsonParser {
                 dynamicData.setUnit(annotation.getCountUnit());
                 jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
             }
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("dynamicData", jsonArray);
-            i.setSequenceNumber(sequenceNumber);
-            i.setDynamicData(jsonObject.toString());
-            annotationMapper.aiUpdateById(i);
+            if(jsonArray.size() > 0){
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("dynamicData", jsonArray);
+                i.setSequenceNumber(sequenceNumber);
+                i.setDynamicData(jsonObject.toString());
+                annotationMapper.aiUpdateById(i);
+            }
         }
     }
 
@@ -598,11 +614,13 @@ public class CommonJsonParser {
                 dynamicData.setUnit(annotation.getPerimeterUnit());
                 jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
             }
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("dynamicData", jsonArray);
-            i.setSequenceNumber(sequenceNumber);
-            i.setDynamicData(jsonObject.toString());
-            annotationMapper.aiUpdateById(i);
+            if(jsonArray.size() > 0){
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("dynamicData", jsonArray);
+                i.setSequenceNumber(sequenceNumber);
+                i.setDynamicData(jsonObject.toString());
+                annotationMapper.aiUpdateById(i);
+            }
         }
     }
 
@@ -635,12 +653,13 @@ public class CommonJsonParser {
             dynamicData.setUnit(annotation.getPerimeterUnit());
             jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
         }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("dynamicData", jsonArray);
-        annotation.setSequenceNumber(sequenceNumber);
-        annotation.setDynamicData(jsonObject.toString());
-        annotationMapper.aiUpdateById(annotation);
-//        }
+        if(jsonArray.size() > 0){
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("dynamicData", jsonArray);
+            annotation.setSequenceNumber(sequenceNumber);
+            annotation.setDynamicData(jsonObject.toString());
+            annotationMapper.aiUpdateById(annotation);
+        }
     }
 
 
@@ -713,7 +732,7 @@ public class CommonJsonParser {
      *
      * @param jsonTask    jsonTask
      * @param structureId 结构ID
-     * @return 脏器面积-10³平方微米
+     * @return 脏器面积10³平方微米
      */
     public BigDecimal getOrganAreaMicron(JsonTask jsonTask, String structureId) {
         // 查询所有未被删除且登录机构相同的数据

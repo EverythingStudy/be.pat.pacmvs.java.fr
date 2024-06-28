@@ -191,7 +191,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("毛囊数量", new IndicatorAddIn("Number of mucous sacs", areaCount.toString(), "个", CommonConstant.NUMBER_1));
 
         // 皮脂腺面积	E	103平方微米	数据相加输出
-        map.put("皮脂腺面积", new IndicatorAddIn("Sebaceous gland area", DecimalUtils.setScale3(organAreaE.multiply(new BigDecimal(1000))), "10³平方微米", CommonConstant.NUMBER_1));
+        map.put("皮脂腺面积", new IndicatorAddIn("Sebaceous gland area", DecimalUtils.setScale3(organAreaE), "10³平方微米", CommonConstant.NUMBER_1));
 
         // 皮脂腺数量	F	个	无
         map.put("皮脂腺数量", new IndicatorAddIn("Number of sebaceous glands", organAreaCount1.toString(), "个", CommonConstant.NUMBER_1));
@@ -225,7 +225,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
             map.put("表皮基底层+棘层+颗粒层面积占比", new IndicatorAddIn("Nucleated cell layer area%", DecimalUtils.percentScale3(nucleatedCellLayerAreaRate), "%"));
 
             // 皮脂腺面积占比	6	%	Sebaceous glands area%	6=E/G	运算前注意统一单位
-            BigDecimal sebaceousGlandsAreaRate = organAreaE.divide(organAreaB, 7, RoundingMode.HALF_UP);
+            BigDecimal sebaceousGlandsAreaRate = organAreaE.divide(organAreaB.multiply(new BigDecimal(1000)), 7, RoundingMode.HALF_UP);
             map.put("皮脂腺面积占比", new IndicatorAddIn("Sebaceous glands area%", DecimalUtils.percentScale3(sebaceousGlandsAreaRate), "%"));
 
             // 毛囊面积占比	7	%	Hair follicles area%	7=H/G
