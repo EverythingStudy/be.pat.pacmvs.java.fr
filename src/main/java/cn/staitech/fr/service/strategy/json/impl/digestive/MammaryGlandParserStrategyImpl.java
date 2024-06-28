@@ -83,7 +83,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         Integer organAreaCount = commonJsonParser.getOrganAreaCount(jsonTask, "12306C");
         //淋巴结A
         BigDecimal organAreaA = commonJsonParser.getOrganArea(jsonTask, "123005").getStructureAreaNum();
-        //皮肤B
+        //皮肤B (皮肤面积	G	平方毫米	此数据使用乳腺中皮肤数据)
         BigDecimal organAreaB = commonJsonParser.getOrganArea(jsonTask, "1230C3").getStructureAreaNum();
         //D乳腺腺泡/导管面积（全片）
         BigDecimal organArea1 = commonJsonParser.getOrganArea(jsonTask, "12306C").getStructureAreaNum();
@@ -191,7 +191,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("毛囊数量", new IndicatorAddIn("Number of mucous sacs", areaCount.toString(), "个", CommonConstant.NUMBER_1));
 
         // 皮脂腺面积	E	103平方微米	数据相加输出
-        map.put("皮脂腺面积", new IndicatorAddIn("Sebaceous gland area", DecimalUtils.setScale3(organAreaE), "10³平方微米", CommonConstant.NUMBER_1));
+        map.put("皮脂腺面积", new IndicatorAddIn("Sebaceous gland area", DecimalUtils.setScale3(organAreaE.multiply(new BigDecimal(1000))), "10³平方微米", CommonConstant.NUMBER_1));
 
         // 皮脂腺数量	F	个	无
         map.put("皮脂腺数量", new IndicatorAddIn("Number of sebaceous glands", organAreaCount1.toString(), "个", CommonConstant.NUMBER_1));
@@ -217,19 +217,19 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
 
         if (organAreaB.compareTo(BigDecimal.ZERO) != 0) {
             // 表皮角质层面积占比	1	%	Stratum corneum area%	1=A/G
-            BigDecimal stratumCorneumAreaRate = organArea3.divide(organAreaB, 10, RoundingMode.HALF_UP);
+            BigDecimal stratumCorneumAreaRate = organArea3.divide(organAreaB, 7, RoundingMode.HALF_UP);
             map.put("表皮角质层面积占比", new IndicatorAddIn("Stratum corneum area%", DecimalUtils.percentScale3(stratumCorneumAreaRate), "%"));
 
             // 表皮基底层+棘层+颗粒层面积占比	2	%	 Nucleated cell layer area%	2=B/G
-            BigDecimal nucleatedCellLayerAreaRate = organArea4.divide(organAreaB, 10, RoundingMode.HALF_UP);
+            BigDecimal nucleatedCellLayerAreaRate = organArea4.divide(organAreaB, 7, RoundingMode.HALF_UP);
             map.put("表皮基底层+棘层+颗粒层面积占比", new IndicatorAddIn("Nucleated cell layer area%", DecimalUtils.percentScale3(nucleatedCellLayerAreaRate), "%"));
 
             // 皮脂腺面积占比	6	%	Sebaceous glands area%	6=E/G	运算前注意统一单位
-            BigDecimal sebaceousGlandsAreaRate = organAreaE.divide(organAreaB, 10, RoundingMode.HALF_UP);
+            BigDecimal sebaceousGlandsAreaRate = organAreaE.divide(organAreaB, 7, RoundingMode.HALF_UP);
             map.put("皮脂腺面积占比", new IndicatorAddIn("Sebaceous glands area%", DecimalUtils.percentScale3(sebaceousGlandsAreaRate), "%"));
 
             // 毛囊面积占比	7	%	Hair follicles area%	7=H/G
-            BigDecimal hairFolliclesAreaRate = organAreaH.divide(organAreaB, 10, RoundingMode.HALF_UP);
+            BigDecimal hairFolliclesAreaRate = organAreaH.divide(organAreaB, 7, RoundingMode.HALF_UP);
             map.put("毛囊面积占比", new IndicatorAddIn("Hair follicles area%", DecimalUtils.percentScale3(hairFolliclesAreaRate), "%"));
         } else {
             map.put("表皮角质层面积占比", new IndicatorAddIn("Stratum corneum area%", "0.000", "%"));
