@@ -151,8 +151,8 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         commonJsonParser.putAnnotationDynamicData(jsonTask,"11B02D","11B02E",annotationBy);
         annotationBy.setCountName(null);
         annotationBy.setAreaName("球内红细胞面积（单个）");
-        annotationBy.setAreaUnit("平方微米");
-        commonJsonParser.putAnnotationDynamicData(jsonTask,"11B02D","11B02F",annotationBy,2);
+        annotationBy.setAreaUnit("10³平方微米");
+        commonJsonParser.putAnnotationDynamicData(jsonTask,"11B02D","11B02F",annotationBy,1);
         annotationBy.setCountName(null);
         annotationBy.setAreaName("肾小球面积（单个）");
         annotationBy.setAreaUnit("10³平方微米");
@@ -161,9 +161,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationBy.setAreaName("肾小管面积（单个）");
         annotationBy.setAreaUnit("10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"11B031",annotationBy,1);
-
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
-
     }
 
     @Override
