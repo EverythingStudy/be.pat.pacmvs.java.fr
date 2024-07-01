@@ -120,8 +120,8 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("乳腺腺泡和导管数量", new IndicatorAddIn("Number of acinus and ducts", organAreaCount.toString(), "个"));
         BigDecimal subtract = h.subtract(organAreaA).subtract(organAreaB);
         if (subtract.signum() == 0) {
-            map.put("乳腺腺泡和导管面积占比", new IndicatorAddIn("Acinus and ducts area%", "0.000", "%"));
-            map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", "0.000", "%"));
+            map.put("乳腺腺泡和导管面积占比", new IndicatorAddIn("Acinus and ducts area%", "0", "%"));
+            map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", "0", "%"));
         } else {
             BigDecimal divide2 = organArea1.divide(subtract, 7, RoundingMode.HALF_UP);
             map.put("乳腺腺泡和导管面积占比", new IndicatorAddIn("Acinus and ducts area%", DecimalUtils.percentScale3(divide2), "%"));
@@ -232,10 +232,10 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
             BigDecimal hairFolliclesAreaRate = organAreaH.divide(organAreaB, 7, RoundingMode.HALF_UP);
             map.put("毛囊面积占比", new IndicatorAddIn("Hair follicles area%", DecimalUtils.percentScale3(hairFolliclesAreaRate), "%"));
         } else {
-            map.put("表皮角质层面积占比", new IndicatorAddIn("Stratum corneum area%", "0.000", "%"));
-            map.put("表皮基底层+棘层+颗粒层面积占比", new IndicatorAddIn("Nucleated cell layer area%", "0.000", "%"));
-            map.put("皮脂腺面积占比", new IndicatorAddIn("Sebaceous glands area%", "0.000", "%"));
-            map.put("毛囊面积占比", new IndicatorAddIn("Hair follicles area%", "0.000", "%"));
+            map.put("表皮角质层面积占比", new IndicatorAddIn("Stratum corneum area%", "0", "%"));
+            map.put("表皮基底层+棘层+颗粒层面积占比", new IndicatorAddIn("Nucleated cell layer area%", "0", "%"));
+            map.put("皮脂腺面积占比", new IndicatorAddIn("Sebaceous glands area%", "0", "%"));
+            map.put("毛囊面积占比", new IndicatorAddIn("Hair follicles area%", "0", "%"));
         }
 
         // 毛囊面积（单个）	3	103平方微米	Hair follicle area（per）	3=C	以95%置信区间和均数±标准差呈现

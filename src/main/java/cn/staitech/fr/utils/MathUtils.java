@@ -196,13 +196,13 @@ public class MathUtils {
             //正态分布(下限)
             BigDecimal subtract2 = bigDecimal.subtract(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
             if(subtract2.compareTo(BigDecimal.ZERO)<0){
-                subtract2=BigDecimal.ZERO.setScale(3);
+                subtract2=BigDecimal.ZERO;
             }
             //正态分布(上限)
             BigDecimal add2 = bigDecimal.add(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
             return bigDecimal+"±"+sqrt+";"+subtract2 + "-" + add2;
         }else{
-            return 0.000+"±"+0.000+";"+0.000 + "-" + 0.000;
+            return 0+"±"+0+";"+0 + "-" + 0;
         }
 
     }

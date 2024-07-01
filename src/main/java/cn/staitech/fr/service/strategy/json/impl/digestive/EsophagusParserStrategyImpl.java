@@ -87,10 +87,10 @@ public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy {
         //f-a
         BigDecimal subtract = bigDecimal.subtract(area);
         if(subtract.signum() == 0){
-            indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum Corneum area%", "0.000", "%"));
-            indicatorResultsMap.put("颗粒层+棘层+基底层面积占比", new IndicatorAddIn("Nucleated cell layer area%", "0.000", "%"));
-            indicatorResultsMap.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", new IndicatorAddIn("Subepithelium area %", "0.000", "%"));
-            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscularis area%", "0.000", "%"));
+            indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum Corneum area%", "0", "%"));
+            indicatorResultsMap.put("颗粒层+棘层+基底层面积占比", new IndicatorAddIn("Nucleated cell layer area%", "0", "%"));
+            indicatorResultsMap.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", new IndicatorAddIn("Subepithelium area %", "0", "%"));
+            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscularis area%", "0", "%"));
 
         }else{
             BigDecimal multiply = subtract.multiply(new BigDecimal("1000"));
