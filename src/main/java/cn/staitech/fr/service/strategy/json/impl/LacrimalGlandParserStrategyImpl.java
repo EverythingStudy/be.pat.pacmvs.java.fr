@@ -96,8 +96,8 @@ public class LacrimalGlandParserStrategyImpl implements ParserStrategy {
         List<BigDecimal> list = new ArrayList<>();
         if (CollectionUtil.isNotEmpty(skinStructureContourList)) {
             for (Annotation annotation : skinStructureContourList) {
-                // 默认平方毫米
-                BigDecimal areaNum = annotation.getStructureAreaNum();
+                // 默认平方毫米 - 转 平方微米
+                BigDecimal areaNum = annotation.getStructureAreaNum().multiply(new BigDecimal(1000000));
                 list.add(areaNum);
             }
         }

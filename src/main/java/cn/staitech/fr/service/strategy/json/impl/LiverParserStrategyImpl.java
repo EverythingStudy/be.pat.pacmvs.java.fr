@@ -103,7 +103,7 @@ public class LiverParserStrategyImpl implements ParserStrategy {
 
                 // 4=E/A
                 if (structureAreaNum.compareTo(BigDecimal.ZERO) != 0) {
-                    listNum.add(new BigDecimal(count).divide(structureAreaNum, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(7));
+                    listNum.add(new BigDecimal(count).divide(structureAreaNum, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)));
                 }
 
                 // 5=F/A

@@ -81,7 +81,7 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		/*BigDecimal bigDecimalH  =  commonJsonParser.getOrganAreaMicron(jsonTask, "124003");
 		bigDecimalH = commonJsonParser.getBigDecimalValue(bigDecimalH);
 		bigDecimalH = bigDecimalH.setScale(3, RoundingMode.HALF_UP);*/
-		BigDecimal bigDecimalH = getOrganArea(jsonTask, "124003", BigDecimal.valueOf(1000)).getStructureAreaNum();
+		BigDecimal bigDecimalH =  getOrganArea(jsonTask, "124003").getStructureAreaNum();
 		//平方毫米转平方微米
 		if(null != bigDecimalH){
 			String bigDecimalASecondStr = areaUtils.convertToMicrometer(bigDecimalH.toString());

@@ -96,7 +96,7 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 
 		indicatorResultsMap.put("灰质面积（全片 ）", new IndicatorAddIn("", bigDecimalA.toString(), "平方毫米", "1"));
 		indicatorResultsMap.put("白质面积（全片 ）", new IndicatorAddIn("", bigDecimalB.toString(), "平方毫米", "1"));
-		indicatorResultsMap.put("中央管面积面积（全片 ）", new IndicatorAddIn("", bigDecimalC.toString(), "10³平方微米", "1"));
+		indicatorResultsMap.put("中央管面积（全片 ）", new IndicatorAddIn("", bigDecimalC.toString(), "10³平方微米", "1"));
 		indicatorResultsMap.put("室管膜细胞核数量（全片 ）", new IndicatorAddIn("", mucosaCountD.toString(), "个", "1"));
 		indicatorResultsMap.put("红细胞面积（全片 ）", new IndicatorAddIn("", bigDecimalE.toString(), "平方毫米", "1"));
 		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", slideArea, "平方毫米", "1"));
