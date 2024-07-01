@@ -373,7 +373,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 					ExportAiListVO exportAiListVO = new ExportAiListVO();
 					BeanUtils.copyProperties(aiForecast, exportAiListVO);
 
-					if(!CommonConstant.SINGLE_RESULT.equals(aiForecast.getQuantitativeIndicators())
+					if(!CommonConstant.SINGLE_RESULT.equals(aiForecast.getResults())
 							&&! (aiForecast.getResults().contains("±"))
 							&& new BigDecimal(aiForecast.getResults()).compareTo(BigDecimal.ZERO)<0){
 						exportAiListVO.setResults("?");
