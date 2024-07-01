@@ -98,7 +98,7 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
 
         Annotation annotation1 = new Annotation();
         annotation1.setAreaName("肌纤维面积（单个）");
-        annotation1.setAreaUnit("平方毫米");
+        annotation1.setAreaUnit("平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"15C02A",annotation1,2);
 
 

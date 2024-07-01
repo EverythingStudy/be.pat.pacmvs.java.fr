@@ -148,12 +148,12 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         // 胆管数量（单个门管区）	E	个	单个门管区内胆管数量
         // 胆管面积（单个门管区）	F	103平方微米	若单个门管区内有多个胆管，则相加输出
         Annotation annotationBy = new Annotation();
+        annotationBy.setAreaName("胆管面积（单个门管区）");
+        annotationBy.setAreaUnit("10³平方微米");
         annotationBy.setCountName("胆管数量（单个门管区）");
         annotationBy.setCountUnit("个");
         commonJsonParser.putAnnotationDynamicData(jsonTask, "112145", "11214A", annotationBy, 1);
-        annotationBy.setAreaName("胆管面积（单个门管区）");
-        annotationBy.setAreaUnit("10³平方微米");
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "112145", "11214A", annotationBy, 1);
+
 
         // E
         map.put("胆管数量（单个门管区）", new IndicatorAddIn());

@@ -99,11 +99,15 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         annotationBy.setAreaName("输出小管/附睾管黏膜上皮面积（单个）");
         annotationBy.setAreaUnit("10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12F0F5",annotationBy,1);
-        annotationBy.setAreaName(null);
-        annotationBy.setAreaUnit(null);
-        annotationBy.setPerimeterUnit("输出小管/附睾管黏膜上皮周长（单个）");
-        annotationBy.setPerimeterUnit("毫米");
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12F0F5",annotationBy,3);
+
+        Annotation annotation1 = new Annotation();
+        annotation1.setPerimeterName("输出小管/附睾管黏膜上皮周长（单个）");
+        annotation1.setPerimeterUnit("毫米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12F0F5",annotation1,3);
+
+        Annotation annotation2s = new Annotation();
+        annotation2s.setCountName("黏膜上皮细胞核数量（单个）");
+        commonJsonParser.putAnnotationDynamicData(jsonTask,"12F0F5","12F0F6", annotation2s);
 
         Annotation annotationBy1 = new Annotation();
         annotationBy1.setAreaName("输出小管/附睾管管腔面积（单个）");
@@ -128,10 +132,10 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         resultsMap.put("精子面积（单个）", createDefaultIndicator());// F精子面积（单个）
 
         // 产品呈现指标
-        BigDecimal one = new BigDecimal("1");
+        BigDecimal one = new BigDecimal("100");
 
         // 输出小管和附睾管面积占比（全片）
-        BigDecimal erythrocyteArea = commonJsonParser.getProportionMultiply(organAreaB, organAreaJ);
+        BigDecimal erythrocyteArea = commonJsonParser.getProportion(organAreaB, organAreaJ);
         // 间质面积占比
         BigDecimal mucosalArea = one.subtract(erythrocyteArea);
         // 黏膜上皮面积占比（单个）
@@ -148,7 +152,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         List<Annotation> annotationList2 = commonJsonParser.getStructureContourList(jsonTask,"12F0F4");
         for(Annotation i : annotationList2){
             Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F7", true);
-            BigDecimal res = commonJsonParser.bigDecimalDivideCheck(i.getStructureAreaNum(),annotation2.getStructureAreaNum());
+            BigDecimal res = commonJsonParser.bigDecimalDivideCheck(annotation2.getStructureAreaNum(),i.getStructureAreaNum());
             list2.add(res);
         }
         String spermAreaPer = MathUtils.getConfidenceInterval(list2);
@@ -168,9 +172,9 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         List<BigDecimal> list4 = new ArrayList<>();
         for(Annotation i : annotationList1){
             Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
-            BigDecimal sqrtI = commonJsonParser.bigDecimalDivideCheck(i.getStructurePerimeterNum(), BigDecimal.valueOf(Double.parseDouble(A)));
+            BigDecimal sqrtI = commonJsonParser.bigDecimalDivideCheck(i.getStructureAreaNum(), BigDecimal.valueOf(Double.parseDouble(A)));
             BigDecimal sqrt1 = commonJsonParser.sqrt(sqrtI);
-            BigDecimal sqrtAnnotation = commonJsonParser.bigDecimalDivideCheck(annotation2.getStructurePerimeterNum(), BigDecimal.valueOf(Double.parseDouble(A)));
+            BigDecimal sqrtAnnotation = commonJsonParser.bigDecimalDivideCheck(annotation2.getStructureAreaNum(), BigDecimal.valueOf(Double.parseDouble(A)));
             BigDecimal sqrt2 = commonJsonParser.sqrt(sqrtAnnotation);
             list4.add(sqrt1.subtract(sqrt2));
         }
