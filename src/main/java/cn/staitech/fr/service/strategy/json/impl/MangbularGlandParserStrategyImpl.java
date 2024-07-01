@@ -138,7 +138,7 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
         resultsMap.put("颗粒管细胞核密度(单个颗粒管)", createNameIndicator("Nucleus density of granular convoluted tubule (per)", granularConvolutedTubules, SQ_MM_PIECE));
         resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE));
         resultsMap.put("红细胞面积占比", createNameIndicator("Erythrocyte area%", erythrocyteArea, PERCENTAGE));
-        resultsMap.put("颌下腺面积", createNameIndicator("Submadibular gland area", slideArea, SQ_MM));
+        resultsMap.put("颌下腺面积", createNameIndicator("Submadibular gland area",String.valueOf(BigDecimal.valueOf(Double.parseDouble(slideArea)).setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM));
         resultsMap.put("颗粒管面积占比（全片）", createNameIndicator("Granular convoluted tubules area% (all)", granularConvolutedTubulesArea, PERCENTAGE));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }

@@ -87,7 +87,7 @@ public class ParotidGlandParserStrategyImpl extends AbstractCustomParserStrategy
         resultsMap.put("腺泡细胞核密度", createNameIndicator("Nucleus density of acinar cell", nucleusResult, SQ_MM_PIECE));
         resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE));
         resultsMap.put("导管面积占比", createNameIndicator("Ducts area%", ductsArea, PERCENTAGE));
-        resultsMap.put("腮腺面积", createNameIndicator("Parotid gland area", slideArea, SQ_MM));
+        resultsMap.put("腮腺面积", createNameIndicator("Parotid gland area",String.valueOf(BigDecimal.valueOf(Double.parseDouble(slideArea)).setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM));
 
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);

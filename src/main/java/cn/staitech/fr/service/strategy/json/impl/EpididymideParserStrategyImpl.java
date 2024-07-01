@@ -152,7 +152,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         List<Annotation> annotationList2 = commonJsonParser.getStructureContourList(jsonTask,"12F0F4");
         for(Annotation i : annotationList2){
             Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F7", true);
-            BigDecimal res = commonJsonParser.bigDecimalDivideCheck(annotation2.getStructureAreaNum(),i.getStructureAreaNum());
+            BigDecimal res = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(areaUtils.micrometerToSquareMicrometer(annotation2.getArea()))),BigDecimal.valueOf(Double.parseDouble(areaUtils.micrometerToSquareMicrometer(i.getArea()))));
             list2.add(res);
         }
         String spermAreaPer = MathUtils.getConfidenceInterval(list2);
@@ -172,11 +172,13 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         List<BigDecimal> list4 = new ArrayList<>();
         for(Annotation i : annotationList1){
             Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
-            BigDecimal sqrtI = commonJsonParser.bigDecimalDivideCheck(i.getStructureAreaNum(), BigDecimal.valueOf(Double.parseDouble(A)));
-            BigDecimal sqrt1 = commonJsonParser.sqrt(sqrtI);
-            BigDecimal sqrtAnnotation = commonJsonParser.bigDecimalDivideCheck(annotation2.getStructureAreaNum(), BigDecimal.valueOf(Double.parseDouble(A)));
-            BigDecimal sqrt2 = commonJsonParser.sqrt(sqrtAnnotation);
-            list4.add(sqrt1.subtract(sqrt2));
+            if(i.getArea() != null && annotation2.getArea() != null){
+                BigDecimal sqrtI = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(i.getArea())), BigDecimal.valueOf(Double.parseDouble(A)));
+                BigDecimal sqrt1 = commonJsonParser.sqrt(sqrtI);
+                BigDecimal sqrtAnnotation = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(annotation2.getArea())), BigDecimal.valueOf(Double.parseDouble(A)));
+                BigDecimal sqrt2 = commonJsonParser.sqrt(sqrtAnnotation);
+                list4.add(sqrt1.subtract(sqrt2));
+            }
         }
         String mucosalThickness = MathUtils.getConfidenceInterval(list4);
 

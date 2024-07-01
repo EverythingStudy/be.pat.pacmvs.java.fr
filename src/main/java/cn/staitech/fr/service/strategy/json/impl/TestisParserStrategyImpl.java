@@ -49,18 +49,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
 
-        List<Annotation> annotationList1 = commonJsonParser.getStructureContourList(jsonTask,"12E0FA");
-        List<BigDecimal> list2 = new ArrayList<>();
-        for (Annotation i : annotationList1) {
-            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12E0FB", true);
-            if(i.getArea() != null && annotation2.getArea() != null){
-                BigDecimal sqrt1 = commonJsonParser.sqrt(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(i.getArea())),BigDecimal.valueOf(Double.parseDouble(A))));
-                BigDecimal sqrt2 = commonJsonParser.sqrt(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(annotation2.getArea())),BigDecimal.valueOf(Double.parseDouble(A))));
-                BigDecimal res = areaUtils.convertToUm(sqrt1.subtract(sqrt2));
-                list2.add(res);
-            }
 
-        }
 
 
         // 获取各种指标
@@ -111,20 +100,27 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
 
         // 计算指标
         BigDecimal densityResult = getDensityResult(areaCountD, slideAreaJ);
-
         // 生精小管面积占比
         BigDecimal seminiferousTubulesArea = commonJsonParser.getProportion(organAreaB, organAreaJ);
         // 生精小管面积（单个）
         List<BigDecimal> list1 = new ArrayList<>();
-
-
+        List<Annotation> annotationList1 = commonJsonParser.getStructureContourList(jsonTask,"12E0FA");
         for (Annotation annotation1 : annotationList1) {
-            BigDecimal area = BigDecimal.valueOf(Double.parseDouble(areaUtils.convertToSquareMicrometer(String.valueOf(annotation1.getStructureAreaNum()))));
-            list1.add(area);
+            String area = areaUtils.micrometerToSquareMicrometer(annotation1.getArea());
+            list1.add(BigDecimal.valueOf(Double.parseDouble(area)));
         }
         String seminiferousTubulesAreaSingle = MathUtils.getConfidenceInterval(list1);
         // 生精小管厚度（单个）
-
+        List<BigDecimal> list2 = new ArrayList<>();
+        for (Annotation i : annotationList1) {
+            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12E0FB", true);
+            if(i.getArea() != null && annotation2.getArea() != null){
+                BigDecimal sqrt1 = commonJsonParser.sqrt(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(i.getArea())),BigDecimal.valueOf(Double.parseDouble(A))));
+                BigDecimal sqrt2 = commonJsonParser.sqrt(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(annotation2.getArea())),BigDecimal.valueOf(Double.parseDouble(A))));
+                BigDecimal res = areaUtils.convertToUm(sqrt1.subtract(sqrt2));
+                list2.add(res);
+            }
+        }
         String averageThicknessOfSpermatogenicTubules = MathUtils.getConfidenceInterval(list2);
         // 生精细胞核密度（单个）
         List<BigDecimal> list3 = new ArrayList<>();
