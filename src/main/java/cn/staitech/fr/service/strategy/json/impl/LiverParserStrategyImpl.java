@@ -92,7 +92,7 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         if (CollectionUtils.isNotEmpty(structureContourList)) {
             for (Annotation annotation : structureContourList) {
                 // A 门管区面积（单个）	A	103平方微米	单个门管区面积
-                BigDecimal structureAreaNum = annotation.getStructureAreaNum().multiply(new BigDecimal(1000));
+                BigDecimal structureAreaNum = annotation.getStructureAreaNum();
                 Annotation contourInsideOrOutside = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "11214A", true);
 
                 // E 胆管数量（单个门管区）	E	个	单个门管区内胆管数量
@@ -103,19 +103,19 @@ public class LiverParserStrategyImpl implements ParserStrategy {
 
                 // 4=E/A
                 if (structureAreaNum.compareTo(BigDecimal.ZERO) != 0) {
-                    listNum.add(new BigDecimal(count).divide(structureAreaNum, 10, RoundingMode.HALF_UP).multiply(new BigDecimal(100)));
+                    listNum.add(new BigDecimal(count).divide(structureAreaNum.multiply(new BigDecimal(1000)), 7, RoundingMode.HALF_UP));
                 }
 
                 // 5=F/A
                 if (structureAreaNum.compareTo(BigDecimal.ZERO) != 0) {
-                    BigDecimal divide = structureAreaNum1.divide(structureAreaNum, 7, RoundingMode.HALF_UP);
+                    BigDecimal divide = structureAreaNum1.divide(structureAreaNum, 7, RoundingMode.HALF_UP).multiply(new BigDecimal(100));
                     lists.add(divide);
                 }
             }
         }
 
-        String confidenceInterval = MathUtils.getConfidenceInterval(lists);
-        String confidenceInterval1 = MathUtils.getConfidenceInterval(listNum);
+        String confidenceInterval = MathUtils.getConfidenceInterval(listNum);
+        String confidenceInterval1 = MathUtils.getConfidenceInterval(lists);
 
         //        产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
         //        肝脏面积	1	平方毫米	Liver area	1=H
