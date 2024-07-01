@@ -106,6 +106,10 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 
 		// 组织轮廓面积 E 平方毫米
 		String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+		BigDecimal bigDSlideArea = BigDecimal.ZERO;
+		if(StringUtils.isNotEmpty(slideArea)){
+			bigDSlideArea = new BigDecimal(slideArea);
+		}
 
 		//算法保存
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
@@ -153,7 +157,7 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		}
 		 
 		if(StringUtils.isNotEmpty(slideArea)) {
-			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", slideArea, "平方毫米", "1"));
+			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDSlideArea.setScale(3, RoundingMode.HALF_UP)), "平方毫米", "1"));
 		}
 
 
