@@ -138,7 +138,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
 
                 // 3=(A-B)/A 甲状腺滤泡上皮面积占比（单个）	3	%	Thyroid follicular epithelium area%(per)	3=(A-B)/A	以95%置信区间和均数±标准差呈现
                 if (structureAreaNumA.compareTo(BigDecimal.ZERO) != 0) {
-                    list3.add(subtractAB.divide(structureAreaNumA, 7, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(7));
+                    list3.add(subtractAB.divide(structureAreaNumA, 7, RoundingMode.HALF_UP).multiply(new BigDecimal(100)));
                 }
                 // 滤泡上皮细胞核密度（单个）	8	个/103平方微米	Nucleus density of follicular cell (per)	8=G/(A-B) 	以95%置信区间和均数±标准差呈现
                 if (subtractAB.compareTo(BigDecimal.ZERO) != 0) {
@@ -191,12 +191,12 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         // 甲状腺滤泡上皮面积占比（单个）	3	%	Thyroid follicular epithelium area%(per)	3=(A-B)/A	以95%置信区间和均数±标准差呈现
         map.put("甲状腺滤泡上皮面积占比（单个）", new IndicatorAddIn("Thyroid follicular epithelium area%(per)", confidenceInterval3, "%"));
 
-        // H-I 转平方毫米
+        // H-I 平方毫米
         BigDecimal hSubtractI = accurateAreaDecimal.subtract(parathyroidGlandArea).setScale(7, RoundingMode.HALF_UP);
 
-        //        血管面积占比	4	%	Vessel area%	4=C/(H-I) 	运算前注意统一单位
+        //        血管面积占比	4	%	Vessel area%	4=C/(H-I) 	运算前注意统一单位  C 103平方微米/平方毫米
         if (hSubtractI.compareTo(BigDecimal.ZERO) != 0) {
-            BigDecimal vesselAreaRate = vesselArea.multiply(new BigDecimal(1000)).divide(hSubtractI, 7, RoundingMode.HALF_UP);
+            BigDecimal vesselAreaRate = vesselArea.divide(hSubtractI.multiply(new BigDecimal(1000)), 7, RoundingMode.HALF_UP);
             map.put("血管面积占比", new IndicatorAddIn("Vessel area", DecimalUtils.percentScale3(vesselAreaRate), "%"));
 
             //        血管内红细胞面积占比	5	%	Intravascular erythrocyte area%	5=D/(H-I) 	运算前注意统一单位
