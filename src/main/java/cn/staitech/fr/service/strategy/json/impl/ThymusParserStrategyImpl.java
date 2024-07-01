@@ -89,7 +89,7 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("髓质面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         //indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("胸腺面积", new IndicatorAddIn("Thymus area", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_0));
+        indicatorResultsMap.put("胸腺面积", new IndicatorAddIn("Thymus area", new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.DOWN).toString(), "平方毫米", CommonConstant.NUMBER_0));
         BigDecimal F = new BigDecimal(singleSlide.getArea());
         BigDecimal b1 = BigDecimal.ZERO;
         if (F.compareTo(BigDecimal.ZERO) != 0) {

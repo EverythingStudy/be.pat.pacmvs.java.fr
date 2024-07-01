@@ -80,7 +80,7 @@ public class SublingualGlandParserStrategyImpl extends AbstractCustomParserStrat
 
         indicatorResultsMap.put("腺泡数量", new IndicatorAddIn("", String.valueOf(count), "个", CommonConstant.NUMBER_1));
         //indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("舌下腺面积", new IndicatorAddIn("Sublingual Gland area%", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_0));
+        indicatorResultsMap.put("舌下腺面积", new IndicatorAddIn("Sublingual Gland area%", new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.DOWN).toString(), "平方毫米", CommonConstant.NUMBER_0));
         indicatorResultsMap.put("导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("导管内腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
 

@@ -129,7 +129,7 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
 
         indicatorResultsMap.put("胰岛细胞核数量（全片）", new IndicatorAddIn("", String.valueOf(count3), "个", CommonConstant.NUMBER_1));
         //indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("胰腺面积", new IndicatorAddIn("Pancreas area%", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_0));
+        indicatorResultsMap.put("胰腺面积", new IndicatorAddIn("Pancreas area%", new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.DOWN).toString(), "平方毫米", CommonConstant.NUMBER_0));
 
         indicatorResultsMap.put("胰岛面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
