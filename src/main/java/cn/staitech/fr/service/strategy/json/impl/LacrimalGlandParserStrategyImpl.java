@@ -109,8 +109,8 @@ public class LacrimalGlandParserStrategyImpl implements ParserStrategy {
         // C
         //  1：面积转10（3）平方微米  2:平方微米 （默认平方毫米）
         Annotation annotationC = new Annotation();
-        annotationC.setCountName("腺泡细胞核面积（单个）");
-        annotationC.setCountUnit("平方微米");
+        annotationC.setAreaName("腺泡细胞核面积（单个）");
+        annotationC.setAreaUnit("平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "16906E", annotationC, 2);
         map.put("腺泡细胞核面积（单个）", new IndicatorAddIn());
 

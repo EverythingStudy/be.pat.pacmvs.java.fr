@@ -109,15 +109,15 @@ public class ColonParserStrategyImpl implements ParserStrategy {
         // 产品呈现指标 -------------------------------------------------------------
         if (eSubtractA.compareTo(BigDecimal.ZERO) != 0) {
             // 黏膜层面积占比	1	%	Mucosal area%	1=B/（E-A）	无
-            BigDecimal mucosalAreaRate = areaNum.divide(eSubtractA, 3, RoundingMode.HALF_UP);
+            BigDecimal mucosalAreaRate = areaNum.divide(eSubtractA, 7, RoundingMode.HALF_UP);
             map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", DecimalUtils.percentScale3(mucosalAreaRate), "%"));
 
             // 黏膜下层面积占比	2	%	Submucosal area%	2=C/（E-A）	无
-            BigDecimal submucosalAreaRate = areaNum2.divide(eSubtractA, 3, RoundingMode.HALF_UP);
+            BigDecimal submucosalAreaRate = areaNum2.divide(eSubtractA, 7, RoundingMode.HALF_UP);
             map.put("黏膜下层面积占比", new IndicatorAddIn("Submucosal area%", DecimalUtils.percentScale3(submucosalAreaRate), "%"));
 
             // 肌层面积占比	3	%	Muscular area%	3=D/（E-A）	无
-            BigDecimal muscularAreaRate = areaNum3.divide(eSubtractA, 3, RoundingMode.HALF_UP);
+            BigDecimal muscularAreaRate = areaNum3.divide(eSubtractA, 7, RoundingMode.HALF_UP);
             map.put("肌层面积占比", new IndicatorAddIn("Muscular area%", DecimalUtils.percentScale3(muscularAreaRate), "%"));
         } else {
             map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", "0.000", "%"));

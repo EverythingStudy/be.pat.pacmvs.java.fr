@@ -67,8 +67,6 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         Map<String, IndicatorAddIn> map = new HashMap<>();
 
         //        哈氏腺
-        //
-        //        结构	编码
         //        腺泡	10206D
         //        腺泡细胞核	10206E
         //        色素	102071
@@ -129,8 +127,8 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
         //  1：面积转10（3）平方微米  2:平方微米 （默认平方毫米）
         Annotation annotationC = new Annotation();
-        annotationC.setCountName("腺泡面积（单个）");
-        annotationC.setCountUnit("10³平方微米");
+        annotationC.setAreaName("腺泡面积（单个）");
+        annotationC.setAreaUnit("10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "10206D", annotationC, 1);
 
         // 算法输出指标 -------------------------------------------------------------

@@ -174,11 +174,11 @@ public class LiverParserStrategyImpl implements ParserStrategy {
 
             // 肝细胞核密度	3	个/平方毫米	Nucleus density of hepatocyte	3=D/H
             BigDecimal density = new BigDecimal(nucleusCount).divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
-            map.put("肝细胞核密度", new IndicatorAddIn("Nucleus density of hepatocyte", DecimalUtils.percentScale3(density), "个/平方毫米"));
+            map.put("肝细胞核密度", new IndicatorAddIn("Nucleus density of hepatocyte", DecimalUtils.setScale3(density), "个/平方毫米"));
 
             // 窦内细胞核密度	6	个/平方毫米	Nucleus density of Sinus cell	6=G/H
             BigDecimal nucleusDensityOfSinusCellRate = new BigDecimal(sinusNnucleusCount).divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
-            map.put("窦内细胞核密度", new IndicatorAddIn("Nucleus density of Sinus cell", DecimalUtils.percentScale3(nucleusDensityOfSinusCellRate), "个/平方毫米"));
+            map.put("窦内细胞核密度", new IndicatorAddIn("Nucleus density of Sinus cell", DecimalUtils.setScale3(nucleusDensityOfSinusCellRate), "个/平方毫米"));
         } else {
             map.put("静脉面积占比", new IndicatorAddIn("Vein area%", "0.000", "%"));
             map.put("肝细胞核密度", new IndicatorAddIn("Nucleus density of hepatocyte", "0.000", "个/平方毫米"));

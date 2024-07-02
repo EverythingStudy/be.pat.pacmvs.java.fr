@@ -95,8 +95,12 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         Annotation annotationI = new Annotation();
         annotationI.setSingleSlideId(jsonTask.getSingleId());
         annotationI.setCategoryId(commonJsonParser.getPathologicalMap(jsonTask.getOrganizationId()).get("108111"));
+
         // 查询轮廓内的轮廓总面积->平方微米|getSpinalCordAnno() 查询精细轮廓列表
-        BigDecimal parathyroidGlandArea = new BigDecimal(annotationMapper.stUnionContourArea(annotationI).getArea());
+        BigDecimal parathyroidGlandArea = new BigDecimal(0);
+        if (annotationMapper.stUnionContourArea(annotationI) != null) {
+            parathyroidGlandArea = new BigDecimal(annotationMapper.stUnionContourArea(annotationI).getArea());
+        }
 
         // 计算置信区间和均数±标准差呈现  -------------------------------------------------------------
         // 甲状腺滤泡面积（单个）	1	103平方微米	Thyroid follicle area (per)	1=A	以95%置信区间和均数±标准差呈现
