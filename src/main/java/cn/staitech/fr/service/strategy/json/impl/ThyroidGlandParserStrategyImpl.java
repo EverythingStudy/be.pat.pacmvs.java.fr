@@ -2,10 +2,12 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.Category;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.CategoryMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
@@ -15,6 +17,7 @@ import cn.staitech.fr.service.strategy.json.ParserStrategy;
 import cn.staitech.fr.utils.AreaUtils;
 import cn.staitech.fr.utils.DecimalUtils;
 import cn.staitech.fr.utils.MathUtils;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
@@ -49,6 +52,9 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
     private AreaUtils areaUtils;
     @Resource
     private AnnotationMapper annotationMapper;
+
+    @Resource
+    private CategoryMapper categoryMapper;
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
@@ -94,9 +100,16 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         // 甲状旁腺组织轮廓面积	I	103平方微米	若多个数据则相加输出(I:甲状旁腺组织轮廓面积-平方毫米)
         Annotation annotationI = new Annotation();
         annotationI.setSingleSlideId(jsonTask.getSingleId());
-        annotationI.setCategoryId(commonJsonParser.getPathologicalMap(jsonTask.getOrganizationId()).get("108111"));
+        LambdaQueryWrapper<Category> categoryLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        categoryLambdaQueryWrapper.eq(Category::getOrganEn, "Parathyroid").eq(Category::getSpecies, 1);
+        Category category = categoryMapper.selectOne(categoryLambdaQueryWrapper);
+        annotationI.setCategoryId(category.getCategoryId());
+
         // 查询轮廓内的轮廓总面积->平方微米|getSpinalCordAnno() 查询精细轮廓列表
-        BigDecimal parathyroidGlandArea = new BigDecimal(annotationMapper.stUnionContourArea(annotationI).getArea());
+        BigDecimal parathyroidGlandArea = new BigDecimal(0);
+        if (annotationMapper.stUnionContourArea(annotationI) != null) {
+            parathyroidGlandArea = new BigDecimal(annotationMapper.stUnionContourArea(annotationI).getArea());
+        }
 
         // 计算置信区间和均数±标准差呈现  -------------------------------------------------------------
         // 甲状腺滤泡面积（单个）	1	103平方微米	Thyroid follicle area (per)	1=A	以95%置信区间和均数±标准差呈现
