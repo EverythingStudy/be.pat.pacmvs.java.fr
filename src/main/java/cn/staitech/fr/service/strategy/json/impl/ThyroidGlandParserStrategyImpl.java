@@ -111,6 +111,8 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
             parathyroidGlandArea = new BigDecimal(annotationMapper.stUnionContourArea(annotationI).getArea());
         }
 
+        log.info("甲状旁腺面积{} 平方微米", parathyroidGlandArea);
+
         // 计算置信区间和均数±标准差呈现  -------------------------------------------------------------
         // 甲状腺滤泡面积（单个）	1	103平方微米	Thyroid follicle area (per)	1=A	以95%置信区间和均数±标准差呈现
         List<BigDecimal> list1 = new ArrayList<>();
@@ -179,8 +181,8 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         // A
         //  1：面积转10（3）平方微米  2:平方微米 （默认平方毫米）
         Annotation annotationC = new Annotation();
-        annotationC.setCountName("甲状腺滤泡面积（单个）");
-        annotationC.setCountUnit("×10³平方微米");
+        annotationC.setAreaName("甲状腺滤泡面积（单个）");
+        annotationC.setAreaUnit("×10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "107088", annotationC, 1);
         map.put("甲状腺滤泡面积（单个）", new IndicatorAddIn());
         // B
@@ -204,8 +206,8 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         // 甲状腺滤泡上皮面积占比（单个）	3	%	Thyroid follicular epithelium area%(per)	3=(A-B)/A	以95%置信区间和均数±标准差呈现
         map.put("甲状腺滤泡上皮面积占比（单个）", new IndicatorAddIn("Thyroid follicular epithelium area%(per)", confidenceInterval3, "%"));
 
-        // H-I 平方毫米
-        BigDecimal hSubtractI = accurateAreaDecimal.subtract(parathyroidGlandArea).setScale(7, RoundingMode.HALF_UP);
+        // H-I 平方毫米  accurateAreaDecimal（平方毫米）  parathyroidGlandArea（平方微米）->平方毫米
+        BigDecimal hSubtractI = accurateAreaDecimal.subtract(parathyroidGlandArea.divide(new BigDecimal(1000000), 10, RoundingMode.HALF_UP));
 
         //        血管面积占比	4	%	Vessel area%	4=C/(H-I) 	运算前注意统一单位  C 103平方微米/平方毫米
         if (hSubtractI.compareTo(BigDecimal.ZERO) != 0) {
@@ -238,7 +240,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
 
         // 甲状旁腺组织轮廓面积	I	103平方微米	若多个数据则相加输出
         // 甲状旁腺面积	10	103平方微米	Parathyroid gland area	10=I
-        map.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", parathyroidGlandArea.divide(new BigDecimal(1000), 3, RoundingMode.HALF_UP).toString(), "×10³平方微米"));
+        // map.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", parathyroidGlandArea.divide(new BigDecimal(1000), 3, RoundingMode.HALF_UP).toString(), "×10³平方微米"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
         log.info("指标计算结束-大鼠甲状腺");
     }
