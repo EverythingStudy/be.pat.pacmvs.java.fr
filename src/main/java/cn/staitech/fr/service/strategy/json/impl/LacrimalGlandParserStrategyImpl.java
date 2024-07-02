@@ -60,13 +60,11 @@ public class LacrimalGlandParserStrategyImpl implements ParserStrategy {
         Map<String, IndicatorAddIn> map = new HashMap<>();
 
         //        泪腺
-        //        结构	编码
         //        导管	16906F
         //        腺泡细胞核	16906E
         //        上皮顶部胞质	16906A
         //        间质	169027
         //        组织轮廓	169111
-        //        169027.json  16906A.json  16906E.json  16906F.json
 
         //        算法输出指标	指标代码（仅限本文档）	单位（保留小数点后三位）	备注
         //        导管面积	A	平方毫米	数据相加输出

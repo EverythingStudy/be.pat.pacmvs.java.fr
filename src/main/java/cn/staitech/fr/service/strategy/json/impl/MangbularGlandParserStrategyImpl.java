@@ -95,6 +95,12 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
         Annotation annotationBy = new Annotation();
         annotationBy.setCountName("颗粒管内细胞核数量（单个）");
         commonJsonParser.putAnnotationDynamicData(jsonTask,"10B125","10B126",annotationBy);
+        // G颗粒管（红色）面积（单个）
+
+        Annotation annotation2 = new Annotation();
+        annotation2.setAreaName("颗粒管（红色）面积（单个）");
+        annotation2.setAreaUnit("10³平方微米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"10B125",annotation2,1);
         // 算法输出指标
         resultsMap.put("颗粒管（红色）数量", createIndicator(organAreaCountA, PIECE));
         resultsMap.put("黏液腺细胞核数量", createIndicator(organAreaCountB, PIECE));
@@ -132,7 +138,7 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
         resultsMap.put("颗粒管细胞核密度(单个颗粒管)", createNameIndicator("Nucleus density of granular convoluted tubule (per)", granularConvolutedTubules, SQ_MM_PIECE));
         resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE));
         resultsMap.put("红细胞面积占比", createNameIndicator("Erythrocyte area%", erythrocyteArea, PERCENTAGE));
-        resultsMap.put("颌下腺面积", createNameIndicator("Submadibular gland area", slideArea, SQ_MM));
+        resultsMap.put("颌下腺面积", createNameIndicator("Submadibular gland area",String.valueOf(BigDecimal.valueOf(Double.parseDouble(slideArea)).setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM));
         resultsMap.put("颗粒管面积占比（全片）", createNameIndicator("Granular convoluted tubules area% (all)", granularConvolutedTubulesArea, PERCENTAGE));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }

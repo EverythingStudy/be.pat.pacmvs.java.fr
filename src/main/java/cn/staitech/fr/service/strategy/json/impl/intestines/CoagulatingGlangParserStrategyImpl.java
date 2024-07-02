@@ -123,6 +123,12 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         String confidenceInterval = MathUtils.getConfidenceInterval(lists);
         String confidenceInterval1 = MathUtils.getConfidenceInterval(listNum);
 
+        // 腺上皮面积（单个）A 平方毫米 单个腺上皮面积 1：面积转10（3）平方微米  2:平方微米 3默认平方毫米
+        Annotation annotationA = new Annotation();
+        annotationA.setAreaName("腺上皮面积（单个）");
+        annotationA.setAreaUnit("平方毫米");
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12B074", annotationA, 3);
+
         // 腺腔面积（单个）	C	平方毫米	单个腺上皮内所有腺腔面积
         Annotation annotationByC = new Annotation();
         annotationByC.setAreaName("腺腔面积（单个）");

@@ -82,7 +82,7 @@ public class AdrenalGlandParserStrategyImpl extends AbstractCustomParserStrategy
         indicatorResultsMap.put("皮质细胞核数量", new IndicatorAddIn("", String.valueOf(C), "个", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("髓质细胞核数量", new IndicatorAddIn("", String.valueOf(D), "个", CommonConstant.NUMBER_1));
         //indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("肾上腺面积", new IndicatorAddIn("Adrenal gland area%", singleSlide.getArea(), "平方毫米"));
+        indicatorResultsMap.put("肾上腺面积", new IndicatorAddIn("Adrenal gland area%", new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.DOWN).toString(), "平方毫米"));
         BigDecimal F = new BigDecimal(singleSlide.getArea());
         BigDecimal b1 = BigDecimal.ZERO;
         if (organArea.compareTo(BigDecimal.ZERO) != 0 && F.compareTo(BigDecimal.ZERO) != 0) {

@@ -89,8 +89,8 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("肾小管数量", new IndicatorAddIn("", String.valueOf(count), "个", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("肾皮质面积", new IndicatorAddIn("",b11B03D.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
 
-        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("肾脏面积", new IndicatorAddIn("Renal area%", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_0));
+        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.DOWN).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        //indicatorResultsMap.put("肾脏面积", new IndicatorAddIn("Renal area%", new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.DOWN).toString(), "平方毫米", CommonConstant.NUMBER_0));
 
         indicatorResultsMap.put("肾小球面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("球内红细胞面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
@@ -127,7 +127,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
             }
             return result;
         }).collect(Collectors.toList());
-        indicatorResultsMap.put("球内红细胞面积（单个）", createComplexIndicator(db, "Erythrocyte of glomerulus area% (per)", "个/平方毫米", CommonConstant.NUMBER_0));
+        indicatorResultsMap.put("球内红细胞面积占比（单个）", createComplexIndicator(db, "Erythrocyte of glomerulus area% (per)", "个/平方毫米", CommonConstant.NUMBER_0));
         List<Annotation> f = getStructureContourList(jsonTask, "11B031");
         if (CollectionUtils.isNotEmpty(f)){
             List<BigDecimal> fb = f.stream().map(annotation -> {

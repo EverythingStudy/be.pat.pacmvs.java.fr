@@ -80,11 +80,11 @@ public class SublingualGlandParserStrategyImpl extends AbstractCustomParserStrat
 
         indicatorResultsMap.put("腺泡数量", new IndicatorAddIn("", String.valueOf(count), "个", CommonConstant.NUMBER_1));
         //indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("舌下腺面积", new IndicatorAddIn("Sublingual Gland area%", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_0));
+        indicatorResultsMap.put("舌下腺面积", new IndicatorAddIn("Sublingual Gland area%", new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.DOWN).toString(), "平方毫米", CommonConstant.NUMBER_0));
         indicatorResultsMap.put("导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("导管内腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
 
-        indicatorResultsMap.put("导管面积占比（全片）", new IndicatorAddIn("Ducts area% (all)", commonJsonParser.getProportion(organArea, new BigDecimal(singleSlide.getArea()).multiply(BigDecimal.valueOf(1000000L))).toString(), "%", CommonConstant.NUMBER_0));
+        indicatorResultsMap.put("导管面积占比（全片）", new IndicatorAddIn("Ducts area% (all)", commonJsonParser.getProportion(organArea, new BigDecimal(singleSlide.getArea()).multiply(BigDecimal.valueOf(1000L))).toString(), "%", CommonConstant.NUMBER_0));
         indicatorResultsMap.put("腺泡面积占比", new IndicatorAddIn("Acinus area%", commonJsonParser.getProportion(organArea2, new BigDecimal(singleSlide.getArea())).toString(), "%", CommonConstant.NUMBER_0));
         indicatorResultsMap.put("腺泡平均面积", new IndicatorAddIn("Average area of acinus", commonJsonParser.getProportionMultiply(organArea2.multiply(BigDecimal.valueOf(1000L)), new BigDecimal(count)).toString(), "10³平方微米", CommonConstant.NUMBER_0));
 

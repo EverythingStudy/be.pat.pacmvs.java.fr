@@ -89,11 +89,11 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("髓质面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         //indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("胸腺面积", new IndicatorAddIn("Thymus area", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_0));
+        indicatorResultsMap.put("胸腺面积", new IndicatorAddIn("Thymus area", new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.DOWN).toString(), "平方毫米", CommonConstant.NUMBER_0));
         BigDecimal F = new BigDecimal(singleSlide.getArea());
         BigDecimal b1 = BigDecimal.ZERO;
         if (F.compareTo(BigDecimal.ZERO) != 0) {
-            BigDecimal temp = organArea2.add(organArea4);
+            BigDecimal temp = organArea2.add(organArea5);
             b1 = commonJsonParser.getProportion(F.subtract(temp), F);
         }
         indicatorResultsMap.put("皮质占比", new IndicatorAddIn("Cortex area%", String.valueOf(b1), "%", CommonConstant.NUMBER_0));
@@ -102,7 +102,7 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal A = BigDecimal.ZERO;
         if (organArea2.compareTo(BigDecimal.ZERO) != 0 && F.compareTo(BigDecimal.ZERO) != 0) {
             b2 = commonJsonParser.getProportion(organArea2, F);
-            A = organArea2.add(organArea4);
+            A = organArea2.add(organArea5);
             b3 = commonJsonParser.getProportion(F.subtract(A), organArea2);
         }
         indicatorResultsMap.put("皮质面积", new IndicatorAddIn("", F.subtract(A).setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));

@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -54,6 +55,19 @@ public class AreaUtils {
         if (!StringUtils.isEmpty(str)) {
             BigDecimal areaNum = new BigDecimal(str).multiply(BigDecimal.valueOf(1000));
             result = areaNum.setScale(3, BigDecimal.ROUND_HALF_UP);
+        }
+        return result.toString();
+    }
+
+    /**
+     * 微末转10³平方微米
+     * @param str 输入值
+     * @return 转换后结果
+     */
+    public String micrometerToSquareMicrometer(String str){
+        BigDecimal result = BigDecimal.ZERO;
+        if (!StringUtils.isEmpty(str)) {
+            result = new BigDecimal(str).divide(BigDecimal.valueOf(1000),3, BigDecimal.ROUND_HALF_UP);
         }
         return result.toString();
     }

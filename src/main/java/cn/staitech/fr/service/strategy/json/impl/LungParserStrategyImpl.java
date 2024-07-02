@@ -89,7 +89,7 @@ public class LungParserStrategyImpl extends AbstractCustomParserStrategy {
 //        indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular erythrocyte area%", String.valueOf(intravascularErythrocyteAreas), PERCENTAGE));
 //        indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", String.valueOf(extravascularErythrocyteAreas), PERCENTAGE));
 //        indicatorResultsMap.put("肺泡上皮细胞核密度", new IndicatorAddIn("Nucleus density of alveolar epithelial cell", String.valueOf(density.setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM_PIECE));
-        indicatorResultsMap.put("肺脏面积", new IndicatorAddIn("Lung area", accurateArea, SQ_MM));
+        indicatorResultsMap.put("肺脏面积", new IndicatorAddIn("Lung area", String.valueOf(BigDecimal.valueOf(Double.parseDouble(accurateArea)).setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
