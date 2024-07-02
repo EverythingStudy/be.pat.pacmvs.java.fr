@@ -69,11 +69,11 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationBy.setCountName("支持细胞核数量（单个）");
         commonJsonParser.putAnnotationDynamicData(jsonTask,"12E0FA","12E0FD",annotationBy);
         annotationBy.setCountName(null);
-        annotationBy.setAreaName("生精小管内腔面积（单个）");
-        annotationBy.setAreaUnit("10³平方微米");
-        commonJsonParser.putAnnotationDynamicData(jsonTask,"12E0FA","12E0FB",annotationBy,1);
+//        annotationBy.setAreaName("生精小管内腔面积（单个）");
+//        annotationBy.setAreaUnit(SQ_UM_THOUSAND);
+//        commonJsonParser.putAnnotationDynamicData(jsonTask,"12E0FA","12E0FB",annotationBy,1);
         annotationBy.setAreaName("生精小管面积（单个）");
-        annotationBy.setAreaUnit("10³平方微米");
+        annotationBy.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12E0FA",annotationBy,1);
         annotationBy.setAreaName(null);
         annotationBy.setAreaUnit(null);
@@ -82,7 +82,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12E0FA",annotationBy,3);
         Annotation annotationBy1 = new Annotation();
         annotationBy1.setAreaName("生精小管内腔面积（单个）");
-        annotationBy1.setAreaUnit("10³平方微米");
+        annotationBy1.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12E0FB",annotationBy1,1);
 
         // 算法输出指标

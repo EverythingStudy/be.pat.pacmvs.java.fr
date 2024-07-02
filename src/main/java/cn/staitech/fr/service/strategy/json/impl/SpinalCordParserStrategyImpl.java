@@ -1,6 +1,16 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
-import cn.staitech.fr.constant.CommonConstant;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -11,17 +21,6 @@ import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author wanglibei
@@ -100,7 +99,7 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 
 		indicatorResultsMap.put("灰质面积（全片 ）", new IndicatorAddIn("", bigDecimalA.toString(), "平方毫米", "1"));
 		indicatorResultsMap.put("白质面积（全片 ）", new IndicatorAddIn("", bigDecimalB.toString(), "平方毫米", "1"));
-		indicatorResultsMap.put("中央管面积（全片 ）", new IndicatorAddIn("", bigDecimalC.toString(), "10³平方微米", "1"));
+		indicatorResultsMap.put("中央管面积（全片 ）", new IndicatorAddIn("", bigDecimalC.toString(), "×10³平方微米", "1"));
 		indicatorResultsMap.put("室管膜细胞核数量（全片 ）", new IndicatorAddIn("", mucosaCountD.toString(), "个", "1"));
 		indicatorResultsMap.put("红细胞面积（全片 ）", new IndicatorAddIn("", bigDecimalE.toString(), "平方毫米", "1"));
 		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("",   String.valueOf(bigDSlideArea.setScale(3, RoundingMode.HALF_UP)), "平方毫米", "1"));

@@ -128,7 +128,7 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         //  1：面积转10（3）平方微米  2:平方微米 （默认平方毫米）
         Annotation annotationC = new Annotation();
         annotationC.setAreaName("腺泡面积（单个）");
-        annotationC.setAreaUnit("10³平方微米");
+        annotationC.setAreaUnit("×10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "10206D", annotationC, 1);
 
         // 算法输出指标 -------------------------------------------------------------

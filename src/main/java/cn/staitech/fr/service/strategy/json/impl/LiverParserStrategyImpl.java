@@ -135,13 +135,13 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         //  1：面积转10（3）平方微米  2:平方微米 （默认平方毫米）
         Annotation annotationC = new Annotation();
         annotationC.setCountName("门管区面积（单个）");
-        annotationC.setCountUnit("10³平方微米");
+        annotationC.setCountUnit("×10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "112145", annotationC, 1);
         map.put("门管区面积（单个）", new IndicatorAddIn());
         // B
-        map.put("中央静脉面积", new IndicatorAddIn("central veins area", DecimalUtils.setScale3(centralVeinsArea), "10³平方微米", CommonConstant.NUMBER_1));
+        map.put("中央静脉面积", new IndicatorAddIn("central veins area", DecimalUtils.setScale3(centralVeinsArea), "×10³平方微米", CommonConstant.NUMBER_1));
         // C
-        map.put("大静脉面积", new IndicatorAddIn("vena cava area", DecimalUtils.setScale3(venaCavaArea), "10³平方微米", CommonConstant.NUMBER_1));
+        map.put("大静脉面积", new IndicatorAddIn("vena cava area", DecimalUtils.setScale3(venaCavaArea), "×10³平方微米", CommonConstant.NUMBER_1));
         // D
         map.put("肝细胞核数量", new IndicatorAddIn("Nucleus count of hepatocyte", nucleusCount.toString(), "个", CommonConstant.NUMBER_1));
 
@@ -149,7 +149,7 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         // 胆管面积（单个门管区）	F	103平方微米	若单个门管区内有多个胆管，则相加输出
         Annotation annotationBy = new Annotation();
         annotationBy.setAreaName("胆管面积（单个门管区）");
-        annotationBy.setAreaUnit("10³平方微米");
+        annotationBy.setAreaUnit("×10³平方微米");
         annotationBy.setCountName("胆管数量（单个门管区）");
         annotationBy.setCountUnit("个");
         commonJsonParser.putAnnotationDynamicData(jsonTask, "112145", "11214A", annotationBy, 1);

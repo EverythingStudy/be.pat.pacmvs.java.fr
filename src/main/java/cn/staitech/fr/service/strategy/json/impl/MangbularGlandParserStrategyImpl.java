@@ -99,7 +99,7 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
 
         Annotation annotation2 = new Annotation();
         annotation2.setAreaName("颗粒管（红色）面积（单个）");
-        annotation2.setAreaUnit("10³平方微米");
+        annotation2.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"10B125",annotation2,1);
         // 算法输出指标
         resultsMap.put("颗粒管（红色）数量", createIndicator(organAreaCountA, PIECE));
