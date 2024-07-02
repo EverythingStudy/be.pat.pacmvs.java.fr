@@ -134,8 +134,8 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         // A
         //  1：面积转10（3）平方微米  2:平方微米 （默认平方毫米）
         Annotation annotationC = new Annotation();
-        annotationC.setCountName("门管区面积（单个）");
-        annotationC.setCountUnit("×10³平方微米");
+        annotationC.setAreaName("门管区面积（单个）");
+        annotationC.setAreaUnit("×10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "112145", annotationC, 1);
         map.put("门管区面积（单个）", new IndicatorAddIn());
         // B
