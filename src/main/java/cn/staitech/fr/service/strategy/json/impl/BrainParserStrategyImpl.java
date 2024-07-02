@@ -87,7 +87,7 @@ public class BrainParserStrategyImpl implements ParserStrategy {
         // A
         map.put("脉络丛面积", new IndicatorAddIn("Choroid Plexus area", DecimalUtils.setScale3(choroidOPlexusAreaAnnotation), "平方毫米", CommonConstant.NUMBER_1));
         // // B
-        // map.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", extravascularErythrocyteArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        // map.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", extravascularErythrocyteArea.setScale(3, RoundingMode.HALF_UP).toString(), "×10³平方微米", CommonConstant.NUMBER_1));
         // // C
         // map.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", intravascularErythrocyteArea.toString(), "平方毫米", CommonConstant.NUMBER_1));
 
