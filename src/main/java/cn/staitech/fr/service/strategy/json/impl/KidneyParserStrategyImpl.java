@@ -103,7 +103,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
             BigDecimal temp = annotation.getStructureAreaNum();
             return temp.multiply(BigDecimal.valueOf(1000));
         }).collect(Collectors.toList());
-        indicatorResultsMap.put("肾小球面积（单个）", createComplexIndicator(bsb, "Glomerulus area (per)", "10³平方微米", CommonConstant.NUMBER_0));
+        indicatorResultsMap.put("肾小球面积（单个）", createComplexIndicator(bsb, "Glomerulus area (per)", "×10³平方微米", CommonConstant.NUMBER_0));
         List<BigDecimal> cb = new ArrayList<>();
         List<Annotation> bs1 = getStructureContourList(jsonTask, "11B02D");
         for (Annotation annotation : bs1){
@@ -134,7 +134,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
                 BigDecimal temp = annotation.getStructureAreaNum();
                 return temp.multiply(BigDecimal.valueOf(1000));
             }).collect(Collectors.toList());
-            indicatorResultsMap.put("肾小管面积(单个)", createComplexIndicator(fb, "Renal tubule area (per)", "10³平方微米", CommonConstant.NUMBER_0));
+            indicatorResultsMap.put("肾小管面积(单个)", createComplexIndicator(fb, "Renal tubule area (per)", "×10³平方微米", CommonConstant.NUMBER_0));
         }
         BigDecimal b1 = BigDecimal.ZERO;
         if (count != 0 && b11B03D.compareTo(BigDecimal.ZERO) != 0) {
@@ -151,15 +151,15 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         commonJsonParser.putAnnotationDynamicData(jsonTask,"11B02D","11B02E",annotationBy);
         annotationBy.setCountName(null);
         annotationBy.setAreaName("球内红细胞面积（单个）");
-        annotationBy.setAreaUnit("10³平方微米");
+        annotationBy.setAreaUnit("×10³平方微米");
         commonJsonParser.putAnnotationDynamicData(jsonTask,"11B02D","11B02F",annotationBy,1);
         annotationBy.setCountName(null);
         annotationBy.setAreaName("肾小球面积（单个）");
-        annotationBy.setAreaUnit("10³平方微米");
+        annotationBy.setAreaUnit("×10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"11B02D",annotationBy,1);
         annotationBy.setCountName(null);
         annotationBy.setAreaName("肾小管面积（单个）");
-        annotationBy.setAreaUnit("10³平方微米");
+        annotationBy.setAreaUnit("×10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"11B031",annotationBy,1);
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }

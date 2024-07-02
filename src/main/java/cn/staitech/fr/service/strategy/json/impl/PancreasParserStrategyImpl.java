@@ -218,11 +218,11 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
         commonJsonParser.putAnnotationDynamicData(jsonTask,"10506F","10507B",annotationBy);
         annotationBy.setCountName(null);
         annotationBy.setAreaName("胰岛面积（单个）");
-        annotationBy.setAreaUnit("10³平方微米");
+        annotationBy.setAreaUnit("×10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"105077",annotationBy,1);
         annotationBy.setCountName(null);
         annotationBy.setAreaName("导管面积（单个）");
-        annotationBy.setAreaUnit("10³平方微米");
+        annotationBy.setAreaUnit("×10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"10506F",annotationBy,1);
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
