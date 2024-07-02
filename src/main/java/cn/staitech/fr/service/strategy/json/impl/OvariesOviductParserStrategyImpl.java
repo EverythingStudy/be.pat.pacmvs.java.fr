@@ -8,16 +8,15 @@ import java.util.Map;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
-import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
-import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
+import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -59,28 +58,31 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		//血管:124003 
 		//组织轮廓:124111
 
+
+		//AI指标保存
+
+		// 黄体数量 1 个 Corpus luteum numbers 1=A
+		// 黄体面积（全片） 2 平方毫米 Corpus luteum area(all) 2=C
+		// 卵泡数量 3 个 Follicle numbers 3=D
+		// 卵泡面积（全片） 4 平方毫米 Follicle area 4=F
+		// 血管面积 3 平方微米 Vessel area 3=H
+		// 血管外红细胞面积 4 平方微米 Extravascular Erythrocyte area 4=I
+		// 血管内红细胞面积 5 平方微米 Intravascular Erythrocyte area 5=J
+
+
 		// 黄体数量 A 个
 		Integer mucosaCountA = commonJsonParser.getOrganAreaCount(jsonTask, "1240CA");
 		mucosaCountA = commonJsonParser.getIntegerValue(mucosaCountA);
 		// 黄体面积（全片） C 平方毫米
-//		Annotation annotationC  = commonJsonParser.getOrganArea(jsonTask, "1240CA");
-//		BigDecimal bigDecimalC = annotationC.getStructureAreaNum();
-//		bigDecimalC = commonJsonParser.getBigDecimalValue(bigDecimalC);
 		BigDecimal bigDecimalC = getOrganArea(jsonTask, "1240CA").getStructureAreaNum();
 		bigDecimalC = bigDecimalC.setScale(3, RoundingMode.HALF_UP);
 		// 卵泡数量 D 个
 		Integer mucosaCountD = commonJsonParser.getOrganAreaCount(jsonTask, "1240CB");
 		mucosaCountD = commonJsonParser.getIntegerValue(mucosaCountD);
 		// 卵泡面积（全片） F 平方毫米
-//		Annotation annotationF  = commonJsonParser.getOrganArea(jsonTask, "1240CB");
-//		BigDecimal bigDecimalF = annotationF.getStructureAreaNum();
-//		bigDecimalF = commonJsonParser.getBigDecimalValue(bigDecimalF);
 		BigDecimal bigDecimalF =  getOrganArea(jsonTask, "1240CB").getStructureAreaNum();
 		bigDecimalF = bigDecimalF.setScale(3, RoundingMode.HALF_UP);
 		// 血管面积 H 平方微米
-		/*BigDecimal bigDecimalH  =  commonJsonParser.getOrganAreaMicron(jsonTask, "124003");
-		bigDecimalH = commonJsonParser.getBigDecimalValue(bigDecimalH);
-		bigDecimalH = bigDecimalH.setScale(3, RoundingMode.HALF_UP);*/
 		BigDecimal bigDecimalH =  getOrganArea(jsonTask, "124003").getStructureAreaNum();
 		//平方毫米转平方微米
 		if(null != bigDecimalH){
@@ -115,32 +117,15 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 		if(mucosaCountA > 0){
 			indicatorResultsMap.put("黄体数量", new IndicatorAddIn("Corpus luteum numbers", String.valueOf(mucosaCountA), "个", "0"));
-			//			indicatorResultsMap.put("黄体数量", new IndicatorAddIn("", String.valueOf(mucosaCountA), "个", "1"));
 		}
 		if(bigDecimalC.compareTo(BigDecimal.ZERO) != 0) {
 			indicatorResultsMap.put("黄体面积（全片）", new IndicatorAddIn("Corpus luteum area(all)", String.valueOf(bigDecimalC.setScale(3, RoundingMode.HALF_UP)), "平方毫米", "0"));
-			//			indicatorResultsMap.put("黄体面积（全片）", new IndicatorAddIn("", String.valueOf(bigDecimalC), "平方毫米", "1"));
 		}
 		if(mucosaCountD > 0){
 			indicatorResultsMap.put("卵泡数量", new IndicatorAddIn("Follicle numbers", String.valueOf(mucosaCountD), "个", "0"));
-			//			indicatorResultsMap.put("卵泡数量", new IndicatorAddIn("", String.valueOf(mucosaCountD), "个", "1"));
 		}
 
-		//		if(bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
-//		indicatorResultsMap.put("卵泡面积（全片）", new IndicatorAddIn("", String.valueOf(bigDecimalF), "平方毫米", "1"));
-		//		}
 
-		//		if(bigDecimalH.compareTo(BigDecimal.ZERO) != 0) {
-//		indicatorResultsMap.put("血管面积", new IndicatorAddIn("", String.valueOf(bigDecimalH), "平方微米", "1"));
-		//		}
-
-		//		if(bigDecimalI.compareTo(BigDecimal.ZERO) != 0) {
-//		indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("",areaUtils.convertToMicrometer(bigDecimalI.toString()), "平方微米", "1"));
-		//		}
-		//		if(bigDecimalJ.compareTo(BigDecimal.ZERO) != 0) {
-//		indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("", areaUtils.convertToMicrometer(bigDecimalJ.toString()), "平方微米", "1"));
-		//		}
-		
 		if(bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
 			indicatorResultsMap.put("卵泡面积（全片）", new IndicatorAddIn("Follicle area", String.valueOf(bigDecimalF.setScale(3, RoundingMode.HALF_UP)), "平方毫米", "0"));
 		}
@@ -155,24 +140,14 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 		if(bigDecimalJ.compareTo(BigDecimal.ZERO) != 0) {
 			indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", String.valueOf(bigDecimalJ.setScale(3, RoundingMode.HALF_UP)), "平方微米", "0"));
 		}
-		 
+
 		if(StringUtils.isNotEmpty(slideArea)) {
 			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDSlideArea.setScale(3, RoundingMode.HALF_UP)), "平方毫米", "1"));
 		}
 
 
 
-		//AI指标保存
 
-		// 黄体数量 1 个 Corpus luteum numbers 1=A
-		// 黄体面积（全片） 2 平方毫米 Corpus luteum area(all) 2=C
-		// 卵泡数量 3 个 Follicle numbers 3=D
-		// 卵泡面积（全片） 4 平方毫米 Follicle area 4=F
-		// 血管面积 3 平方微米 Vessel area 3=H
-		// 血管外红细胞面积 4 平方微米 Extravascular Erythrocyte area 4=I
-		// 血管内红细胞面积 5 平方微米 Intravascular Erythrocyte area 5=J
-
-		//TODO 输卵管算法暂时不支持
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 
 	}

@@ -1,24 +1,25 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+
 import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author wanglibei
@@ -80,12 +81,9 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy 
 
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-//		if(mucosaCountA > 0){
-			indicatorResultsMap.put("主细胞核数", new IndicatorAddIn("", String.valueOf(mucosaCountA), "个", "1"));
-//		}
+		indicatorResultsMap.put("主细胞核数", new IndicatorAddIn("", String.valueOf(mucosaCountA), "个", "1"));
 		if(areaDecimalB.compareTo(BigDecimal.ZERO) != 0) {
-//			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(areaDecimalB), "10³平方微米", "1"));
-			indicatorResultsMap.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", String.valueOf(areaDecimalB.setScale(3, RoundingMode.HALF_UP)), "10³平方微米", "0"));
+			indicatorResultsMap.put("甲状旁腺面积", new IndicatorAddIn("Parathyroid gland area", String.valueOf(areaDecimalB.setScale(3, RoundingMode.HALF_UP)), "×10³平方微米", "0"));
 		}
 
 		if(bigDecimaE.compareTo(BigDecimal.ZERO) != 0) {

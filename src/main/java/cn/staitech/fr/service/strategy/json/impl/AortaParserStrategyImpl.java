@@ -1,6 +1,16 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
-import cn.staitech.fr.domain.Annotation;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -11,15 +21,6 @@ import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author wanglibei
@@ -59,16 +60,15 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 		//组织轮廓	15D111  D   10³平方微米
 
 		//空腔面积 A 10³平方微米
-		// Annotation annotation  = commonJsonParser.getOrganArea(jsonTask, "15D113");
 		//平方毫米
 		BigDecimal organAreaA = getOrganArea(jsonTask, "15D113").getStructureAreaNum();
 		BigDecimal organPerimeterNumP = getOrganArea(jsonTask, "15D113").getStructurePerimeterNum();
-		
+
 		//平方毫米
 		BigDecimal bigDecimalA = BigDecimal.ZERO;
 		//平方微米
 		BigDecimal bigDecimalA_2 = BigDecimal.ZERO;
-		
+
 		if(null !=organAreaA){
 			String bigDecimalAStr = areaUtils.convertToSquareMicrometer(organAreaA.toString());
 			//非10³平方微米 ，普通的平方微米
@@ -76,7 +76,7 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 			bigDecimalA =  new BigDecimal(bigDecimalAStr);
 			bigDecimalA_2 =  new BigDecimal(bigDecimalASecondStr);
 		}
-		
+
 
 		//空腔周长	B	毫米
 		BigDecimal bigDecimalB =  BigDecimal.ZERO;
@@ -100,26 +100,17 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 
 
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-		//		if(bigDecimalA.compareTo(BigDecimal.ZERO) != 0){
-		indicatorResultsMap.put("空腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA.setScale(3, RoundingMode.HALF_UP)), "10³平方微米", "1"));
-		//		}
+		indicatorResultsMap.put("空腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA.setScale(3, RoundingMode.HALF_UP)), "×10³平方微米", "1"));
 
-		//		if(bigDecimalB.compareTo(BigDecimal.ZERO) != 0){
 		indicatorResultsMap.put("空腔周长", new IndicatorAddIn("", String.valueOf(bigDecimalB.setScale(3, RoundingMode.HALF_UP)), "毫米", "1"));
-		//		}
 
-//		indicatorResultsMap.put("空腔周长(单个)", createDefaultIndicator());
 
-		//		if(bigDecimalC.compareTo(BigDecimal.ZERO) != 0){
 		indicatorResultsMap.put("组织轮廓周长", new IndicatorAddIn("", String.valueOf(bigDecimalC.setScale(3, RoundingMode.HALF_UP)), "毫米", "1"));
-		//		}
 
-		//		if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0){
-		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDecimalD.setScale(3, RoundingMode.HALF_UP)), "10³平方微米", "1"));
-		//		}
+		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDecimalD.setScale(3, RoundingMode.HALF_UP)), "×10³平方微米", "1"));
 		//1=D-A
 		if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0 && bigDecimalA.compareTo(BigDecimal.ZERO) != 0){
-			indicatorResultsMap.put("主动脉壁面积", new IndicatorAddIn("Aorta wall area", String.valueOf(bigDecimalD.subtract(bigDecimalA)), "10³平方微米", "0"));
+			indicatorResultsMap.put("主动脉壁面积", new IndicatorAddIn("Aorta wall area", String.valueOf(bigDecimalD.subtract(bigDecimalA)), "×10³平方微米", "0"));
 		}
 		//2=2*（D-A）/(B+C)
 		if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0 && bigDecimalA.compareTo(BigDecimal.ZERO) != 0&& bigDecimalB.compareTo(BigDecimal.ZERO) != 0&& bigDecimalC.compareTo(BigDecimal.ZERO) != 0){

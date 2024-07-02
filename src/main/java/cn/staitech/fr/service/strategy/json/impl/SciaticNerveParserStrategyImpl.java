@@ -61,20 +61,15 @@ public class SciaticNerveParserStrategyImpl extends AbstractCustomParserStrategy
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
 		//神经纤维束面积	1	10³平方微米	Nerve fiber bundles area	1=A
-//		BigDecimal pituitaryA = commonJsonParser.getOrganArea(jsonTask, "1400BB").getStructureAreaNum();
 		 BigDecimal pituitaryA = getOrganArea(jsonTask, "1400BB").getStructureAreaNum();
 		if(null != pituitaryA){
-//			pituitaryA = pituitaryA.setScale(3, RoundingMode.HALF_UP);
-			//pituitaryA = commonJsonParser.getBigDecimalValue(pituitaryA).setScale(3, RoundingMode.HALF_UP);
 			String accurateArea = areaUtils.convertToSquareMicrometer(pituitaryA.toString());
 			//神经纤维束面积	1	10³平方微米	Nerve fiber bundles area	1=A
-//			indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("", accurateArea, "10³平方微米", "1"));
-			indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("Nerve fiber bundles area", accurateArea, "10³平方微米", "0"));
+			indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("Nerve fiber bundles area", accurateArea, "×10³平方微米", "0"));
 		}
 
 
 		//神经外膜结缔组织面积 B 平方毫米
-//		BigDecimal bigDecimalB = commonJsonParser.getOrganArea(jsonTask, "1400BA").getStructureAreaNum();
 		BigDecimal bigDecimalB = getOrganArea(jsonTask, "1400BA").getStructureAreaNum();
 		if(null != bigDecimalB){
 			bigDecimalB = bigDecimalB.setScale(3, RoundingMode.HALF_UP);
