@@ -74,8 +74,8 @@ public class TongueParserStrategyImpl extends AbstractCustomParserStrategy {
         }
 
         indicatorResultsMap.put("舌面积", new IndicatorAddIn("Tongue area", new BigDecimal(singleSlide.getArea()).setScale(3,RoundingMode.HALF_UP).toString(), "平方毫米"));
-        indicatorResultsMap.put("角质层面积", new IndicatorAddIn("Stratum corneum area", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("颗粒层+棘层+基底细胞层面积", new IndicatorAddIn("Nucleated cell layer area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "10³平方微米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("角质层面积", new IndicatorAddIn("Stratum corneum area", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "×10³平方微米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("颗粒层+棘层+基底细胞层面积", new IndicatorAddIn("Nucleated cell layer area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "×10³平方微米", CommonConstant.NUMBER_1));
         indicatorResultsMap.put("固有层+肌层面积", new IndicatorAddIn("Lamina propria and Muscularis area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
         //aiForecastService.addOutIndicators(jsonTask.getSingleId(), indicatorResultsMap);

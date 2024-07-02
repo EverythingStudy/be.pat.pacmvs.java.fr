@@ -162,7 +162,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("乳腺细胞核数量（全片）", new IndicatorAddIn("Number of breast cell nuclei (all)", organAreaCount2.toString(), "个", CommonConstant.NUMBER_1));
         Annotation annotation1 = new Annotation();
         annotation1.setAreaName("乳腺腺泡/导管面积（单个）");
-        annotation1.setAreaUnit("10³平方微米");
+        annotation1.setAreaUnit("×10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12306C", annotation1, 1);
         map.put("乳腺腺泡/导管面积（单个）", new IndicatorAddIn());
 
@@ -183,7 +183,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         //  1：面积转10（3）平方微米  2:平方微米 （默认平方毫米）
         Annotation annotationC = new Annotation();
         annotationC.setCountName("毛囊面积（单个）");
-        annotationC.setCountUnit("10³平方微米");
+        annotationC.setCountUnit("×10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "121098", annotationC, 1);
         map.put("毛囊面积（单个）", new IndicatorAddIn());
 
@@ -191,7 +191,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("毛囊数量", new IndicatorAddIn("Number of mucous sacs", areaCount.toString(), "个", CommonConstant.NUMBER_1));
 
         // 皮脂腺面积	E	103平方微米	数据相加输出
-        map.put("皮脂腺面积", new IndicatorAddIn("Sebaceous gland area", DecimalUtils.setScale3(organAreaE), "10³平方微米", CommonConstant.NUMBER_1));
+        map.put("皮脂腺面积", new IndicatorAddIn("Sebaceous gland area", DecimalUtils.setScale3(organAreaE), "×10³平方微米", CommonConstant.NUMBER_1));
 
         // 皮脂腺数量	F	个	无
         map.put("皮脂腺数量", new IndicatorAddIn("Number of sebaceous glands", organAreaCount1.toString(), "个", CommonConstant.NUMBER_1));
@@ -239,7 +239,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         }
 
         // 毛囊面积（单个）	3	103平方微米	Hair follicle area（per）	3=C	以95%置信区间和均数±标准差呈现
-        map.put("毛囊面积（单个）", new IndicatorAddIn("Hair follicle area（per）", confidenceHairFollicleArea, "10³平方微米"));
+        map.put("毛囊面积（单个）", new IndicatorAddIn("Hair follicle area（per）", confidenceHairFollicleArea, "×10³平方微米"));
 
         // 毛囊密度	4	个/平方毫米	Density of hair follicles 	4=D/G
         map.put("毛囊密度", new IndicatorAddIn("Mucous sac density", divide.toString(), "个/平方毫米"));
