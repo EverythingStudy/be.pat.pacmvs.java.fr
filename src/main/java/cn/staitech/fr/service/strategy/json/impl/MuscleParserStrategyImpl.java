@@ -93,8 +93,8 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
 
 
         List<Annotation> annotationList = commonJsonParser.getStructureContourList(jsonTask, "15C02A");
-        List<BigDecimal> annotationAreaList = annotationList.stream().map(Annotation::getStructureAreaNum).collect(Collectors.toList());
-        String MuscleFiberArea = MathUtils.getConfidenceInterval(annotationAreaList);
+        List<BigDecimal> annotationAreaList = annotationList.stream().map(anno -> new BigDecimal(anno.getArea()).setScale(3, RoundingMode.DOWN)).collect(Collectors.toList());
+        String muscleFiberArea = MathUtils.getConfidenceInterval(annotationAreaList);
 
         Annotation annotation1 = new Annotation();
         annotation1.setAreaName("肌纤维面积（单个）");
@@ -110,7 +110,7 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
         resultsMap.put("血管内红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaE.toString()), SQ_UM));
 
         // 产品呈现指标
-        resultsMap.put("肌纤维面积(单个)", createNameIndicator("Muscle fiber area (per)", MuscleFiberArea, SQ_MM));
+        resultsMap.put("肌纤维面积(单个)", createNameIndicator("Muscle fiber area (per)", muscleFiberArea, SQ_UM));
         resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area %", mesenchymeArea, PERCENTAGE));
         resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE));
         resultsMap.put("血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", vesselInErythrocyteArea.setScale(3, RoundingMode.UP), PERCENTAGE));
