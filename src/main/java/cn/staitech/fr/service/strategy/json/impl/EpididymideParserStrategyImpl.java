@@ -97,7 +97,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
 
         Annotation annotationBy = new Annotation();
         annotationBy.setAreaName("输出小管/附睾管黏膜上皮面积（单个）");
-        annotationBy.setAreaUnit("10³平方微米");
+        annotationBy.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12F0F5",annotationBy,1);
 
         Annotation annotation1 = new Annotation();
@@ -111,13 +111,13 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
 
         Annotation annotationBy1 = new Annotation();
         annotationBy1.setAreaName("输出小管/附睾管管腔面积（单个）");
-        annotationBy1.setAreaUnit("10³平方微米");
+        annotationBy1.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12F0F4",annotationBy1,1);
 
 
         Annotation annotationBy2 = new Annotation();
         annotationBy2.setAreaName("精子面积（单个）");
-        annotationBy2.setAreaUnit("10³平方微米");
+        annotationBy2.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12F0F7",annotationBy2,1);
 
         // 算法输出指标
