@@ -182,8 +182,8 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         // 毛囊面积（单个）	C	103平方微米	单个毛囊面积输出
         //  1：面积转10（3）平方微米  2:平方微米 （默认平方毫米）
         Annotation annotationC = new Annotation();
-        annotationC.setCountName("毛囊面积（单个）");
-        annotationC.setCountUnit("×10³平方微米");
+        annotationC.setAreaName("毛囊面积（单个）");
+        annotationC.setAreaUnit("×10³平方微米");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "121098", annotationC, 1);
         map.put("毛囊面积（单个）", new IndicatorAddIn());
 

@@ -106,7 +106,7 @@ private AreaUtils areaUtils;
         Double nucleusDensityOfMucosalEpithelium = mucosaCount / Double.parseDouble(String.valueOf(mucosaArea));
 
         // 软骨面积占比
-        BigDecimal cartilageAreas = commonJsonParser.getProportion(cartilageArea, areaNum);
+        BigDecimal cartilageAreas = commonJsonParser.getProportion(cartilageArea, areaNum.subtract(organArea));
 
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 

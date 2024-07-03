@@ -127,15 +127,15 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         resultsMap.put("输出小管/附睾管管腔面积（全片）", createIndicator(organAreaE, SQ_MM));
         resultsMap.put("精子面积（全片）", createIndicator(organAreaG, SQ_MM));
         resultsMap.put("血管面积", createIndicator(organAreaI.setScale(3, RoundingMode.HALF_UP), SQ_MM));
-        resultsMap.put("黏膜上皮细胞核数量（单个）", createIndicator(organAreaH, PIECE));
+        resultsMap.put("黏膜上皮细胞核数量（单个）",createDefaultIndicator());
         resultsMap.put("输出小管/附睾管管腔面积（单个）", createDefaultIndicator());// D输出小管/附睾管管腔面积（单个）
         resultsMap.put("精子面积（单个）", createDefaultIndicator());// F精子面积（单个）
 
         // 产品呈现指标
-        BigDecimal one = new BigDecimal("100");
+        BigDecimal one = new BigDecimal("1");
 
         // 输出小管和附睾管面积占比（全片）
-        BigDecimal erythrocyteArea = commonJsonParser.getProportion(organAreaB, organAreaJ);
+        BigDecimal erythrocyteArea = commonJsonParser.getProportionMultiply(organAreaB, organAreaJ);
         // 间质面积占比
         BigDecimal mucosalArea = one.subtract(erythrocyteArea);
         // 黏膜上皮面积占比（单个）
@@ -143,19 +143,41 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         List<Annotation> annotationList1 = commonJsonParser.getStructureContourList(jsonTask,"12F0F5");
         for(Annotation i : annotationList1){
             Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
-            list1.add(one.subtract(commonJsonParser.bigDecimalDivideCheck(annotation2.getStructureAreaNum(),i.getStructureAreaNum())));
+            list1.add(one.subtract(commonJsonParser.bigDecimalDivideCheck(annotation2.getStructureAreaNum(),i.getStructureAreaNum())).multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP));
         }
         String mucosalAreaPer = MathUtils.getConfidenceInterval(list1);
 
         // 精子面积占比（单个）
         List<BigDecimal> list2 = new ArrayList<>();
+        List<String> list3s = new ArrayList<>();
+        List<String> list4s = new ArrayList<>();
         List<Annotation> annotationList2 = commonJsonParser.getStructureContourList(jsonTask,"12F0F4");
         for(Annotation i : annotationList2){
             Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F7", true);
-            BigDecimal res = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(areaUtils.micrometerToSquareMicrometer(annotation2.getArea()))),BigDecimal.valueOf(Double.parseDouble(areaUtils.micrometerToSquareMicrometer(i.getArea()))));
-            list2.add(res);
+            BigDecimal res = commonJsonParser.bigDecimalDivideChecks(BigDecimal.valueOf(Double.parseDouble(areaUtils.micrometerToSquareMicrometer(annotation2.getArea()))),BigDecimal.valueOf(Double.parseDouble(areaUtils.micrometerToSquareMicrometer(i.getArea()))));
+            list3s.add(areaUtils.micrometerToSquareMicrometer(annotation2.getArea()));
+            list4s.add(areaUtils.micrometerToSquareMicrometer(i.getArea()));
+            list2.add(res.multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP));
         }
+//        log.info("====================================================");
+//        for(int i = 0; i < list2.size(); i++){
+//            //log.info("{},{}",i,list2.get(i));
+//            System.out.println(list2.get(i));
+//        }
+//        log.info("------------------------------------------------->");
+//        for(int i = 0; i < list3s.size(); i++){
+//            //log.info("{},{}",i,list2.get(i));
+//            System.out.println(list3s.get(i));
+//        }
+//        log.info("------------------------------------------------->");
+//        for(int i = 0; i < list4s.size(); i++){
+//            //log.info("{},{}",i,list2.get(i));
+//            System.out.println(list4s.get(i));
+//        }
+//        log.info("====================================================");
+
         String spermAreaPer = MathUtils.getConfidenceInterval(list2);
+
         // 精子面积占比（全片）
         BigDecimal spermArea = commonJsonParser.getProportion(organAreaG, organAreaE);
         // 黏膜上皮细胞核密度（单个）

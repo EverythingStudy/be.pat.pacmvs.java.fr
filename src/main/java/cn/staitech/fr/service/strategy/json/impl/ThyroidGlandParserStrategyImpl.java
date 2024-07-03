@@ -133,7 +133,6 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
 
                 // 甲状腺滤泡面积（单个）	A	103平方微米	单个甲状腺滤泡（107088）面积
                 BigDecimal structureAreaNumA = annotation.getStructureAreaNum().multiply(new BigDecimal(1000));
-
                 list1.add(structureAreaNumA);
 
                 // 甲状腺滤泡内 滤泡腔
@@ -154,6 +153,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
                 // 3=(A-B)/A 甲状腺滤泡上皮面积占比（单个）	3	%	Thyroid follicular epithelium area%(per)	3=(A-B)/A	以95%置信区间和均数±标准差呈现
                 if (structureAreaNumA.compareTo(BigDecimal.ZERO) != 0) {
                     list3.add(subtractAB.divide(structureAreaNumA, 7, RoundingMode.HALF_UP).multiply(new BigDecimal(100)));
+                    // list3.add(subtractAB.divide(structureAreaNumA, 7, RoundingMode.HALF_UP));
                 }
                 // 滤泡上皮细胞核密度（单个）	8	个/103平方微米	Nucleus density of follicular cell (per)	8=G/(A-B) 	以95%置信区间和均数±标准差呈现
                 if (subtractAB.compareTo(BigDecimal.ZERO) != 0) {
@@ -177,6 +177,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         annotationByG.setCountName("滤泡上皮细胞核数量（单个）");
         annotationByG.setCountUnit("个");
         commonJsonParser.putAnnotationDynamicData(jsonTask, "107088", "107089", annotationByG);
+
 
         // A
         //  1：面积转10（3）平方微米  2:平方微米 （默认平方毫米）

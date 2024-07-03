@@ -114,7 +114,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
             if(i.getArea() != null && annotation2.getArea() != null){
                 BigDecimal sqrt1 = commonJsonParser.sqrt(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(i.getArea())),BigDecimal.valueOf(Double.parseDouble(A))));
                 BigDecimal sqrt2 = commonJsonParser.sqrt(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(annotation2.getArea())),BigDecimal.valueOf(Double.parseDouble(A))));
-                BigDecimal res = areaUtils.convertToUm(sqrt1.subtract(sqrt2));
+                BigDecimal res = sqrt1.subtract(sqrt2);
                 list2.add(res);
             }
         }
@@ -154,7 +154,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         // 间质面积占比
         BigDecimal interstitialArea = commonJsonParser.getProportion(organAreaJ.subtract(organAreaB), organAreaJ);
         // 间质细胞核密度
-        BigDecimal interstitialCellNucleiDensity = commonJsonParser.getProportion(BigDecimal.valueOf(areaCountH), organAreaJ);
+        BigDecimal interstitialCellNucleiDensity = commonJsonParser.getProportionMultiply(BigDecimal.valueOf(areaCountH), organAreaJ);
 
 
         // 产品呈现指标

@@ -107,7 +107,7 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
                 BigDecimal addAC = structureAreaNum.add(structureAreaNum1);
                 if (addAC.compareTo(BigDecimal.ZERO) != 0) {
                     // 3=A/(A+C)
-                    lists.add(structureAreaNum.divide(addAC, 7, RoundingMode.HALF_UP));
+                    lists.add(structureAreaNum.divide(addAC, 7, RoundingMode.HALF_UP).multiply(new BigDecimal(100)));
                 }
 
                 // E
