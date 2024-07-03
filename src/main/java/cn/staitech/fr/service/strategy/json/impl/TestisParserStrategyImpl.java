@@ -49,9 +49,6 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
 
-
-
-
         // 获取各种指标
         BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "12E0FA");// B生精小管面积（全片）
         Annotation annotation = commonJsonParser.getOrganArea(jsonTask, "12E0FA");// C生精小管周长（单个）
@@ -147,7 +144,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         }
         String nucleusDensityOfSpermatogenicCellsSupportCells = MathUtils.getConfidenceInterval(list5);
         // 血管面积占比
-//        BigDecimal vesselArea = commonJsonParser.getProportion(organAreaI, organAreaJ);
+        BigDecimal vesselArea = commonJsonParser.getProportion(organAreaI, organAreaJ);
         // 间质细胞核：生精小管
 
         BigDecimal interstitialCellNuclei = BigDecimal.ZERO;
