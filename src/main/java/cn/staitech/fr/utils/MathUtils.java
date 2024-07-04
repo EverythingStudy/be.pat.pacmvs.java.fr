@@ -42,11 +42,24 @@ public class MathUtils {
         //BigDecimal sd2=new BigDecimal("0.000");
         //System.out.println(BigDecimal.ZERO.setScale(3, RoundingMode.HALF_UP));
         //System.out.println(sd2.compareTo(BigDecimal.ZERO));
-        List<BigDecimal> list = new ArrayList<>();
+        /*List<BigDecimal> list = new ArrayList<>();
         list.add(new BigDecimal("1.234"));
         String confidenceInterval = getConfidenceInterval(list);
-        System.out.println(confidenceInterval);
+        System.out.println(confidenceInterval);*/
+        List<BigDecimal> dataList = new ArrayList<>();
+        dataList.add(new BigDecimal("-1"));
+        dataList.add(new BigDecimal("0"));
+        dataList.add(new BigDecimal("1"));
 
+        if(CollectionUtil.isNotEmpty(dataList)){
+            List<BigDecimal> objects = new ArrayList<>(dataList);
+            objects.forEach(e->{
+                if(e.compareTo(BigDecimal.ZERO)<0){
+                    dataList.remove(e);
+                }
+            });
+        }
+        System.out.println(dataList);
     }
 
     /**
@@ -179,11 +192,19 @@ public class MathUtils {
      * @return 返回指标结果
      */
     public static String getConfidenceInterval(List<BigDecimal> dataList){
-        List<BigDecimal> objects = new ArrayList<>();
+        /*List<BigDecimal> objects = new ArrayList<>();
         objects.add(BigDecimal.ZERO);
         //筛掉为零的
         if(CollectionUtil.isNotEmpty(dataList)){
             dataList.removeAll(objects);
+        }*/
+        if(CollectionUtil.isNotEmpty(dataList)){
+            List<BigDecimal> objects = new ArrayList<>(dataList);
+            objects.forEach(e->{
+                if(e.compareTo(BigDecimal.ZERO)<0){
+                    dataList.remove(e);
+                }
+            });
         }
         if(CollectionUtil.isNotEmpty(dataList)){
             BigDecimal bigDecimal = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
@@ -196,7 +217,7 @@ public class MathUtils {
             //正态分布(下限)
             BigDecimal subtract2 = bigDecimal.subtract(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
             if(subtract2.compareTo(BigDecimal.ZERO)<0){
-                subtract2=BigDecimal.ZERO;
+                return bigDecimal+"±"+sqrt;
             }
             //正态分布(上限)
             BigDecimal add2 = bigDecimal.add(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
