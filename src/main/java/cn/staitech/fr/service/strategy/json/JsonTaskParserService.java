@@ -227,6 +227,7 @@ public class JsonTaskParserService {
 		Annotation annotation = new Annotation();
 		annotation.setSequenceNumber(sequenceNumber);
 		annotation.setSingleSlideId(jsonTask.getSingleId());
+		annotation.setInsideOrOutside(true);
 		return annotation;
 	}
 

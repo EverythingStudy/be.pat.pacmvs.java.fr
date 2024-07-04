@@ -253,6 +253,7 @@ public class CommonJsonParser {
 //                    annotation3.setContourList(contourList);
                     annotation3.setSequenceNumber(sequenceNumber);
                     annotation3.setSingleSlideId(jsonTask.getSingleId());
+                    annotation3.setInsideOrOutside(false);
                     annotationMapper.deleteAiAnnotation(annotation3);
                 }
             }
@@ -273,7 +274,8 @@ public class CommonJsonParser {
                 if (ObjectUtil.equals(annotation2.getResults(), "t")) {
                     annotation4.setSequenceNumber(sequenceNumber);
                     annotation4.setSingleSlideId(jsonTask.getSingleId());
-                    annotationMapper.deleteAiAnnotation(annotation3);
+                    annotation4.setInsideOrOutside(true);
+                    annotationMapper.deleteAiAnnotation(annotation4);
                 }
             }
         } catch (Exception e) {
