@@ -135,9 +135,10 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         BigDecimal one = new BigDecimal("1");
 
         // 输出小管和附睾管面积占比（全片）
-        BigDecimal erythrocyteArea = commonJsonParser.getProportionMultiply(organAreaB, organAreaJ);
+        BigDecimal erythrocyteArea = commonJsonParser.getProportion(organAreaB, organAreaJ);
         // 间质面积占比
-        BigDecimal mucosalArea = one.subtract(erythrocyteArea);
+        BigDecimal erythrocyteAreas = commonJsonParser.getProportionMultiply(organAreaB, organAreaJ);
+        BigDecimal mucosalArea = one.subtract(erythrocyteAreas).multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP);
         // 黏膜上皮面积占比（单个）
         List<BigDecimal> list1 = new ArrayList<>();
         List<Annotation> annotationList1 = commonJsonParser.getStructureContourList(jsonTask,"12F0F5");
