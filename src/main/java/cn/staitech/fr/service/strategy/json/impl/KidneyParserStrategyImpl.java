@@ -119,15 +119,14 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
 
         List<BigDecimal> db = bs.stream().map(annotation -> {
             Annotation temp = getContourInsideOrOutside(jsonTask,annotation.getContour(),"11B02F",true);
-            Integer c = temp.getCount();
+            BigDecimal c = temp.getStructureAreaNum();
             BigDecimal result = BigDecimal.valueOf(0);
-            if (c != null && c > 0) {
-                BigDecimal temp1 = BigDecimal.valueOf(c);
-                result = temp1.divide(annotation.getStructureAreaNum(), 3, RoundingMode.HALF_UP);
+            if (c != null) {
+                result = commonJsonParser.getProportion(c, annotation.getStructureAreaNum());
             }
             return result;
         }).collect(Collectors.toList());
-        indicatorResultsMap.put("球内红细胞面积占比（单个）", createComplexIndicator(db, "Erythrocyte of glomerulus area% (per)", "个/平方毫米", CommonConstant.NUMBER_0));
+        indicatorResultsMap.put("球内红细胞面积占比（单个）", createComplexIndicator(db, "Erythrocyte of glomerulus area% (per)", "%", CommonConstant.NUMBER_0));
         List<Annotation> f = getStructureContourList(jsonTask, "11B031");
         if (CollectionUtils.isNotEmpty(f)){
             List<BigDecimal> fb = f.stream().map(annotation -> {
