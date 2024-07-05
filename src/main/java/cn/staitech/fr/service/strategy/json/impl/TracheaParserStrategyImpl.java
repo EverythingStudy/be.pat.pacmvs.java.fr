@@ -115,7 +115,7 @@ private AreaUtils areaUtils;
         indicatorResultsMap.put("黏膜上皮层周长", new IndicatorAddIn("黏膜上皮层周长", String.valueOf(mucosaPerimeter.setScale(3, RoundingMode.HALF_UP)), MM, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("黏膜上皮细胞核数量", new IndicatorAddIn("黏膜上皮细胞核数量", String.valueOf(mucosaCount), PIECE, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("软骨面积", new IndicatorAddIn("软骨面积", String.valueOf(cartilageArea.setScale(3, RoundingMode.HALF_UP)), SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("组织轮廓面积", areaNum.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("组织轮廓面积", new BigDecimal(accurateArea).setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
 
         indicatorResultsMap.put("黏膜上皮层平均厚度", new IndicatorAddIn("Average thickness of mucosal epithelium", areaUtils.convertToSquareMicrometer(String.valueOf(averageThicknessOfMucosalEpithelium)), UM));
         indicatorResultsMap.put("黏膜上皮细胞核密度", new IndicatorAddIn("Nucleus density of mucosal epithelium", String.valueOf(BigDecimal.valueOf(nucleusDensityOfMucosalEpithelium).setScale(3, RoundingMode.HALF_UP)), SQ_MM_PIECE));
