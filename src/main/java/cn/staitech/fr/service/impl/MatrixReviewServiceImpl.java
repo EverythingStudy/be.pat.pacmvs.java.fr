@@ -582,33 +582,42 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 	private void setReferenceScope(Special special, Long singleId, ExportAiListVO exportAiListVO, Map<Long, Long> categorys, String genderFlag) {
 		List<BigDecimal> dataList= singleSlideMapper.getReferenceScope(exportAiListVO.getQuantitativeIndicators(),categorys.get(singleId), special.getSpecialId(),
 				special.getControlGroup(),genderFlag,CommonConstant.NUMBER_0);
-		if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(dataList)){
-			BigDecimal bigDecimal = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
-			log.info("平均值"+ bigDecimal);
-			BigDecimal variance = MathUtils.variance(dataList.toArray(new BigDecimal[dataList.size()]), 3);
-			log.info("总体方差" + variance);
-			BigDecimal sqrt = MathUtils.sqrt(variance, 3);
-			log.info("总体标准差" + sqrt);
-			//平均值-标准差
-			//BigDecimal subtract = bigDecimal.subtract(sqrt).setScale(3, RoundingMode.UP);
-			//平均值+标准差
-			//BigDecimal add = bigDecimal.add(sqrt).setScale(3, RoundingMode.UP);
-			exportAiListVO.setAverageValue(bigDecimal+"±"+sqrt);
+		if(org.apache.commons.collections4.CollectionUtils.isNotEmpty(dataList)) {
+			if (CollectionUtil.isNotEmpty(dataList)) {
+				List<BigDecimal> objects = new ArrayList<>(dataList);
+				objects.forEach(e -> {
+					if (e.compareTo(BigDecimal.ZERO) < 0) {
+						dataList.remove(e);
+					}
+				});
+			}
+			if (CollectionUtil.isNotEmpty(dataList)) {
+				BigDecimal bigDecimal = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
+				log.info("平均值" + bigDecimal);
+				BigDecimal variance = MathUtils.variance(dataList.toArray(new BigDecimal[dataList.size()]), 3);
+				log.info("总体方差" + variance);
+				BigDecimal sqrt = MathUtils.sqrt(variance, 3);
+				log.info("总体标准差" + sqrt);
+				//平均值-标准差
+				//BigDecimal subtract = bigDecimal.subtract(sqrt).setScale(3, RoundingMode.UP);
+				//平均值+标准差
+				//BigDecimal add = bigDecimal.add(sqrt).setScale(3, RoundingMode.UP);
+				exportAiListVO.setAverageValue(bigDecimal + "±" + sqrt);
 
-			//正态分布(下限)
-			BigDecimal subtract2 = bigDecimal.subtract(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
+				//正态分布(下限)
+				BigDecimal subtract2 = bigDecimal.subtract(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
 			/*if(subtract2.compareTo(BigDecimal.ZERO)<0){
 				subtract2=BigDecimal.ZERO;
 			}*/
-			//正态分布(上限)
-			BigDecimal add2 = bigDecimal.add(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
-			if(subtract2.compareTo(BigDecimal.ZERO)>=0){
-				exportAiListVO.setNormalDistribution(subtract2+"-"+add2);
+				//正态分布(上限)
+				BigDecimal add2 = bigDecimal.add(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
+				if (subtract2.compareTo(BigDecimal.ZERO) >= 0) {
+					exportAiListVO.setNormalDistribution(subtract2 + "-" + add2);
+				}
+
 			}
 
 		}
-
-
 
 	}
 
