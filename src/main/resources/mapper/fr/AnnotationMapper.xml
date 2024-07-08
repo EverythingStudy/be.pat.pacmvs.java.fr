@@ -644,6 +644,17 @@
           AND contour_type = 3
     </select>
 
+    <select id="unionGeometryArea" parameterType="long" resultMap="BaseResultMap">
+        SELECT
+            st_area ( st_union ( contour40000 ) ) AS area,
+            ST_Perimeter ( ST_Collect ( contour40000 ) ) AS perimeter
+        FROM
+            fr_annotation
+        WHERE
+            single_slide_id = #{singleSlideId}
+          AND contour_type = 3
+    </select>
+
 
     <select id="stUnionContourArea" parameterType="long" resultMap="BaseResultMap">
         SELECT st_area(st_asgeojson(ST_Collect(contour40000))) as area,
