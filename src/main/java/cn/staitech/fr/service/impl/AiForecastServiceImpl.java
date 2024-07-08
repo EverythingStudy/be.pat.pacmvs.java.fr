@@ -47,6 +47,9 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
     private SlideMapper slideMapper;
 
     @Resource
+    private CategoryMapper categoryMapper;
+
+    @Resource
     private AiForecastMapper aiForecastMapper;
 
     @Resource
@@ -66,8 +69,17 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             Annotation annotation = new Annotation();
             annotation.setSingleSlideId(singleSlideId);
             annotation.setFiligreeContour(true);
-            annotation.setCategoryId(singleSlideBy.getCategoryId());
+            Category category = categoryMapper.selectById(singleSlideBy.getCategoryId());
+            if(category != null && Objects.equals(category.getOrganId(), "08") && category.getSpecies() == 1){
+                // 甲状旁腺
+                annotation.setCategoryId(singleSlideBy.getCategoryId());
+            }
             Annotation annotationBy = annotationMapper.getOrganArea(annotation);
+
+            if (category != null && Objects.equals(category.getOrganId(), "07") && category.getSpecies() == 1) {
+                // 甲状腺
+                annotationBy = annotationMapper.unionGeometryArea(singleSlideId);
+            }
             if (annotationBy == null || annotationBy.getArea() == null) {
                 return false;
             }
