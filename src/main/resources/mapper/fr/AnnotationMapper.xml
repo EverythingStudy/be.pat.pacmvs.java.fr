@@ -646,8 +646,8 @@
 
 
     <select id="stUnionContourArea" parameterType="long" resultMap="BaseResultMap">
-        SELECT st_area(st_asgeojson(st_union(contour40000))) as area,
-               st_asgeojson(st_union(contour40000)) as collectContour
+        SELECT st_area(st_asgeojson(ST_Collect(contour40000))) as area,
+               st_asgeojson(ST_Collect(contour40000)) as collectContour
         FROM fr_annotation
         WHERE single_slide_id = #{singleSlideId}
           AND category_id = #{categoryId}
@@ -724,6 +724,7 @@
                ST_Perimeter(ST_Collect(contour40000)) AS perimeter
         from fr_annotation
         where single_slide_id = #{singleSlideId}
+          and category_id = #{categoryId}
           and contour_type = 3
     </select>
 

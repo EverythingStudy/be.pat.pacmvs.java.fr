@@ -58,9 +58,15 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             if (!Optional.ofNullable(singleSlideId).isPresent()) {
                 return false;
             }
+            SingleSlide singleSlideBy = singleSlideMapper.selectById(singleSlideId);
+            if(singleSlideBy == null){
+                return false;
+            }
+            // 查询详情信息
             Annotation annotation = new Annotation();
             annotation.setSingleSlideId(singleSlideId);
             annotation.setFiligreeContour(true);
+            annotation.setCategoryId(singleSlideBy.getCategoryId());
             Annotation annotationBy = annotationMapper.getOrganArea(annotation);
             if (annotationBy == null || annotationBy.getArea() == null) {
                 return false;

@@ -291,24 +291,24 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             list.addAll(annoList);
         }
         // 查询精细轮廓数据
-//        Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
-//        QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.eq("del_flag", 1);
-//        queryWrapper.eq("organization_id", organizationId);
-//        List<Category> categoryList = categoryMapper.selectList(queryWrapper);
-//        annotation.setFiligreeContour(true);
-//        // 精细轮廓不显示眼球-视神经
-//        QueryWrapper<Category> categoryQueryWrapper = new QueryWrapper<>();
-//        categoryQueryWrapper.eq("organ_id", "7B");
-//        List<Category> categoryLists = categoryMapper.selectList(categoryQueryWrapper);
-//        categoryList.addAll(categoryLists);
-//        List<Long> categoryIdLists = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
-//        annotation.setCategoryIdLists(categoryIdLists);
-//        List<Annotation> selfAnnoList = annotationMapper.selectListBy(annotation);
-//        List<Features> annoList1 = getFeaturesList(selfAnnoList);
-//        if (CollectionUtils.isNotEmpty(annoList1)) {
-//            list.addAll(annoList1);
-//        }
+        Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
+        QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("del_flag", 1);
+        queryWrapper.eq("organization_id", organizationId);
+        List<Category> categoryList = categoryMapper.selectList(queryWrapper);
+        annotation.setFiligreeContour(true);
+        // 精细轮廓不显示眼球-视神经
+        QueryWrapper<Category> categoryQueryWrapper = new QueryWrapper<>();
+        categoryQueryWrapper.eq("organ_id", "7B");
+        List<Category> categoryLists = categoryMapper.selectList(categoryQueryWrapper);
+        categoryList.addAll(categoryLists);
+        List<Long> categoryIdLists = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
+        annotation.setCategoryIdLists(categoryIdLists);
+        List<Annotation> selfAnnoList = annotationMapper.selectListBy(annotation);
+        List<Features> annoList1 = getFeaturesList(selfAnnoList);
+        if (CollectionUtils.isNotEmpty(annoList1)) {
+            list.addAll(annoList1);
+        }
         return list;
     }
 

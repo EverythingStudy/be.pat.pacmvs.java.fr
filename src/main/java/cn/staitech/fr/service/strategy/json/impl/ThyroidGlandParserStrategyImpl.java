@@ -1,16 +1,15 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.constant.CommonConstant;
-import cn.staitech.fr.domain.Annotation;
-import cn.staitech.fr.domain.Category;
-import cn.staitech.fr.domain.JsonFile;
-import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.CategoryMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
+import cn.staitech.fr.service.ImageService;
+import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
@@ -25,10 +24,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author: wangfeng
@@ -44,6 +40,10 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
     private SingleSlideMapper singleSlideMapper;
     @Resource
     private AiForecastService aiForecastService;
+    @Resource
+    private ImageService imageService;
+    @Resource
+    private SlideService slideService;
     @Resource
     private CommonJsonParser commonJsonParser;
     @Resource
@@ -107,8 +107,14 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
 
         // 查询轮廓内的轮廓总面积->平方微米|getSpinalCordAnno() 查询精细轮廓列表
         BigDecimal parathyroidGlandArea = new BigDecimal(0);
-        if (annotationMapper.stUnionContourArea(annotationI) != null) {
-            parathyroidGlandArea = new BigDecimal(annotationMapper.stUnionContourArea(annotationI).getArea());
+
+        if (annotationMapper.getOrganArea(annotationI) != null) {
+            SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+            Slide slide = slideService.getById(singleSlide.getSlideId());
+            Image image = imageService.selectById(slide.getImageId());
+            BigDecimal resolutions = BigDecimal.valueOf(Double.parseDouble(image.getResolutionX()));
+            String area = annotationMapper.getOrganArea(annotationI).getArea();
+            parathyroidGlandArea = new BigDecimal(area).multiply(resolutions).multiply(resolutions);
         }
 
         log.info("甲状旁腺面积{} 平方微米", parathyroidGlandArea);
