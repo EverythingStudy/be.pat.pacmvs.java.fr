@@ -735,7 +735,9 @@
                ST_Perimeter(ST_Collect(contour40000)) AS perimeter
         from fr_annotation
         where single_slide_id = #{singleSlideId}
+        <if test="categoryId != null">
           and category_id = #{categoryId}
+        </if>
           and contour_type = 3
     </select>
 
