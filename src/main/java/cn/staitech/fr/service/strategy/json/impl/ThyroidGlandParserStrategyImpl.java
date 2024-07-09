@@ -101,7 +101,7 @@ public class ThyroidGlandParserStrategyImpl implements ParserStrategy {
         Annotation annotationI = new Annotation();
         annotationI.setSingleSlideId(jsonTask.getSingleId());
         LambdaQueryWrapper<Category> categoryLambdaQueryWrapper = new LambdaQueryWrapper<>();
-        categoryLambdaQueryWrapper.eq(Category::getOrganEn, "Parathyroid").eq(Category::getSpecies, 1);
+        categoryLambdaQueryWrapper.eq(Category::getOrganId, "08").eq(Category::getSpecies, 1).eq(Category::getOrganizationId, jsonTask.getOrganizationId()).eq(Category::getDelFlag,0);
         Category category = categoryMapper.selectOne(categoryLambdaQueryWrapper);
         annotationI.setCategoryId(category.getCategoryId());
 
