@@ -21,4 +21,6 @@ public interface WaxBlockInfoMapper extends BaseMapper<WaxBlockInfo> {
     String getOrganName(@Param("topicId") Long topicId, @Param("speciesId") String speciesId,@Param("waxCode") String waxCode,@Param("genderFlag")String genderFlag);
 
 	List<WaxBlockInfo> getWaxBlockInfoList(Map<String,Object> parm);
+	
+	List<WaxBlockInfo> getSpecialWaxBlockInfoList(Map<String,Object> parm);
 }

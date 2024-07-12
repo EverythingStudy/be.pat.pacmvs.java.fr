@@ -14,7 +14,7 @@
         <result column="position_name" property="positionName" />
         <result column="lesion" property="lesion" />
         <result column="lesion_name" property="lesionName" />
-        <result column="ddefinition" property="ddefinition" />
+        <result column="ddefinition" property="ddefinition"  typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
         <result column="ddefinition_name" property="ddefinitionName" />
         <result column="grade" property="grade" />
         <result column="grade_name" property="gradeName" />
@@ -24,16 +24,30 @@
         <result column="create_time" property="createTime" />
         <result column="update_by" property="updateBy" />
         <result column="update_time" property="updateTime" />
+        <result column="position_source" property="positionSource" />
+        <result column="lesion_source" property="lesionSource" />
+        <result column="grade_source" property="gradeSource" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        diagnosis_id, special_id, group_id, single_id, viscera, viscrea_name, position, position_name, lesion, lesion_name, ddefinition, ddefinition_name, grade, grade_name, remark, delete_flag, create_by, create_time, update_by, update_time
+        diagnosis_id, special_id, group_id, single_id, viscera, viscrea_name, position, position_name, lesion, lesion_name, ddefinition, ddefinition_name, grade, grade_name, 
+        remark, delete_flag, create_by, create_time, update_by, update_time,position_source,lesion_source,ddefinition_source,grade_source
     </sql>
-    
-     <select id="selectUserById" parameterType="Long" resultType="cn.staitech.system.api.domain.SysUser">
+
+     <select id="selectUserById" parameterType="map" resultType="cn.staitech.system.api.domain.SysUser">
         select * from sys_user
-        where user_id = #{userId}
+        <where>
+            <if test="userId != null">
+                AND user_id = #{userId}
+            </if>
+            <if test="userName != null">
+                AND user_name = #{userName}
+            </if>
+             <if test="organizationId != null">
+                AND organization_id = #{organizationId}
+            </if>
+        </where>
     </select>
 
     <select id="getExportListVO" resultType="cn.staitech.fr.domain.out.ExportListVO">
@@ -50,5 +64,29 @@
         where fd.single_id = #{singleId}
           and fd.delete_flag = 1
 
+    </select>
+    <select id="getOrganizationName" resultType="java.lang.String">
+        select organization_name
+        from sys_organization
+        where organization_id = #{organizationId}
+    </select>
+    
+    <select id="selectListByParm" parameterType="cn.staitech.fr.domain.Diagnosis"
+            resultMap="BaseResultMap">
+        select
+        	*
+        from fr_diagnosis
+        <where>
+            <if test="specialId != null">
+                AND special_id = #{specialId}
+            </if>
+            <if test="singleId != null">
+                AND single_id = #{singleId}
+            </if>
+            <if test="deleteFlag != null">
+                AND delete_flag = #{deleteFlag}
+            </if>
+        </where>
+        order by create_time asc
     </select>
 </mapper>

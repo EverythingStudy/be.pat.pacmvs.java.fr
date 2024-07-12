@@ -19,4 +19,6 @@ public interface WaxBlockInfoService extends IService<WaxBlockInfo> {
     R<List<WaxBlockInfo>> waxPreview(Long id);
     
     List<WaxBlockInfo> getWaxBlockInfoList (Long slideId,String waxCode,String genderFlag);
+    
+    List<WaxBlockInfo> getSpecialWaxBlockInfoList (Long specialId);
 }

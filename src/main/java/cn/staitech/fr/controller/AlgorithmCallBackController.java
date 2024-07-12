@@ -1,20 +1,28 @@
 package cn.staitech.fr.controller;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.annotation.Resource;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 import cn.hutool.json.JSONUtil;
 import cn.staitech.common.core.domain.R;
-import cn.staitech.fr.domain.Image;
+import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.in.AlgorithmAnnIn;
-import cn.staitech.fr.domain.in.DefinitionIn;
+import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.service.AlgorithmPredictionService;
 import cn.staitech.fr.service.ImageService;
+import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -38,38 +46,62 @@ public class AlgorithmCallBackController {
     
     @Resource
     private AlgorithmPredictionService algorithmPredictionService;
-
-    @ApiOperation(value = "清晰度回调")
-    @PostMapping("/verification")
-    public R verification(@Validated @RequestBody DefinitionIn req) {
-    	if (null != req) {
-    		log.info("清晰度算法回调,完整数据是：{}",JSONUtil.toJsonStr(req));
-    		Long imageId = req.getImageId();
-    		//AI分析状态：0:待分析（初始状态）、1:AI分析中、2:AI分析成功、3:AI分析失败 4：部分分析成功
-    		int aiAnalyzed = req.getAiAnalyzed();
-    		//文件状态:0上传中、1上传失败、2解析中、3解析失败、4可用 5:不可用
-    		int userStatus = 5;
-    		if (aiAnalyzed == 2 || aiAnalyzed == 4) {
-    			userStatus = 4;
-    		}
-    		userStatus = 4;
-    		Image image = new Image();
-    		image.setImageId(imageId);
-    		image.setStatus(userStatus);
-    		imageService.updateById(image);
-    	}
-        return R.ok();
-    }
+    @Resource
+    private JsonTaskParserService jsonTaskParserService;
     
+    @Resource
+	private SlideMapper slideMapper;
     
     @SuppressWarnings("rawtypes")
 	@ApiOperation(value = "脏器识别回调")
 	@PostMapping("/recognition")
-	public R recognition(@Validated @RequestBody AlgorithmAnnIn  algorithmAnnIn) throws Exception {
+	public R recognition(@Validated @RequestBody AlgorithmAnnIn  algorithmAnnIn) {
 		log.info("脏器识别算法回调专题,完整数据是：{}",JSONUtil.toJsonStr(algorithmAnnIn));
 		// 多线程处理
         algorithmPredictionService.recognition(algorithmAnnIn);
 		return R.ok();
 	}
+    
+    
+    @SuppressWarnings("rawtypes")
+	@ApiOperation(value = "脏器识别回调(按专题)")
+	@PostMapping("/recognitionBySpecial")
+	public R recognitionBySpecial(@Validated @RequestBody AlgorithmAnnIn  algorithmAnnIn) {
+		log.info("脏器识别算法回调专题,完整数据是：{}",JSONUtil.toJsonStr(algorithmAnnIn));
+		// 多线程处理
+		//专题id 185 全部从新核对
+		QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
+		queryWrapper.eq("special_id",algorithmAnnIn.getSlideId());
+		queryWrapper.eq("check_status",0);
+		//逻辑删除状态（0存在，1删除）
+		queryWrapper.eq("del_flag",CommonConstant.NUMBER_0);
+		List<Slide> slideList = slideMapper.selectList(queryWrapper);
+		if(CollectionUtils.isNotEmpty(slideList)){
+			List<Long> slideIdList = slideList.stream().map(Slide::getSlideId).collect(Collectors.toList());
+			for(Long slideId:slideIdList){
+				AlgorithmAnnIn  anno = new AlgorithmAnnIn();
+				anno.setSlideId(slideId);
+				anno.setOrganizationId(6L);
+				algorithmPredictionService.recognition(anno);
+				try {
+					Thread.sleep(10L);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return R.ok();
+	}
+    
+    
+    @SuppressWarnings("rawtypes")
+	@ApiOperation(value = "AI预测回调")
+	@PostMapping("/aiTest")
+    public R test(@Validated @RequestBody String  str) {
+    	log.info("脏器识别算法回调专题,完整数据是：{}",str);
+    	jsonTaskParserService.input(str);
+    	return R.ok();
+    }
     
 }

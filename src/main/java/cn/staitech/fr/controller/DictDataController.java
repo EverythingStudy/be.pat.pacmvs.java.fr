@@ -29,7 +29,7 @@ public class DictDataController {
     private DictDataService dictDataService;
 
     @ApiOperation(value = "根据codeType获得字典数据")
-    @GetMapping(value = "codeType")
+    @GetMapping(value = "/codeType")
     public R<List<DictData>> dictType(@RequestParam(value = "codeType")
                                     @ApiParam(name="codeType",value = "字典type",required = true) String codeType) {
         LambdaQueryWrapper<DictData> wrapper = new LambdaQueryWrapper<>();

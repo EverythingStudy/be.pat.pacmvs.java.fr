@@ -33,6 +33,7 @@ public class SendMessage {
         BroadcastVO broadcast = new BroadcastVO();
         broadcast.setData(features);
         broadcast.setType(status);
+        broadcast.setAnnotation_type("Draw");
         broadcast.setPoint_count_list(new ArrayList<>());
         return broadcast;
     }

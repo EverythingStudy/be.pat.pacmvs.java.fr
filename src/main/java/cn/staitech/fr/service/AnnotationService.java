@@ -8,9 +8,11 @@ import cn.staitech.fr.vo.annotation.AnnotationCountByCategory;
 import cn.staitech.fr.vo.annotation.AnnotationSelectList;
 import cn.staitech.fr.vo.annotation.MarkingMerge;
 import cn.staitech.fr.vo.geojson.Features;
+import cn.staitech.fr.vo.geojson.in.DistanceGet;
 import cn.staitech.fr.vo.geojson.in.RoiIn;
 import cn.staitech.fr.vo.geojson.in.UpdateOperationIn;
 import cn.staitech.fr.vo.geojson.in.ViewAddIn;
+import cn.staitech.fr.vo.geojson.out.AnnotationDistanceOut;
 import cn.staitech.fr.vo.geojson.out.BatchResult;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -25,6 +27,8 @@ import java.util.List;
 public interface AnnotationService extends IService<Annotation> {
 
     List<Features> selectListBy(AnnotationSelectList annotation) throws Exception;
+
+    List<Features> aiSelectListBy(AnnotationSelectList annotation) throws Exception;
 
     Long insert(ViewAddIn req) throws Exception;
 
@@ -42,8 +46,6 @@ public interface AnnotationService extends IService<Annotation> {
 
     List<BatchResult> batch(List<ViewAddIn> list) throws Exception;
     
-    List<AnnotationCountByCategory> getCategoryCount(Long slideId);
-
     Boolean undo(HistoryDTO dto);
 
     Boolean redo(HistoryDTO dto);
@@ -54,4 +56,12 @@ public interface AnnotationService extends IService<Annotation> {
 
     Annotation updateOperationByHistory(Annotation annotation);
 
+    /**
+     * 批量保存
+     * @param annotation
+     * @param batchSize
+     */
+    void batchProcessAndSave(Annotation annotation, int batchSize);
+
+    AnnotationDistanceOut getDistance(DistanceGet distanceGet);
 }

@@ -1,21 +1,18 @@
 package cn.staitech.fr.service.impl;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Resource;
-
-import org.springframework.stereotype.Service;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Structure;
 import cn.staitech.fr.mapper.StructureMapper;
 import cn.staitech.fr.service.StructureService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author: wangfeng
@@ -30,6 +27,20 @@ class StructureServiceImpl extends ServiceImpl<StructureMapper, Structure> imple
     @Override
     public Map<String, String> selectMap() {
         return select(false);
+    }
+
+    @Override
+    public Map<String, Integer> selectStructureSizeMap() {
+        return selectStructureSize();
+    }
+
+    private Map<String, Integer> selectStructureSize() {
+        List<Structure> list = structureMapper.selectList(new Structure());
+        return list.stream().collect(
+                HashMap::new,
+                (m, node) -> m.put(node.getOrganizationId().toString() + node.getStructureId(), node.getStructureSize()),
+                HashMap::putAll
+        );
     }
 
     @Override
@@ -80,7 +91,6 @@ class StructureServiceImpl extends ServiceImpl<StructureMapper, Structure> imple
     public Map<String, String> select(boolean en) {
         List<Structure> list = structureMapper.selectList(new Structure());
         if (en) {
-            // 20231222
             return list.stream().collect(
                     HashMap::new,
                     (m, node) -> m.put(node.getOrganizationId().toString() + node.getSpeciesId() + node.getOrganId() + node.getStructureId(), node.getNameEn()),

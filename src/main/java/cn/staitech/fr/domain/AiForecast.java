@@ -36,6 +36,12 @@ public class AiForecast implements Serializable {
     private String quantitativeIndicators;
 
     /**
+     * 定量指标英文
+     */
+    @ApiModelProperty(name = "quantitativeIndicatorsEn" , value = "定量指标英文")
+    private String quantitativeIndicatorsEn;
+
+    /**
      * 预测结果
      */
     @ApiModelProperty(name = "results" , value = "预测结果")
@@ -59,6 +65,14 @@ public class AiForecast implements Serializable {
     @ApiModelProperty(name = "createTime" , value = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private String createTime;
+
+    @ApiModelProperty(name = "unit" , value = "单位")
+    private String unit;
+
+    @ApiModelProperty("结构指标类别\n" +
+            "0：产品呈现指标\n" +
+            "1：算法输出指标")
+    private String structType;
 
 
 

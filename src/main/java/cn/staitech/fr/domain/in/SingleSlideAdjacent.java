@@ -14,7 +14,7 @@ public class SingleSlideAdjacent {
     @NotNull(message = "[专题id]不能为空")
     private Long specialId;
 
-    @NotNull(message = "单脏器id")
+//    @NotNull(message = "单脏器id")
     private Long singleSlideId;
 
     @ApiModelProperty(value = "动物编号")

@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.AlgorithmMapper">
+
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.Algorithm">
+        <result property="algorithmUuid" column="algorithm_uuid" jdbcType="INTEGER"/>
+        <result property="algorithmName" column="algorithm_name" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="VARCHAR"/>
+        <result property="whetherToCompare" column="whether_to_compare" jdbcType="BOOLEAN"/>
+        <result property="compareGroup" column="compare_group" jdbcType="VARCHAR"/>
+        <result property="code" column="code" jdbcType="VARCHAR"/>
+        <result property="abbreviation" column="abbreviation" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="VARCHAR"/>
+        <result property="minMem" column="min_mem" jdbcType="NUMERIC"/>
+        <result property="videoMemory" column="video_memory" jdbcType="NUMERIC"/>
+        <result property="algorithmLesion" column="algorithm_lesion" jdbcType="VARCHAR"/>
+        <result property="fileType" column="file_type" jdbcType="VARCHAR"/>
+        <result property="modelVersion" column="model_version" jdbcType="VARCHAR"/>
+        <result property="direction" column="direction" jdbcType="VARCHAR"/>
+        <result property="nividiaAmount" column="nividia_amount" jdbcType="INTEGER"/>
+        <result property="requestUrl" column="request_url" jdbcType="VARCHAR"/>
+        <result property="requestIp" column="request_ip" jdbcType="VARCHAR"/>
+        <result property="imageSize" column="image_size" jdbcType="INTEGER"/>
+        <result property="timeoutSeconds" column="timeout_seconds" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="BaseResultMap">
+        select
+          algorithm_uuid, algorithm_name, status, whether_to_compare, compare_group, code, abbreviation, create_time, min_mem, video_memory, algorithm_lesion, file_type, model_version, direction, nividia_amount, request_url, request_ip, image_size, timeout_seconds
+        from aipre_algorithm
+        where algorithm_uuid = #{algorithmUuid}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="BaseResultMap">
+        select
+          algorithm_uuid, algorithm_name, status, whether_to_compare, compare_group, code, abbreviation, create_time, min_mem, video_memory, algorithm_lesion, file_type, model_version, direction, nividia_amount, request_url, request_ip, image_size, timeout_seconds
+        from aipre_algorithm
+        <where>
+            <if test="algorithmUuid != null">
+                and algorithm_uuid = #{algorithmUuid}
+            </if>
+            <if test="algorithmName != null and algorithmName != ''">
+                and algorithm_name = #{algorithmName}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+            <if test="whetherToCompare != null">
+                and whether_to_compare = #{whetherToCompare}
+            </if>
+            <if test="compareGroup != null and compareGroup != ''">
+                and compare_group = #{compareGroup}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="abbreviation != null and abbreviation != ''">
+                and abbreviation = #{abbreviation}
+            </if>
+            <if test="createTime != null and createTime != ''">
+                and create_time = #{createTime}
+            </if>
+            <if test="minMem != null">
+                and min_mem = #{minMem}
+            </if>
+            <if test="videoMemory != null">
+                and video_memory = #{videoMemory}
+            </if>
+            <if test="algorithmLesion != null and algorithmLesion != ''">
+                and algorithm_lesion = #{algorithmLesion}
+            </if>
+            <if test="fileType != null and fileType != ''">
+                and file_type = #{fileType}
+            </if>
+            <if test="modelVersion != null and modelVersion != ''">
+                and model_version = #{modelVersion}
+            </if>
+            <if test="direction != null and direction != ''">
+                and direction = #{direction}
+            </if>
+            <if test="nividiaAmount != null">
+                and nividia_amount = #{nividiaAmount}
+            </if>
+            <if test="requestUrl != null and requestUrl != ''">
+                and request_url = #{requestUrl}
+            </if>
+            <if test="requestIp != null and requestIp != ''">
+                and request_ip = #{requestIp}
+            </if>
+            <if test="imageSize != null">
+                and image_size = #{imageSize}
+            </if>
+            <if test="timeoutSeconds != null">
+                and timeout_seconds = #{timeoutSeconds}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--通过实体作为筛选条件查询-->
+    <select id="queryAll" resultMap="BaseResultMap">
+        select
+          algorithm_uuid, algorithm_name, status, whether_to_compare, compare_group, code, abbreviation, create_time, min_mem, video_memory, algorithm_lesion, file_type, model_version, direction, nividia_amount, request_url, request_ip, image_size, timeout_seconds
+        from patsaas.aipre_algorithm
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from aipre_algorithm
+        <where>
+            <if test="algorithmUuid != null">
+                and algorithm_uuid = #{algorithmUuid}
+            </if>
+            <if test="algorithmName != null and algorithmName != ''">
+                and algorithm_name = #{algorithmName}
+            </if>
+            <if test="status != null and status != ''">
+                and status = #{status}
+            </if>
+            <if test="whetherToCompare != null">
+                and whether_to_compare = #{whetherToCompare}
+            </if>
+            <if test="compareGroup != null and compareGroup != ''">
+                and compare_group = #{compareGroup}
+            </if>
+            <if test="code != null and code != ''">
+                and code = #{code}
+            </if>
+            <if test="abbreviation != null and abbreviation != ''">
+                and abbreviation = #{abbreviation}
+            </if>
+            <if test="createTime != null and createTime != ''">
+                and create_time = #{createTime}
+            </if>
+            <if test="minMem != null">
+                and min_mem = #{minMem}
+            </if>
+            <if test="videoMemory != null">
+                and video_memory = #{videoMemory}
+            </if>
+            <if test="algorithmLesion != null and algorithmLesion != ''">
+                and algorithm_lesion = #{algorithmLesion}
+            </if>
+            <if test="fileType != null and fileType != ''">
+                and file_type = #{fileType}
+            </if>
+            <if test="modelVersion != null and modelVersion != ''">
+                and model_version = #{modelVersion}
+            </if>
+            <if test="direction != null and direction != ''">
+                and direction = #{direction}
+            </if>
+            <if test="nividiaAmount != null">
+                and nividia_amount = #{nividiaAmount}
+            </if>
+            <if test="requestUrl != null and requestUrl != ''">
+                and request_url = #{requestUrl}
+            </if>
+            <if test="requestIp != null and requestIp != ''">
+                and request_ip = #{requestIp}
+            </if>
+            <if test="imageSize != null">
+                and image_size = #{imageSize}
+            </if>
+            <if test="timeoutSeconds != null">
+                and timeout_seconds = #{timeoutSeconds}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="algorithmUuid" useGeneratedKeys="true">
+        insert into aipre_algorithm(algorithm_name, status, whether_to_compare, compare_group, code, abbreviation, create_time, min_mem, video_memory, algorithm_lesion, file_type, model_version, direction, nividia_amount, request_url, request_ip, image_size, timeout_seconds)
+        values (#{algorithmName}, #{status}, #{whetherToCompare}, #{compareGroup}, #{code}, #{abbreviation}, #{createTime}, #{minMem}, #{videoMemory}, #{algorithmLesion}, #{fileType}, #{modelVersion}, #{direction}, #{nividiaAmount}, #{requestUrl}, #{requestIp}, #{imageSize}, #{timeoutSeconds})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="algorithmUuid" useGeneratedKeys="true">
+        insert into aipre_algorithm(algorithm_name, status, whether_to_compare, compare_group, code, abbreviation, create_time, min_mem, video_memory, algorithm_lesion, file_type, model_version, direction, nividia_amount, request_url, request_ip, image_size, timeout_seconds)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.algorithmName}, #{entity.status}, #{entity.whetherToCompare}, #{entity.compareGroup}, #{entity.code}, #{entity.abbreviation}, #{entity.createTime}, #{entity.minMem}, #{entity.videoMemory}, #{entity.algorithmLesion}, #{entity.fileType}, #{entity.modelVersion}, #{entity.direction}, #{entity.nividiaAmount}, #{entity.requestUrl}, #{entity.requestIp}, #{entity.imageSize}, #{entity.timeoutSeconds})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="algorithmUuid" useGeneratedKeys="true">
+        insert into aipre_algorithm(algorithm_name, status, whether_to_compare, compare_group, code, abbreviation, create_time, min_mem, video_memory, algorithm_lesion, file_type, model_version, direction, nividia_amount, request_url, request_ip, image_size, timeout_seconds)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.algorithmName}, #{entity.status}, #{entity.whetherToCompare}, #{entity.compareGroup}, #{entity.code}, #{entity.abbreviation}, #{entity.createTime}, #{entity.minMem}, #{entity.videoMemory}, #{entity.algorithmLesion}, #{entity.fileType}, #{entity.modelVersion}, #{entity.direction}, #{entity.nividiaAmount}, #{entity.requestUrl}, #{entity.requestIp}, #{entity.imageSize}, #{entity.timeoutSeconds})
+        </foreach>
+        on duplicate key update
+        algorithm_name = values(algorithm_name),
+        status = values(status),
+        whether_to_compare = values(whether_to_compare),
+        compare_group = values(compare_group),
+        code = values(code),
+        abbreviation = values(abbreviation),
+        create_time = values(create_time),
+        min_mem = values(min_mem),
+        video_memory = values(video_memory),
+        algorithm_lesion = values(algorithm_lesion),
+        file_type = values(file_type),
+        model_version = values(model_version),
+        direction = values(direction),
+        nividia_amount = values(nividia_amount),
+        request_url = values(request_url),
+        request_ip = values(request_ip),
+        image_size = values(image_size),
+        timeout_seconds = values(timeout_seconds)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update aipre_algorithm
+        <set>
+            <if test="algorithmName != null and algorithmName != ''">
+                algorithm_name = #{algorithmName},
+            </if>
+            <if test="status != null and status != ''">
+                status = #{status},
+            </if>
+            <if test="whetherToCompare != null">
+                whether_to_compare = #{whetherToCompare},
+            </if>
+            <if test="compareGroup != null and compareGroup != ''">
+                compare_group = #{compareGroup},
+            </if>
+            <if test="code != null and code != ''">
+                code = #{code},
+            </if>
+            <if test="abbreviation != null and abbreviation != ''">
+                abbreviation = #{abbreviation},
+            </if>
+            <if test="createTime != null and createTime != ''">
+                create_time = #{createTime},
+            </if>
+            <if test="minMem != null">
+                min_mem = #{minMem},
+            </if>
+            <if test="videoMemory != null">
+                video_memory = #{videoMemory},
+            </if>
+            <if test="algorithmLesion != null and algorithmLesion != ''">
+                algorithm_lesion = #{algorithmLesion},
+            </if>
+            <if test="fileType != null and fileType != ''">
+                file_type = #{fileType},
+            </if>
+            <if test="modelVersion != null and modelVersion != ''">
+                model_version = #{modelVersion},
+            </if>
+            <if test="direction != null and direction != ''">
+                direction = #{direction},
+            </if>
+            <if test="nividiaAmount != null">
+                nividia_amount = #{nividiaAmount},
+            </if>
+            <if test="requestUrl != null and requestUrl != ''">
+                request_url = #{requestUrl},
+            </if>
+            <if test="requestIp != null and requestIp != ''">
+                request_ip = #{requestIp},
+            </if>
+            <if test="imageSize != null">
+                image_size = #{imageSize},
+            </if>
+            <if test="timeoutSeconds != null">
+                timeout_seconds = #{timeoutSeconds},
+            </if>
+        </set>
+        where algorithm_uuid = #{algorithmUuid}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from aipre_algorithm where algorithm_uuid = #{algorithmUuid}
+    </delete>
+
+</mapper>
+

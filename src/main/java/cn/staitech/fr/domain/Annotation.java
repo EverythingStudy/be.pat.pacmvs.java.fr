@@ -1,9 +1,11 @@
 package cn.staitech.fr.domain;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -81,6 +83,11 @@ public class Annotation implements Serializable {
     private Long projectId;
 
     /**
+     * 矩形轮廓
+     */
+    private String contourPolygon;
+
+    /**
      * 切片id
      */
     private Long slideId;
@@ -93,7 +100,19 @@ public class Annotation implements Serializable {
     /**
      * 轮廓坐标
      */
+    @TableField(exist = false)
     private String contour;
+
+    private String contour40000;
+
+    private String contour10000;
+    
+    @TableField(exist = false)
+    private String contour5000;
+
+    private String contour2500;
+
+    private String contour625;
     
     /**
      * 轮廓类型 1：矩形 2：标注轮廓
@@ -112,6 +131,127 @@ public class Annotation implements Serializable {
     
     @TableField(exist = false)
     private List<Long> slideIdList;
+
+    @TableField(exist = false)
+    private Long sequenceNumber;
+
+    @TableField(exist = false)
+    private Boolean filigreeContour;
+
+    @TableField(exist = false)
+    private List<Long> structureSizeList;
+
+    @TableField(exist = false)
+    private Long magnification;
+
+    @TableField(exist = false)
+    private Long magnifications;
+
+    @TableField(exist = false)
+    private String collectContour;
+
+    @TableField(exist = false)
+    private String results;
+
+    @TableField(exist = false)
+    private List<Annotation> list;
+
+    @TableField(exist = false)
+    private String intersectsResults;
+
+    @TableField(exist = false)
+    private Integer structureSize;
+
+    @TableField(exist = false)
+    private BigDecimal structureAreaNum = BigDecimal.ZERO;
+
+    @TableField(exist = false)
+    private BigDecimal structurePerimeterNum = BigDecimal.ZERO;
+
+    @TableField(exist = false)
+    private Boolean insideOrOutside;
+
+    @TableField(exist = false)
+    private List<Long> singleSlideIdList;
+    
+    @TableField(exist = false)
+    private List<Long> categoryIdList;
+
+    @TableField(exist = false)
+    private List<Long> categoryIdLists;
+
+    @TableField(exist = false)
+    private List<String> contourList;
+
+    @TableField(exist = false)
+    private String cellType;
+
+    @TableField(exist = false)
+    private String contourOne;
+
+    @TableField(exist = false)
+    private String contourTwo;
+
+    @TableField(exist = false)
+    private Double meanDistance;
+
+    @TableField(exist = false)
+    private Double minDistance;
+
+    @TableField(exist = false)
+    private String results40000;
+
+    @TableField(exist = false)
+    private String results10000;
+
+    @TableField(exist = false)
+    private String results2500;
+
+    @TableField(exist = false)
+    private String results625;
+
+    @TableField(exist = false)
+    private Integer count = 0;
+
+    @TableField(exist = false)
+    private String dynamicData;
+
+    public Object getDynamicDataList() {
+        return JSON.parseObject(dynamicData);
+    }
+
+    @TableField(exist = false)
+    private Object dynamicDataList;
+
+    @TableField(exist = false)
+    private String areaName;
+
+    @TableField(exist = false)
+    private String perimeterName;
+
+    @TableField(exist = false)
+    private String countName;
+
+    @TableField(exist = false)
+    private String areaUnit;
+
+    @TableField(exist = false)
+    private String perimeterUnit;
+
+    @TableField(exist = false)
+    private String areaValue;
+
+    @TableField(exist = false)
+    private String perimeterValue;
+
+    @TableField(exist = false)
+    private String countUnit = "个";
+
+
+
+
+
+
 
     @Override
     public boolean equals(Object that) {

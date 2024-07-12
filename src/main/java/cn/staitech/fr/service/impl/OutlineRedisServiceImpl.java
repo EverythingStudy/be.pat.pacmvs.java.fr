@@ -13,14 +13,12 @@ import cn.staitech.fr.vo.measure.BroadcastVO;
 import cn.staitech.fr.vo.outline.OutlineRoot;
 import cn.staitech.fr.vo.outline.OutlineSelectVO;
 import cn.staitech.fr.vo.outline.OutlineStatistic;
-import cn.staitech.system.api.domain.SysUser;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -46,10 +44,6 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
     private AnnotationMapper annotationMapper;
     @Resource
     private RedisService redisService;
-    @Resource
-    private SlideMapper slideMapper;
-    @Resource
-    private UserMapper userMapper;
 
     @Resource
     private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;

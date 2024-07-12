@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 
-import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.thread.ExecutorBuilder;
 import cn.hutool.json.JSONUtil;
@@ -30,6 +29,8 @@ import cn.staitech.common.redis.service.RedisService;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.Category;
 import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.Special;
@@ -38,17 +39,14 @@ import cn.staitech.fr.domain.in.AlgorithmAnnIn;
 import cn.staitech.fr.domain.in.StartPredictionIn;
 import cn.staitech.fr.domain.out.AlgorithmImageOut;
 import cn.staitech.fr.feign.PythonOrganRecognitionService;
-import cn.staitech.fr.feign.PythonService;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
 import cn.staitech.fr.service.AlgorithmPredictionService;
-import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.service.CategoryService;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.WaxBlockInfoService;
-import cn.staitech.fr.service.WaxBlockNumberService;
 import cn.staitech.fr.vo.annotation.AnnotationCountByCategory;
 import cn.staitech.fr.vo.annotation.StartRecognition;
 import lombok.extern.slf4j.Slf4j;
@@ -80,14 +78,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	private WaxBlockInfoService waxBlockInfoService;
 
 	@Resource
-	private WaxBlockNumberService waxBlockNumberService;
-
-	@Resource
 	private RedisService redisService;
-
-	@Resource
-	private CategoryService categoryService;
-
 
 	@Resource
 	private SpecialMapper specialMapper;
@@ -97,6 +88,9 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 
 	@Resource
 	private PythonOrganRecognitionService pythonService;
+	
+	@Resource
+    private CategoryService categoryService;
 
 
 	@SuppressWarnings("rawtypes")
@@ -138,7 +132,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 				Long imageId = algorithmImageOut.getImageId();
 				String organizatinName = geNumber(organizationId);
 				if(null != slideId && StringUtils.isNotEmpty(imageUrl)){
-					if(imageUrl.endsWith("svs")||imageUrl.endsWith("SVS")){
+					if(imageUrl.toLowerCase().endsWith("svs")){
 						//请求算法接口
 						try {
 							log.info("AI算法请求内容是imageId:{},slideId:{},organizationId:{},imageUrl:{},algorithm_name:{}", imageId,slideId,organizationId,imageUrl,CommonConstant.RECOGNITION_MODEL_NAME);
@@ -204,7 +198,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 	}
 
 
-	public void process(AlgorithmAnnIn  algorithmAnnIn) throws Exception {
+	public void process(AlgorithmAnnIn  algorithmAnnIn){
 		Long startTime = System.currentTimeMillis();
 		Long slideId = algorithmAnnIn.getSlideId();
 		if(null != slideId){
@@ -226,21 +220,6 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 
 
 	public void checkSlide(Slide slide) {
-		//启动时间
-		Date initiateTime =slide.getInitiateTime();
-		Date currentTime = DateUtil.date();
-		if(null != initiateTime){
-			Image image = imageMapper.selectById(slide.getImageId());
-			// Calculate the difference in milliseconds
-			Long diffInMilliseconds = currentTime.getTime() - initiateTime.getTime();
-			// Convert the difference to seconds
-			double diffInSeconds = diffInMilliseconds.doubleValue() / 1000L;
-			String imageSize = "";
-			if(StringUtils.isNotEmpty(image.getSize())){
-				imageSize = String.format("%.2f", Long.parseLong(image.getSize()) / (1024.0 * 1024.0)) + "MB";
-			}
-			log.info("AI统脏器识别算法耗时统计,slideId:{},imageId:{},切片名称：{},切片大小：{},开始时间：{},结束时间：{},总共历时：{}秒", slide.getSlideId(),slide.getImageId(),image.getImageName(),imageSize,DateUtil.format(slide.getInitiateTime(), "yyyy-MM-dd HH:mm:ss") ,DateUtil.format(new Date(), "yyyy-MM-dd HH:mm:ss"),diffInSeconds);
-		}
 		//切片名称解析，0：成功；1：失败
 		String analyzeStatus = slide.getAnalyzeStatus();
 		if(StringUtils.isNotEmpty(analyzeStatus) && analyzeStatus.equals("1")){
@@ -261,9 +240,9 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 		Special special = specialMapper.selectById(slideInfo.getSpecialId());
 		Long organizationId = special.getOrganizationId();
 
-		//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
+		//处理状态（0：待切图,1：切图中,2：已切图 3：切图失败  4：禁止切图）
 		int processFlag = slide.getProcessFlag();
-		if(processFlag == 3){
+		if(processFlag == 3 || processFlag == 4){
 			//更新checkStatus
 			Slide updateSlide = new Slide();
 			updateSlide.setSlideId(slideId);
@@ -312,8 +291,16 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			//查询所属切片AI脏器信息
 			Map<String,Integer> slideCountMap = new HashMap<String, Integer>();
 			int slideCountSize = 0;
-
-			List<AnnotationCountByCategory>  countList = annotationMapper.getCategoryCount(slideId);
+			Annotation annotationParm = new Annotation();
+			annotationParm.setSlideId(slideId);
+			//查询
+			QueryWrapper<Category> queryWrapper = new QueryWrapper<>();
+			queryWrapper.eq("del_flag", 1);
+			queryWrapper.eq("organization_id", organizationId);
+			List<Category> categoryList =  categoryService.list(queryWrapper);
+			List<Long> categoryIdList = categoryList.stream().map(Category::getCategoryId).collect(Collectors.toList());
+			annotationParm.setCategoryIdList(categoryIdList);
+			List<AnnotationCountByCategory>  countList = annotationMapper.getCategoryCount(annotationParm);
 			if(CollectionUtils.isNotEmpty(countList)){
 				for(AnnotationCountByCategory annotationCount:countList){
 					Long categoryId = annotationCount.getCategoryId();
@@ -402,7 +389,7 @@ public class AlgorithmPredictionServiceImpl implements AlgorithmPredictionServic
 			//模糊匹配
 			if (organName.contains(slideOrganName)) {
 				//数量相等
-				if (organNumber == slideOrganNumber) {
+				if (organNumber <= slideOrganNumber) {
 					containsValue = true;
 					break;
 				}

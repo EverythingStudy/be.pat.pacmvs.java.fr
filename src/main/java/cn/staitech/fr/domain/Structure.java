@@ -59,4 +59,6 @@ public class Structure {
     @ApiModelProperty(value = "机构ID")
     @TableField("organization_id")
     private Long organizationId;
+    @TableField(value = "structure_size")
+    private Integer structureSize;
 }

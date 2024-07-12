@@ -6,19 +6,27 @@ import cn.staitech.common.core.web.controller.BaseController;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.Container;
 import cn.staitech.fr.domain.AccessProjectRecords;
+import cn.staitech.fr.domain.AiForecast;
 import cn.staitech.fr.domain.Special;
+import cn.staitech.fr.domain.SpecialLockLog;
 import cn.staitech.fr.domain.in.EditSpecialStatusIn;
 import cn.staitech.fr.domain.in.SpecialAddIn;
 import cn.staitech.fr.domain.in.SpecialEditIn;
 import cn.staitech.fr.domain.in.SpecialListQueryIn;
 import cn.staitech.fr.domain.in.SpecialsQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
+import cn.staitech.fr.mapper.DiagnosisMapper;
 import cn.staitech.fr.service.AccessProjectRecordsService;
+import cn.staitech.fr.service.DiagnosisService;
+import cn.staitech.fr.service.SpecialLockLogService;
 import cn.staitech.fr.service.SpecialService;
 import cn.staitech.fr.utils.LanguageUtils;
+import cn.staitech.system.api.domain.SysUser;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,8 +36,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Resource;
 
 /**
  * @Author wudi
@@ -46,6 +60,12 @@ public class SpecialController  extends BaseController {
     
     @Autowired
     private AccessProjectRecordsService accessProjectRecordsService;
+    
+    @Autowired
+    private SpecialLockLogService specialLockLogService;
+    
+    @Resource
+	private DiagnosisService diagnosisService;
 
     @ApiOperation(value = "专题列表分页查询")
     @PostMapping("/list")
@@ -132,6 +152,52 @@ public class SpecialController  extends BaseController {
     public R<PageResponse<SpecialListQueryOut>> specialList(@RequestBody @Validated SpecialsQueryIn req) {
         PageResponse<SpecialListQueryOut> resp = specialService.getSpecials(req);
         return R.ok(resp);
+    }
+    
+    @ApiOperation(value = "专题锁定日志")
+    @GetMapping("/getLockLog")
+    public R<List<SpecialLockLog>> getLockLog(@RequestParam("specialId") @ApiParam(name = "specialId", value ="专题id" ) Long specialId){
+    	//查询锁定记录
+    	QueryWrapper<SpecialLockLog> queryWrapper = new QueryWrapper<>();
+    	queryWrapper.eq("special_id", specialId);
+    	queryWrapper.orderByDesc("create_time");
+    	List<SpecialLockLog> list = specialLockLogService.list(queryWrapper);
+    	if(CollectionUtils.isNotEmpty(list)){
+    		for(SpecialLockLog log:list){
+    			Map<String,Object> parm = new HashMap<>();
+				parm.put("userId", log.getCreateBy());
+//				List<SysUser> loginUserList = diagnosisMapper.selectUserById(parm);
+//				log.setNickName(loginUserList.get(0).getNickName());
+				SysUser loginUser =  diagnosisService.getUserInfo(parm);
+				if(null != loginUser){
+					log.setNickName(loginUser.getNickName());
+				}else{
+					log.setNickName("");
+				}
+    		}
+    	}
+    	return R.ok(list);
+    }
+    
+    @ApiOperation(value = "根据帐号查询昵称")
+    @GetMapping("/getNickName")
+    public R<String> getNickName(@RequestParam("userName") @ApiParam(name = "userName", value ="帐号名称" ) String userName){
+    	//查询锁定记录
+    	Map<String,Object> parm = new HashMap<>();
+		parm.put("userName", userName);
+		parm.put("organizationId", SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
+		/*List<SysUser> userList = diagnosisMapper.selectUserById(parm);
+		String nickName = "";
+		if(CollectionUtils.isNotEmpty(userList)){
+			 nickName = userList.get(0).getNickName();
+		}*/
+//		List<SysUser> userList =  diagnosisService.getUserInfo(parm);
+		String nickName = "";
+		SysUser loginUser =  diagnosisService.getUserInfo(parm);
+		if(null != loginUser){
+			 nickName = loginUser.getNickName();
+		}
+    	return R.ok(nickName);
     }
 
 }

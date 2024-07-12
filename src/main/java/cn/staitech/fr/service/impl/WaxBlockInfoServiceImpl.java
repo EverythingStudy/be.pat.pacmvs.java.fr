@@ -2,7 +2,6 @@ package cn.staitech.fr.service.impl;
 
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.WaxBlockInfo;
-import cn.staitech.fr.mapper.StructureMapper;
 import cn.staitech.fr.mapper.WaxBlockInfoMapper;
 import cn.staitech.fr.service.WaxBlockInfoService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -51,6 +50,14 @@ public class WaxBlockInfoServiceImpl extends ServiceImpl<WaxBlockInfoMapper, Wax
 			parm.put("genderFlag", genderFlag);
 		}
 		List<WaxBlockInfo> list = waxBlockInfoMapper.getWaxBlockInfoList(parm);
+		return list;
+	}
+
+	@Override
+	public List<WaxBlockInfo> getSpecialWaxBlockInfoList(Long specialId) {
+		Map<String,Object> parm = new HashMap<>();
+		parm.put("specialId", specialId);
+		List<WaxBlockInfo> list = waxBlockInfoMapper.getSpecialWaxBlockInfoList(parm);
 		return list;
 	}
 }

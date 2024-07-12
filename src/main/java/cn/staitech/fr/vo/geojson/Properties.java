@@ -3,6 +3,8 @@ package cn.staitech.fr.vo.geojson;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.Map;
+
 @Data
 public class Properties {
 
@@ -110,4 +112,8 @@ public class Properties {
 
     @ApiModelProperty(value = "区分单脏器还是多脏器")
     private int single;
+    @ApiModelProperty(value = "指标")
+    private Map<String, Indicator> data_indicators;
+    @ApiModelProperty(value = "质点标识")
+    private String cell_type;
 }

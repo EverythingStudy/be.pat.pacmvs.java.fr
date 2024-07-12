@@ -21,5 +21,7 @@ public class AlgorithmAnnIn{
 //	@ApiModelProperty(name = "slideIdList" , value = "切片id")
 //	private List<Long> slideIdList;
 	private Long slideId;
+
+	private Long organizationId;
 }
 

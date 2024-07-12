@@ -3,20 +3,18 @@ package cn.staitech.fr.controller;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.utils.uuid.UUID;
 import cn.staitech.common.security.utils.SecurityUtils;
+import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.service.AnnotationService;
-import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.fr.vo.annotation.AnnotationById;
 import cn.staitech.fr.vo.annotation.AnnotationSelectList;
 import cn.staitech.fr.vo.annotation.MarkingMerge;
 import cn.staitech.fr.vo.geojson.Features;
-import cn.staitech.fr.vo.geojson.in.RoiIn;
-import cn.staitech.fr.vo.geojson.in.UpdateOperationIn;
-import cn.staitech.fr.vo.geojson.in.ViewAddIn;
-import cn.staitech.fr.vo.geojson.in.ViewAddInList;
+import cn.staitech.fr.vo.geojson.in.*;
+import cn.staitech.fr.vo.geojson.out.AnnotationDistanceOut;
 import cn.staitech.fr.vo.geojson.out.BatchResult;
 import com.alibaba.fastjson.JSONObject;
-import com.github.xiaoymin.knife4j.annotations.ApiOperationSupport;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -26,7 +24,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/annotation")
@@ -36,7 +33,15 @@ public class AnnotationController {
     private AnnotationService annotationService;
 
     @Resource
-    private SlideService slideService;
+    private AnnotationMapper annotationMapper;
+
+
+    @PostMapping("/getDistance")
+    @ApiOperation(value = "获取间距")
+    public R<AnnotationDistanceOut> getDistance(@RequestBody DistanceGet res)  {
+        return R.ok(annotationService.getDistance(res));
+    }
+
 
     @ApiOperation(value = "添加标注")
     @PostMapping("/insert")
@@ -92,7 +97,6 @@ public class AnnotationController {
         }
     }
 
-    @ApiOperationSupport(author = "zmj")
     @ApiOperation(value = "添加ROI轮廓")
     @PostMapping("/intelligentAnno/insertROI")
     public R<String> addList(@Validated @RequestBody RoiIn req) throws Exception {
@@ -105,7 +109,6 @@ public class AnnotationController {
         return annotationService.roiContDel(req);
     }
 
-    @ApiOperationSupport(author = "gjt")
     @ApiOperation(value = "合并轮廓预览")
     @PostMapping("/markingMerge")
     public R<JSONObject> markingMerge(@Validated @RequestBody MarkingMerge req) throws Exception {
@@ -117,6 +120,12 @@ public class AnnotationController {
     @PostMapping("/selectLists")
     public R<List<Features>> selectLists(@Validated @RequestBody AnnotationSelectList req) throws Exception {
         return R.ok(annotationService.selectListBy(req));
+    }
+
+    @ApiOperation(value = "获取AIGeoJson数据")
+    @PostMapping("/aiSelectLists")
+    public R<List<Features>> aiSelectLists(@Validated @RequestBody AnnotationSelectList req) throws Exception {
+        return R.ok(annotationService.aiSelectListBy(req));
     }
 
     /**

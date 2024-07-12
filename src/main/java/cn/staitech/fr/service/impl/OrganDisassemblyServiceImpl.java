@@ -1,20 +1,12 @@
 package cn.staitech.fr.service.impl;
 
-import cn.hutool.core.collection.CollectionUtil;
 import cn.staitech.common.core.domain.PageResponse;
-import cn.staitech.common.core.utils.bean.BeanUtils;
-import cn.staitech.fr.config.MapConstant;
-import cn.staitech.fr.domain.Image;
-import cn.staitech.fr.domain.in.ImageVagueQueryIn;
 import cn.staitech.fr.domain.in.OrganDisassemblyQueryIn;
 import cn.staitech.fr.domain.out.ImageExportOut;
-import cn.staitech.fr.domain.out.ImageVagueListOutVO;
 import cn.staitech.fr.domain.out.OrganDisassemblyOut;
-import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.service.OrganDisassemblyService;
 import cn.staitech.fr.service.SingleSlideService;
 import cn.staitech.fr.utils.MessageSource;
-import cn.staitech.fr.utils.PageMaster;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.converters.longconverter.LongStringConverter;
@@ -33,8 +25,6 @@ import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
@@ -50,8 +40,6 @@ public class OrganDisassemblyServiceImpl implements OrganDisassemblyService {
     private SingleSlideService singleSlideService;
     @Resource
     private HttpServletResponse response;
-    @Resource
-    private ImageMapper mapper;
 
     @Override
     public PageResponse<OrganDisassemblyOut> getList(OrganDisassemblyQueryIn req) {

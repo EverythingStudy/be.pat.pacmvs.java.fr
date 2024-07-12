@@ -1,7 +1,6 @@
 package cn.staitech.fr.service.impl;
 
 
-import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.history.Cursor;
 import cn.staitech.fr.domain.history.HistoryDTO;
 import cn.staitech.fr.domain.history.Session;
@@ -26,9 +25,6 @@ public class HistoryServiceImpl implements HistoryService {
 
     @Resource
     AnnotationService annotationService;
-
-//    @Resource
-//    MarkingExamineService markingExamineService;
 
     public static Session refreshSession(Long userId, Long slideId) {
         // 撤消,恢复历史记录 用HistoryService会引起循环依赖！ -> 后续在线程池中处理 判断是批处理，还是单独处理
