@@ -718,6 +718,22 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setAnnotationId(Long.valueOf(req.getMarking_id()));
         if (req.getGeometry() != null) {
             annotation.setContour(String.valueOf(req.getGeometry()));
+            Geometry geometry = WKT_READER.read(MarkingUtils.jsonToWkt(JSONObject.parseObject(annotation.getContour())));
+            Slide slide = slideMapper.selectById(annotationBy.getSlideId());
+            if (!Optional.ofNullable(slide).isPresent()) {
+                throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
+            }
+            Image image = imageMapper.selectById(slide.getImageId());
+            if (!Optional.ofNullable(image).isPresent()) {
+                throw new Exception(MessageSource.M("NODATA"));
+            }
+            if (image.getResolutionX() != null) {
+                double resolutions = Double.parseDouble(image.getResolutionX());
+                String area = String.valueOf(geometry.getArea() * resolutions * resolutions);
+                annotation.setArea(AreaUtils.formattedNumber(area));
+                String per = String.valueOf(geometry.getLength() * resolutions);
+                annotation.setPerimeter(AreaUtils.formattedNumber(per));
+            }
         }
         annotationMapper.updateById(annotation);
         Annotation annotationBys = annotationMapper.selectById(annotation);
@@ -830,9 +846,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (image.getResolutionX() != null) {
             double resolutions = Double.parseDouble(image.getResolutionX());
             String area = String.valueOf(geometry.getArea() * resolutions * resolutions);
-            annotation.setArea(area);
+            annotation.setArea(AreaUtils.formattedNumber(area));
             String per = String.valueOf(geometry.getLength() * resolutions);
-            annotation.setPerimeter(per);
+            annotation.setPerimeter(AreaUtils.formattedNumber(per));
         }
         annotation.setUpdateBy(SecurityUtils.getUserId());
         int res = annotationMapper.updateById(annotation);
@@ -840,7 +856,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         PropertiesBriefly properties = getProperties(annotationBys);
         Features features = socketData(annotationBys.getId(), geometryJson, properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
-        NioWebSocketHandler.sendSingle(annotation.getSingleSlideId(), broadcastVO);
+        NioWebSocketHandler.sendSingle(annotationBy.getSingleSlideId(), broadcastVO);
         return res;
     }
 
@@ -931,9 +947,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (image.getResolutionX() != null) {
             double resolutions = Double.parseDouble(image.getResolutionX());
             String area = String.valueOf(Double.parseDouble(annotationArea.getArea()) * resolutions * resolutions);
-            annotation.setArea(area);
+            annotationBys.setArea(AreaUtils.formattedNumber(area));
             String per = String.valueOf(Double.parseDouble(annotationArea.getPerimeter()) * resolutions);
-            annotation.setPerimeter(per);
+            annotationBys.setPerimeter(AreaUtils.formattedNumber(per));
         }
         if (annotation.getSingleSlideId() == null) {
             // 更新矩形轮廓
