@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -136,6 +137,13 @@ public class AreaUtils {
         annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
         return annotationMapper.countDucts(annotation);
 
+    }
+
+
+    public static String formattedNumber(String res) {
+        double value = Double.parseDouble(res);
+        DecimalFormat df = new DecimalFormat("0.000");
+        return df.format(value);
     }
 
     /**

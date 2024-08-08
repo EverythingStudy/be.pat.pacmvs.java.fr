@@ -83,6 +83,8 @@
         <set>
             <if test="categoryId != null">category_id = #{categoryId},</if>
             <if test="description != null">description = #{description},</if>
+            <if test="area != null">area = #{area},</if>
+            <if test="perimeter != null">perimeter = #{perimeter},</if>
             <if test="locationType != null and locationType != ''">location_type = #{locationType},</if>
             <if test="annotationType != null and annotationType != ''">annotation_type = #{annotationType},</if>
             <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
