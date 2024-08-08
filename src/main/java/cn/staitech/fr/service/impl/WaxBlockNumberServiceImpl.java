@@ -88,6 +88,9 @@ public class WaxBlockNumberServiceImpl extends ServiceImpl<WaxBlockNumberMapper,
         log.info("蜡块编号分页查询接口开始：");
         //创建响应
         PageResponse resp = new PageResponse();
+        if(!SecurityUtils.isAdmin(SecurityUtils.getUserId())){
+            req.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
+        }
         //分页查询
         Page<SysUser> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
         List<WaxBlockNumberListOut> waxList = this.baseMapper.getWaxList(req);
