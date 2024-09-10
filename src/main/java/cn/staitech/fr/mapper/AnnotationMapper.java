@@ -1,7 +1,10 @@
 package cn.staitech.fr.mapper;
 
 import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.vo.annotation.in.MarkingMerge;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
 * @author admin
@@ -10,6 +13,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @Entity cn.staitech.fr.domain.Contour
 */
 public interface AnnotationMapper extends BaseMapper<Annotation> {
+
+	List<Annotation> selectListBy(Annotation annotation);
+
 	Integer selectExistTable(Annotation annotation);
 
 	void createTableSequence(Annotation annotation);
@@ -25,6 +31,14 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 	Annotation avgDistance(Annotation annotation);
 
 	Annotation selectByIds(Annotation annotation);
+
+	List<Annotation> selectInList(MarkingMerge req);
+
+	Annotation mergeContour(Annotation annotation);
+
+	Annotation selectContourType(Annotation annotation);
+
+	Annotation getArea(Annotation annotation);
 
 
 

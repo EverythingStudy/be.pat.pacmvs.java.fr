@@ -2,6 +2,7 @@ package cn.staitech.fr.service;
 
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.vo.annotation.Features;
 import cn.staitech.fr.vo.annotation.in.*;
 import cn.staitech.fr.vo.annotation.out.AnnotationDistanceOut;
 import cn.staitech.fr.vo.history.HistoryDTO;
@@ -17,25 +18,25 @@ import java.util.List;
 */
 public interface AnnotationService extends IService<Annotation> {
 
-//    List<Features> selectListBy(AnnotationSelectList annotation) throws Exception;
+    List<Features> selectListBy(AnnotationSelectList annotation) throws Exception;
 //
 //    List<Features> aiSelectListBy(AnnotationSelectList annotation) throws Exception;
 //
     Long insert(ViewAddIn req) throws Exception;
+
+    int delete(AnnotationById req) throws Exception;
 //
-//    int delete(AnnotationById req) throws Exception;
-//
-//    R<String> roiContDel(RoiIn viewAddIns) throws Exception;
+    R<String> roiContDel(RoiIn viewAddIns) throws Exception;
 //
 //
-//    Long update(ViewAddIn marking) throws Exception;
-//    int padding(AnnotationById req) throws Exception;
-//    int stickup(AnnotationById req) throws Exception;
-//    JSONObject markingMerge(MarkingMerge req) throws Exception;
+    Long update(ViewAddIn marking) throws Exception;
+    int padding(AnnotationById req) throws Exception;
+    int stickup(AnnotationById req) throws Exception;
+    JSONObject markingMerge(MarkingMerge req) throws Exception;
 //
-//    JSONObject updateOperation(UpdateOperationIn req, String traceId, Boolean isBatch) throws Exception;
+    JSONObject updateOperation(UpdateOperationIn req, String traceId, Boolean isBatch) throws Exception;
 //
-//    List<BatchResult> batch(List<ViewAddIn> list) throws Exception;
+    List<BatchResult> batch(List<ViewAddIn> list) throws Exception;
 //
     Boolean undo(HistoryDTO dto);
 
