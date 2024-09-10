@@ -10,7 +10,15 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @Entity cn.staitech.fr.domain.Contour
 */
 public interface ContourMapper extends BaseMapper<Contour> {
+	Integer selectExistTable(Contour contour);
+	
+	void createTableSequence(Contour contour);
+	
+	void createTable(Contour contour);
+	
+    Integer selectTableRecordCount(Contour contour);
 
+	
 }
 
 

@@ -1,0 +1,46 @@
+package cn.staitech.fr.domain.in;
+
+import io.swagger.annotations.ApiModelProperty;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import java.util.Date;
+import java.util.Map;
+
+@Data
+public class SingleSlideAdjacent {
+
+    @ApiModelProperty(value = "专题id")
+    @NotNull(message = "[专题id]不能为空")
+    private Long specialId;
+
+//    @NotNull(message = "单脏器id")
+    private Long singleSlideId;
+
+    @ApiModelProperty(value = "动物编号")
+    private String animalCode;
+
+    @ApiModelProperty(value = "切片编号")
+    private String imageName;
+
+    @ApiModelProperty(value = "组号")
+    private String groupCode;
+
+    @ApiModelProperty(value = "脏器类型")
+    private Long categoryId;
+
+    @ApiModelProperty(value = "0未预测、1预测成功、2预测失败、3预测中;ai预测字典标识符：ai_forecast_type")
+    private String forecastStatus;
+
+    @ApiModelProperty(value = "人工诊断状态 0：未诊断；1：已诊断;字典标识符：diagnosis_status")
+    private String diagnosisStatus;
+
+    @ApiModelProperty(value = "时间范围")
+    private Map<String, Date> createTimeParams;
+
+    @ApiModelProperty(value = "排序字段：动物编号-animal_code；脏器-category_id")
+    private String sortField;
+
+    @ApiModelProperty(value = "排序方式：asc-升序；desc-降序")
+    private String sortType;
+}

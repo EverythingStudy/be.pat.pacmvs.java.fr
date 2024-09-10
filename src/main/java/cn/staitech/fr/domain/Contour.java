@@ -101,4 +101,7 @@ public class Contour implements Serializable {
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
+    
+    @TableField(exist = false)
+    private Long sequenceNumber;
 }
