@@ -24,14 +24,11 @@ import java.util.List;
  * @author gjt
  */
 @RestController
-@RequestMapping("/contour")
+@RequestMapping("/annotation")
 public class AnnotationController {
 
     @Resource
     private AnnotationService annotationService;
-
-
-
 
     @PostMapping("/getDistance")
     @ApiOperation(value = "获取间距")

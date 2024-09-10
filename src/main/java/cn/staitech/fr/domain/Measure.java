@@ -160,5 +160,9 @@ public class Measure implements Serializable {
     private String measureFullName;
 
     @TableField(exist = false)
+    private Integer PointCount;
+
+
+    @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }
