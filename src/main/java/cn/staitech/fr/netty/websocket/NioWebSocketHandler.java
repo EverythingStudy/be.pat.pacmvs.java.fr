@@ -1,11 +1,7 @@
 package cn.staitech.fr.netty.websocket;
 
-
-import cn.staitech.anno.netty.global.ChannelSupervise;
-import cn.staitech.anno.netty.global.ChatGroup;
-import cn.staitech.anno.vo.slideExport.out.BroadcastVO;
-import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
+import cn.staitech.fr.netty.global.ChannelSupervise;
+import cn.staitech.fr.netty.global.ChatGroup;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
@@ -37,15 +33,15 @@ public class NioWebSocketHandler extends SimpleChannelInboundHandler<Object> {
     /**
      * . 循环map里面的每一对键值对，然后获取key和value 判断value是否等于slide，若是相等，就进行发送
      */
-    public static void sendAll(Long slideId, BroadcastVO message) {
-        String jsonStr = JSONObject.toJSONString(message, SerializerFeature.WriteMapNullValue);
-        for (Map.Entry<Channel, Long> vo : ChannelSupervise.CHANNEL_MAP.entrySet()) {
-            if (vo.getValue().equals(slideId)) {
-                TextWebSocketFrame tws = new TextWebSocketFrame(jsonStr);
-                vo.getKey().writeAndFlush(tws);
-            }
-        }
-    }
+//    public static void sendAll(Long slideId, BroadcastVO message) {
+//        String jsonStr = JSONObject.toJSONString(message, SerializerFeature.WriteMapNullValue);
+//        for (Map.Entry<Channel, Long> vo : ChannelSupervise.CHANNEL_MAP.entrySet()) {
+//            if (vo.getValue().equals(slideId)) {
+//                TextWebSocketFrame tws = new TextWebSocketFrame(jsonStr);
+//                vo.getKey().writeAndFlush(tws);
+//            }
+//        }
+//    }
 
 
 
