@@ -1,6 +1,6 @@
 # Tomcat
 server:
-  port: 19998
+  port: 9701
 
 knife4j:
   enable: true

@@ -3,6 +3,7 @@ package cn.staitech.fr;
 import cn.staitech.common.security.annotation.EnableCustomConfig;
 import cn.staitech.common.security.annotation.EnableRyFeignClients;
 import cn.staitech.common.swagger.annotation.EnableCustomSwagger2;
+import cn.staitech.fr.netty.websocket.NioWebSocketServer;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -31,6 +32,7 @@ public class StaTechFrApplication {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Shanghai"));
         SpringApplication.run(StaTechFrApplication.class, args);
         System.out.println("数字阅片模块启动成功");
+        new NioWebSocketServer().start();
 
     }
 }
