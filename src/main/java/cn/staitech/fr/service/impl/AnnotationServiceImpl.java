@@ -1184,6 +1184,27 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         return contour;
     }
 
+	@Override
+	public boolean getCountByCategory(CategoryStatisticsIn req) {
+		boolean existence = false;
+		//查询符合条件的所有的专题
+		List<SpecialAnnotationRel> sAnnoRelList = specialAnnotationRelMapper.getSeqNumberList();
+		if(CollectionUtils.isNotEmpty(sAnnoRelList)){
+			List<Long> sequenceNumberList = sAnnoRelList.stream().map(SpecialAnnotationRel::getSequenceNumber).collect(Collectors.toList());
+			for(Long seqNumber:sequenceNumberList){
+				Annotation annotation = new Annotation();
+				annotation.setCategoryId(req.getCategoryId());
+				annotation.setSequenceNumber(seqNumber);
+				int categoryCount = annotationMapper.getCountByCategory(annotation);
+				if(categoryCount > 0){
+					existence = true;
+					break;
+				}
+			}
+		}
+		return existence;
+	}
+
 
 }
 

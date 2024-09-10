@@ -56,5 +56,7 @@ public interface AnnotationService extends IService<Annotation> {
 //    void batchProcessAndSave(Annotation annotation, int batchSize);
 
     AnnotationDistanceOut getDistance(DistanceGet distanceGet);
+    
+    boolean getCountByCategory(CategoryStatisticsIn req);
 
 }

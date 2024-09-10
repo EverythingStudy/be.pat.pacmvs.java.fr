@@ -310,6 +310,11 @@
     </select>
 
 
-
+	<!--根据标签查询是否存在记录-->
+    <select id="getCountByCategory" parameterType="cn.staitech.fr.domain.Annotation" resultType="int">
+        select count(*)
+        from fr_annotation_${sequenceNumber}
+        where category_id = #{categoryId}
+    </select>
 
 </mapper>

@@ -140,6 +140,10 @@ public class AnnotationController {
         return R.ok(result, MessageSource.M("OPERATE_SUCCEED"));
     }
 
-
+    @ApiOperation(value = "查询标签是否被使用" ,hidden = true)
+    @PostMapping("/categoryStatistics")
+    public R<Boolean> categoryStatistics(@RequestBody CategoryStatisticsIn req) throws Exception {
+        return R.ok(annotationService.getCountByCategory(req));
+    }
 
 }

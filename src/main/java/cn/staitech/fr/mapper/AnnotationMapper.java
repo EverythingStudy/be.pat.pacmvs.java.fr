@@ -46,7 +46,7 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
 	int deleteByIds(Annotation annotation);
 
-
+	Integer getCountByCategory(Annotation annotation);
 
 }
 
