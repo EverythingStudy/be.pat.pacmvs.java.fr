@@ -229,10 +229,10 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 //            algorithmAnnIn.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
 //            algorithmPredictionService.recognition(algorithmAnnIn);
         // 切图完成后更新切片状态
-        if (slide.getProcessFlag() != 2) {
-            slide.setProcessFlag(2);
-            slideMapper.updateById(slide);
-        }
+//        if (slide.getProcessFlag() != 2) {
+//            slide.setProcessFlag(2);
+//            slideMapper.updateById(slide);
+//        }
         {
             Long slideId;
             if (req.getSingle_slide_id() != null) {

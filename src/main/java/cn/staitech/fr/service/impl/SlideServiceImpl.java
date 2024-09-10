@@ -124,14 +124,12 @@ implements SlideService {
 		if (s.length < 3) {
 			log.info("切片文件名格式错误：" + fileName);
 			slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-			slide.setProcessFlag(4);
 			return slide;
 		}
 		String s1 = this.baseMapper.selectBySpecialId(specialId);
 		if (!s[0].equals(s1)) {
 			log.info("切片文件名格式错误：" + fileName);
 			slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-			slide.setProcessFlag(4);
 			return slide;
 		}
 		slide.setAnimalCode(StringUtils.substringBeforeLast(s[1], "-"));
@@ -141,7 +139,6 @@ implements SlideService {
 				!CommonConstant.FEMALE.equals(s[2].substring(s[2].length() - 1))) {
 			log.info("切片文件名格式错误：" + fileName);
 			slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-			slide.setProcessFlag(4);
 			return slide;
 		}
 		slide.setGenderFlag(s[2].substring(s[2].length() - 1));
@@ -174,18 +171,6 @@ implements SlideService {
 		queryWrapper.eq("del_flag",CommonConstant.NUMBER_0);
 		List<Slide> slideList = list(queryWrapper);
 		if(CollectionUtils.isNotEmpty(slideList)){
-			//2024.06.03 如果是全部删除，需要校验下当前数据中数据有切图中的数据
-			//processFlag 处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
-			List<Integer> processFlags = slideList.stream().map(Slide::getProcessFlag).distinct().collect(Collectors.toList()); // 收集结果到新的List中
-			if(CollectionUtils.isNotEmpty(processFlags) && processFlags.contains(1)){
-				if(allDel){
-					//全部删除
-					return R.fail(MessageSource.M("SLIDE.ALL.DELETE.MSG"));
-				}else{
-					//单个删除
-					return R.fail(MessageSource.M("SLIDE.ONE.DELETE.MSG"));
-				}
-			}
 			//当前专题
 			UpdateWrapper<Slide> updateWrapper = new UpdateWrapper<>();
 			updateWrapper.eq(ObjectUtil.isNotEmpty(specialId),"special_id", specialId);
@@ -196,7 +181,7 @@ implements SlideService {
 			update(sd, updateWrapper);
 
 			//slideId集合
-			List<Long> slideIdList = slideList.stream().map(Slide::getSlideId).collect(Collectors.toList());
+//			List<Long> slideIdList = slideList.stream().map(Slide::getSlideId).collect(Collectors.toList());
 			//fr_measure表数据处理
 //			QueryWrapper<Measure> queryAmWrapper = new QueryWrapper<>();
 //			queryAmWrapper.in("single_slide_id",slideList);

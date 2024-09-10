@@ -355,8 +355,6 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         if (req.getStatus().equals(CommonConstant.INT_1)) {
             LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(Slide::getSpecialId, req.getSpecialId());
-            wrapper.ne(Slide::getCheckStatus, 1);
-            wrapper.ne(Slide::getCheckStatus, 2);
             wrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
             List<Slide> slideList = slideService.list(wrapper);
             if (CollectionUtils.isNotEmpty(slideList)) {
@@ -460,14 +458,12 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         if (s.length < 3) {
             log.info("切片文件名格式错误：" + fileName);
             slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-            slide.setProcessFlag(4);
             return slide;
         }
         String s1 = slideMapper.selectBySpecialId(specialId);
         if (!s[0].equals(s1)) {
             log.info("切片文件名格式错误：" + fileName);
             slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-            slide.setProcessFlag(4);
             return slide;
         }
         slide.setAnimalCode(StringUtils.substringBeforeLast(s[1], "-"));
@@ -477,7 +473,6 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
                 !CommonConstant.FEMALE.equals(s[2].substring(s[2].length() - 1))) {
             log.info("切片文件名格式错误：" + fileName);
             slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-            slide.setProcessFlag(4);
             return slide;
         }
         slide.setGenderFlag(s[2].substring(s[2].length() - 1));

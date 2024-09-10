@@ -20,6 +20,4 @@ public class AlgorithmImageOut {
     private Long imageId;
     @ApiModelProperty(value = "图像url地址")
     private String imageUrl;
-//    @ApiModelProperty(value = "图片绝对路径")
-//    private String imagePath;
 }

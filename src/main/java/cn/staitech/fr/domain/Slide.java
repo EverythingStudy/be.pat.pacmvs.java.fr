@@ -59,43 +59,6 @@ public class Slide implements Serializable {
     private String organs;
 
     /**
-     * 处理状态（0：待切图,1：切图中,2：已切图 3：切图失败）
-     */
-    private Integer processFlag;
-
-    /**
-     * 核对状态 0：初始 1：正确 2：错误 3：修正正常
-     */
-    private Integer animalCheckStatus;
-    
-    /**
-     * 核对状态 0：初始 1：正确 2：错误 3：修正正常
-     */
-    private Integer checkStatus;
-
-    private String analyzeStatus;
-    /**
-     * 核对者
-     */
-    private Long checkBy;
-    
-    /**
-     * 核对时间
-     */
-    private Date checkTime;
-    
-    /**
-     * 启动者
-     */
-    private Long initiateBy;
-
-    /**
-     * 启动时间
-     */
-    private Date initiateTime;
-    
-    
-    /**
      * 创建者
      */
     private Long createBy;
@@ -116,6 +79,8 @@ public class Slide implements Serializable {
      * 更新时间
      */
     private Date updateTime;
+    
+    private String analyzeStatus;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
@@ -140,15 +105,9 @@ public class Slide implements Serializable {
             && (this.getAnimalCode() == null ? other.getAnimalCode() == null : this.getAnimalCode().equals(other.getAnimalCode()))
             && (this.getGenderFlag() == null ? other.getGenderFlag() == null : this.getGenderFlag().equals(other.getGenderFlag()))
             && (this.getOrgans() == null ? other.getOrgans() == null : this.getOrgans().equals(other.getOrgans()))
-            && (this.getProcessFlag() == null ? other.getProcessFlag() == null : this.getProcessFlag().equals(other.getProcessFlag()))
             && (this.getCreateBy() == null ? other.getCreateBy() == null : this.getCreateBy().equals(other.getCreateBy()))
             && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
             && (this.getUpdateBy() == null ? other.getUpdateBy() == null : this.getUpdateBy().equals(other.getUpdateBy()))
-            && (this.getCheckStatus() == null ? other.getCheckStatus() == null : this.getCheckStatus().equals(other.getCheckStatus()))
-            && (this.getCheckBy() == null ? other.getCheckBy() == null : this.getCheckBy().equals(other.getCheckBy()))
-            && (this.getCheckTime() == null ? other.getCheckTime() == null : this.getCheckTime().equals(other.getCheckTime()))
-            && (this.getInitiateBy() == null ? other.getInitiateBy() == null : this.getInitiateBy().equals(other.getInitiateBy()))
-            && (this.getInitiateTime() == null ? other.getInitiateTime() == null : this.getInitiateTime().equals(other.getInitiateTime()))
             && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()));
     }
 
@@ -164,16 +123,10 @@ public class Slide implements Serializable {
         result = prime * result + ((getAnimalCode() == null) ? 0 : getAnimalCode().hashCode());
         result = prime * result + ((getGenderFlag() == null) ? 0 : getGenderFlag().hashCode());
         result = prime * result + ((getOrgans() == null) ? 0 : getOrgans().hashCode());
-        result = prime * result + ((getProcessFlag() == null) ? 0 : getProcessFlag().hashCode());
         result = prime * result + ((getCreateBy() == null) ? 0 : getCreateBy().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
         result = prime * result + ((getUpdateBy() == null) ? 0 : getUpdateBy().hashCode());
         result = prime * result + ((getUpdateTime() == null) ? 0 : getUpdateTime().hashCode());
-        result = prime * result + ((getCheckStatus() == null) ? 0 : getCheckStatus().hashCode());
-        result = prime * result + ((getCheckBy() == null) ? 0 : getCheckBy().hashCode());
-        result = prime * result + ((getCheckTime() == null) ? 0 : getCheckTime().hashCode());
-        result = prime * result + ((getInitiateBy() == null) ? 0 : getInitiateBy().hashCode());
-        result = prime * result + ((getInitiateTime() == null) ? 0 : getInitiateTime().hashCode());
         return result;
     }
 
@@ -191,16 +144,10 @@ public class Slide implements Serializable {
         sb.append(", animalCode=").append(animalCode);
         sb.append(", genderFlag=").append(genderFlag);
         sb.append(", organs=").append(organs);
-        sb.append(", processFlag=").append(processFlag);
         sb.append(", createBy=").append(createBy);
         sb.append(", createTime=").append(createTime);
         sb.append(", updateBy=").append(updateBy);
         sb.append(", updateTime=").append(updateTime);
-        sb.append(", checkStatus=").append(checkStatus);
-        sb.append(", checkBy=").append(checkBy);
-        sb.append(", checkStatus=").append(checkStatus);
-        sb.append(", initiateBy=").append(initiateBy);
-        sb.append(", initiateTime=").append(initiateTime);
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();

@@ -1,17 +1,19 @@
 package cn.staitech.fr.mapper;
 
-import cn.staitech.fr.domain.Category;
-import cn.staitech.fr.domain.Slide;
-import cn.staitech.fr.domain.in.MatrixReviewListIn;
-import cn.staitech.fr.domain.in.SingleSlideAdjacent;
-import cn.staitech.fr.domain.in.SlideListQueryIn;
-import cn.staitech.fr.domain.in.SplitVerificationQueryIn;
-import cn.staitech.fr.domain.out.*;
-
 import java.util.List;
 import java.util.Map;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 import org.apache.ibatis.annotations.Param;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.in.SlideListQueryIn;
+import cn.staitech.fr.domain.in.SplitVerificationQueryIn;
+import cn.staitech.fr.domain.out.AlgorithmImageOut;
+import cn.staitech.fr.domain.out.SlideListQueryOut;
+import cn.staitech.fr.domain.out.SlideSelectBy;
+import cn.staitech.fr.domain.out.SplitVerificationOut;
 
 
 /**
@@ -41,13 +43,13 @@ public interface SlideMapper extends BaseMapper<Slide> {
 
     SlideSelectBy pageImageCsvListVOBy(Long slideId);
 
-    List<MatrixReviewListOut> getMatrixReview(MatrixReviewListIn req);
-    List<MatrixReviewListOut> SingleSlideAdjacent(SingleSlideAdjacent req);
-    List<SelectImageSlideOut> selectSlideList(MatrixReviewListIn req);
+//    List<MatrixReviewListOut> getMatrixReview(MatrixReviewListIn req);
+//    List<MatrixReviewListOut> SingleSlideAdjacent(SingleSlideAdjacent req);
+//    List<SelectImageSlideOut> selectSlideList(MatrixReviewListIn req);
 
-    List<OrgansData> selectRespData(@Param("list") List<Slide> list);
+//    List<OrgansData> selectRespData(@Param("list") List<Slide> list);
 
-    List<Category> selectHeadList(Long specialId);
+//    List<Category> selectHeadList(Long specialId);
 }
 
 
