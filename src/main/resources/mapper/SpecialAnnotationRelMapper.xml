@@ -19,4 +19,10 @@
         create_by,create_time,update_by,
         update_time
     </sql>
+
+
+
+    <select id="selectTableSpecialCount" parameterType="cn.staitech.fr.domain.Contour" resultType="int">
+        select count(distinct(special_id)) from fr_special_annotation_rel t where t.sequence_number = #{sequenceNumber}
+    </select>
 </mapper>

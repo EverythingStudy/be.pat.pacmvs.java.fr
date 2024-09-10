@@ -1,278 +1,180 @@
 package cn.staitech.fr.domain;
 
+import cn.staitech.common.core.web.domain.BaseEntity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.Date;
+import java.util.Map;
 
 /**
- * 
- * @TableName tb_image
+ * 图像表 tb_image
+ *
+ * @author WangFeng
  */
-@TableName(value ="tb_image")
 @Data
-public class Image implements Serializable {
-    /**
-     * 图像ID
-     */
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@TableName(value = "tb_image")
+public class Image extends BaseEntity {
     @TableId(value = "image_id", type = IdType.AUTO)
+    @ApiModelProperty(value = "图像id", hidden = true)
     private Long imageId;
-
-    /**
-     * 无扩展名文件名称
-     */
     @TableField(value = "file_name")
+    @ApiModelProperty(value = "无扩展名文件名称")
     private String fileName;
-
-    /**
-     * 图像名称（文件名）
-     */
     @TableField(value = "image_name")
+    @ApiModelProperty(value = "图像名称-文件名称（文件名）", hidden = true)
     private String imageName;
-
-    /**
-     * 图像的绝对路径
-     */
-    @TableField(value = "image_path")
-    private String imagePath;
-
-    /**
-     * 图像URL地址
-     */
     @TableField(value = "image_url")
+    @ApiModelProperty(value = "图像url地址", hidden = true)
     private String imageUrl;
-
-    /**
-     * 缩略图URL地址
-     */
+    @TableField(value = "image_path")
+    @ApiModelProperty(value = "图片绝对路径", hidden = true)
+    private String imagePath;
     @TableField(value = "thumb_url")
+    @ApiModelProperty(value = "缩略图url地址", hidden = true)
     private String thumbUrl;
-
-    /**
-     * macro图片URL地址
-     */
     @TableField(value = "macro_url")
+    @ApiModelProperty(value = "macro图片URL地址", hidden = true)
     private String macroUrl;
-
-    /**
-     * label图片RUL地址
-     */
     @TableField(value = "label_url")
+    @ApiModelProperty(value = "label图片URL地址", hidden = true)
     private String labelUrl;
-
-    /**
-     * 1024缩略图路径（用于缓存、标注缩略图时需要）
-     */
+    @TableField(value = "format")
+    @ApiModelProperty(value = "文件格式", hidden = true)
+    private String format;
+    @TableField(value = "width")
+    @ApiModelProperty(value = "宽度", hidden = true)
+    private String width;
+    @TableField(value = "height")
+    @ApiModelProperty(value = "高度", hidden = true)
+    private String height;
+    @TableField(value = "depth")
+    @ApiModelProperty(value = "深度", hidden = true)
+    private String depth;
+    @TableField(value = "size")
+    @ApiModelProperty(value = "大小", hidden = true)
+    private String size;
+    @TableField(value = "global_size")
+    @ApiModelProperty(value = "大小", hidden = true)
+    private String globalSize;
+    @TableField(value = "resolving_power")
+    @ApiModelProperty(value = "分辨率", hidden = true)
+    private String resolvingPower;
+    @TableField(value = "tile_count_list")
+    @ApiModelProperty(value = "每层的切片个数", hidden = true)
+    private String tileCountList;
+    @TableField(value = "level_count")
+    @ApiModelProperty(value = "总层数", hidden = true)
+    private Integer levelCount;
+    @TableField(value = "chunk_total")
+    @ApiModelProperty(value = "前端总切片个数", hidden = true)
+    private Integer chunkTotal;
+    @TableField(value = "md5")
+    @ApiModelProperty(value = "图片的Md5值", hidden = true)
+    private String md5;
+    @TableField(value = "resolution_x")
+    @ApiModelProperty(value = "x轴分辨率", hidden = true)
+    private String resolutionX;
+    @TableField(value = "resolution_y")
+    @ApiModelProperty(value = "y轴分辨率", hidden = true)
+    private String resolutionY;
+    @TableField(value = "source_lens")
+    @ApiModelProperty(value = "原放大倍数", hidden = true)
+    private Integer sourceLens;
+    @TableField(value = "create_by")
+    @ApiModelProperty(value = "创建人", hidden = true)
+    private Long createBy;
+    @TableField(value = "create_time")
+    @ApiModelProperty(value = "上传时间 - 创建时间", hidden = true)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createTime;
+    @TableField(value = "update_by")
+    @ApiModelProperty(value = "", hidden = true)
+    private Long updateBy;
+    @TableField(value = "update_time")
+    @ApiModelProperty(value = "", hidden = true)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date updateTime;
     @TableField(value = "cache_url")
+    @ApiModelProperty(value = "1024缩略图路径（用于缓存、标注缩略图时需要）")
     private String cacheUrl;
 
-    /**
-     * 原图缩到cache图的倍数
-     */
     @TableField(value = "multiple")
+    @ApiModelProperty(value = "原图缩到cache图的倍数")
     private String multiple;
 
-    /**
-     * 文件格式
-     */
-    @TableField(value = "format")
-    private String format;
-
-    /**
-     * 宽度
-     */
-    @TableField(value = "width")
-    private String width;
-
-    /**
-     * 高度
-     */
-    @TableField(value = "height")
-    private String height;
-
-    /**
-     * 深度
-     */
-    @TableField(value = "depth")
-    private String depth;
-
-    /**
-     * 大小
-     */
-    @TableField(value = "size")
-    private String size;
-
-    /**
-     * 全局大小
-     */
-    @TableField(value = "global_size")
-    private String globalSize;
-
-    /**
-     * 分辨率
-     */
-    @TableField(value = "resolving_power")
-    private String resolvingPower;
-
-    /**
-     * 每层的切片个数
-     */
-    @TableField(value = "tile_count_list")
-    private String tileCountList;
-
-    /**
-     * 总层数（小于2则失败）
-     */
-    @TableField(value = "level_count")
-    private Integer levelCount;
-
-    /**
-     * 前端总切片个数
-     */
-    @TableField(value = "chunk_total")
-    private Integer chunkTotal;
-
-    /**
-     * 图片的MD5值
-     */
-    @TableField(value = "md5")
-    private String md5;
-
-    /**
-     * x轴分辨率
-     */
-    @TableField(value = "resolution_x")
-    private String resolutionX;
-
-    /**
-     * y轴分辨率
-     */
-    @TableField(value = "resolution_y")
-    private String resolutionY;
-
-    /**
-     * 原放大倍数
-     */
-    @TableField(value = "source_lens")
-    private Integer sourceLens;
-
-    /**
-     * 创建人id
-     */
-    @TableField(value = "create_by")
-    private Long createBy;
-
-    /**
-     * 创建时间
-     */
-    @TableField(value = "create_time")
-    private Date createTime;
-
-    /**
-     * 更新人id
-     */
-    @TableField(value = "update_by")
-    private Long updateBy;
-
-    /**
-     * 更新时间
-     */
-    @TableField(value = "update_time")
-    private Date updateTime;
-
-    /**
-     * 图片（切片）编号
-     */
-    @TableField(value = "image_code")
-    private String imageCode;
-
-    /**
-     * 专题ID
-     */
-    @TableField(value = "topic_id")
-    private Long topicId;
-
-    /**
-     * 专题名称
-     */
-    @TableField(value = "topic_name")
-    private String topicName;
-
-    /**
-     * 0上传中、1上传失败、2解析中、3解析失败、4可用 5:不可用
-     */
-    @TableField(value = "status")
-    private Integer status;
-
-    /**
-     * 所在主机ID
-     */
     @TableField(value = "host_id")
-    private Integer hostId;
-
-    /**
-     * 机构ID
-     */
-    @TableField(value = "organization_id")
-    private Long organizationId;
-
-    /**
-     * 轮次ID（现默认1到8）
-     */
-    @TableField(value = "round_id")
-    private Long roundId;
-
-    /**
-     * 业务类型（1原始切片（默认）、2预测切片）
-     */
-    @TableField(value = "biz_type")
-    private Integer bizType;
-
-    /**
-     * 图像来源(1前端上传，2目录选片，3TCP客户端上传)
-     */
-    @TableField(value = "source")
-    private Integer source;
-
-    /**
-     * 总块数
-     */
-    @TableField(value = "fuzzy_count_chunk")
-    private Long fuzzyCountChunk;
-
-    /**
-     * 专题号
-     */
-    @TableField(value = "topic_code")
-    private String topicCode;
-
-    /**
-     * 动物号
-     */
-    @TableField(value = "animal_code")
-    private String animalCode;
-
-    /**
-     * 蜡块号
-     */
-    @TableField(value = "wax_code")
-    private String waxCode;
-
-    /**
-     * 组别号
-     */
-    @TableField(value = "group_code")
-    private String groupCode;
-
-    /**
-     * 性别（0：M；1：F）
-     */
-    @TableField(value = "sex_flag")
-    private Integer sexFlag;
+    @ApiModelProperty(value = "所在主机ID")
+    private Byte hostId;
 
     @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
+    @ApiModelProperty(value = "", hidden = true)
+    private String remark;
+    @TableField(value = "image_code")
+    @ApiModelProperty(value = "切片编号")
+    private String imageCode;
+    @TableField(value = "topic_id")
+    @ApiModelProperty(value = "所属专题", hidden = true)
+    private Long topicId;
+    @TableField(value = "topic_name")
+    @ApiModelProperty(value = "所属专题-专题名称")
+    private String topicName;
+    @TableField(value = "status")
+    @ApiModelProperty(value = "文件状态:0上传中、1上传失败、2解析中、3解析失败、4可用")
+    private Integer status;
+    @ApiModelProperty(value = "机构编号")
+    @TableField(value = "organization_id")
+    private Long organizationId;
+    @TableField(exist = false)
+    @ApiModelProperty(value = "创建时间-查询入参")
+    private Map<String, Object> createTimeParams;
+    @TableField(exist = false)
+    @ApiModelProperty(value = "", hidden = true)
+    private Map<String, Object> params;
+
+    @ApiModelProperty(value = "机构名称")
+    @TableField(exist = false)
+    private String organizationName;
+    @ApiModelProperty(value = "轮次ID-1到10")
+    private Long roundId;
+    @ApiModelProperty(value = "轮次名称")
+    @TableField(exist = false)
+    private String roundName;
+    @ApiModelProperty(value = "业务类型:1原始切片（默认）、2预测切片、7拼接图像或单张图像（单张图像folder_id=0）")
+    private Integer bizType;
+    @ApiModelProperty(value = "业务类型:1原始切片（默认）、2预测切片、7拼接图像或单张图像（单张图像folder_id=0）")
+    @TableField(exist = false)
+    private String businessTypeName;
+    @ApiModelProperty(value = "图像来源、上传方式(1前端上传，2目录选片，3TCP客户端上传)")
+    private Integer source;
+    @TableField(exist = false)
+    @ApiModelProperty(value = "", hidden = true)
+    private String searchValue;
+    @ApiModelProperty(value = "项目编号")
+    @TableField(exist = false)
+    private Long projectId;
+    @ApiModelProperty(value = "reviewRoundId")
+    @TableField(exist = false)
+    private Long reviewRoundId;
+    @ApiModelProperty(value = "文件夹编号")
+    @TableField(value = "folder_id")
+    private Long folderId;
+    @ApiModelProperty(value = "创建人")
+    @TableField(exist = false)
+    private String nickName;
+    @ApiModelProperty(value = "文件夹名称")
+    @TableField(exist = false)
+    private String folderName;
+
 }
