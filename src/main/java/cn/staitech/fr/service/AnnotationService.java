@@ -4,6 +4,7 @@ import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.vo.annotation.in.*;
 import cn.staitech.fr.vo.annotation.out.AnnotationDistanceOut;
+import cn.staitech.fr.vo.history.HistoryDTO;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -20,7 +21,7 @@ public interface AnnotationService extends IService<Annotation> {
 //
 //    List<Features> aiSelectListBy(AnnotationSelectList annotation) throws Exception;
 //
-//    Long insert(ViewAddIn req) throws Exception;
+    Long insert(ViewAddIn req) throws Exception;
 //
 //    int delete(AnnotationById req) throws Exception;
 //
@@ -36,15 +37,15 @@ public interface AnnotationService extends IService<Annotation> {
 //
 //    List<BatchResult> batch(List<ViewAddIn> list) throws Exception;
 //
-//    Boolean undo(HistoryDTO dto);
-//
-//    Boolean redo(HistoryDTO dto);
-//
-//    Annotation deleteByHistory(Long annotationId) throws Exception;
-//
-//    Annotation insertByHistory(Annotation annotation);
-//
-//    Annotation updateOperationByHistory(Annotation annotation);
+    Boolean undo(HistoryDTO dto);
+
+    Boolean redo(HistoryDTO dto);
+
+    Annotation deleteByHistory(Long annotationId) throws Exception;
+
+    Annotation insertByHistory(Annotation annotation);
+
+    Annotation updateOperationByHistory(Annotation annotation);
 //
 //    /**
 //     * 批量保存

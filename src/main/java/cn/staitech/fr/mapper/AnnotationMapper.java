@@ -24,7 +24,7 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
 	Annotation avgDistance(Annotation annotation);
 
-	Annotation selectByIds(Long annotationId);
+	Annotation selectByIds(Annotation annotation);
 
 
 

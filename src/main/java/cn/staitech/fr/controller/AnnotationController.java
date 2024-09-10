@@ -2,10 +2,13 @@ package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
+import cn.staitech.common.core.utils.uuid.UUID;
 import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.vo.annotation.in.DistanceGet;
+import cn.staitech.fr.vo.annotation.in.ViewAddIn;
 import cn.staitech.fr.vo.annotation.out.AnnotationDistanceOut;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -29,15 +32,15 @@ public class AnnotationController {
     public R<AnnotationDistanceOut> getDistance(@RequestBody DistanceGet res)  {
         return R.ok(annotationService.getDistance(res));
     }
-//
-//    @ApiOperation(value = "添加标注")
-//    @PostMapping("/insert")
-//    public R<Long> add(@Validated @RequestBody ViewAddIn req) throws Exception {
-//        req.setTraceId(UUID.fastUUID().toString());
-//        req.setIsBatch(false);
-//        Long res = annotationService.insert(req);
-//        return R.ok(res);
-//    }
+
+    @ApiOperation(value = "添加标注")
+    @PostMapping("/insert")
+    public R<Long> add(@Validated @RequestBody ViewAddIn req) throws Exception {
+        req.setTraceId(UUID.fastUUID().toString());
+        req.setIsBatch(false);
+        Long res = annotationService.insert(req);
+        return R.ok(res);
+    }
 //
 //    @ApiOperation(value = "删除标注")
 //    @ApiImplicitParams({@ApiImplicitParam(name = "annotationId", value = "标注id", required = true, dataType = "Long", paramType = "query")})
