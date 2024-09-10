@@ -2,8 +2,8 @@ package cn.staitech.fr.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.staitech.fr.domain.Contour;
-import cn.staitech.fr.service.ContourService;
-import cn.staitech.fr.mapper.ContourMapper;
+import cn.staitech.fr.service.AnnotationService;
+import cn.staitech.fr.mapper.AnnotationMapper;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 * @createDate 2024-09-10 09:31:06
 */
 @Service
-public class ContourServiceImpl extends ServiceImpl<ContourMapper, Contour>
-    implements ContourService{
+public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Contour>
+    implements AnnotationService {
 
 }
 

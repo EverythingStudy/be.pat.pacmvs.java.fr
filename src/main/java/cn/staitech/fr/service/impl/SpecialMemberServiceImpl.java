@@ -25,7 +25,7 @@ import cn.staitech.fr.domain.SpecialMember;
 import cn.staitech.fr.domain.in.AddMemberIn;
 import cn.staitech.fr.domain.in.SpecialMemberSelectIn;
 import cn.staitech.fr.domain.out.SpecialMemberSelectOut;
-import cn.staitech.fr.mapper.ContourMapper;
+import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SpecialMemberMapper;
 import cn.staitech.fr.service.SpecialMemberService;
 import cn.staitech.fr.utils.MessageSource;
@@ -43,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SpecialMemberServiceImpl extends ServiceImpl<SpecialMemberMapper, SpecialMember> implements SpecialMemberService {
     @Resource
-    private ContourMapper contourMapper;
+    private AnnotationMapper annotationMapper;
 
 
     @Override
@@ -70,7 +70,7 @@ public class SpecialMemberServiceImpl extends ServiceImpl<SpecialMemberMapper, S
         //校验标注信息
         LambdaQueryWrapper<Contour> labelWrapper = new LambdaQueryWrapper<>();
         labelWrapper.eq(Contour::getCreateBy, specialMember1.getUserId());
-        Integer integer1 = contourMapper.selectCount(labelWrapper);
+        Integer integer1 = annotationMapper.selectCount(labelWrapper);
         if(integer1>0){
             return R.fail(MessageSource.M("DATA_CANNOT_EDITED_OR_DELETED"));
         }

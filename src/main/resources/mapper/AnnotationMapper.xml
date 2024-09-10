@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="cn.staitech.fr.mapper.ContourMapper">
+<mapper namespace="cn.staitech.fr.mapper.AnnotationMapper">
 
     <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.Contour">
             <result property="contourId" column="contour_id" jdbcType="BIGINT"/>

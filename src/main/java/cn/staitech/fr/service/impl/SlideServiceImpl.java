@@ -30,7 +30,7 @@ import cn.staitech.fr.domain.in.SlideListQueryIn;
 import cn.staitech.fr.domain.out.ImageListOutVO;
 import cn.staitech.fr.domain.out.SlideListQueryOut;
 import cn.staitech.fr.domain.out.SlideSelectBy;
-import cn.staitech.fr.mapper.ContourMapper;
+import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
@@ -69,7 +69,7 @@ implements SlideService {
 //	private MeasureMapper measureMapper;
 
 	@Resource
-	private ContourMapper contourMapper;
+	private AnnotationMapper annotationMapper;
 
 	@Resource
 	private SpecialAnnotationRelMapper specialAnnotationRelMapper;

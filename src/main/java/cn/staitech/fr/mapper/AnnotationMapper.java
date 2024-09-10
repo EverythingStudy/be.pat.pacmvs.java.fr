@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @createDate 2024-09-10 09:31:06
 * @Entity cn.staitech.fr.domain.Contour
 */
-public interface ContourMapper extends BaseMapper<Contour> {
+public interface AnnotationMapper extends BaseMapper<Contour> {
 	Integer selectExistTable(Contour contour);
 	
 	void createTableSequence(Contour contour);
