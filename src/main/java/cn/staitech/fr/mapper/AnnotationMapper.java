@@ -44,6 +44,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
 	int insert(Annotation annotation);
 
+	int deleteByIds(Annotation annotation);
+
 
 
 }

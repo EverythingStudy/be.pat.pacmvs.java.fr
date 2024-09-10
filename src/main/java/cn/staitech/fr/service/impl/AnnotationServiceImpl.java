@@ -108,12 +108,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     public List<Features> selectListBy(AnnotationSelectList req) throws Exception {
         List<Features> list = new ArrayList<>();
         Annotation annotation = new Annotation();
-        BeanUtils.copyProperties(req, annotation);
-        if (req.getGeometry() != null) {
-            annotation.setContour(String.valueOf(req.getGeometry()));
-        }
-        annotation.setFiligreeContour(false);
-        annotation.setMagnification(40000L);
+        annotation.setSlideId(req.getSlideId());
+        annotation.setSequenceNumber(getSequenceNumber(req.getSlideId()));
         // 查询普通轮廓
         List<Annotation> annotationList = annotationMapper.selectListBy(annotation);
         List<Features> annoList = getFeaturesList(annotationList);
@@ -398,7 +394,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
         NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
 
-        int res = annotationMapper.deleteById(annotation);
+        int res = annotationMapper.deleteByIds(annotation);
 
         String traceId = req.getTraceId();
         boolean isBatch = req.getIsBatch();

@@ -129,79 +129,6 @@
                ST_Area(st_geomfromgeojson(#{contour}))      as area
     </select>
 
-    <select id="selectListBy" parameterType="cn.staitech.fr.domain.Annotation"
-            resultMap="BaseResultMap">
-        select
-        annotation_id,
-        area,
-        perimeter,
-        description,
-        category_id,
-        location_type,
-        annotation_type,
-        create_by,
-        create_time,
-        update_by,
-        update_time,
-        slide_id,
-        id,
-        contour_type,
-        ST_AsGeoJSON(contour${magnification}) as contour,
-        single_slide_id,
-        single
-        from fr_annotation
-        <where>
-            contour_type != 1
-            <if test="slideId != null">
-                AND slide_id = #{slideId}
-                AND single_slide_id is null
-                <if test="categoryIdLists != null and categoryIdLists.size() > 0">
-                    AND category_id not in
-                    <foreach collection="categoryIdLists" item="item" index="index" open="(" separator="," close=")">
-                        #{item}
-                    </foreach>
-                </if>
-            </if>
-            <if test="categoryId != null">
-                AND category_id = #{categoryId}
-            </if>
-            <if test="singleSlideId != null">
-                AND single_slide_id = #{singleSlideId}
-            </if>
-            <if test="slideIdList != null and slideIdList.size() > 0">
-                AND slide_id in
-                <foreach collection="slideIdList" item="item" index="index" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
-            <if test="filigreeContour != null and filigreeContour == true">
-                AND contour_type = 3
-                <if test="categoryIdLists != null and categoryIdLists.size() > 0">
-                    AND category_id not in
-                    <foreach collection="categoryIdLists" item="item" index="index" open="(" separator="," close=")">
-                        #{item}
-                    </foreach>
-                </if>
-            </if>
-            <if test="filigreeContour != null and filigreeContour == false">
-                AND contour_type != 3
-            </if>
-            <if test="contourType != null">
-                AND contour_type = #{contourType}
-            </if>
-            <if test="contour != null">
-                AND ST_Intersects(st_geomfromgeojson(#{contour}),contour${magnification})
-            </if>
-            <if test="categoryIdList != null and categoryIdList.size() > 0">
-                AND category_id not in
-                <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
-        </where>
-    </select>
-
-
     <!--查询是放存在表-->
     <select id="selectExistTable" parameterType="cn.staitech.fr.domain.Annotation" resultType="int">
         select count(*)
@@ -348,6 +275,39 @@
         )
     </insert>
 
+    <delete id="deleteByIds" parameterType="cn.staitech.fr.domain.Annotation">
+        delete from
+                   fr_annotation_${sequenceNumber}
+        where
+            annotation_id = #{annotationId}
+    </delete>
+
+
+
+    <select id="selectListBy" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        select
+        annotation_id,
+        area,
+        perimeter,
+        description,
+        category_id,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        slide_id,
+        json_id,
+        ST_AsGeoJSON(contour) as contour
+        from fr_annotation_${sequenceNumber}
+        <where>
+            <if test="slideId != null">
+                AND slide_id = #{slideId}
+            </if>
+        </where>
+    </select>
 
 
 
