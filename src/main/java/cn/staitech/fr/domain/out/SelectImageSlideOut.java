@@ -48,10 +48,6 @@ public class SelectImageSlideOut {
     @ApiModelProperty(value = "性别（M:雄；F:雌）")
     private String genderFlag;
 
-    @ApiModelProperty(value = "启动者")
-    private Long initiateBy;
-    @ApiModelProperty(value = "启动者")
-    private String userName;
 
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -69,11 +65,11 @@ public class SelectImageSlideOut {
     @ApiModelProperty(value = "脏器数量")
     private Long organNumber;
 
-    @ApiModelProperty(value = "结构指标：0未预测、1预测成功、2预测失败、3预测中;ai预测字典标识符：ai_forecast_type")
-    private String forecastStatus;
-
-    @ApiModelProperty(value = "人工诊断状态 0：未诊断；1：已诊断;字典标识符：diagnosis_status")
-    private String diagnosisStatus;
+//    @ApiModelProperty(value = "结构指标：0未预测、1预测成功、2预测失败、3预测中;ai预测字典标识符：ai_forecast_type")
+//    private String forecastStatus;
+//
+//    @ApiModelProperty(value = "人工诊断状态 0：未诊断；1：已诊断;字典标识符：diagnosis_status")
+//    private String diagnosisStatus;
 
 
     @ApiModelProperty(value = "描述")

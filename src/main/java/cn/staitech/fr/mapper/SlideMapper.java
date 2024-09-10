@@ -9,11 +9,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
-import cn.staitech.fr.domain.in.SplitVerificationQueryIn;
 import cn.staitech.fr.domain.out.AlgorithmImageOut;
 import cn.staitech.fr.domain.out.SlideListQueryOut;
 import cn.staitech.fr.domain.out.SlideSelectBy;
-import cn.staitech.fr.domain.out.SplitVerificationOut;
 
 
 /**
@@ -39,17 +37,8 @@ public interface SlideMapper extends BaseMapper<Slide> {
 
     List<Slide> selectListByWax(@Param("topicId") Long topicId, @Param("speciesId")String speciesId);
     
-    List<SplitVerificationOut> getVerificationSlideListQuery(SplitVerificationQueryIn req);
-
     SlideSelectBy pageImageCsvListVOBy(Long slideId);
 
-//    List<MatrixReviewListOut> getMatrixReview(MatrixReviewListIn req);
-//    List<MatrixReviewListOut> SingleSlideAdjacent(SingleSlideAdjacent req);
-//    List<SelectImageSlideOut> selectSlideList(MatrixReviewListIn req);
-
-//    List<OrgansData> selectRespData(@Param("list") List<Slide> list);
-
-//    List<Category> selectHeadList(Long specialId);
 }
 
 

@@ -159,10 +159,6 @@ implements SlideService {
 	@Override
 	public R deleteAll(Long specialId,Long slideId) {
 		log.info("删除全部切片接口开始：");
-		boolean allDel = true;
-		if(ObjectUtil.isNotEmpty(slideId)){
-			allDel = false;
-		}
 		//fr_slide 切片删除
 		QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
 		queryWrapper.eq(ObjectUtil.isNotEmpty(specialId),"special_id",specialId);

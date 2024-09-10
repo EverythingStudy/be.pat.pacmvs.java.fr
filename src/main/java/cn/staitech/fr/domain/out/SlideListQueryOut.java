@@ -45,8 +45,8 @@ public class SlideListQueryOut {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
-    @ApiModelProperty(value = "处理状态（0：待切图,1：切图中,2：切图成功 3：切图失败）")
-    private Integer processFlag;
+//    @ApiModelProperty(value = "处理状态（0：待切图,1：切图中,2：切图成功 3：切图失败）")
+//    private Integer processFlag;
 
     @ApiModelProperty(value = "脏器类型")
     private String organs;

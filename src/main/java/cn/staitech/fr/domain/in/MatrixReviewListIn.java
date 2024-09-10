@@ -36,17 +36,17 @@ public class MatrixReviewListIn extends PageRequest {
     @ApiModelProperty(value = "脏器类型")
     private Long categoryId;
 
-    @ApiModelProperty(value = "0未预测、1预测成功、2预测失败、3预测中;ai预测字典标识符：ai_forecast_type")
-    private String forecastStatus;
+//    @ApiModelProperty(value = "0未预测、1预测成功、2预测失败、3预测中;ai预测字典标识符：ai_forecast_type")
+//    private String forecastStatus;
     
-    @ApiModelProperty(value = "0未预测、1预测成功、2预测失败、3预测中;")
-    private List<Integer> aiStatusFineList;
+//    @ApiModelProperty(value = "0未预测、1预测成功、2预测失败、3预测中;")
+//    private List<Integer> aiStatusFineList;
 
-    @ApiModelProperty(value = "人工诊断状态 0：未诊断；1：已诊断;字典标识符：diagnosis_status")
-    private String diagnosisStatus;
+//    @ApiModelProperty(value = "人工诊断状态 0：未诊断；1：已诊断;字典标识符：diagnosis_status")
+//    private String diagnosisStatus;
     
-    @ApiModelProperty(value = "0未预测、1预测成功、2预测失败、3预测中")
-    private List<String> forecastStatusList;
+//    @ApiModelProperty(value = "0未预测、1预测成功、2预测失败、3预测中")
+//    private List<String> forecastStatusList;
 
     @ApiModelProperty(value = "时间范围")
     private Map<String, Date> createTimeParams;
@@ -60,6 +60,6 @@ public class MatrixReviewListIn extends PageRequest {
     @ApiModelProperty(value = "标签列表")
     private List<Long> categoryIdList;
 
-    @ApiModelProperty(value = "AI精细轮廓：0未预测、1预测成功、2预测失败、3预测中;")
-    private String aiStatusFine;
+//    @ApiModelProperty(value = "AI精细轮廓：0未预测、1预测成功、2预测失败、3预测中;")
+//    private String aiStatusFine;
 }
