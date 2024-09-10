@@ -15,8 +15,8 @@ public class AnnotationById {
 
 
 
-    @ApiModelProperty(value = "项目id", required = true)
-    private Long project_id;
+    @ApiModelProperty(value = "切片id", required = true)
+    private Long slide_id;
 
     private Boolean isBatch;
 

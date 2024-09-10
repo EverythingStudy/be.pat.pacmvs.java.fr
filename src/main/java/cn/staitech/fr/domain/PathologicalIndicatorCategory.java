@@ -10,7 +10,7 @@ import lombok.Data;
 
 /**
  * tb_pathological_indicator_category
- * @TableName tb_pathological_indicator_category
+ * @author gjt
  */
 @TableName(value ="tb_pathological_indicator_category")
 @Data

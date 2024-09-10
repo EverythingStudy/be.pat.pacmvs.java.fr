@@ -205,7 +205,15 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
 
+    public Long getSequenceNumber(Long slideId) {
+        Slide slide = slideMapper.selectById(slideId);
+        SpecialAnnotationRel specialAnnotationRel = specialAnnotationRelMapper.selectById(slide.getSpecialId());
+        return specialAnnotationRel.getSequenceNumber();
+    }
+
+
     @Override
+//    @Transactional(rollbackFor = Exception.class)
     public Long insert(ViewAddIn req) throws Exception {
         if (req.getSlide_id() == null) {
             throw new Exception(MessageSource.M("MarkingDelIn.slideId.notNull"));
@@ -220,15 +228,16 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             throw new Exception(MessageSource.M("NO_SLIDE_DATA"));
         }
         String jsonId = null;
-        Category category = null;
         Annotation annotation = new Annotation();
         if (req.getCategory_id() != null) {
             PathologicalIndicatorCategory pathologicalIndicatorCategory = pathologicalIndicatorCategoryMapper.selectById(req.getCategory_id());
             if (pathologicalIndicatorCategory != null) {
                 jsonId = MarkingUtils.getSdId(pathologicalIndicatorCategory.getCategoryName());
+            }else{
+                jsonId = MarkingUtils.getSdId();
             }
         } else {
-            jsonId = MarkingUtils.getSdId(null);
+            jsonId = MarkingUtils.getSdId();
         }
         annotation.setSlideId(req.getSlide_id());
         annotation.setArea(req.getArea());
@@ -238,32 +247,15 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setPerimeter(req.getPerimeter());
         annotation.setCreateBy(req.getCreate_by());
         annotation.setJsonId(jsonId);
-        annotation.setAnnotationType("Draw");
+        Long seq = getSequenceNumber(req.getSlide_id());
+        annotation.setSequenceNumber(seq);
         annotationMapper.insert(annotation);
-        Annotation annotationBy = annotationMapper.selectById(annotation);
+        System.out.println(annotation + "=======================>");
+        Annotation annotationBy = annotationMapper.selectByIds(annotation);
         PropertiesBriefly properties = getProperties(annotationBy);
         Features features = socketData(annotation.getJsonId(), JSONObject.parseObject(annotationBy.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(ADD_STATUS, features);
-
         NioWebSocketHandler.sendAll(req.getSlide_id(), broadcastVO);
-
-
-//            Image image = imageMapper.selectById(slide.getImageId());
-//            if (!Optional.ofNullable(image).isPresent()) {
-//                throw new Exception(MessageSource.M("NODATA"));
-//            }
-//            Special special = specialService.getById(slide.getSpecialId());
-//            List<JSONObject> contourList = selectContourList(annotation.getSlideId(), req.getCategory_id());
-//            asyncTask.generateThumbnail(annotation.getSlideId(), req.getCategory_id(), image.getImageUrl(), contourList, 1, category.getCategoryAbbreviation(), special.getSpecialName());
-//            AlgorithmAnnIn algorithmAnnIn = new AlgorithmAnnIn();
-//            algorithmAnnIn.setSlideId(slide.getSlideId());
-//            algorithmAnnIn.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
-//            algorithmPredictionService.recognition(algorithmAnnIn);
-        // 切图完成后更新切片状态
-//        if (slide.getProcessFlag() != 2) {
-//            slide.setProcessFlag(2);
-//            slideMapper.updateById(slide);
-//        }
         {
             Long slideId;
             if (req.getSingle_slide_id() != null) {
@@ -394,7 +386,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
         Annotation annotation = new Annotation();
         annotation.setAnnotationId(req.getMarking_id());
-        Annotation annotationBy = annotationMapper.selectById(annotation);
+        annotation.setSequenceNumber(getSequenceNumber(req.getSlide_id()));
+        Annotation annotationBy = annotationMapper.selectByIds(annotation);
         if (!Optional.ofNullable(annotationBy).isPresent()) {
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }

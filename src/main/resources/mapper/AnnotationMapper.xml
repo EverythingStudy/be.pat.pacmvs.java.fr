@@ -70,8 +70,7 @@
                update_by,
                update_time,
                slide_id,
-               id,
-               contour_type,
+               json_id,
                ST_AsGeoJSON(contour) AS contour
         from fr_annotation_${sequenceNumber}
         where annotation_id = #{annotationId}
@@ -320,6 +319,34 @@
         where schemaname = 'public'
           and relname = 'fr_ai_annotation_${sequenceNumber}'
     </select>
+
+    <insert id="insert" parameterType="cn.staitech.fr.domain.Annotation" useGeneratedKeys="true" keyProperty="annotationId">
+        insert into fr_annotation_${sequenceNumber} (
+        <if test="area != null and area != '' ">area,</if>
+        <if test="perimeter != null and perimeter != '' ">perimeter,</if>
+        <if test="categoryId != null">category_id,</if>
+        <if test="description != null and description != '' ">description,</if>
+        <if test="locationType != null and locationType != '' ">location_type,</if>
+        <if test="annotationType != null and annotationType != '' ">annotation_type,</if>
+        <if test="contour != null">contour,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        <if test="slideId != null and slideId != ''">slide_id,</if>
+        <if test="jsonId != null and jsonId != ''">json_id,</if>
+        create_time
+        )values(
+        <if test="area != null and area != ''">#{area},</if>
+        <if test="perimeter != null and perimeter != ''">#{perimeter},</if>
+        <if test="categoryId != null">#{categoryId},</if>
+        <if test="description != null">#{description},</if>
+        <if test="locationType != null and locationType != ''">#{locationType},</if>
+        <if test="annotationType != null and annotationType != ''">#{annotationType},</if>
+        <if test="contour != null">st_geomfromgeojson(#{contour}),</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        <if test="slideId != null and slideId != ''">#{slideId},</if>
+        <if test="jsonId != null and jsonId != ''">#{jsonId},</if>
+        now()
+        )
+    </insert>
 
 
 

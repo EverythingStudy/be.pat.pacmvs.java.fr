@@ -43,7 +43,7 @@ public class MarkingUtils {
     }
 
     public static String getSdId() {
-        return SD + LABEL_NAME + MillisDefaultZone() + RandomNumbers();
+        return SD  + MillisDefaultZone() + RandomNumbers();
     }
 
     public static String getSdId(String categoryName) {
