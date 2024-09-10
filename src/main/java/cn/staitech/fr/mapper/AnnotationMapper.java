@@ -1,6 +1,6 @@
 package cn.staitech.fr.mapper;
 
-import cn.staitech.fr.domain.Contour;
+import cn.staitech.fr.domain.Annotation;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -9,16 +9,25 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @createDate 2024-09-10 09:31:06
 * @Entity cn.staitech.fr.domain.Contour
 */
-public interface AnnotationMapper extends BaseMapper<Contour> {
-	Integer selectExistTable(Contour contour);
-	
-	void createTableSequence(Contour contour);
-	
-	void createTable(Contour contour);
-	
-    Integer selectTableRecordCount(Contour contour);
+public interface AnnotationMapper extends BaseMapper<Annotation> {
+	Integer selectExistTable(Annotation annotation);
 
-	
+	void createTableSequence(Annotation annotation);
+
+	void createTable(Annotation annotation);
+
+    Integer selectTableRecordCount(Annotation annotation);
+
+	Annotation stClosestPoint(Annotation annotation);
+
+	Annotation stDistance(Annotation annotation);
+
+	Annotation avgDistance(Annotation annotation);
+
+	Annotation selectByIds(Long annotationId);
+
+
+
 }
 
 

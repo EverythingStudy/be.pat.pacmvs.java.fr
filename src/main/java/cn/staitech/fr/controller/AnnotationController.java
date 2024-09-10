@@ -3,13 +3,9 @@ package cn.staitech.fr.controller;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.service.AnnotationService;
-import cn.staitech.fr.utils.MessageSource;
-import cn.staitech.fr.vo.annotation.in.*;
+import cn.staitech.fr.vo.annotation.in.DistanceGet;
 import cn.staitech.fr.vo.annotation.out.AnnotationDistanceOut;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -27,12 +23,12 @@ public class AnnotationController {
 
 
 
-//
-//    @PostMapping("/getDistance")
-//    @ApiOperation(value = "获取间距")
-//    public R<AnnotationDistanceOut> getDistance(@RequestBody DistanceGet res)  {
-//        return R.ok(annotationService.getDistance(res));
-//    }
+
+    @PostMapping("/getDistance")
+    @ApiOperation(value = "获取间距")
+    public R<AnnotationDistanceOut> getDistance(@RequestBody DistanceGet res)  {
+        return R.ok(annotationService.getDistance(res));
+    }
 //
 //    @ApiOperation(value = "添加标注")
 //    @PostMapping("/insert")

@@ -20,7 +20,7 @@ import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
-import cn.staitech.fr.domain.Contour;
+import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.SpecialMember;
 import cn.staitech.fr.domain.in.AddMemberIn;
 import cn.staitech.fr.domain.in.SpecialMemberSelectIn;
@@ -68,8 +68,8 @@ public class SpecialMemberServiceImpl extends ServiceImpl<SpecialMemberMapper, S
         SpecialMember specialMember1 = baseMapper.selectById(memberId);
 
         //校验标注信息
-        LambdaQueryWrapper<Contour> labelWrapper = new LambdaQueryWrapper<>();
-        labelWrapper.eq(Contour::getCreateBy, specialMember1.getUserId());
+        LambdaQueryWrapper<Annotation> labelWrapper = new LambdaQueryWrapper<>();
+        labelWrapper.eq(Annotation::getCreateBy, specialMember1.getUserId());
         Integer integer1 = annotationMapper.selectCount(labelWrapper);
         if(integer1>0){
             return R.fail(MessageSource.M("DATA_CANNOT_EDITED_OR_DELETED"));

@@ -1,6 +1,6 @@
 package cn.staitech.fr.mapper;
 
-import cn.staitech.fr.domain.Contour;
+import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.SpecialAnnotationRel;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -12,7 +12,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface SpecialAnnotationRelMapper extends BaseMapper<SpecialAnnotationRel> {
 
-    Integer selectTableSpecialCount(Contour contour);
+    Integer selectTableSpecialCount(Annotation annotation);
     
 
 }

@@ -228,11 +228,12 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
                         }
                     }
                     //查下当前表的项目个数和记录条数，如果可以用继续，如果不可以就新建表
-                    Contour  queryContour = new Contour();
-                    queryContour.setSequenceNumber(currentSequenceNumber);
+                    Annotation queryAnnotation = new Annotation();
+                    queryAnnotation.setSequenceNumber(currentSequenceNumber);
                     
-                    Integer totalProjects = specialAnnotationRelMapper.selectTableSpecialCount(queryContour);
-                    Integer totalRecords = annotationMapper.selectTableRecordCount(queryContour);
+                    Integer totalProjects = specialAnnotationRelMapper.selectTableSpecialCount(queryAnnotation);
+//                    Integer totalRecords = annotationMapper.selectTableRecordCount(queryAnnotation);
+                    Integer totalRecords = 1;
                     if (totalProjects >= CommonConstant.PROJECT_NUMBER_LIMIT || totalRecords >= CommonConstant.TABLE_RECORD_LIMIT) {
                         //新建表
                         Long sequenceNumber = currentSequenceNumber + 1;
@@ -259,7 +260,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     }
 
     private SpecialAnnotationRel generateTable(SpecialAnnotationRel cacheSpecialAnnotationRel, Long specialId, Long userId, Long sequenceNumber) {
-        Contour annotation = new Contour();
+        Annotation annotation = new Annotation();
         annotation.setSequenceNumber(sequenceNumber);
         //先确认是否存在这个表了，如果存在就不新建表了
         Integer existTable = annotationMapper.selectExistTable(annotation);

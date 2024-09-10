@@ -22,7 +22,7 @@
 
 
 
-    <select id="selectTableSpecialCount" parameterType="cn.staitech.fr.domain.Contour" resultType="int">
+    <select id="selectTableSpecialCount" parameterType="cn.staitech.fr.domain.Annotation" resultType="int">
         select count(distinct(special_id)) from fr_special_annotation_rel t where t.sequence_number = #{sequenceNumber}
     </select>
 </mapper>
