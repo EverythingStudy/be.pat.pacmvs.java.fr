@@ -164,7 +164,8 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         LambdaQueryWrapper<Image> qw = new LambdaQueryWrapper<>();
         qw.eq(Image::getOrganizationId, req.getOrganizationId());
         qw.eq(Image::getStatus, CommonConstant.NUMBER_4);
-//        qw.eq(Image::getTopicId, req.getTopicId());
+        qw.eq(Image::getTopicId, req.getTopicId());
+        qw.eq(Image::getAnalyzeStatus, CommonConstant.INT_1);
         List<Image> images = imageMapper.selectList(qw);
         List<Slide> arrayList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(images)) {
@@ -174,7 +175,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
                 slide.setCreateTime(new Date());
                 slide.setImageId(image.getImageId());
                 slide.setSpecialId(special.getSpecialId());
-                getExtInfo(image.getFileName(), slide, special.getSpecialId(), req);
+                //getExtInfo(image.getFileName(), slide, special.getSpecialId(), req);
                 arrayList.add(slide);
             }
         }
@@ -453,34 +454,6 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         return R.ok(special);
     }
 
-    private Slide getExtInfo(String fileName, Slide slide, Long specialId, SpecialAddIn req) {
-        String[] s = fileName.split(" ");
-//        if (s.length < 3) {
-//            log.info("切片文件名格式错误：" + fileName);
-//            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-//            return slide;
-//        }
-//        String s1 = slideMapper.selectBySpecialId(specialId);
-//        if (!s[0].equals(s1)) {
-//            log.info("切片文件名格式错误：" + fileName);
-//            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-//            return slide;
-//        }
-//        slide.setAnimalCode(StringUtils.substringBeforeLast(s[1], "-"));
-//        slide.setWaxCode(StringUtils.substringAfterLast(s[1], "-"));
-//        //判断性别数据
-//        if (!CommonConstant.MALE.equals(s[2].substring(s[2].length() - 1)) &&
-//                !CommonConstant.FEMALE.equals(s[2].substring(s[2].length() - 1))) {
-//            log.info("切片文件名格式错误：" + fileName);
-//            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-//            return slide;
-//        }
-//        slide.setGenderFlag(s[2].substring(s[2].length() - 1));
-//        slide.setGroupCode(s[2].substring(0, s[2].length() - 1));
-        String waxCode = StringUtils.substringAfterLast(s[1], "-");
-        slide.setOrgans(waxBlockInfoMapper.getOrganName(req.getTopicId(), req.getSpeciesId(),waxCode, s[2].substring(s[2].length() - 1)));
-        return slide;
-    }
 
 
     public Boolean userLoginVerify(String username, String pwd) {

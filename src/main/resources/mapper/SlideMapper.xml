@@ -8,7 +8,6 @@
         <id property="slideId" column="slide_id" jdbcType="BIGINT"/>
         <result property="specialId" column="special_id" jdbcType="INTEGER"/>
         <result property="imageId" column="image_id" jdbcType="INTEGER"/>
-        <result property="organs" column="organs" jdbcType="VARCHAR"/>
         <result property="createBy" column="create_by" jdbcType="BIGINT"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateBy" column="update_by" jdbcType="BIGINT"/>
@@ -16,7 +15,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        slide_id,special_id,image_id,organs,
+        slide_id,special_id,image_id,
         create_by,create_time,update_by,
         update_time
     </sql>
@@ -35,7 +34,6 @@
         ti.wax_code,
         ti.animal_code,
         ti.sex_flag gender_flag,
-        fs.organs,
         su.user_name createUser,
         fs.create_time,
         fs.slide_id,
@@ -115,7 +113,6 @@
         m.wax_code,
         m.animal_code,
         m.sex_flag gender_flag,
-        s.organs,
         s.del_flag,
         s.create_by,
         s.create_time,

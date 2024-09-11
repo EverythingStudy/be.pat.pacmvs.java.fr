@@ -171,5 +171,23 @@ public class Image extends BaseEntity {
     @ApiModelProperty(value = "文件夹名称")
     @TableField(exist = false)
     private String folderName;
+    
+   //2024.09.11
+    @ApiModelProperty(value = "专题id")
+    private Long topicId;
+    @ApiModelProperty(value = "专题号")
+    private String topicName;
+    @ApiModelProperty(value = "动物号")
+    private String animalCode;
+    @ApiModelProperty(value = "蜡块号")
+    private String waxCode;
+    @ApiModelProperty(value = "组别号")
+    private String groupCode;
+    @ApiModelProperty(value = "性别（M；F）")
+    private String sexFlag;
+    @ApiModelProperty(value = "文件名解析状态（0失败1成功）")
+    private Integer analyzeStatus;
+    
+    
 
 }
