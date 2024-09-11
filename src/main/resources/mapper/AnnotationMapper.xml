@@ -104,20 +104,6 @@
         </where>
     </select>
 
-    <select id="mergeContour" parameterType="cn.staitech.fr.domain.Annotation"
-            resultMap="BaseResultMap">
-        <if test="operation != null and operation == 'UNION'">
-            select
-            ST_AsGeoJSON(ST_Union((select contour40000 from fr_annotation where annotation_id =
-            #{annotationId}),st_geomfromgeojson(#{contour}))) as contour
-        </if>
-        <if test="operation != null and operation == 'DIFFERENCE'">
-            select
-            ST_AsGeoJSON(ST_Difference((select contour40000 from fr_annotation where annotation_id =
-            #{annotationId}),st_geomfromgeojson(#{contour}))) as contour
-        </if>
-    </select>
-
     <select id="selectContourType" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
         SELECT GeometryType(st_geomfromgeojson(#{contour})) as location_type
@@ -315,6 +301,47 @@
         select count(*)
         from fr_annotation_${sequenceNumber}
         where category_id = #{categoryId}
+    </select>
+
+
+    <update id="updateByIds" parameterType="cn.staitech.fr.domain.Annotation">
+        update fr_annotation_${sequenceNumber}
+        <set>
+            <if test="area != null and area != ''">
+                area = #{area},
+            </if>
+            <if test="perimeter != null and perimeter != ''">
+                perimeter = #{perimeter},
+            </if>
+            <if test="description != null and description != ''">
+                description = #{description},
+            </if>
+            <if test="contour != null and contour != ''">
+                contour = st_geomfromgeojson(#{contour}),
+            </if>
+            <if test="updateBy != null and updateBy != ''">
+                update_by = #{updateBy},
+            </if>
+            <if test="categoryId != null and categoryId != ''">
+                category_id = #{categoryId},
+            </if>
+            update_time = now()
+        </set>
+        where annotation_id = #{annotationId}
+    </update>
+
+    <select id="mergeContour" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        <if test="operation != null and operation == 'UNION'">
+            select
+            ST_AsGeoJSON(ST_Union((select contour from fr_annotation_${sequenceNumber} where annotation_id =
+            #{annotationId}),st_geomfromgeojson(#{contour}))) as contour
+        </if>
+        <if test="operation != null and operation == 'DIFFERENCE'">
+            select
+            ST_AsGeoJSON(ST_Difference((select contour from fr_annotation_${sequenceNumber} where annotation_id =
+            #{annotationId}),st_geomfromgeojson(#{contour}))) as contour
+        </if>
     </select>
 
 </mapper>

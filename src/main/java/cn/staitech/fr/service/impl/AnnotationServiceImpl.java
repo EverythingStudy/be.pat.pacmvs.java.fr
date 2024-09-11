@@ -55,8 +55,7 @@ import static cn.staitech.fr.constant.CommonConstant.*;
  */
 @Slf4j
 @Service
-public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotation>
-        implements AnnotationService {
+public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotation> implements AnnotationService {
 
 
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory(new PrecisionModel(PrecisionModel.FLOATING), 4326);
@@ -118,7 +117,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
         return list;
     }
-
 
 
     public PropertiesBriefly getProperties(Annotation annotation) {
@@ -229,7 +227,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             PathologicalIndicatorCategory pathologicalIndicatorCategory = pathologicalIndicatorCategoryMapper.selectById(req.getCategory_id());
             if (pathologicalIndicatorCategory != null) {
                 jsonId = MarkingUtils.getSdId(pathologicalIndicatorCategory.getCategoryName());
-            }else{
+            } else {
                 jsonId = MarkingUtils.getSdId();
             }
         } else {
@@ -274,7 +272,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
         return annotation.getAnnotationId();
     }
-
 
 
     @Override
@@ -374,7 +371,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
 
-
     @Override
     public int delete(AnnotationById req) throws Exception {
         if (!Optional.ofNullable(req.getMarking_id()).isPresent()) {
@@ -432,12 +428,13 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
 
-
     @Override
     public JSONObject updateOperation(UpdateOperationIn req, String traceId, Boolean isBatch) throws Exception {
+        Long seq = getSequenceNumber(req.getSlide_id());
         Annotation annotations = new Annotation();
         annotations.setAnnotationId(req.getMarking_id());
-        Annotation annotation = annotationMapper.selectById(annotations);
+        annotations.setSequenceNumber(seq);
+        Annotation annotation = annotationMapper.selectByIds(annotations);
         // 查询数据是否存在
         if (!Optional.ofNullable(annotation).isPresent()) {
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
@@ -451,6 +448,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotationBys.setContour(String.valueOf(req.getGeometry()));
         annotationBys.setUpdateBy(req.getUpdate_by());
         annotationBys.setOperation(req.getOperation());
+        annotationBys.setSequenceNumber(seq);
         Annotation annotation1 = annotationMapper.mergeContour(annotationBys);
         String contourType = annotationMapper.selectContourType(annotation1).getLocationType();
         if (!Objects.equals(contourType, "POLYGON")) {
@@ -473,16 +471,14 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             String per = String.valueOf(Double.parseDouble(annotationArea.getPerimeter()) * resolutions);
             annotationBys.setPerimeter(AreaUtils.formattedNumber(per));
         }
-        annotationMapper.updateById(annotationBys);
+        annotationMapper.updateByIds(annotationBys);
         // 更新后查询数据并返回
-        Annotation annotationById = annotationMapper.selectById(annotations);
+        Annotation annotationById = annotationMapper.selectByIds(annotations);
         PropertiesBriefly properties = getProperties(annotationById);
         Features features = socketData(annotationBys.getJsonId(), JSONObject.parseObject(annotation1.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
 
         NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
-
-
         {
             Long userId = req.getUpdate_by();
             Long slideId = annotation.getSlideId();
@@ -586,19 +582,20 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
 
-
     @Override
     public Long update(ViewAddIn req) throws Exception {
+        Long seq = getSequenceNumber(req.getSlide_id());
         Annotation annotations = new Annotation();
         annotations.setAnnotationId(Long.valueOf(req.getMarking_id()));
-        Annotation annotationBy = annotationMapper.selectById(annotations);
-        Long userId = req.getUpdate_by();
+        annotations.setSequenceNumber(seq);
+        Annotation annotationBy = annotationMapper.selectByIds(annotations);
 
         if (!Optional.ofNullable(annotationBy).isPresent()) {
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }
         String traceId = req.getTraceId();
         boolean isBatch = req.getIsBatch();
+        Long userId = req.getUpdate_by();
         {
 
             Long slideId = annotationBy.getSlideId();
@@ -619,11 +616,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                 trace.getNodeList().add(new TraceNode(req.getMarking_id(), "UPDATE"));
                 session.drawListAdd(trace);
             }
-//            // 3、数据持久化写入RocksDB
-//            Gson gson = new Gson();
-//            // 将对象转换成JSON字符串
-//            String json = gson.toJson(markingBy);
-//            RocksDBUtil.put(traceId, markingId, json);
             rocksdbService.submitTask(traceId, req.getMarking_id(), annotationBy);
         }
         Annotation annotation = new Annotation();
@@ -672,8 +664,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                 annotation.setPerimeter(AreaUtils.formattedNumber(per));
             }
         }
-        annotationMapper.updateById(annotation);
-        Annotation annotationBys = annotationMapper.selectById(annotation);
+        annotation.setSequenceNumber(seq);
+        annotationMapper.updateByIds(annotation);
+        Annotation annotationBys = annotationMapper.selectByIds(annotation);
         PropertiesBriefly properties = getProperties(annotationBys);
         Features features = socketData(annotation.getJsonId(), req.getGeometry(), properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
@@ -682,17 +675,16 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
 
-
-
-
     @Override
     public int padding(AnnotationById req) throws Exception {
+        Long seq = getSequenceNumber(req.getSlide_id());
         if (!Optional.ofNullable(req.getMarking_id()).isPresent()) {
             throw new Exception(MessageSource.M("ARGUMENT_INVALID"));
         }
         Annotation annotations = new Annotation();
         annotations.setAnnotationId(req.getMarking_id());
-        Annotation annotationBy = annotationMapper.selectById(annotations);
+        annotations.setSequenceNumber(seq);
+        Annotation annotationBy = annotationMapper.selectByIds(annotations);
         if (!Optional.ofNullable(annotationBy).isPresent()) {
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
         }
@@ -744,16 +736,16 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             String per = String.valueOf(geometry.getLength() * resolutions);
             annotation.setPerimeter(AreaUtils.formattedNumber(per));
         }
+        annotation.setSequenceNumber(seq);
         annotation.setUpdateBy(SecurityUtils.getUserId());
-        int res = annotationMapper.updateById(annotation);
-        Annotation annotationBys = annotationMapper.selectById(annotations);
+        int res = annotationMapper.updateByIds(annotation);
+        Annotation annotationBys = annotationMapper.selectByIds(annotations);
         PropertiesBriefly properties = getProperties(annotationBys);
         Features features = socketData(annotationBys.getJsonId(), geometryJson, properties);
         BroadcastVO broadcastVO = sendOneMessages(UPDATE_STATUS, features);
         NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
         return res;
     }
-
 
 
     @Override
@@ -763,17 +755,15 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         }
         Annotation annotations = new Annotation();
         annotations.setAnnotationId(req.getMarking_id());
-        Annotation annotation = annotationMapper.selectById(annotations);
+        Annotation annotation = annotationMapper.selectByIds(annotations);
         int res = annotationMapper.insert(annotation);
-        Annotation annotationBys = annotationMapper.selectById(annotation.getAnnotationId());
+        Annotation annotationBys = annotationMapper.selectByIds(annotation);
         PropertiesBriefly properties = getProperties(annotationBys);
         Features features = socketData(annotationBys.getJsonId(), JSONObject.parseObject(annotation.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(ADD_STATUS, features);
         NioWebSocketHandler.sendAll(annotation.getSlideId(), broadcastVO);
         return res;
     }
-
-
 
 
     @Override
@@ -811,6 +801,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     @Override
     public Boolean redo(HistoryDTO dto) {
+        Long seq = getSequenceNumber(dto.getSlideId());
         String traceId = UUID.randomUUID().toString();
         // Boolean isUndo = dto.getEnvType() == 1 ? true : false;
 
@@ -843,6 +834,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                         Gson gson = new Gson();
                         String json = RocksDBUtil.get(trace.getTraceId(), markingId);
                         Annotation annotation = gson.fromJson(json, Annotation.class);
+                        annotation.setSequenceNumber(seq);
                         Long beforeMarkingId = annotation.getAnnotationId();
 
                         Annotation newAnnotation = new Annotation();
@@ -854,7 +846,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                                 refresh(undoList, String.valueOf(beforeMarkingId), annotation.getAnnotationId());
                                 break;
                             case "DELETE":
-                                newAnnotation = deleteByHistory(Long.valueOf(markingId));
+                                newAnnotation = deleteByHistory(Long.valueOf(markingId), seq);
                                 break;
                             case "UPDATE":
                             case "UPDATEOPERATION":
@@ -887,7 +879,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                     String json = RocksDBUtil.get(trace.getTraceId(), markingId);
                     Annotation annotation = gson.fromJson(json, Annotation.class);
                     String beforeMarkingId = String.valueOf(annotation.getAnnotationId());
-
+                    annotation.setSequenceNumber(seq);
                     Annotation newAnnotation = new Annotation();
 
                     switch (node.getOperation()) {
@@ -897,7 +889,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                             refresh(undoList, beforeMarkingId, newAnnotation.getAnnotationId());
                             break;
                         case "DELETE":
-                            newAnnotation = deleteByHistory(Long.valueOf(markingId));
+                            newAnnotation = deleteByHistory(Long.valueOf(markingId), seq);
                             break;
                         case "UPDATE":
                         case "UPDATEOPERATION":
@@ -924,6 +916,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     @Override
     public Boolean undo(HistoryDTO dto) {
+        Long seq = getSequenceNumber(dto.getSlideId());
         String traceId = UUID.randomUUID().toString();
         //Boolean isUndo = dto.getEnvType() == 1 ? true : false;
         Long userId = dto.getUserId();
@@ -958,7 +951,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
                         switch (node.getOperation()) {
                             case "INSERT":
-                                newAnnotation = deleteByHistory(Long.valueOf(markingId));
+                                newAnnotation = deleteByHistory(Long.valueOf(markingId), seq);
                                 break;
                             case "DELETE":
                                 newAnnotation = insertByHistory(annotation);
@@ -995,12 +988,13 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                     Gson gson = new Gson();
                     String json = RocksDBUtil.get(trace.getTraceId(), markingId);
                     Annotation annotation = gson.fromJson(json, Annotation.class);
+                    annotation.setSequenceNumber(seq);
                     Long beforeMarkingId = annotation.getAnnotationId();
                     Annotation newAnnotation = new Annotation();
 
                     switch (node.getOperation()) {
                         case "INSERT":
-                            newAnnotation = deleteByHistory(Long.valueOf(markingId));
+                            newAnnotation = deleteByHistory(Long.valueOf(markingId), seq);
                             break;
                         case "DELETE":
                             newAnnotation = insertByHistory(annotation);
@@ -1087,7 +1081,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             return null;
         }
         annotationMapper.insert(annotation);
-        Annotation annotationById = annotationMapper.selectById(annotation.getAnnotationId());
+        Annotation annotationById = annotationMapper.selectByIds(annotation);
         PropertiesBriefly properties = getProperties(annotationById);
         Features features = socketData(String.valueOf(annotation.getAnnotationId()), JSONObject.parseObject(annotation.getContour()), properties);
         BroadcastVO broadcastVO = sendListMessages(CommonConstant.ANNO_TYPE_DRAW, ADD_STATUS, features);
@@ -1106,7 +1100,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     @Override
     public Annotation updateOperationByHistory(Annotation req) {
-        Annotation annotationBy = annotationMapper.selectById(req.getAnnotationId());
+        Annotation annotationBy = annotationMapper.selectByIds(req);
         if (!Optional.ofNullable(annotationBy).isPresent()) {
             return null;
         }
@@ -1130,8 +1124,11 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Annotation deleteByHistory(Long annotationId) {
-        Annotation annotationById = annotationMapper.selectById(annotationId);
+    public Annotation deleteByHistory(Long annotationId, Long seq) {
+        Annotation annotation = new Annotation();
+        annotation.setAnnotationId(annotationId);
+        annotation.setSequenceNumber(seq);
+        Annotation annotationById = annotationMapper.selectByIds(annotation);
         PropertiesBriefly properties = getProperties(annotationById);
         Features features = socketData(String.valueOf(annotationId), JSONObject.parseObject(annotationById.getContour()), properties);
         BroadcastVO broadcastVO = sendListMessages(CommonConstant.ANNO_TYPE_DRAW, DELETE_STATUS, features);
@@ -1184,26 +1181,26 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         return contour;
     }
 
-	@Override
-	public boolean getCountByCategory(CategoryStatisticsIn req) {
-		boolean existence = false;
-		//查询符合条件的所有的专题
-		List<SpecialAnnotationRel> sAnnoRelList = specialAnnotationRelMapper.getSeqNumberList();
-		if(CollectionUtils.isNotEmpty(sAnnoRelList)){
-			List<Long> sequenceNumberList = sAnnoRelList.stream().map(SpecialAnnotationRel::getSequenceNumber).collect(Collectors.toList());
-			for(Long seqNumber:sequenceNumberList){
-				Annotation annotation = new Annotation();
-				annotation.setCategoryId(req.getCategoryId());
-				annotation.setSequenceNumber(seqNumber);
-				int categoryCount = annotationMapper.getCountByCategory(annotation);
-				if(categoryCount > 0){
-					existence = true;
-					break;
-				}
-			}
-		}
-		return existence;
-	}
+    @Override
+    public boolean getCountByCategory(CategoryStatisticsIn req) {
+        boolean existence = false;
+        //查询符合条件的所有的专题
+        List<SpecialAnnotationRel> sAnnoRelList = specialAnnotationRelMapper.getSeqNumberList();
+        if (CollectionUtils.isNotEmpty(sAnnoRelList)) {
+            List<Long> sequenceNumberList = sAnnoRelList.stream().map(SpecialAnnotationRel::getSequenceNumber).collect(Collectors.toList());
+            for (Long seqNumber : sequenceNumberList) {
+                Annotation annotation = new Annotation();
+                annotation.setCategoryId(req.getCategoryId());
+                annotation.setSequenceNumber(seqNumber);
+                int categoryCount = annotationMapper.getCountByCategory(annotation);
+                if (categoryCount > 0) {
+                    existence = true;
+                    break;
+                }
+            }
+        }
+        return existence;
+    }
 
 
 }

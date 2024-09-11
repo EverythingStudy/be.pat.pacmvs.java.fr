@@ -84,15 +84,12 @@
                update_by,
                update_time,
                image_code,
-               topic_id,
-               topic_name,
                `status`,
                host_id,
                organization_id,
                round_id,
                biz_type,
-               `source`,
-               folder_id
+               `source`
         from tb_image
     </sql>
 

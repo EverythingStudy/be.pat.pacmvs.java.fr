@@ -4,6 +4,7 @@ import cn.staitech.common.security.annotation.EnableCustomConfig;
 import cn.staitech.common.security.annotation.EnableRyFeignClients;
 import cn.staitech.common.swagger.annotation.EnableCustomSwagger2;
 import cn.staitech.fr.netty.websocket.NioWebSocketServer;
+import cn.staitech.fr.utils.MessageSource;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,6 +27,10 @@ import java.util.TimeZone;
 @MapperScan({"cn.staitech.fr.mapper"})
 @EnableElasticsearchRepositories(basePackages = {"cn.staitech.common.log.elasticsearchRepositories"})
 public class StaTechFrApplication {
+
+    public StaTechFrApplication(org.springframework.context.MessageSource messageSource) {
+        MessageSource.init(messageSource);
+    }
 
     public static void main(String[] args) {
         //jvm参数设置时间 -Duser.timezone="Asia/Shanghai"

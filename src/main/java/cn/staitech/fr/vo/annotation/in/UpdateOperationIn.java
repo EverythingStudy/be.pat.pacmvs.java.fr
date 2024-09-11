@@ -20,6 +20,9 @@ public class UpdateOperationIn {
     @ApiModelProperty(value = "标注作者(绘制者)")
     private Long update_by;
 
+    @ApiModelProperty(value = "切片id")
+    private Long slide_id;
+
     @ApiModelProperty(value = "(新图形) 标注坐标")
     private JSONObject geometry;
 

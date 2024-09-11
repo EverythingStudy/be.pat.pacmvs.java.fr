@@ -42,7 +42,7 @@ public interface AnnotationService extends IService<Annotation> {
 
     Boolean redo(HistoryDTO dto);
 
-    Annotation deleteByHistory(Long annotationId) throws Exception;
+    Annotation deleteByHistory(Long annotationId,Long seq) throws Exception;
 
     Annotation insertByHistory(Annotation annotation);
 

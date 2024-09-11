@@ -164,7 +164,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         LambdaQueryWrapper<Image> qw = new LambdaQueryWrapper<>();
         qw.eq(Image::getOrganizationId, req.getOrganizationId());
         qw.eq(Image::getStatus, CommonConstant.NUMBER_4);
-        qw.eq(Image::getTopicId, req.getTopicId());
+//        qw.eq(Image::getTopicId, req.getTopicId());
         List<Image> images = imageMapper.selectList(qw);
         List<Slide> arrayList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(images)) {

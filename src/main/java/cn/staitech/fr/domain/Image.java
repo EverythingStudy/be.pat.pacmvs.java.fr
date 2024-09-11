@@ -124,12 +124,7 @@ public class Image extends BaseEntity {
     @TableField(value = "image_code")
     @ApiModelProperty(value = "切片编号")
     private String imageCode;
-    @TableField(value = "topic_id")
-    @ApiModelProperty(value = "所属专题", hidden = true)
-    private Long topicId;
-    @TableField(value = "topic_name")
-    @ApiModelProperty(value = "所属专题-专题名称")
-    private String topicName;
+
     @TableField(value = "status")
     @ApiModelProperty(value = "文件状态:0上传中、1上传失败、2解析中、3解析失败、4可用")
     private Integer status;
