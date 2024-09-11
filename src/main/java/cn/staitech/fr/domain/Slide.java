@@ -33,25 +33,7 @@ public class Slide implements Serializable {
      */
     private Long imageId;
 
-    /**
-     * 组别号
-     */
-    private String groupCode;
 
-    /**
-     * 蜡块编号
-     */
-    private String waxCode;
-
-    /**
-     * 动物编号
-     */
-    private String animalCode;
-
-    /**
-     * 性别（M:雄；F:雌）
-     */
-    private String genderFlag;
 
     /**
      * 脏器
@@ -80,7 +62,6 @@ public class Slide implements Serializable {
      */
     private Date updateTime;
     
-    private String analyzeStatus;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
@@ -100,10 +81,6 @@ public class Slide implements Serializable {
         return (this.getSlideId() == null ? other.getSlideId() == null : this.getSlideId().equals(other.getSlideId()))
             && (this.getSpecialId() == null ? other.getSpecialId() == null : this.getSpecialId().equals(other.getSpecialId()))
             && (this.getImageId() == null ? other.getImageId() == null : this.getImageId().equals(other.getImageId()))
-            && (this.getGroupCode() == null ? other.getGroupCode() == null : this.getGroupCode().equals(other.getGroupCode()))
-            && (this.getWaxCode() == null ? other.getWaxCode() == null : this.getWaxCode().equals(other.getWaxCode()))
-            && (this.getAnimalCode() == null ? other.getAnimalCode() == null : this.getAnimalCode().equals(other.getAnimalCode()))
-            && (this.getGenderFlag() == null ? other.getGenderFlag() == null : this.getGenderFlag().equals(other.getGenderFlag()))
             && (this.getOrgans() == null ? other.getOrgans() == null : this.getOrgans().equals(other.getOrgans()))
             && (this.getCreateBy() == null ? other.getCreateBy() == null : this.getCreateBy().equals(other.getCreateBy()))
             && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
@@ -118,10 +95,6 @@ public class Slide implements Serializable {
         result = prime * result + ((getSlideId() == null) ? 0 : getSlideId().hashCode());
         result = prime * result + ((getSpecialId() == null) ? 0 : getSpecialId().hashCode());
         result = prime * result + ((getImageId() == null) ? 0 : getImageId().hashCode());
-        result = prime * result + ((getGroupCode() == null) ? 0 : getGroupCode().hashCode());
-        result = prime * result + ((getWaxCode() == null) ? 0 : getWaxCode().hashCode());
-        result = prime * result + ((getAnimalCode() == null) ? 0 : getAnimalCode().hashCode());
-        result = prime * result + ((getGenderFlag() == null) ? 0 : getGenderFlag().hashCode());
         result = prime * result + ((getOrgans() == null) ? 0 : getOrgans().hashCode());
         result = prime * result + ((getCreateBy() == null) ? 0 : getCreateBy().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
@@ -139,10 +112,6 @@ public class Slide implements Serializable {
         sb.append(", slideId=").append(slideId);
         sb.append(", specialId=").append(specialId);
         sb.append(", imageId=").append(imageId);
-        sb.append(", groupCode=").append(groupCode);
-        sb.append(", waxCode=").append(waxCode);
-        sb.append(", animalCode=").append(animalCode);
-        sb.append(", genderFlag=").append(genderFlag);
         sb.append(", organs=").append(organs);
         sb.append(", createBy=").append(createBy);
         sb.append(", createTime=").append(createTime);

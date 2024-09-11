@@ -8,10 +8,6 @@
         <id property="slideId" column="slide_id" jdbcType="BIGINT"/>
         <result property="specialId" column="special_id" jdbcType="INTEGER"/>
         <result property="imageId" column="image_id" jdbcType="INTEGER"/>
-        <result property="groupCode" column="group_code" jdbcType="VARCHAR"/>
-        <result property="waxCode" column="wax_code" jdbcType="INTEGER"/>
-        <result property="animalCode" column="animal_code" jdbcType="VARCHAR"/>
-        <result property="genderFlag" column="gender_flag" jdbcType="CHAR"/>
         <result property="organs" column="organs" jdbcType="VARCHAR"/>
         <result property="createBy" column="create_by" jdbcType="BIGINT"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
@@ -20,10 +16,7 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        slide_id
-        ,special_id,image_id,
-        group_code,wax_code,animal_code,
-        gender_flag,organs,
+        slide_id,special_id,image_id,organs,
         create_by,create_time,update_by,
         update_time
     </sql>
@@ -38,15 +31,15 @@
             resultType="cn.staitech.fr.domain.out.SlideListQueryOut">
         select ti.thumb_url,
         ti.image_name fileName,
-        fs.group_code,
-        fs.wax_code,
-        fs.animal_code,
-        fs.gender_flag,
+        ti.group_code,
+        ti.wax_code,
+        ti.animal_code,
+        ti.sex_flag gender_flag,
         fs.organs,
         su.user_name createUser,
         fs.create_time,
         fs.slide_id,
-        fs.analyze_status
+        ti.analyze_status
         from fr_slide fs
         left join tb_image ti on fs.image_id = ti.image_id
         left join sys_user su on fs.create_by = su.user_id
@@ -57,7 +50,7 @@
                 and ti.image_name like concat('%',#{fileName},'%')
             </if>
             <if test="analyzeStatus!= null and analyzeStatus != ''">
-                and fs.analyze_status = #{analyzeStatus}
+                and ti.analyze_status = #{analyzeStatus}
             </if>
             <if test="createBy != null and createBy != ''">
                 and su.user_name like concat('%',#{createBy},'%')
@@ -88,7 +81,7 @@
                 AND t1.special_id = #{specialId}
             </if>
             <if test="analyzeStatus != null">
-                AND t1.analyze_status = #{analyzeStatus}
+                AND t2.analyze_status = #{analyzeStatus}
             </if>
 			 <if test="list != null and list.size() >0 ">
 	            AND t1.slide_id in
@@ -102,9 +95,10 @@
     </select>
 
     <select id="selectListByWax" resultType="cn.staitech.fr.domain.Slide">
-        select fs.slide_id,fs.wax_code
+        select fs.slide_id,t2.wax_code
         from fr_slide fs
-                 left join fr_special fsl on fs.special_id = fsl.special_id
+          left join fr_special fsl on fs.special_id = fsl.special_id
+          left join tb_image t2 on fs.image_id = t2.image_id 
         where fsl.topic_id= #{topicId}
           and fsl.species_id= #{speciesId}
           and fsl.del_flag='0'
@@ -117,9 +111,10 @@
         s.slide_id,
         s.special_id,
         s.image_id,
-        s.group_code,      s.wax_code,
-        s.animal_code,
-        s.gender_flag,
+        m.group_code,
+        m.wax_code,
+        m.animal_code,
+        m.sex_flag gender_flag,
         s.organs,
         s.del_flag,
         s.create_by,
