@@ -7,7 +7,6 @@
         <result property="topicId" column="topic_id"/>
         <result property="topicName" column="topic_name"/>
         <result property="organizationId" column="organization_id"/>
-        <result property="projectTypeId" column="project_type_id"/>
         <result property="createBy" column="create_by"/>
         <result property="createTime" column="create_time"/>
         <result property="updateBy" column="update_by"/>
@@ -16,10 +15,8 @@
     <select id="getTopicList" resultType="cn.staitech.fr.domain.Topic">
         select ti.topic_id, ti.topic_name
         from tb_image ti
-                 left join tb_topic tt
-                           on ti.topic_id = tt.topic_id
+        left join tb_topic tt on ti.topic_id = tt.topic_id
         where ti.organization_id = #{organizationId}
-          and tt.project_type_id = 1
           and ti.status = 4
           and ti.topic_id is not null
           and ti.image_id is not null

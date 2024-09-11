@@ -455,37 +455,29 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 
     private Slide getExtInfo(String fileName, Slide slide, Long specialId, SpecialAddIn req) {
         String[] s = fileName.split(" ");
-        if (s.length < 3) {
-            log.info("切片文件名格式错误：" + fileName);
-            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-            return slide;
-        }
-        String s1 = slideMapper.selectBySpecialId(specialId);
-        if (!s[0].equals(s1)) {
-            log.info("切片文件名格式错误：" + fileName);
-            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-            return slide;
-        }
-        slide.setAnimalCode(StringUtils.substringBeforeLast(s[1], "-"));
-        slide.setWaxCode(StringUtils.substringAfterLast(s[1], "-"));
-        //判断性别数据
-        if (!CommonConstant.MALE.equals(s[2].substring(s[2].length() - 1)) &&
-                !CommonConstant.FEMALE.equals(s[2].substring(s[2].length() - 1))) {
-            log.info("切片文件名格式错误：" + fileName);
-            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-            return slide;
-        }
-        slide.setGenderFlag(s[2].substring(s[2].length() - 1));
-        //判断组别
-        /*Group byId = groupService.getById(s[2].substring(0, s[2].length() - 1));
-        if (ObjectUtils.isEmpty(byId)) {
-            log.info("切片文件名格式错误：" + fileName);
-            return slide;
-        }*/
-        slide.setGroupCode(s[2].substring(0, s[2].length() - 1));
-
+//        if (s.length < 3) {
+//            log.info("切片文件名格式错误：" + fileName);
+//            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
+//            return slide;
+//        }
+//        String s1 = slideMapper.selectBySpecialId(specialId);
+//        if (!s[0].equals(s1)) {
+//            log.info("切片文件名格式错误：" + fileName);
+//            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
+//            return slide;
+//        }
+//        slide.setAnimalCode(StringUtils.substringBeforeLast(s[1], "-"));
+//        slide.setWaxCode(StringUtils.substringAfterLast(s[1], "-"));
+//        //判断性别数据
+//        if (!CommonConstant.MALE.equals(s[2].substring(s[2].length() - 1)) &&
+//                !CommonConstant.FEMALE.equals(s[2].substring(s[2].length() - 1))) {
+//            log.info("切片文件名格式错误：" + fileName);
+//            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
+//            return slide;
+//        }
+//        slide.setGenderFlag(s[2].substring(s[2].length() - 1));
+//        slide.setGroupCode(s[2].substring(0, s[2].length() - 1));
         slide.setOrgans(waxBlockInfoMapper.getOrganName(req.getTopicId(), req.getSpeciesId(), slide.getWaxCode(), s[2].substring(s[2].length() - 1)));
-
         return slide;
     }
 
