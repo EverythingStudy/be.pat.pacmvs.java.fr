@@ -470,6 +470,8 @@
         <where>
             and fsl.special_id = #{specialId}
             and i.status = 4
+            <!-- 文件名解析状态（0失败1成功） -->
+            and i.analyze_status = 1
             <if test="orgId != null">
                 <!-- 组织机构编号 -->
                 and i.organization_id = #{orgId}

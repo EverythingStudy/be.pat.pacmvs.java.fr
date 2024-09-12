@@ -36,8 +36,7 @@
         ti.sex_flag gender_flag,
         su.user_name createUser,
         fs.create_time,
-        fs.slide_id,
-        ti.analyze_status
+        fs.slide_id
         from fr_slide fs
         left join tb_image ti on fs.image_id = ti.image_id
         left join sys_user su on fs.create_by = su.user_id
@@ -46,9 +45,6 @@
             and fs.del_flag='0'
             <if test="fileName != null and fileName != ''">
                 and ti.image_name like concat('%',#{fileName},'%')
-            </if>
-            <if test="analyzeStatus!= null and analyzeStatus != ''">
-                and ti.analyze_status = #{analyzeStatus}
             </if>
             <if test="createBy != null and createBy != ''">
                 and su.user_name like concat('%',#{createBy},'%')

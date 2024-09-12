@@ -1,13 +1,11 @@
 package cn.staitech.fr.domain.out;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.annotations.Api;
+
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import java.util.Date;
 
 /**
  * @Author wudi
@@ -48,10 +46,5 @@ public class SlideListQueryOut {
 //    @ApiModelProperty(value = "处理状态（0：待切图,1：切图中,2：切图成功 3：切图失败）")
 //    private Integer processFlag;
 
-    @ApiModelProperty(value = "脏器类型")
-    private String organs;
-
-    @ApiModelProperty(value = "切片名称解析，0：成功；1：失败")
-    private String analyzeStatus;
 
 }
