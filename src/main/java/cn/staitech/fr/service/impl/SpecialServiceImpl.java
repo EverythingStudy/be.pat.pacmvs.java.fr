@@ -233,8 +233,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
                     queryAnnotation.setSequenceNumber(currentSequenceNumber);
                     
                     Integer totalProjects = specialAnnotationRelMapper.selectTableSpecialCount(queryAnnotation);
-//                    Integer totalRecords = annotationMapper.selectTableRecordCount(queryAnnotation);
-                    Integer totalRecords = 1;
+                    Integer totalRecords = annotationMapper.selectTableRecordCount(queryAnnotation);
                     if (totalProjects >= CommonConstant.PROJECT_NUMBER_LIMIT || totalRecords >= CommonConstant.TABLE_RECORD_LIMIT) {
                         //新建表
                         Long sequenceNumber = currentSequenceNumber + 1;
