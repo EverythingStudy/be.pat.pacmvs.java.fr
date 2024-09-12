@@ -85,8 +85,7 @@ implements SlideService {
 			slide.setCreateTime(new Date());
 			slide.setImageId(image.getImageId());
 			slide.setSpecialId(req.getSpecialId());
-			Slide extInfo = getExtInfo(image.getFileName(), slide, req.getSpecialId());
-			arrayList.add(extInfo);
+			arrayList.add(slide);
 		}
 		saveBatch(arrayList);
 		return R.ok();
@@ -119,42 +118,6 @@ implements SlideService {
 		return R.ok();
 	}
 
-	private Slide getExtInfo(String fileName, Slide slide, Long specialId) {
-		String[] s = fileName.split(" ");
-		if (s.length < 3) {
-			log.info("切片文件名格式错误：" + fileName);
-			slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-			return slide;
-		}
-		String s1 = this.baseMapper.selectBySpecialId(specialId);
-		if (!s[0].equals(s1)) {
-			log.info("切片文件名格式错误：" + fileName);
-			slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-			return slide;
-		}
-		slide.setAnimalCode(StringUtils.substringBeforeLast(s[1], "-"));
-		slide.setWaxCode(StringUtils.substringAfterLast(s[1], "-"));
-		//判断性别数据
-		if (!CommonConstant.MALE.equals(s[2].substring(s[2].length() - 1)) &&
-				!CommonConstant.FEMALE.equals(s[2].substring(s[2].length() - 1))) {
-			log.info("切片文件名格式错误：" + fileName);
-			slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-			return slide;
-		}
-		slide.setGenderFlag(s[2].substring(s[2].length() - 1));
-		//判断组别
-		/*Group byId = groupService.getById(s[2].substring(0, s[2].length() - 1));
-        if (ObjectUtils.isEmpty(byId)) {
-            log.info("切片文件名格式错误：" + fileName);
-            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-            slide.setProcessFlag(4);
-            return slide;
-        }*/
-		slide.setGroupCode(s[2].substring(0, s[2].length() - 1));
-		Special special = specialMapper.selectById(specialId);
-		slide.setOrgans(waxBlockInfoMapper.getOrganName(special.getTopicId(),special.getSpeciesId(),slide.getWaxCode(),s[2].substring(s[2].length() - 1)));
-		return slide;
-	}
 
 	@Override
 	public R deleteAll(Long specialId,Long slideId) {
