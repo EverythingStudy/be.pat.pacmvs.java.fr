@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import cn.staitech.fr.domain.PathologicalIndicatorCategory;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -69,6 +70,14 @@ public class SpecialController  extends BaseController {
     public R<PageResponse<SpecialListQueryOut>> list(@RequestBody @Validated SpecialListQueryIn req) {
         PageResponse<SpecialListQueryOut> resp = specialService.getSpecialList(req);
         return R.ok(resp);
+    }
+
+
+    @ApiOperation(value = "种属关联病理指标列表", notes = "wangfeng")
+    @GetMapping("/speciesCategory")
+    public R<List<PathologicalIndicatorCategory>> speciesCategory(@Validated @RequestParam Long specialId) {
+        List<PathologicalIndicatorCategory> list = specialService.speciesCategory(specialId);
+        return R.ok(list);
     }
 
     @ApiOperation(value = "专题新增")

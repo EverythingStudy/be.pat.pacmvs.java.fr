@@ -105,6 +105,28 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     @Resource
     private SpecialMapper specialMapper;
 
+    @Resource
+    private PathologicalIndicatorMapper pathologicalIndicatorMapper;
+
+    @Resource
+    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
+
+
+
+    @Override
+    public List<PathologicalIndicatorCategory> speciesCategory(Long specialId){
+        Special special = specialMapper.selectById(specialId);
+        LambdaQueryWrapper<PathologicalIndicator> indicatorQueryWrapper = new LambdaQueryWrapper<>();
+        indicatorQueryWrapper.eq(PathologicalIndicator::getDelFlag,0).eq(PathologicalIndicator::getSpeciesId, special.getSpeciesId()).eq(PathologicalIndicator::getOrganizationId, special.getOrganizationId());
+        List<PathologicalIndicator> indicatorList = pathologicalIndicatorMapper.selectList(indicatorQueryWrapper);
+        if(indicatorList.size() > 0){
+            LambdaQueryWrapper<PathologicalIndicatorCategory> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.in(PathologicalIndicatorCategory::getIndicatorId, indicatorList).eq(PathologicalIndicatorCategory::getDelFlag,0);
+            return pathologicalIndicatorCategoryMapper.selectList(queryWrapper);
+        }
+        return new ArrayList<>();
+    }
+
 
     @Override
     public PageResponse<SpecialListQueryOut> getSpecialList(SpecialListQueryIn req) {
