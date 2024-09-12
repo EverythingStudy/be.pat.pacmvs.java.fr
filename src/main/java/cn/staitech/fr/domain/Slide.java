@@ -28,6 +28,8 @@ public class Slide implements Serializable {
      */
     private Long specialId;
 
+    private String description;
+
     /**
      * 图像ID
      */

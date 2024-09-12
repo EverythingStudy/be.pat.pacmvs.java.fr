@@ -36,6 +36,7 @@
         ti.sex_flag gender_flag,
         su.user_name createUser,
         fs.create_time,
+        fs.description,
         fs.slide_id
         from fr_slide fs
         left join tb_image ti on fs.image_id = ti.image_id

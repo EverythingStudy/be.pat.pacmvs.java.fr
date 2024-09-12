@@ -39,6 +39,9 @@ public class SlideListQueryOut {
     @ApiModelProperty(value = "添加人")
     private String createUser;
 
+    @ApiModelProperty(value = "描述")
+    private String description;
+
     @ApiModelProperty(value = "添加时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
