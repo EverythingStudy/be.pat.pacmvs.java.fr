@@ -128,6 +128,12 @@
 	    CREATE
         SEQUENCE fr_annotation_${sequenceNumber}_annotation_id_seq START
         1;
+
+        DROP
+        SEQUENCE IF EXISTS fr_annotation_del_${sequenceNumber}_annotation_id_seq;
+	    CREATE
+        SEQUENCE fr_annotation_del_${sequenceNumber}_annotation_id_seq START
+        1;
     </insert>
 
     <insert id="createTable" parameterType="cn.staitech.fr.domain.Annotation">
@@ -164,6 +170,44 @@
 		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."update_time" IS '更新时间';
 		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."slide_id" IS '切片id';
 		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."json_id" IS 'geojson中数据id';
+
+        CREATE TABLE "public".fr_annotation_del_${sequenceNumber}
+        (
+            "annotation_id"   int8 NOT NULL DEFAULT nextval('fr_annotation_del_${sequenceNumber}_annotation_id_seq'::regclass),
+            "area" varchar(50) COLLATE "pg_catalog"."default",
+            "perimeter" varchar(50) COLLATE "pg_catalog"."default",
+            "description" varchar(100) COLLATE "pg_catalog"."default",
+            "category_id" int8,
+            "contour" geometry(GEOMETRY),
+            "location_type" varchar(100) COLLATE "pg_catalog"."default",
+            "annotation_type" varchar(50) COLLATE "pg_catalog"."default" DEFAULT 'draw'::character varying,
+            "create_by" int8,
+            "create_time" date,
+            "update_by" int8,
+            "update_time" date,
+            "delete_by" int8,
+            "delete_time" date,
+            "slide_id" int8,
+            "json_id" varchar(500) COLLATE "pg_catalog"."default"
+        );
+
+        ALTER TABLE "fr_annotation_del_${sequenceNumber}" OWNER TO "postgres";
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."annotation_id" IS '主键id';
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."area" IS '面积';
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."perimeter" IS '周长';
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."description" IS '轮廓描述';
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."category_id" IS '轮廓标签id';
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."contour" IS '轮廓坐标625';
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."location_type" IS '轮廓类型';
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."annotation_type" IS '标注类型(AI表示AI算出的标注，Draw表示前端绘制的标注)';
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."create_by" IS '标注创建者';
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."create_time" IS '创建时间';
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."update_by" IS '更新者';
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."update_time" IS '更新时间';
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."delete_by" IS '删除者';
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."update_time" IS '删除时间';
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."slide_id" IS '切片id';
+        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."json_id" IS 'geojson中数据id';
     </insert>
 
     <!--查询表下记录总数-->
