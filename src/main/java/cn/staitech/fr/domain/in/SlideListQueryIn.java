@@ -44,5 +44,11 @@ public class SlideListQueryIn extends PageRequest {
 
     @ApiModelProperty(value = "添加时间")
     private Map<String, Date> createTimeParams;
+    
+    @ApiModelProperty(value = "排序字段")
+    private String sortField;
+    
+    @ApiModelProperty(value = "排序类型")
+    private String sortType;
 
 }

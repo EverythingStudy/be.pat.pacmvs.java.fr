@@ -71,7 +71,12 @@
                 </if>
             </if>
         </where>
-        order by fs.create_time desc
+	        <if test="sortField != null and sortField!=''">
+	            	order by ${sortField} ${sortType}
+	        </if>
+	        <if test="sortField == null and sortField==''">
+	            order by create_time desc
+	        </if>
     </select>
     
     <select id="getAlgorithmImage" parameterType="map" resultType="cn.staitech.fr.domain.out.AlgorithmImageOut">
