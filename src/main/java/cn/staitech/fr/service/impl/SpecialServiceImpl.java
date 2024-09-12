@@ -352,16 +352,6 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     @Override
     public R editSpecialStatus(EditSpecialStatusIn req) {
         log.info("专题状态按钮接口开始：");
-        //启动条件判断
-        if (req.getStatus().equals(CommonConstant.INT_1)) {
-            LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(Slide::getSpecialId, req.getSpecialId());
-            wrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
-            List<Slide> slideList = slideService.list(wrapper);
-            if (CollectionUtils.isNotEmpty(slideList)) {
-                return R.fail(MessageSource.M("START_SPECIAL_ERROR"));
-            }
-        }
         //锁定传4,解锁 5
         if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {
         	Special special = this.baseMapper.selectById(req.getSpecialId());

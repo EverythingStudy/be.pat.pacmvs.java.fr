@@ -162,9 +162,6 @@ public class Image extends BaseEntity {
     @ApiModelProperty(value = "reviewRoundId")
     @TableField(exist = false)
     private Long reviewRoundId;
-    @ApiModelProperty(value = "文件夹编号")
-    @TableField(value = "folder_id")
-    private Long folderId;
     @ApiModelProperty(value = "创建人")
     @TableField(exist = false)
     private String nickName;

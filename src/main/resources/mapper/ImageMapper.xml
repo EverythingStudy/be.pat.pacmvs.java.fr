@@ -456,7 +456,6 @@
         i.round_id,
         i.biz_type,
         i.`source`,
-        i.folder_id,
         if(fs.special_id=#{specialId},1,0) choiceState
         from tb_image i
         left join fr_slide fs
