@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.AnnotationDelMapper">
+
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.AnnotationDel">
+            <result property="annotationId" column="annotation_id" jdbcType="BIGINT"/>
+            <result property="area" column="area" jdbcType="VARCHAR"/>
+            <result property="perimeter" column="perimeter" jdbcType="VARCHAR"/>
+            <result property="description" column="description" jdbcType="VARCHAR"/>
+            <result property="categoryId" column="category_id" jdbcType="BIGINT"/>
+            <result property="contour" column="contour" jdbcType="OTHER"/>
+            <result property="locationType" column="location_type" jdbcType="VARCHAR"/>
+            <result property="annotationType" column="annotation_type" jdbcType="VARCHAR"/>
+            <result property="createBy" column="create_by" jdbcType="BIGINT"/>
+            <result property="createTime" column="create_time" jdbcType="DATE"/>
+            <result property="updateBy" column="update_by" jdbcType="BIGINT"/>
+            <result property="updateTime" column="update_time" jdbcType="DATE"/>
+            <result property="slideId" column="slide_id" jdbcType="BIGINT"/>
+            <result property="jsonId" column="json_id" jdbcType="VARCHAR"/>
+            <result property="deleteBy" column="delete_by" jdbcType="BIGINT"/>
+            <result property="deleteTime" column="delete_time" jdbcType="DATE"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        annotation_id,area,perimeter,
+        description,category_id,contour,
+        location_type,annotation_type,create_by,
+        create_time,update_by,update_time,
+        slide_id,json_id,delete_by,
+        delete_time
+    </sql>
+
+
+    <insert id="insert" parameterType="cn.staitech.fr.domain.Annotation" useGeneratedKeys="true" keyProperty="annotationId">
+        insert into fr_annotation_del_${sequenceNumber} (
+        <if test="annotationId != null and annotationId != '' ">annotation_id,</if>
+        <if test="area != null and area != '' ">area,</if>
+        <if test="perimeter != null and perimeter != '' ">perimeter,</if>
+        <if test="categoryId != null">category_id,</if>
+        <if test="description != null and description != '' ">description,</if>
+        <if test="locationType != null and locationType != '' ">location_type,</if>
+        <if test="annotationType != null and annotationType != '' ">annotation_type,</if>
+        <if test="contour != null">contour,</if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        <if test="createTime != null and createTime != ''">create_time,</if>
+        <if test="updateBy != null and updateBy != ''">update_by,</if>
+        <if test="updateTime != null and updateTime != ''">update_time,</if>
+        <if test="slideId != null and slideId != ''">slide_id,</if>
+        <if test="jsonId != null and jsonId != ''">json_id,</if>
+        <if test="deleteBy != null and deleteBy != ''">delete_by,</if>
+        delete_time
+        )values(
+        <if test="annotationId != null and annotationId != ''">#{annotationId},</if>
+        <if test="area != null and area != ''">#{area},</if>
+        <if test="perimeter != null and perimeter != ''">#{perimeter},</if>
+        <if test="categoryId != null">#{categoryId},</if>
+        <if test="description != null">#{description},</if>
+        <if test="locationType != null and locationType != ''">#{locationType},</if>
+        <if test="annotationType != null and annotationType != ''">#{annotationType},</if>
+        <if test="contour != null">st_geomfromgeojson(#{contour}),</if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        <if test="createTime != null and createTime != ''">#{createTime},</if>
+        <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+        <if test="updateTime != null and updateTime != ''">#{updateTime},</if>
+        <if test="slideId != null and slideId != ''">#{slideId},</if>
+        <if test="jsonId != null and jsonId != ''">#{jsonId},</if>
+        <if test="deleteBy != null and deleteBy != ''">#{deleteBy},</if>
+        now()
+        )
+    </insert>
+
+
+
+</mapper>

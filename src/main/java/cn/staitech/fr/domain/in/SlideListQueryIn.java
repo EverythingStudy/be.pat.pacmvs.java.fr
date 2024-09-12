@@ -21,6 +21,18 @@ public class SlideListQueryIn extends PageRequest {
     @ApiModelProperty(value = "切片编号")
     private String fileName;
 
+    @ApiModelProperty(value = "动物编号")
+    private String animalCode;
+
+    @ApiModelProperty(value = "组号")
+    private String groupCode;
+
+    @ApiModelProperty(value = "性别")
+    private String sexFlag;
+
+    @ApiModelProperty(value = "蜡块编号")
+    private String waxCode;
+
     @ApiModelProperty(value = "状态")
     private String processFlag;
 

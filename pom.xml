@@ -468,5 +468,17 @@
                 <serverAddr>192.168.52.224:8848</serverAddr>
             </properties>
         </profile>
+        <profile>
+            <!--开发环境-->
+            <id>pvcmvsdev1</id>
+            <properties>
+                <activatedProperties>pvcmvsdev1</activatedProperties>
+                <nacosNamespace>18649c47-5206-4c52-9560-44c66d300d0f</nacosNamespace>
+                <nacosAddress>http://192.168.52.224:8848</nacosAddress>
+                <nacosGroup>DEFAULT_GROUP</nacosGroup>
+                <serverAddr>192.168.52.224:8848</serverAddr>
+            </properties>
+        </profile>
     </profiles>
+
 </project>

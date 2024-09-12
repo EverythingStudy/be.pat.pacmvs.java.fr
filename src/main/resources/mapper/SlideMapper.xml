@@ -46,6 +46,18 @@
             <if test="fileName != null and fileName != ''">
                 and ti.image_name like concat('%',#{fileName},'%')
             </if>
+            <if test="animalCode != null and animalCode != ''">
+                and ti.animal_code like concat('%',#{animalCode},'%')
+            </if>
+            <if test="sexFlag != null and sexFlag != ''">
+                and ti.sex_flag = #{sexFlag}
+            </if>
+            <if test="groupCode != null and groupCode != ''">
+                and ti.group_code = #{groupCode}
+            </if>
+            <if test="waxCode != null and waxCode != ''">
+                and ti.wax_code like concat('%',#{waxCode},'%')
+            </if>
             <if test="createBy != null and createBy != ''">
                 and su.user_name like concat('%',#{createBy},'%')
             </if>

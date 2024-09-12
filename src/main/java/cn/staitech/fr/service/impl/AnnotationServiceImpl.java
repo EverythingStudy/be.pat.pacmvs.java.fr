@@ -77,6 +77,9 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     private UserMapper userMapper;
 
     @Resource
+    private AnnotationDelMapper annotationDelMapper;
+
+    @Resource
     private RocksdbService rocksdbService;
 
     @Resource
@@ -244,7 +247,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Long seq = getSequenceNumber(req.getSlide_id());
         annotation.setSequenceNumber(seq);
         annotationMapper.insert(annotation);
-        System.out.println(annotation + "=======================>");
         Annotation annotationBy = annotationMapper.selectByIds(annotation);
         PropertiesBriefly properties = getProperties(annotationBy);
         Features features = socketData(annotation.getJsonId(), JSONObject.parseObject(annotationBy.getContour()), properties);
@@ -391,6 +393,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         NioWebSocketHandler.sendAll(annotationBy.getSlideId(), broadcastVO);
 
         int res = annotationMapper.deleteByIds(annotation);
+
+        AnnotationDel annotationDel = new AnnotationDel();
+        BeanUtils.copyProperties(annotationBy, annotationDel);
+        annotationDel.setDeleteBy(SecurityUtils.getLoginUser().getSysUser().getUserId());
+        annotationDel.setDeleteTime(new Date());
+        annotationDelMapper.insert(annotationDel);
 
         String traceId = req.getTraceId();
         boolean isBatch = req.getIsBatch();
