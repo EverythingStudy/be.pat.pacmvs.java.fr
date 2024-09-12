@@ -285,7 +285,20 @@
     <select id="getCountByCategory" parameterType="cn.staitech.fr.domain.Annotation" resultType="int">
         select count(*)
         from fr_annotation_${sequenceNumber}
-        where category_id = #{categoryId}
+        <where>
+        	<if test="categoryId != null">
+               and category_id = #{categoryId}
+            </if>
+            <if test="createBy != null">
+               and create_by = #{createBy}
+            </if>
+            <if test="slideIdList != null and slideIdList.size()>0">
+                and slide_id in
+                <foreach collection="slideIdList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
     </select>
 
 

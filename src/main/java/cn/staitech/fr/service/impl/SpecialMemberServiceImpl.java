@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -21,11 +22,16 @@ import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.Image;
+import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.SpecialAnnotationRel;
 import cn.staitech.fr.domain.SpecialMember;
 import cn.staitech.fr.domain.in.AddMemberIn;
 import cn.staitech.fr.domain.in.SpecialMemberSelectIn;
 import cn.staitech.fr.domain.out.SpecialMemberSelectOut;
 import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.SlideMapper;
+import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.mapper.SpecialMemberMapper;
 import cn.staitech.fr.service.SpecialMemberService;
 import cn.staitech.fr.utils.MessageSource;
@@ -44,7 +50,10 @@ import lombok.extern.slf4j.Slf4j;
 public class SpecialMemberServiceImpl extends ServiceImpl<SpecialMemberMapper, SpecialMember> implements SpecialMemberService {
     @Resource
     private AnnotationMapper annotationMapper;
-
+    @Resource
+    private SpecialAnnotationRelMapper specialAnnotationRelMapper;
+    @Resource
+    private SlideMapper slideMapper;
 
     @Override
     public PageResponse<SpecialMemberSelectOut> getSpecialMemberList(SpecialMemberSelectIn req) {
@@ -64,21 +73,39 @@ public class SpecialMemberServiceImpl extends ServiceImpl<SpecialMemberMapper, S
     @Override
     public R removeMember(Long memberId) {
         log.info("专题成员删除接口开始：");
-        //todo 校验用户操作信息
+        //校验用户操作信息
         SpecialMember specialMember1 = baseMapper.selectById(memberId);
+        Long specialId = specialMember1.getSpecialId();
+        Long memberUserId = specialMember1.getUserId();
+        
+        LambdaQueryWrapper<SpecialAnnotationRel> queryWrapper = new LambdaQueryWrapper<>();
+			queryWrapper.eq(SpecialAnnotationRel::getSpecialId, specialId);
+		SpecialAnnotationRel specialAnnotationRel = specialAnnotationRelMapper.selectOne(queryWrapper);
+		if(null != specialAnnotationRel) {
+			Long sequenceNumber = specialAnnotationRel.getSequenceNumber();
+			//查询是否有标注信息
+			LambdaQueryWrapper<Slide> slideWrapper = new LambdaQueryWrapper<>();
+			slideWrapper.eq(Slide::getSpecialId, specialId);
+			slideWrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
+			List<Slide> slideList = slideMapper.selectList(slideWrapper);
+			if(CollectionUtils.isNotEmpty(slideList)) {
+				List<Long> slideIdList =  slideList.stream().map(Slide::getSlideId).collect(Collectors.toList());
 
-        //校验标注信息
-        LambdaQueryWrapper<Annotation> labelWrapper = new LambdaQueryWrapper<>();
-        labelWrapper.eq(Annotation::getCreateBy, specialMember1.getUserId());
-        Integer integer1 = annotationMapper.selectCount(labelWrapper);
-        if(integer1>0){
-            return R.fail(MessageSource.M("DATA_CANNOT_EDITED_OR_DELETED"));
-        }
+				Annotation queryAnnotation = new Annotation();
+				queryAnnotation.setSequenceNumber(sequenceNumber);
+				queryAnnotation.setCreateBy(memberUserId);
+				queryAnnotation.setSlideIdList(slideIdList);
+				Integer integer = annotationMapper.getCountByCategory(queryAnnotation);
+				if(integer > 0){
+					return R.fail(MessageSource.M("DATA_CANNOT_EDITED_OR_DELETED"));
+				}
 
-        SpecialMember specialMember = new SpecialMember();
-        specialMember.setMemberId(memberId);
-        specialMember.setDelFlag(CommonConstant.NUMBER_1);
-        this.updateById(specialMember);
+				SpecialMember specialMember = new SpecialMember();
+				specialMember.setMemberId(memberId);
+				specialMember.setDelFlag(CommonConstant.NUMBER_1);
+				this.updateById(specialMember);
+			}
+		}
         return R.ok();
 
     }
