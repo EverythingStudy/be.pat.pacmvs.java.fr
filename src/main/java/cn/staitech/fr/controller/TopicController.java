@@ -41,7 +41,7 @@ public class TopicController {
         Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
         QueryWrapper<Topic> qw = new QueryWrapper();
         qw.eq(!SysUser.isAdmin(SecurityUtils.getUserId()), "organization_id", organizationId);
-        qw.eq("del_flag", "0").orderByDesc("topic_id");
+        qw.orderByDesc("topic_id");
         List<Topic> list = topicService.list(qw);
         return R.ok(list);
     }
