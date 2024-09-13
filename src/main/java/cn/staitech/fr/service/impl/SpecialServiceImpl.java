@@ -1,5 +1,28 @@
 package cn.staitech.fr.service.impl;
 
+import static cn.staitech.common.core.constant.UserConstants.RSA_KEYS;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+
 import cn.staitech.common.core.constant.SecurityConstants;
 import cn.staitech.common.core.constant.UserConstants;
 import cn.staitech.common.core.domain.PageResponse;
@@ -12,14 +35,32 @@ import cn.staitech.common.redis.service.RedisService;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Container;
-import cn.staitech.fr.domain.*;
+import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.Image;
+import cn.staitech.fr.domain.PathologicalIndicator;
+import cn.staitech.fr.domain.PathologicalIndicatorCategory;
+import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.Special;
+import cn.staitech.fr.domain.SpecialAnnotationRel;
+import cn.staitech.fr.domain.SpecialLockLog;
+import cn.staitech.fr.domain.SpecialMember;
+import cn.staitech.fr.domain.SpecialRecycling;
 import cn.staitech.fr.domain.in.EditSpecialStatusIn;
 import cn.staitech.fr.domain.in.SpecialAddIn;
 import cn.staitech.fr.domain.in.SpecialEditIn;
 import cn.staitech.fr.domain.in.SpecialListQueryIn;
 import cn.staitech.fr.domain.in.SpecialsQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
-import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.ImageMapper;
+import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
+import cn.staitech.fr.mapper.PathologicalIndicatorMapper;
+import cn.staitech.fr.mapper.SlideMapper;
+import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
+import cn.staitech.fr.mapper.SpecialLockLogMapper;
+import cn.staitech.fr.mapper.SpecialMapper;
+import cn.staitech.fr.mapper.SpecialMemberMapper;
+import cn.staitech.fr.mapper.TopicMapper;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.SpecialRecyclingService;
 import cn.staitech.fr.service.SpecialService;
@@ -27,29 +68,7 @@ import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.system.api.RemoteUserService;
 import cn.staitech.system.api.domain.SysUser;
 import cn.staitech.system.api.model.LoginUser;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-
-import static cn.staitech.common.core.constant.UserConstants.RSA_KEYS;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -78,8 +97,6 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     @Autowired
     private SlideService slideService;
 
-    @Resource
-    private WaxBlockInfoMapper waxBlockInfoMapper;
 
     @Resource
     private SpecialMemberMapper specialMemberMapper;

@@ -40,7 +40,7 @@ public class SelectImageSlideOut {
     private String groupCode;
 
     @ApiModelProperty(value = "蜡块编号")
-    private String waxCode;
+    private Integer waxCode;
 
     @ApiModelProperty(value = "动物编号")
     private String animalCode;

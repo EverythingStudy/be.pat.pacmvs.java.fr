@@ -3,12 +3,10 @@ package cn.staitech.fr.service.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +22,6 @@ import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Slide;
-import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.in.ChoiceSaveInVo;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
 import cn.staitech.fr.domain.out.ImageListOutVO;
@@ -34,9 +31,7 @@ import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.mapper.SpecialMapper;
-import cn.staitech.fr.mapper.WaxBlockInfoMapper;
 import cn.staitech.fr.service.SlideService;
-import cn.staitech.fr.utils.MessageSource;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -50,23 +45,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide>
 implements SlideService {
 
 	@Resource
-	private WaxBlockInfoMapper waxBlockInfoMapper;
-	@Resource
 	private SpecialMapper specialMapper;
-
-	//	@Resource
-	//	private SingleSlideMapper singleSlideMapper;
-	//	@Resource
-	//	private AiForecastMapper aiForecastMapper;
-	//	@Resource
-	//	private DiagnosisMapper diagnosisMapper;
-	//	@Resource
-	//	private JsonTaskMapper jsonTaskMapper;
-	//	@Resource
-	//	private JsonFileMapper jsonFileMapper;
-
-//	@Resource
-//	private MeasureMapper measureMapper;
 
 	@Resource
 	private AnnotationMapper annotationMapper;

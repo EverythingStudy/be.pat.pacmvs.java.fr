@@ -31,7 +31,7 @@ public class SlideListQueryIn extends PageRequest {
     private String sexFlag;
 
     @ApiModelProperty(value = "蜡块编号")
-    private String waxCode;
+    private Integer waxCode;
 
     @ApiModelProperty(value = "状态")
     private String processFlag;
