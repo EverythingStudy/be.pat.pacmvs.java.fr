@@ -35,5 +35,8 @@ public class SpecialEditIn {
     @ApiModelProperty(value = "机构id")
     private Long organizationId;
 
+    @ApiModelProperty(value = "图像增强(0:增强，1：不增强)")
+    private String imageIntensifier;
+
 
 }

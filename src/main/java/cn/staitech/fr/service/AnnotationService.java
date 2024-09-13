@@ -2,6 +2,8 @@ package cn.staitech.fr.service;
 
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.SpecialAnnotationRel;
 import cn.staitech.fr.vo.annotation.Features;
 import cn.staitech.fr.vo.annotation.in.*;
 import cn.staitech.fr.vo.annotation.out.AnnotationDistanceOut;
@@ -23,6 +25,9 @@ public interface AnnotationService extends IService<Annotation> {
 //    List<Features> aiSelectListBy(AnnotationSelectList annotation) throws Exception;
 //
     Long insert(ViewAddIn req) throws Exception;
+
+    public  Long getSequenceNumber(Long slideId);
+
 
     int delete(AnnotationById req) throws Exception;
 //

@@ -200,7 +200,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
 
-    public Long getSequenceNumber(Long slideId) {
+    public  Long getSequenceNumber(Long slideId) {
         Slide slide = slideMapper.selectById(slideId);
         SpecialAnnotationRel specialAnnotationRel = specialAnnotationRelMapper.selectById(slide.getSpecialId());
         return specialAnnotationRel.getSequenceNumber();
@@ -286,13 +286,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (annotationIdList.isEmpty()) {
             return R.ok(null, MessageSource.M("OPERATE_SUCCEED"));
         }
-        //标注信息
-        Map<Long, Annotation> markingMap = features.stream().collect(Collectors.toMap(Annotation::getAnnotationId, Function.identity()));
         //异步删除
         CompletableFuture<Integer> cf1 = CompletableFuture.supplyAsync(() -> {
-            Set<Long> categoryIds = new HashSet<>();
-            categoryIds.add(0L);
-            Set<Long> createBys = new HashSet<>();
             if (CollectionUtils.isNotEmpty(annotationIdList)) {
                 req.setAnnotationIdList(annotationIdList);
                 annotationMapper.deleteRoiContDel(req);
@@ -301,15 +296,20 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                     Annotation annotation = new Annotation();
                     annotation.setAnnotationId(markingId);
                     annotation.setSequenceNumber(req.getSequenceNumber());
-                    annotationMapper.selectByIds(annotation);
-                    categoryIds.add(markingMap.get(markingId).getCategoryId());
-                    createBys.add(markingMap.get(markingId).getCategoryId());
+                    Annotation annotation1 = annotationMapper.selectByIds(annotation);
+                    annotation1.setSequenceNumber(req.getSequenceNumber());
+                    try {
+                        annotationDelInsert(annotation1, req.getSequenceNumber());
+                    } catch (java.text.ParseException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
-            BroadcastVO broadcastVO = sendListMessages(CommonConstant.ANNO_TYPE_DRAW, RELOAD_STATUS, null);
-            NioWebSocketHandler.sendAll(req.getSlideId(), broadcastVO);
             return 1;
         });
+
+        BroadcastVO broadcastVO = sendListMessages(CommonConstant.ANNO_TYPE_DRAW, RELOAD_STATUS, null);
+        NioWebSocketHandler.sendAll(req.getSlideId(), broadcastVO);
         return R.ok(null, MessageSource.M("OPERATE_SUCCEED"));
     }
 

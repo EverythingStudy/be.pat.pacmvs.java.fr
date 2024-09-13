@@ -3,14 +3,13 @@ package cn.staitech.fr.service.impl;
 
 import cn.staitech.common.redis.service.RedisService;
 import cn.staitech.fr.constant.CommonConstant;
-import cn.staitech.fr.domain.Annotation;
-import cn.staitech.fr.domain.Outline;
-import cn.staitech.fr.domain.PathologicalIndicatorCategory;
+import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.MeasureMapper;
 import cn.staitech.fr.mapper.OutlineMapper;
 import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
 import cn.staitech.fr.netty.websocket.NioWebSocketHandler;
+import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.service.OutlineService;
 import cn.staitech.fr.utils.MarkingUtils;
 import cn.staitech.fr.vo.annotation.Features;
@@ -52,6 +51,9 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
     private RedisService redisService;
 
     @Resource
+    private AnnotationService annotationService;
+
+    @Resource
     private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
 
     public static final String REDIS_OUTLINE_ROOT = "OUTLINE_ROOT:";
@@ -85,9 +87,6 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
 
         AtomicLong outlineId = new AtomicLong(1);
         // 格式转换
-        if(selectVO.getSingleSlideId() != null){
-            selectVO.setSlideId(selectVO.getSingleSlideId());
-        }
         for (com.alibaba.fastjson2.JSONObject jsonObject : srcJsonList) {
             Outline outline = new Outline();
             outline.setOutlineId(outlineId.getAndIncrement());
@@ -294,6 +293,7 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
                 annotation.setPerimeter(outline.getPerimeter().toString());
                 annotation.setCreateBy(outline.getCreateBy());
                 annotation.setAnnotationType("Draw");
+                annotation.setSequenceNumber(annotationService.getSequenceNumber(selectVO.getSlideId()));
                 // 添加数据库，添加后返回自增id
                 annotationMapper.insert(annotation);
 
@@ -302,7 +302,7 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
             }
         }
         BroadcastVO broadcastVO = sendListMessages(CommonConstant.ANNO_TYPE_DRAW, RELOAD_STATUS,new Features());
-        NioWebSocketHandler.sendAll(selectVO.getSingleSlideId(), broadcastVO);
+        NioWebSocketHandler.sendAll(selectVO.getSlideId(), broadcastVO);
         // 删除所有当前用户的记录
         removeByCreateByAndToken(createBy, null);
     }

@@ -337,7 +337,7 @@
         </where>
     </select>
 
-    <select id="deleteRoiContDel" parameterType="cn.staitech.fr.vo.annotation.in.RoiIn">
+    <select id="deleteRoiContDel" parameterType="cn.staitech.fr.vo.annotation.in.RoiIn" resultType="java.lang.Integer">
         delete
         from fr_annotation_${sequenceNumber}
         <where>

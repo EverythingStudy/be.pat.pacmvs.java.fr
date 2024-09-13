@@ -24,9 +24,6 @@ public class OutlineSelectVO implements Serializable {
     @ApiModelProperty(value = "切片ID")
     private Long slideId;
 
-    @ApiModelProperty(value = "单切片ID")
-    private Long singleSlideId;
-
     @NotNull
     @ApiModelProperty(value = "创建者ID")
     private Long createBy;

@@ -154,9 +154,6 @@ public class Annotation implements Serializable {
     private Boolean insideOrOutside;
 
     @TableField(exist = false)
-    private List<Long> singleSlideIdList;
-
-    @TableField(exist = false)
     private List<Long> categoryIdList;
 
     @TableField(exist = false)

@@ -68,17 +68,10 @@ public class HistoryController {
             @ApiImplicitParam(name = "slideId", value = "切片ID", required = true, dataType = "Long", paramType = "query")})
     @Log(title = "标注编辑-历史记录", menu = "标注编辑-历史记录", subMenu = "清空", businessType = BusinessType.QUERY)
     @GetMapping("/clean")
-    public R<String> clean(@ApiParam(name = "slideId", value = "切片ID", required = true) Long slideId,
-                           @ApiParam(name = "singleSlideId", value = "单切片ID", required = true) Long singleSlideId
+    public R<String> clean(@ApiParam(name = "slideId", value = "切片ID", required = true) Long slideId
                            ) {
         Long userId = SecurityUtils.getLoginUser().getSysUser().getUserId();
-        Long slides;
-        if(singleSlideId != null){
-            slides = singleSlideId;
-        }else{
-            slides = slideId;
-        }
-        historyService.clearSessionList(userId, slides);
+        historyService.clearSessionList(userId, slideId);
         return R.ok();
     }
 }
