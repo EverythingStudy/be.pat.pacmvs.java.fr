@@ -1121,7 +1121,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setArea(req.getArea());
         annotation.setPerimeter(req.getPerimeter());
         annotation.setUpdateBy(SecurityUtils.getUserId());
-        annotationMapper.updateById(annotation);
+        annotation.setSequenceNumber(req.getSequenceNumber());
+        annotationMapper.updateByIds(annotation);
         PropertiesBriefly properties = getProperties(annotationBy);
         Features features = socketData(String.valueOf(annotationBy.getAnnotationId()), JSONObject.parseObject(req.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_DRAW, UPDATE_STATUS, features);
