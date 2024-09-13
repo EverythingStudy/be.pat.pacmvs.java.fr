@@ -35,6 +35,8 @@ public interface SlideMapper extends BaseMapper<Slide> {
 
     List<SlideListQueryOut> slideListQuery(SlideListQueryIn req);
 
+    SlideListQueryOut slideQueryBy(Long slideId);
+
     List<Slide> selectListByWax(@Param("topicId") Long topicId, @Param("speciesId")String speciesId);
     
     SlideSelectBy pageImageCsvListVOBy(Long slideId);

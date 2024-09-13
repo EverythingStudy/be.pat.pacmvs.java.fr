@@ -53,8 +53,8 @@
             <if test="animalCode != null and animalCode != ''">
                 and ti.animal_code like concat('%',#{animalCode},'%')
             </if>
-            <if test="sexFlag != null and sexFlag != ''">
-                and ti.sex_flag = #{sexFlag}
+            <if test="genderFlag != null and genderFlag != ''">
+                and ti.sex_flag = #{genderFlag}
             </if>
             <if test="groupCode != null and groupCode != ''">
                 and ti.group_code = #{groupCode}
@@ -84,6 +84,24 @@
 	        <if test="sortField == null and sortField==''">
 	            order by topic_name asc,animal_code asc,wax_code asc
 	        </if>
+    </select>
+
+    <select id="slideQueryBy" parameterType="long"
+            resultType="cn.staitech.fr.domain.out.SlideListQueryOut">
+        select ti.thumb_url,
+        ti.image_name fileName,
+        ti.group_code,
+        ti.wax_code,
+        ti.animal_code,
+        ti.sex_flag gender_flag,
+        su.user_name createUser,
+        fs.create_time,
+        fs.description,
+        fs.slide_id
+        from fr_slide fs
+        left join tb_image ti on fs.image_id = ti.image_id
+        left join sys_user su on fs.create_by = su.user_id
+        where fs.slide_id = #{slideId}
     </select>
     
     <select id="getAlgorithmImage" parameterType="map" resultType="cn.staitech.fr.domain.out.AlgorithmImageOut">
@@ -134,6 +152,7 @@
         m.wax_code,
         m.animal_code,
         m.sex_flag gender_flag,
+        s.description,
         s.del_flag,
         s.create_by,
         s.create_time,

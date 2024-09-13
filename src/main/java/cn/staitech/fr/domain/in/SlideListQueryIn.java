@@ -28,7 +28,7 @@ public class SlideListQueryIn extends PageRequest {
     private String groupCode;
 
     @ApiModelProperty(value = "性别")
-    private String sexFlag;
+    private String genderFlag;
 
     @ApiModelProperty(value = "蜡块编号")
     private Integer waxCode;
@@ -41,6 +41,9 @@ public class SlideListQueryIn extends PageRequest {
 
     @ApiModelProperty(value = "添加人")
     private String createBy;
+
+    @ApiModelProperty(value = "切片id")
+    private Long slideId;
 
     @ApiModelProperty(value = "添加时间")
     private Map<String, Date> createTimeParams;

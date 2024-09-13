@@ -37,19 +37,19 @@ public class MeasureController {
             @NotNull(message = "{ReviewRoundController.list.isnull}") @RequestParam("pageNum") @ApiParam(name = "pageNum", value = "分页参数", required = true) Integer pageNum,
             @NotNull(message = "{ReviewRoundController.list.isnull}") @RequestParam("pageSize") @ApiParam(name = "pageSize", value = "分页参数", required = true) Integer pageSize,
             @RequestParam(value = "measureFullName", required = false) @ApiParam(name = "measureFullName", value = "标注名称", required = true) String measureFullName,
-            @RequestParam(value = "singleSlideId") @ApiParam(name = "singleSlideId", value = "切片ID", required = true) Long singleSlideId) throws Exception {
-        if (!Optional.ofNullable(singleSlideId).isPresent()) {
+            @RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "切片ID", required = true) Long slideId) throws Exception {
+        if (!Optional.ofNullable(slideId).isPresent()) {
             return R.fail(MessageSource.M("ARGUMENT_INVALID"));
         }
 
-        return R.ok(measureService.list(singleSlideId, pageNum, pageSize, measureFullName));
+        return R.ok(measureService.list(slideId, pageNum, pageSize, measureFullName));
     }
 
 
     @ApiOperation(value = "获取GeoJson数据")
     @GetMapping("/getDataList")
-    public R<List<Features>> getDataList(@RequestParam(value = "singleSlideId") @ApiParam(name = "singleSlideId", value = "切片ID", required = true) Long singleSlideId) throws Exception {
-        return R.ok(measureService.selectListBy(singleSlideId));
+    public R<List<Features>> getDataList(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "切片ID", required = true) Long slideId) throws Exception {
+        return R.ok(measureService.selectListBy(slideId));
     }
 
 

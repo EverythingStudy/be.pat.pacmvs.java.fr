@@ -18,9 +18,9 @@ import java.util.List;
 public interface MeasureService extends IService<Measure> {
 
 
-    PageResponse<MarkingSelectListVO> list(Long singleSlideId, Integer pageNum, Integer pageSize, String measureFullName) throws Exception;
+    PageResponse<MarkingSelectListVO> list(Long slideId, Integer pageNum, Integer pageSize, String measureFullName) throws Exception;
 
-    List<Features> selectListBy(Long singleSlideId) throws Exception;
+    List<Features> selectListBy(Long slideId) throws Exception;
 
     Long insert(ViewAddIn req) throws Exception;
 

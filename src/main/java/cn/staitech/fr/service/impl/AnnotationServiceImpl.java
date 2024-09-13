@@ -251,7 +251,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         PropertiesBriefly properties = getProperties(annotationBy);
         Features features = socketData(annotation.getJsonId(), JSONObject.parseObject(annotationBy.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(ADD_STATUS, features);
-        NioWebSocketHandler.sendAll(req.getSlide_id(), broadcastVO);
         {
             Long slideId;
             if (req.getSingle_slide_id() != null) {
@@ -272,6 +271,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             }
             rocksdbService.submitTask(traceId, String.valueOf(annotation.getAnnotationId()), annotation);
         }
+        NioWebSocketHandler.sendAll(req.getSlide_id(), broadcastVO);
         return annotation.getAnnotationId();
     }
 
@@ -761,9 +761,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (!Optional.ofNullable(req.getMarking_id()).isPresent()) {
             throw new Exception(MessageSource.M("ARGUMENT_INVALID"));
         }
+        Long seq = getSequenceNumber(req.getSlide_id());
         Annotation annotations = new Annotation();
         annotations.setAnnotationId(req.getMarking_id());
+        annotations.setSequenceNumber(seq);
         Annotation annotation = annotationMapper.selectByIds(annotations);
+        annotation.setSequenceNumber(seq);
         int res = annotationMapper.insert(annotation);
         Annotation annotationBys = annotationMapper.selectByIds(annotation);
         PropertiesBriefly properties = getProperties(annotationBys);
@@ -776,6 +779,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     @Override
     public JSONObject markingMerge(MarkingMerge req) throws Exception {
+        Long seq = getSequenceNumber(req.getSlide_id());
+        req.setSequenceNumber(seq);
         List<Annotation> annotationList = annotationMapper.selectInList(req);
         List<Geometry> geometryList = new ArrayList<>();
         for (Annotation annotation : annotationList) {
@@ -1119,7 +1124,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setArea(req.getArea());
         annotation.setPerimeter(req.getPerimeter());
         annotation.setUpdateBy(SecurityUtils.getUserId());
-        annotation.setUpdateTime(new Date());
         annotationMapper.updateById(annotation);
         PropertiesBriefly properties = getProperties(annotationBy);
         Features features = socketData(String.valueOf(annotationBy.getAnnotationId()), JSONObject.parseObject(req.getContour()), properties);
@@ -1153,6 +1157,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         AnnotationDistanceOut annotationDistanceOut = new AnnotationDistanceOut();
         LambdaQueryWrapper<SpecialAnnotationRel> queryWrapper = new LambdaQueryWrapper<SpecialAnnotationRel>().eq(SpecialAnnotationRel::getSpecialId, req.getSpecialId());
         SpecialAnnotationRel specialAnnotationRel = specialAnnotationRelMapper.selectOne(queryWrapper);
+        System.out.println("specialAnnotationRel = " + specialAnnotationRel.getSequenceNumber() + "================>");
         String contourOne = selectContour(req.getAnnotationIdOne(), req.getAnnotationTypeOne(), specialAnnotationRel.getSequenceNumber());
         String contourTwo = selectContour(req.getAnnotationIdTwo(), req.getAnnotationTypeTwo(), specialAnnotationRel.getSequenceNumber());
         Annotation annotation = new Annotation();
@@ -1181,6 +1186,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             Annotation annotation = new Annotation();
             annotation.setAnnotationId(annotationId);
             annotation.setSequenceNumber(sequenceNumber);
+            System.out.println(annotation + "------------------>");
             contour = annotationMapper.selectByIds(annotation).getContour();
         } else if (Objects.equals(annotationType, "Measure")) {
             // 根据主键查询fr_measure表中信息

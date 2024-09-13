@@ -2,7 +2,10 @@ package cn.staitech.fr.service.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -80,6 +83,54 @@ implements SlideService {
 		pageResponse.setList(resp);
 		pageResponse.setPages(page.getPages());
 		return pageResponse;
+	}
+
+	@Override
+	public HashMap<String, SlideListQueryOut> slideAdjacent(SlideListQueryIn req){
+
+		List<SlideListQueryOut> waxList = this.baseMapper.slideListQuery(req);
+		// 根据下标查询出附近的数据
+		AtomicInteger index = new AtomicInteger(0);
+		waxList.stream()
+				//指定匹配逻辑
+				.filter(s -> {
+					//每比对一个元素，数值加1
+					index.getAndIncrement();
+					return s.getSlideId().equals(req.getSlideId());
+				}).findFirst();
+		HashMap<String, SlideListQueryOut> map = new HashMap<>();
+
+		int indexsx = index.get() - 1;
+		if (waxList.size() > 0) {
+			if (indexsx == 0) {
+				if (waxList.size() > 1) {
+					map.put("prev", null);
+					Long slideId = waxList.get(indexsx + 1).getSlideId();
+					SlideListQueryOut slideSelectBy = baseMapper.slideQueryBy(slideId);
+					map.put("next", slideSelectBy);
+				} else {
+					map.put("prev", null);
+					map.put("next", null);
+				}
+			} else if (waxList.size() - 1 == indexsx) {
+				Long slideId = waxList.get(indexsx - 1).getSlideId();
+				SlideListQueryOut slideSelectBy = baseMapper.slideQueryBy(slideId);
+				map.put("prev", slideSelectBy);
+				map.put("next", null);
+			} else {
+				Long slideIdPrev = waxList.get(indexsx - 1).getSlideId();
+				SlideListQueryOut slideSelectByPrev = baseMapper.slideQueryBy(slideIdPrev);
+				map.put("prev", slideSelectByPrev);
+				Long slideIdNext = waxList.get(indexsx + 1).getSlideId();
+				SlideListQueryOut slideSelectByNext = baseMapper.slideQueryBy(slideIdNext);
+				map.put("next", slideSelectByNext);
+			}
+		} else {
+			map.put("prev", null);
+			map.put("next", null);
+		}
+		return map;
+
 	}
 
 	@Override

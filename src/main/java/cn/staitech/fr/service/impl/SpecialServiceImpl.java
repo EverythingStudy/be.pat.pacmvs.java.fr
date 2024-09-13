@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 
@@ -137,8 +138,10 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         indicatorQueryWrapper.eq(PathologicalIndicator::getDelFlag,0).eq(PathologicalIndicator::getSpeciesId, special.getSpeciesId()).eq(PathologicalIndicator::getOrganizationId, special.getOrganizationId());
         List<PathologicalIndicator> indicatorList = pathologicalIndicatorMapper.selectList(indicatorQueryWrapper);
         if(indicatorList.size() > 0){
+            // 获取指标id
+            List<Long> indicatorIdList = indicatorList.stream().map(PathologicalIndicator::getIndicatorId).collect(Collectors.toList());
             LambdaQueryWrapper<PathologicalIndicatorCategory> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.in(PathologicalIndicatorCategory::getIndicatorId, indicatorList).eq(PathologicalIndicatorCategory::getDelFlag,0);
+            queryWrapper.in(PathologicalIndicatorCategory::getIndicatorId, indicatorIdList).eq(PathologicalIndicatorCategory::getDelFlag,0);
             return pathologicalIndicatorCategoryMapper.selectList(queryWrapper);
         }
         return new ArrayList<>();

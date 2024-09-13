@@ -24,8 +24,8 @@ public class Measure implements Serializable {
     /**
      * 切片id
      */
-    @TableField(value = "single_slide_id")
-    private Long singleSlideId;
+    @TableField(value = "slide_id")
+    private Long slideId;
 
     /**
      * 标注类型(AI表示AI算出的标注，Draw表示前端绘制的标注，Measure表示测量工具数据)

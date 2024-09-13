@@ -5,7 +5,7 @@
 <mapper namespace="cn.staitech.fr.mapper.AnnotationMapper">
 
     <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.Annotation">
-            <result property="annotationId" column="contour_id" jdbcType="BIGINT"/>
+            <result property="annotationId" column="annotation_id" jdbcType="BIGINT"/>
             <result property="area" column="area" jdbcType="VARCHAR"/>
             <result property="perimeter" column="perimeter" jdbcType="VARCHAR"/>
             <result property="description" column="description" jdbcType="VARCHAR"/>
@@ -94,7 +94,7 @@
         project_id,
         slide_id,
         id,
-        ST_AsGeoJSON(contour40000) AS contour
+        ST_AsGeoJSON(contour) AS contour
         from fr_annotation
         <where>
             annotation_id in

@@ -294,7 +294,6 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
                 annotation.setPerimeter(outline.getPerimeter().toString());
                 annotation.setCreateBy(outline.getCreateBy());
                 annotation.setAnnotationType("Draw");
-                annotation.setCreateTime(new Date());
                 // 添加数据库，添加后返回自增id
                 annotationMapper.insert(annotation);
 
