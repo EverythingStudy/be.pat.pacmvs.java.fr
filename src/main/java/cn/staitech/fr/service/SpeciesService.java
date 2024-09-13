@@ -1,7 +1,6 @@
 package cn.staitech.fr.service;
 
 import cn.staitech.fr.domain.Species;
-import cn.staitech.fr.domain.out.SpeciesOut;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;

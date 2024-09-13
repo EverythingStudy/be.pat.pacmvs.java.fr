@@ -1,12 +1,15 @@
 package cn.staitech.fr.mapper;
 
+import java.util.List;
+import java.util.Map;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.in.SpecialListQueryIn;
 import cn.staitech.fr.domain.in.SpecialsQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
-import java.util.List;
+import cn.staitech.system.api.domain.SysUser;
 
 /**
  * <p>
@@ -23,4 +26,6 @@ public interface SpecialMapper extends BaseMapper<Special> {
     List<SpecialListQueryOut> getSpecials(SpecialsQueryIn req);
 
     Integer countgetUserRole(Long userId);
+    
+    List<SysUser>  selectUserById(Map<String,Object> parm);
 }

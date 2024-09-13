@@ -22,7 +22,6 @@
             <result property="loginStatus" column="login_status" jdbcType="CHAR"/>
             <result property="loginIp" column="login_ip" jdbcType="VARCHAR"/>
             <result property="loginDate" column="login_date" jdbcType="TIMESTAMP"/>
-            <result property="userSource" column="user_source" jdbcType="CHAR"/>
             <result property="createBy" column="create_by" jdbcType="BIGINT"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
             <result property="updateBy" column="update_by" jdbcType="BIGINT"/>
@@ -35,8 +34,7 @@
         user_type,dept,email,
         phonenumber,sex,password,
         status,del_flag,login_status,
-        login_ip,login_date,user_source,
-        create_by,create_time,update_by,
-        update_time
+        login_ip,login_date,create_by,
+        create_time,update_by,update_time
     </sql>
 </mapper>

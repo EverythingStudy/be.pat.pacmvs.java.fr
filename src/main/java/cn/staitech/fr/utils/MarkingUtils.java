@@ -1,23 +1,19 @@
 package cn.staitech.fr.utils;
 
-import cn.staitech.fr.vo.geojson.Features;
-import cn.staitech.fr.vo.geojson.PropertiesBriefly;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
-import com.vividsolutions.jts.geom.*;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.PrecisionModel;
 import com.vividsolutions.jts.io.WKTReader;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.geotools.geojson.GeoJSONUtil;
 import org.geotools.geojson.geom.GeometryJSON;
 
-
 import java.io.IOException;
 import java.io.Reader;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -47,7 +43,7 @@ public class MarkingUtils {
     }
 
     public static String getSdId() {
-        return SD + LABEL_NAME + MillisDefaultZone() + RandomNumbers();
+        return SD  + MillisDefaultZone() + RandomNumbers();
     }
 
     public static String getSdId(String categoryName) {

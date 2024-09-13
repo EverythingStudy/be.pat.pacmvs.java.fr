@@ -1,12 +1,8 @@
 package cn.staitech.fr.netty.websocket;
 
-
-import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.netty.global.ChannelSupervise;
 import cn.staitech.fr.netty.global.ChatGroup;
-import cn.staitech.fr.service.SlideService;
-import cn.staitech.fr.vo.measure.BroadcastVO;
-import com.alibaba.fastjson.JSON;
+import cn.staitech.fr.vo.annotation.out.BroadcastVO;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import io.netty.buffer.ByteBuf;
@@ -21,7 +17,6 @@ import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
@@ -36,7 +31,6 @@ public class NioWebSocketHandler extends SimpleChannelInboundHandler<Object> {
     /**
      * . 注入的时候，给类的 service 注入 ,直接使用装饰符进行装饰会报错 空指针异常
      */
-    private static SlideService slideService;
     private WebSocketServerHandshaker handshaker;
 
     /**
@@ -52,15 +46,8 @@ public class NioWebSocketHandler extends SimpleChannelInboundHandler<Object> {
         }
     }
 
-    public static void sendSingle(Long singleSlideId, BroadcastVO message) {
-        String jsonStr = JSONObject.toJSONString(message, SerializerFeature.WriteMapNullValue);
-        for (Map.Entry<Channel, Long> vo : ChannelSupervise.SINGLE_CHANNEL_MAP.entrySet()) {
-            if (vo.getValue().equals(singleSlideId)) {
-                TextWebSocketFrame tws = new TextWebSocketFrame(jsonStr);
-                vo.getKey().writeAndFlush(tws);
-            }
-        }
-    }
+
+
 
 
 
@@ -82,13 +69,6 @@ public class NioWebSocketHandler extends SimpleChannelInboundHandler<Object> {
     }
 
 
-
-    // 数据发送时根据键来判断发送给谁
-
-    @Resource
-    public void setSubImageService(SlideService slideService) {
-        NioWebSocketHandler.slideService = slideService;
-    }
 
     /**
      * . 使用channelRead0不用释放资源,jvm会自动释放
@@ -148,9 +128,9 @@ public class NioWebSocketHandler extends SimpleChannelInboundHandler<Object> {
             ctx.channel().write(new PongWebSocketFrame(frame.content().retain()));
             return;
         }
-        // 本例程仅支持文本消息，不支持二进制消息
+        // 仅支持文本消息，不支持二进制消息
         if (!(frame instanceof TextWebSocketFrame)) {
-            log.debug("本例程仅支持文本消息，不支持二进制消息");
+            log.debug("仅支持文本消息，不支持二进制消息");
             throw new UnsupportedOperationException(String.format("%s frame types not supported", frame.getClass().getName()));
         }
         // 返回应答消息
@@ -183,10 +163,6 @@ public class NioWebSocketHandler extends SimpleChannelInboundHandler<Object> {
         if (Objects.equals(type, "slide")) {
             long slideId = Long.parseLong(req.getUri().split("/")[req.getUri().split("/").length - 1]);
             ChannelSupervise.addChannelTest(ctx.channel(), slideId);
-        } else if (Objects.equals(type, "singleSlide")) {
-
-            long questionProjectId = Long.parseLong(req.getUri().split("/")[req.getUri().split("/").length - 1]);
-            ChannelSupervise.addSingleChannel(ctx.channel(), questionProjectId);
         }
 
         handshaker = wsFactory.newHandshaker(req);

@@ -10,10 +10,13 @@ import io.netty.util.concurrent.GlobalEventExecutor;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+/**
+ * @author gjt
+ * @date 2024/08/29
+ */
 public class ChannelSupervise {
 
     public static final ConcurrentMap<Channel, Long> CHANNEL_MAP = new ConcurrentHashMap<>(16);
-    public static final ConcurrentMap<Channel, Long> SINGLE_CHANNEL_MAP = new ConcurrentHashMap<>(16);
     private static final ChannelGroup CHANNEL_GROUP = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     private static final ConcurrentMap<String, ChannelId> CHANNEL_ID_MAP = new ConcurrentHashMap();
 
@@ -27,20 +30,12 @@ public class ChannelSupervise {
         CHANNEL_ID_MAP.remove(channel.id().asShortText());
     }
 
-    public static Channel findChannel(String id) {
-        return CHANNEL_GROUP.find(CHANNEL_ID_MAP.get(id));
-    }
-
     public static void send2All(TextWebSocketFrame tws) {
         CHANNEL_GROUP.writeAndFlush(tws);
     }
 
     public static void addChannelTest(Channel channel, Long slideId) {
         CHANNEL_MAP.put(channel, slideId);
-    }
-
-    public static void addSingleChannel(Channel channel, Long singleSlideId) {
-        SINGLE_CHANNEL_MAP.put(channel, singleSlideId);
     }
 
     public static void removeChannelTest(Channel channel) {

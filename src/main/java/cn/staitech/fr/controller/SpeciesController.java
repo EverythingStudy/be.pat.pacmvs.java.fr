@@ -13,9 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
- * @Author wudi
- * @Date 2024/4/1 15:17
- * @desc
+ * 
+* @ClassName: SpeciesController
+* @Description:种属处理
+* @author wanglibei
+* @date 2024年9月10日
+* @version V1.0
  */
 @Api(tags = "种属")
 @RestController

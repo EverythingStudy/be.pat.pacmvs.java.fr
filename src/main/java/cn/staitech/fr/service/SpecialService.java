@@ -1,5 +1,11 @@
 package cn.staitech.fr.service;
 
+import java.util.List;
+import java.util.Map;
+
+import cn.staitech.fr.domain.PathologicalIndicatorCategory;
+import com.baomidou.mybatisplus.extension.service.IService;
+
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Special;
@@ -9,7 +15,7 @@ import cn.staitech.fr.domain.in.SpecialEditIn;
 import cn.staitech.fr.domain.in.SpecialListQueryIn;
 import cn.staitech.fr.domain.in.SpecialsQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
-import com.baomidou.mybatisplus.extension.service.IService;
+import cn.staitech.system.api.domain.SysUser;
 
 /**
  * <p>
@@ -23,6 +29,8 @@ public interface SpecialService extends IService<Special> {
 
     PageResponse<SpecialListQueryOut> getSpecialList(SpecialListQueryIn req);
 
+    List<PathologicalIndicatorCategory> speciesCategory(Long specialId);
+
     R addSpecial(SpecialAddIn req);
 
     R editSpecial(SpecialEditIn req);
@@ -34,4 +42,6 @@ public interface SpecialService extends IService<Special> {
     PageResponse<SpecialListQueryOut> getSpecials(SpecialsQueryIn req);
 
     R<Special> getInfoById(Long specialId);
+    
+    public SysUser getUserInfo(Map<String,Object> parm);
 }

@@ -1,5 +1,29 @@
 package cn.staitech.fr.service.impl;
 
+import static cn.staitech.common.core.constant.UserConstants.RSA_KEYS;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import javax.annotation.Resource;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+
 import cn.staitech.common.core.constant.SecurityConstants;
 import cn.staitech.common.core.constant.UserConstants;
 import cn.staitech.common.core.domain.PageResponse;
@@ -12,14 +36,32 @@ import cn.staitech.common.redis.service.RedisService;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Container;
-import cn.staitech.fr.domain.*;
+import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.Image;
+import cn.staitech.fr.domain.PathologicalIndicator;
+import cn.staitech.fr.domain.PathologicalIndicatorCategory;
+import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.Special;
+import cn.staitech.fr.domain.SpecialAnnotationRel;
+import cn.staitech.fr.domain.SpecialLockLog;
+import cn.staitech.fr.domain.SpecialMember;
+import cn.staitech.fr.domain.SpecialRecycling;
 import cn.staitech.fr.domain.in.EditSpecialStatusIn;
 import cn.staitech.fr.domain.in.SpecialAddIn;
 import cn.staitech.fr.domain.in.SpecialEditIn;
 import cn.staitech.fr.domain.in.SpecialListQueryIn;
 import cn.staitech.fr.domain.in.SpecialsQueryIn;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
-import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.ImageMapper;
+import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
+import cn.staitech.fr.mapper.PathologicalIndicatorMapper;
+import cn.staitech.fr.mapper.SlideMapper;
+import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
+import cn.staitech.fr.mapper.SpecialLockLogMapper;
+import cn.staitech.fr.mapper.SpecialMapper;
+import cn.staitech.fr.mapper.SpecialMemberMapper;
+import cn.staitech.fr.mapper.TopicMapper;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.SpecialRecyclingService;
 import cn.staitech.fr.service.SpecialService;
@@ -27,28 +69,7 @@ import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.system.api.RemoteUserService;
 import cn.staitech.system.api.domain.SysUser;
 import cn.staitech.system.api.model.LoginUser;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.Resource;
-
-import static cn.staitech.common.core.constant.UserConstants.RSA_KEYS;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 /**
  * <p>
@@ -61,6 +82,10 @@ import java.util.concurrent.TimeUnit;
 @Service
 @Slf4j
 public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> implements SpecialService {
+	
+	
+	
+	
     @Autowired
     private SpecialRecyclingService specialRecyclingService;
 
@@ -73,8 +98,6 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     @Autowired
     private SlideService slideService;
 
-    @Resource
-    private WaxBlockInfoMapper waxBlockInfoMapper;
 
     @Resource
     private SpecialMemberMapper specialMemberMapper;
@@ -96,6 +119,33 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 
     @Resource
     private AnnotationMapper annotationMapper;
+    
+    @Resource
+    private SpecialMapper specialMapper;
+
+    @Resource
+    private PathologicalIndicatorMapper pathologicalIndicatorMapper;
+
+    @Resource
+    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
+
+
+
+    @Override
+    public List<PathologicalIndicatorCategory> speciesCategory(Long specialId){
+        Special special = specialMapper.selectById(specialId);
+        LambdaQueryWrapper<PathologicalIndicator> indicatorQueryWrapper = new LambdaQueryWrapper<>();
+        indicatorQueryWrapper.eq(PathologicalIndicator::getDelFlag,0).eq(PathologicalIndicator::getSpeciesId, special.getSpeciesId()).eq(PathologicalIndicator::getOrganizationId, special.getOrganizationId());
+        List<PathologicalIndicator> indicatorList = pathologicalIndicatorMapper.selectList(indicatorQueryWrapper);
+        if(indicatorList.size() > 0){
+            // 获取指标id
+            List<Long> indicatorIdList = indicatorList.stream().map(PathologicalIndicator::getIndicatorId).collect(Collectors.toList());
+            LambdaQueryWrapper<PathologicalIndicatorCategory> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.in(PathologicalIndicatorCategory::getIndicatorId, indicatorIdList).eq(PathologicalIndicatorCategory::getDelFlag,0);
+            return pathologicalIndicatorCategoryMapper.selectList(queryWrapper);
+        }
+        return new ArrayList<>();
+    }
 
 
     @Override
@@ -157,6 +207,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         qw.eq(Image::getOrganizationId, req.getOrganizationId());
         qw.eq(Image::getStatus, CommonConstant.NUMBER_4);
         qw.eq(Image::getTopicId, req.getTopicId());
+        qw.eq(Image::getAnalyzeStatus, CommonConstant.INT_1);
         List<Image> images = imageMapper.selectList(qw);
         List<Slide> arrayList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(images)) {
@@ -166,7 +217,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
                 slide.setCreateTime(new Date());
                 slide.setImageId(image.getImageId());
                 slide.setSpecialId(special.getSpecialId());
-                getExtInfo(image.getFileName(), slide, special.getSpecialId(), req);
+                //getExtInfo(image.getFileName(), slide, special.getSpecialId(), req);
                 arrayList.add(slide);
             }
         }
@@ -257,9 +308,9 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         Integer existTable = annotationMapper.selectExistTable(annotation);
         if (existTable == 0) {
             //1、Sequence
-            annotationMapper.createTableSequence(annotation);
+        	annotationMapper.createTableSequence(annotation);
             //2、建表
-            annotationMapper.createTable(annotation);
+        	annotationMapper.createTable(annotation);
         }
         //3、insert 记录
         cacheSpecialAnnotationRel.setSpecialId(specialId);
@@ -342,18 +393,6 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     @Override
     public R editSpecialStatus(EditSpecialStatusIn req) {
         log.info("专题状态按钮接口开始：");
-        //启动条件判断
-        if (req.getStatus().equals(CommonConstant.INT_1)) {
-            LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(Slide::getSpecialId, req.getSpecialId());
-            wrapper.ne(Slide::getCheckStatus, 1);
-            wrapper.ne(Slide::getCheckStatus, 2);
-            wrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
-            List<Slide> slideList = slideService.list(wrapper);
-            if (CollectionUtils.isNotEmpty(slideList)) {
-                return R.fail(MessageSource.M("START_SPECIAL_ERROR"));
-            }
-        }
         //锁定传4,解锁 5
         if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {
         	Special special = this.baseMapper.selectById(req.getSpecialId());
@@ -446,44 +485,6 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         return R.ok(special);
     }
 
-    private Slide getExtInfo(String fileName, Slide slide, Long specialId, SpecialAddIn req) {
-        String[] s = fileName.split(" ");
-        if (s.length < 3) {
-            log.info("切片文件名格式错误：" + fileName);
-            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-            slide.setProcessFlag(4);
-            return slide;
-        }
-        String s1 = slideMapper.selectBySpecialId(specialId);
-        if (!s[0].equals(s1)) {
-            log.info("切片文件名格式错误：" + fileName);
-            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-            slide.setProcessFlag(4);
-            return slide;
-        }
-        slide.setAnimalCode(StringUtils.substringBeforeLast(s[1], "-"));
-        slide.setWaxCode(StringUtils.substringAfterLast(s[1], "-"));
-        //判断性别数据
-        if (!CommonConstant.MALE.equals(s[2].substring(s[2].length() - 1)) &&
-                !CommonConstant.FEMALE.equals(s[2].substring(s[2].length() - 1))) {
-            log.info("切片文件名格式错误：" + fileName);
-            slide.setAnalyzeStatus(CommonConstant.NUMBER_1);
-            slide.setProcessFlag(4);
-            return slide;
-        }
-        slide.setGenderFlag(s[2].substring(s[2].length() - 1));
-        //判断组别
-        /*Group byId = groupService.getById(s[2].substring(0, s[2].length() - 1));
-        if (ObjectUtils.isEmpty(byId)) {
-            log.info("切片文件名格式错误：" + fileName);
-            return slide;
-        }*/
-        slide.setGroupCode(s[2].substring(0, s[2].length() - 1));
-
-        slide.setOrgans(waxBlockInfoMapper.getOrganName(req.getTopicId(), req.getSpeciesId(), slide.getWaxCode(), s[2].substring(s[2].length() - 1)));
-
-        return slide;
-    }
 
 
     public Boolean userLoginVerify(String username, String pwd) {
@@ -540,5 +541,32 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         }
         return true;
     }
+
+	@Override
+	public SysUser getUserInfo(Map<String, Object> parm) {
+		String cacheKey = "user_";
+		if(null!=parm && parm.containsKey("userId")){
+			Long cacheUserIdKey = (Long) parm.get("userId");
+			cacheKey = cacheKey+cacheUserIdKey.toString(); 
+		}
+
+		if(null!=parm && parm.containsKey("userName")){
+			String userName =(String) parm.get("userName");
+			Long organizationId =(Long) parm.get("organizationId");
+			cacheKey = cacheKey+organizationId+"_"+userName;
+		}
+
+		SysUser sysUser = redisService.getCacheObject(cacheKey);
+		if(null != sysUser){
+			return sysUser;
+		}else{
+			List<SysUser> userList = specialMapper.selectUserById(parm);
+			if(CollectionUtils.isNotEmpty(userList)){
+				sysUser = userList.get(0);
+				redisService.setCacheObject(cacheKey,sysUser, 31L, TimeUnit.DAYS);
+			}
+		}
+		return sysUser;
+	}
 
 }

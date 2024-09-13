@@ -1,14 +1,12 @@
 package cn.staitech.fr.controller;
 
-import cn.staitech.common.core.domain.PageResponse;
-import cn.staitech.common.core.domain.R;
-import cn.staitech.fr.domain.in.OrganDisassemblyQueryIn;
-import cn.staitech.fr.domain.out.OrganDisassemblyOut;
 import cn.staitech.fr.service.OrganDisassemblyService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -26,12 +24,6 @@ public class OrganDisassemblyController {
     @Resource
     private OrganDisassemblyService organDisassemblyService;
 
-    @ApiOperation(value = "专题管理-脏器拆分")
-    @PostMapping("/list")
-    public R<PageResponse<OrganDisassemblyOut>> list(@Validated @RequestBody OrganDisassemblyQueryIn req) {
-        PageResponse<OrganDisassemblyOut> page = organDisassemblyService.getList(req);
-        return R.ok(page);
-    }
 
     @ApiOperation(value = "原始切片-导出按钮")
     @GetMapping("/export")

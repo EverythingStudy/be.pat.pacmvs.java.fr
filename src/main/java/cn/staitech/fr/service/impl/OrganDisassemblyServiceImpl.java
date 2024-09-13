@@ -1,9 +1,6 @@
 package cn.staitech.fr.service.impl;
 
-import cn.staitech.common.core.domain.PageResponse;
-import cn.staitech.fr.domain.in.OrganDisassemblyQueryIn;
 import cn.staitech.fr.domain.out.ImageExportOut;
-import cn.staitech.fr.domain.out.OrganDisassemblyOut;
 import cn.staitech.fr.service.OrganDisassemblyService;
 import cn.staitech.fr.service.SingleSlideService;
 import cn.staitech.fr.utils.MessageSource;
@@ -12,8 +9,6 @@ import com.alibaba.excel.ExcelWriter;
 import com.alibaba.excel.converters.longconverter.LongStringConverter;
 import com.alibaba.excel.write.metadata.WriteSheet;
 import com.alibaba.excel.write.style.column.LongestMatchColumnWidthStyleStrategy;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -41,17 +36,6 @@ public class OrganDisassemblyServiceImpl implements OrganDisassemblyService {
     @Resource
     private HttpServletResponse response;
 
-    @Override
-    public PageResponse<OrganDisassemblyOut> getList(OrganDisassemblyQueryIn req) {
-        PageResponse<OrganDisassemblyOut> pageResponse = new PageResponse<>();
-        Page<OrganDisassemblyOut> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
-        // 根据查询条件得到脏器拆分后的数据
-        List<OrganDisassemblyOut> disassembly = singleSlideService.getSingleList(req);
-        pageResponse.setTotal(page.getTotal());
-        pageResponse.setList(disassembly);
-        pageResponse.setPages(page.getPages());
-        return pageResponse;
-    }
 
     @Override
     public void export(List<Long> imageIds) throws IOException {

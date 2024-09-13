@@ -1,6 +1,6 @@
 package cn.staitech.fr.vo.measure;
 
-import cn.staitech.fr.vo.geojson.Features;
+import cn.staitech.fr.vo.annotation.Features;
 import lombok.Data;
 
 import java.util.List;

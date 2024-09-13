@@ -18,16 +18,8 @@ public class ImageVagueQueryIn extends PageRequest {
     private String imageCode;
     @ApiModelProperty(value = "专题名称")
     private String topicName;
-    //    @ApiModelProperty(value = "机构名称")
-//    private String organizationName;
     @ApiModelProperty("机构id")
     private Long organizationId;
     @ApiModelProperty(value = "创建时间-查询入参")
     private Map<String, String> createTimeParams;
-    @ApiModelProperty(value = "是否条状模糊，0：初始值 1：是 2：不是")
-    private Integer stripFuzzy;
-    @ApiModelProperty(value = "切片是否多次模糊，0：初始值 1：是 2：不是")
-    private Integer multipleFuzzy;
-    @ApiModelProperty(value = "是否手动修正，0：初始值 1：更正 2：还原")
-    private Integer definitionStatus;
 }

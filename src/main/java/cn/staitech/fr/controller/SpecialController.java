@@ -1,31 +1,11 @@
 package cn.staitech.fr.controller;
 
-import cn.staitech.common.core.domain.PageResponse;
-import cn.staitech.common.core.domain.R;
-import cn.staitech.common.core.web.controller.BaseController;
-import cn.staitech.common.security.utils.SecurityUtils;
-import cn.staitech.fr.constant.Container;
-import cn.staitech.fr.domain.AccessProjectRecords;
-import cn.staitech.fr.domain.AiForecast;
-import cn.staitech.fr.domain.Special;
-import cn.staitech.fr.domain.SpecialLockLog;
-import cn.staitech.fr.domain.in.EditSpecialStatusIn;
-import cn.staitech.fr.domain.in.SpecialAddIn;
-import cn.staitech.fr.domain.in.SpecialEditIn;
-import cn.staitech.fr.domain.in.SpecialListQueryIn;
-import cn.staitech.fr.domain.in.SpecialsQueryIn;
-import cn.staitech.fr.domain.out.SpecialListQueryOut;
-import cn.staitech.fr.mapper.DiagnosisMapper;
-import cn.staitech.fr.service.AccessProjectRecordsService;
-import cn.staitech.fr.service.DiagnosisService;
-import cn.staitech.fr.service.SpecialLockLogService;
-import cn.staitech.fr.service.SpecialService;
-import cn.staitech.fr.utils.LanguageUtils;
-import cn.staitech.system.api.domain.SysUser;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import cn.staitech.fr.domain.PathologicalIndicatorCategory;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -38,17 +18,37 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import cn.staitech.common.core.domain.PageResponse;
+import cn.staitech.common.core.domain.R;
+import cn.staitech.common.core.web.controller.BaseController;
+import cn.staitech.common.security.utils.SecurityUtils;
+import cn.staitech.fr.constant.Container;
+import cn.staitech.fr.domain.AccessProjectRecords;
+import cn.staitech.fr.domain.Special;
+import cn.staitech.fr.domain.SpecialLockLog;
+import cn.staitech.fr.domain.in.EditSpecialStatusIn;
+import cn.staitech.fr.domain.in.SpecialAddIn;
+import cn.staitech.fr.domain.in.SpecialEditIn;
+import cn.staitech.fr.domain.in.SpecialListQueryIn;
+import cn.staitech.fr.domain.in.SpecialsQueryIn;
+import cn.staitech.fr.domain.out.SpecialListQueryOut;
+import cn.staitech.fr.service.AccessProjectRecordsService;
+import cn.staitech.fr.service.SpecialLockLogService;
+import cn.staitech.fr.service.SpecialService;
+import cn.staitech.fr.utils.LanguageUtils;
+import cn.staitech.system.api.domain.SysUser;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
-import javax.annotation.Resource;
 
 /**
- * @Author wudi
- * @Date 2024/3/29 14:17
- * @desc
+ * 
+* @ClassName: SpecialController
+* @Description:专题
+* @author wanglibei
+* @date 2024年9月10日
+* @version V1.0
  */
 @Api(value = "专题", tags = "专题")
 @RestController
@@ -64,14 +64,20 @@ public class SpecialController  extends BaseController {
     @Autowired
     private SpecialLockLogService specialLockLogService;
     
-    @Resource
-	private DiagnosisService diagnosisService;
 
     @ApiOperation(value = "专题列表分页查询")
     @PostMapping("/list")
     public R<PageResponse<SpecialListQueryOut>> list(@RequestBody @Validated SpecialListQueryIn req) {
         PageResponse<SpecialListQueryOut> resp = specialService.getSpecialList(req);
         return R.ok(resp);
+    }
+
+
+    @ApiOperation(value = "种属关联病理指标列表", notes = "wangfeng")
+    @GetMapping("/speciesCategory")
+    public R<List<PathologicalIndicatorCategory>> speciesCategory(@Validated @RequestParam Long specialId) {
+        List<PathologicalIndicatorCategory> list = specialService.speciesCategory(specialId);
+        return R.ok(list);
     }
 
     @ApiOperation(value = "专题新增")
@@ -166,9 +172,7 @@ public class SpecialController  extends BaseController {
     		for(SpecialLockLog log:list){
     			Map<String,Object> parm = new HashMap<>();
 				parm.put("userId", log.getCreateBy());
-//				List<SysUser> loginUserList = diagnosisMapper.selectUserById(parm);
-//				log.setNickName(loginUserList.get(0).getNickName());
-				SysUser loginUser =  diagnosisService.getUserInfo(parm);
+				SysUser loginUser =  specialService.getUserInfo(parm);
 				if(null != loginUser){
 					log.setNickName(loginUser.getNickName());
 				}else{
@@ -193,7 +197,7 @@ public class SpecialController  extends BaseController {
 		}*/
 //		List<SysUser> userList =  diagnosisService.getUserInfo(parm);
 		String nickName = "";
-		SysUser loginUser =  diagnosisService.getUserInfo(parm);
+		SysUser loginUser =  specialService.getUserInfo(parm);
 		if(null != loginUser){
 			 nickName = loginUser.getNickName();
 		}

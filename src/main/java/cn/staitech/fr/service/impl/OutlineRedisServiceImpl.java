@@ -3,13 +3,18 @@ package cn.staitech.fr.service.impl;
 
 import cn.staitech.common.redis.service.RedisService;
 import cn.staitech.fr.constant.CommonConstant;
-import cn.staitech.fr.domain.*;
-import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.Outline;
+import cn.staitech.fr.domain.PathologicalIndicatorCategory;
+import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.MeasureMapper;
+import cn.staitech.fr.mapper.OutlineMapper;
+import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
 import cn.staitech.fr.netty.websocket.NioWebSocketHandler;
 import cn.staitech.fr.service.OutlineService;
 import cn.staitech.fr.utils.MarkingUtils;
-import cn.staitech.fr.utils.SendMessage;
-import cn.staitech.fr.vo.measure.BroadcastVO;
+import cn.staitech.fr.vo.annotation.Features;
+import cn.staitech.fr.vo.annotation.out.BroadcastVO;
 import cn.staitech.fr.vo.outline.OutlineRoot;
 import cn.staitech.fr.vo.outline.OutlineSelectVO;
 import cn.staitech.fr.vo.outline.OutlineStatistic;
@@ -29,6 +34,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import static cn.staitech.fr.constant.CommonConstant.RELOAD_STATUS;
+import static cn.staitech.fr.service.impl.AnnotationServiceImpl.sendListMessages;
 
 
 /**
@@ -280,19 +286,14 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
                 } else {
                     id = MarkingUtils.getSdId(null);
                 }
-                annotation.setId(id);
+                annotation.setJsonId(id);
                 annotation.setCategoryId(categoryId);
                 annotation.setContour(String.valueOf(outline.getGeometry()));
-                annotation.setSingleSlideId(outline.getSlideId());
                 annotation.setArea(outline.getArea().toString());
-                annotation.setSingleSlideId(selectVO.getSingleSlideId());
                 annotation.setSlideId(selectVO.getSlideId());
                 annotation.setPerimeter(outline.getPerimeter().toString());
                 annotation.setCreateBy(outline.getCreateBy());
                 annotation.setAnnotationType("Draw");
-                annotation.setCreateTime(String.valueOf(new Date()));
-                annotation.setSingle(1);
-                annotation.setContourType(2L);
                 // 添加数据库，添加后返回自增id
                 annotationMapper.insert(annotation);
 
@@ -300,8 +301,8 @@ public class OutlineRedisServiceImpl extends ServiceImpl<OutlineMapper, Outline>
                 log.info("save marking error：{} {} {}", e, outline.getOutlineId(), outline.getGeometry());
             }
         }
-        BroadcastVO broadcastVO = SendMessage.sendListMessages(CommonConstant.ANNO_TYPE_DRAW, RELOAD_STATUS, null, null);
-        NioWebSocketHandler.sendSingle(selectVO.getSingleSlideId(), broadcastVO);
+        BroadcastVO broadcastVO = sendListMessages(CommonConstant.ANNO_TYPE_DRAW, RELOAD_STATUS,new Features());
+        NioWebSocketHandler.sendAll(selectVO.getSingleSlideId(), broadcastVO);
         // 删除所有当前用户的记录
         removeByCreateByAndToken(createBy, null);
     }

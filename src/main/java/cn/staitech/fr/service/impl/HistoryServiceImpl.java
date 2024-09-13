@@ -1,11 +1,10 @@
 package cn.staitech.fr.service.impl;
 
-
-import cn.staitech.fr.domain.history.Cursor;
-import cn.staitech.fr.domain.history.HistoryDTO;
-import cn.staitech.fr.domain.history.Session;
 import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.service.HistoryService;
+import cn.staitech.fr.vo.history.Cursor;
+import cn.staitech.fr.vo.history.HistoryDTO;
+import cn.staitech.fr.vo.history.Session;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

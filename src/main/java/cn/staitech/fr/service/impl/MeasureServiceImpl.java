@@ -2,21 +2,21 @@ package cn.staitech.fr.service.impl;
 
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.fr.constant.CommonConstant;
-import cn.staitech.fr.domain.*;
+import cn.staitech.fr.domain.User;
 import cn.staitech.fr.mapper.UserMapper;
 import cn.staitech.fr.netty.websocket.NioWebSocketHandler;
 import cn.staitech.fr.utils.*;
-import cn.staitech.fr.vo.geojson.Features;
-import cn.staitech.fr.vo.geojson.Properties;
-import cn.staitech.fr.vo.geojson.PropertiesBriefly;
-import cn.staitech.fr.vo.geojson.in.ViewAddIn;
+import cn.staitech.fr.vo.annotation.Features;
+import cn.staitech.fr.vo.annotation.Properties;
+import cn.staitech.fr.vo.annotation.PropertiesBriefly;
+import cn.staitech.fr.vo.annotation.in.ViewAddIn;
 import cn.staitech.fr.vo.measure.BroadcastVO;
 import cn.staitech.fr.vo.measure.MarkingSelectListVO;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import cn.staitech.fr.domain.Measure;
 import cn.staitech.fr.service.MeasureService;
 import cn.staitech.fr.mapper.MeasureMapper;
 import com.ibm.icu.text.SimpleDateFormat;
@@ -29,17 +29,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 import static cn.staitech.fr.constant.CommonConstant.ADD_STATUS;
-import static cn.staitech.fr.utils.AnnotationDataEncapsulation.socketData;
 import static cn.staitech.fr.constant.CommonConstant.DELETE_STATUS;
 
 /**
- * @author admin
- * @description 针对表【fr_measure】的数据库操作Service实现
- * @createDate 2024-04-09 14:42:38
- */
+* @author admin
+* @description 针对表【fr_measure】的数据库操作Service实现
+* @createDate 2024-09-10 11:24:58
+*/
 @Service
 public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
-        implements MeasureService {
+    implements MeasureService{
+
+
 
     @Resource
     private MeasureMapper measureMapper;
@@ -66,7 +67,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
 
 
     @Override
-    public PageResponse<MarkingSelectListVO> list(Long singleSlideId, Integer pageNum, Integer pageSize, String measureFullName) throws Exception {
+    public PageResponse<MarkingSelectListVO> list(Long slideId, Integer pageNum, Integer pageSize, String measureFullName) throws Exception {
         Integer resPageNum = pageNum;
         if (pageNum > 0) {
             pageNum = pageNum - 1;
@@ -75,10 +76,10 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         }
         PageResponse<MarkingSelectListVO> resp = new PageResponse<>();
         ExcludeEmptyQueryWrapper<Measure> measureQueryWrapper = new ExcludeEmptyQueryWrapper<>();
-        measureQueryWrapper.eq("single_slide_id", singleSlideId).ne("location_type", "Point").like("measure_full_name", measureFullName);
+        measureQueryWrapper.eq("slide_id", slideId).ne("location_type", "Point").like("measure_full_name", measureFullName);
         Integer markingCount = measureMapper.selectCount(measureQueryWrapper);
         ExcludeEmptyQueryWrapper<Measure> measurePointCount = new ExcludeEmptyQueryWrapper<>();
-        measurePointCount.eq("single_slide_id", singleSlideId).eq("location_type", "Point").like("measure_full_name", measureFullName);
+        measurePointCount.eq("slide_id", slideId).eq("location_type", "Point").like("measure_full_name", measureFullName);
         Integer measurePointCounts = measureMapper.selectCount(measurePointCount);
         measureQueryWrapper.last("limit " + pageNum * pageSize + "," + pageSize);
         List<Measure> measureList = measureMapper.selectList(measureQueryWrapper);
@@ -119,9 +120,9 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
 
 
     @Override
-    public List<Features> selectListBy(Long singleSlideId) throws Exception {
+    public List<Features> selectListBy(Long slideId) throws Exception {
         QueryWrapper<Measure> measureQueryWrapper = new QueryWrapper<>();
-        measureQueryWrapper.eq("single_slide_id", singleSlideId);
+        measureQueryWrapper.eq("slide_id", slideId);
         List<Measure> measures = measureMapper.selectList(measureQueryWrapper);
         return getFeaturesList(measures);
     }
@@ -144,7 +145,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         long number = 1L;
         QueryWrapper<Measure> markingQueryWrapper = new QueryWrapper<>();
         // 根据切片和测量轮廓名称查询最大值
-        markingQueryWrapper.eq("single_slide_id", req.getSingle_slide_id()).eq("measure_name", req.getMeasure_name()).orderByDesc("create_time").last("limit 1");
+        markingQueryWrapper.eq("slide_id", req.getSlide_id()).eq("measure_name", req.getMeasure_name()).orderByDesc("create_time").last("limit 1");
         Measure markingBy = measureMapper.selectOne(markingQueryWrapper);
         if (markingBy != null) {
             if (markingBy.getNumber() != null) {
@@ -158,9 +159,29 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         Measure measureBy = measureMapper.selectById(measure.getMeasureId());
         PropertiesBriefly properties = getPropertiesBriefly(measureBy);
         Features features = socketData(null, JSONObject.parseObject(measure.getContour()), properties);
-        BroadcastVO broadcastVO = SendMessage.sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_MEASURE, ADD_STATUS, features);
-        NioWebSocketHandler.sendSingle(req.getSingle_slide_id(), broadcastVO);
+        BroadcastVO broadcastVO = sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_MEASURE, ADD_STATUS, features);
+//        NioWebSocketHandler.sendAll(req.getSlide_id(), broadcastVO);
         return measure.getMeasureId();
+    }
+
+    public static BroadcastVO sendOneMessagesByAnnoType(String annoType, String status, Features features) {
+        BroadcastVO broadcast = new BroadcastVO();
+        broadcast.setData(features);
+        broadcast.setType(status);
+        broadcast.setAnnotation_type(annoType);
+        broadcast.setPoint_count_list(new ArrayList<>());
+        return broadcast;
+    }
+
+    public static Features socketData(String annotationId, JSONObject geometry, PropertiesBriefly properties) {
+        Features features = new Features();
+        features.setGeometry(geometry);
+        features.setId(annotationId);
+        features.setType("Feature");
+        String s1 = JSONObject.toJSONString(properties, SerializerFeature.PrettyFormat);
+        JSONObject jsonObject = JSONObject.parseObject(s1);
+        features.setProperties(jsonObject);
+        return features;
     }
 
 
@@ -177,28 +198,28 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         Measure measureBy = measureMapper.selectById(measure.getMeasureId());
         PropertiesBriefly properties = getPropertiesBriefly(measureBy);
         Features features = socketData(null, JSONObject.parseObject(measure.getContour()), properties);
-        BroadcastVO broadcastVO = SendMessage.sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_MEASURE, DELETE_STATUS, features);
-        NioWebSocketHandler.sendSingle(measure.getSingleSlideId(), broadcastVO);
+        BroadcastVO broadcastVO = sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_MEASURE, DELETE_STATUS, features);
+//        NioWebSocketHandler.sendSingle(measure.getSingleSlideId(), broadcastVO);
         return measureMapper.deleteById(markingId);
     }
 
 
 
     @Override
-    public void execlExport(Long singleSlideId, HttpServletResponse response) throws Exception {
+    public void execlExport(Long slideId, HttpServletResponse response) throws Exception {
         List<Map<String, String>> titleList = getTitleList(CommonConstant.MEASURE_COLHEAD_KEY, CommonConstant.MEASURE_COLHEAD_VALUE);
         ExcludeEmptyQueryWrapper<Measure> measureQueryWrapper = new ExcludeEmptyQueryWrapper<>();
-        measureQueryWrapper.eq("single_slide_id", singleSlideId).ne("location_type", "Point");
+        measureQueryWrapper.eq("slide_id", slideId).ne("location_type", "Point");
         List<Measure> measureList = measureMapper.selectList(measureQueryWrapper);
         List<Properties> propertiesList = new ArrayList<>();
         for(Measure measure:measureList){
             propertiesList.add(getProperties(measure));
         }
         ExcludeEmptyQueryWrapper<Measure> measurePointCount = new ExcludeEmptyQueryWrapper<>();
-        measurePointCount.eq("single_slide_id", singleSlideId).eq("location_type", "Point");
+        measurePointCount.eq("slide_id", slideId).eq("location_type", "Point");
         Integer measurePointCounts = measureMapper.selectCount(measurePointCount);
         if(measurePointCounts > 0){
-            Properties properties = new Properties();
+            cn.staitech.fr.vo.annotation.Properties properties = new cn.staitech.fr.vo.annotation.Properties();
             properties.setPoint_count(measurePointCounts);
             properties.setMeasure_full_name("P");
             propertiesList.add(properties);
@@ -225,7 +246,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
 
     private Measure trans2Marking(ViewAddIn view) {
         Measure measure = new Measure();
-        measure.setSingleSlideId(view.getSingle_slide_id());
+        measure.setSlideId(view.getSlide_id());
         if (null != view.getCreate_by()) {
             measure.setCreateBy(view.getCreate_by());
         }
@@ -332,8 +353,8 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
 
 
 
-    public cn.staitech.fr.vo.geojson.Properties getProperties(Measure measure) {
-        cn.staitech.fr.vo.geojson.Properties properties = new cn.staitech.fr.vo.geojson.Properties();
+    public cn.staitech.fr.vo.annotation.Properties getProperties(Measure measure) {
+        cn.staitech.fr.vo.annotation.Properties properties = new cn.staitech.fr.vo.annotation.Properties();
         properties.setMarking_id(String.valueOf(measure.getMeasureId()));
         properties.setArea(measure.getArea());
         properties.setPerimeter(measure.getPerimeter());
@@ -380,8 +401,6 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         }
         return properties;
     }
-
-
 
 }
 

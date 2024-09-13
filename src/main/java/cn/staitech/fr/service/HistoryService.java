@@ -1,9 +1,8 @@
 package cn.staitech.fr.service;
 
-
-import cn.staitech.fr.domain.history.Cursor;
-import cn.staitech.fr.domain.history.HistoryDTO;
-import cn.staitech.fr.domain.history.Session;
+import cn.staitech.fr.vo.history.Cursor;
+import cn.staitech.fr.vo.history.HistoryDTO;
+import cn.staitech.fr.vo.history.Session;
 
 /**
  * @author: wangfeng

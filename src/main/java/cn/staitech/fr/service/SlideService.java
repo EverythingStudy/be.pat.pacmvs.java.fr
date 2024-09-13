@@ -9,6 +9,8 @@ import cn.staitech.fr.domain.out.SlideListQueryOut;
 import cn.staitech.fr.domain.out.SlideSelectBy;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.HashMap;
+
 /**
 * @author admin
 * @description 针对表【fr_slide(专题选片表)】的数据库操作Service
@@ -19,6 +21,8 @@ public interface SlideService extends IService<Slide> {
     R choiceSave(ChoiceSaveInVo choiceSaveInVo);
 
     PageResponse<SlideListQueryOut> slideListQuery(SlideListQueryIn req);
+
+    HashMap<String, SlideListQueryOut> slideAdjacent(SlideListQueryIn req);
 
     /**
      * 查询切片、图片信息接口

@@ -2,7 +2,6 @@ package cn.staitech.fr.service.impl;
 
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.domain.Species;
-import cn.staitech.fr.domain.out.SpeciesOut;
 import cn.staitech.fr.mapper.SpeciesMapper;
 import cn.staitech.fr.service.SpeciesService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;

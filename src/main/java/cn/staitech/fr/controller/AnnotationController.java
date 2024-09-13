@@ -1,30 +1,28 @@
 package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.R;
-import cn.staitech.common.core.utils.uuid.UUID;
 import cn.staitech.common.security.utils.SecurityUtils;
-import cn.staitech.fr.domain.Annotation;
-import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.common.core.utils.uuid.UUID;
 import cn.staitech.fr.service.AnnotationService;
 import cn.staitech.fr.utils.MessageSource;
-import cn.staitech.fr.vo.annotation.AnnotationById;
-import cn.staitech.fr.vo.annotation.AnnotationSelectList;
-import cn.staitech.fr.vo.annotation.MarkingMerge;
-import cn.staitech.fr.vo.geojson.Features;
-import cn.staitech.fr.vo.geojson.in.*;
-import cn.staitech.fr.vo.geojson.out.AnnotationDistanceOut;
-import cn.staitech.fr.vo.geojson.out.BatchResult;
+import cn.staitech.fr.vo.annotation.Features;
+import cn.staitech.fr.vo.annotation.in.*;
+import cn.staitech.fr.vo.annotation.out.AnnotationDistanceOut;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
 
+
+/**
+ * @author gjt
+ */
 @RestController
 @RequestMapping("/annotation")
 public class AnnotationController {
@@ -32,16 +30,11 @@ public class AnnotationController {
     @Resource
     private AnnotationService annotationService;
 
-    @Resource
-    private AnnotationMapper annotationMapper;
-
-
     @PostMapping("/getDistance")
     @ApiOperation(value = "获取间距")
     public R<AnnotationDistanceOut> getDistance(@RequestBody DistanceGet res)  {
         return R.ok(annotationService.getDistance(res));
     }
-
 
     @ApiOperation(value = "添加标注")
     @PostMapping("/insert")
@@ -122,16 +115,7 @@ public class AnnotationController {
         return R.ok(annotationService.selectListBy(req));
     }
 
-    @ApiOperation(value = "获取AIGeoJson数据")
-    @PostMapping("/aiSelectLists")
-    public R<List<Features>> aiSelectLists(@Validated @RequestBody AnnotationSelectList req) throws Exception {
-        return R.ok(annotationService.aiSelectListBy(req));
-    }
-
     /**
-     * TODO:
-     * 2
-     *
      * @param req
      * @return
      * @throws Exception
@@ -156,6 +140,10 @@ public class AnnotationController {
         return R.ok(result, MessageSource.M("OPERATE_SUCCEED"));
     }
 
+    @ApiOperation(value = "查询标签是否被使用" ,hidden = true)
+    @PostMapping("/categoryStatistics")
+    public R<Boolean> categoryStatistics(@RequestBody CategoryStatisticsIn req) throws Exception {
+        return R.ok(annotationService.getCountByCategory(req));
+    }
 
 }
-

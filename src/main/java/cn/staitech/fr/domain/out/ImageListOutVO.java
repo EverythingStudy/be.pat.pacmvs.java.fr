@@ -75,8 +75,8 @@ public class ImageListOutVO {
     private Integer deleState;
     @ApiModelProperty(value = "添加状态：0未添加、1已添加")
     private Integer choiceState;
-    @ApiModelProperty(value = "文件夹ID")
-    private Long folderId;
+//    @ApiModelProperty(value = "文件夹ID")
+//    private Long folderId;
     @ApiModelProperty(value = "创建人")
     private String nickName;
     @ApiModelProperty(value = "文件夹名称-眼科新添加字段")

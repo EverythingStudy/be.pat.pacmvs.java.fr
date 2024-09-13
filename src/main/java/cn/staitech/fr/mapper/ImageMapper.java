@@ -3,7 +3,6 @@ package cn.staitech.fr.mapper;
 import java.util.List;
 
 import cn.staitech.fr.domain.in.ChoiceImageListInVo;
-import cn.staitech.fr.domain.in.ImageVagueQueryIn;
 import cn.staitech.fr.domain.out.ImageListOutVO;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 

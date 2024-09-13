@@ -3,6 +3,8 @@ package cn.staitech.fr.controller;
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.web.controller.BaseController;
+import cn.staitech.fr.domain.SingleSlide;
+import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.in.ChoiceImageListInVo;
 import cn.staitech.fr.domain.in.ChoiceSaveInVo;
 import cn.staitech.fr.domain.in.SlideListQueryIn;
@@ -11,6 +13,7 @@ import cn.staitech.fr.domain.out.SlideListQueryOut;
 import cn.staitech.fr.domain.out.SlideSelectBy;
 import cn.staitech.fr.service.ImageService;
 import cn.staitech.fr.service.SlideService;
+import cn.staitech.fr.utils.MessageSource;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -18,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
 
 /**
  * @Author wudi
@@ -55,6 +60,24 @@ public class SlideController  extends BaseController {
     public R<PageResponse<SlideListQueryOut>> list(@Validated @RequestBody SlideListQueryIn req) {
         PageResponse<SlideListQueryOut> page = slideService.slideListQuery(req);
         return R.ok(page);
+    }
+
+    @ApiOperation(value = "更新单切片描述")
+    @PostMapping("/updateDescription")
+    public R getDataList(@RequestBody Slide slide) {
+        boolean res = slideService.updateById(slide);
+        if(res){
+            return R.ok(MessageSource.M("OPERATE_SUCCEED"));
+        }else {
+            return R.fail(MessageSource.M("OPERATE_ERROR"));
+        }
+    }
+
+    @ApiOperation(value = "矩阵阅片-切片维度(相邻切片)")
+    @PostMapping("/slideAdjacent")
+    public R<HashMap<String, SlideListQueryOut>> slideAdjacent(@RequestBody @Validated SlideListQueryIn req) {
+        HashMap<String, SlideListQueryOut> resp = slideService.slideAdjacent(req);
+        return R.ok(resp);
     }
 
 
