@@ -46,6 +46,24 @@ public class SlideListQueryOut {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
+    private String imagePath;
+
+    private String format;
+
+    private String width;
+
+    private String height;
+
+    private String resolutionX;
+
+    private String resolutionY;
+
+    private String sourceLens;
+
+    private String imageId;
+
+    private String imageName;
+
 //    @ApiModelProperty(value = "处理状态（0：待切图,1：切图中,2：切图成功 3：切图失败）")
 //    private Integer processFlag;
 
