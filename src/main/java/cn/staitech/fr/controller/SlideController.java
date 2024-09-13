@@ -3,7 +3,6 @@ package cn.staitech.fr.controller;
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.web.controller.BaseController;
-import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.in.ChoiceImageListInVo;
 import cn.staitech.fr.domain.in.ChoiceSaveInVo;

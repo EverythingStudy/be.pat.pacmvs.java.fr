@@ -57,9 +57,6 @@ public class OutlineRedisController {
     @PostMapping("/list")
     public R<OutlineStatistic> list(@Validated @RequestBody OutlineSelectVO selectVO) {
         // 删除当前用户、非当前slideId的记录
-        if(selectVO.getSingleSlideId() != null){
-            selectVO.setSlideId(selectVO.getSingleSlideId());
-        }
         outlineService.removeBycreateBySlideId(selectVO.getCreateBy(), selectVO.getSlideId());
 
         if (selectVO.getMinVal() != null && selectVO.getMaxVal() != null && (selectVO.getMinVal() > selectVO.getMaxVal())) {

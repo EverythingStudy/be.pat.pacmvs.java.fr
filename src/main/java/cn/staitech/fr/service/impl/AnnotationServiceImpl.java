@@ -37,7 +37,6 @@ import net.jodah.expiringmap.ExpiringMap;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -47,6 +46,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static cn.staitech.fr.constant.CommonConstant.*;
+import static org.apache.lucene.document.DateTools.stringToDate;
 
 /**
  * @author admin
@@ -134,8 +134,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         properties.setA11(annotation.getCreateBy());
         properties.setA12(String.valueOf(annotation.getCreateTime()));
         properties.setA13(annotation.getUpdateBy());
-        properties.setA29(annotation.getCellType());
-        properties.setA30(annotation.getDynamicDataList());
 
         if (annotation.getCategoryId() != null) {
             PathologicalIndicatorCategory pathologicalIndicatorCategory = pathologicalIndicatorCategoryHashMap.get(annotation.getCategoryId());
@@ -202,7 +200,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
 
-    public Long getSequenceNumber(Long slideId) {
+    public  Long getSequenceNumber(Long slideId) {
         Slide slide = slideMapper.selectById(slideId);
         SpecialAnnotationRel specialAnnotationRel = specialAnnotationRelMapper.selectById(slide.getSpecialId());
         return specialAnnotationRel.getSequenceNumber();
@@ -210,7 +208,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
 
     @Override
-//    @Transactional(rollbackFor = Exception.class)
     public Long insert(ViewAddIn req) throws Exception {
         if (req.getSlide_id() == null) {
             throw new Exception(MessageSource.M("MarkingDelIn.slideId.notNull"));
@@ -241,6 +238,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setCategoryId(req.getCategory_id());
         annotation.setContour(String.valueOf(req.getGeometry()));
         annotation.setLocationType(req.getLocation_type());
+        annotation.setAnnotationType("Draw");
         annotation.setPerimeter(req.getPerimeter());
         annotation.setCreateBy(req.getCreate_by());
         annotation.setJsonId(jsonId);
@@ -252,12 +250,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Features features = socketData(annotation.getJsonId(), JSONObject.parseObject(annotationBy.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessages(ADD_STATUS, features);
         {
-            Long slideId;
-            if (req.getSingle_slide_id() != null) {
-                slideId = req.getSingle_slide_id();
-            } else {
-                slideId = req.getSlide_id();
-            }
+            Long slideId = req.getSlide_id();
             String traceId = req.getTraceId();
             Long userId = req.getCreate_by();
             Session session = HistoryServiceImpl.refreshSession(userId, slideId);
@@ -278,10 +271,11 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     @Override
     public R<String> roiContDel(RoiIn req) throws Exception {
-        QueryWrapper<Annotation> annotationQueryWrapper = new QueryWrapper<>();
+
         req.getCategoryIds().add(null);
-        annotationQueryWrapper.select("annotation_id,category_id,create_by,ST_AsGeoJSON(contour40000) AS contour").eq("single_slide_id", req.getSingleSlideId()).eq("annotation_type", "Draw").eq("contour_type", 2).eq("create_by", SecurityUtils.getUserId()).in("category_id", req.getCategoryIds());
-        List<Annotation> features = annotationMapper.selectList(annotationQueryWrapper);
+        req.setCreateBy(SecurityUtils.getUserId());
+        req.setSequenceNumber(getSequenceNumber(req.getSlideId()));
+        List<Annotation> features = annotationMapper.selectListRoiContDel(req);
         List<Long> annotationIdList;
         //roi包含
         if (req.getRoiStatus() == 0) {
@@ -292,28 +286,30 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         if (annotationIdList.isEmpty()) {
             return R.ok(null, MessageSource.M("OPERATE_SUCCEED"));
         }
-        //标注信息
-        Map<Long, Annotation> markingMap = features.stream().collect(Collectors.toMap(Annotation::getAnnotationId, Function.identity()));
         //异步删除
         CompletableFuture<Integer> cf1 = CompletableFuture.supplyAsync(() -> {
-            Set<Long> categoryIds = new HashSet<>();
-            categoryIds.add(0L);
-            Set<Long> createBys = new HashSet<>();
             if (CollectionUtils.isNotEmpty(annotationIdList)) {
-                QueryWrapper<Annotation> wrapper = new QueryWrapper<>();
-                wrapper.in("annotation_id", annotationIdList);
-                //删除标注
-                annotationMapper.delete(wrapper);
+                req.setAnnotationIdList(annotationIdList);
+                annotationMapper.deleteRoiContDel(req);
                 //标注的createBy和categoryId
                 for (Long markingId : annotationIdList) {
-                    categoryIds.add(markingMap.get(markingId).getCategoryId());
-                    createBys.add(markingMap.get(markingId).getCategoryId());
+                    Annotation annotation = new Annotation();
+                    annotation.setAnnotationId(markingId);
+                    annotation.setSequenceNumber(req.getSequenceNumber());
+                    Annotation annotation1 = annotationMapper.selectByIds(annotation);
+                    annotation1.setSequenceNumber(req.getSequenceNumber());
+                    try {
+                        annotationDelInsert(annotation1, req.getSequenceNumber());
+                    } catch (java.text.ParseException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
             }
-            BroadcastVO broadcastVO = sendListMessages(CommonConstant.ANNO_TYPE_DRAW, RELOAD_STATUS, null);
-            NioWebSocketHandler.sendAll(req.getSingleSlideId(), broadcastVO);
             return 1;
         });
+
+        BroadcastVO broadcastVO = sendListMessages(CommonConstant.ANNO_TYPE_DRAW, RELOAD_STATUS, null);
+        NioWebSocketHandler.sendAll(req.getSlideId(), broadcastVO);
         return R.ok(null, MessageSource.M("OPERATE_SUCCEED"));
     }
 
@@ -375,12 +371,13 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     @Override
     public int delete(AnnotationById req) throws Exception {
+        Long seq = getSequenceNumber(req.getSlide_id());
         if (!Optional.ofNullable(req.getMarking_id()).isPresent()) {
             throw new Exception(MessageSource.M("ARGUMENT_INVALID"));
         }
         Annotation annotation = new Annotation();
         annotation.setAnnotationId(req.getMarking_id());
-        annotation.setSequenceNumber(getSequenceNumber(req.getSlide_id()));
+        annotation.setSequenceNumber(seq);
         Annotation annotationBy = annotationMapper.selectByIds(annotation);
         if (!Optional.ofNullable(annotationBy).isPresent()) {
             throw new Exception(MessageSource.M("NO_ANNOTATION_DATA"));
@@ -394,11 +391,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
         int res = annotationMapper.deleteByIds(annotation);
 
-        AnnotationDel annotationDel = new AnnotationDel();
-        BeanUtils.copyProperties(annotationBy, annotationDel);
-        annotationDel.setDeleteBy(SecurityUtils.getLoginUser().getSysUser().getUserId());
-        annotationDel.setDeleteTime(new Date());
-        annotationDelMapper.insert(annotationDel);
+        // 添加删除记录表中
+        annotationDelInsert(annotationBy, seq);
 
         String traceId = req.getTraceId();
         boolean isBatch = req.getIsBatch();
@@ -433,6 +427,21 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             rocksdbService.submitTask(traceId, String.valueOf(annotationBy.getAnnotationId()), annotationBy);
         }
         return res;
+    }
+
+    public void annotationDelInsert(Annotation annotationBy, Long seq) throws java.text.ParseException {
+        AnnotationDel annotationDel = new AnnotationDel();
+        BeanUtils.copyProperties(annotationBy, annotationDel);
+        if (annotationBy.getCreateTime() != null) {
+            annotationDel.setCreateTime(stringToDate(annotationBy.getCreateTime()));
+        }
+        if (annotationBy.getUpdateTime() != null) {
+            annotationDel.setUpdateTime(stringToDate(annotationBy.getUpdateTime()));
+        }
+        annotationDel.setDeleteBy(SecurityUtils.getLoginUser().getSysUser().getUserId());
+        annotationDel.setDeleteTime(new Date());
+        annotationDel.setSequenceNumber(seq);
+        annotationDelMapper.insert(annotationDel);
     }
 
 
@@ -516,12 +525,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                 trace.getNodeList().add(new TraceNode(annotationId, "UPDATEOPERATION"));
                 session.drawListAdd(trace);
             }
-
-//            // 3、数据持久化写入RocksDB
-//            Gson gson = new Gson();
-//            // 将对象转换成JSON字符串
-//            String json = gson.toJson(markingBy);
-//            RocksDBUtil.put(traceId, markingId, json);
             rocksdbService.submitTask(traceId, annotationId, annotation);
         }
         return JSONObject.parseObject(annotation1.getContour());
@@ -529,12 +532,12 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
 
     @Override
-    public List<BatchResult> batch(List<ViewAddIn> list) throws Exception {
+    public List<BatchResult> batch(ViewAddInList list) throws Exception {
         String traceId = UUID.randomUUID().toString();
 
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         Long userId = sysUser.getUserId();
-        Long slideId = list.get(0).getSingle_slide_id();
+        Long slideId = list.getList().get(0).getSlide_id();
 
         Session session = HistoryServiceImpl.refreshSession(userId, slideId);
         // 2、创建Trace,并存入Session.list,LinkedList<Trace>
@@ -542,12 +545,14 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         Trace trace = new Trace(userId, traceId, true);
         session.drawListAdd(trace);
 
-        List<BatchResult> result = new ArrayList<>(list.size());
-        for (ViewAddIn dto : list) {
+        List<BatchResult> result = new ArrayList<>(list.getList().size());
+        Long seq = getSequenceNumber(list.getSlide_id());
+        for (ViewAddIn dto : list.getList()) {
             BatchResult batchResult = new BatchResult();
             batchResult.setFront_id(dto.getMarking_id());
-
+//            dto.setSequenceNumber(seq);
             dto.setUpdate_by(userId);
+            dto.setSlide_id(slideId);
             dto.setTraceId(traceId);
             dto.setIsBatch(true);
             try {
@@ -561,6 +566,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                     case "DELETE":
                         AnnotationById annotationById = new AnnotationById();
                         annotationById.setIsBatch(true);
+                        annotationById.setSlide_id(slideId);
                         annotationById.setTraceId(traceId);
                         annotationById.setMarking_id(Long.valueOf(dto.getMarking_id()));
                         if (delete(annotationById) > 0) {
@@ -779,7 +785,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     @Override
     public JSONObject markingMerge(MarkingMerge req) throws Exception {
-        Long seq = getSequenceNumber(req.getSlide_id());
+        Long seq = getSequenceNumber(req.getSlideId());
         req.setSequenceNumber(seq);
         List<Annotation> annotationList = annotationMapper.selectInList(req);
         List<Geometry> geometryList = new ArrayList<>();
@@ -819,12 +825,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         // Boolean isUndo = dto.getEnvType() == 1 ? true : false;
 
         Long userId = dto.getUserId();
-        Long slideId;
-        if (dto.getSingleSlideId() != null) {
-            slideId = dto.getSingleSlideId();
-        } else {
-            slideId = dto.getSlideId();
-        }
+        Long slideId = dto.getSlideId();
+
 
         String key = userId + "_" + slideId;
         Session session = HistoryServiceImpl.USER_SESSION_MAP.get(key);
@@ -933,12 +935,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         String traceId = UUID.randomUUID().toString();
         //Boolean isUndo = dto.getEnvType() == 1 ? true : false;
         Long userId = dto.getUserId();
-        Long slideId;
-        if (dto.getSingleSlideId() != null) {
-            slideId = dto.getSingleSlideId();
-        } else {
-            slideId = dto.getSlideId();
-        }
+        Long slideId = dto.getSlideId();
+
         String key = userId + "_" + slideId;
         Session session = HistoryServiceImpl.USER_SESSION_MAP.get(key);
         LinkedList<Trace> drawList = session.getDrawList();
@@ -959,9 +957,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                         String json = RocksDBUtil.get(trace.getTraceId(), markingId);
                         Annotation annotation = gson.fromJson(json, Annotation.class);
                         String beforeMarkingId = String.valueOf(annotation.getAnnotationId());
-
+                        annotation.setSequenceNumber(seq);
                         Annotation newAnnotation = new Annotation();
-
                         switch (node.getOperation()) {
                             case "INSERT":
                                 newAnnotation = deleteByHistory(Long.valueOf(markingId), seq);
@@ -1010,6 +1007,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
                             newAnnotation = deleteByHistory(Long.valueOf(markingId), seq);
                             break;
                         case "DELETE":
+
                             newAnnotation = insertByHistory(annotation);
                             refresh(drawList, String.valueOf(beforeMarkingId), newAnnotation.getAnnotationId());
                             refresh(undoList, String.valueOf(beforeMarkingId), newAnnotation.getAnnotationId());
@@ -1084,7 +1082,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public Annotation insertByHistory(Annotation annotation) {
         Long slideId = annotation.getSlideId();
 
@@ -1124,7 +1121,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         annotation.setArea(req.getArea());
         annotation.setPerimeter(req.getPerimeter());
         annotation.setUpdateBy(SecurityUtils.getUserId());
-        annotationMapper.updateById(annotation);
+        annotation.setSequenceNumber(req.getSequenceNumber());
+        annotationMapper.updateByIds(annotation);
         PropertiesBriefly properties = getProperties(annotationBy);
         Features features = socketData(String.valueOf(annotationBy.getAnnotationId()), JSONObject.parseObject(req.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_DRAW, UPDATE_STATUS, features);
@@ -1135,8 +1133,7 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Annotation deleteByHistory(Long annotationId, Long seq) {
+    public Annotation deleteByHistory(Long annotationId, Long seq) throws java.text.ParseException {
         Annotation annotation = new Annotation();
         annotation.setAnnotationId(annotationId);
         annotation.setSequenceNumber(seq);
@@ -1144,8 +1141,10 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         PropertiesBriefly properties = getProperties(annotationById);
         Features features = socketData(String.valueOf(annotationId), JSONObject.parseObject(annotationById.getContour()), properties);
         BroadcastVO broadcastVO = sendListMessages(CommonConstant.ANNO_TYPE_DRAW, DELETE_STATUS, features);
-        annotationMapper.deleteById(annotationById);
-
+        annotationById.setSequenceNumber(seq);
+        annotationMapper.deleteByIds(annotationById);
+        // 添加删除记录表中
+        annotationDelInsert(annotationById, seq);
         NioWebSocketHandler.sendAll(annotationById.getSlideId(), broadcastVO);
 
         return annotationById;
@@ -1157,7 +1156,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
         AnnotationDistanceOut annotationDistanceOut = new AnnotationDistanceOut();
         LambdaQueryWrapper<SpecialAnnotationRel> queryWrapper = new LambdaQueryWrapper<SpecialAnnotationRel>().eq(SpecialAnnotationRel::getSpecialId, req.getSpecialId());
         SpecialAnnotationRel specialAnnotationRel = specialAnnotationRelMapper.selectOne(queryWrapper);
-        System.out.println("specialAnnotationRel = " + specialAnnotationRel.getSequenceNumber() + "================>");
         String contourOne = selectContour(req.getAnnotationIdOne(), req.getAnnotationTypeOne(), specialAnnotationRel.getSequenceNumber());
         String contourTwo = selectContour(req.getAnnotationIdTwo(), req.getAnnotationTypeTwo(), specialAnnotationRel.getSequenceNumber());
         Annotation annotation = new Annotation();
@@ -1186,7 +1184,6 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             Annotation annotation = new Annotation();
             annotation.setAnnotationId(annotationId);
             annotation.setSequenceNumber(sequenceNumber);
-            System.out.println(annotation + "------------------>");
             contour = annotationMapper.selectByIds(annotation).getContour();
         } else if (Objects.equals(annotationType, "Measure")) {
             // 根据主键查询fr_measure表中信息

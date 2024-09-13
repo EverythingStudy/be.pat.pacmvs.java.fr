@@ -136,7 +136,7 @@ public class AnnotationController {
         if (CollectionUtils.isEmpty(list.getList())) {
             return R.fail(MessageSource.M("ARGUMENT_INVALID"));
         }
-        List<BatchResult> result = annotationService.batch(list.getList());
+        List<BatchResult> result = annotationService.batch(list);
         return R.ok(result, MessageSource.M("OPERATE_SUCCEED"));
     }
 

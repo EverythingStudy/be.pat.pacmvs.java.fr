@@ -2,6 +2,8 @@ package cn.staitech.fr.service;
 
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.SpecialAnnotationRel;
 import cn.staitech.fr.vo.annotation.Features;
 import cn.staitech.fr.vo.annotation.in.*;
 import cn.staitech.fr.vo.annotation.out.AnnotationDistanceOut;
@@ -24,6 +26,9 @@ public interface AnnotationService extends IService<Annotation> {
 //
     Long insert(ViewAddIn req) throws Exception;
 
+    public  Long getSequenceNumber(Long slideId);
+
+
     int delete(AnnotationById req) throws Exception;
 //
     R<String> roiContDel(RoiIn viewAddIns) throws Exception;
@@ -36,7 +41,7 @@ public interface AnnotationService extends IService<Annotation> {
 //
     JSONObject updateOperation(UpdateOperationIn req, String traceId, Boolean isBatch) throws Exception;
 //
-    List<BatchResult> batch(List<ViewAddIn> list) throws Exception;
+    List<BatchResult> batch(ViewAddInList list) throws Exception;
 //
     Boolean undo(HistoryDTO dto);
 

@@ -73,8 +73,8 @@ public class MeasureController {
     @Log(title = "标注测量excel导出", businessType = BusinessType.EXPORT)
     @ApiOperation(value = "标注测量excel导出")
     @GetMapping("/export")
-    public void export(@RequestParam(value = "singleSlideId") @ApiParam(name = "singleSlideId", value = "切片ID", required = true) Long singleSlideId, HttpServletResponse response) throws Exception {
-        measureService.execlExport(singleSlideId, response);
+    public void export(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "切片ID", required = true) Long slideId, HttpServletResponse response) throws Exception {
+        measureService.execlExport(slideId, response);
     }
 
 }

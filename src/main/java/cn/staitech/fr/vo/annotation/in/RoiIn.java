@@ -1,6 +1,7 @@
 package cn.staitech.fr.vo.annotation.in;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.annotation.TableField;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,16 +29,18 @@ public class RoiIn {
     @NotNull(message = "{SlidePredictionIn.slideId.isnull}")
     private Long slideId;
 
-    @ApiModelProperty(value = "单切片ID", required = true)
-    @NotNull(message = "{SlidePredictionIn.slideId.isnull}")
-    private Long singleSlideId;
-
 
     @ApiModelProperty(value = "标签id列表")
     private List<Long> categoryIds;
+
+    private Long sequenceNumber;
 
     @ApiModelProperty(value = "标签id", hidden = true)
     private Long categoryId;
     @ApiModelProperty(value = "创建者id", hidden = true)
     private Long createBy;
+
+    @ApiModelProperty(value = "标注列表", hidden = true)
+    private List<Long> annotationIdList;
+
 }

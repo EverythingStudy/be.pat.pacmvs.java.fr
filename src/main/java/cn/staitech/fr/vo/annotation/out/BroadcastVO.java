@@ -1,6 +1,7 @@
 package cn.staitech.fr.vo.annotation.out;
 
 import cn.staitech.fr.vo.annotation.Features;
+import cn.staitech.fr.vo.measure.PointCount;
 import lombok.Data;
 
 import java.util.List;
@@ -17,5 +18,7 @@ public class BroadcastVO {
     private Features data;
 
     private List<Features> dataList;
+
+    private List<PointCount> point_count_list;
 
 }

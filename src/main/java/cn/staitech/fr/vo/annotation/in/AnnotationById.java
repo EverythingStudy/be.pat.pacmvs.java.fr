@@ -13,8 +13,6 @@ public class AnnotationById {
     @ApiModelProperty(value = "轮廓id", required = true)
     private Long marking_id;
 
-
-
     @ApiModelProperty(value = "切片id", required = true)
     private Long slide_id;
 
