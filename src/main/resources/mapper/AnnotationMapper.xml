@@ -77,32 +77,7 @@
     </select>
 
 
-    <select id="selectInList" parameterType="cn.staitech.fr.vo.annotation.in.MarkingMerge"
-            resultMap="BaseResultMap">
-        select
-        annotation_id,
-        area,
-        perimeter,
-        description,
-        category_id,
-        location_type,
-        annotation_type,
-        create_by,
-        create_time,
-        update_by,
-        update_time,
-        project_id,
-        slide_id,
-        id,
-        ST_AsGeoJSON(contour) AS contour
-        from fr_annotation
-        <where>
-            annotation_id in
-            <foreach collection="markingIdList" item="annotationId" index="index" open="(" separator="," close=")">
-                #{annotationId,jdbcType=BIGINT}
-            </foreach>
-        </where>
-    </select>
+
 
     <select id="selectContourType" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
@@ -341,5 +316,65 @@
             #{annotationId}),st_geomfromgeojson(#{contour}))) as contour
         </if>
     </select>
+
+
+    <select id="selectListRoiContDel" parameterType="cn.staitech.fr.vo.annotation.in.RoiIn"
+            resultMap="BaseResultMap">
+        select
+        annotation_id,
+        category_id,
+        create_by,
+        ST_AsGeoJSON(contour) AS contour
+        from fr_annotation_${sequenceNumber}
+        <where>
+            annotation_type = 'Draw'
+            AND create_by = #{createBy}
+            AND slide_id = #{slideId}
+            AND category_id in
+            <foreach collection="categoryIds" item="categoryId" index="index" open="(" separator="," close=")">
+                #{categoryId}
+            </foreach>
+        </where>
+    </select>
+
+    <select id="deleteRoiContDel" parameterType="cn.staitech.fr.vo.annotation.in.RoiIn">
+        delete
+        from fr_annotation_${sequenceNumber}
+        <where>
+        AND annotation_id in
+            <foreach collection="annotationIdList" item="annotationId" index="index" open="(" separator="," close=")">
+                #{annotationId}
+            </foreach>
+        </where>
+    </select>
+
+
+    <select id="selectInList" parameterType="cn.staitech.fr.vo.annotation.in.MarkingMerge"
+            resultMap="BaseResultMap">
+        select
+        annotation_id,
+        area,
+        perimeter,
+        description,
+        category_id,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        slide_id,
+        json_id,
+        ST_AsGeoJSON(contour) AS contour
+        from fr_annotation_${sequenceNumber}
+        <where>
+            annotation_id in
+            <foreach collection="markingIdList" item="annotationId" index="index" open="(" separator="," close=")">
+                #{annotationId,jdbcType=BIGINT}
+            </foreach>
+        </where>
+    </select>
+
+
 
 </mapper>

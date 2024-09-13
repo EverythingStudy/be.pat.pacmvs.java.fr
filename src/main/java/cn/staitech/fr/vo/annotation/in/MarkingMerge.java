@@ -13,7 +13,7 @@ public class MarkingMerge {
     private List<Long> markingIdList;
 
     @ApiModelProperty(value = "切片id", required = true)
-    private Long slide_id;
+    private Long slideId;
 
     private Long sequenceNumber;
 

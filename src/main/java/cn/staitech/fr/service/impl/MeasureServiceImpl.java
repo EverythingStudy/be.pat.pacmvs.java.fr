@@ -10,7 +10,7 @@ import cn.staitech.fr.vo.annotation.Features;
 import cn.staitech.fr.vo.annotation.Properties;
 import cn.staitech.fr.vo.annotation.PropertiesBriefly;
 import cn.staitech.fr.vo.annotation.in.ViewAddIn;
-import cn.staitech.fr.vo.measure.BroadcastVO;
+import cn.staitech.fr.vo.annotation.out.BroadcastVO;
 import cn.staitech.fr.vo.measure.MarkingSelectListVO;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
@@ -160,7 +160,7 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         PropertiesBriefly properties = getPropertiesBriefly(measureBy);
         Features features = socketData(null, JSONObject.parseObject(measure.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_MEASURE, ADD_STATUS, features);
-//        NioWebSocketHandler.sendAll(req.getSlide_id(), broadcastVO);
+        NioWebSocketHandler.sendAll(req.getSlide_id(), broadcastVO);
         return measure.getMeasureId();
     }
 
@@ -199,7 +199,10 @@ public class MeasureServiceImpl extends ServiceImpl<MeasureMapper, Measure>
         PropertiesBriefly properties = getPropertiesBriefly(measureBy);
         Features features = socketData(null, JSONObject.parseObject(measure.getContour()), properties);
         BroadcastVO broadcastVO = sendOneMessagesByAnnoType(CommonConstant.ANNO_TYPE_MEASURE, DELETE_STATUS, features);
-//        NioWebSocketHandler.sendSingle(measure.getSingleSlideId(), broadcastVO);
+        NioWebSocketHandler.sendAll(measure.getSlideId(), broadcastVO);
+
+
+
         return measureMapper.deleteById(markingId);
     }
 

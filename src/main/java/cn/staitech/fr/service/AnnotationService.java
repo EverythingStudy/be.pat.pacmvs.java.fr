@@ -36,7 +36,7 @@ public interface AnnotationService extends IService<Annotation> {
 //
     JSONObject updateOperation(UpdateOperationIn req, String traceId, Boolean isBatch) throws Exception;
 //
-    List<BatchResult> batch(List<ViewAddIn> list) throws Exception;
+    List<BatchResult> batch(ViewAddInList list) throws Exception;
 //
     Boolean undo(HistoryDTO dto);
 

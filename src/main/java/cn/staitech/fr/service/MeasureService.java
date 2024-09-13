@@ -26,7 +26,7 @@ public interface MeasureService extends IService<Measure> {
 
     int delete(Long markingId) throws Exception;
 
-    void execlExport(Long singleSlideId, HttpServletResponse response) throws Exception;
+    void execlExport(Long slideId, HttpServletResponse response) throws Exception;
 
 
 }

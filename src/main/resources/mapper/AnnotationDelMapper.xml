@@ -44,9 +44,9 @@
         <if test="annotationType != null and annotationType != '' ">annotation_type,</if>
         <if test="contour != null">contour,</if>
         <if test="createBy != null and createBy != ''">create_by,</if>
-        <if test="createTime != null and createTime != ''">create_time,</if>
+        <if test="createTime != null">create_time,</if>
         <if test="updateBy != null and updateBy != ''">update_by,</if>
-        <if test="updateTime != null and updateTime != ''">update_time,</if>
+        <if test="updateTime != null">update_time,</if>
         <if test="slideId != null and slideId != ''">slide_id,</if>
         <if test="jsonId != null and jsonId != ''">json_id,</if>
         <if test="deleteBy != null and deleteBy != ''">delete_by,</if>
@@ -61,9 +61,9 @@
         <if test="annotationType != null and annotationType != ''">#{annotationType},</if>
         <if test="contour != null">st_geomfromgeojson(#{contour}),</if>
         <if test="createBy != null and createBy != ''">#{createBy},</if>
-        <if test="createTime != null and createTime != ''">#{createTime},</if>
+        <if test="createTime != null">#{createTime},</if>
         <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
-        <if test="updateTime != null and updateTime != ''">#{updateTime},</if>
+        <if test="updateTime != null">#{updateTime},</if>
         <if test="slideId != null and slideId != ''">#{slideId},</if>
         <if test="jsonId != null and jsonId != ''">#{jsonId},</if>
         <if test="deleteBy != null and deleteBy != ''">#{deleteBy},</if>

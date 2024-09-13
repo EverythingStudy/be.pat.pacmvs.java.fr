@@ -12,4 +12,6 @@ import java.util.List;
 @Data
 public class ViewAddInList {
     private List<ViewAddIn> list;
+
+    private Long slide_id;
 }

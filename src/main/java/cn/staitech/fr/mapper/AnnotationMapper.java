@@ -2,6 +2,7 @@ package cn.staitech.fr.mapper;
 
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.vo.annotation.in.MarkingMerge;
+import cn.staitech.fr.vo.annotation.in.RoiIn;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
@@ -30,6 +31,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 
 	Annotation stDistance(Annotation annotation);
 
+	List<Annotation> selectListRoiContDel(RoiIn req);
+
 	Annotation avgDistance(Annotation annotation);
 
 	Annotation selectByIds(Annotation annotation);
@@ -50,6 +53,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
 	int updateByIds(Annotation annotation);
 
 	Integer getCountByCategory(Annotation annotation);
+
+	int deleteRoiContDel(RoiIn req);
 
 }
 
