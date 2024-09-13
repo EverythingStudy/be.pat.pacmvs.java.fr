@@ -43,7 +43,7 @@ public class RocksDBUtil {
                 rocksDBPath = "D:\\RocksDB";
             } else {
                 // 指定linux系统下RocksDB文件目录
-                rocksDBPath = "/home/pat_saas/rocksdb";
+                rocksDBPath = "/home/pacmvs/rocksdb";
             }
 
 
