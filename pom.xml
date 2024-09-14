@@ -479,6 +479,19 @@
                 <serverAddr>192.168.52.224:8848</serverAddr>
             </properties>
         </profile>
+
+        <profile>
+            <!--测试环境-->
+            <id>testpvcmvs</id>
+            <properties>
+                <activatedProperties>testpvcmvs</activatedProperties>
+                <nacosNamespace>301f5c59-5f9c-451c-a77b-88d64ddfd9f0</nacosNamespace>
+                <nacosAddress>http://192.168.160.105:8848</nacosAddress>
+                <nacosGroup>DEFAULT_GROUP</nacosGroup>
+                <serverAddr>192.168.160.105:8848</serverAddr>
+            </properties>
+        </profile>
+
     </profiles>
 
 </project>
