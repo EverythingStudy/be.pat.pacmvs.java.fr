@@ -324,17 +324,17 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 
     @Override
     public R editSpecial(SpecialEditIn req) {
-        log.info("专题编辑接口开始：");
-        LambdaQueryWrapper<Special> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Special::getOrganizationId, req.getOrganizationId());
-        wrapper.eq(Special::getDelFlag, CommonConstant.NUMBER_0);
-        wrapper.eq(Special::getSpecialName, req.getSpecialName());
-        wrapper.ne(Special::getSpecialId, req.getSpecialId());
-        List<Special> specials2 = this.baseMapper.selectList(wrapper);
-        if (CollectionUtils.isNotEmpty(specials2)) {
-            return R.fail(MessageSource.M("EXISTS_SPECIAL_DATA"));
-        }
-        Special special = new Special();
+    	log.info("专题编辑接口开始：");
+    	LambdaQueryWrapper<Special> wrapper = new LambdaQueryWrapper<>();
+    	wrapper.eq(Special::getOrganizationId, req.getOrganizationId());
+    	wrapper.eq(Special::getDelFlag, CommonConstant.NUMBER_0);
+    	wrapper.eq(Special::getSpecialName, req.getSpecialName());
+    	wrapper.ne(Special::getSpecialId, req.getSpecialId());
+    	List<Special> specials2 = this.baseMapper.selectList(wrapper);
+    	if (CollectionUtils.isNotEmpty(specials2)) {
+    		return R.fail(MessageSource.M("EXISTS_SPECIAL_DATA"));
+    	}
+    	Special special = new Special();
         BeanUtils.copyProperties(req, special);
         special.setUpdateBy(SecurityUtils.getUserId());
         special.setUpdateTime(new Date());
@@ -355,8 +355,8 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         queryWrapper.eq(Slide::getSpecialId, specialId);
         queryWrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
         List<Slide> slides = slideService.list(queryWrapper);
-        if (slides.size() > 0) {
-            return R.fail(MessageSource.M("EXISTS_SLIDE_DATA"));
+        if (CollectionUtils.isEmpty(slides)) {
+            return R.fail(MessageSource.M("NO_SLIDE_DATA_CANNOT_START"));
         }
 
         special.setDelFlag(CommonConstant.NUMBER_1);
@@ -392,65 +392,77 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 
     @Override
     public R editSpecialStatus(EditSpecialStatusIn req) {
-        log.info("专题状态按钮接口开始：");
-        //锁定传4,解锁 5
-        if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {
-        	Special special = this.baseMapper.selectById(req.getSpecialId());
-            if (special == null) {
-                return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
-            }
-            //状态(0待启动，1进行中，2暂停，3已完成，4锁定)
-            Integer status = special.getStatus();
-            //已经锁定判断
-            if(status.equals(CommonConstant.INT_4) && req.getStatus().equals(CommonConstant.INT_4)){
-            	 return R.fail(MessageSource.M("SPECIAL_HAVE_LOCK"));
-            }
-            //解锁判断
-            if(status.equals(CommonConstant.INT_1) && req.getStatus().equals(CommonConstant.INT_5)){
-           	 return R.fail(MessageSource.M("SPECIAL_HAVE_UNLOCK"));
-           }
-        }
-        
-        Integer unlock = 0;
-        //锁定传4,解锁 5 校验
-        if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {
-            //校验用户名、密码
-            boolean res = userLoginVerify(req.getUserName(), req.getPwd());
-            if (!res) {
-                return R.fail("校验失败");
-            }
+    	log.info("专题状态按钮接口开始：");
+    	//启动条件判断
+    	if (req.getStatus().equals(CommonConstant.INT_1)) {
+    		//判断专题下是否存在切片数据
+    		LambdaQueryWrapper<Slide> queryWrapper = new LambdaQueryWrapper<>();
+    		queryWrapper.eq(Slide::getSpecialId, req.getSpecialId());
+    		queryWrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
+    		List<Slide> slides = slideService.list(queryWrapper);
+    		if (slides.size() > 0) {
+    			return R.fail(MessageSource.M("NO_SLIDE_DATA_CANNOT_START"));
+    		}
+    	}
 
-            if (req.getStatus().equals(CommonConstant.INT_5)) {
-                //解锁 赋值为1
-                req.setStatus(1);
-                unlock = 5;
-            }
-        }
-        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
-        Long currentUserId = sysUser.getUserId();
-        Long specialId = req.getSpecialId();
+    	//锁定传4,解锁 5
+    	if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {
+    		Special special = this.baseMapper.selectById(req.getSpecialId());
+    		if (special == null) {
+    			return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
+    		}
+    		//状态(0待启动，1进行中，2暂停，3已完成，4锁定)
+    		Integer status = special.getStatus();
+    		//已经锁定判断
+    		if(status.equals(CommonConstant.INT_4) && req.getStatus().equals(CommonConstant.INT_4)){
+    			return R.fail(MessageSource.M("SPECIAL_HAVE_LOCK"));
+    		}
+    		//解锁判断
+    		if(status.equals(CommonConstant.INT_1) && req.getStatus().equals(CommonConstant.INT_5)){
+    			return R.fail(MessageSource.M("SPECIAL_HAVE_UNLOCK"));
+    		}
+    	}
 
-        Special special = new Special();
-        special.setSpecialId(specialId);
-        special.setUpdateTime(new Date());
-        special.setUpdateBy(currentUserId);
-        special.setStatus(req.getStatus());
-        this.baseMapper.updateById(special);
-        //锁定传4,解锁 5 增加日志
-        if (req.getStatus().equals(CommonConstant.INT_4) || unlock.equals(CommonConstant.INT_5)) {
-            SpecialLockLog entity = new SpecialLockLog();
-            entity.setSpecialId(specialId);
-            if (req.getStatus().equals(CommonConstant.INT_4)) {
-                entity.setType(CommonConstant.INT_4);
-            } else {
-                entity.setType(CommonConstant.INT_5);
-            }
-            entity.setCreateBy(currentUserId);
-            entity.setCreateTime(new Date());
-            entity.setReason(req.getReason());
-            specialLockLogMapper.insert(entity);
-        }
-        return R.ok();
+    	Integer unlock = 0;
+    	//锁定传4,解锁 5 校验
+    	if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {
+    		//校验用户名、密码
+    		boolean res = userLoginVerify(req.getUserName(), req.getPwd());
+    		if (!res) {
+    			return R.fail("校验失败");
+    		}
+
+    		if (req.getStatus().equals(CommonConstant.INT_5)) {
+    			//解锁 赋值为1
+    			req.setStatus(1);
+    			unlock = 5;
+    		}
+    	}
+    	SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
+    	Long currentUserId = sysUser.getUserId();
+    	Long specialId = req.getSpecialId();
+
+    	Special special = new Special();
+    	special.setSpecialId(specialId);
+    	special.setUpdateTime(new Date());
+    	special.setUpdateBy(currentUserId);
+    	special.setStatus(req.getStatus());
+    	this.baseMapper.updateById(special);
+    	//锁定传4,解锁 5 增加日志
+    	if (req.getStatus().equals(CommonConstant.INT_4) || unlock.equals(CommonConstant.INT_5)) {
+    		SpecialLockLog entity = new SpecialLockLog();
+    		entity.setSpecialId(specialId);
+    		if (req.getStatus().equals(CommonConstant.INT_4)) {
+    			entity.setType(CommonConstant.INT_4);
+    		} else {
+    			entity.setType(CommonConstant.INT_5);
+    		}
+    		entity.setCreateBy(currentUserId);
+    		entity.setCreateTime(new Date());
+    		entity.setReason(req.getReason());
+    		specialLockLogMapper.insert(entity);
+    	}
+    	return R.ok();
     }
 
     @Override
