@@ -400,7 +400,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     		queryWrapper.eq(Slide::getSpecialId, req.getSpecialId());
     		queryWrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
     		List<Slide> slides = slideService.list(queryWrapper);
-    		if (slides.size() > 0) {
+    		if (CollectionUtils.isEmpty(slides)) {
     			return R.fail(MessageSource.M("NO_SLIDE_DATA_CANNOT_START"));
     		}
     	}
