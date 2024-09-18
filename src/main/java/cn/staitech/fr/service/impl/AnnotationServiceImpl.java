@@ -202,7 +202,8 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
 
     public  Long getSequenceNumber(Long slideId) {
         Slide slide = slideMapper.selectById(slideId);
-        SpecialAnnotationRel specialAnnotationRel = specialAnnotationRelMapper.selectById(slide.getSpecialId());
+        LambdaQueryWrapper<SpecialAnnotationRel> queryWrapper = new LambdaQueryWrapper<SpecialAnnotationRel>().eq(SpecialAnnotationRel::getSpecialId, slide.getSpecialId());
+        SpecialAnnotationRel specialAnnotationRel = specialAnnotationRelMapper.selectOne(queryWrapper);
         return specialAnnotationRel.getSequenceNumber();
     }
 
