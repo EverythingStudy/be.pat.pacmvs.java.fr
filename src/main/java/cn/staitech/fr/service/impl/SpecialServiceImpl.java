@@ -427,7 +427,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     	//锁定传4,解锁 5 校验
     	if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {
     		//校验用户名、密码
-    		boolean res = userLoginVerify(req.getUserName(), req.getPwd());
+    		boolean res = userLoginVerify(req.getUserName(), req.getPwd(),req);
     		if (!res) {
     			return R.fail("校验失败");
     		}
@@ -499,7 +499,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 
 
 
-    public Boolean userLoginVerify(String username, String pwd) {
+    public Boolean userLoginVerify(String username, String pwd,EditSpecialStatusIn req) {
         // 获取密钥对解密密码
         String cacheObject = redisService.getCacheObject(RSA_KEYS + username);
         if (Objects.isNull(cacheObject)) {
@@ -551,6 +551,19 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         if (!SecurityUtils.matchesPassword(password, user.getPassword())) {
             throw new ServiceException("用户不存在/密码错误");
         }
+        
+      //锁定传4,解锁 5 增加日志
+    	SpecialLockLog entity = new SpecialLockLog();
+    	entity.setSpecialId(req.getSpecialId());
+    	if (req.getStatus().equals(CommonConstant.INT_4)) {
+    		entity.setType(CommonConstant.INT_4);
+    	} else {
+    		entity.setType(CommonConstant.INT_5);
+    	}
+    	entity.setCreateBy(user.getUserId());
+    	entity.setCreateTime(new Date());
+    	entity.setReason(req.getReason());
+    	specialLockLogMapper.insert(entity);
         return true;
     }
 
