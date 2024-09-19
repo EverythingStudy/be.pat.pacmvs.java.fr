@@ -350,15 +350,6 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         if (special == null) {
             return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
         }
-        //判断专题下是否存在切片数据
-        LambdaQueryWrapper<Slide> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(Slide::getSpecialId, specialId);
-        queryWrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
-        List<Slide> slides = slideService.list(queryWrapper);
-        if (CollectionUtils.isEmpty(slides)) {
-            return R.fail(MessageSource.M("NO_SLIDE_DATA_CANNOT_START"));
-        }
-
         special.setDelFlag(CommonConstant.NUMBER_1);
         special.setUpdateBy(SecurityUtils.getUserId());
         special.setUpdateTime(new Date());
@@ -393,21 +384,27 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     @Override
     public R editSpecialStatus(EditSpecialStatusIn req) {
     	log.info("专题状态按钮接口开始：");
+    	Special special = this.baseMapper.selectById(req.getSpecialId());
     	//启动条件判断
     	if (req.getStatus().equals(CommonConstant.INT_1)) {
-    		//判断专题下是否存在切片数据
-    		LambdaQueryWrapper<Slide> queryWrapper = new LambdaQueryWrapper<>();
-    		queryWrapper.eq(Slide::getSpecialId, req.getSpecialId());
-    		queryWrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
-    		List<Slide> slides = slideService.list(queryWrapper);
-    		if (CollectionUtils.isEmpty(slides)) {
-    			return R.fail(MessageSource.M("NO_SLIDE_DATA_CANNOT_START"));
+    		//启动和取消完成传入的状态都是1，如何判断是取消完整呢，需要看之前的状态是否是“完成状态”，如果是完成责是取消完成 反之是启动
+    		//状态(0待启动，1进行中，2暂停，3已完成，4锁定)
+    		int status = special.getStatus();
+    		if(status == 0) {
+    			//判断专题下是否存在切片数据
+    			LambdaQueryWrapper<Slide> queryWrapper = new LambdaQueryWrapper<>();
+    			queryWrapper.eq(Slide::getSpecialId, req.getSpecialId());
+    			queryWrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
+    			List<Slide> slides = slideService.list(queryWrapper);
+    			if (CollectionUtils.isEmpty(slides)) {
+    				return R.fail(MessageSource.M("NO_SLIDE_DATA_CANNOT_START"));
+    			}
     		}
     	}
 
     	//锁定传4,解锁 5
     	if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {
-    		Special special = this.baseMapper.selectById(req.getSpecialId());
+    		
     		if (special == null) {
     			return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
     		}
@@ -423,7 +420,6 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     		}
     	}
 
-    	Integer unlock = 0;
     	//锁定传4,解锁 5 校验
     	if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {
     		//校验用户名、密码
@@ -435,30 +431,18 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     		if (req.getStatus().equals(CommonConstant.INT_5)) {
     			//解锁 赋值为1
     			req.setStatus(1);
-    			unlock = 5;
     		}
     	}
     	SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
     	Long currentUserId = sysUser.getUserId();
     	Long specialId = req.getSpecialId();
 
-    	Special special = new Special();
-    	special.setSpecialId(specialId);
-    	special.setUpdateTime(new Date());
-    	special.setUpdateBy(currentUserId);
-    	special.setStatus(req.getStatus());
-    	this.baseMapper.updateById(special);
-    	//锁定传4,解锁 5 增加日志
-		/*
-		 * if (req.getStatus().equals(CommonConstant.INT_4) ||
-		 * unlock.equals(CommonConstant.INT_5)) { SpecialLockLog entity = new
-		 * SpecialLockLog(); entity.setSpecialId(specialId); if
-		 * (req.getStatus().equals(CommonConstant.INT_4)) {
-		 * entity.setType(CommonConstant.INT_4); } else {
-		 * entity.setType(CommonConstant.INT_5); } entity.setCreateBy(currentUserId);
-		 * entity.setCreateTime(new Date()); entity.setReason(req.getReason());
-		 * specialLockLogMapper.insert(entity); }
-		 */
+    	Special bean = new Special();
+    	bean.setSpecialId(specialId);
+    	bean.setUpdateTime(new Date());
+    	bean.setUpdateBy(currentUserId);
+    	bean.setStatus(req.getStatus());
+    	this.baseMapper.updateById(bean);
     	return R.ok();
     }
 
