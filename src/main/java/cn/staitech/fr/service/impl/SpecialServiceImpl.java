@@ -346,6 +346,16 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     @Transactional(rollbackFor = Exception.class)
     public R removeSpecial(Long specialId) {
         log.info("专题删除接口开始：specialId={}", specialId);
+        
+        //判断专题下是否存在切片数据
+        LambdaQueryWrapper<Slide> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Slide::getSpecialId, specialId);
+        queryWrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
+        List<Slide> slides = slideService.list(queryWrapper);
+        if (slides.size() > 0) {
+            return R.fail(MessageSource.M("EXISTS_SLIDE_DATA"));
+        }
+        
         Special special = this.baseMapper.selectById(specialId);
         if (special == null) {
             return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
