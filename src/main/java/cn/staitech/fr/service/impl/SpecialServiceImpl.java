@@ -449,19 +449,16 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     	special.setStatus(req.getStatus());
     	this.baseMapper.updateById(special);
     	//锁定传4,解锁 5 增加日志
-    	if (req.getStatus().equals(CommonConstant.INT_4) || unlock.equals(CommonConstant.INT_5)) {
-    		SpecialLockLog entity = new SpecialLockLog();
-    		entity.setSpecialId(specialId);
-    		if (req.getStatus().equals(CommonConstant.INT_4)) {
-    			entity.setType(CommonConstant.INT_4);
-    		} else {
-    			entity.setType(CommonConstant.INT_5);
-    		}
-    		entity.setCreateBy(currentUserId);
-    		entity.setCreateTime(new Date());
-    		entity.setReason(req.getReason());
-    		specialLockLogMapper.insert(entity);
-    	}
+		/*
+		 * if (req.getStatus().equals(CommonConstant.INT_4) ||
+		 * unlock.equals(CommonConstant.INT_5)) { SpecialLockLog entity = new
+		 * SpecialLockLog(); entity.setSpecialId(specialId); if
+		 * (req.getStatus().equals(CommonConstant.INT_4)) {
+		 * entity.setType(CommonConstant.INT_4); } else {
+		 * entity.setType(CommonConstant.INT_5); } entity.setCreateBy(currentUserId);
+		 * entity.setCreateTime(new Date()); entity.setReason(req.getReason());
+		 * specialLockLogMapper.insert(entity); }
+		 */
     	return R.ok();
     }
 
