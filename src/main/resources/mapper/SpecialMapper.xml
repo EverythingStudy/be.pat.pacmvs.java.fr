@@ -53,7 +53,7 @@
         <if test="speciesId != null and speciesId != ''">
             and fs.species_id = #{speciesId}
         </if>
-        <if test="status != null and status != ''">
+        <if test="status != null">
             and fs.status = #{status}
         </if>
         <if test="colorType!= null and colorType != ''">
