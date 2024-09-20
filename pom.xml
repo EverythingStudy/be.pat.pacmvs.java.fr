@@ -491,6 +491,17 @@
                 <serverAddr>192.168.160.105:8848</serverAddr>
             </properties>
         </profile>
+        <profile>
+            <!--生产环境-->
+            <id>pathmedics</id>
+            <properties>
+                <activatedProperties>pathmedics</activatedProperties>
+                <nacosNamespace>40438ad6-00f6-4524-8043-4e79819cccf0</nacosNamespace>
+                <nacosAddress>http://10.10.4.13:8848</nacosAddress>
+                <nacosGroup>DEFAULT_GROUP</nacosGroup>
+                <serverAddr>10.10.4.13:8848</serverAddr>
+            </properties>
+        </profile>
 
     </profiles>
 
