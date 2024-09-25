@@ -69,7 +69,8 @@
                 and ti.group_code = #{groupCode}
             </if>
             <if test="waxCode != null and waxCode != ''">
-                and ti.wax_code like concat('%',#{waxCode},'%')
+               <!--  and ti.wax_code like concat('%',#{waxCode},'%') -->
+                and ti.wax_code =  #{waxCode}
             </if>
             <if test="createBy != null and createBy != ''">
                 and su.user_name like concat('%',#{createBy},'%')
