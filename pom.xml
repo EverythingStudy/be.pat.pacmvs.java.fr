@@ -459,9 +459,9 @@
     <profiles>
         <profile>
             <!--开发环境-->
-            <id>pvcmvsdev</id>
+            <id>pacmvsdev</id>
             <properties>
-                <activatedProperties>pvcmvsdev</activatedProperties>
+                <activatedProperties>pacmvsdev</activatedProperties>
                 <nacosNamespace>pacmvsdev</nacosNamespace>
                 <nacosAddress>http://192.168.52.224/:8848</nacosAddress>
                 <nacosGroup>DEFAULT_GROUP</nacosGroup>
