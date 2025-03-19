@@ -462,7 +462,7 @@
             <id>pvcmvsdev</id>
             <properties>
                 <activatedProperties>pvcmvsdev</activatedProperties>
-                <nacosNamespace>a62adac6-cf17-4802-bd5d-8232ad97cb4a</nacosNamespace>
+                <nacosNamespace>pacmvsdev</nacosNamespace>
                 <nacosAddress>http://192.168.52.224/:8848</nacosAddress>
                 <nacosGroup>DEFAULT_GROUP</nacosGroup>
                 <serverAddr>192.168.52.224:8848</serverAddr>
