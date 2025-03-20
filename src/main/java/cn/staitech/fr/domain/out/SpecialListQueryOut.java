@@ -52,6 +52,8 @@ public class SpecialListQueryOut {
 
     @ApiModelProperty(value = "创建者")
     private String createName;
+    @ApiModelProperty(value = "创建者ID")
+    private Long createBy;
 
     @ApiModelProperty(value = "创建时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

@@ -168,15 +168,13 @@
             <artifactId>jts</artifactId>
             <version>1.13</version>
         </dependency>
-
-        <!--  geotools依赖 -->
+        <!-- https://mvnrepository.com/artifact/org.geotools/gt-geojson -->
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojson</artifactId>
-            <version>19</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/src/main/resources/lib/gt-geojson-19.0.jar</systemPath>
+            <version>19.0</version>
         </dependency>
+
 
         <!--加入log4j -->
         <dependency>
@@ -193,31 +191,31 @@
         </dependency>
 
         <!--poi-->
-       <!-- <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>4.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml</artifactId>
-            <version>4.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-ooxml-schemas</artifactId>
-            <version>4.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>poi-scratchpad</artifactId>
-            <version>4.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.poi</groupId>
-            <artifactId>ooxml-schemas</artifactId>
-            <version>1.4</version>
-        </dependency>-->
+        <!-- <dependency>
+             <groupId>org.apache.poi</groupId>
+             <artifactId>poi</artifactId>
+             <version>4.1.0</version>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.poi</groupId>
+             <artifactId>poi-ooxml</artifactId>
+             <version>4.1.0</version>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.poi</groupId>
+             <artifactId>poi-ooxml-schemas</artifactId>
+             <version>4.1.0</version>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.poi</groupId>
+             <artifactId>poi-scratchpad</artifactId>
+             <version>4.1.0</version>
+         </dependency>
+         <dependency>
+             <groupId>org.apache.poi</groupId>
+             <artifactId>ooxml-schemas</artifactId>
+             <version>1.4</version>
+         </dependency>-->
 
         <!--导出报告-->
         <dependency>
@@ -255,18 +253,18 @@
 
         </dependency>
         <!--pdf-->
-       <!-- <dependency>
-            <groupId>org.docx4j</groupId>
-            <artifactId>docx4j-export-fo</artifactId>
-            <version>6.1.0</version>
-            &lt;!&ndash;因为项目中slf4j版本冲突,忽悠这个依赖中的slf4j版本&ndash;&gt;
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>-->
+        <!-- <dependency>
+             <groupId>org.docx4j</groupId>
+             <artifactId>docx4j-export-fo</artifactId>
+             <version>6.1.0</version>
+             &lt;!&ndash;因为项目中slf4j版本冲突,忽悠这个依赖中的slf4j版本&ndash;&gt;
+             <exclusions>
+                 <exclusion>
+                     <groupId>org.slf4j</groupId>
+                     <artifactId>slf4j-log4j12</artifactId>
+                 </exclusion>
+             </exclusions>
+         </dependency>-->
         <!--导出报告end-->
         <!-- https://mvnrepository.com/artifact/com.luhuiguo/aspose-words -->
         <dependency>
@@ -386,7 +384,30 @@
         </dependency>
 
     </dependencies>
-
+    <repositories>
+        <repository>
+            <id>osgeo</id>
+            <name>OSGeo Release Repository</name>
+            <url>https://repo.osgeo.org/repository/release/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>osgeo-snapshot</id>
+            <name>OSGeo Snapshot Repository</name>
+            <url>https://repo.osgeo.org/repository/snapshot/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
 
     <build>
         <finalName>${project.artifactId}</finalName>
@@ -445,6 +466,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
                 <configuration>
                     <nonFilteredFileExtensions>
                         <nonFilteredFileExtension>docx</nonFilteredFileExtension>
@@ -468,17 +490,17 @@
                 <serverAddr>192.168.52.224:8848</serverAddr>
             </properties>
         </profile>
-        <profile>
-            <!--开发环境-->
-            <id>pvcmvsdev1</id>
-            <properties>
-                <activatedProperties>pvcmvsdev1</activatedProperties>
-                <nacosNamespace>18649c47-5206-4c52-9560-44c66d300d0f</nacosNamespace>
-                <nacosAddress>http://192.168.52.224:8848</nacosAddress>
-                <nacosGroup>DEFAULT_GROUP</nacosGroup>
-                <serverAddr>192.168.52.224:8848</serverAddr>
-            </properties>
-        </profile>
+<!--        <profile>-->
+<!--            &lt;!&ndash;开发环境&ndash;&gt;-->
+<!--            <id>pvcmvsdev1</id>-->
+<!--            <properties>-->
+<!--                <activatedProperties>pvcmvsdev1</activatedProperties>-->
+<!--                <nacosNamespace>18649c47-5206-4c52-9560-44c66d300d0f</nacosNamespace>-->
+<!--                <nacosAddress>http://192.168.52.224:8848</nacosAddress>-->
+<!--                <nacosGroup>DEFAULT_GROUP</nacosGroup>-->
+<!--                <serverAddr>192.168.52.224:8848</serverAddr>-->
+<!--            </properties>-->
+<!--        </profile>-->
 
         <profile>
             <!--测试环境-->
