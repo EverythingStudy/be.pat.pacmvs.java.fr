@@ -28,4 +28,6 @@ public interface SpecialMapper extends BaseMapper<Special> {
     Integer countgetUserRole(Long userId);
     
     List<SysUser>  selectUserById(Map<String,Object> parm);
+
+    List<SpecialListQueryOut> getSpecialArchivedList(SpecialListQueryIn req);
 }

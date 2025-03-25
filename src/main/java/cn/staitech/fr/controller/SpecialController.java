@@ -192,4 +192,11 @@ public class SpecialController extends BaseController {
         return R.ok(nickName);
     }
 
+    @ApiOperation(value = "已归档专题列表")
+    @PostMapping("/archived-list")
+    public R<PageResponse<SpecialListQueryOut>> archivedList(@RequestBody @Validated SpecialListQueryIn req) {
+        PageResponse<SpecialListQueryOut> resp = specialService.getSpecialArchivedList(req);
+        return R.ok(resp);
+    }
+
 }

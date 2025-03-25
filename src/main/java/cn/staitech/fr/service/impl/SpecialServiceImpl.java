@@ -144,6 +144,18 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 //    @Transactional(rollbackFor = Exception.class)
     public R addSpecial(SpecialAddIn req) {
         log.info("添加专题接口开始：");
+        LambdaQueryWrapper<Special> wrapper0 = new LambdaQueryWrapper<>();
+        wrapper0.eq(Special::getOrganizationId, req.getOrganizationId());
+        wrapper0.eq(Special::getDelFlag, CommonConstant.NUMBER_0);
+        wrapper0.eq(Special::getStatus, 6);
+        wrapper0.and(wq -> wq
+                .eq(Special::getTopicId, req.getTopicId())
+                .or()
+                .eq(Special::getSpecialName, req.getSpecialName()));
+        List<Special> specials0 = this.baseMapper.selectList(wrapper0);
+        if (CollectionUtils.isNotEmpty(specials0)) {
+            return R.fail("该专题已归档，不能重复创建项目，请选择其他专题");
+        }
         //校验专题编号唯一性
         LambdaQueryWrapper<Special> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Special::getOrganizationId, req.getOrganizationId());
@@ -411,11 +423,6 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         Long currentUserId = sysUser.getUserId();
         Long specialId = req.getSpecialId();
         if (req.getStatus().equals(CommonConstant.INT_6)) {
-            //校验用户名、密码
-            boolean res = userLoginVerify(req.getUserName(), req.getPwd(), req);
-            if (!res) {
-                return R.fail("校验失败");
-            }
             if (special.getStatus() != 3) {
                 return R.fail("只有已完成才允许归档");
             }
@@ -555,6 +562,35 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
             }
         }
         return sysUser;
+    }
+
+    @Override
+    public PageResponse<SpecialListQueryOut> getSpecialArchivedList(SpecialListQueryIn req) {
+        log.info("专题列表查询接口开始：");
+        //创建响应
+        PageResponse resp = new PageResponse();
+        //分页查询
+        req.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
+        //判断是不是管理员
+        Integer integer = this.baseMapper.countgetUserRole(SecurityUtils.getUserId());
+        if (integer == 0) {
+            req.setUserId(SecurityUtils.getUserId());
+        }
+        Page<SpecialListQueryOut> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
+        List<SpecialListQueryOut> specialList = this.baseMapper.getSpecialArchivedList(req);
+        if (CollectionUtils.isNotEmpty(specialList)) {
+            specialList.forEach(e -> {
+                e.setColorName(Container.COLOR_TYPE.get(Integer.valueOf(e.getColorType())));
+                e.setColorNameEn(Container.COLOR_TYPE_EN.get(Integer.valueOf(e.getColorType())));
+                e.setTrialType(Container.TRIAL_TYPE.get(e.getTrialId()));
+                e.setTrialTypeEn(Container.TRIAL_TYPE_EN.get(e.getTrialId()));
+            });
+        }
+        resp.setTotal(page.getTotal());
+        resp.setList(specialList);
+        resp.setPages(page.getPages());
+        return resp;
+
     }
 
 }
