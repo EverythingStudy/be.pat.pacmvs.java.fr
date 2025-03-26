@@ -169,13 +169,18 @@
             <version>1.13</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.geotools/gt-geojson -->
+<!--        <dependency>-->
+<!--            <groupId>org.geotools</groupId>-->
+<!--            <artifactId>gt-geojson</artifactId>-->
+<!--            <version>19.0</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojson</artifactId>
-            <version>19.0</version>
+            <version>19</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/gt-geojson-19.0.jar</systemPath>
         </dependency>
-
-
         <!--加入log4j -->
         <dependency>
             <groupId>log4j</groupId>
