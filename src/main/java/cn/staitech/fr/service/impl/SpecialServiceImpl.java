@@ -1,29 +1,5 @@
 package cn.staitech.fr.service.impl;
 
-import static cn.staitech.common.core.constant.UserConstants.RSA_KEYS;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import javax.annotation.Resource;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-
 import cn.staitech.common.core.constant.SecurityConstants;
 import cn.staitech.common.core.constant.UserConstants;
 import cn.staitech.common.core.domain.PageResponse;
@@ -36,32 +12,10 @@ import cn.staitech.common.redis.service.RedisService;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Container;
-import cn.staitech.fr.domain.Annotation;
-import cn.staitech.fr.domain.Image;
-import cn.staitech.fr.domain.PathologicalIndicator;
-import cn.staitech.fr.domain.PathologicalIndicatorCategory;
-import cn.staitech.fr.domain.Slide;
-import cn.staitech.fr.domain.Special;
-import cn.staitech.fr.domain.SpecialAnnotationRel;
-import cn.staitech.fr.domain.SpecialLockLog;
-import cn.staitech.fr.domain.SpecialMember;
-import cn.staitech.fr.domain.SpecialRecycling;
-import cn.staitech.fr.domain.in.EditSpecialStatusIn;
-import cn.staitech.fr.domain.in.SpecialAddIn;
-import cn.staitech.fr.domain.in.SpecialEditIn;
-import cn.staitech.fr.domain.in.SpecialListQueryIn;
-import cn.staitech.fr.domain.in.SpecialsQueryIn;
+import cn.staitech.fr.domain.*;
+import cn.staitech.fr.domain.in.*;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
-import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.ImageMapper;
-import cn.staitech.fr.mapper.PathologicalIndicatorCategoryMapper;
-import cn.staitech.fr.mapper.PathologicalIndicatorMapper;
-import cn.staitech.fr.mapper.SlideMapper;
-import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
-import cn.staitech.fr.mapper.SpecialLockLogMapper;
-import cn.staitech.fr.mapper.SpecialMapper;
-import cn.staitech.fr.mapper.SpecialMemberMapper;
-import cn.staitech.fr.mapper.TopicMapper;
+import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.SpecialRecyclingService;
 import cn.staitech.fr.service.SpecialService;
@@ -69,7 +23,24 @@ import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.system.api.RemoteUserService;
 import cn.staitech.system.api.domain.SysUser;
 import cn.staitech.system.api.model.LoginUser;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+
+import static cn.staitech.common.core.constant.UserConstants.RSA_KEYS;
 
 /**
  * <p>
@@ -82,22 +53,16 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @Slf4j
 public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> implements SpecialService {
-	
-	
-	
-	
+
+
     @Autowired
     private SpecialRecyclingService specialRecyclingService;
 
     @Resource
     private ImageMapper imageMapper;
 
-    @Resource
-    private SlideMapper slideMapper;
-
     @Autowired
     private SlideService slideService;
-
 
     @Resource
     private SpecialMemberMapper specialMemberMapper;
@@ -119,7 +84,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 
     @Resource
     private AnnotationMapper annotationMapper;
-    
+
     @Resource
     private SpecialMapper specialMapper;
 
@@ -130,18 +95,17 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
 
 
-
     @Override
-    public List<PathologicalIndicatorCategory> speciesCategory(Long specialId){
+    public List<PathologicalIndicatorCategory> speciesCategory(Long specialId) {
         Special special = specialMapper.selectById(specialId);
         LambdaQueryWrapper<PathologicalIndicator> indicatorQueryWrapper = new LambdaQueryWrapper<>();
-        indicatorQueryWrapper.eq(PathologicalIndicator::getDelFlag,0).eq(PathologicalIndicator::getSpeciesId, special.getSpeciesId()).eq(PathologicalIndicator::getOrganizationId, special.getOrganizationId());
+        indicatorQueryWrapper.eq(PathologicalIndicator::getDelFlag, 0).eq(PathologicalIndicator::getSpeciesId, special.getSpeciesId()).eq(PathologicalIndicator::getOrganizationId, special.getOrganizationId());
         List<PathologicalIndicator> indicatorList = pathologicalIndicatorMapper.selectList(indicatorQueryWrapper);
-        if(indicatorList.size() > 0){
+        if (indicatorList.size() > 0) {
             // 获取指标id
             List<Long> indicatorIdList = indicatorList.stream().map(PathologicalIndicator::getIndicatorId).collect(Collectors.toList());
             LambdaQueryWrapper<PathologicalIndicatorCategory> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.in(PathologicalIndicatorCategory::getIndicatorId, indicatorIdList).eq(PathologicalIndicatorCategory::getDelFlag,0);
+            queryWrapper.in(PathologicalIndicatorCategory::getIndicatorId, indicatorIdList).eq(PathologicalIndicatorCategory::getDelFlag, 0);
             return pathologicalIndicatorCategoryMapper.selectList(queryWrapper);
         }
         return new ArrayList<>();
@@ -180,6 +144,18 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 //    @Transactional(rollbackFor = Exception.class)
     public R addSpecial(SpecialAddIn req) {
         log.info("添加专题接口开始：");
+        LambdaQueryWrapper<Special> wrapper0 = new LambdaQueryWrapper<>();
+        wrapper0.eq(Special::getOrganizationId, req.getOrganizationId());
+        wrapper0.eq(Special::getDelFlag, CommonConstant.NUMBER_0);
+        wrapper0.eq(Special::getStatus, 6);
+        wrapper0.and(wq -> wq
+                .eq(Special::getTopicId, req.getTopicId())
+                .or()
+                .eq(Special::getSpecialName, req.getSpecialName()));
+        List<Special> specials0 = this.baseMapper.selectList(wrapper0);
+        if (CollectionUtils.isNotEmpty(specials0)) {
+            return R.fail("该专题已归档，不能重复创建项目，请选择其他专题");
+        }
         //校验专题编号唯一性
         LambdaQueryWrapper<Special> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(Special::getOrganizationId, req.getOrganizationId());
@@ -263,8 +239,8 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
                 } else {
                     SpecialAnnotationRel pAnnoRel = userPARList.get(0);
                     Long currentSequenceNumber = pAnnoRel.getSequenceNumber();
-                    if(null == currentSequenceNumber) {
-                    	synchronized (this) {
+                    if (null == currentSequenceNumber) {
+                        synchronized (this) {
                             Long sequenceNumber = 1L;
                             cacheSpecialAnnotationRel = generateTable(cacheSpecialAnnotationRel, specialId, userId, sequenceNumber);
                             return cacheSpecialAnnotationRel;
@@ -273,7 +249,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
                     //查下当前表的项目个数和记录条数，如果可以用继续，如果不可以就新建表
                     Annotation queryAnnotation = new Annotation();
                     queryAnnotation.setSequenceNumber(currentSequenceNumber);
-                    
+
                     Integer totalProjects = specialAnnotationRelMapper.selectTableSpecialCount(queryAnnotation);
                     Integer totalRecords = annotationMapper.selectTableRecordCount(queryAnnotation);
                     if (totalProjects >= CommonConstant.PROJECT_NUMBER_LIMIT || totalRecords >= CommonConstant.TABLE_RECORD_LIMIT) {
@@ -308,9 +284,9 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         Integer existTable = annotationMapper.selectExistTable(annotation);
         if (existTable == 0) {
             //1、Sequence
-        	annotationMapper.createTableSequence(annotation);
+            annotationMapper.createTableSequence(annotation);
             //2、建表
-        	annotationMapper.createTable(annotation);
+            annotationMapper.createTable(annotation);
         }
         //3、insert 记录
         cacheSpecialAnnotationRel.setSpecialId(specialId);
@@ -324,17 +300,17 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 
     @Override
     public R editSpecial(SpecialEditIn req) {
-    	log.info("专题编辑接口开始：");
-    	LambdaQueryWrapper<Special> wrapper = new LambdaQueryWrapper<>();
-    	wrapper.eq(Special::getOrganizationId, req.getOrganizationId());
-    	wrapper.eq(Special::getDelFlag, CommonConstant.NUMBER_0);
-    	wrapper.eq(Special::getSpecialName, req.getSpecialName());
-    	wrapper.ne(Special::getSpecialId, req.getSpecialId());
-    	List<Special> specials2 = this.baseMapper.selectList(wrapper);
-    	if (CollectionUtils.isNotEmpty(specials2)) {
-    		return R.fail(MessageSource.M("EXISTS_SPECIAL_DATA"));
-    	}
-    	Special special = new Special();
+        log.info("专题编辑接口开始：");
+        LambdaQueryWrapper<Special> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Special::getOrganizationId, req.getOrganizationId());
+        wrapper.eq(Special::getDelFlag, CommonConstant.NUMBER_0);
+        wrapper.eq(Special::getSpecialName, req.getSpecialName());
+        wrapper.ne(Special::getSpecialId, req.getSpecialId());
+        List<Special> specials2 = this.baseMapper.selectList(wrapper);
+        if (CollectionUtils.isNotEmpty(specials2)) {
+            return R.fail(MessageSource.M("EXISTS_SPECIAL_DATA"));
+        }
+        Special special = new Special();
         BeanUtils.copyProperties(req, special);
         special.setUpdateBy(SecurityUtils.getUserId());
         special.setUpdateTime(new Date());
@@ -346,7 +322,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     @Transactional(rollbackFor = Exception.class)
     public R removeSpecial(Long specialId) {
         log.info("专题删除接口开始：specialId={}", specialId);
-        
+
         //判断专题下是否存在切片数据
         LambdaQueryWrapper<Slide> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Slide::getSpecialId, specialId);
@@ -355,7 +331,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         if (slides.size() > 0) {
             return R.fail(MessageSource.M("EXISTS_SLIDE_DATA"));
         }
-        
+
         Special special = this.baseMapper.selectById(specialId);
         if (special == null) {
             return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
@@ -393,67 +369,71 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
 
     @Override
     public R editSpecialStatus(EditSpecialStatusIn req) {
-    	log.info("专题状态按钮接口开始：");
-    	Special special = this.baseMapper.selectById(req.getSpecialId());
-    	//启动条件判断
-    	if (req.getStatus().equals(CommonConstant.INT_1)) {
-    		//启动和取消完成传入的状态都是1，如何判断是取消完整呢，需要看之前的状态是否是“完成状态”，如果是完成责是取消完成 反之是启动
-    		//状态(0待启动，1进行中，2暂停，3已完成，4锁定)
-    		int status = special.getStatus();
-    		if(status == 0) {
-    			//判断专题下是否存在切片数据
-    			LambdaQueryWrapper<Slide> queryWrapper = new LambdaQueryWrapper<>();
-    			queryWrapper.eq(Slide::getSpecialId, req.getSpecialId());
-    			queryWrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
-    			List<Slide> slides = slideService.list(queryWrapper);
-    			if (CollectionUtils.isEmpty(slides)) {
-    				return R.fail(MessageSource.M("NO_SLIDE_DATA_CANNOT_START"));
-    			}
-    		}
-    	}
+        log.info("专题状态按钮接口开始：");
+        Special special = this.baseMapper.selectById(req.getSpecialId());
+        //启动条件判断
+        if (req.getStatus().equals(CommonConstant.INT_1)) {
+            //启动和取消完成传入的状态都是1，如何判断是取消完整呢，需要看之前的状态是否是“完成状态”，如果是完成责是取消完成 反之是启动
+            //状态(0待启动，1进行中，2暂停，3已完成，4锁定)
+            int status = special.getStatus();
+            if (status == 0) {
+                //判断专题下是否存在切片数据
+                LambdaQueryWrapper<Slide> queryWrapper = new LambdaQueryWrapper<>();
+                queryWrapper.eq(Slide::getSpecialId, req.getSpecialId());
+                queryWrapper.eq(Slide::getDelFlag, CommonConstant.NUMBER_0);
+                List<Slide> slides = slideService.list(queryWrapper);
+                if (CollectionUtils.isEmpty(slides)) {
+                    return R.fail(MessageSource.M("NO_SLIDE_DATA_CANNOT_START"));
+                }
+            }
+        }
 
-    	//锁定传4,解锁 5
-    	if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {
-    		
-    		if (special == null) {
-    			return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
-    		}
-    		//状态(0待启动，1进行中，2暂停，3已完成，4锁定)
-    		Integer status = special.getStatus();
-    		//已经锁定判断
-    		if(status.equals(CommonConstant.INT_4) && req.getStatus().equals(CommonConstant.INT_4)){
-    			return R.fail(MessageSource.M("SPECIAL_HAVE_LOCK"));
-    		}
-    		//解锁判断
-    		if(status.equals(CommonConstant.INT_1) && req.getStatus().equals(CommonConstant.INT_5)){
-    			return R.fail(MessageSource.M("SPECIAL_HAVE_UNLOCK"));
-    		}
-    	}
+        //锁定传4,解锁 5
+        if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {
 
-    	//锁定传4,解锁 5 校验
-    	if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {
-    		//校验用户名、密码
-    		boolean res = userLoginVerify(req.getUserName(), req.getPwd(),req);
-    		if (!res) {
-    			return R.fail("校验失败");
-    		}
+            if (special == null) {
+                return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
+            }
+            //状态(0待启动，1进行中，2暂停，3已完成，4锁定)
+            Integer status = special.getStatus();
+            //已经锁定判断
+            if (status.equals(CommonConstant.INT_4) && req.getStatus().equals(CommonConstant.INT_4)) {
+                return R.fail(MessageSource.M("SPECIAL_HAVE_LOCK"));
+            }
+            //解锁判断
+            if (status.equals(CommonConstant.INT_1) && req.getStatus().equals(CommonConstant.INT_5)) {
+                return R.fail(MessageSource.M("SPECIAL_HAVE_UNLOCK"));
+            }
+        }
 
-    		if (req.getStatus().equals(CommonConstant.INT_5)) {
-    			//解锁 赋值为1
-    			req.setStatus(1);
-    		}
-    	}
-    	SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
-    	Long currentUserId = sysUser.getUserId();
-    	Long specialId = req.getSpecialId();
+        //锁定传4,解锁 5 校验
+        if (req.getStatus().equals(CommonConstant.INT_4) || req.getStatus().equals(CommonConstant.INT_5)) {
+            //校验用户名、密码
+            boolean res = userLoginVerify(req.getUserName(), req.getPwd(), req);
+            if (!res) {
+                return R.fail("校验失败");
+            }
 
-    	Special bean = new Special();
-    	bean.setSpecialId(specialId);
-    	bean.setUpdateTime(new Date());
-    	bean.setUpdateBy(currentUserId);
-    	bean.setStatus(req.getStatus());
-    	this.baseMapper.updateById(bean);
-    	return R.ok();
+            if (req.getStatus().equals(CommonConstant.INT_5)) {
+                //解锁 赋值为1
+                req.setStatus(1);
+            }
+        }
+        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
+        Long currentUserId = sysUser.getUserId();
+        Long specialId = req.getSpecialId();
+        if (req.getStatus().equals(CommonConstant.INT_6)) {
+            if (special.getStatus() != 3) {
+                return R.fail("只有已完成才允许归档");
+            }
+        }
+        Special bean = new Special();
+        bean.setSpecialId(specialId);
+        bean.setUpdateTime(new Date());
+        bean.setUpdateBy(currentUserId);
+        bean.setStatus(req.getStatus());
+        this.baseMapper.updateById(bean);
+        return R.ok();
     }
 
     @Override
@@ -489,8 +469,7 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
     }
 
 
-
-    public Boolean userLoginVerify(String username, String pwd,EditSpecialStatusIn req) {
+    public Boolean userLoginVerify(String username, String pwd, EditSpecialStatusIn req) {
         // 获取密钥对解密密码
         String cacheObject = redisService.getCacheObject(RSA_KEYS + username);
         if (Objects.isNull(cacheObject)) {
@@ -542,47 +521,76 @@ public class SpecialServiceImpl extends ServiceImpl<SpecialMapper, Special> impl
         if (!SecurityUtils.matchesPassword(password, user.getPassword())) {
             throw new ServiceException("用户不存在/密码错误");
         }
-        
-      //锁定传4,解锁 5 增加日志
-    	SpecialLockLog entity = new SpecialLockLog();
-    	entity.setSpecialId(req.getSpecialId());
-    	if (req.getStatus().equals(CommonConstant.INT_4)) {
-    		entity.setType(CommonConstant.INT_4);
-    	} else {
-    		entity.setType(CommonConstant.INT_5);
-    	}
-    	entity.setCreateBy(user.getUserId());
-    	entity.setCreateTime(new Date());
-    	entity.setReason(req.getReason());
-    	specialLockLogMapper.insert(entity);
+
+        //锁定传4,解锁 5 增加日志
+        SpecialLockLog entity = new SpecialLockLog();
+        entity.setSpecialId(req.getSpecialId());
+        if (req.getStatus().equals(CommonConstant.INT_4)) {
+            entity.setType(CommonConstant.INT_4);
+        } else {
+            entity.setType(CommonConstant.INT_5);
+        }
+        entity.setCreateBy(user.getUserId());
+        entity.setCreateTime(new Date());
+        entity.setReason(req.getReason());
+        specialLockLogMapper.insert(entity);
         return true;
     }
 
-	@Override
-	public SysUser getUserInfo(Map<String, Object> parm) {
-		String cacheKey = "user_";
-		if(null!=parm && parm.containsKey("userId")){
-			Long cacheUserIdKey = (Long) parm.get("userId");
-			cacheKey = cacheKey+cacheUserIdKey.toString(); 
-		}
+    @Override
+    public SysUser getUserInfo(Map<String, Object> parm) {
+        String cacheKey = "user_";
+        if (null != parm && parm.containsKey("userId")) {
+            Long cacheUserIdKey = (Long) parm.get("userId");
+            cacheKey = cacheKey + cacheUserIdKey.toString();
+        }
 
-		if(null!=parm && parm.containsKey("userName")){
-			String userName =(String) parm.get("userName");
-			Long organizationId =(Long) parm.get("organizationId");
-			cacheKey = cacheKey+organizationId+"_"+userName;
-		}
+        if (null != parm && parm.containsKey("userName")) {
+            String userName = (String) parm.get("userName");
+            Long organizationId = (Long) parm.get("organizationId");
+            cacheKey = cacheKey + organizationId + "_" + userName;
+        }
 
-		SysUser sysUser = redisService.getCacheObject(cacheKey);
-		if(null != sysUser){
-			return sysUser;
-		}else{
-			List<SysUser> userList = specialMapper.selectUserById(parm);
-			if(CollectionUtils.isNotEmpty(userList)){
-				sysUser = userList.get(0);
-				redisService.setCacheObject(cacheKey,sysUser, 31L, TimeUnit.DAYS);
-			}
-		}
-		return sysUser;
-	}
+        SysUser sysUser = redisService.getCacheObject(cacheKey);
+        if (null != sysUser) {
+            return sysUser;
+        } else {
+            List<SysUser> userList = specialMapper.selectUserById(parm);
+            if (CollectionUtils.isNotEmpty(userList)) {
+                sysUser = userList.get(0);
+                redisService.setCacheObject(cacheKey, sysUser, 31L, TimeUnit.DAYS);
+            }
+        }
+        return sysUser;
+    }
+
+    @Override
+    public PageResponse<SpecialListQueryOut> getSpecialArchivedList(SpecialListQueryIn req) {
+        log.info("专题列表查询接口开始：");
+        //创建响应
+        PageResponse resp = new PageResponse();
+        //分页查询
+        req.setOrganizationId(SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
+        //判断是不是管理员
+        Integer integer = this.baseMapper.countgetUserRole(SecurityUtils.getUserId());
+        if (integer == 0) {
+            req.setUserId(SecurityUtils.getUserId());
+        }
+        Page<SpecialListQueryOut> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
+        List<SpecialListQueryOut> specialList = this.baseMapper.getSpecialArchivedList(req);
+        if (CollectionUtils.isNotEmpty(specialList)) {
+            specialList.forEach(e -> {
+                e.setColorName(Container.COLOR_TYPE.get(Integer.valueOf(e.getColorType())));
+                e.setColorNameEn(Container.COLOR_TYPE_EN.get(Integer.valueOf(e.getColorType())));
+                e.setTrialType(Container.TRIAL_TYPE.get(e.getTrialId()));
+                e.setTrialTypeEn(Container.TRIAL_TYPE_EN.get(e.getTrialId()));
+            });
+        }
+        resp.setTotal(page.getTotal());
+        resp.setList(specialList);
+        resp.setPages(page.getPages());
+        return resp;
+
+    }
 
 }

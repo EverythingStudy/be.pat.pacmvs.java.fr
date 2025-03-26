@@ -30,16 +30,16 @@ public class SpecialListQueryIn extends PageRequest {
     @ApiModelProperty(value = "染色类型")
     private Integer colorType;
 
-    @ApiModelProperty(value = "状态(0待启动，1进行中，2暂停，3已完成，4锁定)")
+    @ApiModelProperty(value = "状态(0待启动，1进行中，2暂停，3已完成，4锁定,6已归档)")
     private Integer status;
 
     @ApiModelProperty(value = "专题名称")
     private String createName;
 
-    @ApiModelProperty(value = "机构id",hidden = true)
+    @ApiModelProperty(value = "机构id", hidden = true)
     private Long organizationId;
 
-    @ApiModelProperty(value = "用户id",hidden = true)
+    @ApiModelProperty(value = "用户id", hidden = true)
     private Long userId;
 
     @ApiModelProperty(value = "时间范围")
