@@ -49,7 +49,18 @@ public class Container {
             .put(1, "进行中")
             .put(2, "暂停")
             .put(3, "已完成")
-            .put(4,"锁定")
+            .put(4, "锁定")
+            .build();
+    /**
+     * 项目状态
+     */
+    public static final Map<Integer, String> SPECIAL_STATUS_ARCHIVED = new ImmutableMap.Builder<Integer, String>()
+            .put(0, "待启动")
+            .put(1, "进行中")
+            .put(2, "暂停")
+            .put(3, "已完成")
+            .put(4, "锁定")
+            .put(6, "已归档")
             .build();
 
     /**
@@ -60,7 +71,19 @@ public class Container {
             .put(1, "In process")
             .put(2, "Pause")
             .put(3, "Done")
-            .put(4,"Locked")
+            .put(4, "Locked")
+            .build();
+
+    /**
+     * 项目状态 - EN
+     */
+    public static final Map<Integer, String> SPECIAL_STATUS_ARCHIVED_EN = new ImmutableMap.Builder<Integer, String>()
+            .put(0, "Pending Started")
+            .put(1, "In process")
+            .put(2, "Pause")
+            .put(3, "Done")
+            .put(4, "Locked")
+            .put(6, "Archived")
             .build();
 
     /**
@@ -197,7 +220,7 @@ public class Container {
      * 眼科ZIP压缩包解压后可解析的图像文件
      */
     public static final ImmutableSet<String> IMAGE_EXT_SET = ImmutableSet.of("png", "jpg");
-    
+
     /**
      * 单审状态
      */

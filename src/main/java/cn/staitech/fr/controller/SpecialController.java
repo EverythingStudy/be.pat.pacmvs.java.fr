@@ -1,69 +1,57 @@
 package cn.staitech.fr.controller;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import cn.staitech.fr.domain.PathologicalIndicatorCategory;
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-
 import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.web.controller.BaseController;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.Container;
 import cn.staitech.fr.domain.AccessProjectRecords;
+import cn.staitech.fr.domain.PathologicalIndicatorCategory;
 import cn.staitech.fr.domain.Special;
 import cn.staitech.fr.domain.SpecialLockLog;
-import cn.staitech.fr.domain.in.EditSpecialStatusIn;
-import cn.staitech.fr.domain.in.SpecialAddIn;
-import cn.staitech.fr.domain.in.SpecialEditIn;
-import cn.staitech.fr.domain.in.SpecialListQueryIn;
-import cn.staitech.fr.domain.in.SpecialsQueryIn;
+import cn.staitech.fr.domain.in.*;
 import cn.staitech.fr.domain.out.SpecialListQueryOut;
 import cn.staitech.fr.service.AccessProjectRecordsService;
 import cn.staitech.fr.service.SpecialLockLogService;
 import cn.staitech.fr.service.SpecialService;
 import cn.staitech.fr.utils.LanguageUtils;
 import cn.staitech.system.api.domain.SysUser;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
- * 
-* @ClassName: SpecialController
-* @Description:专题
-* @author wanglibei
-* @date 2024年9月10日
-* @version V1.0
+ * @author wanglibei
+ * @version V1.0
+ * @ClassName: SpecialController
+ * @Description:专题
+ * @date 2024年9月10日
  */
 @Api(value = "专题", tags = "专题")
 @RestController
 @RequestMapping("/special")
-public class SpecialController  extends BaseController {
+public class SpecialController extends BaseController {
 
     @Autowired
     private SpecialService specialService;
-    
+
     @Autowired
     private AccessProjectRecordsService accessProjectRecordsService;
-    
+
     @Autowired
     private SpecialLockLogService specialLockLogService;
-    
+
 
     @ApiOperation(value = "专题列表分页查询")
     @PostMapping("/list")
@@ -89,9 +77,9 @@ public class SpecialController  extends BaseController {
 
     @ApiOperation(value = "专题详情")
     @GetMapping("/info")
-    public R<Special> info(@RequestParam("specialId") @ApiParam(name = "specialId", value ="专题id" ) Long specialId){
-    	 //add访问记录
-        AccessProjectRecords record=AccessProjectRecords.builder().projectId(specialId).userId(SecurityUtils.getUserId()).accessTime(new Date()).build();
+    public R<Special> info(@RequestParam("specialId") @ApiParam(name = "specialId", value = "专题id") Long specialId) {
+        //add访问记录
+        AccessProjectRecords record = AccessProjectRecords.builder().projectId(specialId).userId(SecurityUtils.getUserId()).accessTime(new Date()).build();
         accessProjectRecordsService.save(record);
         return specialService.getInfoById(specialId);
 
@@ -105,7 +93,7 @@ public class SpecialController  extends BaseController {
 
     @ApiOperation(value = "专题删除")
     @GetMapping("/remove")
-    public R remove(@RequestParam("specialId") @ApiParam(name = "specialId", value ="专题id" ) Long specialId) {
+    public R remove(@RequestParam("specialId") @ApiParam(name = "specialId", value = "专题id") Long specialId) {
         return specialService.removeSpecial(specialId);
     }
 
@@ -142,12 +130,18 @@ public class SpecialController  extends BaseController {
 
     @ApiOperation(value = "专题状态列表", notes = "专题状态列表")
     @GetMapping("/specialStatus")
-    public R<Map<Integer, String>> specialStatus() {
+    public R<Map<Integer, String>> specialStatus(@Validated @RequestParam Boolean flag) {
         Map<Integer, String> map;
         if (LanguageUtils.isEn()) {
             map = Container.SPECIAL_STATUS_EN;
+            if (flag) {
+                map = Container.SPECIAL_STATUS_ARCHIVED_EN;
+            }
         } else {
             map = Container.SPECIAL_STATUS;
+            if (flag) {
+                map = Container.SPECIAL_STATUS_ARCHIVED;
+            }
         }
         return R.ok(map);
     }
@@ -159,49 +153,50 @@ public class SpecialController  extends BaseController {
         PageResponse<SpecialListQueryOut> resp = specialService.getSpecials(req);
         return R.ok(resp);
     }
-    
+
     @ApiOperation(value = "专题锁定日志")
     @GetMapping("/getLockLog")
-    public R<List<SpecialLockLog>> getLockLog(@RequestParam("specialId") @ApiParam(name = "specialId", value ="专题id" ) Long specialId){
-    	//查询锁定记录
-    	QueryWrapper<SpecialLockLog> queryWrapper = new QueryWrapper<>();
-    	queryWrapper.eq("special_id", specialId);
-    	queryWrapper.orderByDesc("create_time");
-    	List<SpecialLockLog> list = specialLockLogService.list(queryWrapper);
-    	if(CollectionUtils.isNotEmpty(list)){
-    		for(SpecialLockLog log:list){
-    			Map<String,Object> parm = new HashMap<>();
-				parm.put("userId", log.getCreateBy());
-				SysUser loginUser =  specialService.getUserInfo(parm);
-				if(null != loginUser){
-					log.setNickName(loginUser.getNickName());
-				}else{
-					log.setNickName("");
-				}
-    		}
-    	}
-    	return R.ok(list);
+    public R<List<SpecialLockLog>> getLockLog(@RequestParam("specialId") @ApiParam(name = "specialId", value = "专题id") Long specialId) {
+        //查询锁定记录
+        QueryWrapper<SpecialLockLog> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("special_id", specialId);
+        queryWrapper.orderByDesc("create_time");
+        List<SpecialLockLog> list = specialLockLogService.list(queryWrapper);
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (SpecialLockLog log : list) {
+                Map<String, Object> parm = new HashMap<>();
+                parm.put("userId", log.getCreateBy());
+                SysUser loginUser = specialService.getUserInfo(parm);
+                if (null != loginUser) {
+                    log.setNickName(loginUser.getNickName());
+                } else {
+                    log.setNickName("");
+                }
+            }
+        }
+        return R.ok(list);
     }
-    
+
     @ApiOperation(value = "根据帐号查询昵称")
     @GetMapping("/getNickName")
-    public R<String> getNickName(@RequestParam("userName") @ApiParam(name = "userName", value ="帐号名称" ) String userName){
-    	//查询锁定记录
-    	Map<String,Object> parm = new HashMap<>();
-		parm.put("userName", userName);
-		parm.put("organizationId", SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
-		/*List<SysUser> userList = diagnosisMapper.selectUserById(parm);
-		String nickName = "";
-		if(CollectionUtils.isNotEmpty(userList)){
-			 nickName = userList.get(0).getNickName();
-		}*/
-//		List<SysUser> userList =  diagnosisService.getUserInfo(parm);
-		String nickName = "";
-		SysUser loginUser =  specialService.getUserInfo(parm);
-		if(null != loginUser){
-			 nickName = loginUser.getNickName();
-		}
-    	return R.ok(nickName);
+    public R<String> getNickName(@RequestParam("userName") @ApiParam(name = "userName", value = "帐号名称") String userName) {
+        //查询锁定记录
+        Map<String, Object> parm = new HashMap<>();
+        parm.put("userName", userName);
+        parm.put("organizationId", SecurityUtils.getLoginUser().getSysUser().getOrganizationId());
+        String nickName = "";
+        SysUser loginUser = specialService.getUserInfo(parm);
+        if (null != loginUser) {
+            nickName = loginUser.getNickName();
+        }
+        return R.ok(nickName);
+    }
+
+    @ApiOperation(value = "已归档专题列表")
+    @PostMapping("/archived-list")
+    public R<PageResponse<SpecialListQueryOut>> archivedList(@RequestBody @Validated SpecialListQueryIn req) {
+        PageResponse<SpecialListQueryOut> resp = specialService.getSpecialArchivedList(req);
+        return R.ok(resp);
     }
 
 }

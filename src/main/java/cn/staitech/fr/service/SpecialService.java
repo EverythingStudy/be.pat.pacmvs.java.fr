@@ -44,4 +44,5 @@ public interface SpecialService extends IService<Special> {
     R<Special> getInfoById(Long specialId);
     
     public SysUser getUserInfo(Map<String,Object> parm);
+    PageResponse<SpecialListQueryOut> getSpecialArchivedList(SpecialListQueryIn req);
 }

@@ -30,7 +30,7 @@ public class SpecialsQueryIn extends PageRequest {
     @ApiModelProperty(value = "染色类型")
     private Integer colorType;
 
-    @ApiModelProperty(value = "状态(0待启动，1进行中，2暂停，3已完成，4锁定)")
+    @ApiModelProperty(value = "状态(0待启动，1进行中，2暂停，3已完成，4锁定,5解锁,6归档)")
     private Integer status;
 
     @ApiModelProperty(value = "专题名称")

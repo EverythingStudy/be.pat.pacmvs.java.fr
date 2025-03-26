@@ -61,6 +61,7 @@ public class Special implements Serializable {
     private String delFlag;
 
     @ApiModelProperty(value = "机构id")
+
     private Long organizationId;
 
     @ApiModelProperty(value = "对照组")
