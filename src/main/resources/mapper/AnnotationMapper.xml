@@ -295,7 +295,7 @@
             <if test="updateBy != null and updateBy != ''">
                 update_by = #{updateBy},
             </if>
-            <if test="categoryId != null and categoryId != ''">
+            <if test="categoryId != null">
                 category_id = #{categoryId},
             </if>
             update_time = now()
