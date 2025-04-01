@@ -7,6 +7,11 @@ import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactor
 import org.springframework.stereotype.Component;
 
 
+/**
+ *  @author staitech
+ *  @since : 2024/07/18
+ * @version :v0.0.1
+ */
 @Component
 public class InitializinConfig implements InitializingBean {
     @Autowired
