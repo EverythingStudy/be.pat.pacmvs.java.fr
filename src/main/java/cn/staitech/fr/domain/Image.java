@@ -177,7 +177,7 @@ public class Image extends BaseEntity {
     @ApiModelProperty(value = "动物号")
     private String animalCode;
     @ApiModelProperty(value = "蜡块号")
-    private Integer waxCode;
+    private String waxCode;
     @ApiModelProperty(value = "组别号")
     private String groupCode;
     @ApiModelProperty(value = "性别（M；F）")
