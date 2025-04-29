@@ -26,6 +26,7 @@ spring:
         namespace: @nacosNamespace@
         # nacos group
         group: @nacosGroup@
+       # register-enabled: false
       config:
         # 配置中心地址
         server-addr: @serverAddr@
