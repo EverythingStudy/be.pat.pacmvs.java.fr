@@ -28,7 +28,7 @@ public class SlideListQueryOut {
     private String groupCode;
     
     @ApiModelProperty(value = "蜡块编号")
-    private Integer waxCode;
+    private String waxCode;
 
     @ApiModelProperty(value="动物编号")
     private String animalCode;
