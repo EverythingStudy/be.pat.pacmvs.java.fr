@@ -1,38 +1,38 @@
 package cn.staitech.fr.service;
 
-import cn.staitech.common.core.domain.PageResponse;
+import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Slide;
-import cn.staitech.fr.domain.in.ChoiceSaveInVo;
-import cn.staitech.fr.domain.in.SlideListQueryIn;
-import cn.staitech.fr.domain.out.SlideListQueryOut;
-import cn.staitech.fr.domain.out.SlideSelectBy;
+import cn.staitech.fr.vo.project.ChoiceImagePageReq;
+import cn.staitech.fr.vo.project.ProjectImageVo;
+import cn.staitech.fr.vo.project.slide.SlidePageReq;
+import cn.staitech.fr.vo.project.ImageVO;
+import cn.staitech.fr.vo.project.slide.SlidePageVo;
+import cn.staitech.fr.vo.project.slide.SlideDetailVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
 * @author admin
-* @description 针对表【fr_slide(专题选片表)】的数据库操作Service
+* @description 针对表【fr_slide(项目选片表)】的数据库操作Service
 * @createDate 2024-03-29 13:33:37
 */
 public interface SlideService extends IService<Slide> {
 
-    R choiceSave(ChoiceSaveInVo choiceSaveInVo);
+    R<CustomPage<SlidePageVo>> page(SlidePageReq req, boolean isPageConfigSlide, boolean isAccessPermission);
 
-    PageResponse<SlideListQueryOut> slideListQuery(SlideListQueryIn req);
+    R<CustomPage<ImageVO>> choiceImageList(ChoiceImagePageReq image);
 
-    HashMap<String, SlideListQueryOut> slideAdjacent(SlideListQueryIn req);
+    R deleteSlide(Long projectId, List<Long> slideIds);
 
-    /**
-     * 查询切片、图片信息接口
-     *
-     * @param slideId 切片id
-     * @return
-     */
-    SlideSelectBy pageImageCsvListVOBy(Long slideId);
+    R choiceSave(ProjectImageVo choiceSaveInVo);
 
-    R deleteById(Long slideId);
-    
-    R deleteAll(Long specialId,Long slideId);
+    R choiceAll(Long projectId) throws Exception;
+
+    HashMap<String, SlidePageVo> slideAdjacent(SlidePageReq req);
+
+    SlideDetailVo getSlideInfo(Long slideId);
+
 }

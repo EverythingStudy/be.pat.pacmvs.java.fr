@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.ProjectMapper">
+
+    <select id="pageProject"
+            resultType="cn.staitech.fr.vo.project.ProjectPageVo">
+        select distinct fs.special_id as projectId, tt.topic_name, fs.color_type,fs.special_name as projectName,fs.trial_id, ts.name speciesName,
+        ts.name_en speciesNameEn, fs.status, fs.create_time,fs.create_by,su.user_name createName,fs.principal,user.user_name principalName,fs.update_time
+                        ,fs.update_time as recoveryTime
+        from fr_special fs
+        left join tb_topic tt on fs.topic_id = tt.topic_id
+        left join sys_user su on fs.create_by = su.user_id
+        left join sys_user user on fs.principal = user.user_id
+        left join tb_species ts on fs.species_id = ts.species_id
+        left join fr_special_member fsm on fs.special_id = fsm.special_id
+        and fsm.del_flag = '0'
+        and ts.organization_id = #{params.organizationId}
+        where fs.del_flag = #{params.delFlag}
+        and fs.organization_id = #{params.organizationId}
+        and fs.is_permanent_del = 0
+        <if test="params.topicName != null and params.topicName != ''">
+            and tt.topic_name like concat('%', #{params.topicName}, '%')
+        </if>
+        <if test="params.projectName != null and params.projectName != ''">
+            and fs.special_name like concat('%', #{params.projectName}, '%')
+        </if>
+        <if test="params.trialId != null ">
+            and fs.trial_id = #{params.trialId}
+        </if>
+        <if test="params.userId != null ">
+            and fsm.user_id = #{params.userId}
+        </if>
+        <if test="params.speciesId != null and params.speciesId != ''">
+            and fs.species_id = #{params.speciesId}
+        </if>
+        -- 创建状态集合查询条件
+        <if test="params.status != null and params.status.size > 0">
+            and fs.status in
+            <foreach item="item" index="index" collection="params.status"
+                     open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="params.colorType!= null and params.colorType != ''">
+            and fs.color_type = #{params.colorType}
+        </if>
+        <if test="params.principalName != null and params.principalName != ''">
+            and user.user_name like concat('%', #{params.principalName}, '%')
+        </if>
+        <if test="params.createTimeParams != null">
+            <if test="params.createTimeParams.beginTime != null ">
+                <!-- 开始时间检索 -->
+                AND date_format(fs.create_time,'%Y%m%d') &gt;= date_format(#{params.createTimeParams.beginTime},'%Y%m%d')
+            </if>
+            <if test="params.createTimeParams.endTime != null ">
+                <!-- 结束时间检索 -->
+                AND date_format(fs.create_time,'%Y%m%d') &lt;= date_format(#{params.createTimeParams.endTime},'%Y%m%d')
+            </if>
+        </if>
+        <if test="params.recoveryTimeParams != null">
+            <if test="params.recoveryTimeParams.beginTime != null ">
+                <!-- 开始时间检索 -->
+                AND date_format(fs.update_time,'%Y%m%d') &gt;= date_format(#{params.recoveryTimeParams.beginTime},'%Y%m%d')
+            </if>
+            <if test="params.recoveryTimeParams.endTime != null ">
+                <!-- 结束时间检索 -->
+                AND date_format(fs.update_time,'%Y%m%d') &lt;= date_format(#{params.recoveryTimeParams.endTime},'%Y%m%d')
+            </if>
+        </if>
+        <if test="params.expireTimeParams != null">
+            <if test="params.expireTimeParams.beginTime != null ">
+                <!-- 开始时间检索 -->
+                AND date_format(fs.update_time,'%Y%m%d') &gt;= date_format(#{params.expireTimeParams.beginTime},'%Y%m%d')
+            </if>
+            <if test="params.expireTimeParams.endTime != null ">
+                <!-- 结束时间检索 -->
+                AND date_format(fs.update_time,'%Y%m%d') &lt;= date_format(#{params.expireTimeParams.endTime},'%Y%m%d')
+            </if>
+        </if>
+        order by fs.create_time desc
+    </select>
+
+</mapper>

@@ -1,247 +1,298 @@
 package cn.staitech.fr.service.impl;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.*;
 import java.util.stream.Collectors;
-
 import javax.annotation.Resource;
 
+import cn.staitech.common.core.domain.CustomPage;
+import cn.staitech.fr.domain.Image;
+import cn.staitech.fr.domain.Project;
+import cn.staitech.fr.domain.ProjectMember;
+import cn.staitech.fr.vo.project.ChoiceImagePageReq;
+import cn.staitech.fr.mapper.*;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.github.pagehelper.Page;
-import com.github.pagehelper.PageHelper;
-
 import cn.hutool.core.util.ObjectUtil;
-import cn.staitech.common.core.domain.PageResponse;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
-import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.constant.Constants;
 import cn.staitech.fr.domain.Slide;
-import cn.staitech.fr.domain.in.ChoiceSaveInVo;
-import cn.staitech.fr.domain.in.SlideListQueryIn;
-import cn.staitech.fr.domain.out.ImageListOutVO;
-import cn.staitech.fr.domain.out.SlideListQueryOut;
-import cn.staitech.fr.domain.out.SlideSelectBy;
-import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.SlideMapper;
-import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
-import cn.staitech.fr.mapper.SpecialMapper;
+import cn.staitech.fr.vo.project.ProjectImageVo;
+import cn.staitech.fr.vo.project.slide.SlidePageReq;
+import cn.staitech.fr.vo.project.ImageVO;
+import cn.staitech.fr.vo.project.slide.SlidePageVo;
+import cn.staitech.fr.vo.project.slide.SlideDetailVo;
 import cn.staitech.fr.service.SlideService;
 import lombok.extern.slf4j.Slf4j;
 
+import static cn.staitech.common.security.utils.SecurityUtils.isAdmin;
+
 /**
- * @author admin
- * @description 针对表【fr_slide(专题选片表)】的数据库操作Service实现
- * @createDate 2024-03-29 13:33:37
+ * @author mugw
+ * @version 2.6.0
+ * @description 项目切片管理
+ * @date 2025/5/14 13:44:14
  */
 @Service
 @Slf4j
-public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide>
-implements SlideService {
+public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements SlideService {
 
 	@Resource
-	private SpecialMapper specialMapper;
-
+	private ProjectMapper projectMapper;
 	@Resource
-	private AnnotationMapper annotationMapper;
-
+	private ProjectMemberMapper projectMemberMapper;
 	@Resource
-	private SpecialAnnotationRelMapper specialAnnotationRelMapper;
+	private ImageMapper imageMapper;
+
+
+
+	@Override
+	public R<CustomPage<SlidePageVo>> page(SlidePageReq req, boolean isPageConfigSlide, boolean isAccessPermission) {
+		log.info("项目下切片列表查询接口开始，请求参数: {}", req);
+
+		Long userId = SecurityUtils.getUserId();
+		Project project = projectMapper.selectById(req.getProjectId());
+
+		if (project == null) {
+			log.warn("项目不存在，projectId: {}", req.getProjectId());
+			return R.fail("您没有该项目的访问权限，请联系该项目负责人或机构管理员");
+		}
+
+		if (isAccessPermission){
+			// 检查用户是否为成员
+			long isMember = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery()
+					.eq(ProjectMember::getProjectId, req.getProjectId())
+					.eq(ProjectMember::getUserId, userId)
+					.eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
+
+			// 权限校验
+			if (!hasAccessPermission(project, userId, isMember)) {
+				log.warn("用户无访问权限，userId: {}, projectId: {}", userId, req.getProjectId());
+				return R.fail("您没有该项目的访问权限，请联系该项目负责人或机构管理员");
+			}
+		}
+
+		// 检查项目状态
+		Integer status = project.getStatus();
+		if (!isPageConfigSlide) {
+			if (status != Constants.STATUS_RUNNING) {
+				log.warn("项目状态不可访问，projectId: {}, status: {}", req.getProjectId(), status);
+				return R.fail("非进行中的项目不可阅片，请联系该项目负责人或机构管理员");
+			}
+		}
+		// 分页查询
+		CustomPage<SlidePageVo> page = new CustomPage<>(req);
+		req.setCurrentUserId("'"+userId+"'");
+		baseMapper.page(page, req);
+		page.convert(this::renderSlide);
+		log.info("项目下切片列表查询接口结束");
+		return R.ok(page);
+	}
+
+	private SlidePageVo renderSlide(SlidePageVo slide){
+		List<Long> viewers = slide.getViewers();
+		if (CollectionUtils.isNotEmpty(viewers) && !viewers.contains(SecurityUtils.getUserId())){
+			slide.setIsView(true);
+		}
+		return slide;
+	}
+
+	/**
+	 * 判断用户是否有访问权限
+	 */
+	private boolean hasAccessPermission(Project project, Long userId, long isMember) {
+		return project.getOrganizationId() == SecurityUtils.getOrganizationId()
+				|| userId == project.getPrincipal()
+				|| SecurityUtils.isOrgAdmin()
+				|| isMember > 0;
+	}
+
+	@Override
+	public R<CustomPage<ImageVO>> choiceImageList(ChoiceImagePageReq image) {
+		Objects.requireNonNull(image, "请求参数不能为空");
+
+		R validationResult = validateProjectStatus(image.getProjectId());
+		if (validationResult != null) {
+			return validationResult;
+		}
+
+		if (!isAdmin(SecurityUtils.getUserId())) {
+			image.setOrgId(SecurityUtils.getOrganizationId());
+		}
+
+		CustomPage<ImageVO> page = new CustomPage<>(image);
+		imageMapper.choiceImageList(page, image);
+		return R.ok(page);
+	}
 
 	@Override
 	@Transactional(rollbackFor = Exception.class)
-	public R choiceSave(ChoiceSaveInVo req) {
-		log.info("切片选择保存接口开始：");
-		List<Slide> arrayList = new ArrayList<>();
-		for (ImageListOutVO image : req.getImages()) {
+	public R choiceSave(ProjectImageVo req) {
+		Objects.requireNonNull(req, "请求参数不能为空");
+		List<ImageVO> images = req.getImages();
+		Objects.requireNonNull(images, "图片列表不能为空");
+
+		log.info("切片选择保存接口开始，用户ID：{}，ProjectId：{}", SecurityUtils.getUserId(), req.getProjectId());
+
+		R validationResult = validateProjectStatus(req.getProjectId());
+		if (validationResult != null) {
+			return validationResult;
+		}
+
+		List<Slide> slidesToSave = new ArrayList<>();
+		Long userId = SecurityUtils.getUserId();
+		List<Long> imageIds = imageIdsFilter(images.stream().map(ImageVO::getImageId).collect(Collectors.toList()), req.getProjectId());
+		for (Long imageId : imageIds) {
 			Slide slide = new Slide();
-			slide.setCreateBy(SecurityUtils.getUserId());
+			slide.setCreateBy(userId);
 			slide.setCreateTime(new Date());
-			slide.setImageId(image.getImageId());
-			slide.setSpecialId(req.getSpecialId());
-			arrayList.add(slide);
+			slide.setImageId(imageId);
+			slide.setProjectId(req.getProjectId());
+			slidesToSave.add(slide);
 		}
-		saveBatch(arrayList);
+		saveBatch(slidesToSave);
 		return R.ok();
 	}
 
 	@Override
-	public PageResponse<SlideListQueryOut> slideListQuery(SlideListQueryIn req) {
-		log.info("专题下切片列表查询接口开始：");
-		PageResponse<SlideListQueryOut> pageResponse = new PageResponse<>();
-		Page<SlideListQueryOut> page = PageHelper.startPage(req.getPageNum(), req.getPageSize());
-		List<SlideListQueryOut> resp = this.baseMapper.slideListQuery(req);
-		pageResponse.setTotal(page.getTotal());
-		pageResponse.setList(resp);
-		pageResponse.setPages(page.getPages());
-		return pageResponse;
-	}
+	public R choiceAll(Long projectId) throws Exception{
 
-	@Override
-	public HashMap<String, SlideListQueryOut> slideAdjacent(SlideListQueryIn req){
+		R validationResult = validateProjectStatus(projectId);
 
-		List<SlideListQueryOut> waxList = this.baseMapper.slideListQuery(req);
-		// 根据下标查询出附近的数据
-		AtomicInteger index = new AtomicInteger(0);
-		waxList.stream()
-				//指定匹配逻辑
-				.filter(s -> {
-					//每比对一个元素，数值加1
-					index.getAndIncrement();
-					return s.getSlideId().equals(req.getSlideId());
-				}).findFirst();
-		HashMap<String, SlideListQueryOut> map = new HashMap<>();
-
-		int indexsx = index.get() - 1;
-		if (waxList.size() > 0) {
-			if (indexsx == 0) {
-				if (waxList.size() > 1) {
-					map.put("prev", null);
-					Long slideId = waxList.get(indexsx + 1).getSlideId();
-					SlideListQueryOut slideSelectBy = baseMapper.slideQueryBy(slideId);
-					map.put("next", slideSelectBy);
-				} else {
-					map.put("prev", null);
-					map.put("next", null);
-				}
-			} else if (waxList.size() - 1 == indexsx) {
-				Long slideId = waxList.get(indexsx - 1).getSlideId();
-				SlideListQueryOut slideSelectBy = baseMapper.slideQueryBy(slideId);
-				map.put("prev", slideSelectBy);
-				map.put("next", null);
-			} else {
-				Long slideIdPrev = waxList.get(indexsx - 1).getSlideId();
-				SlideListQueryOut slideSelectByPrev = baseMapper.slideQueryBy(slideIdPrev);
-				map.put("prev", slideSelectByPrev);
-				Long slideIdNext = waxList.get(indexsx + 1).getSlideId();
-				SlideListQueryOut slideSelectByNext = baseMapper.slideQueryBy(slideIdNext);
-				map.put("next", slideSelectByNext);
-			}
-		} else {
-			map.put("prev", null);
-			map.put("next", null);
+		if (validationResult != null) {
+			return validationResult;
 		}
-		return map;
-
-	}
-
-	@Override
-	public SlideSelectBy pageImageCsvListVOBy(Long slideId) {
-		return this.baseMapper.pageImageCsvListVOBy(slideId);
-	}
-
-	@Override
-	public R deleteById(Long slideId) {
-		log.info("删除切片接口开始：");
-		Slide slide = new Slide();
-		slide.setSlideId(slideId);
-		slide.setDelFlag(CommonConstant.NUMBER_1);
-		this.baseMapper.updateById(slide);
+		Project project = projectMapper.selectById(projectId);
+		Long topicId = project.getTopicId();
+		List<Image> images = imageMapper.selectList(Wrappers.<Image>lambdaQuery().eq(Image::getTopicId, topicId)
+				.eq(Image::getStatus, Constants.IMAGE_STATUS_ENABLE)
+				.eq(Image::getAnalyzeStatus, Constants.IMAGE_NAME_PARSE_SUCC));
+		List<Slide> slidesToSave = new ArrayList<>();
+		Long userId = SecurityUtils.getUserId();
+		List<Long> imageIds = imageIdsFilter(images.stream().map(Image::getImageId).collect(Collectors.toList()), projectId);
+		for (Long imageId : imageIds) {
+			Slide slide = new Slide();
+			slide.setCreateBy(userId);
+			slide.setCreateTime(new Date());
+			slide.setImageId(imageId);
+			slide.setProjectId(projectId);
+			slidesToSave.add(slide);
+		}
+		saveBatch(slidesToSave);
 		return R.ok();
 	}
 
+	private List<Long> imageIdsFilter(List<Long> imageIds,  Long projectId) {
+		List<Slide> slides = list(Wrappers.<Slide>lambdaQuery().eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL)
+				.eq(Slide::getProjectId, projectId)
+				.in(Slide::getImageId, imageIds).select(Slide::getImageId));
+		if (CollectionUtils.isNotEmpty(slides)) {
+			List<Long> temp = slides.stream().map(Slide::getImageId).collect(Collectors.toList());
+			imageIds.removeAll(temp);
+		}
+		return imageIds;
+	}
 
 	@Override
-	public R deleteAll(Long specialId,Long slideId) {
+	public R deleteSlide(Long projectId, List<Long> slideIds) {
 		log.info("删除全部切片接口开始：");
-		//fr_slide 切片删除
-		QueryWrapper<Slide> queryWrapper = new QueryWrapper<>();
-		queryWrapper.eq(ObjectUtil.isNotEmpty(specialId),"special_id",specialId);
-		queryWrapper.eq(ObjectUtil.isNotEmpty(slideId),"slide_id",slideId);
-		//逻辑删除状态（0存在，1删除）
-		queryWrapper.eq("del_flag",CommonConstant.NUMBER_0);
-		List<Slide> slideList = list(queryWrapper);
-		if(CollectionUtils.isNotEmpty(slideList)){
-			//当前专题
-			UpdateWrapper<Slide> updateWrapper = new UpdateWrapper<>();
-			updateWrapper.eq(ObjectUtil.isNotEmpty(specialId),"special_id", specialId);
-			updateWrapper.eq(ObjectUtil.isNotEmpty(slideId),"slide_id",slideId);
-			//修改状态
-			Slide sd = new Slide();
-			sd.setDelFlag("1");
-			update(sd, updateWrapper);
-
-			//slideId集合
-//			List<Long> slideIdList = slideList.stream().map(Slide::getSlideId).collect(Collectors.toList());
-			//fr_measure表数据处理
-//			QueryWrapper<Measure> queryAmWrapper = new QueryWrapper<>();
-//			queryAmWrapper.in("single_slide_id",slideList);
-//			List<Measure> amList = measureMapper.selectList(queryAmWrapper);
-//			if(CollectionUtils.isNotEmpty(amList)){
-//				QueryWrapper<Measure> wrapper = new QueryWrapper<>();
-//				wrapper.in("single_slide_id", slideList);
-//				measureMapper.delete(wrapper);
-//			}
-
-
-			//postgre数据处理
-//			int batchSize = 2000;
-//			//fr_annotation
-//			QueryWrapper<Contour> queryAnnowrapper = new QueryWrapper<>();
-//			queryAnnowrapper.in("slide_id",slideIdList);
-//			List<Contour> annoList = annotationMapper.selectList(queryAnnowrapper);
-//			if(CollectionUtils.isNotEmpty(annoList)){
-//				List<Long> annoIdList = annoList.stream().map(Contour::getAnnotationId).collect(Collectors.toList());
-//				//数据处理
-//				// 如果待删除的singleSlideId少于或等于batchSize，则直接一次性删除
-//				if (CollectionUtils.isNotEmpty(annoIdList)) {
-//					if (annoIdList.size() <= batchSize) {
-//						annotationMapper.deleteBatchIds(annoIdList);
-//					}else{
-//						// 分批次删除，每次处理batchSize条
-//						for (int i = 0; i < annoIdList.size(); i += batchSize) {
-//							int end = Math.min(i + batchSize, annoIdList.size()); // 防止数组越界
-//							List<Long> idsBatch = annoIdList.subList(i, end); // 获取当前批次的ID
-//							annotationMapper.deleteBatchIds(idsBatch);
-//						}
-//					}
-//				}
-//			}
-//			//查询专题和fr_ai_annotation_X管理
-//			QueryWrapper<SpecialAnnotationRel> specialQueryWrapper = new QueryWrapper<>();
-//			specialQueryWrapper.in("special_id",specialId);
-//			SpecialAnnotationRel annotationRel = specialAnnotationRelMapper.selectOne(specialQueryWrapper);
-//			Long aiSequenceNumber = annotationRel.getSequenceNumber();
-//			if(null != aiSequenceNumber){
-//				//fr_ai_annotation_X
-//				Contour annotation = new Contour();
-//				annotation.setSequenceNumber(aiSequenceNumber);
-//				annotation.setSingleSlideIdList(slideList);
-//				List<Contour> aiAnnoList = annotationMapper.aiSelectListBy(annotation);
-//				// 如果待删除的singleSlideId少于或等于batchSize，则直接一次性删除
-//				if (CollectionUtils.isNotEmpty(aiAnnoList)) {
-//					List<Long> annoIdList = aiAnnoList.stream().map(Contour::getContourId).collect(Collectors.toList());
-//					if (aiAnnoList.size() <= batchSize) {
-//						Map<String,Object> parm = new HashMap<String, Object>();
-//						parm.put("list", annoIdList);
-//						parm.put("sequenceNumber", aiSequenceNumber);
-//						contourMapper.batchDeleteBySsIds(parm);
-//					}else{
-//						// 分批次删除，每次处理batchSize条
-//						for (int i = 0; i < annoIdList.size(); i += batchSize) {
-//							int end = Math.min(i + batchSize, annoIdList.size()); // 防止数组越界
-//							List<Long> idsBatch = annoIdList.subList(i, end); // 获取当前批次的ID
-//							Map<String,Object> parm = new HashMap<String, Object>();
-//							parm.put("list", idsBatch);
-//							parm.put("sequenceNumber", aiSequenceNumber);
-//							contourMapper.batchDeleteBySsIds(parm);
-//						}
-//					}
-//				}
-//			}
+		R validationResult = validateProjectStatus(projectId);
+		if (validationResult != null) {
+			return validationResult;
 		}
+		List<Slide> slideList = list(Wrappers.<Slide>lambdaQuery().eq(ObjectUtil.isNotEmpty(projectId),Slide::getProjectId,projectId)
+				.in(CollectionUtils.isNotEmpty(slideIds),Slide::getSlideId,slideIds)
+				.eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).select(Slide::getSlideId));
+		if(CollectionUtils.isNotEmpty(slideList)){
+			slideList.forEach(slide -> {slide.setDelFlag(cn.staitech.common.core.constant.Constants.DEL_FLAG_DELETED);});
+			updateBatchById(slideList);
+		}
+		//todo 删除标注数据
 		return R.ok();
-
 	}
 
+	/**
+	 * 验证项目状态是否允许配置
+	 *
+	 * @param projectId 项目对象
+	 * @return 如果状态不合法，返回错误 R.fail；否则继续执行
+	 */
+	private R validateProjectStatus(Long projectId) {
+		Project project = projectMapper.selectById(projectId);
+		Integer status = project.getStatus();
+
+		if (status == Constants.STATUS_RUNNING) {
+			return R.fail("项目状态为“进行中”时，不能配置项目基础信息和切片");
+		}
+
+		if (status == Constants.STATUS_COMPLETED) {
+			return R.fail("项目状态为“完成”时，任何用户不能再配置项目任何信息");
+		}
+
+		if (status == Constants.STATUS_PAUSED
+				&& !(SecurityUtils.getUserId() == project.getPrincipal() || SecurityUtils.isOrgAdmin())) {
+			return R.fail("项目状态为“暂停”时，机构管理员和项目负责人可以配置项目基础信息");
+		}
+
+		return null; // 表示通过校验
+	}
+
+
+	@Override
+	public HashMap<String, SlidePageVo> slideAdjacent(SlidePageReq req) {
+		List<SlidePageVo> waxList = baseMapper.slideListQuery(req);
+
+		// 防止 waxList 为 null
+		if (waxList == null) {
+			waxList = Collections.emptyList();
+		}
+
+		int index = -1;
+		Long targetSlideId = req.getSlideId();
+
+		// 查找目标 slideId 所在位置
+		for (int i = 0; i < waxList.size(); i++) {
+			if (targetSlideId.equals(waxList.get(i).getSlideId())) {
+				index = i;
+				break;
+			}
+		}
+
+		HashMap<String, SlidePageVo> map = new HashMap<>();
+		map.put("prev", null);
+		map.put("next", null);
+
+		if (index != -1) {
+			if (index > 0) {
+				map.put("prev", waxList.get(index - 1));
+			}
+			if (index < waxList.size() - 1) {
+				map.put("next", waxList.get(index + 1));
+			}
+		}
+
+		return map;
+	}
+
+	@Override
+	public SlideDetailVo getSlideInfo(Long slideId) {
+		SlideDetailVo slideInfo = baseMapper.getSlideInfo(slideId);
+		if (Objects.nonNull(slideInfo)){
+			List<Long> viewers = slideInfo.getViewers();
+			if (CollectionUtils.isNotEmpty(viewers) && !viewers.contains(SecurityUtils.getUserId())){
+				viewers.add(SecurityUtils.getUserId());
+			}
+			if (CollectionUtils.isEmpty(viewers)){
+				viewers = new ArrayList<>();
+				viewers.add(SecurityUtils.getUserId());
+			}
+			update(Wrappers.<Slide>lambdaUpdate().eq(Slide::getSlideId,slideId).set(Slide::getViewers, viewers, "typeHandler=com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"));
+		}
+		return slideInfo;
+	}
 
 }
 

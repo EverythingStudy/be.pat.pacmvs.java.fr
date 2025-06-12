@@ -2,18 +2,27 @@ package cn.staitech.fr.domain;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
- * 专题选片表
+ * 项目选片表
  * @TableName fr_slide
  */
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @TableName(value ="fr_slide")
 @Data
 public class Slide implements Serializable {
@@ -24,9 +33,10 @@ public class Slide implements Serializable {
     private Long slideId;
 
     /**
-     * 专题ID
+     * 项目ID
      */
-    private Long specialId;
+    @TableField(value ="special_id")
+    private Long projectId;
 
     private String description;
 
@@ -34,8 +44,6 @@ public class Slide implements Serializable {
      * 图像ID
      */
     private Long imageId;
-
-
 
     /**
      * 创建者
@@ -58,6 +66,10 @@ public class Slide implements Serializable {
      * 更新时间
      */
     private Date updateTime;
+
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    @ApiModelProperty(value = "已阅片用户")
+    private List<Long> viewers;
     
 
     @TableField(exist = false)
@@ -76,7 +88,7 @@ public class Slide implements Serializable {
         }
         Slide other = (Slide) that;
         return (this.getSlideId() == null ? other.getSlideId() == null : this.getSlideId().equals(other.getSlideId()))
-            && (this.getSpecialId() == null ? other.getSpecialId() == null : this.getSpecialId().equals(other.getSpecialId()))
+            && (this.getProjectId() == null ? other.getProjectId() == null : this.getProjectId().equals(other.getProjectId()))
             && (this.getImageId() == null ? other.getImageId() == null : this.getImageId().equals(other.getImageId()))
             && (this.getCreateBy() == null ? other.getCreateBy() == null : this.getCreateBy().equals(other.getCreateBy()))
             && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
@@ -89,7 +101,7 @@ public class Slide implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + ((getSlideId() == null) ? 0 : getSlideId().hashCode());
-        result = prime * result + ((getSpecialId() == null) ? 0 : getSpecialId().hashCode());
+        result = prime * result + ((getProjectId() == null) ? 0 : getProjectId().hashCode());
         result = prime * result + ((getImageId() == null) ? 0 : getImageId().hashCode());
         result = prime * result + ((getCreateBy() == null) ? 0 : getCreateBy().hashCode());
         result = prime * result + ((getCreateTime() == null) ? 0 : getCreateTime().hashCode());
@@ -105,7 +117,7 @@ public class Slide implements Serializable {
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
         sb.append(", slideId=").append(slideId);
-        sb.append(", specialId=").append(specialId);
+        sb.append(", specialId=").append(projectId);
         sb.append(", imageId=").append(imageId);
         sb.append(", createBy=").append(createBy);
         sb.append(", createTime=").append(createTime);

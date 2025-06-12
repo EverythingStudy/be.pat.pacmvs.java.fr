@@ -27,9 +27,7 @@
         where special_id = #{specialId}
     </select>
     
-    
-    <select id="slideListQuery" parameterType="cn.staitech.fr.domain.in.SlideListQueryIn"
-            resultType="cn.staitech.fr.domain.out.SlideListQueryOut">
+    <sql id = "slideList">
         select ti.thumb_url,
         ti.image_name fileName,
         ti.image_path,
@@ -49,55 +47,77 @@
         su.user_name createUser,
         fs.create_time,
         fs.description,
-        fs.slide_id
+        fs.slide_id,
+        fs.viewers
         from fr_slide fs
         left join tb_image ti on fs.image_id = ti.image_id
         left join sys_user su on fs.create_by = su.user_id
         <where>
-            fs.special_id = #{specialId}
+            fs.special_id = #{params.projectId}
             and fs.del_flag='0'
-            <if test="fileName != null and fileName != ''">
-                and ti.image_name like concat('%',#{fileName},'%')
+            <if test="params.fileName != null and params.fileName != ''">
+                and ti.image_name like concat('%',#{params.fileName},'%')
             </if>
-            <if test="animalCode != null and animalCode != ''">
-                and ti.animal_code like concat('%',#{animalCode},'%')
+            <if test="params.animalCode != null and params.animalCode != ''">
+                and ti.animal_code like concat('%',#{params.animalCode},'%')
             </if>
-            <if test="genderFlag != null and genderFlag != ''">
-                and ti.sex_flag = #{genderFlag}
+            <if test="params.description != null and params.description != ''">
+                and fs.description like concat('%',#{params.description},'%')
             </if>
-            <if test="groupCode != null and groupCode != ''">
-                and ti.group_code = #{groupCode}
+            <if test="params.genderFlag != null and params.genderFlag != ''">
+                and ti.sex_flag = #{params.genderFlag}
             </if>
-            <if test="waxCode != null and waxCode != ''">
-               <!--  and ti.wax_code like concat('%',#{waxCode},'%') -->
-                and ti.wax_code =  #{waxCode}
-            </if>
-            <if test="createBy != null and createBy != ''">
-                and su.user_name like concat('%',#{createBy},'%')
-            </if>
-            <if test="createTimeParams!=null and createTimeParams.size() > 0">
-                <if test="createTimeParams.beginTime != null "><!-- 开始时间检索 -->
-                    AND date_format(fs.create_time,'%Y%m%d') &gt;= date_format(#{createTimeParams.beginTime},'%Y%m%d')
+            <if test="params.isView != null">
+                <if test="params.isView">
+                    and JSON_CONTAINS(fs.viewers, ${params.currentUserId}, '$')
                 </if>
-                <if test="createTimeParams.endTime != null "><!-- 结束时间检索 -->
-                    AND date_format(fs.create_time,'%Y%m%d') &lt;= date_format(#{createTimeParams.endTime},'%Y%m%d')
+                <if test="!params.isView">
+                    and not JSON_CONTAINS(fs.viewers, ${params.currentUserId}, '$')
+                </if>
+            </if>
+            <if test="params.groupCode != null and params.groupCode != ''">
+                and ti.group_code = #{params.groupCode}
+            </if>
+            <if test="params.waxCode != null and params.waxCode != ''">
+                <!--  and ti.wax_code like concat('%',#{waxCode},'%') -->
+                and ti.wax_code =  #{params.waxCode}
+            </if>
+            <if test="params.createBy != null and params.createBy != ''">
+                and su.user_name like concat('%',#{params.createBy},'%')
+            </if>
+            <if test="params.createTimeParams!=null">
+                <if test="params.createTimeParams.beginTime != null "><!-- 开始时间检索 -->
+                    AND date_format(fs.create_time,'%Y%m%d') &gt;= date_format(#{params.createTimeParams.beginTime},'%Y%m%d')
+                </if>
+                <if test="params.createTimeParams.endTime != null "><!-- 结束时间检索 -->
+                    AND date_format(fs.create_time,'%Y%m%d') &lt;= date_format(#{params.createTimeParams.endTime},'%Y%m%d')
                 </if>
             </if>
         </where>
-	        <if test="sortField != null and sortField!=''">
-	            	order by ${sortField} ${sortType}
-	        </if>
-	        <!-- 阅片列表排序规则：
-		     1、根据切片编号由小到大排序，切片编号前几位是专题号是一样，
-		     2、之后是动物号，动物号前几位相同，从不同的数字开始由小到大排序。
-		     3、如果是相同动物号的图片则根据蜡块编号由小到大再排 -->
-	        <if test="sortField == null and sortField==''">
-	            order by topic_name asc,animal_code asc,wax_code asc
-	        </if>
+        <if test="params.sortField != null and params.sortField!=''">
+            order by ${params.sortField} ${params.sortType}
+        </if>
+        <!-- 阅片列表排序规则：
+         1、根据切片编号由小到大排序，切片编号前几位是项目号是一样，
+         2、之后是动物号，动物号前几位相同，从不同的数字开始由小到大排序。
+         3、如果是相同动物号的图片则根据蜡块编号由小到大再排 -->
+        <if test="params.sortField == null and params.sortField==''">
+            order by ti.animal_code asc,ti.wax_code asc,ti.group_code asc,ti.sex_flag asc
+        </if>
+    </sql>
+
+    <select id="slideListQuery" parameterType="cn.staitech.fr.vo.project.slide.SlidePageReq"
+            resultType="cn.staitech.fr.vo.project.slide.SlidePageVo">
+        <include refid="slideList"/>
+    </select>
+
+    <select id="page" parameterType="cn.staitech.fr.vo.project.slide.SlidePageReq"
+            resultType="cn.staitech.fr.vo.project.slide.SlidePageVo">
+        <include refid="slideList"/>
     </select>
 
     <select id="slideQueryBy" parameterType="long"
-            resultType="cn.staitech.fr.domain.out.SlideListQueryOut">
+            resultType="cn.staitech.fr.vo.project.slide.SlidePageVo">
         select ti.thumb_url,
         ti.image_name fileName,
         ti.group_code,
@@ -114,32 +134,6 @@
         where fs.slide_id = #{slideId}
     </select>
     
-    <select id="getAlgorithmImage" parameterType="map" resultType="cn.staitech.fr.domain.out.AlgorithmImageOut">
-		SELECT
-			t1.slide_id,
-			t1.image_id,
-			t2.image_url,
-			t2.image_path 
-		FROM
-			fr_slide t1
-			LEFT JOIN tb_image t2 ON t1.image_id = t2.image_id 
-		<where>
-			<if test="specialId != null">
-                AND t1.special_id = #{specialId}
-            </if>
-            <if test="analyzeStatus != null">
-                AND t2.analyze_status = #{analyzeStatus}
-            </if>
-			 <if test="list != null and list.size() >0 ">
-	            AND t1.slide_id in
-	            <foreach item="item" collection="list" separator="," open="(" close=")" index="">
-	                #{item}
-	            </foreach>
-        	</if>
-        	and t1.del_flag = '0'
-		</where>
-		ORDER BY	t1.create_time ASC
-    </select>
 
     <select id="selectListByWax" resultType="cn.staitech.fr.domain.Slide">
         select fs.slide_id,t2.wax_code
@@ -152,8 +146,8 @@
     </select>
     
 
-    <select id="pageImageCsvListVOBy" parameterType="long"
-            resultType="cn.staitech.fr.domain.out.SlideSelectBy">
+    <select id="getSlideInfo" parameterType="long"
+            resultType="cn.staitech.fr.vo.project.slide.SlideDetailVo">
         select 
         s.slide_id,
         s.special_id,
@@ -161,7 +155,7 @@
         m.group_code,
         m.wax_code,
         m.animal_code,
-        m.sex_flag gender_flag,
+        m.sex_flag as gender,
         s.description,
         s.del_flag,
         s.create_by,
@@ -179,7 +173,8 @@
         m.source_lens,
         m.image_path,
         m.thumb_url,
-        m.image_name
+        m.image_name,
+        s.viewers
         from fr_slide s
         left join tb_image m on m.image_id = s.image_id
         <where>

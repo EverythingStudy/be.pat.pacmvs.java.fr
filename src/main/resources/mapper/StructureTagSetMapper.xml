@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.StructureTagSetMapper">
+
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.StructureTagSet">
+            <id property="structureTagSetId" column="structure_tag_set_id" jdbcType="BIGINT"/>
+            <result property="structureTagSetName" column="structure_tag_set_name" jdbcType="VARCHAR"/>
+            <result property="structureTagSetNameEn" column="structure_tag_set_name_en" jdbcType="VARCHAR"/>
+            <result property="speciesId" column="species_id" jdbcType="VARCHAR"/>
+            <result property="organCode" column="organ_code" jdbcType="VARCHAR"/>
+            <result property="organizationId" column="organization_id" jdbcType="BIGINT"/>
+            <result property="delFlag" column="del_flag" jdbcType="TINYINT"/>
+            <result property="type" column="type" jdbcType="TINYINT"/>
+            <result property="createBy" column="create_by" jdbcType="BIGINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateBy" column="update_by" jdbcType="BIGINT"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        structure_tag_set_id,structure_tag_set_name,structure_tag_set_name_en,
+        species_id,organ_code,organization_id,
+        del_flag,type,create_by,
+        create_time,update_by,update_time
+    </sql>
+
+    <sql id = "listStructureTagSet">
+        select t.*,
+        u.nick_name as createName,
+        b.tags,
+        s.name      as speciesName,
+        s.name_en   as speciesNameEn,
+        o.name      as organName,
+        o.name_en   as organNameEn
+        from tb_structure_tag_set t
+        left join tb_organ o on t.organ_code = o.organ_code and o.organization_id = t.organization_id and t.species_id = o.species_id
+        left join tb_species s on t.species_id = s.species_id and s.organization_id = t.organization_id
+        left join sys_user u on t.create_by = u.user_id
+        left join (select a.structure_tag_set_id, count(1) as tags
+        from tb_structure_tag a
+        where a.del_flag = 0
+        group by a.structure_tag_set_id) b on b.structure_tag_set_id = t.structure_tag_set_id
+        <where>
+            t.del_flag = 0
+            <if test="params.speciesId != null and params.speciesId != ''">
+                and t.species_id = #{params.speciesId}
+            </if>
+            <if test="params.organCode != null and params.organCode != ''">
+                and t.organ_code = #{params.organCode}
+            </if>
+<!--            <if test="params.speciesName != null and params.speciesName != ''">-->
+<!--                and s.name like concat('%',#{params.speciesName},'%')-->
+<!--            </if>-->
+            <if test="params.createTimeParams != null">
+                <if test="params.createTimeParams.beginTime != null ">
+                    <!-- 开始时间检索 -->
+                    AND date_format(t.create_time,'%Y%m%d') &gt;= date_format(#{params.createTimeParams.beginTime},'%Y%m%d')
+                </if>
+                <if test="params.createTimeParams.endTime != null ">
+                    <!-- 结束时间检索 -->
+                    AND date_format(t.create_time,'%Y%m%d') &lt;= date_format(#{params.createTimeParams.endTime},'%Y%m%d')
+                </if>
+            </if>
+            <!--添加组织机构查询条件-->
+            <if test="params.organizationId != null">
+                and t.organization_id = #{params.organizationId}
+            </if>
+        </where>
+    </sql>
+
+    <select id="pageStructureTagSet" resultType="cn.staitech.fr.vo.structure.StructureTagSetVo">
+        <include refid="listStructureTagSet"></include>
+    </select>
+    <select id="queryStructureTagSet" resultType="cn.staitech.fr.vo.structure.StructureTagSetVo">
+        <include refid="listStructureTagSet"></include>
+    </select>
+</mapper>

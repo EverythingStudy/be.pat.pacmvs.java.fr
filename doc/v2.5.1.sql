@@ -8,7 +8,7 @@ INSERT INTO `pathmedics`.`sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `or
                                      `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`,
                                      `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`,
                                      `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`)
-VALUES (695, '已归档专题', '已归档专题(en)', 4, 'archivedTopic', 'topic-readFilm/archived-topic/index', 651, NULL, 0,
+VALUES (695, '已归档项目', '已归档项目(en)', 4, 'archivedTopic', 'topic-readFilm/archived-topic/index', 651, NULL, 0,
         'C', 1, '0', 'archivedTopic', '#', 5, '2025-03-19 15:02:22', 5, '2025-03-19 15:03:44', '', NULL, '0', '0', '0',
         '0');
 INSERT INTO `pathmedics`.`sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`,

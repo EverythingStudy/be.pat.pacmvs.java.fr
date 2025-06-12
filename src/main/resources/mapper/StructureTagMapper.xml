@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.StructureTagMapper">
+
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.StructureTag">
+            <id property="structureTagId" column="structure_tag_id" jdbcType="BIGINT"/>
+            <result property="structureTagSetId" column="structure_tag_set_id" jdbcType="BIGINT"/>
+            <result property="structureTagName" column="structure_tag_name" jdbcType="VARCHAR"/>
+            <result property="structureId" column="structure_id" jdbcType="VARCHAR"/>
+            <result property="rgb" column="rgb" jdbcType="VARCHAR"/>
+            <result property="hex" column="hex" jdbcType="VARCHAR"/>
+            <result property="color" column="color" jdbcType="VARCHAR"/>
+            <result property="orderNumber" column="order_number" jdbcType="INTEGER"/>
+            <result property="organizationId" column="organization_id" jdbcType="BIGINT"/>
+            <result property="delFlag" column="del_flag" jdbcType="TINYINT"/>
+            <result property="createBy" column="create_by" jdbcType="BIGINT"/>
+            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+            <result property="updateBy" column="update_by" jdbcType="BIGINT"/>
+            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <result property="groupInnerOrder" column="group_inner_order" jdbcType="INTEGER"/>
+            <result property="type" column="type" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        structure_tag_id,structure_tag_set_id,structure_tag_name,
+        structure_id,rgb,hex,
+        color,order_number,organization_id,
+        del_flag,create_by,create_time,
+        update_by,update_time,group_inner_order,
+        type
+    </sql>
+    <sql id="query">
+        select
+            ts.name as structure_name,
+            ts.name_en as structure_name_en,
+            ts.type as type_number,
+            s.organ_code,
+            t.structure_tag_name,
+            t.structure_id,
+            t.structure_id as number,
+            t.rgb,
+            t.hex,
+            t.color,
+            t.order_number,
+            t.group_inner_order,
+            t.type,
+            t.create_time,
+            t.update_time,
+            t.update_by,
+            t.create_by,
+            t.del_flag,
+            t.structure_tag_set_id,
+            t.structure_tag_id,
+            u.nick_name as user_name
+        from tb_structure_tag t
+        left join sys_user u on t.create_by = u.user_id
+        left join tb_structure_tag_set s on t.structure_tag_set_id = s.structure_tag_set_id
+        left join tb_structure ts on t.structure_id = ts.structure_id and ts.species_id = s.species_id
+                                         and ts.organ_code = s.organ_code and ts.organization_id = t.organization_id
+        <where>
+            t.del_flag = 0
+            <if test="params.structureName != null and params.structureName != ''">
+                and (ts.name like concat('%',#{params.structureName},'%') or ts.name_en like concat('%',#{params.structureName},'%'))
+            </if>
+            <if test="params.structureId != null and params.structureId != ''">
+                and t.structure_id = #{params.structureId}
+            </if>
+            <if test="params.createTimeParams != null">
+                <if test="params.createTimeParams.beginTime != null ">
+                    <!-- 开始时间检索 -->
+                    AND date_format(t.create_time,'%Y%m%d') &gt;= date_format(#{params.createTimeParams.beginTime},'%Y%m%d')
+                </if>
+                <if test="params.createTimeParams.endTime != null ">
+                    <!-- 结束时间检索 -->
+                    AND date_format(t.create_time,'%Y%m%d') &lt;= date_format(#{params.createTimeParams.endTime},'%Y%m%d')
+                </if>
+            </if>
+            <if test="params.structureTagSetId != null">
+                and t.structure_tag_set_id = #{params.structureTagSetId}
+            </if>
+            <!--添加组织机构查询条件-->
+            <if test="params.organizationId != null">
+                and t.organization_id = #{params.organizationId}
+            </if>
+            <!--添加标签id集合查询条件-->
+            <if test="params.structureTagIds != null and params.structureTagIds.size() > 0">
+                and t.structure_tag_id in
+                <foreach collection="params.structureTagIds" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+        </where>
+    </sql>
+
+    <select id="pageTag" resultType="cn.staitech.fr.vo.structure.StructureTagPageVo">
+        <include refid="query"></include>
+    </select>
+    <select id="queryTag" resultType="cn.staitech.fr.vo.structure.StructureTagPageVo">
+        <include refid="query"></include>
+    </select>
+
+</mapper>

@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.ProjectMemberMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.ProjectMember">
+        <id column="member_id" property="memberId"/>
+        <result column="user_id" property="userId"/>
+        <result column="special_id" property="projectId"/>
+        <result column="organization_id" property="organizationId"/>
+        <result column="create_by" property="createBy"/>
+        <result column="del_flag" property="delFlag"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_by" property="updateBy"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        member_id
+        , user_id, special_id, organization_id, create_by, del_flag, create_time, update_by, update_time
+    </sql>
+
+    <select id="getProjectMemberList" parameterType="cn.staitech.fr.vo.project.ProjectMemberPageReq"
+            resultType="cn.staitech.fr.vo.project.ProjectMemberPageVo">
+        select sm.member_id,sm.user_id,su.user_name,su.nick_name, su.sex, su.phonenumber
+        from fr_special_member sm
+        left join sys_user su on sm.user_id = su.user_id
+        left join sys_user_role sur on su.user_id = sur.user_id
+        <where>
+            sm.del_flag ='0'
+        and sm.special_id = #{params.projectId}
+        <if test="params.userName != null and params.userName != ''">
+            and su.user_name like concat('%', #{params.userName}, '%')
+        </if>
+        <if test="params.nickName != null and params.nickName != ''">
+            and su.nick_name like concat('%', #{params.nickName}, '%')
+        </if>
+        <if test="params.sex != null and params.sex != ''">
+            and su.sex = #{params.sex}
+        </if>
+        <if test="params.roleId != null and params.roleId != ''">
+            and sur.role_id = #{params.roleId}
+        </if>
+        </where>
+        group by (sm.member_id)
+        order by sm.create_time desc
+
+    </select>
+</mapper>

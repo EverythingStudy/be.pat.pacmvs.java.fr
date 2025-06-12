@@ -1,45 +1,27 @@
 package cn.staitech.fr.mapper;
 
 import java.util.List;
-import java.util.Map;
-
+import cn.staitech.common.core.domain.CustomPage;
 import org.apache.ibatis.annotations.Param;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
 import cn.staitech.fr.domain.Slide;
-import cn.staitech.fr.domain.in.SlideListQueryIn;
-import cn.staitech.fr.domain.out.AlgorithmImageOut;
-import cn.staitech.fr.domain.out.SlideListQueryOut;
-import cn.staitech.fr.domain.out.SlideSelectBy;
+import cn.staitech.fr.vo.project.slide.SlidePageReq;
+import cn.staitech.fr.vo.project.slide.SlidePageVo;
+import cn.staitech.fr.vo.project.slide.SlideDetailVo;
 
 
-/**
-* @author admin
-* @description 针对表【fr_slide(专题选片表)】的数据库操作Mapper
-* @createDate 2024-03-29 13:33:37
-* @Entity cn.staitech.fr.domain.Slide
-*/
 public interface SlideMapper extends BaseMapper<Slide> {
     String selectBySpecialId(Long specialId);
-    /**
-     * 
-    * @Title: getAlgorithmImage
-    * @Description: 查下启动的所有切片信息
-    * @param @param queryMap
-    * @param @return
-    * @return List<AlgorithmImageOut>
-    * @throws
-     */
-    List<AlgorithmImageOut> getAlgorithmImage(Map<String,Object> queryMap);
 
-    List<SlideListQueryOut> slideListQuery(SlideListQueryIn req);
+    CustomPage<SlidePageVo> page(CustomPage page, @Param("params") SlidePageReq req);
 
-    SlideListQueryOut slideQueryBy(Long slideId);
+    List<SlidePageVo> slideListQuery(@Param("params") SlidePageReq req);
+
+    SlidePageVo slideQueryBy(Long slideId);
 
     List<Slide> selectListByWax(@Param("topicId") Long topicId, @Param("speciesId")String speciesId);
     
-    SlideSelectBy pageImageCsvListVOBy(Long slideId);
+    SlideDetailVo getSlideInfo(Long slideId);
 
 }
 

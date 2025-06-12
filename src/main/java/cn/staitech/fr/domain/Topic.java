@@ -14,7 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * 切片-专题（原图像）表 tb_topic
+ * 切片-项目（原图像）表 tb_topic
  *
  * @author WangFeng
  */
@@ -33,7 +33,7 @@ public class Topic implements Serializable {
     private Long topicId;
 
     /**
-     * 专题名称 .
+     * 项目名称 .
      */
     @TableField(value = "topic_name")
     private String topicName;
