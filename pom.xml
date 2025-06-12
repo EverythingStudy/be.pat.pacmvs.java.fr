@@ -337,11 +337,7 @@
             <artifactId>expiringmap</artifactId>
             <version>0.5.8</version>
         </dependency>
-        <dependency>
-            <groupId>org.locationtech.jts</groupId>
-            <artifactId>jts-ext</artifactId>
-            <version>1.0</version>
-        </dependency>
+
     </dependencies>
     <repositories>
         <repository>
