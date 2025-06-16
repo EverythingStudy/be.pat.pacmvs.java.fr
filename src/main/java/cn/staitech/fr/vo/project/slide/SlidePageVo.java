@@ -3,6 +3,8 @@ package cn.staitech.fr.vo.project.slide;
 import java.util.Date;
 import java.util.List;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -66,7 +68,7 @@ public class SlidePageVo {
     private String imageName;
 
     @ApiModelProperty(value = "是否已阅")
-    private Boolean isView = false;
+    private Boolean isView;
 
     @ApiModelProperty(value = "已阅片用户")
     private List<Long> viewers;

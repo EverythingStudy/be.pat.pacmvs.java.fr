@@ -87,10 +87,7 @@ public class SlideDetailVo {
     @ApiModelProperty(value = "项目名称")
     private String topicName;
 
-    /**
-     * 是否可用0不可用1可用
-     */
-    @ApiModelProperty(value = "是否可用0不可用1可用")
+
     private Integer status;
 
     /**
@@ -121,7 +118,6 @@ public class SlideDetailVo {
     @ApiModelProperty(value = "缩略图url地址")
     private String thumbUrl;
 
-    private Long reviewRoundId;
     @TableField(exist = false, value = "format")
     @ApiModelProperty(value = "文件格式")
     private String format;
@@ -140,7 +136,6 @@ public class SlideDetailVo {
     @TableField(exist = false, value = "source_lens")
     @ApiModelProperty(value = "原放大倍数")
     private Integer sourceLens;
-    @TableField(typeHandler = JacksonTypeHandler.class)
     @ApiModelProperty(value = "已阅片用户")
     private List<Long> viewers;
 

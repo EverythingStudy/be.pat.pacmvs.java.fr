@@ -6,19 +6,71 @@
 
     <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.Slide">
         <id property="slideId" column="slide_id" jdbcType="BIGINT"/>
-        <result property="specialId" column="special_id" jdbcType="INTEGER"/>
-        <result property="imageId" column="image_id" jdbcType="INTEGER"/>
+        <result property="projectId" column="special_id" jdbcType="BIGINT"/>
+        <result property="imageId" column="image_id" jdbcType="BIGINT"/>
         <result property="createBy" column="create_by" jdbcType="BIGINT"/>
         <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
         <result property="updateBy" column="update_by" jdbcType="BIGINT"/>
         <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
     </resultMap>
+    <resultMap id="SlidePageVoMap" type="cn.staitech.fr.vo.project.slide.SlidePageVo">
+        <id property="slideId" column="slide_id"/>
+        <result property="thumbUrl" column="thumb_url"/>
+        <result property="fileName" column="image_name"/>
+        <result property="groupCode" column="group_code"/>
+        <result property="waxCode" column="wax_code"/>
+        <result property="animalCode" column="animal_code"/>
+        <result property="genderFlag" column="sex_flag"/>
+        <result property="createUser" column="user_name"/>
+        <result property="description" column="description"/>
+        <result property="createTime" column="create_time"/>
+        <result property="imagePath" column="image_path"/>
+        <result property="format" column="format"/>
+        <result property="width" column="width"/>
+        <result property="height" column="height"/>
+        <result property="resolutionX" column="resolution_x"/>
+        <result property="resolutionY" column="resolution_y"/>
+        <result property="sourceLens" column="source_lens"/>
+        <result property="imageId" column="image_id"/>
+        <result property="imageName" column="image_name"/>
+        <result property="isView" column="is_view"/>
+        <result property="viewers" column="viewers"
+                 typeHandler="cn.staitech.fr.mapper.handler.ListLongTypeHandler"
+                 javaType="java.util.List"/>
+    </resultMap>
 
-    <sql id="Base_Column_List">
-        slide_id,special_id,image_id,
-        create_by,create_time,update_by,
-        update_time
-    </sql>
+    <resultMap id="SlideDetailVoMap" type="cn.staitech.fr.vo.project.slide.SlideDetailVo">
+        <!-- 主键 -->
+        <id property="slideId" column="slide_id"/>
+
+        <!-- 基础字段 -->
+        <result property="description" column="description"/>
+        <result property="imageId" column="image_id"/>
+        <result property="imageName" column="image_name"/>
+        <result property="groupName" column="group_code"/>
+        <result property="gender" column="sex_flag"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="topicId" column="topic_id"/>
+        <result property="topicName" column="topic_name"/>
+        <result property="status" column="status"/>
+        <result property="deleteFlag" column="del_flag"/>
+        <result property="imagePath" column="image_path"/>
+        <result property="thumbUrl" column="thumb_url"/>
+        <result property="format" column="format"/>
+        <result property="width" column="width"/>
+        <result property="height" column="height"/>
+        <result property="resolutionX" column="resolution_x"/>
+        <result property="resolutionY" column="resolution_y"/>
+        <result property="sourceLens" column="source_lens"/>
+
+        <!-- JSON 字段：需要指定 JacksonTypeHandler 解析为 List<Long> -->
+        <result property="viewers" column="viewers"
+                 typeHandler="cn.staitech.fr.mapper.handler.ListLongTypeHandler"
+                 javaType="java.util.List"/>
+</resultMap>
 
     <select id="selectBySpecialId" parameterType="java.lang.Long" resultType="java.lang.String">
         select tt.topic_name
@@ -42,12 +94,13 @@
         ti.group_code,
         ti.wax_code,
         ti.animal_code,
-        ti.sex_flag gender_flag,
+        ti.sex_flag,
         ti.topic_name,
-        su.user_name createUser,
+        su.user_name,
         fs.create_time,
         fs.description,
         fs.slide_id,
+        ${params.currentUserId} as is_view,
         fs.viewers
         from fr_slide fs
         left join tb_image ti on fs.image_id = ti.image_id
@@ -69,10 +122,10 @@
             </if>
             <if test="params.isView != null">
                 <if test="params.isView">
-                    and JSON_CONTAINS(fs.viewers, ${params.currentUserId}, '$')
+                    and ${params.currentUserId}
                 </if>
                 <if test="!params.isView">
-                    and not JSON_CONTAINS(fs.viewers, ${params.currentUserId}, '$')
+                    and not ${params.currentUserId}
                 </if>
             </if>
             <if test="params.groupCode != null and params.groupCode != ''">
@@ -107,12 +160,12 @@
     </sql>
 
     <select id="slideListQuery" parameterType="cn.staitech.fr.vo.project.slide.SlidePageReq"
-            resultType="cn.staitech.fr.vo.project.slide.SlidePageVo">
+            resultMap="SlidePageVoMap">
         <include refid="slideList"/>
     </select>
 
     <select id="page" parameterType="cn.staitech.fr.vo.project.slide.SlidePageReq"
-            resultType="cn.staitech.fr.vo.project.slide.SlidePageVo">
+            resultMap="SlidePageVoMap">
         <include refid="slideList"/>
     </select>
 
@@ -147,15 +200,16 @@
     
 
     <select id="getSlideInfo" parameterType="long"
-            resultType="cn.staitech.fr.vo.project.slide.SlideDetailVo">
+            resultMap="SlideDetailVoMap">
         select 
         s.slide_id,
         s.special_id,
         s.image_id,
+        m.status,
         m.group_code,
         m.wax_code,
         m.animal_code,
-        m.sex_flag as gender,
+        m.sex_flag,
         s.description,
         s.del_flag,
         s.create_by,
@@ -174,6 +228,8 @@
         m.image_path,
         m.thumb_url,
         m.image_name,
+        m.topic_id,
+        m.topic_name,
         s.viewers
         from fr_slide s
         left join tb_image m on m.image_id = s.image_id

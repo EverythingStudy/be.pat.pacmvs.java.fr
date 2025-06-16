@@ -143,7 +143,6 @@
             </if>
 
             <if test="params.choiceState != null and params.choiceState==0">
-
                 and (fs.slide_id is null  or fs.special_id != #{params.projectId})
             </if>
             <if test="params.choiceState != null and params.choiceState==1">

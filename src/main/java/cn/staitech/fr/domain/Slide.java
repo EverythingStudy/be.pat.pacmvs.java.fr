@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import cn.staitech.fr.mapper.handler.ListLongTypeHandler;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -67,7 +68,7 @@ public class Slide implements Serializable {
      */
     private Date updateTime;
 
-    @TableField(typeHandler = JacksonTypeHandler.class)
+    @TableField(typeHandler = ListLongTypeHandler.class)
     @ApiModelProperty(value = "已阅片用户")
     private List<Long> viewers;
     

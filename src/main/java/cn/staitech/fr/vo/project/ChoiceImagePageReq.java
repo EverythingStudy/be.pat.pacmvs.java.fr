@@ -16,4 +16,7 @@ public class ChoiceImagePageReq extends PageRequest {
     @ApiModelProperty(value = "项目id")
     private Long projectId;
 
+    @ApiModelProperty(value = "添加状态：0未添加、1已添加",hidden = true)
+    private Integer choiceState = 0;
+
 }

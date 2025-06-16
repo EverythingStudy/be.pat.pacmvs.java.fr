@@ -85,20 +85,21 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 		}
 		// 分页查询
 		CustomPage<SlidePageVo> page = new CustomPage<>(req);
-		req.setCurrentUserId("'"+userId+"'");
+//		req.setCurrentUserId("'"+userId+"'");
+		req.setCurrentUserId("JSON_CONTAINS(fs.viewers, '"+userId+"', '$')");
 		baseMapper.page(page, req);
-		page.convert(this::renderSlide);
+//		page.convert(this::renderSlide);
 		log.info("项目下切片列表查询接口结束");
 		return R.ok(page);
 	}
 
-	private SlidePageVo renderSlide(SlidePageVo slide){
+	/*private SlidePageVo renderSlide(SlidePageVo slide){
 		List<Long> viewers = slide.getViewers();
 		if (CollectionUtils.isNotEmpty(viewers) && !viewers.contains(SecurityUtils.getUserId())){
 			slide.setIsView(true);
 		}
 		return slide;
-	}
+	}*/
 
 	/**
 	 * 判断用户是否有访问权限
@@ -243,6 +244,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
 	@Override
 	public HashMap<String, SlidePageVo> slideAdjacent(SlidePageReq req) {
+		req.setCurrentUserId("JSON_CONTAINS(fs.viewers, '"+SecurityUtils.getUserId()+"', '$')");
 		List<SlidePageVo> waxList = baseMapper.slideListQuery(req);
 
 		// 防止 waxList 为 null

@@ -106,7 +106,7 @@ public class SlideController  extends BaseController {
     @ApiOperation(value = "查询切片、图片详情接口。调用后更新阅片状态")
     @GetMapping("/slideInfo")
     public R<SlideDetailVo> slideInfo(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "标注id", required = true) Long slideId) {
-
+        Slide slide = slideService.getById(slideId);
         return R.ok(slideService.getSlideInfo(slideId));
     }
     

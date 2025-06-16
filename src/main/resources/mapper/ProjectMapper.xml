@@ -4,17 +4,27 @@
 
     <select id="pageProject"
             resultType="cn.staitech.fr.vo.project.ProjectPageVo">
-        select distinct fs.special_id as projectId, tt.topic_name, fs.color_type,fs.special_name as projectName,fs.trial_id, ts.name speciesName,
-        ts.name_en speciesNameEn, fs.status, fs.create_time,fs.create_by,su.user_name createName,fs.principal,user.user_name principalName,fs.update_time
-                        ,fs.update_time as recoveryTime
+        select distinct fs.special_id   as projectId,
+            tt.topic_name,
+            fs.color_type,
+            fs.special_name as projectName,
+            fs.trial_id,
+            ts.name            speciesName,
+            ts.name_en         speciesNameEn,
+            fs.status,
+            fs.create_time,
+            fs.create_by,
+            su.user_name as createName,
+            fs.principal,
+            user.user_name     principalName,
+            fs.update_time,
+            fs.update_time  as recoveryTime
         from fr_special fs
         left join tb_topic tt on fs.topic_id = tt.topic_id
         left join sys_user su on fs.create_by = su.user_id
         left join sys_user user on fs.principal = user.user_id
         left join tb_species ts on fs.species_id = ts.species_id
-        left join fr_special_member fsm on fs.special_id = fsm.special_id
-        and fsm.del_flag = '0'
-        and ts.organization_id = #{params.organizationId}
+        left join fr_special_member fsm on fs.special_id = fsm.special_id and fsm.del_flag = '0' and ts.organization_id = #{params.organizationId}
         where fs.del_flag = #{params.delFlag}
         and fs.organization_id = #{params.organizationId}
         and fs.is_permanent_del = 0
