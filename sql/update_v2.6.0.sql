@@ -1023,7 +1023,7 @@ INSERT INTO tb_structure_tag (structure_tag_id, structure_tag_set_id, structure_
 INSERT INTO tb_structure_tag (structure_tag_id, structure_tag_set_id, structure_tag_name, structure_id, rgb, hex, color, order_number, organization_id, del_flag, create_by, create_time, update_by, update_time, group_inner_order, type) VALUES (3889, 1060, '肾脏髓质', '11B03E', 'rgba(255,255,200,1)', '#FFFFC8', null, 3, 1, 0, 62, '2025-06-09 18:24:41', null, '2025-06-09 18:24:41', 3, 0);
 
 
-delete from sys_menu p where p.menu_id in (32, 42,43,317,652,653,654,663,670,680,681,692);
+delete from sys_menu p where p.menu_id in (32, 42,43,317,652,653,654,663,670,680,681,692,695,696);
 
 INSERT INTO sys_menu (menu_id, menu_name, menu_name_en, order_num, path, component, parent_id, query, is_cache, menu_type, is_frame, status, perms, icon, create_by, create_time, update_by, update_time, remark, is_functional_modules, visible, full_width, no_fit, no_header) VALUES (32, '结构指标', 'Annotation Label-Set', 1, 'indicator', 'subject/indicator/index', 3, null, 1, 'C', 1, '0', 'project:pathology:query', '#', 1, '2023-06-02 10:18:05', 5, '2025-05-30 13:34:56', '专题管理-结构指标', '1', '0', '0', '0', '0');
 INSERT INTO sys_menu (menu_id, menu_name, menu_name_en, order_num, path, component, parent_id, query, is_cache, menu_type, is_frame, status, perms, icon, create_by, create_time, update_by, update_time, remark, is_functional_modules, visible, full_width, no_fit, no_header) VALUES (42, '编辑', '编辑(en)', 4, '', 'special/pathology/tabedit', 39, null, 1, 'F', 1, '0', 'project:pathology:tabedit', '#', 1, '2023-06-02 11:53:12', 5, '2025-06-05 14:48:48', '专题管理-结构指标-配置标签-编辑', '1', '0', '0', '0', '0');
