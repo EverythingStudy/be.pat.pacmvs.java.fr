@@ -68,7 +68,7 @@ public class SlidePageVo {
     private String imageName;
 
     @ApiModelProperty(value = "是否已阅")
-    private Boolean isView;
+    private Boolean isView = false;
 
     @ApiModelProperty(value = "已阅片用户")
     private List<Long> viewers;
