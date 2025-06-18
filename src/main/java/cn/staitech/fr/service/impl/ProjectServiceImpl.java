@@ -46,8 +46,6 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Resource
     private SlideService slideService;
 
-    @Resource
-    private ProjectMemberMapper specialMemberMapper;
 
     @Resource
     private TopicMapper topicMapper;
@@ -159,7 +157,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         slideService.saveBatch(slides);
 
         //添加项目成员
-        addProjectMember(project.getProjectId(), SecurityUtils.getUserId());
+        addProjectMember(project.getProjectId(), req.getPrincipal());
         return R.ok(project);
     }
 
@@ -170,7 +168,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         specialMember.setOrganizationId(SecurityUtils.getOrganizationId());
         specialMember.setCreateBy(SecurityUtils.getUserId());
         specialMember.setCreateTime(new Date());
-        specialMemberMapper.insert(specialMember);
+        projectMemberMapper.insert(specialMember);
     }
 
     /**
@@ -205,12 +203,16 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         if (count > 0) {
             return R.fail(MessageSource.M("EXISTS_SPECIAL_DATA"));
         }
-        Project special = new Project();
-        BeanUtils.copyProperties(req, special);
-        special.setUpdateBy(SecurityUtils.getUserId());
-        special.setUpdateTime(new Date());
-        baseMapper.updateById(special);
-        return R.ok(special);
+        Project project = new Project();
+        BeanUtils.copyProperties(req, project);
+        project.setUpdateBy(SecurityUtils.getUserId());
+        project.setUpdateTime(new Date());
+        baseMapper.updateById(project);//添加项目成员
+        Long memberCount = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, project.getProjectId()).eq(ProjectMember::getUserId, req.getPrincipal()));
+        if (memberCount == 0){
+            addProjectMember(project.getProjectId(), req.getPrincipal());
+        }
+        return R.ok(project);
     }
 
     /**
