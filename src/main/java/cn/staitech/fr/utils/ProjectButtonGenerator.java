@@ -44,6 +44,7 @@ public class ProjectButtonGenerator {
                 addPausedButtons(buttons, memberRole);
                 break;
             case Constants.STATUS_COMPLETED:
+                addCompletedOrArchivedButtons(buttons, memberRole);
                 break;
             case Constants.STATUS_ARCHIVED:
                 addCompletedOrArchivedButtons(buttons, memberRole);
