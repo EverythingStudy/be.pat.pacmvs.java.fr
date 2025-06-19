@@ -154,7 +154,7 @@
          1、根据切片编号由小到大排序，切片编号前几位是项目号是一样，
          2、之后是动物号，动物号前几位相同，从不同的数字开始由小到大排序。
          3、如果是相同动物号的图片则根据蜡块编号由小到大再排 -->
-        <if test="params.sortField == null and params.sortField==''">
+        <if test="params.sortField == null or params.sortField==''">
             order by ti.animal_code asc,ti.wax_code asc,ti.group_code asc,ti.sex_flag asc
         </if>
     </sql>

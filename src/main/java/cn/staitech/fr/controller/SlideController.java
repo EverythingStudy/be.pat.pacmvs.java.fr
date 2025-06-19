@@ -76,13 +76,20 @@ public class SlideController  extends BaseController {
 
     @ApiOperation(value = "项目配置-删除切片")
     @PostMapping("/deleteSlide")
-    public R deleteSlide(@RequestParam(value = "projectId") @ApiParam(name = "projectId", value = "项目id") Long projectId) {
+    public R deleteSlide(@RequestParam(value = "projectId") @ApiParam(name = "projectId", value = "项目id") Long projectId)throws  Exception {
         return slideService.deleteSlide(projectId,null);
     }
+
     @ApiOperation(value = "项目配置-删除切片")
     @PostMapping("/deleteSlideByIds")
-    public R deleteSlide(@RequestBody @Validated SlideDelVo slideDelIn) {
+    public R deleteSlideByIds(@RequestBody @Validated SlideDelVo slideDelIn)throws  Exception {
         return slideService.deleteSlide(slideDelIn.getProjectId(),slideDelIn.getSlideIds());
+    }
+
+    @ApiOperation(value = "项目配置-检查删除切片")
+    @PostMapping("/checkDeleteSlide")
+    public R checkDeleteSlide(@RequestBody @Validated SlideDelVo slideDelIn)throws  Exception {
+        return slideService.checkDeleteSlide(slideDelIn.getProjectId(),slideDelIn.getSlideIds());
     }
 
     @ApiOperation(value = "更新单切片描述")

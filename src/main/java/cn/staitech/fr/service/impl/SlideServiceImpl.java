@@ -10,6 +10,7 @@ import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.ProjectMember;
 import cn.staitech.fr.vo.project.ChoiceImagePageReq;
 import cn.staitech.fr.mapper.*;
+import cn.staitech.system.api.RemoteAnnotationService;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 	private ProjectMemberMapper projectMemberMapper;
 	@Resource
 	private ImageMapper imageMapper;
+	@Resource
+	private RemoteAnnotationService remoteAnnotationService;
 
 
 
@@ -85,21 +88,11 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 		}
 		// 分页查询
 		CustomPage<SlidePageVo> page = new CustomPage<>(req);
-//		req.setCurrentUserId("'"+userId+"'");
 		req.setCurrentUserId("JSON_CONTAINS(fs.viewers, '"+userId+"', '$')");
 		baseMapper.page(page, req);
-//		page.convert(this::renderSlide);
 		log.info("项目下切片列表查询接口结束");
 		return R.ok(page);
 	}
-
-	/*private SlidePageVo renderSlide(SlidePageVo slide){
-		List<Long> viewers = slide.getViewers();
-		if (CollectionUtils.isNotEmpty(viewers) && !viewers.contains(SecurityUtils.getUserId())){
-			slide.setIsView(true);
-		}
-		return slide;
-	}*/
 
 	/**
 	 * 判断用户是否有访问权限
@@ -198,7 +191,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 	}
 
 	@Override
-	public R deleteSlide(Long projectId, List<Long> slideIds) {
+	public R deleteSlide(Long projectId, List<Long> slideIds) throws Exception{
 		log.info("删除全部切片接口开始：");
 		R validationResult = validateProjectStatus(projectId);
 		if (validationResult != null) {
@@ -211,8 +204,24 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			slideList.forEach(slide -> {slide.setDelFlag(cn.staitech.common.core.constant.Constants.DEL_FLAG_DELETED);});
 			updateBatchById(slideList);
 		}
-		//todo 删除标注数据
+		R<Boolean> deleteResult = remoteAnnotationService.deleteBySlide(slideIds);
 		return R.ok();
+	}
+
+	@Override
+	public R checkDeleteSlide(Long projectId, List<Long> slideIds) throws  Exception{
+		List<Slide> slideList = list(Wrappers.<Slide>lambdaQuery().eq(ObjectUtil.isNotEmpty(projectId),Slide::getProjectId,projectId)
+				.in(CollectionUtils.isNotEmpty(slideIds),Slide::getSlideId,slideIds)
+				.eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).select(Slide::getSlideId));
+		if (CollectionUtils.isEmpty(slideList)){
+			return R.fail("未找到要删除的切片");
+		}
+		R<Long> resp = remoteAnnotationService.countAnnoBySlides(slideList.stream().map(Slide::getSlideId).collect(Collectors.toList()));
+		if (resp.getCode() == 500){
+			return resp;
+		}else{
+			return R.ok(resp.getData()>0);
+		}
 	}
 
 	/**
