@@ -134,6 +134,9 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image>
                     .eq(Slide::getDelFlag, DEL_FLAG_NORMAL)
                     .select(Slide::getImageId));
             forbidIds = slideList.stream().map(Slide::getImageId).collect(Collectors.toList());
+            if (CollectionUtils.isNotEmpty(forbidIds)){
+                throw new RuntimeException("已关联项目的图像不可删除，请重新选择");
+            }
             imageIdList.removeAll(forbidIds);
             if (CollectionUtils.isNotEmpty(imageIdList)){
                 imageMapper.deleteBatchIds(imageIdList);
