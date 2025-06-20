@@ -96,7 +96,7 @@
         ti.animal_code,
         ti.sex_flag,
         ti.topic_name,
-        su.user_name,
+        su.nick_name as user_name,
         fs.create_time,
         fs.description,
         fs.slide_id,

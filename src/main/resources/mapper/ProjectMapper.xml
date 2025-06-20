@@ -14,9 +14,9 @@
             fs.status,
             fs.create_time,
             fs.create_by,
-            su.user_name as createName,
+            su.nick_name as createName,
             fs.principal,
-            user.user_name     principalName,
+            user.nick_name     principalName,
             fs.update_time,
             fs.update_time  as recoveryTime
         from fr_special fs
