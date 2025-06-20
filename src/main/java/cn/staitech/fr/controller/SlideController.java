@@ -4,6 +4,7 @@ import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.web.controller.BaseController;
 import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.vo.project.ChoiceImagePageReq;
 import cn.staitech.fr.vo.project.ProjectImageVo;
 import cn.staitech.fr.vo.project.slide.SlideDelVo;
@@ -37,6 +38,8 @@ public class SlideController  extends BaseController {
 
     @Resource
     private SlideService slideService;
+    @Resource
+    private SlideMapper slideMapper;
 
     @ApiOperation(value = "项目阅片-已选切片分页查询")
     @PostMapping("/page")
@@ -113,7 +116,13 @@ public class SlideController  extends BaseController {
     @ApiOperation(value = "查询切片、图片详情接口。调用后更新阅片状态")
     @GetMapping("/slideInfo")
     public R<SlideDetailVo> slideInfo(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "标注id", required = true) Long slideId) {
-        Slide slide = slideService.getById(slideId);
+        SlideDetailVo slideInfo = slideMapper.getSlideInfo(slideId);
+        return R.ok(slideInfo);
+    }
+
+    @ApiOperation(value = "阅片记录")
+    @GetMapping("/visit")
+    public R visit(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "标注id", required = true) Long slideId) {
         return R.ok(slideService.getSlideInfo(slideId));
     }
     
