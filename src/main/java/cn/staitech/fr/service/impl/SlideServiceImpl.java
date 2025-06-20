@@ -203,8 +203,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 		if(CollectionUtils.isNotEmpty(slideList)){
 			slideList.forEach(slide -> {slide.setDelFlag(cn.staitech.common.core.constant.Constants.DEL_FLAG_DELETED);});
 			updateBatchById(slideList);
+			R<Boolean> deleteResult = remoteAnnotationService.deleteBySlide(slideList.stream().map(Slide::getSlideId).collect(Collectors.toList()));
 		}
-		R<Boolean> deleteResult = remoteAnnotationService.deleteBySlide(slideIds);
 		return R.ok();
 	}
 
