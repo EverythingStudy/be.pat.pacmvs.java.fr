@@ -164,6 +164,9 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 		List<Image> images = imageMapper.selectList(Wrappers.<Image>lambdaQuery().eq(Image::getTopicId, topicId)
 				.eq(Image::getStatus, Constants.IMAGE_STATUS_ENABLE)
 				.eq(Image::getAnalyzeStatus, Constants.IMAGE_NAME_PARSE_SUCC));
+		if (CollectionUtils.isEmpty(images)){
+			return R.fail("没有可关联的新切片");
+		}
 		List<Slide> slidesToSave = new ArrayList<>();
 		Long userId = SecurityUtils.getUserId();
 		List<Long> imageIds = imageIdsFilter(images.stream().map(Image::getImageId).collect(Collectors.toList()), projectId);
