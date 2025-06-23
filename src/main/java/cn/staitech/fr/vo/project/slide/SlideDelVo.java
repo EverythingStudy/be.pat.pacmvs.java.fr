@@ -18,7 +18,7 @@ public class SlideDelVo {
     @NotNull(message = "项目id不能为空")
     @ApiModelProperty(value = "项目id")
     private Long projectId;
-    @NotEmpty(message = "切片id集合不能为空")
+//    @NotEmpty(message = "切片id集合不能为空")
     @ApiModelProperty(value = "切片id集合")
     private List<Long> slideIds;
 }
