@@ -55,7 +55,7 @@
             and fs.color_type = #{params.colorType}
         </if>
         <if test="params.principalName != null and params.principalName != ''">
-            and user.user_name like concat('%', #{params.principalName}, '%')
+            and user.nick_name like concat('%', #{params.principalName}, '%')
         </if>
         <if test="params.createTimeParams != null">
             <if test="params.createTimeParams.beginTime != null ">
