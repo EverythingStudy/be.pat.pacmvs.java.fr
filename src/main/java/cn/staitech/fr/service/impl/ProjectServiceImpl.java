@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.impl;
 
+import cn.hutool.core.date.DateUtil;
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.utils.bean.BeanUtils;
@@ -83,6 +84,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         e.setColorNameEn(DictData.COLOR_TYPE_EN.get(Integer.valueOf(e.getColorType())));
         e.setTrialType(DictData.TRIAL_TYPE.get(e.getTrialId()));
         e.setTrialTypeEn(DictData.TRIAL_TYPE_EN.get(e.getTrialId()));
+        e.setExpireTime(DateUtil.offsetDay(e.getExpireTime(), 30));
         long count = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, e.getProjectId())
                 .eq(ProjectMember::getUserId, SecurityUtils.getUserId())
                 .eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));

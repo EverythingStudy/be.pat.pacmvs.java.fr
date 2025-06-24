@@ -7,6 +7,8 @@ update fr_special set principal = create_by where principal is null;
 
 alter table fr_slide
     add viewers json null comment '已阅片用户';
+alter table fr_slide
+    alter column viewers set default ((json_array()));
 alter table fr_special
     add is_permanent_del tinyint default 0 not null comment '是否永久删除';
 alter table tb_organ

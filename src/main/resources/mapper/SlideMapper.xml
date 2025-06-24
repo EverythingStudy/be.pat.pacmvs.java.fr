@@ -136,7 +136,7 @@
                 and ti.wax_code =  #{params.waxCode}
             </if>
             <if test="params.createBy != null and params.createBy != ''">
-                and su.user_name like concat('%',#{params.createBy},'%')
+                and su.nick_name like concat('%',#{params.createBy},'%')
             </if>
             <if test="params.createTimeParams!=null">
                 <if test="params.createTimeParams.beginTime != null "><!-- 开始时间检索 -->
