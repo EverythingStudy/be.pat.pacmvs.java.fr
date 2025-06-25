@@ -71,17 +71,13 @@ public class ProjectPageVo {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date recoveryTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @ApiModelProperty(value = "更新时间")
     private Date updateTime;
 
     @ApiModelProperty(value = "到期时间")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date expireTime;
-
-    public Date getExpireTime() {
-        DateUtil.offsetDay(updateTime,30);
-        return updateTime;
-    }
 
     @ApiModelProperty(value = "操作按钮")
     private List<String> buttons;
