@@ -83,6 +83,10 @@ public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, P
                 throw new RuntimeException(e);
             }
         }
+        Project project = projectMapper.selectById(member.getProjectId());
+        if (project.getPrincipal() == memberUserId){
+            return R.fail("项目负责人不可删除，若要删除该用户，请先更换项目负责人");
+        }
         ProjectMember specialMember = new ProjectMember();
         specialMember.setMemberId(memberId);
         specialMember.setDelFlag(cn.staitech.common.core.constant.Constants.DEL_FLAG_DELETED);
