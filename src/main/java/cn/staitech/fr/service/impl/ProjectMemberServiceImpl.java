@@ -136,12 +136,14 @@ public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, P
         Integer status = special.getStatus();
 
         if (status == Constants.STATUS_COMPLETED) {
-            return R.fail("项目状态为“完成”时，任何用户不能再配置项目任何信息");
+//            return R.fail("项目状态为“完成”时，任何用户不能再配置项目任何信息");
+            return R.fail("项目已完成，不可修改配置");
         }
 
         if (status == Constants.STATUS_PAUSED
                 && !(SecurityUtils.getUserId() == special.getPrincipal() || SecurityUtils.isOrgAdmin())) {
-            return R.fail("项目状态为“暂停”时，机构管理员和项目负责人可以配置项目基础信息");
+//            return R.fail("项目状态为“暂停”时，机构管理员和项目负责人可以配置项目基础信息");
+            return R.fail("您没有该项目的配置权限，请联系该项目负责人或机构管理员");
         }
 
         return null; // 表示通过校验
