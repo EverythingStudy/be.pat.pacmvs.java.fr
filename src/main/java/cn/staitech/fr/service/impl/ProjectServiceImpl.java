@@ -210,7 +210,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         project.setUpdateBy(SecurityUtils.getUserId());
         project.setUpdateTime(new Date());
         baseMapper.updateById(project);//添加项目成员
-        Long memberCount = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, project.getProjectId()).eq(ProjectMember::getUserId, req.getPrincipal()));
+        Long memberCount = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, project.getProjectId())
+                .eq(ProjectMember::getUserId, req.getPrincipal())
+                .eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
         if (memberCount == 0){
             addProjectMember(project.getProjectId(), req.getPrincipal());
         }
