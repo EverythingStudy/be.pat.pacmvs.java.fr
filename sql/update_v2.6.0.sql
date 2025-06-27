@@ -1052,3 +1052,57 @@ INSERT INTO sys_menu (menu_id, menu_name, menu_name_en, order_num, path, compone
 INSERT INTO sys_menu (menu_id, menu_name, menu_name_en, order_num, path, component, parent_id, query, is_cache, menu_type, is_frame, status, perms, icon, create_by, create_time, update_by, update_time, remark, is_functional_modules, visible, full_width, no_fit, no_header) VALUES (706, '批量删除', '批量删除(en)', 4, '', null, 654, null, 1, 'F', 1, '0', 'readFilmCreate:sliceConfig:removeBatch', ' ', 5, '2025-06-23 13:54:14', null, null, '', null, '0', '0', '0', '0');
 INSERT INTO sys_menu (menu_id, menu_name, menu_name_en, order_num, path, component, parent_id, query, is_cache, menu_type, is_frame, status, perms, icon, create_by, create_time, update_by, update_time, remark, is_functional_modules, visible, full_width, no_fit, no_header) VALUES (707, '关联新切片', '关联新切片(en)', 5, '', null, 654, null, 1, 'F', 1, '0', 'readFilmCreate:sliceConfig:choiceLinkNew', '#', 5, '2025-06-23 13:55:35', 5, '2025-06-23 13:55:40', '', null, '0', '0', '0', '0');
 INSERT INTO sys_menu (menu_id, menu_name, menu_name_en, order_num, path, component, parent_id, query, is_cache, menu_type, is_frame, status, perms, icon, create_by, create_time, update_by, update_time, remark, is_functional_modules, visible, full_width, no_fit, no_header) VALUES (708, '详情', '详情(en)', 1, '', null, 698, null, 1, 'C', 1, '0', 'archivedTopic:list:detail', '#', 5, '2025-06-23 14:41:28', 5, '2025-06-23 14:41:51', '', null, '0', '0', '0', '0');
+
+alter table tb_image
+    add wax_code_order varchar(255) null after wax_code;
+
+-- 更新纯数字且长度为1的 wax_code，补前导零至两位
+UPDATE tb_image
+SET wax_code_order = LPAD(wax_code, 2, '0')
+WHERE status = 4
+  AND analyze_status = 1
+  AND wax_code IS NOT NULL
+  AND wax_code REGEXP '^[0-9]$';
+
+-- 更新以数字开头后跟一个连字符或字母的 wax_code，在前面加 '0'
+UPDATE tb_image
+SET wax_code_order = CONCAT('0', wax_code)
+WHERE status = 4
+  AND analyze_status = 1
+  AND wax_code IS NOT NULL
+  AND (wax_code REGEXP '^[0-9]-[0-9A-Za-z]' OR wax_code REGEXP '^[0-9][A-Za-z]');
+
+DELIMITER $$
+
+CREATE TRIGGER trg_before_insert_update_wax_code_order
+    BEFORE INSERT ON tb_image
+    FOR EACH ROW
+BEGIN
+    IF NEW.wax_code REGEXP '^[0-9]$' THEN
+        -- 情况1: 一位数字
+        SET NEW.wax_code_order = LPAD(NEW.wax_code, 2, '0');
+    ELSEIF NEW.wax_code REGEXP '^[0-9][A-Za-z]' THEN
+        -- 情况2: 一位数字+字母
+        SET NEW.wax_code_order = CONCAT('0', NEW.wax_code);
+    ELSEIF NEW.wax_code REGEXP '^[0-9]-[A-Za-z0-9]' THEN
+        -- 情况3: 一位数字+-+字母/数字
+        SET NEW.wax_code_order = CONCAT('0', NEW.wax_code);
+    END IF;
+END$$
+
+CREATE TRIGGER trg_before_update_wax_code_order
+    BEFORE UPDATE ON tb_image
+    FOR EACH ROW
+BEGIN
+    IF NEW.wax_code <> OLD.wax_code THEN
+        IF NEW.wax_code REGEXP '^[0-9]$' THEN
+            SET NEW.wax_code_order = LPAD(NEW.wax_code, 2, '0');
+        ELSEIF NEW.wax_code REGEXP '^[0-9][A-Za-z]' THEN
+            SET NEW.wax_code_order = CONCAT('0', NEW.wax_code);
+        ELSEIF NEW.wax_code REGEXP '^[0-9]-[A-Za-z0-9]' THEN
+            SET NEW.wax_code_order = CONCAT('0', NEW.wax_code);
+        END IF;
+    END IF;
+END$$
+
+DELIMITER ;
