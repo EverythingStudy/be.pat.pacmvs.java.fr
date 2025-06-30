@@ -1056,6 +1056,12 @@ INSERT INTO sys_menu (menu_id, menu_name, menu_name_en, order_num, path, compone
 alter table tb_image
     add wax_code_order varchar(255) null after wax_code;
 
+UPDATE tb_image
+SET wax_code_order = wax_code
+WHERE status = 4
+  AND analyze_status = 1
+  AND wax_code_order IS NULL;
+
 -- 更新纯数字且长度为1的 wax_code，补前导零至两位
 UPDATE tb_image
 SET wax_code_order = LPAD(wax_code, 2, '0')
@@ -1072,6 +1078,9 @@ WHERE status = 4
   AND wax_code IS NOT NULL
   AND (wax_code REGEXP '^[0-9]-[0-9A-Za-z]' OR wax_code REGEXP '^[0-9][A-Za-z]');
 
+
+DROP TRIGGER IF EXISTS trg_before_insert_update_wax_code_order;
+
 DELIMITER $$
 
 CREATE TRIGGER trg_before_insert_update_wax_code_order
@@ -1087,8 +1096,12 @@ BEGIN
     ELSEIF NEW.wax_code REGEXP '^[0-9]-[A-Za-z0-9]' THEN
         -- 情况3: 一位数字+-+字母/数字
         SET NEW.wax_code_order = CONCAT('0', NEW.wax_code);
+    ELSE
+        SET NEW.wax_code_order = NEW.wax_code;
     END IF;
 END$$
+
+DROP TRIGGER IF EXISTS trg_before_update_wax_code_order;
 
 CREATE TRIGGER trg_before_update_wax_code_order
     BEFORE UPDATE ON tb_image
@@ -1101,6 +1114,8 @@ BEGIN
             SET NEW.wax_code_order = CONCAT('0', NEW.wax_code);
         ELSEIF NEW.wax_code REGEXP '^[0-9]-[A-Za-z0-9]' THEN
             SET NEW.wax_code_order = CONCAT('0', NEW.wax_code);
+        ELSE
+            SET NEW.wax_code_order = NEW.wax_code;
         END IF;
     END IF;
 END$$
