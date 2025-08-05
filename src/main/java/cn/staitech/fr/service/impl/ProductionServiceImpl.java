@@ -28,6 +28,17 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
     public List<ProductionVO> list(ProductionReq req) {
         return Collections.emptyList();
     }
+
+    /**
+     * 蜡块编号下拉列表
+     *
+     * @param req 制片信息参数
+     * @return 蜡块编号下拉列表
+     */
+    @Override
+    public List<String> waxCodeList(ProductionReq req) {
+        return Collections.emptyList();
+    }
 }
 
 

@@ -20,4 +20,12 @@ public interface ProductionService extends IService<Production> {
      * @return 制片信息结果
      */
     List<ProductionVO> list(ProductionReq req);
+
+    /**
+     * 蜡块编号下拉列表
+     *
+     * @param req 制片信息参数
+     * @return 蜡块编号下拉列表
+     */
+    List<String> waxCodeList(ProductionReq req);
 }

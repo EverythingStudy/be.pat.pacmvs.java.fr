@@ -39,4 +39,13 @@ public class ProductionController {
         List<ProductionVO> list = this.productionService.list(req);
         return R.ok(list);
     }
+
+    @ApiOperation(value = "蜡块编号下拉列表")
+    @PostMapping("/waxCodeList")
+    public R<List<String>> waxCodeList(@RequestBody @Validated ProductionReq req) {
+        Long organizationId = SecurityUtils.getOrganizationId();
+        req.setOrganizationId(organizationId);
+        List<String> list = this.productionService.waxCodeList(req);
+        return R.ok(list);
+    }
 }
