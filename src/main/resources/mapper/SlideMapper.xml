@@ -239,5 +239,13 @@
             </if>
         </where>
     </select>
+    <select id="selectWaxCodes" resultType="java.lang.String">
+        SELECT DISTINCT b.wax_code
+        FROM fr_slide a JOIN tb_image b ON a.image_id = b.image_id
+        WHERE
+            a.special_id = #{projectId}
+        AND a.del_flag = '0'
+        ORDER BY b.wax_code_order asc,b.wax_code asc
+    </select>
 
 </mapper>

@@ -9,6 +9,8 @@ import cn.staitech.fr.vo.project.slide.SlidePageReq;
 import cn.staitech.fr.vo.project.slide.SlidePageVo;
 import cn.staitech.fr.vo.project.slide.SlideDetailVo;
 
+import javax.validation.constraints.NotNull;
+
 
 public interface SlideMapper extends BaseMapper<Slide> {
     String selectBySpecialId(Long specialId);
@@ -23,6 +25,7 @@ public interface SlideMapper extends BaseMapper<Slide> {
     
     SlideDetailVo getSlideInfo(Long slideId);
 
+    List<String> selectWaxCodes(@Param("projectId") Long projectId);
 }
 
 
