@@ -13,12 +13,12 @@ public class ProductionVO {
     /**
      * 主键
      */
-    @ApiModelProperty(value = "主键")
+    @ApiModelProperty(value = "主键", hidden = true)
     private Long id;
     /**
      * 种属ID
      */
-    @ApiModelProperty(value = "种属ID")
+    @ApiModelProperty(value = "种属ID", hidden = true)
     private String speciesId;
     /**
      * 蜡块编号
@@ -26,14 +26,19 @@ public class ProductionVO {
     @ApiModelProperty(value = "蜡块编号")
     private String waxCode;
     /**
+     * 种属蜡块模板ID
+     */
+    @ApiModelProperty(value = "种属蜡块模板ID：与 种属脏器下拉列表（取自种属蜡块模板数据）配合使用")
+    private Long templateId;
+    /**
      * 脏器名称
      */
-    @ApiModelProperty(value = "脏器名称")
+    @ApiModelProperty(value = "脏器名称：辅助使用")
     private String organName;
     /**
      * 英文名称
      */
-    @ApiModelProperty(value = "英文名称")
+    @ApiModelProperty(value = "英文名称：辅助使用")
     private String organEn;
     /**
      * 取材块数
