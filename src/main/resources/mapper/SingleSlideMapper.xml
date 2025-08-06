@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.SingleSlideMapper">
+
+    <select id="selectSingleOrgan" resultType="cn.staitech.fr.domain.out.OrganDisassemblyOut">
+        SELECT
+        ti.file_name,
+        ss.single_id,
+        ss.slide_id,
+        ss.thumb_url,
+        ss.category_id,
+        fc.organ_en,
+        fc.organ_name,
+        fs.group_code,
+        fs.wax_code,
+        fs.animal_code,
+        fs.gender_flag,
+        fs.initiate_by,
+        su.user_name as initiate_name,
+        fs.initiate_time
+        FROM
+        fr_single_slide ss
+        LEFT JOIN fr_slide fs ON ss.slide_id = fs.slide_id
+        LEFT JOIN fr_category fc ON ss.category_id = fc.category_id
+        left join tb_image ti on fs.image_id = ti.image_id
+        left join sys_user su on fs.initiate_by=su.user_id
+        <where>
+            fs.special_id = #{specialId} and fs.process_flag = '2' and fc.del_flag = '0' and fs.del_flag = '0'
+            <if test="fileName != null and fileName != ''">
+                and ti.file_name like concat('%',#{fileName},'%')
+            </if>
+            <if test="initiateName != null and initiateName != ''">
+                and su.user_name like concat('%',#{initiateName},'%')
+            </if>
+            <if test="categoryId != null and categoryId != ''">
+                and ss.category_id =#{categoryId}
+            </if>
+            <if test="initiateTimeParams!=null and initiateTimeParams.size() > 0">
+                <if test="initiateTimeParams.beginTime != null and initiateTimeParams.beginTime != ''">
+                    AND date_format(fs.initiate_time,'%Y%m%d') &gt;=
+                    date_format(#{initiateTimeParams.beginTime},'%Y%m%d')
+                </if>
+                <if test="initiateTimeParams.endTime != null and initiateTimeParams.endTime != ''">
+                    AND date_format(fs.initiate_time,'%Y%m%d') &lt;= date_format(#{initiateTimeParams.endTime},'%Y%m%d')
+                </if>
+            </if>
+        </where>
+        order by fs.initiate_time desc,ss.single_id asc
+    </select>
+    <select id="selectNumber" resultType="cn.staitech.fr.domain.SingleOrganNumber">
+        select count(*) as organ_number, category_id, slide_id
+        from fr_annotation
+        <where>
+            contour_type='2'
+            and single_slide_id is null
+            <if test="slideIds != null and slideIds.size>0">
+                AND slide_id in
+                <foreach collection="slideIds" item="id" open="(" separator="," close=")">
+                    #{id}
+                </foreach>
+            </if>
+            <if test="categoryId!= null and categoryId!= ''">
+                AND category_id = #{categoryId}
+            </if>
+        </where>
+        group by slide_id, category_id
+    </select>
+    <sql id="singleSlideBy">
+        s
+        .
+        slide_id
+        ,
+        s.special_id,
+        s.image_id,
+        s.group_code,
+        s.wax_code,
+        s.animal_code,
+        s.gender_flag,
+        s.organs,
+        s.process_flag,
+        s.check_status,
+        s.check_by,
+        s.check_time,
+        s.initiate_by,
+        s.initiate_time,
+        s.del_flag,
+        s.create_by,
+        s.create_time,
+        s.update_by,
+        s.update_time,
+        m.image_id,
+        m.thumb_url,
+        m.image_path,
+        m.format,
+        m.width,
+        m.height,
+        m.source_lens,
+        m.resolution_x,
+        m.resolution_y,
+        m.source_lens,
+        m.image_name,
+        ss.single_id,
+        ss.single_id as singleSlideId,
+        ss.thumb_url as singleThumbUrl,
+        ss.category_id,
+        ss.description,
+        ss.forecast_status,
+        ss.diagnosis_status
+    </sql>
+
+    <select id="getRangOut" resultType="java.lang.String">
+        select concat(min(cast(faf.results AS DECIMAL(18, 3))), faf.unit, '-', max(cast(faf.results AS DECIMAL(18, 3))),
+                      faf.unit)
+        from fr_ai_forecast faf
+                 left join fr_single_slide fss on faf.single_slide_id = fss.single_id
+                 left join fr_slide fs on fss.slide_id = fs.slide_id and fs.del_flag = '0'
+        where fss.category_id = #{categoryId}
+          and fs.special_id = #{specialId}
+          and fs.group_code = #{groupCode}
+          and faf.quantitative_indicators = #{quantitativeIndicators}
+        group by faf.unit;
+    </select>
+    <select id="getImageId" resultType="java.lang.String">
+        select ti.resolution_x
+        from fr_slide fs
+                 left join tb_image ti on fs.image_id = ti.image_id
+        where fs.slide_id = #{slideId}
+    </select>
+    <select id="getReferenceScope" resultType="java.math.BigDecimal">
+        select if(locate('±', faf.results) > 0,
+                  CAST(LEFT (faf.results, locate('±', faf.results) - 1) AS DECIMAL (10, 3)),
+                  CAST(faf.results AS DECIMAL(10, 3)))
+        from fr_ai_forecast faf
+                 left join fr_single_slide fss on faf.single_slide_id = fss.single_id
+                 left join fr_slide fs on fss.slide_id = fs.slide_id and fs.del_flag = '0'
+        where fss.category_id = #{categoryId}
+          and fs.special_id = #{specialId}
+          and fs.group_code = #{groupCode}
+          and faf.quantitative_indicators = #{quantitativeIndicators}
+          and faf.struct_type = #{structType}
+          and fs.gender_flag = #{genderFlag}
+        group by faf.forecast_id;
+
+    </select>
+    <select id="getGender" resultType="java.lang.String">
+        select fs.gender_flag
+        from fr_slide fs
+                 left join fr_single_slide fss on fs.slide_id = fss.slide_id
+        where fss.single_id = #{id}
+    </select>
+
+</mapper>

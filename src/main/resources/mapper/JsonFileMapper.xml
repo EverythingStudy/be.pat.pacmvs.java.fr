@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.JsonFileMapper">
+
+    <resultMap type="cn.staitech.fr.domain.JsonFile" id="JsonFileMap">
+        <result property="fileId" column="file_id" jdbcType="INTEGER"/>
+        <result property="taskId" column="task_id" jdbcType="INTEGER"/>
+        <result property="fileUrl" column="file_url" jdbcType="VARCHAR"/>
+        <result property="status" column="status" jdbcType="INTEGER"/>
+        <result property="times" column="times" jdbcType="INTEGER"/>
+        <result property="startTime" column="start_time" jdbcType="TIMESTAMP"/>
+        <result property="endTime" column="end_time" jdbcType="TIMESTAMP"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <!-- 批量插入 -->
+    <insert id="insertBatch" keyProperty="fileId" useGeneratedKeys="true">
+        insert into patsaas.fr_json_file(file_url, status, times, start_time, end_time, create_time,
+        update_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.fileUrl},#{entity.status}, #{entity.times}, #{entity.startTime},
+            #{entity.endTime}, #{entity.createTime}, #{entity.updateTime})
+        </foreach>
+    </insert>
+    <!-- 批量插入或按主键更新 -->
+    <insert id="insertOrUpdateBatch" keyProperty="fileId" useGeneratedKeys="true">
+        insert into patsaas.fr_json_file(file_url, status, times, start_time, end_time, create_time,
+        update_time)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.fileUrl}, #{entity.status}, #{entity.times}, #{entity.startTime},
+            #{entity.endTime}, #{entity.createTime}, #{entity.updateTime})
+        </foreach>
+        on duplicate key update
+        file_url = values(file_url) , status = values(status) , times =
+        values(times) , start_time = values(start_time) , end_time = values(end_time) , create_time =
+        values(create_time) , update_time = values(update_time)
+    </insert>
+
+</mapper>
+
