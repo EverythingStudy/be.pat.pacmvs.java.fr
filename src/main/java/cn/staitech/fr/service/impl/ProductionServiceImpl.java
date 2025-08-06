@@ -99,7 +99,24 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
      */
     @Override
     public List<OrganVO> organList(ProductionReq req) {
-        return Collections.emptyList();
+        List<OrganVO> list = new ArrayList<>();
+        // 查询项目信息
+        Project project = this.projectMapper.selectById(req.getProjectId());
+        if (project != null && StringUtils.isNotBlank(project.getSpeciesId())) {
+            LambdaQueryWrapper<SpeciesWaxCodeTemplate> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(SpeciesWaxCodeTemplate::getSpeciesId, project.getSpeciesId());
+            List<SpeciesWaxCodeTemplate> templates = speciesWaxCodeTemplateMapper.selectList(wrapper);
+            if (!CollectionUtils.isEmpty(templates)) {
+                for (SpeciesWaxCodeTemplate template : templates) {
+                    OrganVO vo = new OrganVO();
+                    vo.setTemplateId(template.getId());
+                    vo.setOrganName(template.getOrganName());
+                    vo.setOrganEn(template.getOrganEn());
+                    list.add(vo);
+                }
+            }
+        }
+        return list;
     }
 }
 
