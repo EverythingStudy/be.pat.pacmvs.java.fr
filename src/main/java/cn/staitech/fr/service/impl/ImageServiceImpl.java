@@ -20,15 +20,20 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.NumberFormat;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 import static cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL;
@@ -45,6 +50,8 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image>
     private ImageMapper imageMapper;
     @Resource
     private SlideMapper slideMapper;
+    @Value("${file.path:/home/pacmvs}")
+    private String localFilePath;
 
     /**
      * 切片状态字典 .
@@ -140,6 +147,29 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image>
             imageIdList.removeAll(forbidIds);
             if (CollectionUtils.isNotEmpty(imageIdList)){
                 imageMapper.deleteBatchIds(imageIdList);
+                NumberFormat formatter = NumberFormat.getNumberInstance();
+                formatter.setMinimumIntegerDigits(3);
+                formatter.setGroupingUsed(false);
+                String orgCodeStr = "C" + formatter.format(SecurityUtils.getOrganizationId());
+                for (Long imageId : imageIdList) {
+                    String tilesPath = localFilePath + File.separator + orgCodeStr + File.separator + imageId + "TileGroup0";
+                    // 异步执行删除切片目录
+                    CompletableFuture.supplyAsync(() -> {
+                        try {
+                            Path path = Paths.get(tilesPath);
+                            if (Files.exists(path)) {
+                                Files.walk(path)
+                                        .sorted(Comparator.reverseOrder())
+                                        .map(Path::toFile)
+                                        .forEach(File::delete);
+                                return true;
+                            }
+                            return false;
+                        } catch (IOException e) {
+                            throw new RuntimeException("Failed to delete slice directory: " + tilesPath, e);
+                        }
+                    });
+                }
             }
         }
         return forbidIds;
