@@ -53,7 +53,7 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
         // 查询项目信息
         Project project = this.projectMapper.selectById(req.getProjectId());
         if (project != null && StringUtils.isNotBlank(project.getSpeciesId())) {
-            // 先查询制片信息表，为空，再查询模板表
+            // 先查询制片信息表，为空，再查询模板表+项目蜡块号
             LambdaQueryWrapper<Production> pWrapper = new LambdaQueryWrapper<>();
             pWrapper.eq(Production::getSpecialId, req.getProjectId());
             pWrapper.eq(Production::getSpeciesId, project.getSpeciesId());
@@ -65,6 +65,7 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                     list.add(vo);
                 }
             } else {
+                // 查询模板表
                 LambdaQueryWrapper<SpeciesWaxCodeTemplate> wrapper = new LambdaQueryWrapper<>();
                 wrapper.eq(SpeciesWaxCodeTemplate::getSpeciesId, project.getSpeciesId());
                 List<SpeciesWaxCodeTemplate> templates = speciesWaxCodeTemplateMapper.selectList(wrapper);
@@ -74,6 +75,16 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                         BeanUtils.copyProperties(template, vo);
                         vo.setTemplateId(template.getId());
                         vo.setId(null);
+                        list.add(vo);
+                    }
+                }
+                // 项目切片蜡块号
+                List<String> projectWaxCodes = this.slideMapper.selectWaxCodes(req.getProjectId());
+                if (!CollectionUtils.isEmpty(projectWaxCodes)) {
+                    for (String code : projectWaxCodes) {
+                        ProductionVO vo = new ProductionVO();
+                        vo.setSpeciesId(project.getSpeciesId());
+                        vo.setWaxCode(code);
                         list.add(vo);
                     }
                 }
