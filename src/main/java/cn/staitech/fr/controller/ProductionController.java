@@ -3,7 +3,9 @@ package cn.staitech.fr.controller;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.service.ProductionService;
+import cn.staitech.fr.vo.project.OrganVO;
 import cn.staitech.fr.vo.project.ProductionReq;
+import cn.staitech.fr.vo.project.ProductionSaveReq;
 import cn.staitech.fr.vo.project.ProductionVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -47,5 +49,18 @@ public class ProductionController {
         req.setOrganizationId(organizationId);
         List<String> list = this.productionService.waxCodeList(req);
         return R.ok(list);
+    }
+
+    @ApiOperation(value = "种属脏器下拉列表（取自种属蜡块模板数据）")
+    @PostMapping("/organList")
+    public R<List<OrganVO>> organList(@RequestBody @Validated ProductionReq req) {
+        List<OrganVO> list = this.productionService.organList(req);
+        return R.ok(list);
+    }
+
+    @ApiOperation(value = "保存制片信息")
+    @PostMapping("/save")
+    public R<String> save(@RequestBody @Validated ProductionSaveReq req) {
+        return this.productionService.save(req);
     }
 }
