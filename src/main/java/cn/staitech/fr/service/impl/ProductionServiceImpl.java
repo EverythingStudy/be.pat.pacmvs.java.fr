@@ -16,11 +16,15 @@ import cn.staitech.fr.vo.project.ProductionVO;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -45,7 +49,37 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
      */
     @Override
     public List<ProductionVO> list(ProductionReq req) {
-        return Collections.emptyList();
+        List<ProductionVO> list = new ArrayList<>();
+        // 查询项目信息
+        Project project = this.projectMapper.selectById(req.getProjectId());
+        if (project != null && StringUtils.isNotBlank(project.getSpeciesId())) {
+            // 先查询制片信息表，为空，再查询模板表
+            LambdaQueryWrapper<Production> pWrapper = new LambdaQueryWrapper<>();
+            pWrapper.eq(Production::getSpecialId, req.getProjectId());
+            pWrapper.eq(Production::getSpeciesId, project.getSpeciesId());
+            List<Production> productions = this.baseMapper.selectList(pWrapper);
+            if (!CollectionUtils.isEmpty(productions)) {
+                for (Production p : productions) {
+                    ProductionVO vo = new ProductionVO();
+                    BeanUtils.copyProperties(p, vo);
+                    list.add(vo);
+                }
+            } else {
+                LambdaQueryWrapper<SpeciesWaxCodeTemplate> wrapper = new LambdaQueryWrapper<>();
+                wrapper.eq(SpeciesWaxCodeTemplate::getSpeciesId, project.getSpeciesId());
+                List<SpeciesWaxCodeTemplate> templates = speciesWaxCodeTemplateMapper.selectList(wrapper);
+                if (!CollectionUtils.isEmpty(templates)) {
+                    for (SpeciesWaxCodeTemplate template : templates) {
+                        ProductionVO vo = new ProductionVO();
+                        BeanUtils.copyProperties(template, vo);
+                        vo.setTemplateId(template.getId());
+                        vo.setId(null);
+                        list.add(vo);
+                    }
+                }
+            }
+        }
+        return list;
     }
 
     /**
