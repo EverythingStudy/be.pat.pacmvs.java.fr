@@ -9,13 +9,17 @@ import java.util.Map;
 public class DictData {
 
     /**
-     * Image - 原始切片 - 切片状态：0上传中、1上传失败、2解析中、3解析失败、4可用
+     * Image - 原始切片 - 切片状态：0上传中、1上传失败、2解析中、3解析失败、4可用、5信息解析中、6信息解析失败、7处理中、8处理失败
      */
     public static final Map<Integer, String> IMAGE_STATUS_MAP = new ImmutableMap.Builder<Integer, String>()
             .put(0, "上传中")
             .put(1, "上传失败")
             .put(2, "解析中")
             .put(3, "解析失败")
+            .put(5, "信息解析中")
+            .put(6, "信息解析失败")
+            .put(7, "处理中")
+            .put(8, "处理失败")
             .put(4, "可用")
             .build();
 
