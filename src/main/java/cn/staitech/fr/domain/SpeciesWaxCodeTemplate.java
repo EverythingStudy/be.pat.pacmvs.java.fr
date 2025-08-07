@@ -38,6 +38,10 @@ public class SpeciesWaxCodeTemplate implements Serializable {
      */
     private String organEn;
     /**
+     * 取材块数
+     */
+    private Integer blockCount;
+    /**
      * 性别（M：男性；F：女性；N：未知）
      */
     private String sexFlag;

@@ -5,6 +5,7 @@ CREATE TABLE `tb_species_wax_code_template` (
   `wax_code` varchar(255)  DEFAULT NULL COMMENT '蜡块编号',
   `organ_name` varchar(255) DEFAULT NULL COMMENT '脏器名称',
   `organ_en` varchar(255) DEFAULT NULL COMMENT '英文名称',
+  `block_count` int NOT NULL DEFAULT '0' COMMENT '取材块数',
   `sex_flag` char(1)  DEFAULT 'N' COMMENT '性别（M；F；N）',
   `organ_code` varchar(255) DEFAULT NULL COMMENT '脏器编码',
   `abbreviation` varchar(255) DEFAULT NULL COMMENT '脏器缩写',
