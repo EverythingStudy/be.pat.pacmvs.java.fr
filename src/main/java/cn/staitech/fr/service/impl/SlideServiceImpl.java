@@ -5,12 +5,11 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
 import cn.staitech.common.core.domain.CustomPage;
-import cn.staitech.fr.domain.Image;
-import cn.staitech.fr.domain.Project;
-import cn.staitech.fr.domain.ProjectMember;
+import cn.staitech.fr.domain.*;
 import cn.staitech.fr.vo.project.ChoiceImagePageReq;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.system.api.RemoteAnnotationService;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -20,7 +19,6 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.Constants;
-import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.vo.project.ProjectImageVo;
 import cn.staitech.fr.vo.project.slide.SlidePageReq;
 import cn.staitech.fr.vo.project.ImageVO;
@@ -311,6 +309,15 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 		return slideInfo;
 	}
 
+	@Override
+	public boolean checkAiExecuted(Long projectId) {
+		LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(Slide::getProjectId, projectId);
+		wrapper.eq(Slide::getDelFlag, "0");
+		wrapper.gt(Slide::getAiStatus, 0);
+		List<Slide> slides = this.baseMapper.selectList(wrapper);
+		return !org.springframework.util.CollectionUtils.isEmpty(slides);
+	}
 }
 
 

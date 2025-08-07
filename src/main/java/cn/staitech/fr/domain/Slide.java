@@ -71,7 +71,11 @@ public class Slide implements Serializable {
     @TableField(typeHandler = ListLongTypeHandler.class)
     @ApiModelProperty(value = "已阅片用户")
     private List<Long> viewers;
-    
+
+    /**
+     * AI分析状态：0-未分析；1-脏器识别中；2-脏器识别异常
+     */
+    private Integer aiStatus;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
