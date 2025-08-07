@@ -41,7 +41,7 @@ CREATE TABLE `fr_production` (
 ) COMMENT = '专题制片信息';
 
 ALTER TABLE `fr_slide`
-ADD COLUMN `ai_status` int NOT NULL DEFAULT 0 COMMENT 'AI分析状态：0-未分析；1-脏器识别中；2-脏器识别异常' AFTER `viewers`;
+ADD COLUMN `ai_status` int NOT NULL DEFAULT 0 COMMENT 'AI分析状态：0-未分析；1-脏器识别中；2-脏器识别异常；3-脏器识别完成' AFTER `viewers`;
 
 -- 以下sql林亚提供
 CREATE TABLE `fr_single_slide`
