@@ -159,6 +159,7 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
             Map<Long, SpeciesWaxCodeTemplate> map = templateList.stream().collect(Collectors.toMap(SpeciesWaxCodeTemplate::getId, item -> item));
 
             List<Production> productions = new ArrayList<>();
+            Date now = new Date();
             for (ProductionInfoReq r : req.getProductions()) {
                 SpeciesWaxCodeTemplate template = map.get(r.getTemplateId());
                 Production production = new Production();
@@ -187,7 +188,6 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                 // 机构ID
                 production.setOrganizationId(project.getOrganizationId());
                 Long userid = SecurityUtils.getUserId();
-                Date now = new Date();
                 // 创建人id
                 production.setCreateBy(userid);
                 // 创建时间
