@@ -79,8 +79,12 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                         organTagWrapper.eq(OrganTag::getOrganizationId, project.getOrganizationId());
                         organTagWrapper.eq(OrganTag::getDelFlag, false);
                         OrganTag tag = organTagMapper.selectOne(organTagWrapper);
-                        // 脏器标签ID
-                        vo.setTemplateId(tag.getOrganTagId());
+                        if (tag != null) {
+                            // 脏器标签ID
+                            vo.setTemplateId(tag.getOrganTagId());
+                        } else {
+                            log.error("种属蜡块模板表的脏器编码：" + template.getOrganCode() + "，不在脏器标签中，机构ID=" + project.getOrganizationId());
+                        }
                         vo.setId(null);
                         list.add(vo);
                     }
