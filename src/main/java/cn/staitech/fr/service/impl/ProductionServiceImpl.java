@@ -16,6 +16,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
@@ -144,6 +145,7 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
      * @return 结果
      */
     @Override
+    @Transactional(rollbackFor = Throwable.class)
     public R<String> save(ProductionSaveReq req) {
         // 查询项目信息
         Project project = this.projectMapper.selectById(req.getProjectId());
