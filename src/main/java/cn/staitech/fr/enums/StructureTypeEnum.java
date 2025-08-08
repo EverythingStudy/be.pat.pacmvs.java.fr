@@ -1,4 +1,4 @@
-package cn.staitech.fr.enmu;
+package cn.staitech.fr.enums;
 
 import lombok.Getter;
 

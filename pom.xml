@@ -50,7 +50,16 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>1.2.11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.5.0</version>
+        </dependency>
         <dependency>
             <groupId>cn.staitech</groupId>
             <artifactId>staitech-api-system</artifactId>
@@ -78,6 +87,52 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+            <version>${dynamic-ds.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20190722</version>
+        </dependency>
+        <dependency>
+            <groupId>org.rocksdb</groupId>
+            <artifactId>rocksdbjni</artifactId>
+            <version>7.10.2</version> <!-- 可根据需要选择最新版本 -->
+        </dependency>
+        <!--Geometry 操作依赖-->
+        <dependency>
+            <groupId>com.vividsolutions</groupId>
+            <artifactId>jts</artifactId>
+            <version>1.13</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.locationtech.jts/jts-core -->
+        <dependency>
+            <groupId>org.locationtech.jts</groupId>
+            <artifactId>jts-core</artifactId>
+            <version>1.19.0</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.github.shyiko/mysql-binlog-connector-java -->
+        <dependency>
+            <groupId>com.github.shyiko</groupId>
+            <artifactId>mysql-binlog-connector-java</artifactId>
+            <version>0.17.0</version>
+        </dependency>
+        <!--  geotools依赖 -->
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-geojson</artifactId>
+            <version>19.0</version>
+<!--            <scope>system</scope>-->
+<!--            <systemPath>${project.basedir}/src/main/resources/lib/gt-geojson-19.0.jar</systemPath>-->
         </dependency>
     </dependencies>
     <repositories>
@@ -184,6 +239,19 @@
 
     <!--配置profiles环境-->
     <profiles>
+        <profile>
+            <!--开发环境-->
+            <id>local</id>
+            <properties>
+                <!-- 激活 local 配置 -->
+                <activatedProperties>local</activatedProperties>
+                <!-- 这三项对 local 模式无效，但必须留空，避免占位符报错 -->
+                <nacosNamespace></nacosNamespace>
+                <nacosAddress></nacosAddress>
+                <nacosGroup></nacosGroup>
+                <serverAddr></serverAddr>
+            </properties>
+        </profile>
         <profile>
             <!--开发环境-->
             <id>pacmvsdev</id>

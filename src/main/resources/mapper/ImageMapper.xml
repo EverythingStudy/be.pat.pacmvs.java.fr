@@ -151,5 +151,54 @@
         </where>
         order by i.image_id desc
     </select>
-
+    <sql id="selectImageVo">
+        select image_id,
+               file_name,
+               image_name,
+               image_path,
+               image_url,
+               thumb_url,
+               macro_url,
+               label_url,
+               cache_url,
+               multiple,
+               format,
+               width,
+               height,
+               `depth`,
+               `size`,
+               global_size,
+               resolving_power,
+               tile_count_list,
+               level_count,
+               chunk_total,
+               md5,
+               resolution_x,
+               resolution_y,
+               source_lens,
+               create_by,
+               create_time,
+               update_by,
+               update_time,
+               image_code,
+               topic_id,
+               topic_name,
+               `status`,
+               host_id,
+               organization_id,
+               round_id,
+               biz_type,
+               `source`,
+               folder_id
+        from tb_image
+    </sql>
+    <!--查询单个图像信息-->
+    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+        <include refid="selectImageVo"/>
+        <where>
+            <if test="imageId != null and imageId != ''">
+                and image_id = #{imageId}
+            </if>
+        </where>
+    </select>
 </mapper>

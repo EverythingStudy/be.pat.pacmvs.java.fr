@@ -5,7 +5,6 @@ import cn.staitech.common.security.annotation.EnableCustomConfig;
 import cn.staitech.common.security.annotation.EnableRyFeignClients;
 import cn.staitech.common.swagger.annotation.EnableCustomSwagger2;
 import cn.staitech.fr.utils.MessageSource;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import org.mybatis.spring.annotation.MapperScan;
@@ -15,6 +14,7 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
 import java.util.TimeZone;
 
 /**

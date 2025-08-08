@@ -25,4 +25,11 @@ public interface ImageService extends IService<Image> {
     List<Long> deleteBatchIds(ImageBatchIdsVO ids);
 
     int updateById(ImageUpdateVO vo);
+    /**
+     * 查询单个切片信息
+     *
+     * @param imageId
+     * @return
+     */
+    Image selectById(Long imageId);
 }

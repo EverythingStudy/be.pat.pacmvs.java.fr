@@ -193,7 +193,16 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image>
         image.setUpdateBy(loginUser);
         return imageMapper.updateById(image);
     }
-
+    /**
+     * 查询单个图像信息
+     *
+     * @param image
+     * @return
+     */
+    @Override
+    public Image selectById(Long image) {
+        return imageMapper.selectById(image);
+    }
 
 }
 

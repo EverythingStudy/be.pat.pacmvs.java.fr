@@ -150,5 +150,17 @@
                  left join fr_single_slide fss on fs.slide_id = fss.slide_id
         where fss.single_id = #{id}
     </select>
-
+    <select id="singleSlideBy" parameterType="long"
+            resultType="cn.staitech.fr.domain.out.SingleSlideSelectBy">
+        select
+        <include refid="singleSlideBy"/>
+        from fr_single_slide as ss
+        left join fr_slide s on ss.slide_id = s.slide_id
+        left join tb_image m on m.image_id = s.image_id
+        <where>
+            <if test="singleId != null">
+                ss.single_id = #{singleId, jdbcType=NUMERIC}
+            </if>
+        </where>
+    </select>
 </mapper>
