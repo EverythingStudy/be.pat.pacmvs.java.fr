@@ -5,10 +5,8 @@ import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.web.controller.BaseController;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.mapper.SlideMapper;
-import cn.staitech.fr.vo.project.ChoiceImagePageReq;
-import cn.staitech.fr.vo.project.ProjectImageVo;
+import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
-import cn.staitech.fr.vo.project.ImageVO;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.MessageSource;
 import io.swagger.annotations.Api;
@@ -149,6 +147,10 @@ public class SlideController  extends BaseController {
     public R visit(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "标注id", required = true) Long slideId) {
         return R.ok(slideService.getSlideInfo(slideId));
     }
-    
 
+    @ApiOperation(value = "AI分析")
+    @PostMapping("/aiAnalysis")
+    public R<String> aiAnalysis(@RequestBody @Validated AiAnalysisReq req) {
+        return this.slideService.aiAnalysis(req);
+    }
 }

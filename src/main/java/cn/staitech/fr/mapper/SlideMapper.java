@@ -2,6 +2,7 @@ package cn.staitech.fr.mapper;
 
 import java.util.List;
 import cn.staitech.common.core.domain.CustomPage;
+import cn.staitech.fr.vo.project.AiAnalysisBO;
 import cn.staitech.fr.vo.project.slide.*;
 import org.apache.ibatis.annotations.Param;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -30,6 +31,8 @@ public interface SlideMapper extends BaseMapper<Slide> {
     boolean isAiSlideFinished(Long projectId);
 
     List<SlideOrganTagVo> getOrganCode(SlideSelectListReq req);
+
+    List<AiAnalysisBO> selectAiAnalysis(@Param("projectId")Long projectId);
 }
 
 

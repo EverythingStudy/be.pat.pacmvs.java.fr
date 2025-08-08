@@ -296,5 +296,23 @@
                       left join tb_organ_tag tg on fss.category_id=tg.organ_tag_id
         where fs.del_flag='0'
     </select>
+    <select id="selectAiAnalysis" resultType="cn.staitech.fr.vo.project.AiAnalysisBO">
+        SELECT
+            a.slide_id AS slideId,
+            a.image_id AS imageId,
+            b.image_path AS imagePath,
+            b.file_name AS fileName,
+            d.topic_name AS topicName,
+            e.organization_id AS organizationId,
+            e.organization_name AS organizationName
+        FROM fr_slide a LEFT JOIN tb_image b ON a.image_id = b.image_id
+        LEFT JOIN fr_special c ON a.special_id = c.special_id
+        LEFT JOIN tb_topic d ON c.topic_id = d.topic_id
+        LEFT JOIN sys_organization e ON c.organization_id = e.organization_id
+        WHERE
+            a.del_flag = '0'
+        AND a.ai_status = 0
+        AND a.special_id = #{projectId}
+    </select>
 
 </mapper>

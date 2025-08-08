@@ -1,29 +1,34 @@
 package cn.staitech.fr.service.impl;
 
-import java.util.*;
-import java.util.stream.Collectors;
-import javax.annotation.Resource;
-
+import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.common.core.domain.CustomPage;
-import cn.staitech.fr.domain.*;
-import cn.staitech.fr.vo.project.ChoiceImagePageReq;
-import cn.staitech.fr.mapper.*;
+import cn.staitech.common.core.domain.R;
+import cn.staitech.common.security.utils.SecurityUtils;
+import cn.staitech.fr.constant.Constants;
+import cn.staitech.fr.domain.Image;
+import cn.staitech.fr.domain.Project;
+import cn.staitech.fr.domain.ProjectMember;
+import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.mapper.ImageMapper;
+import cn.staitech.fr.mapper.ProjectMapper;
+import cn.staitech.fr.mapper.ProjectMemberMapper;
+import cn.staitech.fr.mapper.SlideMapper;
+import cn.staitech.fr.service.SlideService;
+import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.system.api.RemoteAnnotationService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import cn.hutool.core.util.ObjectUtil;
-import cn.staitech.common.core.domain.R;
-import cn.staitech.common.security.utils.SecurityUtils;
-import cn.staitech.fr.constant.Constants;
-import cn.staitech.fr.vo.project.ProjectImageVo;
-import cn.staitech.fr.vo.project.ImageVO;
-import cn.staitech.fr.service.SlideService;
-import lombok.extern.slf4j.Slf4j;
+
+import javax.annotation.Resource;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static cn.staitech.common.security.utils.SecurityUtils.isAdmin;
 
@@ -45,6 +50,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 	private ImageMapper imageMapper;
 	@Resource
 	private RemoteAnnotationService remoteAnnotationService;
+	@Resource
+	public RedisTemplate<String,Object> redisTemplate;
 
 
 
@@ -349,6 +356,23 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 	public boolean isAiSlideFinished(Long projectId) {
 		return baseMapper.isAiSlideFinished(projectId);
 	}
+
+	@Override
+	public R<String> aiAnalysis(AiAnalysisReq req) {
+		// 分布式锁
+		String key = "ai_analysis_projectId_" + req.getProjectId();
+		Boolean result = this.redisTemplate.opsForValue().setIfAbsent(key, req.getProjectId());
+		if (Boolean.FALSE.equals(result)) {
+			return R.fail("处理中，请稍后");
+		}
+		// 查询所有未分析的切片
+		List<AiAnalysisBO> list = this.baseMapper.selectAiAnalysis(req.getProjectId());
+		for (AiAnalysisBO bo : list) {
+
+		}
+		return null;
+	}
+
 	@Override
 	public boolean checkAiExecuted(Long projectId) {
 		LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();

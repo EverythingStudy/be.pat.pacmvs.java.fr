@@ -3,9 +3,7 @@ package cn.staitech.fr.service;
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Slide;
-import cn.staitech.fr.vo.project.ChoiceImagePageReq;
-import cn.staitech.fr.vo.project.ImageVO;
-import cn.staitech.fr.vo.project.ProjectImageVo;
+import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.SlideDetailVo;
 import cn.staitech.fr.vo.project.slide.SlidePageReq;
 import cn.staitech.fr.vo.project.slide.SlidePageVo;
@@ -54,4 +52,6 @@ public interface SlideService extends IService<Slide> {
      * @return
      */
     boolean isAiSlideFinished(Long projectId);
+
+    R<String> aiAnalysis(AiAnalysisReq req);
 }
