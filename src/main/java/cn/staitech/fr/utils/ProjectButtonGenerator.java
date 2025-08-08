@@ -2,6 +2,8 @@ package cn.staitech.fr.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import cn.staitech.common.core.utils.SpringUtils;
 import cn.staitech.fr.constant.Constants;
 
 /**
@@ -21,6 +23,25 @@ public class ProjectButtonGenerator {
     public static final String LOG = "LOG";
     public static final String ARCHIVE = "ARCHIVE";
     public static final String CANCEL_COMPLETE = "CANCEL_COMPLETE";
+
+    public static final String AI_ANALYSIS= "AI_ANALYSIS"; //ai分析
+    public static final String CONTROL_GROUP= "CONTROL_GROUP"; //设置对照组
+    public static final String AI_OUTLINE = "AI_OUTLINE"; //加载ai轮廓数据
+    public static final String DEL_AI_OUTLINE = "DEL_AI_OUTLINE"; //删除ai轮廓数据
+    public static final String IMPORT_AI_INDEX = "IMPORT_AI_INDEX"; //导出AI指标信息
+    public static final String IMPORT_DIAGNOSTIC_DESC = "IMPORT_AI_OUTLINE"; //导出诊断描述信息
+
+    public static List<String> filterButtons(List<String> buttons) {
+        List<String> permission = new ArrayList<>();
+        permission.add(AI_ANALYSIS);
+        permission.add(CONTROL_GROUP);
+        permission.add(AI_OUTLINE);
+        permission.add(IMPORT_AI_INDEX);
+        permission.add(IMPORT_DIAGNOSTIC_DESC);
+        permission.add(DEL_AI_OUTLINE);
+        buttons.removeAll(permission);
+        return buttons;
+    }
 
 
     /**
@@ -73,9 +94,20 @@ public class ProjectButtonGenerator {
             buttons.add(CONFIG);
             buttons.add(PAUSE);
             buttons.add(COMPLETE);
+
+            buttons.add(AI_ANALYSIS);
+            buttons.add(CONTROL_GROUP);
+            buttons.add(AI_OUTLINE);
+            buttons.add(DEL_AI_OUTLINE);
+            buttons.add(IMPORT_AI_INDEX);
+            buttons.add(IMPORT_DIAGNOSTIC_DESC);
         } else if (isProjectMember(memberRole)) {
             //详情、日志
             buttons.add(DETAIL);
+            buttons.add(AI_OUTLINE);
+            buttons.add(DEL_AI_OUTLINE);
+            buttons.add(IMPORT_AI_INDEX);
+            buttons.add(IMPORT_DIAGNOSTIC_DESC);
         }
     }
 

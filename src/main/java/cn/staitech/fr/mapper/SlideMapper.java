@@ -2,12 +2,10 @@ package cn.staitech.fr.mapper;
 
 import java.util.List;
 import cn.staitech.common.core.domain.CustomPage;
+import cn.staitech.fr.vo.project.slide.*;
 import org.apache.ibatis.annotations.Param;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import cn.staitech.fr.domain.Slide;
-import cn.staitech.fr.vo.project.slide.SlidePageReq;
-import cn.staitech.fr.vo.project.slide.SlidePageVo;
-import cn.staitech.fr.vo.project.slide.SlideDetailVo;
 
 import javax.validation.constraints.NotNull;
 
@@ -26,6 +24,12 @@ public interface SlideMapper extends BaseMapper<Slide> {
     SlideDetailVo getSlideInfo(Long slideId);
 
     List<String> selectWaxCodes(@Param("projectId") Long projectId);
+
+    List<SlidePageVo> getSlideSelectList(SlideSelectListReq req);
+
+    boolean isAiSlideFinished(Long projectId);
+
+    List<SlideOrganTagVo> getOrganCode(SlideSelectListReq req);
 }
 
 

@@ -8,6 +8,7 @@ import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.Constants;
 import cn.staitech.fr.constant.DictData;
 import cn.staitech.fr.domain.*;
+import cn.staitech.fr.enmu.SpeciesTypeEnum;
 import cn.staitech.fr.vo.project.ProjectPageVo;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.SlideService;
@@ -53,6 +54,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
     @Resource
     private ProjectMemberMapper projectMemberMapper;
+
+    @Resource
+    private SpeciesMapper speciesMapper;
 
     /**
      * 分页查询项目列表
@@ -307,7 +311,28 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         }else{
             buttons = ProjectButtonGenerator.generateButtons(status, Constants.ROLE_OTHER);
         }
+        //在设置完成按钮之后过滤一下 在项目所选种属是“大鼠”、“小鼠”、“猴”、“犬”四个时显示，其他种属不显示任何按钮，即不提供任何AI辅助功能
+        String speciesId = project.getSpeciesId();
+        if(null != speciesId ){
+            Integer speciesIds = Integer.parseInt(speciesId);
+            if(!speciesIds.equals(SpeciesTypeEnum.RAT.getCode()) && !speciesIds.equals(SpeciesTypeEnum.MOUSE.getCode())
+                    && !speciesIds.equals(SpeciesTypeEnum.DOG.getCode()) && !speciesIds.equals(SpeciesTypeEnum.MONKEY.getCode())) {
+                ProjectButtonGenerator.filterButtons(buttons);
+            }
+        }
         project.setButtons(buttons);
+        //设置对照组按钮置
+        boolean isAiSlideFinished = slideService.isAiSlideFinished(projectId);
+        project.setAiSlideFinished(isAiSlideFinished);
+
+        //增加种属名称
+        if(null != project.getSpeciesId()) {
+            Species species = speciesMapper.selectById(project.getSpeciesId());
+            project.setSpeciesName(species.getName());
+        }
+        //ai是否执行
+        boolean isAiTrained = slideService.checkAiExecuted(projectId);
+        project.setIsAiTrained(isAiTrained);
         return R.ok(project);
     }
 

@@ -8,6 +8,7 @@ import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.vo.project.ChoiceImagePageReq;
 import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.system.api.RemoteAnnotationService;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -20,10 +21,7 @@ import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.Constants;
 import cn.staitech.fr.vo.project.ProjectImageVo;
-import cn.staitech.fr.vo.project.slide.SlidePageReq;
 import cn.staitech.fr.vo.project.ImageVO;
-import cn.staitech.fr.vo.project.slide.SlidePageVo;
-import cn.staitech.fr.vo.project.slide.SlideDetailVo;
 import cn.staitech.fr.service.SlideService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -309,6 +307,47 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 		return slideInfo;
 	}
 
+	@Override
+	public SlideSelectListVo getAnimalCode(SlideSelectListReq req) {
+		List<SlidePageVo> slideSelectList = this.baseMapper.getSlideSelectList(req);
+		List<String> animalCodes = slideSelectList.stream().map(SlidePageVo::getAnimalCode).distinct().sorted().collect(Collectors.toList());
+
+		SlideSelectListVo slideSelectListVo = new SlideSelectListVo();
+		slideSelectListVo.setAnimalCodes(animalCodes);
+		return slideSelectListVo;
+	}
+
+	@Override
+	public SlideSelectListVo getWaxCode(SlideSelectListReq req) {
+		List<SlidePageVo> slideSelectList = this.baseMapper.getSlideSelectList(req);
+		List<String> waxCode = slideSelectList.stream().map(SlidePageVo::getWaxCode).distinct().sorted().collect(Collectors.toList());
+
+		SlideSelectListVo slideSelectListVo = new SlideSelectListVo();
+		slideSelectListVo.setWaxCodes(waxCode);
+		return slideSelectListVo;
+	}
+
+	@Override
+	public SlideSelectListVo getGroupCode(SlideSelectListReq req) {
+		List<SlidePageVo> slideSelectList = this.baseMapper.getSlideSelectList(req);
+		List<String> groupCode = slideSelectList.stream().map(SlidePageVo::getGroupCode).distinct().sorted().collect(Collectors.toList());
+
+		SlideSelectListVo slideSelectListVo = new SlideSelectListVo();
+		slideSelectListVo.setGroupCodes(groupCode);
+		return slideSelectListVo;
+	}
+
+	@Override
+	public SlideSelectListVo getOrganCode(SlideSelectListReq req) {
+		SlideSelectListVo slideSelectListVo = new SlideSelectListVo();
+		baseMapper.getOrganCode(req);
+		return slideSelectListVo;
+	}
+
+	@Override
+	public boolean isAiSlideFinished(Long projectId) {
+		return baseMapper.isAiSlideFinished(projectId);
+	}
 	@Override
 	public boolean checkAiExecuted(Long projectId) {
 		LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
