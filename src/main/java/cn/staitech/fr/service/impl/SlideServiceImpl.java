@@ -340,7 +340,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 	@Override
 	public SlideSelectListVo getOrganCode(SlideSelectListReq req) {
 		SlideSelectListVo slideSelectListVo = new SlideSelectListVo();
-		baseMapper.getOrganCode(req);
+		List<SlideOrganTagVo> organCode = baseMapper.getOrganCode(req);
+		slideSelectListVo.setOrganCodes(organCode);
 		return slideSelectListVo;
 	}
 
