@@ -14,4 +14,6 @@ public class SlideSelectListVo {
     private List<String> waxCodes;
     @ApiModelProperty(value = "获取组号下拉列表")
     private List<String> groupCodes;
+    @ApiModelProperty(value = "获取脏器下拉列表")
+    private List<SlideOrganTagVo> organCodes;
 }

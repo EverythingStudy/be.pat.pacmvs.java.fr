@@ -291,8 +291,9 @@
         ) t
     </select>
     <select id="getOrganCode" resultType="cn.staitech.fr.vo.project.slide.SlideOrganTagVo">
-        select * from fr_slide fs left JOIN
+        select tg.organ_tag_id,tg.organ_tag_code,tg.organ_name from fr_slide fs left JOIN
                       fr_single_slide fss on fs.slide_id=fss.slide_id
+                      left join tb_organ_tag tg on fss.category_id=tg.organ_tag_id
         where fs.del_flag='0'
     </select>
 
