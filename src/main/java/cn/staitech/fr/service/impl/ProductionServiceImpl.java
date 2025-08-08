@@ -231,7 +231,7 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
             LambdaQueryWrapper<OrganTag> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(OrganTag::getSpeciesId, project.getSpeciesId());
             wrapper.eq(OrganTag::getOrganizationId, project.getOrganizationId());
-            wrapper.eq(OrganTag::getDelFlag, true);
+            wrapper.eq(OrganTag::getDelFlag, false);
             List<OrganTag> tags = organTagMapper.selectList(wrapper);
             if (!CollectionUtils.isEmpty(tags)) {
                 for (OrganTag tag : tags) {
