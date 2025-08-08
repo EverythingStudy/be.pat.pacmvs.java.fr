@@ -9,6 +9,8 @@ import cn.staitech.fr.vo.project.ProjectImageVo;
 import cn.staitech.fr.vo.project.slide.SlideDetailVo;
 import cn.staitech.fr.vo.project.slide.SlidePageReq;
 import cn.staitech.fr.vo.project.slide.SlidePageVo;
+import cn.staitech.fr.vo.project.slide.*;
+import cn.staitech.fr.vo.project.ImageVO;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.HashMap;
@@ -38,4 +40,18 @@ public interface SlideService extends IService<Slide> {
     SlideDetailVo getSlideInfo(Long slideId);
 
     boolean checkAiExecuted(Long projectId);
+    SlideSelectListVo getAnimalCode(SlideSelectListReq req);
+
+    SlideSelectListVo getWaxCode(SlideSelectListReq req);
+
+    SlideSelectListVo getGroupCode(SlideSelectListReq req);
+
+    SlideSelectListVo getOrganCode(SlideSelectListReq req);
+
+    /**
+     * 查看Ai切片是否分析完成，没有完成返回false，完成返回true
+     * @param projectId
+     * @return
+     */
+    boolean isAiSlideFinished(Long projectId);
 }

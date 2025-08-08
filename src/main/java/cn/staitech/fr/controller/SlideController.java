@@ -7,11 +7,8 @@ import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.vo.project.ChoiceImagePageReq;
 import cn.staitech.fr.vo.project.ProjectImageVo;
-import cn.staitech.fr.vo.project.slide.SlideDelVo;
-import cn.staitech.fr.vo.project.slide.SlidePageReq;
+import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.fr.vo.project.ImageVO;
-import cn.staitech.fr.vo.project.slide.SlidePageVo;
-import cn.staitech.fr.vo.project.slide.SlideDetailVo;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.MessageSource;
 import io.swagger.annotations.Api;
@@ -23,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author mugw
@@ -40,6 +38,32 @@ public class SlideController  extends BaseController {
     private SlideService slideService;
     @Resource
     private SlideMapper slideMapper;
+
+    @ApiOperation(value = "获取动物编号下拉列表")
+    @PostMapping("/getAnimalCode")
+    public R<SlideSelectListVo> getAnimalCode(@RequestBody SlideSelectListReq req) {
+        return R.ok(slideService.getAnimalCode(req));
+    }
+
+    @ApiOperation(value = "获取蜡块下拉列表")
+    @PostMapping("/getWaxCode")
+    public R<SlideSelectListVo> getWaxCode(@RequestBody SlideSelectListReq req) {
+        return R.ok(slideService.getWaxCode(req));
+    }
+
+    @ApiOperation(value = "获取组号下拉列表")
+    @PostMapping("/getGroupCode")
+    public R<SlideSelectListVo> getGroupCode(@RequestBody SlideSelectListReq req) {
+        return R.ok(slideService.getGroupCode(req));
+    }
+
+    //@TODO 切片脏器下拉列表
+    @ApiOperation(value = "获取脏器下拉列表")
+    @PostMapping("/getOrganCode")
+    public R<SlideSelectListVo> getOrganCode(@RequestBody SlideSelectListReq req) {
+        return R.ok(slideService.getOrganCode(req));
+    }
+
 
     @ApiOperation(value = "项目阅片-已选切片分页查询")
     @PostMapping("/page")

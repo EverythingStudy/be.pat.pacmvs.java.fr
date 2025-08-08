@@ -94,4 +94,16 @@ public class Project implements Serializable {
     @ApiModelProperty(value = "操作按钮")
     private List<String> buttons;
 
+    @TableField(exist = false)
+    @ApiModelProperty(value = "种属名称:制片信息使用")
+    private String speciesName;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "是否启动过AI分析:制片信息使用")
+    private Boolean isAiTrained;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "查看Ai切片是否分析完成，没有完成设置对照组按钮置灰不可配置")
+    private boolean isAiSlideFinished;
+
 }

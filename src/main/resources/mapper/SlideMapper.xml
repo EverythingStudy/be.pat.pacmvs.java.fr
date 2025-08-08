@@ -248,4 +248,52 @@
         ORDER BY b.wax_code_order asc,b.wax_code asc
     </select>
 
+    <select id="getSlideSelectList" resultType="cn.staitech.fr.vo.project.slide.SlidePageVo">
+        select ti.thumb_url,
+        ti.image_name fileName,
+        ti.image_path,
+        ti.format,
+        ti.width,
+        ti.height,
+        ti.resolution_x,
+        ti.resolution_y,
+        ti.source_lens,
+        ti.image_id,
+        ti.image_name,
+        ti.group_code,
+        ti.wax_code,
+        ti.animal_code,
+        ti.sex_flag,
+        ti.topic_name,
+        fs.create_time,
+        fs.description,
+        fs.slide_id,
+        fs.viewers
+        from fr_slide fs
+        left join tb_image ti on fs.image_id = ti.image_id
+        <where>
+            fs.special_id = #{projectId}
+            and fs.del_flag='0'
+        </where>
+    </select>
+    <select id="isAiSlideFinished" resultType="java.lang.Boolean">
+        select t.* from (
+            select case WHEN
+                (select count(fss.single_id) from fr_slide fs
+                                                      left join fr_single_slide fss on fss.slide_id = fs.slide_id
+                 where fs.special_id = #{projectId} and fs.del_flag = '0' and fss.single_id is null) = 0  then 'false'
+            WHEN
+                (select count(fss.single_id) from fr_slide fs
+                                                      left join fr_single_slide fss on fss.slide_id = fs.slide_id
+                 where fs.special_id = #{projectId} and fs.del_flag = '0' and (fss.forecast_status in(0,3) or fss.ai_status_fine in(0,3))) > 0 then 'false'
+
+            else 'true' end as aa
+        ) t
+    </select>
+    <select id="getOrganCode" resultType="cn.staitech.fr.vo.project.slide.SlideOrganTagVo">
+        select * from fr_slide fs left JOIN
+                      fr_single_slide fss on fs.slide_id=fss.slide_id
+        where fs.del_flag='0'
+    </select>
+
 </mapper>
