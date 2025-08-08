@@ -25,7 +25,7 @@ public class ProductionInfoReq implements Serializable {
      * 脏器标签ID
      */
     @ApiModelProperty(value = "脏器标签ID：种属脏器下拉列表（取自脏器标签数据）接口中返回", required = true)
-    @NotNull(message = "种属蜡块模板ID不能为空")
+    @NotNull(message = "脏器标签ID不能为空")
     private Long templateId;
     /**
      * 取材块数
