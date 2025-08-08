@@ -4,16 +4,16 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
- * 种属蜡块模板信息
+ * 脏器标签信息
  *
  * @author yxy
  */
 @Data
 public class OrganVO {
     /**
-     * 主键
+     * 脏器标签ID
      */
-    @ApiModelProperty(value = "种属蜡块模板ID")
+    @ApiModelProperty(value = "脏器标签ID")
     private Long templateId;
     /**
      * 脏器名称

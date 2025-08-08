@@ -51,7 +51,7 @@ public class ProductionController {
         return R.ok(list);
     }
 
-    @ApiOperation(value = "种属脏器下拉列表（取自种属蜡块模板数据）")
+    @ApiOperation(value = "种属脏器下拉列表（取自脏器标签数据）")
     @PostMapping("/organList")
     public R<List<OrganVO>> organList(@RequestBody @Validated ProductionReq req) {
         List<OrganVO> list = this.productionService.organList(req);

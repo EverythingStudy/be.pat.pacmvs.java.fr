@@ -21,7 +21,7 @@ DROP TABLE if EXISTS fr_production;
 CREATE TABLE `fr_production` (
   `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
   `special_id` bigint NOT NULL DEFAULT '0' COMMENT '专题ID',
-  `template_id` bigint NOT NULL DEFAULT '0' COMMENT '种属蜡块模板表ID',
+  `organ_tag_id` bigint NOT NULL DEFAULT '0' COMMENT '脏器标签ID',
   `species_id` varchar(100) DEFAULT NULL COMMENT '种属ID',
   `wax_code` varchar(255)  DEFAULT NULL COMMENT '蜡块编号',
   `organ_name` varchar(255) DEFAULT NULL COMMENT '脏器名称',

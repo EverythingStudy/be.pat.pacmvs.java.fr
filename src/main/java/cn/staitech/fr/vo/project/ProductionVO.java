@@ -26,9 +26,9 @@ public class ProductionVO {
     @ApiModelProperty(value = "蜡块编号")
     private String waxCode;
     /**
-     * 种属蜡块模板ID
+     * 脏器标签ID：与 种属脏器下拉列表（取自脏器标签数据）配合使用
      */
-    @ApiModelProperty(value = "种属蜡块模板ID：与 种属脏器下拉列表（取自种属蜡块模板数据）配合使用")
+    @ApiModelProperty(value = "脏器标签ID：与 种属脏器下拉列表（取自脏器标签数据）配合使用")
     private Long templateId;
     /**
      * 脏器名称

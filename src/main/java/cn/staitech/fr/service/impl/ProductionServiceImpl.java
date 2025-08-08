@@ -2,13 +2,11 @@ package cn.staitech.fr.service.impl;
 
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
+import cn.staitech.fr.domain.OrganTag;
 import cn.staitech.fr.domain.Production;
 import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.SpeciesWaxCodeTemplate;
-import cn.staitech.fr.mapper.ProductionMapper;
-import cn.staitech.fr.mapper.ProjectMapper;
-import cn.staitech.fr.mapper.SlideMapper;
-import cn.staitech.fr.mapper.SpeciesWaxCodeTemplateMapper;
+import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.ProductionService;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.vo.project.*;
@@ -38,6 +36,8 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
     private SpeciesWaxCodeTemplateMapper speciesWaxCodeTemplateMapper;
     @Resource
     private SlideService slideService;
+    @Resource
+    private OrganTagMapper organTagMapper;
 
     /**
      * 制片信息列表
@@ -60,6 +60,8 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                 for (Production p : productions) {
                     ProductionVO vo = new ProductionVO();
                     BeanUtils.copyProperties(p, vo);
+                    // 脏器标签ID
+                    vo.setTemplateId(p.getOrganTagId());
                     list.add(vo);
                 }
             } else {
@@ -71,7 +73,14 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                     for (SpeciesWaxCodeTemplate template : templates) {
                         ProductionVO vo = new ProductionVO();
                         BeanUtils.copyProperties(template, vo);
-                        vo.setTemplateId(template.getId());
+                        // 查询脏器标签ID
+                        LambdaQueryWrapper<OrganTag> organTagWrapper = new LambdaQueryWrapper<>();
+                        organTagWrapper.eq(OrganTag::getOrganTagCode, template.getOrganCode());
+                        organTagWrapper.eq(OrganTag::getOrganizationId, project.getOrganizationId());
+                        organTagWrapper.eq(OrganTag::getDelFlag, true);
+                        OrganTag tag = organTagMapper.selectOne(organTagWrapper);
+                        // 脏器标签ID
+                        vo.setTemplateId(tag.getOrganTagId());
                         vo.setId(null);
                         list.add(vo);
                     }
@@ -133,7 +142,7 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
     public R<String> save(ProductionSaveReq req) {
         // 查询项目信息
         Project project = this.projectMapper.selectById(req.getProjectId());
-        Set<Long> templateIds = new HashSet<>(16);
+        Set<Long> organTagIds = new HashSet<>(16);
         // 校验
         if (!CollectionUtils.isEmpty(req.getProductions())) {
             List<String> list = new ArrayList<>();
@@ -143,7 +152,7 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                     return R.fail("表中有重复信息，请删除重复信息后再保存");
                 }
                 list.add(key);
-                templateIds.add(r.getTemplateId());
+                organTagIds.add(r.getTemplateId());
             }
         }
         // 先删除后插入
@@ -152,32 +161,32 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
         this.baseMapper.delete(wrapper);
 
         if (!CollectionUtils.isEmpty(req.getProductions())) {
-            // 查询种属蜡块模板信息
-            LambdaQueryWrapper<SpeciesWaxCodeTemplate> tWrapper = new LambdaQueryWrapper<>();
-            tWrapper.in(SpeciesWaxCodeTemplate::getId, templateIds);
-            List<SpeciesWaxCodeTemplate> templateList = this.speciesWaxCodeTemplateMapper.selectList(tWrapper);
-            Map<Long, SpeciesWaxCodeTemplate> map = templateList.stream().collect(Collectors.toMap(SpeciesWaxCodeTemplate::getId, item -> item));
+            // 查询脏器标签信息
+            LambdaQueryWrapper<OrganTag> tagWrapper = new LambdaQueryWrapper<>();
+            tagWrapper.in(OrganTag::getOrganTagId, organTagIds);
+            List<OrganTag> tags = organTagMapper.selectList(tagWrapper);
+            Map<Long, OrganTag> map = tags.stream().collect(Collectors.toMap(OrganTag::getOrganTagId, item -> item));
 
             List<Production> productions = new ArrayList<>();
             Date now = new Date();
             for (ProductionInfoReq r : req.getProductions()) {
-                SpeciesWaxCodeTemplate template = map.get(r.getTemplateId());
+                OrganTag organTag = map.get(r.getTemplateId());
                 Production production = new Production();
                 // 专题ID
                 production.setSpecialId(req.getProjectId());
-                // 种属蜡块模板表ID
-                production.setTemplateId(r.getTemplateId());
-                if (template != null) {
+                // 脏器标签ID
+                production.setOrganTagId(r.getTemplateId());
+                if (organTag != null) {
                     // 种属ID
-                    production.setSpeciesId(template.getSpeciesId());
+                    production.setSpeciesId(organTag.getSpeciesId());
                     // 脏器名称
-                    production.setOrganName(template.getOrganName());
+                    production.setOrganName(organTag.getOrganName());
                     // 英文名称
-                    production.setOrganEn(template.getOrganEn());
+                    production.setOrganEn(organTag.getOrganEn());
                     // 脏器编码
-                    production.setOrganCode(template.getOrganCode());
+                    production.setOrganCode(organTag.getOrganTagCode());
                     // 脏器缩写
-                    production.setAbbreviation(template.getAbbreviation());
+                    production.setAbbreviation(organTag.getAbbreviation());
                 }
                 // 蜡块编号
                 production.setWaxCode(r.getWaxCode());
@@ -215,15 +224,17 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
         // 查询项目信息
         Project project = this.projectMapper.selectById(req.getProjectId());
         if (project != null && StringUtils.isNotBlank(project.getSpeciesId())) {
-            LambdaQueryWrapper<SpeciesWaxCodeTemplate> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(SpeciesWaxCodeTemplate::getSpeciesId, project.getSpeciesId());
-            List<SpeciesWaxCodeTemplate> templates = speciesWaxCodeTemplateMapper.selectList(wrapper);
-            if (!CollectionUtils.isEmpty(templates)) {
-                for (SpeciesWaxCodeTemplate template : templates) {
+            LambdaQueryWrapper<OrganTag> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(OrganTag::getSpeciesId, project.getSpeciesId());
+            wrapper.eq(OrganTag::getOrganizationId, project.getOrganizationId());
+            wrapper.eq(OrganTag::getDelFlag, true);
+            List<OrganTag> tags = organTagMapper.selectList(wrapper);
+            if (!CollectionUtils.isEmpty(tags)) {
+                for (OrganTag tag : tags) {
                     OrganVO vo = new OrganVO();
-                    vo.setTemplateId(template.getId());
-                    vo.setOrganName(template.getOrganName());
-                    vo.setOrganEn(template.getOrganEn());
+                    vo.setTemplateId(tag.getOrganTagId());
+                    vo.setOrganName(tag.getOrganName());
+                    vo.setOrganEn(tag.getOrganEn());
                     list.add(vo);
                 }
             }

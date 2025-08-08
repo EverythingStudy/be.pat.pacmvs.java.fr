@@ -26,9 +26,9 @@ public class Production implements Serializable {
      */
     private Long specialId;
     /**
-     * 种属蜡块模板表ID
+     * 脏器标签ID
      */
-    private Long templateId;
+    private Long organTagId;
     /**
      * 种属ID
      */
