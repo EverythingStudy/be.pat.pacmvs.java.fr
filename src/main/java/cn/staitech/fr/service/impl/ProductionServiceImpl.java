@@ -2,6 +2,7 @@ package cn.staitech.fr.service.impl;
 
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
+import cn.staitech.fr.constant.Constants;
 import cn.staitech.fr.domain.OrganTag;
 import cn.staitech.fr.domain.Production;
 import cn.staitech.fr.domain.Project;
@@ -146,6 +147,15 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
     public R<String> save(ProductionSaveReq req) {
         // 查询项目信息
         Project project = this.projectMapper.selectById(req.getProjectId());
+        // 校验
+        if (Constants.STATUS_COMPLETED == project.getStatus()) {
+            return R.fail("项目已完成，不可修改");
+        }
+        if (Constants.STATUS_RUNNING == project.getStatus() || Constants.STATUS_PAUSED == project.getStatus()) {
+            if (!(SecurityUtils.getUserId().equals(project.getPrincipal()) || SecurityUtils.isOrgAdmin())) {
+                return R.fail("您没有该项目的配置权限，请联系该项目负责人或机构管理员");
+            }
+        }
         Set<Long> organTagIds = new HashSet<>(16);
         // 校验
         if (!CollectionUtils.isEmpty(req.getProductions())) {
