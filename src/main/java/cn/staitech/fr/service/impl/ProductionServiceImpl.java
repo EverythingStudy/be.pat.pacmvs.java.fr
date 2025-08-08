@@ -77,7 +77,7 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                         LambdaQueryWrapper<OrganTag> organTagWrapper = new LambdaQueryWrapper<>();
                         organTagWrapper.eq(OrganTag::getOrganTagCode, template.getOrganCode());
                         organTagWrapper.eq(OrganTag::getOrganizationId, project.getOrganizationId());
-                        organTagWrapper.eq(OrganTag::getDelFlag, true);
+                        organTagWrapper.eq(OrganTag::getDelFlag, false);
                         OrganTag tag = organTagMapper.selectOne(organTagWrapper);
                         // 脏器标签ID
                         vo.setTemplateId(tag.getOrganTagId());
