@@ -47,8 +47,9 @@ public class LungParserStrategyImpl extends AbstractCustomParserStrategy {
 
         // 查询精细轮廓面积
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        //String accurateArea = singleSlide.getArea();
-        BigDecimal outlineArea = commonJsonParser.getOrganArea(jsonTask, "14C111").getStructureAreaNum();
+        String accurateArea = singleSlide.getArea();
+//        BigDecimal outlineArea = commonJsonParser.getOrganArea(jsonTask, "14C111").getStructureAreaNum();
+        BigDecimal outlineArea = new BigDecimal(accurateArea);
         Integer count = commonJsonParser.getOrganAreaCount(jsonTask, "14C006");
 
         //肺泡上皮细胞核密度
