@@ -1,27 +1,25 @@
 package cn.staitech.fr.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.http.HttpUtil;
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.Constants;
-import cn.staitech.fr.domain.Image;
-import cn.staitech.fr.domain.Project;
-import cn.staitech.fr.domain.ProjectMember;
-import cn.staitech.fr.domain.Slide;
-import cn.staitech.fr.mapper.ImageMapper;
-import cn.staitech.fr.mapper.ProjectMapper;
-import cn.staitech.fr.mapper.ProjectMemberMapper;
-import cn.staitech.fr.mapper.SlideMapper;
+import cn.staitech.fr.domain.*;
+import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.system.api.RemoteAnnotationService;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.checkerframework.checker.units.qual.A;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,9 +49,11 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 	@Resource
 	private RemoteAnnotationService remoteAnnotationService;
 	@Resource
-	public RedisTemplate<String,Object> redisTemplate;
-
-
+	private RedisTemplate<String,Object> redisTemplate;
+	@Resource
+	private ProductionMapper productionMapper;
+	@Value("${ai.url:http://192.168.160.112:8003/CreateAIwtr}")
+	private String aiUrl;
 
 	@Override
 	public R<CustomPage<SlidePageVo>> page(SlidePageReq req, boolean isPageConfigSlide, boolean isAccessPermission) {
@@ -359,18 +359,59 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
 	@Override
 	public R<String> aiAnalysis(AiAnalysisReq req) {
-		// 分布式锁
+		// 加锁
 		String key = "ai_analysis_projectId_" + req.getProjectId();
 		Boolean result = this.redisTemplate.opsForValue().setIfAbsent(key, req.getProjectId());
 		if (Boolean.FALSE.equals(result)) {
 			return R.fail("处理中，请稍后");
 		}
-		// 查询所有未分析的切片
-		List<AiAnalysisBO> list = this.baseMapper.selectAiAnalysis(req.getProjectId());
-		for (AiAnalysisBO bo : list) {
+		try {
+			// 查询项目信息
+			Project project = this.projectMapper.selectById(req.getProjectId());
+			// 校验：制片信息包含的蜡块编号是否覆盖项目内所有切片包含的所有蜡块编号
+			// 查询项目切片蜡块号
+			List<String> projectWaxCodes = this.baseMapper.selectWaxCodes(req.getProjectId());
+			// 不为空才进行校验
+			if (!CollectionUtils.isEmpty(projectWaxCodes)) {
+				boolean match = false;
+				// 查询制片信息蜡块编号
+				LambdaQueryWrapper<Production> wrapper = new LambdaQueryWrapper<>();
+				wrapper.eq(Production::getSpecialId, req.getProjectId());
+				wrapper.eq(Production::getSpeciesId, project.getSpeciesId());
+				List<Production> productions = this.productionMapper.selectList(wrapper);
+				if (!CollectionUtils.isEmpty(productions)) {
+					List<String> productionWaxCodes = productions.stream().map(Production::getWaxCode).collect(Collectors.toList());
+					projectWaxCodes.removeAll(productionWaxCodes);
+					if (CollectionUtils.isEmpty(projectWaxCodes)) {
+						match = true;
+					}
+				}
+				if (!match) {
+					return R.fail("制片信息缺失，无法启动AI分析，请在项目配置中检查制片信息。");
+				}
+			}
 
+			// 查询所有未分析的切片
+			List<AiAnalysisBO> list = this.baseMapper.selectAiAnalysis(req.getProjectId());
+			for (AiAnalysisBO bo : list) {
+				try {
+					log.info("脏器识别请求参数：{}", JSON.toJSONString(bo));
+					String aiResult = HttpUtil.post(this.aiUrl, JSON.toJSONString(bo));
+					log.info("脏器识别返回结果：{}", aiResult);
+					// 更新切片状态为：脏器识别中
+					Slide slide = new Slide();
+					slide.setSlideId(bo.getSlideId());
+					slide.setAiStatus(1);
+					this.baseMapper.updateById(slide);
+				} catch (Exception e) {
+					log.info("脏器识别异常", e);
+				}
+			}
+			return R.ok();
+		} finally {
+			// 释放锁
+			this.redisTemplate.delete(key);
 		}
-		return null;
 	}
 
 	@Override

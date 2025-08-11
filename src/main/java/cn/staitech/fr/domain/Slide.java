@@ -73,7 +73,7 @@ public class Slide implements Serializable {
     private List<Long> viewers;
 
     /**
-     * AI分析状态：0-未分析；1-脏器识别中；2-脏器识别异常
+     * AI分析状态：0-未分析；1-脏器识别中；2-脏器识别异常；3-脏器识别完成（算法接口成功并且核对一致）
      */
     private Integer aiStatus;
 
