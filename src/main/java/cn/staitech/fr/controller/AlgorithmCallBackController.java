@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.service.AiForecastService;
+import cn.staitech.fr.service.AlgorithmCallBackService;
 import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,17 +35,20 @@ import lombok.extern.slf4j.Slf4j;
 public class AlgorithmCallBackController {
 
     @Resource
-    private JsonTaskParserService jsonTaskParserService;
+    private AiForecastService aiForecastService;
     
     @Resource
-    private AiForecastService aiForecastService;
+    private AlgorithmCallBackService algorithmCallBackService;
+    
+    @Resource
+    private JsonTaskParserService jsonTaskParserService;
     
     @SuppressWarnings("rawtypes")
 	@ApiOperation(value = "结构回调")
 	@PostMapping("/structure")
-    public R structure(@Validated @RequestBody String  str) {
-    	log.info("脏器识别算法回调专题,完整数据是：{}",str);
-    	jsonTaskParserService.input(str);
+    public R structure(@RequestBody String  data) {
+    	log.info("结构回调完整数据是：{}",data);
+    	algorithmCallBackService.input(data);
     	return R.ok();
     }
     
