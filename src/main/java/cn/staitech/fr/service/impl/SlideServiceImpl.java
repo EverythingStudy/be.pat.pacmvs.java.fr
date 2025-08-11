@@ -54,6 +54,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 	private ProductionMapper productionMapper;
 	@Value("${ai.url:http://192.168.160.112:8003/CreateAIwtr}")
 	private String aiUrl;
+	@Value("${ai.timeout:5000}")
+	private Integer timeout;
 
 	@Override
 	public R<CustomPage<SlidePageVo>> page(SlidePageReq req, boolean isPageConfigSlide, boolean isAccessPermission) {
@@ -396,7 +398,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			for (AiAnalysisBO bo : list) {
 				try {
 					log.info("脏器识别请求参数：{}", JSON.toJSONString(bo));
-					String aiResult = HttpUtil.post(this.aiUrl, JSON.toJSONString(bo));
+					String aiResult = HttpUtil.post(this.aiUrl, JSON.toJSONString(bo), this.timeout);
 					log.info("脏器识别返回结果：{}", aiResult);
 					// 更新切片状态为：脏器识别中
 					Slide slide = new Slide();
