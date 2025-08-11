@@ -184,7 +184,7 @@ public class JsonTaskParserService {
             //校验脏器下所有结构是否解析完成
             Boolean flag = verifyCategoryStructure(jsonTask);
             if (!flag) {
-                // 解析文件路径，并存入MySQL
+                // 解析脏器结构文件路径，并存入MySQL
                 parseSingleJsonFile(jsonTask, jsonObject);
             }
         } catch (Exception e) {
