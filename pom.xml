@@ -168,6 +168,10 @@
                 <enabled>false</enabled>
             </releases>
         </repository>
+        <repository>
+            <id>maven_public</id>
+            <url>http://192.168.195.101:8081/repository/maven_public/</url>
+        </repository>
     </repositories>
 
     <build>
