@@ -67,6 +67,8 @@ CREATE TABLE `fr_single_slide`
     PRIMARY KEY (`single_id`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=756 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='单脏器切片表';
 
+ALTER TABLE `fr_single_slide` ADD INDEX `idx_slide_id`(`slide_id`) USING BTREE;
+
 CREATE TABLE `fr_json_file`
 (
     `file_id`        bigint NOT NULL AUTO_INCREMENT COMMENT '文件ID',

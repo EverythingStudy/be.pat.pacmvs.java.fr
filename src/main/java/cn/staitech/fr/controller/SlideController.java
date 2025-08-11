@@ -153,4 +153,10 @@ public class SlideController  extends BaseController {
     public R<String> aiAnalysis(@RequestBody @Validated AiAnalysisReq req) {
         return this.slideService.aiAnalysis(req);
     }
+
+    @ApiOperation(value = "脏器识别校对")
+    @PostMapping("/organCheck")
+    public R<OrganCheckVo> organCheck(@RequestBody @Validated OrganCheckReq req) {
+        return R.ok(this.slideService.organCheck(req));
+    }
 }

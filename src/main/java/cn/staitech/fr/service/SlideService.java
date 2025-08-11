@@ -54,4 +54,6 @@ public interface SlideService extends IService<Slide> {
     boolean isAiSlideFinished(Long projectId);
 
     R<String> aiAnalysis(AiAnalysisReq req);
+
+    OrganCheckVo organCheck(OrganCheckReq req);
 }

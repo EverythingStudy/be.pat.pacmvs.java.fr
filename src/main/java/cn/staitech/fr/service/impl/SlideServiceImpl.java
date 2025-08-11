@@ -52,6 +52,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 	private RedisTemplate<String,Object> redisTemplate;
 	@Resource
 	private ProductionMapper productionMapper;
+	@Resource
+	private SingleSlideMapper singleSlideMapper;
 	@Value("${ai.url:http://192.168.160.112:8003/CreateAIwtr}")
 	private String aiUrl;
 	@Value("${ai.timeout:5000}")
@@ -414,6 +416,49 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			// 释放锁
 			this.redisTemplate.delete(key);
 		}
+	}
+
+	@Override
+	public OrganCheckVo organCheck(OrganCheckReq req) {
+		OrganCheckVo vo = new OrganCheckVo();
+		vo.setSuccess(false);
+		// 查询切片信息
+		Slide slide = this.baseMapper.selectById(req.getSlideId());
+		if (slide != null) {
+			// 查询AI脏器识别信息
+			LambdaQueryWrapper<SingleSlide> singleSlideWrapper = new LambdaQueryWrapper<>();
+			singleSlideWrapper.eq(SingleSlide::getSlideId, req.getSlideId());
+			List<SingleSlide> singleSlides = this.singleSlideMapper.selectList(singleSlideWrapper);
+			if (!CollectionUtils.isEmpty(singleSlides)) {
+				// 脏器标签集合
+				Set<Long> categoryIds = singleSlides.stream().map(SingleSlide::getCategoryId).collect(Collectors.toSet());
+				// 查询图片信息
+				Image image = this.imageMapper.selectById(slide.getImageId());
+				// 查询项目信息
+				Project project = this.projectMapper.selectById(slide.getProjectId());
+				// 性别
+				List<String> sexFlags = new ArrayList<>();
+				sexFlags.add("N");
+				sexFlags.add(image.getSexFlag());
+				// 查询制片信息：通过项目ID、种属ID、蜡块编号、性别
+				LambdaQueryWrapper<Production> wrapper = new LambdaQueryWrapper<>();
+				wrapper.eq(Production::getSpecialId, slide.getProjectId());
+				wrapper.eq(Production::getSpeciesId, project.getSpeciesId());
+				wrapper.eq(Production::getWaxCode, image.getWaxCode());
+				wrapper.in(Production::getSexFlag, sexFlags);
+				List<Production> productions = this.productionMapper.selectList(wrapper);
+				if (!CollectionUtils.isEmpty(productions)) {
+					Set<Long> organTagIds = productions.stream().map(Production::getOrganTagId).collect(Collectors.toSet());
+					if (categoryIds.size() == organTagIds.size()) {
+						categoryIds.removeAll(organTagIds);
+						if (CollectionUtils.isEmpty(categoryIds)) {
+							vo.setSuccess(true);
+						}
+					}
+				}
+			}
+		}
+		return vo;
 	}
 
 	@Override
