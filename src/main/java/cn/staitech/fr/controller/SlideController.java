@@ -2,7 +2,9 @@ package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
+import cn.staitech.common.core.utils.poi.ExcelUtil;
 import cn.staitech.common.core.web.controller.BaseController;
+import cn.staitech.common.security.annotation.RequiresPermissions;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.vo.project.*;
@@ -17,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
 
@@ -148,6 +151,7 @@ public class SlideController  extends BaseController {
         return R.ok(slideService.getSlideInfo(slideId));
     }
 
+
     @ApiOperation(value = "AI分析")
     @PostMapping("/aiAnalysis")
     public R<String> aiAnalysis(@RequestBody @Validated AiAnalysisReq req) {
@@ -172,4 +176,17 @@ public class SlideController  extends BaseController {
         this.slideService.organCheckConfirm(req);
         return R.ok();
     }
+
+    @ApiOperation(value = "导出AI指标信息")
+    @PostMapping("/exportAiInfo")
+    public void exportAiInfo(HttpServletResponse response, ExportAiInfoReq req) {
+        List<ExportAiInfoVo> list = slideService.exportAiInfo(req);
+        ExcelUtil<ExportAiInfoVo> util = new ExcelUtil<ExportAiInfoVo>(ExportAiInfoVo.class);
+        util.exportExcel(response, list, "导出AI指标信息");
+    }
+
+
+
+
+
 }

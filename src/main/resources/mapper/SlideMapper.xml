@@ -314,5 +314,21 @@
         AND a.ai_status = 0
         AND a.special_id = #{projectId}
     </select>
+    <select id="exportAiInfo" resultType="cn.staitech.fr.vo.project.slide.ExportAiInfoVo">
+        select frs.topic_name,frs.special_name,ti.image_name,tg.organ_name,af.quantitative_indicators,af.unit,af.results,af.forecast_range
+        from fr_slide fs
+                 left join tb_image ti on fs.image_id = ti.image_id
+                 left join fr_special frs on fs.special_id=frs.special_id
+                 left join fr_single_slide fss on fs.slide_id=fss.slide_id
+                 left join tb_organ_tag tg on fss.category_id=tg.organ_tag_id
+                 left join fr_ai_forecast af on af.single_slide_id
+        where fs.special_id=#{projectId}
+        <if test="singleId != null">
+            and fss.single_id=#{singleId}
+        </if>
+        <if test="categoryId != null">
+            and fss.category_id=#{categoryId}
+        </if>
+    </select>
 
 </mapper>
