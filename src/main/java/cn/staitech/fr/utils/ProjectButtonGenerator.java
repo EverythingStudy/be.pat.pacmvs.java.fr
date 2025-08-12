@@ -28,16 +28,16 @@ public class ProjectButtonGenerator {
     public static final String CONTROL_GROUP= "CONTROL_GROUP"; //设置对照组
     public static final String AI_OUTLINE = "AI_OUTLINE"; //加载ai轮廓数据
     public static final String DEL_AI_OUTLINE = "DEL_AI_OUTLINE"; //删除ai轮廓数据
-    public static final String IMPORT_AI_INDEX = "IMPORT_AI_INDEX"; //导出AI指标信息
-    public static final String IMPORT_DIAGNOSTIC_DESC = "IMPORT_AI_OUTLINE"; //导出诊断描述信息
+    public static final String EXPORT_AI_INDEX = "EXPORT_AI_INDEX"; //导出AI指标信息
+    public static final String EXPORT_DIAGNOSTIC_DESC = "EXPORT_AI_OUTLINE"; //导出诊断描述信息
 
     public static List<String> filterButtons(List<String> buttons) {
         List<String> permission = new ArrayList<>();
         permission.add(AI_ANALYSIS);
         permission.add(CONTROL_GROUP);
         permission.add(AI_OUTLINE);
-        permission.add(IMPORT_AI_INDEX);
-        permission.add(IMPORT_DIAGNOSTIC_DESC);
+        permission.add(EXPORT_AI_INDEX);
+        permission.add(EXPORT_DIAGNOSTIC_DESC);
         permission.add(DEL_AI_OUTLINE);
         buttons.removeAll(permission);
         return buttons;
@@ -99,15 +99,15 @@ public class ProjectButtonGenerator {
             buttons.add(CONTROL_GROUP);
             buttons.add(AI_OUTLINE);
             buttons.add(DEL_AI_OUTLINE);
-            buttons.add(IMPORT_AI_INDEX);
-            buttons.add(IMPORT_DIAGNOSTIC_DESC);
+            buttons.add(EXPORT_AI_INDEX);
+            buttons.add(EXPORT_DIAGNOSTIC_DESC);
         } else if (isProjectMember(memberRole)) {
             //详情、日志
             buttons.add(DETAIL);
             buttons.add(AI_OUTLINE);
             buttons.add(DEL_AI_OUTLINE);
-            buttons.add(IMPORT_AI_INDEX);
-            buttons.add(IMPORT_DIAGNOSTIC_DESC);
+            buttons.add(EXPORT_AI_INDEX);
+            buttons.add(EXPORT_DIAGNOSTIC_DESC);
         }
     }
 

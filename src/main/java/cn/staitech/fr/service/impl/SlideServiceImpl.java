@@ -568,6 +568,11 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 		List<Slide> slides = this.baseMapper.selectList(wrapper);
 		return !org.springframework.util.CollectionUtils.isEmpty(slides);
 	}
+
+	@Override
+	public List<ExportAiInfoVo> exportAiInfo(ExportAiInfoReq req) {
+		return baseMapper.exportAiInfo(req);
+	}
 }
 
 

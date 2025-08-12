@@ -164,6 +164,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
         //添加项目成员
         addProjectMember(project.getProjectId(), req.getPrincipal());
+
+        getSpecialAnnotationRel(project.getProjectId(), req.getPrincipal());
         return R.ok(project);
     }
 

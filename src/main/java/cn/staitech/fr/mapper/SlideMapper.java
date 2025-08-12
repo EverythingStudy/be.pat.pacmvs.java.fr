@@ -33,6 +33,8 @@ public interface SlideMapper extends BaseMapper<Slide> {
     List<SlideOrganTagVo> getOrganCode(SlideSelectListReq req);
 
     List<AiAnalysisBO> selectAiAnalysis(@Param("projectId")Long projectId);
+
+    List<ExportAiInfoVo> exportAiInfo(ExportAiInfoReq req);
 }
 
 
