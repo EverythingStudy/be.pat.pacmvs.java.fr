@@ -386,7 +386,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 				wrapper.eq(Production::getSpeciesId, project.getSpeciesId());
 				List<Production> productions = this.productionMapper.selectList(wrapper);
 				if (!CollectionUtils.isEmpty(productions)) {
-					List<String> productionWaxCodes = productions.stream().map(Production::getWaxCode).collect(Collectors.toList());
+					Set<String> productionWaxCodes = productions.stream().map(Production::getWaxCode).collect(Collectors.toSet());
 					projectWaxCodes.removeAll(productionWaxCodes);
 					if (CollectionUtils.isEmpty(projectWaxCodes)) {
 						match = true;
