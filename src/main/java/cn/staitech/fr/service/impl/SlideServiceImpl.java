@@ -54,6 +54,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 	private ProductionMapper productionMapper;
 	@Resource
 	private SingleSlideMapper singleSlideMapper;
+	@Resource
+	private OrganTagMapper organTagMapper;
 	@Value("${ai.url:http://192.168.160.112:8003/CreateAIwtr}")
 	private String aiUrl;
 	@Value("${ai.timeout:5000}")
@@ -460,6 +462,88 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 		}
 		return vo;
 	}
+
+	@Override
+	public OrganCheckViewVo organCheckView(OrganCheckViewReq req) {
+        OrganCheckViewVo vo = new OrganCheckViewVo();
+        List<OrganCheckAiVo> aiVos = new ArrayList<>();
+        List<OrganCheckProductionVo> productionVos = new ArrayList<>();
+        vo.setAis(aiVos);
+        vo.setProductions(productionVos);
+        // 查询切片信息
+        Slide slide = this.baseMapper.selectById(req.getSlideId());
+        if (slide != null) {
+            Map<Long,SingleSlide> singleSlideMap = new HashMap<>(16);
+            // 查询AI脏器识别信息
+            LambdaQueryWrapper<SingleSlide> singleSlideWrapper = new LambdaQueryWrapper<>();
+            singleSlideWrapper.eq(SingleSlide::getSlideId, req.getSlideId());
+            List<SingleSlide> singleSlides = this.singleSlideMapper.selectList(singleSlideWrapper);
+            if (!CollectionUtils.isEmpty(singleSlides)) {
+				// 脏器标签集合
+				singleSlideMap = singleSlides.stream().collect(Collectors.toMap(SingleSlide::getCategoryId, singleSlide -> singleSlide, (existing, replacement) -> existing));
+			}
+
+            Map<Long,Production> productionMap = new HashMap<>(16);
+            // 查询图片信息
+            Image image = this.imageMapper.selectById(slide.getImageId());
+            // 查询项目信息
+            Project project = this.projectMapper.selectById(slide.getProjectId());
+            // 性别
+            List<String> sexFlags = new ArrayList<>();
+            sexFlags.add("N");
+            sexFlags.add(image.getSexFlag());
+            // 查询制片信息：通过项目ID、种属ID、蜡块编号、性别
+            LambdaQueryWrapper<Production> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(Production::getSpecialId, slide.getProjectId());
+            wrapper.eq(Production::getSpeciesId, project.getSpeciesId());
+            wrapper.eq(Production::getWaxCode, image.getWaxCode());
+            wrapper.in(Production::getSexFlag, sexFlags);
+            List<Production> productions = this.productionMapper.selectList(wrapper);
+			if (!CollectionUtils.isEmpty(productions)) {
+				productionMap = productions.stream().collect(Collectors.toMap(Production::getOrganTagId, production -> production, (existing, replacement) -> existing));
+			}
+
+			// 查询标签信息
+			Map<Long, OrganTag> tagMap = new HashMap<>(16);
+			Set<Long> tagIds = new HashSet<>(16);
+			tagIds.addAll(singleSlideMap.keySet());
+			tagIds.addAll(productionMap.keySet());
+			if (!CollectionUtils.isEmpty(tagIds)) {
+				LambdaQueryWrapper<OrganTag> tagWrapper = new LambdaQueryWrapper<>();
+				tagWrapper.in(OrganTag::getOrganTagId, tagIds);
+				List<OrganTag> tags = organTagMapper.selectList(tagWrapper);
+				if (!CollectionUtils.isEmpty(tags)) {
+					tagMap = tags.stream().collect(Collectors.toMap(OrganTag::getOrganTagId, tag -> tag));
+				}
+			}
+
+            // 组装信息
+            for (SingleSlide singleSlide : singleSlideMap.values()) {
+				OrganTag organTag = tagMap.get(singleSlide.getCategoryId());
+				OrganCheckAiVo aiVo = new OrganCheckAiVo();
+				aiVo.setSingleId(singleSlide.getSingleId());
+				aiVo.setOrganTagId(singleSlide.getCategoryId());
+				aiVo.setOrganName(organTag.getOrganName());
+				aiVo.setOrganEn(organTag.getOrganEn());
+				aiVo.setRgb(organTag.getRgb());
+				aiVo.setChromaticValue(organTag.getChromaticValue());
+				aiVo.setRedHighlight(!productionMap.containsKey(singleSlide.getCategoryId()));
+				aiVos.add(aiVo);
+			}
+			for (Production production : productionMap.values()) {
+				OrganTag organTag = tagMap.get(production.getOrganTagId());
+				OrganCheckProductionVo productionVo = new OrganCheckProductionVo();
+				productionVo.setId(production.getId());
+				productionVo.setOrganTagId(production.getOrganTagId());
+				productionVo.setOrganName(organTag.getOrganName());
+				productionVo.setOrganEn(organTag.getOrganEn());
+				productionVo.setWaxCode(production.getWaxCode());
+				productionVo.setRedHighlight(!singleSlideMap.containsKey(production.getOrganTagId()));
+				productionVos.add(productionVo);
+			}
+        }
+        return vo;
+    }
 
 	@Override
 	public boolean checkAiExecuted(Long projectId) {

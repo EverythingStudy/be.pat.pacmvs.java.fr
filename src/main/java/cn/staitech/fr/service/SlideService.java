@@ -56,4 +56,6 @@ public interface SlideService extends IService<Slide> {
     R<String> aiAnalysis(AiAnalysisReq req);
 
     OrganCheckVo organCheck(OrganCheckReq req);
+
+    OrganCheckViewVo organCheckView(OrganCheckViewReq req);
 }

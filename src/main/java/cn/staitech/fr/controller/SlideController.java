@@ -154,9 +154,15 @@ public class SlideController  extends BaseController {
         return this.slideService.aiAnalysis(req);
     }
 
-    @ApiOperation(value = "脏器识别校对")
+    @ApiOperation(value = "脏器识别校对-python服务使用")
     @PostMapping("/organCheck")
     public R<OrganCheckVo> organCheck(@RequestBody @Validated OrganCheckReq req) {
         return R.ok(this.slideService.organCheck(req));
+    }
+
+    @ApiOperation(value = "脏器识别校对-view页面数据")
+    @PostMapping("/organCheckView")
+    public R<OrganCheckViewVo> organCheckView(@RequestBody @Validated OrganCheckViewReq req) {
+        return R.ok(this.slideService.organCheckView(req));
     }
 }
