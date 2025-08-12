@@ -6,6 +6,7 @@ import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.out.SingleSlideSelectBy;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.ContourJsonMapper;
+import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.ContourJsonService;
 import cn.staitech.fr.utils.AreaUtils;
@@ -63,6 +64,9 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
 
     @Resource
     private SingleSlideMapper singleSlideMapper;
+    
+    @Resource
+    private ImageMapper imageMapper;
 
     // json文件存储路径
     private final static String OUTPUT_FILTERED_FILE_PATH = File.separator + "home" + File.separator + "data" + File.separator + "aiJson";
@@ -96,10 +100,18 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
     @Override
     public void aiJson(List<JsonFile> jsonFileList, JsonTask jsonTask) {
         // 删除文件夹下所有的文件
-        String directoryPath = OUTPUT_FILTERED_FILE_PATH + File.separator + jsonTask.getSpecialId() + File.separator + jsonTask.getSingleId();
-        FileUtils.deleteFilesInDirectory(directoryPath);
+//        String directoryPath = OUTPUT_FILTERED_FILE_PATH + File.separator + jsonTask.getSpecialId() + File.separator + jsonTask.getSingleId();
+//        FileUtils.deleteFilesInDirectory(directoryPath);
         Long specialId = jsonTask.getSpecialId();
         Long singleId = jsonTask.getSingleId();
+        //切片id
+        Long slideId = jsonTask.getSlideId();
+        //图片id
+        Long imageId = jsonTask.getImageId();
+        //原始图片信息
+//        Image image = imageMapper.selectById(imageId);
+        //蜡块号
+//        String waxCode = image.getWaxCode();
         Long createBy = 0L;
         // 查询切片信息
         SingleSlideSelectBy singleSlideSelectBy = singleSlideMapper.singleSlideBy(singleId);
@@ -113,7 +125,8 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
         ConcurrentMap<String, Geometry> geometryIdMap = new ConcurrentHashMap<>();
 
         // 创建保存的目录
-        String outputDir = OUTPUT_FILTERED_FILE_PATH + File.separator + specialId + File.separator + singleId;
+//        String outputDir = OUTPUT_FILTERED_FILE_PATH + File.separator + specialId + File.separator + singleId;
+        String outputDir = OUTPUT_FILTERED_FILE_PATH + File.separator + specialId + File.separator + slideId;
         try {
             Files.createDirectories(Paths.get(outputDir));
         } catch (IOException e) {
