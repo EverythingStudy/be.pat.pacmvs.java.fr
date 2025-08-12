@@ -193,12 +193,12 @@
         from tb_image
     </sql>
     <!--查询单个图像信息-->
-    <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
+ <!--   <select id="selectById" parameterType="java.lang.Long" resultMap="BaseResultMap">
         <include refid="selectImageVo"/>
         <where>
             <if test="imageId != null and imageId != ''">
                 and image_id = #{imageId}
             </if>
         </where>
-    </select>
+    </select>-->
 </mapper>
