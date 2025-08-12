@@ -18,11 +18,11 @@ public interface ImageMapper extends BaseMapper<Image> {
     CustomPage<Image> pageImage(CustomPage page, @Param("params") ImagePageReq params);
 
     CustomPage<ImageVO> choiceImageList(CustomPage page, @Param("params") ChoiceImagePageReq image);
-    /**
+   /* *//**
      * 查询单个切片信息
      *
      * @param imageId
      * @return
-     */
-    Image selectById(Long imageId);
+     *//*
+    Image selectById(Long imageId);*/
 }
