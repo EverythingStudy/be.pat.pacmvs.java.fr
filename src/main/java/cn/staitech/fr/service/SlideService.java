@@ -58,4 +58,6 @@ public interface SlideService extends IService<Slide> {
     OrganCheckVo organCheck(OrganCheckReq req);
 
     OrganCheckViewVo organCheckView(OrganCheckViewReq req);
+
+    void organCheckConfirm(OrganCheckViewReq req);
 }

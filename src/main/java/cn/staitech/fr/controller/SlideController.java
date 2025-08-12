@@ -165,4 +165,11 @@ public class SlideController  extends BaseController {
     public R<OrganCheckViewVo> organCheckView(@RequestBody @Validated OrganCheckViewReq req) {
         return R.ok(this.slideService.organCheckView(req));
     }
+
+    @ApiOperation(value = "脏器识别校对-确认修改")
+    @PostMapping("/organCheckConfirm")
+    public R<String> organCheckConfirm(@RequestBody @Validated OrganCheckViewReq req) {
+        this.slideService.organCheckConfirm(req);
+        return R.ok();
+    }
 }

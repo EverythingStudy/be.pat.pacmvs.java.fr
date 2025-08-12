@@ -546,6 +546,20 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
     }
 
 	@Override
+	public void organCheckConfirm(OrganCheckViewReq req) {
+		// 查询切片信息
+		Slide slide = this.baseMapper.selectById(req.getSlideId());
+		if (slide != null) {
+			// 修改状态
+			Slide update = new Slide();
+			update.setSlideId(req.getSlideId());
+			update.setAiStatus(3);
+			this.baseMapper.updateById(update);
+			// TODO 调用python
+		}
+	}
+
+	@Override
 	public boolean checkAiExecuted(Long projectId) {
 		LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
 		wrapper.eq(Slide::getProjectId, projectId);
