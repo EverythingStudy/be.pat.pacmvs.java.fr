@@ -140,6 +140,7 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             if (StringUtils.isNotEmpty(indicator.getStructType())) {
                 forecast.setStructType(indicator.getStructType());
             }
+            forecast.setStructureIds(indicator.getStructureIds());
             aiForecasts.add(forecast);
         }
         // 批量插入
