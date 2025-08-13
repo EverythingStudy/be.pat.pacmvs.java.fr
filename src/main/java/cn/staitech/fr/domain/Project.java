@@ -103,10 +103,6 @@ public class Project implements Serializable {
     private Boolean isAiTrained;
 
     @TableField(exist = false)
-    @ApiModelProperty(value = "查看Ai切片是否分析完成，没有完成设置对照组按钮置灰不可配置")
-    private boolean isAiSlideFinished;
-
-    @TableField(exist = false)
     @ApiModelProperty(value = "SOP")
     private String sop = "PATH001";
 
