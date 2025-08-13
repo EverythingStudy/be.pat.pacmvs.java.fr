@@ -18,6 +18,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -556,6 +558,28 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			this.baseMapper.updateById(update);
 			// TODO 调用python
 		}
+	}
+
+	@Override
+	public List<OrganTagVO> organList(Long projectId) {
+		List<OrganTagVO> list = new ArrayList<>();
+		// 查询项目信息
+		Project project = this.projectMapper.selectById(projectId);
+		if (project != null && StringUtils.isNotBlank(project.getSpeciesId())) {
+			LambdaQueryWrapper<OrganTag> wrapper = new LambdaQueryWrapper<>();
+			wrapper.eq(OrganTag::getSpeciesId, project.getSpeciesId());
+			wrapper.eq(OrganTag::getOrganizationId, project.getOrganizationId());
+			wrapper.eq(OrganTag::getDelFlag, false);
+			List<OrganTag> tags = organTagMapper.selectList(wrapper);
+			if (!CollectionUtils.isEmpty(tags)) {
+				for (OrganTag tag : tags) {
+					OrganTagVO vo = new OrganTagVO();
+					BeanUtils.copyProperties(tag, vo);
+					list.add(vo);
+				}
+			}
+		}
+		return list;
 	}
 
 	@Override

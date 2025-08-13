@@ -185,8 +185,10 @@ public class SlideController  extends BaseController {
         util.exportExcel(response, list, "导出AI指标信息");
     }
 
-
-
-
-
+    @ApiOperation(value = "脏器识别校对-标签下拉列表")
+    @PostMapping("/organList")
+    public R<List<OrganTagVO>> organList(@RequestBody @Validated ProductionReq req) {
+        List<OrganTagVO> list = this.slideService.organList(req.getProjectId());
+        return R.ok(list);
+    }
 }
