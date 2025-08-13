@@ -6,6 +6,7 @@ import cn.staitech.common.core.utils.poi.ExcelUtil;
 import cn.staitech.common.core.web.controller.BaseController;
 import cn.staitech.common.security.annotation.RequiresPermissions;
 import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.out.ExportAiListVO;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
@@ -42,27 +43,32 @@ public class SlideController  extends BaseController {
 
     @ApiOperation(value = "获取动物编号下拉列表")
     @PostMapping("/getAnimalCode")
-    public R<SlideSelectListVo> getAnimalCode(@RequestBody SlideSelectListReq req) {
+    public R<List<String>> getAnimalCode(@RequestBody SlideSelectListReq req) {
         return R.ok(slideService.getAnimalCode(req));
     }
 
     @ApiOperation(value = "获取蜡块下拉列表")
     @PostMapping("/getWaxCode")
-    public R<SlideSelectListVo> getWaxCode(@RequestBody SlideSelectListReq req) {
+    public R<List<String>> getWaxCode(@RequestBody SlideSelectListReq req) {
         return R.ok(slideService.getWaxCode(req));
     }
 
     @ApiOperation(value = "获取组号下拉列表")
     @PostMapping("/getGroupCode")
-    public R<SlideSelectListVo> getGroupCode(@RequestBody SlideSelectListReq req) {
+    public R<List<String>> getGroupCode(@RequestBody SlideSelectListReq req) {
         return R.ok(slideService.getGroupCode(req));
     }
 
-    //@TODO 切片脏器下拉列表
     @ApiOperation(value = "获取脏器下拉列表")
     @PostMapping("/getOrganCode")
-    public R<SlideSelectListVo> getOrganCode(@RequestBody SlideSelectListReq req) {
+    public R<List<SlideOrganTagVo> > getOrganCode(@RequestBody SlideSelectListReq req) {
         return R.ok(slideService.getOrganCode(req));
+    }
+
+    @ApiOperation(value = "查看Ai切片是否分析完成，没有完成返回false，完成返回true")
+    @PostMapping("/isAiSlideFinished")
+    public R<Boolean> isAiSlideFinished(@RequestBody SlideSelectListReq req) {
+        return R.ok(slideService.isAiSlideFinished(Long.valueOf(req.getProjectId())));
     }
 
 
@@ -184,6 +190,9 @@ public class SlideController  extends BaseController {
         ExcelUtil<ExportAiInfoVo> util = new ExcelUtil<ExportAiInfoVo>(ExportAiInfoVo.class);
         util.exportExcel(response, list, "导出AI指标信息");
     }
+//
+//    @ApiOperation(value = "AI分析列表数据")
+//    public R<List<ExportAiListVO>>
 
 
 

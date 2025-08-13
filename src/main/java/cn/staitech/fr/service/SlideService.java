@@ -38,13 +38,13 @@ public interface SlideService extends IService<Slide> {
     SlideDetailVo getSlideInfo(Long slideId);
 
     boolean checkAiExecuted(Long projectId);
-    SlideSelectListVo getAnimalCode(SlideSelectListReq req);
+    List<String> getAnimalCode(SlideSelectListReq req);
 
-    SlideSelectListVo getWaxCode(SlideSelectListReq req);
+    List<String> getWaxCode(SlideSelectListReq req);
 
-    SlideSelectListVo getGroupCode(SlideSelectListReq req);
+    List<String> getGroupCode(SlideSelectListReq req);
 
-    SlideSelectListVo getOrganCode(SlideSelectListReq req);
+    List<SlideOrganTagVo>  getOrganCode(SlideSelectListReq req);
 
     /**
      * 查看Ai切片是否分析完成，没有完成返回false，完成返回true
