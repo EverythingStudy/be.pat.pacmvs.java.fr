@@ -24,5 +24,5 @@ public interface AiForecastService extends IService<AiForecast> {
     List<AiForecast> selectList(Long singleSlideId);
 
 
-    //List<AiForecastListOut> calculateList(Long singleSlideId, String structType);
+    List<AiForecastListOut> calculateList(Long singleSlideId, String structType);
 }

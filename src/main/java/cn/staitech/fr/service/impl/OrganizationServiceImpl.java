@@ -2,7 +2,7 @@ package cn.staitech.fr.service.impl;
 
 
 import cn.staitech.fr.domain.OrganizationIdName;
-import cn.staitech.fr.mapper.OrganizationMapper;
+import cn.staitech.fr.mapper.SysOrganizationMapper;
 import cn.staitech.fr.service.OrganizationService;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class OrganizationServiceImpl implements OrganizationService {
 
     @Resource
-    private OrganizationMapper organizationMapper;
+    private SysOrganizationMapper organizationMapper;
 
     @Override
     public Map<Long, String> selectMap() {

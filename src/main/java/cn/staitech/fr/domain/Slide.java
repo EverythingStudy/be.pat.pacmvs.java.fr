@@ -1,30 +1,29 @@
 package cn.staitech.fr.domain;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-
 import cn.staitech.fr.mapper.handler.ListLongTypeHandler;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
+
 /**
  * 项目选片表
+ *
  * @TableName fr_slide
  */
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@TableName(value ="fr_slide")
+@TableName(value = "fr_slide")
 @Data
 public class Slide implements Serializable {
     /**
@@ -36,7 +35,7 @@ public class Slide implements Serializable {
     /**
      * 项目ID
      */
-    @TableField(value ="special_id")
+    @TableField(value = "special_id")
     private Long projectId;
 
     private String description;
@@ -68,6 +67,20 @@ public class Slide implements Serializable {
      */
     private Date updateTime;
 
+    /**
+     * 组别号
+     */
+    private String groupCode;
+
+    /**
+     * 蜡块编号
+     */
+    private String waxCode;
+    /**
+     * 性别（M:雄；F:雌）
+     */
+    private String genderFlag;
+
     @TableField(typeHandler = ListLongTypeHandler.class)
     @ApiModelProperty(value = "已阅片用户")
     private List<Long> viewers;
@@ -92,13 +105,7 @@ public class Slide implements Serializable {
             return false;
         }
         Slide other = (Slide) that;
-        return (this.getSlideId() == null ? other.getSlideId() == null : this.getSlideId().equals(other.getSlideId()))
-            && (this.getProjectId() == null ? other.getProjectId() == null : this.getProjectId().equals(other.getProjectId()))
-            && (this.getImageId() == null ? other.getImageId() == null : this.getImageId().equals(other.getImageId()))
-            && (this.getCreateBy() == null ? other.getCreateBy() == null : this.getCreateBy().equals(other.getCreateBy()))
-            && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime()))
-            && (this.getUpdateBy() == null ? other.getUpdateBy() == null : this.getUpdateBy().equals(other.getUpdateBy()))
-            && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()));
+        return (this.getSlideId() == null ? other.getSlideId() == null : this.getSlideId().equals(other.getSlideId())) && (this.getProjectId() == null ? other.getProjectId() == null : this.getProjectId().equals(other.getProjectId())) && (this.getImageId() == null ? other.getImageId() == null : this.getImageId().equals(other.getImageId())) && (this.getCreateBy() == null ? other.getCreateBy() == null : this.getCreateBy().equals(other.getCreateBy())) && (this.getCreateTime() == null ? other.getCreateTime() == null : this.getCreateTime().equals(other.getCreateTime())) && (this.getUpdateBy() == null ? other.getUpdateBy() == null : this.getUpdateBy().equals(other.getUpdateBy())) && (this.getUpdateTime() == null ? other.getUpdateTime() == null : this.getUpdateTime().equals(other.getUpdateTime()));
     }
 
     @Override
