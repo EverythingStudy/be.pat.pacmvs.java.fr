@@ -130,7 +130,6 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             String indicatorCode = entry.getKey();
             // 指标信息
             IndicatorAddIn indicator = entry.getValue();
-
             AiForecast forecast = new AiForecast();
             forecast.setSingleSlideId(singleSlideId);
             forecast.setQuantitativeIndicators(indicatorCode);

@@ -21,6 +21,8 @@ public class IndicatorAddIn {
     private String unit;
 
     private String structType;
+    //指标关联结构编码
+    private String structureIds;
 
     public IndicatorAddIn() {
         this.result = CommonConstant.SINGLE_RESULT;
@@ -36,6 +38,14 @@ public class IndicatorAddIn {
     public IndicatorAddIn(String result, String structType) {
         this.result = result;
         this.structType = structType;
+    }
+
+    public IndicatorAddIn(String englishName, String result, String unit, String structType) {
+        this.englishName = englishName;
+        this.result = result;
+        this.unit = unit;
+        this.structType = structType;
+
     }
 
 }
