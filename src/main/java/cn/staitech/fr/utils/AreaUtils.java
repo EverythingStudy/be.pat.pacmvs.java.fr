@@ -7,12 +7,15 @@ import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -174,6 +177,20 @@ public class AreaUtils {
                 PathologicalIndicatorCategory::getStructureId,
                 PathologicalIndicatorCategory::getCategoryId,
                 (entity1, entity2) -> entity1));
+    }
+    
+    
+    /**
+     * 
+    * @Title: getStructureIds
+    * @Description: 获取结构
+    * @param @param structureIdList
+    * @param @return
+    * @return String
+    * @throws
+     */
+    public String getStructureIds(String ... structureId) {
+    	return structureId == null || structureId.length == 0 ? "" : String.join(",", structureId);
     }
 
 }
