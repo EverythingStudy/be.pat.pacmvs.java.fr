@@ -13,8 +13,8 @@ import java.util.List;
  */
 @Data
 public class AiDownloadIn {
-    @ApiModelProperty(value = "待导出报告数据id；")
-    @Size( max=10,message ="{MAX.TEN.DATA}")
+    @ApiModelProperty(value = "切片id")
+    @Size(max = 10, message = "{MAX.TEN.DATA}")
     private List<Long> ids;
 
     @ApiModelProperty(value = "专题id")

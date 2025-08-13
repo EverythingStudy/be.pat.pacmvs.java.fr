@@ -402,9 +402,6 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             }
         }
         project.setButtons(buttons);
-        //设置对照组按钮置
-        boolean isAiSlideFinished = slideService.isAiSlideFinished(projectId);
-        project.setAiSlideFinished(isAiSlideFinished);
 
         //增加种属名称
         if (null != project.getSpeciesId()) {

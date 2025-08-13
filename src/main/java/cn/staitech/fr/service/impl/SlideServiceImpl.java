@@ -322,41 +322,30 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 	}
 
 	@Override
-	public SlideSelectListVo getAnimalCode(SlideSelectListReq req) {
+	public List<String> getAnimalCode(SlideSelectListReq req) {
 		List<SlidePageVo> slideSelectList = this.baseMapper.getSlideSelectList(req);
 		List<String> animalCodes = slideSelectList.stream().map(SlidePageVo::getAnimalCode).distinct().sorted().collect(Collectors.toList());
-
-		SlideSelectListVo slideSelectListVo = new SlideSelectListVo();
-		slideSelectListVo.setAnimalCodes(animalCodes);
-		return slideSelectListVo;
+		return animalCodes;
 	}
 
 	@Override
-	public SlideSelectListVo getWaxCode(SlideSelectListReq req) {
+	public List<String> getWaxCode(SlideSelectListReq req) {
 		List<SlidePageVo> slideSelectList = this.baseMapper.getSlideSelectList(req);
 		List<String> waxCode = slideSelectList.stream().map(SlidePageVo::getWaxCode).distinct().sorted().collect(Collectors.toList());
-
-		SlideSelectListVo slideSelectListVo = new SlideSelectListVo();
-		slideSelectListVo.setWaxCodes(waxCode);
-		return slideSelectListVo;
+		return waxCode;
 	}
 
 	@Override
-	public SlideSelectListVo getGroupCode(SlideSelectListReq req) {
+	public List<String> getGroupCode(SlideSelectListReq req) {
 		List<SlidePageVo> slideSelectList = this.baseMapper.getSlideSelectList(req);
 		List<String> groupCode = slideSelectList.stream().map(SlidePageVo::getGroupCode).distinct().sorted().collect(Collectors.toList());
-
-		SlideSelectListVo slideSelectListVo = new SlideSelectListVo();
-		slideSelectListVo.setGroupCodes(groupCode);
-		return slideSelectListVo;
+		return groupCode;
 	}
 
 	@Override
-	public SlideSelectListVo getOrganCode(SlideSelectListReq req) {
-		SlideSelectListVo slideSelectListVo = new SlideSelectListVo();
+	public List<SlideOrganTagVo> getOrganCode(SlideSelectListReq req) {
 		List<SlideOrganTagVo> organCode = baseMapper.getOrganCode(req);
-		slideSelectListVo.setOrganCodes(organCode);
-		return slideSelectListVo;
+		return organCode;
 	}
 
 	@Override

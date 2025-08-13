@@ -142,35 +142,11 @@ CREATE TABLE `fr_contour_json`
     PRIMARY KEY (`contour_json_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1024859 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
-ALTER TABLE `pacmvs`.`fr_ai_forecast`
+ALTER TABLE `fr_ai_forecast`
     ADD COLUMN `structure_ids` varchar(255) NULL COMMENT '指标计算机构编码' AFTER `struct_type`;
 
 
-ALTER TABLE `pacmvs`.`fr_slide`
+ALTER TABLE `fr_slide`
     ADD COLUMN `group_code` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '组别号',
     ADD COLUMN `gender_flag` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '性别（M:雄；F:雌）',
     ADD COLUMN `wax_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '蜡块编号';
-CREATE TABLE `fr_slide` (
-                            `slide_id` bigint NOT NULL AUTO_INCREMENT COMMENT '切片ID',
-                            `special_id` int DEFAULT NULL COMMENT '专题ID',
-                            `image_id` int DEFAULT NULL COMMENT '图像ID',
-                            `group_code` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '组别号',
-                            `wax_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '蜡块编号',
-                            `animal_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '动物编号',
-                            `gender_flag` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '性别（M:雄；F:雌）',
-                            `organs` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '脏器',
-                            `process_flag` smallint DEFAULT '0' COMMENT '处理状态（0：待切图,1：切图中,2：已切图 3：切图失败4：禁止切图）',
-                            `animal_check_status` smallint DEFAULT '0' COMMENT '当前动物号检查状态 核对状态 0：初始 1：正确 2：修正正常 3：错误 ',
-                            `check_status` smallint DEFAULT '0' COMMENT '核对状态 0：初始 1：正确 2：修正正常 3：错误 ',
-                            `analyze_status` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '0' COMMENT '切片名称解析，0：成功；1：失败',
-                            `check_by` bigint DEFAULT NULL COMMENT '修正人',
-                            `check_time` datetime DEFAULT NULL COMMENT '修正时间',
-                            `initiate_by` bigint DEFAULT NULL COMMENT '启动者',
-                            `initiate_time` datetime DEFAULT NULL COMMENT '启动时间',
-                            `del_flag` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '0' COMMENT '0存在，1删除',
-                            `create_by` bigint DEFAULT NULL COMMENT '创建者',
-                            `create_time` datetime DEFAULT NULL,
-                            `update_by` bigint DEFAULT NULL COMMENT '更新者',
-                            `update_time` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-                            PRIMARY KEY (`slide_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1618 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='专题选片表';

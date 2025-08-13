@@ -130,7 +130,6 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             String indicatorCode = entry.getKey();
             // 指标信息
             IndicatorAddIn indicator = entry.getValue();
-
             AiForecast forecast = new AiForecast();
             forecast.setSingleSlideId(singleSlideId);
             forecast.setQuantitativeIndicators(indicatorCode);
@@ -141,6 +140,7 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             if (StringUtils.isNotEmpty(indicator.getStructType())) {
                 forecast.setStructType(indicator.getStructType());
             }
+            forecast.setStructureIds(indicator.getStructureIds());
             aiForecasts.add(forecast);
         }
         // 批量插入
