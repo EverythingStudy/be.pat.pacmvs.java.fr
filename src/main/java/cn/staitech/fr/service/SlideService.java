@@ -3,6 +3,7 @@ package cn.staitech.fr.service;
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.out.AiInfoListRequest;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -60,4 +61,6 @@ public interface SlideService extends IService<Slide> {
     void organCheckConfirm(OrganCheckViewReq req);
 
     List<OrganTagVO> organList(Long projectId);
+
+    List<AiInfoListResp> getAiInfoList(AiInfoListRequest request);
 }

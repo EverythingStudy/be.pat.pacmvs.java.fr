@@ -2,6 +2,7 @@ package cn.staitech.fr.mapper;
 
 import java.util.List;
 import cn.staitech.common.core.domain.CustomPage;
+import cn.staitech.fr.domain.out.AiInfoListRequest;
 import cn.staitech.fr.vo.project.AiAnalysisBO;
 import cn.staitech.fr.vo.project.slide.*;
 import org.apache.ibatis.annotations.Param;
@@ -35,6 +36,8 @@ public interface SlideMapper extends BaseMapper<Slide> {
     List<AiAnalysisBO> selectAiAnalysis(@Param("projectId")Long projectId);
 
     List<ExportAiInfoVo> exportAiInfo(ExportAiInfoReq req);
+
+    List<AiInfoListVO> getAiInfoList(AiInfoListRequest request);
 }
 
 
