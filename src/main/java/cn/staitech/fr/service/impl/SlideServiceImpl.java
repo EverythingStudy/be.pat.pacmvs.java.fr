@@ -614,6 +614,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			SingleSlide singleSlide = new SingleSlide();
 			singleSlide.setSlideId(req.getSlideId());
 			singleSlide.setCategoryId(req.getCategoryId());
+			singleSlide.setThumbUrl("");
 			this.singleSlideMapper.insert(singleSlide);
 			id = singleSlide.getSingleId();
 		}
