@@ -30,7 +30,8 @@ public class AiInfoListVO {
     @Excel(name = "对照组数值分布区间")
     private String forecastRange;
 
-
     @ApiModelProperty(name = "normalDistribution", value = "正态分布95%")
     private String normalDistribution;
+
+    private String structureIds;
 }

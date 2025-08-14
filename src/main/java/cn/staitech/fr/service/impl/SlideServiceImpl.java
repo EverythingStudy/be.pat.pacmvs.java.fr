@@ -577,8 +577,10 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
 	@Override
 	public List<AiInfoListResp> getAiInfoList(AiInfoListRequest request) {
+		//判断是不是存在对照组
+		Project special = projectMapper.selectById(request.getProjectId());
 		List<AiInfoListVO> aiInfoList = baseMapper.getAiInfoList(request);
-
+		request.setControlGroup(special.getControlGroup());
 		List<AiInfoListResp> aiInfoListResps = new ArrayList<>();
 		Map<Integer, List<AiInfoListVO>> aiInfoListMap = aiInfoList.stream().collect(Collectors.groupingBy(AiInfoListVO::getCategoryId));
 
@@ -590,14 +592,23 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			}
 
 			List<AiInfoListVO> aiInfoListVOS = value;
+			Set<String> setStr = new HashSet<>();
 			for (AiInfoListVO aiInfoListVO : aiInfoListVOS) {
-				List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), request.getControlGroup(), CommonConstant.NUMBER_0);
-				aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
+				if (StringUtils.isNotEmpty(special.getControlGroup())) {
+					List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), request.getControlGroup(), CommonConstant.NUMBER_0);
+					aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
+				}
+				String structureIds = aiInfoListVO.getStructureIds();
+				if(null != structureIds) {
+					Set<String> set = Arrays.stream(structureIds.split(",")).collect(Collectors.toSet());
+					setStr.addAll(set);
+				}
 			}
 			resp.setAiInfoList(value);
 			aiInfoListResps.add(resp);
 		});
-
+		// @TODO
+		//还差一个指标勾选和红色标注判断
 		return aiInfoListResps;
 	}
 

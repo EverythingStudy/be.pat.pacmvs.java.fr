@@ -24,7 +24,7 @@ public interface SingleSlideMapper extends BaseMapper<SingleSlide> {
     List<BigDecimal> getReferenceScope(@Param("quantitativeIndicators") String quantitativeIndicators, @Param("categoryId") Long aLong, @Param("specialId") Long specialId, @Param("groupCode") String groupCode, @Param("genderFlag") String genderFlag, @Param("structType") String structType);
 
     List<BigDecimal> getReferenceScopeCopy(@Param("quantitativeIndicators") String quantitativeIndicators,
-                                           @Param("categoryId") Long aLong,
+                                           @Param("categoryId") Long categoryId,
                                            @Param("specialId") Long specialId,
                                            @Param("groupCode") String groupCode,
                                            @Param("structType") String structType);

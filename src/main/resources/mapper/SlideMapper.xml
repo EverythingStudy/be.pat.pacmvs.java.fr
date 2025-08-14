@@ -331,7 +331,7 @@
         </if>
     </select>
     <select id="getAiInfoList" resultType="cn.staitech.fr.vo.project.slide.AiInfoListVO">
-        select fss.category_id,tg.organ_name,af.quantitative_indicators,af.unit,af.results,af.forecast_range
+        select af.structure_ids,fss.category_id,tg.organ_name,af.quantitative_indicators,af.unit,af.results,af.forecast_range
         from fr_slide fs
         left join tb_image ti on fs.image_id = ti.image_id
         left join fr_special frs on fs.special_id=frs.special_id
@@ -342,14 +342,8 @@
         <if test="projectId != null">
             and fs.special_id=#{projectId}
         </if>
-        <if test="groupCode != null and groupCode !=''">
-            and ti.group_code=#{groupCode}
-        </if>
-        <if test="singleId != null">
-            and fss.single_id=#{singleId}
-        </if>
-        <if test="categoryId != null">
-            and fss.category_id=#{categoryId}
+        <if test="slideId != null">
+            and fs.slide_id=#{slideId}
         </if>
     </select>
 
