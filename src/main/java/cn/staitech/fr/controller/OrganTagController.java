@@ -77,7 +77,7 @@ public class OrganTagController {
     }
 
     @ApiOperation(value = "查询脏器标签", tags = {"V2.6.0"})
-    @GetMapping("/queryOrganTag")
+    @PostMapping("/queryOrganTag")
     public R<List<OrganTagQueryVo>> queryOrganTag(@RequestBody OrganTagQuery organTagQuery) {
         List<OrganTagQueryVo> vos = new ArrayList<>();
         List<OrganTag> organTags = this.organTagService.listByIds(organTagQuery.getOrganTagIds());
