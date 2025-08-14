@@ -40,7 +40,7 @@ public class CommonJsonParser {
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
-    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
+    private StructureTagMapper structureTagMapper;
     @Resource
     private AnnotationMapper annotationMapper;
     @Resource
@@ -168,7 +168,7 @@ public class CommonJsonParser {
     }
 
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
-        log.info("parseJson -------------->  Json文件解析开始:{} {} {} {}",System.currentTimeMillis() ,  jsonFileS.getFileUrl(),jsonTask);
+        log.info("parseJson -------------->  Json文件解析开始:{} {} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
         if (checkCategory(jsonTask)) {
             return;
         }
@@ -193,7 +193,7 @@ public class CommonJsonParser {
         int bathSize = 5000;
 
         try (FileInputStream fis = new FileInputStream(jsonFile); JsonParser jsonParser = jsonFactory.createParser(fis)) {
-            log.info("parseJson --------------> Json文件解析读取文件流(FileInputStream)开始:{} {} {} {}",System.currentTimeMillis() ,  jsonFileS.getFileUrl(),jsonTask);
+            log.info("parseJson --------------> Json文件解析读取文件流(FileInputStream)开始:{} {} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
 
             current = jsonParser.nextToken();
             if (current != JsonToken.START_OBJECT) {
@@ -201,7 +201,7 @@ public class CommonJsonParser {
                 return;
             }
 
-            log.info("parseJson -------------->  Json文件解析 while loop start:{} {} {} {}",System.currentTimeMillis() ,  jsonFileS.getFileUrl(),jsonTask);
+            log.info("parseJson -------------->  Json文件解析 while loop start:{} {} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
 
             while (jsonParser.nextToken() != JsonToken.END_OBJECT) {
                 String fieldName = jsonParser.getCurrentName();
@@ -232,7 +232,7 @@ public class CommonJsonParser {
                 }
             }
 
-            log.info("parseJson --------------> Json文件解析 while loop end:{} {} {} {}",System.currentTimeMillis() ,  jsonFileS.getFileUrl(),jsonTask);
+            log.info("parseJson --------------> Json文件解析 while loop end:{} {} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
 
             if (CollectionUtil.isNotEmpty(elementsList)) {
                 processedAnnotations = elementsList.parallelStream().map(element -> {
@@ -289,7 +289,7 @@ public class CommonJsonParser {
                     annotationMapper.deleteAiAnnotation(annotation4);
                 }
             }
-            log.info("parseJson --------------> Json文件解析结束:{} {} {} {}",System.currentTimeMillis() ,  jsonFileS.getFileUrl(),jsonTask);
+            log.info("parseJson --------------> Json文件解析结束:{} {} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
@@ -359,10 +359,10 @@ public class CommonJsonParser {
     public Map<String, Long> getPathologicalMap(Long organizationId) {
         Map<String, Long> pathlogicalMap = pathologicalHasMap.get(organizationId);
         if (pathlogicalMap == null) {
-            LambdaQueryWrapper<PathologicalIndicatorCategory> CategoryQueryWrapper = new LambdaQueryWrapper<>();
-            CategoryQueryWrapper.eq(PathologicalIndicatorCategory::getDelFlag, 0).eq(PathologicalIndicatorCategory::getOrganizationId, organizationId);
-            List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(CategoryQueryWrapper);
-            pathlogicalMap = list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+            LambdaQueryWrapper<StructureTag> categoryQueryWrapper = new LambdaQueryWrapper<>();
+            categoryQueryWrapper.eq(StructureTag::getDelFlag, 0).eq(StructureTag::getOrganizationId, organizationId);
+            List<StructureTag> list = structureTagMapper.selectList(categoryQueryWrapper);
+            pathlogicalMap = list.stream().collect(Collectors.toMap(StructureTag::getStructureId, StructureTag::getStructureTagId, (entity1, entity2) -> entity1));
             pathologicalHasMap.put(organizationId, pathlogicalMap);
             return pathlogicalMap;
         }
@@ -832,7 +832,7 @@ public class CommonJsonParser {
         if (null == bigDecimal1 || null == bigDecimal2 || bigDecimal1.compareTo(BigDecimal.ZERO) == 0 || bigDecimal2.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
-        return bigDecimal1.divide(bigDecimal2,9, RoundingMode.HALF_UP);
+        return bigDecimal1.divide(bigDecimal2, 9, RoundingMode.HALF_UP);
     }
 
 
