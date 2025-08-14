@@ -76,7 +76,7 @@ public class OrganTagController {
         return R.ok(organTagService.list(categoryQueryWrapper));
     }
 
-    @ApiOperation(value = "查询脏器标签", tags = {"V2.6.0"})
+    @ApiOperation(value = "查询脏器标签-feign服务", tags = {"V2.6.0"})
     @PostMapping("/queryOrganTag")
     public R<List<OrganTagQueryVo>> queryOrganTag(@RequestBody OrganTagQuery organTagQuery) {
         List<OrganTagQueryVo> vos = new ArrayList<>();

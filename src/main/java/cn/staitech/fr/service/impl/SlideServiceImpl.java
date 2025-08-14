@@ -16,6 +16,7 @@ import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.system.api.RemoteAnnotationService;
 import cn.staitech.system.api.domain.biz.AddSingleSlide;
+import cn.staitech.system.api.domain.biz.DelSingleSlide;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -619,6 +620,15 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			id = singleSlide.getSingleId();
 		}
 		return id;
+	}
+
+	@Override
+	public int delSingleSlide(DelSingleSlide req) {
+		// 删除脏器
+		LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(SingleSlide::getSlideId, req.getSlideId());
+		wrapper.eq(SingleSlide::getCategoryId, req.getCategoryId());
+		return this.singleSlideMapper.delete(wrapper);
 	}
 
 	@Override

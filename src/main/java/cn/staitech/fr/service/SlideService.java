@@ -7,6 +7,7 @@ import cn.staitech.fr.domain.out.AiInfoListRequest;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.system.api.domain.biz.AddSingleSlide;
+import cn.staitech.system.api.domain.biz.DelSingleSlide;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.HashMap;
@@ -66,4 +67,6 @@ public interface SlideService extends IService<Slide> {
     List<AiInfoListResp> getAiInfoList(AiInfoListRequest request);
 
     Long addSingleSlide(AddSingleSlide req);
+
+    int delSingleSlide(DelSingleSlide req);
 }
