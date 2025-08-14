@@ -12,6 +12,7 @@ import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.MessageSource;
+import cn.staitech.system.api.domain.biz.AddSingleSlide;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -199,5 +200,12 @@ public class SlideController  extends BaseController {
     public R<List<OrganTagVO>> organList(@RequestBody @Validated ProductionReq req) {
         List<OrganTagVO> list = this.slideService.organList(req.getProjectId());
         return R.ok(list);
+    }
+
+    @ApiOperation(value = "添加脏器")
+    @PostMapping("/addSingleSlide")
+    public R<Long> addSingleSlide(@RequestBody @Validated AddSingleSlide req) {
+        Long id = this.slideService.addSingleSlide(req);
+        return R.ok(id);
     }
 }

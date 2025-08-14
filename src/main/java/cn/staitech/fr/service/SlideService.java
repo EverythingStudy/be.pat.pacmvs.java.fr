@@ -5,6 +5,7 @@ import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
+import cn.staitech.system.api.domain.biz.AddSingleSlide;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.HashMap;
@@ -60,4 +61,6 @@ public interface SlideService extends IService<Slide> {
     void organCheckConfirm(OrganCheckViewReq req);
 
     List<OrganTagVO> organList(Long projectId);
+
+    Long addSingleSlide(AddSingleSlide req);
 }

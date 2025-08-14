@@ -12,6 +12,7 @@ import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.system.api.RemoteAnnotationService;
+import cn.staitech.system.api.domain.biz.AddSingleSlide;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -569,6 +570,24 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			}
 		}
 		return list;
+	}
+
+	@Override
+	public Long addSingleSlide(AddSingleSlide req) {
+		Long id = null;
+		// 先查询是否存在，不存在插入
+		LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(SingleSlide::getSlideId, req.getSlideId());
+		wrapper.eq(SingleSlide::getCategoryId, req.getCategoryId());
+		List<SingleSlide> singleSlides = this.singleSlideMapper.selectList(wrapper);
+		if (CollectionUtils.isEmpty(singleSlides)) {
+			SingleSlide singleSlide = new SingleSlide();
+			singleSlide.setSlideId(req.getSlideId());
+			singleSlide.setCategoryId(req.getCategoryId());
+			this.singleSlideMapper.insert(singleSlide);
+			id = singleSlide.getSingleId();
+		}
+		return id;
 	}
 
 	@Override
