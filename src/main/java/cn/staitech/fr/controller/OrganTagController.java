@@ -84,7 +84,7 @@ public class OrganTagController {
         if (!CollectionUtils.isEmpty(organTags)) {
             for (OrganTag organTag : organTags) {
                 OrganTagQueryVo vo = new OrganTagQueryVo();
-                BeanUtils.copyProperties(organTag, vos);
+                BeanUtils.copyProperties(organTag, vo);
                 vos.add(vo);
             }
         }
