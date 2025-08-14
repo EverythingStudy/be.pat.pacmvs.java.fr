@@ -5,10 +5,13 @@ import cn.hutool.http.HttpUtil;
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Constants;
 import cn.staitech.fr.domain.*;
+import cn.staitech.fr.domain.out.AiInfoListRequest;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.SlideService;
+import cn.staitech.fr.utils.MathUtils;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.system.api.RemoteAnnotationService;
@@ -27,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -570,6 +574,32 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			}
 		}
 		return list;
+	}
+
+	@Override
+	public List<AiInfoListResp> getAiInfoList(AiInfoListRequest request) {
+		List<AiInfoListVO> aiInfoList = baseMapper.getAiInfoList(request);
+
+		List<AiInfoListResp> aiInfoListResps = new ArrayList<>();
+		Map<Integer, List<AiInfoListVO>> aiInfoListMap = aiInfoList.stream().collect(Collectors.groupingBy(AiInfoListVO::getCategoryId));
+
+		aiInfoListMap.forEach((key, value) -> {
+			AiInfoListResp resp = new AiInfoListResp();
+			OrganTag organTag = organTagMapper.selectById(key);
+			if(null != organTag) {
+				resp.setOrganName(organTag.getOrganName());
+			}
+
+			List<AiInfoListVO> aiInfoListVOS = value;
+			for (AiInfoListVO aiInfoListVO : aiInfoListVOS) {
+				List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), request.getControlGroup(), CommonConstant.NUMBER_0);
+				aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
+			}
+			resp.setAiInfoList(value);
+			aiInfoListResps.add(resp);
+		});
+
+		return aiInfoListResps;
 	}
 
 	@Override

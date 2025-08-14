@@ -4,8 +4,8 @@ import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.utils.poi.ExcelUtil;
 import cn.staitech.common.core.web.controller.BaseController;
-import cn.staitech.common.security.annotation.RequiresPermissions;
 import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.out.AiInfoListRequest;
 import cn.staitech.fr.domain.out.ExportAiListVO;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.vo.project.*;
@@ -191,9 +191,13 @@ public class SlideController  extends BaseController {
         ExcelUtil<ExportAiInfoVo> util = new ExcelUtil<ExportAiInfoVo>(ExportAiInfoVo.class);
         util.exportExcel(response, list, "导出AI指标信息");
     }
-//
-//    @ApiOperation(value = "AI分析列表数据")
-//    public R<List<ExportAiListVO>>
+
+
+    @ApiOperation(value = "AI分析列表数据")
+    @PostMapping("/getAiInfoList")
+    public R<List<AiInfoListResp>> getAiInfoList(@RequestBody AiInfoListRequest request) {
+        return R.ok(slideService.getAiInfoList(request));
+    }
 
     @ApiOperation(value = "脏器识别校对-标签下拉列表")
     @PostMapping("/organList")

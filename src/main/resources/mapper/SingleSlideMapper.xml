@@ -200,4 +200,19 @@
                  left join tb_organ_tag fc on fss.category_id = fc.organ_tag_id
         where fss.single_id = #{id}
     </select>
+    <select id="getReferenceScopeCopy" resultType="java.math.BigDecimal">
+        select if(locate('±', faf.results) > 0,
+                  CAST(LEFT (faf.results, locate('±', faf.results) - 1) AS DECIMAL (10, 3)),
+                  CAST(faf.results AS DECIMAL(10, 3)))
+        from fr_ai_forecast faf
+                 left join fr_single_slide fss on faf.single_slide_id = fss.single_id
+                 left join fr_slide fs on fss.slide_id = fs.slide_id and fs.del_flag = '0'
+        where fss.category_id = #{categoryId}
+          and fs.special_id = #{specialId}
+          and fs.group_code = #{groupCode}
+          and faf.quantitative_indicators = #{quantitativeIndicators}
+          and faf.struct_type = #{structType}
+          group by faf.forecast_id
+          order by faf.results desc
+    </select>
 </mapper>
