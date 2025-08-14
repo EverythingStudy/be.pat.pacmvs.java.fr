@@ -5,25 +5,33 @@ import cn.hutool.http.HttpUtil;
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Constants;
 import cn.staitech.fr.domain.*;
+import cn.staitech.fr.domain.out.AiInfoListRequest;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.SlideService;
+import cn.staitech.fr.utils.MathUtils;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.system.api.RemoteAnnotationService;
+import cn.staitech.system.api.domain.biz.AddSingleSlide;
+import cn.staitech.system.api.domain.biz.DelSingleSlide;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -545,6 +553,82 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			this.baseMapper.updateById(update);
 			// TODO 调用python
 		}
+	}
+
+	@Override
+	public List<OrganTagVO> organList(Long projectId) {
+		List<OrganTagVO> list = new ArrayList<>();
+		// 查询项目信息
+		Project project = this.projectMapper.selectById(projectId);
+		if (project != null && StringUtils.isNotBlank(project.getSpeciesId())) {
+			LambdaQueryWrapper<OrganTag> wrapper = new LambdaQueryWrapper<>();
+			wrapper.eq(OrganTag::getSpeciesId, project.getSpeciesId());
+			wrapper.eq(OrganTag::getOrganizationId, project.getOrganizationId());
+			wrapper.eq(OrganTag::getDelFlag, false);
+			List<OrganTag> tags = organTagMapper.selectList(wrapper);
+			if (!CollectionUtils.isEmpty(tags)) {
+				for (OrganTag tag : tags) {
+					OrganTagVO vo = new OrganTagVO();
+					BeanUtils.copyProperties(tag, vo);
+					list.add(vo);
+				}
+			}
+		}
+		return list;
+	}
+
+	@Override
+	public List<AiInfoListResp> getAiInfoList(AiInfoListRequest request) {
+		List<AiInfoListVO> aiInfoList = baseMapper.getAiInfoList(request);
+
+		List<AiInfoListResp> aiInfoListResps = new ArrayList<>();
+		Map<Integer, List<AiInfoListVO>> aiInfoListMap = aiInfoList.stream().collect(Collectors.groupingBy(AiInfoListVO::getCategoryId));
+
+		aiInfoListMap.forEach((key, value) -> {
+			AiInfoListResp resp = new AiInfoListResp();
+			OrganTag organTag = organTagMapper.selectById(key);
+			if(null != organTag) {
+				resp.setOrganName(organTag.getOrganName());
+			}
+
+			List<AiInfoListVO> aiInfoListVOS = value;
+			for (AiInfoListVO aiInfoListVO : aiInfoListVOS) {
+				List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), request.getControlGroup(), CommonConstant.NUMBER_0);
+				aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
+			}
+			resp.setAiInfoList(value);
+			aiInfoListResps.add(resp);
+		});
+
+		return aiInfoListResps;
+	}
+
+	@Override
+	public Long addSingleSlide(AddSingleSlide req) {
+		Long id = null;
+		// 先查询是否存在，不存在插入
+		LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(SingleSlide::getSlideId, req.getSlideId());
+		wrapper.eq(SingleSlide::getCategoryId, req.getCategoryId());
+		List<SingleSlide> singleSlides = this.singleSlideMapper.selectList(wrapper);
+		if (CollectionUtils.isEmpty(singleSlides)) {
+			SingleSlide singleSlide = new SingleSlide();
+			singleSlide.setSlideId(req.getSlideId());
+			singleSlide.setCategoryId(req.getCategoryId());
+			singleSlide.setThumbUrl("");
+			this.singleSlideMapper.insert(singleSlide);
+			id = singleSlide.getSingleId();
+		}
+		return id;
+	}
+
+	@Override
+	public int delSingleSlide(DelSingleSlide req) {
+		// 删除脏器
+		LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
+		wrapper.eq(SingleSlide::getSlideId, req.getSlideId());
+		wrapper.eq(SingleSlide::getCategoryId, req.getCategoryId());
+		return this.singleSlideMapper.delete(wrapper);
 	}
 
 	@Override

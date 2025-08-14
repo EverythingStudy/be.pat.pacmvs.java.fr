@@ -5,14 +5,19 @@ import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.OrganTag;
 import cn.staitech.fr.vo.OrganTagPageReq;
 import cn.staitech.fr.service.OrganTagService;
+import cn.staitech.system.api.domain.biz.OrganTagQuery;
+import cn.staitech.system.api.domain.biz.OrganTagQueryVo;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -71,4 +76,18 @@ public class OrganTagController {
         return R.ok(organTagService.list(categoryQueryWrapper));
     }
 
+    @ApiOperation(value = "查询脏器标签-feign服务", tags = {"V2.6.0"})
+    @PostMapping("/queryOrganTag")
+    public R<List<OrganTagQueryVo>> queryOrganTag(@RequestBody OrganTagQuery organTagQuery) {
+        List<OrganTagQueryVo> vos = new ArrayList<>();
+        List<OrganTag> organTags = this.organTagService.listByIds(organTagQuery.getOrganTagIds());
+        if (!CollectionUtils.isEmpty(organTags)) {
+            for (OrganTag organTag : organTags) {
+                OrganTagQueryVo vo = new OrganTagQueryVo();
+                BeanUtils.copyProperties(organTag, vo);
+                vos.add(vo);
+            }
+        }
+        return R.ok(vos);
+    }
 }

@@ -4,14 +4,16 @@ import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.utils.poi.ExcelUtil;
 import cn.staitech.common.core.web.controller.BaseController;
-import cn.staitech.common.security.annotation.RequiresPermissions;
 import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.out.AiInfoListRequest;
 import cn.staitech.fr.domain.out.ExportAiListVO;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.MessageSource;
+import cn.staitech.system.api.domain.biz.AddSingleSlide;
+import cn.staitech.system.api.domain.biz.DelSingleSlide;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -190,12 +192,31 @@ public class SlideController  extends BaseController {
         ExcelUtil<ExportAiInfoVo> util = new ExcelUtil<ExportAiInfoVo>(ExportAiInfoVo.class);
         util.exportExcel(response, list, "导出AI指标信息");
     }
-//
-//    @ApiOperation(value = "AI分析列表数据")
-//    public R<List<ExportAiListVO>>
 
 
+    @ApiOperation(value = "AI分析列表数据")
+    @PostMapping("/getAiInfoList")
+    public R<List<AiInfoListResp>> getAiInfoList(@RequestBody AiInfoListRequest request) {
+        return R.ok(slideService.getAiInfoList(request));
+    }
 
+    @ApiOperation(value = "脏器识别校对-标签下拉列表")
+    @PostMapping("/organList")
+    public R<List<OrganTagVO>> organList(@RequestBody @Validated ProductionReq req) {
+        List<OrganTagVO> list = this.slideService.organList(req.getProjectId());
+        return R.ok(list);
+    }
 
+    @ApiOperation(value = "添加脏器-feign服务")
+    @PostMapping("/addSingleSlide")
+    public R<Long> addSingleSlide(@RequestBody @Validated AddSingleSlide req) {
+        Long id = this.slideService.addSingleSlide(req);
+        return R.ok(id);
+    }
 
+    @ApiOperation(value = "删除脏器-feign服务")
+    @PostMapping("/delSingleSlide")
+    public R<Integer> delSingleSlide(@RequestBody @Validated DelSingleSlide req) {
+        return R.ok(this.slideService.delSingleSlide(req));
+    }
 }
