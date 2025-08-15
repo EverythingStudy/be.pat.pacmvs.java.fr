@@ -21,6 +21,7 @@ import cn.staitech.fr.vo.project.ProjectEditVo;
 import cn.staitech.fr.vo.project.ProjectPageReq;
 import cn.staitech.fr.vo.project.ProjectStatusVo;
 import cn.staitech.fr.vo.project.ProjectVo;
+import cn.staitech.fr.vo.project.slide.ChangeControlGroupReq;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -449,6 +450,13 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         project.setDelFlag(cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL);
         int success = baseMapper.updateById(project);
         return R.ok("恢复成功");
+    }
+
+    @Override
+    public Boolean changeControlGroup(ChangeControlGroupReq req) {
+        Project project = getById(req.getProjectId());
+        project.setControlGroup(req.getControlGroup());
+        return baseMapper.updateById(project) > 0;
     }
 
 }

@@ -69,4 +69,6 @@ public interface SlideService extends IService<Slide> {
     Long addSingleSlide(AddSingleSlide req);
 
     int delSingleSlide(DelSingleSlide req);
+
+
 }

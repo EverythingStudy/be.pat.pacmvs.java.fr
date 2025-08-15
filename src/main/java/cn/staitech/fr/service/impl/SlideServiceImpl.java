@@ -656,6 +656,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 	public List<ExportAiInfoVo> exportAiInfo(ExportAiInfoReq req) {
 		return baseMapper.exportAiInfo(req);
 	}
+
+
 }
 
 

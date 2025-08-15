@@ -219,4 +219,5 @@ public class SlideController  extends BaseController {
     public R<Integer> delSingleSlide(@RequestBody @Validated DelSingleSlide req) {
         return R.ok(this.slideService.delSingleSlide(req));
     }
+
 }

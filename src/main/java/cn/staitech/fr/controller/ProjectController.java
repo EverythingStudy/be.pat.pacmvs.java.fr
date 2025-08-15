@@ -22,6 +22,7 @@ import cn.staitech.fr.vo.project.ProjectEditVo;
 import cn.staitech.fr.vo.project.ProjectPageReq;
 import cn.staitech.fr.vo.project.ProjectStatusVo;
 import cn.staitech.fr.vo.project.ProjectVo;
+import cn.staitech.fr.vo.project.slide.ChangeControlGroupReq;
 import cn.staitech.system.api.RemoteUserService;
 import cn.staitech.system.api.domain.SysUser;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -213,6 +214,13 @@ public class ProjectController extends BaseController {
     @PostMapping("/recycleProjectDel/{projectId}")
     public R recycleProjectDel(@PathVariable("projectId") Long projectId) {
         return projectService.recycleProjectDel(projectId);
+    }
+
+
+    @ApiOperation(value = "更换对照组")
+    @PostMapping("/changeControlGroup")
+    public R<Boolean> changeControlGroup(@RequestBody @Validated ChangeControlGroupReq req) {
+        return R.ok(this.projectService.changeControlGroup(req));
     }
 
 }
