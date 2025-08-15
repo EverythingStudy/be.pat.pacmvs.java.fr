@@ -185,13 +185,13 @@ public class SlideController  extends BaseController {
         return R.ok();
     }
 
-    @ApiOperation(value = "导出AI指标信息")
-    @PostMapping("/exportAiInfo")
-    public void exportAiInfo(HttpServletResponse response, ExportAiInfoReq req) {
-        List<ExportAiInfoVo> list = slideService.exportAiInfo(req);
-        ExcelUtil<ExportAiInfoVo> util = new ExcelUtil<ExportAiInfoVo>(ExportAiInfoVo.class);
-        util.exportExcel(response, list, "导出AI指标信息");
-    }
+//    @ApiOperation(value = "导出AI指标信息")
+//    @PostMapping("/exportAiInfo")
+//    public void exportAiInfo(HttpServletResponse response, ExportAiInfoReq req) {
+//        List<ExportAiInfoVo> list = slideService.exportAiInfo(req);
+//        ExcelUtil<ExportAiInfoVo> util = new ExcelUtil<ExportAiInfoVo>(ExportAiInfoVo.class);
+//        util.exportExcel(response, list, "导出AI指标信息");
+//    }
 
 
     @ApiOperation(value = "AI分析列表数据")
