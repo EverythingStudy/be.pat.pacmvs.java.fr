@@ -34,4 +34,10 @@ public class AiInfoListVO {
     private String normalDistribution;
 
     private String structureIds;
+
+    /**
+     * 是否红色底纹高亮整行
+     */
+    @ApiModelProperty(value = "是否红色底纹高亮整行")
+    private Boolean redHighlight;
 }

@@ -23,6 +23,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -586,6 +587,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 		List<AiInfoListResp> aiInfoListResps = new ArrayList<>();
 		Map<Integer, List<AiInfoListVO>> aiInfoListMap = aiInfoList.stream().collect(Collectors.groupingBy(AiInfoListVO::getCategoryId));
 
+		//判断ai分析数据有没有全部完成
 		aiInfoListMap.forEach((key, value) -> {
 			AiInfoListResp resp = new AiInfoListResp();
 			OrganTag organTag = organTagMapper.selectById(key);
@@ -599,6 +601,14 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 				if (StringUtils.isNotEmpty(special.getControlGroup())) {
 					List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), request.getControlGroup(), CommonConstant.NUMBER_0);
 					aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
+
+					if(null != aiInfoListVO.getNormalDistribution() && null != aiInfoListVO.getResults()) {
+						String[] s = aiInfoListVO.getNormalDistribution().split("-");
+						boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiInfoListVO.getResults()));
+						if(!inRange) {
+							aiInfoListVO.setRedHighlight(true);
+						}
+					}
 				}
 				String structureIds = aiInfoListVO.getStructureIds();
 				if(null != structureIds) {
@@ -609,8 +619,6 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			resp.setAiInfoList(value);
 			aiInfoListResps.add(resp);
 		});
-		// @TODO
-		//还差一个指标勾选和红色标注判断
 		return aiInfoListResps;
 	}
 
