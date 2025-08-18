@@ -5,6 +5,8 @@ import cn.staitech.common.core.domain.PageRequest;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @Author wudi
  * @Date 2024/4/1 11:03
@@ -12,21 +14,73 @@ import lombok.Data;
  */
 @Data
 public class SlidePageReq extends PageRequest {
-
-    @ApiModelProperty(value = "项目id")
+    /**
+     * 项目id
+     */
+    @ApiModelProperty(value = "项目id-V2.6.1")
     private Long projectId;
-
-    @ApiModelProperty(value = "切片编号")
+    /**
+     * 切片编号
+     */
+    @ApiModelProperty(value = "切片编号-V2.6.1")
     private String fileName;
+    /**
+     * 动物编号集合
+     */
+    @ApiModelProperty(value = "动物编号集合-V2.6.1")
+    private List<String> animalCodes;
+    /**
+     * 蜡块编号集合
+     */
+    @ApiModelProperty(value = "蜡块编号集合-V2.6.1")
+    private List<String> waxCodes;
+    /**
+     * 组号集合
+     */
+    @ApiModelProperty(value = "组号集合-V2.6.1")
+    private List<String> groupCodes;
+    /**
+     * 性别
+     */
+    @ApiModelProperty(value = "性别，单选F、M-V2.6.1")
+    private String genderFlag;
+    /**
+     * 脏器标签ID集合
+     */
+    @ApiModelProperty(value = "脏器标签ID集合-V2.6.1")
+    private List<Long> organTagIds;
+    /**
+     * 阅片状态集合
+     */
+    @ApiModelProperty(value = "阅片状态集合：0-未阅片；1-已阅片-V2.6.1")
+    private List<Integer> viewStatus;
+    /**
+     * AI分析状态
+     */
+    @ApiModelProperty(value = "AI分析状态：0-未分析、1-脏器识别中、2-脏器识别异常、3-结构未分析、4-结构分析中、5-结构分析完成、6-结构分析失败-V2.6.1")
+    private List<Integer> aiStatus;
+    /**
+     * 描述
+     */
+    @ApiModelProperty(value = "描述-V2.6.1")
+    private String description;
+    /**
+     * 创建时间
+     */
+    @ApiModelProperty(value = "创建时间-V2.6.1")
+    private DateRangeReq createTimeParams;
+
+
+
+
+
+
 
     @ApiModelProperty(value = "动物编号")
     private String animalCode;
 
     @ApiModelProperty(value = "组号")
     private String groupCode;
-
-    @ApiModelProperty(value = "性别")
-    private String genderFlag;
 
     @ApiModelProperty(value = "蜡块编号")
     private String waxCode;
@@ -43,22 +97,15 @@ public class SlidePageReq extends PageRequest {
     @ApiModelProperty(value = "切片id")
     private Long slideId;
 
-    @ApiModelProperty(value = "添加时间")
-    private DateRangeReq createTimeParams;
-    
     @ApiModelProperty(value = "排序字段")
     private String sortField;
     
     @ApiModelProperty(value = "排序类型")
     private String sortType;
 
-    @ApiModelProperty(value = "描述")
-    private String description;
-
     @ApiModelProperty(value = "是否已阅")
     private Boolean isView;
 
     @ApiModelProperty(value = "当前登录人")
     private String currentUserId;
-
 }
