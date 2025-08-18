@@ -17,37 +17,69 @@ import lombok.Data;
  */
 @Data
 public class SlidePageVo {
-
-    @ApiModelProperty(value = "切片id")
+    /**
+     * 切片id
+     */
+    @ApiModelProperty(value = "切片id-V2.6.1")
     private Long slideId;
-
-    @ApiModelProperty(value = "缩略图url地址")
+    /**
+     * 缩略图url地址
+     */
+    @ApiModelProperty(value = "缩略图url地址-V2.6.1")
     private String thumbUrl;
-
-    @ApiModelProperty(value = "切片编号")
+    /**
+     * 切片编号
+     */
+    @ApiModelProperty(value = "切片编号-V2.6.1")
     private String fileName;
-
-    @ApiModelProperty(value = "组别号")
-    private String groupCode;
-    
-    @ApiModelProperty(value = "蜡块编号")
-    private String waxCode;
-
-    @ApiModelProperty(value="动物编号")
+    /**
+     * 动物编号
+     */
+    @ApiModelProperty(value="动物编号-V2.6.1")
     private String animalCode;
-
-    @ApiModelProperty(value="性别（M:雄；F:雌）")
+    /**
+     * 蜡块编号
+     */
+    @ApiModelProperty(value = "蜡块编号-V2.6.1")
+    private String waxCode;
+    /**
+     * 组别号
+     */
+    @ApiModelProperty(value = "组别号-V2.6.1")
+    private String groupCode;
+    /**
+     * 性别（M:雄；F:雌）
+     */
+    @ApiModelProperty(value="性别（M:雄；F:雌）-V2.6.1")
     private String genderFlag;
+    /**
+     * 阅片状态
+     */
+    @ApiModelProperty(value = "阅片状态集合：0-未阅片；1-已阅片-V2.6.1")
+    private Integer viewStatus;
+    /**
+     * AI分析状态
+     */
+    @ApiModelProperty(value = "AI分析状态：0-未分析、1-脏器识别中、2-脏器识别异常、3-结构未分析、4-结构分析中、5-结构分析完成、6-结构分析失败-V2.6.1")
+    private Integer aiStatus;
+    /**
+     * 描述
+     */
+    @ApiModelProperty(value = "描述-V2.6.1")
+    private String description;
+    /**
+     * 创建时间
+     */
+    @ApiModelProperty(value = "创建时间-V2.6.1")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createTime;
+
+
+
+
 
     @ApiModelProperty(value = "添加人")
     private String createUser;
-
-    @ApiModelProperty(value = "描述")
-    private String description;
-
-    @ApiModelProperty(value = "添加时间")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date createTime;
 
     private String imagePath;
 
