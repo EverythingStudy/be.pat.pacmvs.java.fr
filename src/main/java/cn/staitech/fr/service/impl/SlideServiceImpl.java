@@ -659,7 +659,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 				break;
 			}
 		}
-		return false;
+		return flag;
 	}
 
 	@Override
