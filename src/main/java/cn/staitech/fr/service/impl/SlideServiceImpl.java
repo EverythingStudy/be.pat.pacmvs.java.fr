@@ -617,9 +617,49 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 				}
 			}
 			resp.setAiInfoList(value);
+			resp.setStructCode(setStr);
 			aiInfoListResps.add(resp);
 		});
 		return aiInfoListResps;
+	}
+
+	@Override
+	public Boolean getAiInfoListCheck(Long projectId, Long slideId) {
+		//判断是不是存在对照组
+		Project special = projectMapper.selectById(projectId);
+
+		AiInfoListRequest request = new AiInfoListRequest();
+		request.setSlideId(slideId);
+		request.setProjectId(projectId);
+		List<AiInfoListVO> aiInfoList = baseMapper.getAiInfoList(request);
+		request.setControlGroup(special.getControlGroup());
+		Map<Integer, List<AiInfoListVO>> aiInfoListMap = aiInfoList.stream().collect(Collectors.groupingBy(AiInfoListVO::getCategoryId));
+
+		boolean flag = false;
+		//判断ai分析数据有没有全部完成
+		for (Map.Entry<Integer, List<AiInfoListVO>> entry : aiInfoListMap.entrySet()) {
+			Integer key = entry.getKey();
+			List<AiInfoListVO> aiInfoListVOS = entry.getValue();
+			for (AiInfoListVO aiInfoListVO : aiInfoListVOS) {
+				if (StringUtils.isNotEmpty(special.getControlGroup())) {
+					List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), request.getControlGroup(), CommonConstant.NUMBER_0);
+					String firstAndLastOfMiddle95Percent = MathUtils.getFirstAndLastOfMiddle95Percent(dataList);
+
+					if (null != firstAndLastOfMiddle95Percent && null != aiInfoListVO.getResults()) {
+						String[] s = aiInfoListVO.getNormalDistribution().split("-");
+						boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiInfoListVO.getResults()));
+						if (!inRange) {
+							flag = true;
+							break;
+						}
+					}
+				}
+			}
+			if (flag) {
+				break;
+			}
+		}
+		return flag;
 	}
 
 	@Override
