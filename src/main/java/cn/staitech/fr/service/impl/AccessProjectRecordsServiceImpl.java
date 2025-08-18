@@ -8,6 +8,8 @@ import cn.staitech.fr.domain.AccessProjectRecords;
 import cn.staitech.fr.vo.AccessProjectRecordsVo;
 import cn.staitech.fr.mapper.AccessProjectRecordsMapper;
 import cn.staitech.fr.service.AccessProjectRecordsService;
+import cn.staitech.fr.vo.project.AccessProjectRecordReq;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +17,9 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,32 +41,64 @@ public class AccessProjectRecordsServiceImpl extends ServiceImpl<AccessProjectRe
 
     @Override
     public R<List<AccessProjectRecordsVo>> accessProjectStatistics() throws Exception {
-        Date endDate = new Date();
-        Date startDate = DateUtil.offsetMonth(endDate, -1);
-        List<String> dateStrings = DateUtil.rangeToList(startDate, endDate, DateField.DAY_OF_MONTH).stream().map(DateUtil::formatDate).collect(Collectors.toList());
-        List<AccessProjectRecords> accessProjectRecordsList = list(Wrappers.<AccessProjectRecords>lambdaQuery().between(AccessProjectRecords::getAccessTime, startDate, endDate)
-                .eq(AccessProjectRecords::getUserId, SecurityUtils.getUserId()));
-        Map<String, Integer> accessProjectRecordsMap = new HashMap<>();
-        if (CollectionUtils.isNotEmpty(accessProjectRecordsList)){
-            //accessProjectRecordsList将访问时间转换为日期，并按日期分组，计算访问数量
-            for (AccessProjectRecords accessProjectRecords : accessProjectRecordsList) {
-                String accessDate = DateUtil.formatDate(accessProjectRecords.getAccessTime());
-                if (accessProjectRecordsMap.containsKey(accessDate)) {
-                    accessProjectRecordsMap.put(accessDate, accessProjectRecordsMap.get(accessDate) + 1);
-                } else {
-                    accessProjectRecordsMap.put(accessDate, 1);
-                }
-            }
+        List<AccessProjectRecords> accessProjectRecordsList = list(Wrappers.<AccessProjectRecords>lambdaQuery()
+                .eq(AccessProjectRecords::getUserId, SecurityUtils.getUserId())
+                .groupBy(AccessProjectRecords::getProjectId)
+                .orderByDesc(AccessProjectRecords::getAccessTime)).stream().limit(5).collect(Collectors.toList());
+
+        List<Long> projectIds = accessProjectRecordsList.stream().map(AccessProjectRecords::getProjectId).collect(Collectors.toList());
+
+        AccessProjectRecordReq req = new AccessProjectRecordReq();
+        req.setProjectIds(projectIds);
+        List<AccessProjectRecordsVo> accessProjectRecordsVos = this.getBaseMapper().accessProjectStatistics(req);
+        return R.ok(accessProjectRecordsVos);
+//        Date endDate = new Date();
+//        Date startDate = DateUtil.offsetMonth(endDate, -1);
+//        List<String> dateStrings = DateUtil.rangeToList(startDate, endDate, DateField.DAY_OF_MONTH).stream().map(DateUtil::formatDate).collect(Collectors.toList());
+//        List<AccessProjectRecords> accessProjectRecordsList = list(Wrappers.<AccessProjectRecords>lambdaQuery().between(AccessProjectRecords::getAccessTime, startDate, endDate)
+//                .eq(AccessProjectRecords::getUserId, SecurityUtils.getUserId()));
+//        Map<String, Integer> accessProjectRecordsMap = new HashMap<>();
+//        if (CollectionUtils.isNotEmpty(accessProjectRecordsList)){
+//            //accessProjectRecordsList将访问时间转换为日期，并按日期分组，计算访问数量
+//            for (AccessProjectRecords accessProjectRecords : accessProjectRecordsList) {
+//                String accessDate = DateUtil.formatDate(accessProjectRecords.getAccessTime());
+//                if (accessProjectRecordsMap.containsKey(accessDate)) {
+//                    accessProjectRecordsMap.put(accessDate, accessProjectRecordsMap.get(accessDate) + 1);
+//                } else {
+//                    accessProjectRecordsMap.put(accessDate, 1);
+//                }
+//            }
+//        }
+//        List<AccessProjectRecordsVo> accessProjectRecordsOuts = new ArrayList<>();
+//        for (String dateString : dateStrings) {
+//            AccessProjectRecordsVo accessProjectRecordsOut = new AccessProjectRecordsVo(0,dateString);
+//            if (accessProjectRecordsMap.containsKey(dateString)) {
+//                accessProjectRecordsOut.setNum(accessProjectRecordsMap.get(dateString));
+//            }
+//            accessProjectRecordsOuts.add(accessProjectRecordsOut);
+//        }
+ //       return R.ok(accessProjectRecordsOuts);
+ //       return R.ok();
+    }
+
+    @Override
+    public R saveAccessProjectRecords(AccessProjectRecords accessProjectRecordsVo){
+        //LocalDateTime todayStart = LocalDateTime.of(LocalDate.now(), LocalTime.MIN);
+        //LocalDateTime todayEnd   = LocalDateTime.of(LocalDate.now(), LocalTime.MAX);
+        //判断用户当天是否已经访问过该项目，如果已访问则不再添加记录
+        List<AccessProjectRecords> accessProjectRecords = this.list(new LambdaQueryWrapper<AccessProjectRecords>()
+                .eq(AccessProjectRecords::getUserId, accessProjectRecordsVo.getUserId())
+                .eq(AccessProjectRecords::getProjectId, accessProjectRecordsVo.getProjectId()));
+          //      .between(AccessProjectRecords::getAccessTime, todayStart, todayEnd));
+
+        if(CollectionUtils.isEmpty(accessProjectRecords)) {
+            this.save(accessProjectRecordsVo);
+        } else {
+            //如果存在，则更新访问时间
+            accessProjectRecords.get(0).setAccessTime(new Date());
+            this.updateById(accessProjectRecords.get(0));
         }
-        List<AccessProjectRecordsVo> accessProjectRecordsOuts = new ArrayList<>();
-        for (String dateString : dateStrings) {
-            AccessProjectRecordsVo accessProjectRecordsOut = new AccessProjectRecordsVo(0,dateString);
-            if (accessProjectRecordsMap.containsKey(dateString)) {
-                accessProjectRecordsOut.setNum(accessProjectRecordsMap.get(dateString));
-            }
-            accessProjectRecordsOuts.add(accessProjectRecordsOut);
-        }
-        return R.ok(accessProjectRecordsOuts);
+        return R.ok();
     }
 
 }

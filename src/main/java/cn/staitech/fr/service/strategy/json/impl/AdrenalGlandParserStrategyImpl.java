@@ -78,48 +78,33 @@ public class AdrenalGlandParserStrategyImpl extends AbstractCustomParserStrategy
         BigDecimal organArea2 = getOrganArea(jsonTask, "10103E").getStructureAreaNum();
         Integer C = getInsideOrOutside(jsonTask, "10103D", "101068", true).getCount();
         Integer D = getInsideOrOutside(jsonTask, "10103E", "101068", true).getCount();
-        BigDecimal F = getOrganArea(jsonTask, "10103E").getStructureAreaNum();
-        indicatorResultsMap.put("皮质面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("红细胞面积（全片）", new IndicatorAddIn("", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("皮质细胞核数量", new IndicatorAddIn("", String.valueOf(C), "个", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("髓质细胞核数量", new IndicatorAddIn("", String.valueOf(D), "个", CommonConstant.NUMBER_1));
-        //indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("肾上腺面积", new IndicatorAddIn("Adrenal gland area%", F.setScale(3, RoundingMode.DOWN).toString(), SQ_MM));
-        //BigDecimal F = new BigDecimal(singleSlide.getArea());
-        BigDecimal b1 = BigDecimal.ZERO;
-        if (organArea.compareTo(BigDecimal.ZERO) != 0 && F.compareTo(BigDecimal.ZERO) != 0) {
-            b1 = commonJsonParser.getProportion(organArea, F);
-        }
-        indicatorResultsMap.put("皮质面积占比", new IndicatorAddIn("Cortex area %", String.valueOf(b1), PERCENTAGE, CommonConstant.NUMBER_0));
+        BigDecimal F = getOrganArea(jsonTask, "101111").getStructureAreaNum();
+        indicatorResultsMap.put("皮质面积", createIndicator(organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "10103D"));
+        indicatorResultsMap.put("髓质面积", createIndicator(organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "10103E"));
+        indicatorResultsMap.put("皮质细胞核数量", createIndicator(String.valueOf(C), PIECE, "10103D,101068"));
+        indicatorResultsMap.put("髓质细胞核数量", createIndicator(String.valueOf(D), PIECE, "10103E,101068"));
+        indicatorResultsMap.put("红细胞面积（全片）", createIndicator(organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "101004"));
 
-        BigDecimal b2 = BigDecimal.ZERO;
-        if (organArea2.compareTo(BigDecimal.ZERO) != 0 && F.compareTo(BigDecimal.ZERO) != 0) {
-            b2 = commonJsonParser.getProportion(organArea2, F);
-        }
-        indicatorResultsMap.put("髓质面积占比", new IndicatorAddIn("Medulla area%", String.valueOf(b2), PERCENTAGE, CommonConstant.NUMBER_0));
-        BigDecimal b3 = BigDecimal.ZERO;
-        if (organArea.compareTo(BigDecimal.ZERO) != 0 && organArea2.compareTo(BigDecimal.ZERO) != 0) {
-            b3 = commonJsonParser.getProportion(organArea, organArea2);
-        }
-        indicatorResultsMap.put("皮髓比", new IndicatorAddIn("Cortex:Medulla ratio", String.valueOf(b3), PERCENTAGE, CommonConstant.NUMBER_0));
-        BigDecimal b4 = BigDecimal.ZERO;
-        if (C != 0 && organArea.compareTo(BigDecimal.ZERO) != 0) {
-            BigDecimal temp = new BigDecimal(C);
-            b4 = temp.divide(organArea, 3, RoundingMode.HALF_UP);
-        }
-        indicatorResultsMap.put("皮质细胞核密度", new IndicatorAddIn("Nucleus density of adrenal cortex", String.valueOf(b4), SQ_MM_PIECE, CommonConstant.NUMBER_0));
-        BigDecimal b5 = BigDecimal.ZERO;
-        if (D != 0 && organArea2.compareTo(BigDecimal.ZERO) != 0) {
-            BigDecimal temp = new BigDecimal(D);
-            b5 = temp.divide(organArea2, 3, RoundingMode.HALF_UP);
-        }
-        indicatorResultsMap.put("髓质细胞核密度", new IndicatorAddIn("Nucleus density of adrenal medulla", String.valueOf(b5), SQ_MM_PIECE, CommonConstant.NUMBER_0));
-        BigDecimal b6 = BigDecimal.ZERO;
-        if (organArea1.compareTo(BigDecimal.ZERO) != 0 && F.compareTo(BigDecimal.ZERO) != 0) {
-            b6 = commonJsonParser.getProportion(organArea1, F);
-        }
-        indicatorResultsMap.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", String.valueOf(b6), PERCENTAGE, CommonConstant.NUMBER_0));
+        //皮质面积占比 % Cortex area %  1=A/F
+        //BigDecimal F = new BigDecimal(singleSlide.getArea());
+        BigDecimal b1 = getProportion(organArea, F);
+        indicatorResultsMap.put("皮质面积占比", createNameIndicator("Cortex area %", String.valueOf(b1), PERCENTAGE, "10103D,101111"));
+        //2=B/F %
+        BigDecimal b2 = commonJsonParser.getProportion(organArea2, F);
+        indicatorResultsMap.put("髓质面积占比", createNameIndicator("Medulla area%", String.valueOf(b2), PERCENTAGE, "10103E,101111"));
+        BigDecimal b3 = getProportion(organArea, organArea2);
+        indicatorResultsMap.put("皮髓比", createNameIndicator("Cortex:Medulla ratio", String.valueOf(b3), PERCENTAGE, "10103D,10103E"));
+        //4=C/A 个/mm2
+        BigDecimal b4 = bigDecimalDivideCheck(new BigDecimal(C), organArea);
+        indicatorResultsMap.put("皮质细胞核密度", createNameIndicator("Nucleus density of adrenal cortex", String.valueOf(b4), SQ_MM_PIECE, "10103D,101068"));
+        //5=D/B 个/mm2
+        BigDecimal b5 = bigDecimalDivideCheck(new BigDecimal(D), organArea2);
+        indicatorResultsMap.put("髓质细胞核密度", createNameIndicator("Nucleus density of adrenal medulla", String.valueOf(b5), SQ_MM_PIECE, "10103E,101068"));
+        //6=E/F %
+        BigDecimal b6 = getProportion(organArea1, F);
+        indicatorResultsMap.put("红细胞面积占比", createNameIndicator("Erythrocyte area%", String.valueOf(b6), PERCENTAGE, "101004,101111"));
+        //7=F  mm2
+        indicatorResultsMap.put("肾上腺面积", createNameIndicator("Adrenal gland area%", F.setScale(3, RoundingMode.DOWN).toString(), SQ_MM, "101111"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 

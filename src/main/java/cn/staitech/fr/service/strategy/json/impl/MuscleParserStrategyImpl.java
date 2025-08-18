@@ -109,18 +109,18 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
 
         // 算法输出指标
         resultsMap.put("肌纤维面积（单个）", createDefaultIndicator());// A肌纤维面积（单个）
-        resultsMap.put("间质面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaB.toString()), SQ_UM_THOUSAND));
-        resultsMap.put("血管面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaC.toString()), SQ_UM_THOUSAND));
-        resultsMap.put("红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaD.toString()), SQ_UM));
-        resultsMap.put("血管内红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaE.toString()), SQ_UM));
+        resultsMap.put("间质面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaB.toString()), SQ_UM_THOUSAND, "15C027"));
+        resultsMap.put("血管面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaC.toString()), SQ_UM_THOUSAND, "15C003"));
+        resultsMap.put("红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaD.toString()), SQ_UM, "15C004"));
+        resultsMap.put("血管内红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaE.toString()), SQ_UM, "15C003,15C004"));
 
         // 产品呈现指标
-        resultsMap.put("肌纤维面积(单个)", createNameIndicator("Muscle fiber area (per)", muscleFiberArea, SQ_UM));
-        resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area %", mesenchymeArea, PERCENTAGE));
-        resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE));
-        resultsMap.put("血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", vesselInErythrocyteArea.setScale(3, RoundingMode.UP), PERCENTAGE));
-        resultsMap.put("血管外红细胞面积占比", createNameIndicator("Extravascular erythrocyte area%", vesselOutErythrocyteArea.setScale(3, RoundingMode.UP), PERCENTAGE));
-        resultsMap.put("骨骼肌面积", createNameIndicator("Skeletal muscle area", areaUtils.convertToSquareMicrometer(organF.toString()), SQ_UM_THOUSAND));
+        resultsMap.put("肌纤维面积(单个)", createNameIndicator("Muscle fiber area (per)", muscleFiberArea, SQ_UM, "15C02A"));
+        resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area %", mesenchymeArea, PERCENTAGE, "15C027"));
+        resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE, "15C003"));
+        resultsMap.put("血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", vesselInErythrocyteArea.setScale(3, RoundingMode.UP), PERCENTAGE, "15C003,15C004"));
+        resultsMap.put("血管外红细胞面积占比", createNameIndicator("Extravascular erythrocyte area%", vesselOutErythrocyteArea.setScale(3, RoundingMode.UP), PERCENTAGE, "15C004,15C003"));
+        resultsMap.put("骨骼肌面积", createNameIndicator("Skeletal muscle area", areaUtils.convertToSquareMicrometer(organF.toString()), SQ_UM_THOUSAND, "15C111"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }
 

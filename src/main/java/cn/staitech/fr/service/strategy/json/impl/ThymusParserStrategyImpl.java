@@ -1,6 +1,5 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
-import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -78,48 +77,46 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal organArea = getOrganArea(jsonTask, "14403D").getStructureAreaNum();
         BigDecimal organArea1 = getOrganArea(jsonTask, "14403F").getStructureAreaNum();
         BigDecimal organArea2 = getOrganArea(jsonTask, "14403E").getStructureAreaNum();
+        //F
         BigDecimal organArea3 = getOrganArea(jsonTask, "145004").getStructureAreaNum();
         BigDecimal outLine = getOrganArea(jsonTask, "144111").getStructureAreaNum();
+        //A
+        indicatorResultsMap.put("皮质外轮廓面积", createIndicator(organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "14403D"));
+        //B
+        indicatorResultsMap.put("髓质外轮廓面积", createIndicator(organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "14403E"));
+        //D
         Annotation annotation = commonJsonParser.getInsideOrOutside(jsonTask, "14403E", "14403F", true);
         BigDecimal organArea4 = annotation.getStructureAreaNum();
-        indicatorResultsMap.put("髓质内结缔组织面积", new IndicatorAddIn("", organArea4.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("髓质内结缔组织面积", createIndicator(organArea4.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "14403E,14403F"));
+        //E
         Annotation annotation1 = commonJsonParser.getInsideOrOutside(jsonTask, "14403E", "14403F", false);
         BigDecimal organArea5 = annotation1.getStructureAreaNum();
-        indicatorResultsMap.put("髓质外结缔组织面积", new IndicatorAddIn("", organArea5.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("髓质面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("髓质外结缔组织面积", createIndicator(organArea5.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "14403E,14403F"));
+        //F
         //indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        //indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("胸腺面积", new IndicatorAddIn("Thymus area", outLine.setScale(3, RoundingMode.DOWN).toString(), SQ_MM, CommonConstant.NUMBER_0));
+        //G
+        indicatorResultsMap.put("组织轮廓", createIndicator(outLine, "平方毫米", "144111"));
+
+        //indicatorResultsMap.put("皮质面积", new IndicatorAddIn("", F.subtract(A).setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_0));
+        //indicatorResultsMap.put("髓质面积", createIndicator(organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_0));
+        //3=(A-B-E)/A
+        BigDecimal b3 = getProportion(organArea.subtract(organArea2).subtract(organArea4), organArea);
+        indicatorResultsMap.put("皮质占比", createNameIndicator("Cortex area%", String.valueOf(b3), "%", "14403D,14403E,14403F"));
+        //4=(B-D)/A
+        BigDecimal b4 = getProportion(organArea2.subtract(organArea4), organArea);
+        indicatorResultsMap.put("髓质占比", createNameIndicator("Medulla area%", String.valueOf(b4), "%", "14403D,14403E,14403F"));
+        //5=(A-B-E)/(B-D)
+        BigDecimal b5 = getProportion(organArea.subtract(organArea2).subtract(organArea4), organArea2.subtract(organArea4));
+        indicatorResultsMap.put("皮髓比", createNameIndicator("Cortex:medulla ratio", String.valueOf(b5), "%", "14403D,14403E,14403F"));
+        //6=F/A
         BigDecimal F = outLine;
-        BigDecimal b1 = BigDecimal.ZERO;
-        if (F.compareTo(BigDecimal.ZERO) != 0) {
-            BigDecimal temp = organArea2.add(organArea5);
-            b1 = commonJsonParser.getProportion(F.subtract(temp), F);
-        }
-        indicatorResultsMap.put("皮质占比", new IndicatorAddIn("Cortex area%", String.valueOf(b1), "%", CommonConstant.NUMBER_0));
-        BigDecimal b2 = BigDecimal.ZERO;
-        BigDecimal b3 = BigDecimal.ZERO;
-        BigDecimal A = BigDecimal.ZERO;
-        if (organArea2.compareTo(BigDecimal.ZERO) != 0 && F.compareTo(BigDecimal.ZERO) != 0) {
-            b2 = commonJsonParser.getProportion(organArea2, F);
-            A = organArea2.add(organArea5);
-            b3 = commonJsonParser.getProportion(F.subtract(A), organArea2);
-        }
-        indicatorResultsMap.put("皮质面积", new IndicatorAddIn("", F.subtract(A).setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("髓质占比", new IndicatorAddIn("Medulla area%", String.valueOf(b2), "%", CommonConstant.NUMBER_0));
-        indicatorResultsMap.put("皮髓比", new IndicatorAddIn("Cortex:medulla ratio", String.valueOf(b3), "%", CommonConstant.NUMBER_0));
-
-        BigDecimal b4 = BigDecimal.ZERO;
-        if (organArea3.compareTo(BigDecimal.ZERO) != 0 && F.compareTo(BigDecimal.ZERO) != 0) {
-            b4 = commonJsonParser.getProportion(organArea3, F);
-        }
-        //indicatorResultsMap.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", String.valueOf(b4), "%", CommonConstant.NUMBER_0));
-
-        BigDecimal b5 = BigDecimal.ZERO;
-        if (organArea1.compareTo(BigDecimal.ZERO) != 0 && F.compareTo(BigDecimal.ZERO) != 0) {
-            b5 = commonJsonParser.getProportion(organArea1, F);
-        }
-        indicatorResultsMap.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", String.valueOf(b5), PERCENTAGE, CommonConstant.NUMBER_0));
+        BigDecimal b6 = getProportion(F, organArea);
+        //indicatorResultsMap.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", String.valueOf(b6), "%", CommonConstant.NUMBER_0));
+        //7=C/A
+        BigDecimal b7 = getProportion(organArea1, organArea);
+        indicatorResultsMap.put("结缔组织面积占比", createNameIndicator("Connective tissue area%", String.valueOf(b7), PERCENTAGE, "14403D,14403F"));
+        //8=G
+        indicatorResultsMap.put("胸腺面积", createNameIndicator("Thymus area", outLine.setScale(3, RoundingMode.DOWN).toString(), SQ_MM, "144111"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 

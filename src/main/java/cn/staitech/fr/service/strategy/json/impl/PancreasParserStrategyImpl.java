@@ -122,84 +122,31 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
         Annotation annotationOuter = getInsideOrOutside(jsonTask, "105003", "105004", false);
         //O 组织轮廓面积
         BigDecimal organAreaO = getOrganArea(jsonTask, "105111").getStructureAreaNum();
+        //算法输出指标
+        indicatorResultsMap.put("上皮细胞核数量", createIndicator(String.valueOf(countA), PIECE, "105075"));
+        indicatorResultsMap.put("酶原颗粒面积", createIndicator(organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "105076"));
+        indicatorResultsMap.put("胰岛数量", createIndicator(String.valueOf(count1), PIECE, "105077"));
+        indicatorResultsMap.put("胰岛面积（单个）", createDefaultIndicator("105077"));
+        indicatorResultsMap.put("胰岛面积（全片）", createIndicator(organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "105077"));
+        indicatorResultsMap.put("胰岛细胞核数量（单个）", createDefaultIndicator("105077,105078"));
+        indicatorResultsMap.put("间质面积", createIndicator(organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "105027"));
+        indicatorResultsMap.put("导管数量", createIndicator(String.valueOf(count2), PIECE, "10506F"));
+        indicatorResultsMap.put("导管面积（单个）", createDefaultIndicator("10506F"));
+        indicatorResultsMap.put("导管面积（全片）", createIndicator(organArea3.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "10506F"));
+        indicatorResultsMap.put("导管细胞核数量（单个）", createDefaultIndicator("10506F,10507B"));
+        indicatorResultsMap.put("血管面积", createIndicator(organArea4.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "105003"));
+        indicatorResultsMap.put("血管内红细胞面积", createIndicator(annotationInner.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "105003,105004"));
+        indicatorResultsMap.put("血管外红细胞面积", createIndicator(annotationOuter.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "105003,105004"));
+        indicatorResultsMap.put("胰岛细胞核数量（全片）", createIndicator(String.valueOf(count3), PIECE, "105077,105078"));
 
-        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("", annotationInner.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("", annotationOuter.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("酶原颗粒面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("胰岛面积（全片）", new IndicatorAddIn("", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
 
-        indicatorResultsMap.put("间质面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
-
-        indicatorResultsMap.put("导管面积（全片）", new IndicatorAddIn("", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
-
-        indicatorResultsMap.put("血管面积", new IndicatorAddIn("", organArea4.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
-
-        indicatorResultsMap.put("上皮细胞核数量", new IndicatorAddIn("", String.valueOf(countA), "个", CommonConstant.NUMBER_1));
-
-        indicatorResultsMap.put("胰岛数量", new IndicatorAddIn("", String.valueOf(count1), "个", CommonConstant.NUMBER_1));
-
-        indicatorResultsMap.put("导管数量", new IndicatorAddIn("", String.valueOf(count2), "个", CommonConstant.NUMBER_1));
-
-        indicatorResultsMap.put("胰岛细胞核数量（全片）", new IndicatorAddIn("", String.valueOf(count3), "个", CommonConstant.NUMBER_1));
-        //indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", singleSlide.getArea(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("胰腺面积", new IndicatorAddIn("Pancreas area%", organAreaO.setScale(3, RoundingMode.DOWN).toString(), SQ_MM, CommonConstant.NUMBER_0));
-
-        indicatorResultsMap.put("胰岛面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("胰岛细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("导管细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1));
+        //产品定义指标
+        indicatorResultsMap.put("胰腺面积", createNameIndicator("Pancreas area%", organAreaO.setScale(3, RoundingMode.DOWN).toString(), SQ_MM, "105111"));
         BigDecimal O = new BigDecimal(singleSlide.getArea());
-        String result = "";
-        if (countA != 0) {
-            BigDecimal t = O.subtract(organArea1).subtract(organArea2);
-            result = BigDecimal.valueOf(Long.valueOf(countA)).divide(t, 3, RoundingMode.HALF_UP).toString();
-        }
-        indicatorResultsMap.put("上皮细胞核密度", new IndicatorAddIn("Nucleus density of  epithelial cell", result, SQ_MM_PIECE, CommonConstant.NUMBER_0));
-        result = "0.000";
-        if (!organArea.equals(BigDecimal.ZERO) && !O.equals(BigDecimal.ZERO)) {
-            result = commonJsonParser.getProportion(organArea, O).toString();
-        }
-        indicatorResultsMap.put("酶原颗粒面积占比", new IndicatorAddIn("Zymogen granule area%", result, PERCENTAGE, CommonConstant.NUMBER_0));
-        result = "0.000";
-        if (!organArea1.equals(BigDecimal.ZERO) && !O.equals(BigDecimal.ZERO)) {
-            result = commonJsonParser.getProportion(organArea1, O).toString();
-        }
-        indicatorResultsMap.put("胰岛面积占比", new IndicatorAddIn("Pancreatic islet area%", result, PERCENTAGE, CommonConstant.NUMBER_0));
-        result = "0.000";
-        if (!organArea2.equals(BigDecimal.ZERO) && !O.equals(BigDecimal.ZERO)) {
-            result = commonJsonParser.getProportion(organArea2, O).toString();
-        }
-        indicatorResultsMap.put("间质面积占比", new IndicatorAddIn("Interstitial area%", result, PERCENTAGE, CommonConstant.NUMBER_0));
-        result = "0.000";
-        if (!organArea3.equals(BigDecimal.ZERO) && !O.equals(BigDecimal.ZERO)) {
-            result = commonJsonParser.getProportion(organArea3, O).toString();
-        }
-        indicatorResultsMap.put("导管面积占比", new IndicatorAddIn("Vascular area%", result, PERCENTAGE, CommonConstant.NUMBER_0));
-        result = "0.000";
-        if (!annotationInner.getStructureAreaNum().equals(BigDecimal.ZERO) && !O.equals(BigDecimal.ZERO)) {
-            result = commonJsonParser.getProportion(annotationInner.getStructureAreaNum(), O).toString();
-        }
-        indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular erythrocyte area%", result, PERCENTAGE, CommonConstant.NUMBER_0));
-        result = "0.000";
-        if (!annotationOuter.getStructureAreaNum().equals(BigDecimal.ZERO) && !O.equals(BigDecimal.ZERO)) {
-            result = commonJsonParser.getProportion(annotationOuter.getStructureAreaNum(), O).toString();
-        }
-        indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", result, PERCENTAGE, CommonConstant.NUMBER_0));
-        result = "0.000";
-        if (!organArea4.equals(BigDecimal.ZERO) && !O.equals(BigDecimal.ZERO)) {
-            result = commonJsonParser.getProportion(organArea4, O).toString();
-        }
-        indicatorResultsMap.put("血管面积占比", new IndicatorAddIn("Vessel area%", result, PERCENTAGE, CommonConstant.NUMBER_0));
-        result = "0.000";
-        if (!O.equals(BigDecimal.ZERO)) {
-            result = commonJsonParser.getProportion(O.subtract(organArea1).subtract(organArea2), O).toString();
-        }
-        indicatorResultsMap.put("腺泡面积占比", new IndicatorAddIn("Pancreatic acinus area%", result, PERCENTAGE, CommonConstant.NUMBER_0));
-        result = "0.000";
-        if (count3 != 0 && !organArea1.equals(BigDecimal.ZERO)) {
-            result = BigDecimal.valueOf(count3).divide(organArea1, 3, RoundingMode.HALF_UP).toString();
-        }
-        indicatorResultsMap.put("胰岛细胞核密度（全片）", new IndicatorAddIn("Nucleus density of pancreatic islet（all）", result, SQ_MM_PIECE, CommonConstant.NUMBER_0));
+        BigDecimal result = bigDecimalDivideCheck(BigDecimal.valueOf(Long.valueOf(countA)), O.subtract(organArea1).subtract(organArea2));
+        indicatorResultsMap.put("上皮细胞核密度", createNameIndicator("Nucleus density of  epithelial cell", result.toString(), SQ_MM_PIECE, "105075,105111,105077,105027"));
+        indicatorResultsMap.put("酶原颗粒面积占比", createNameIndicator("Zymogen granule area%", getProportion(organArea, O).toString(), PERCENTAGE, "105076,105111"));
+        indicatorResultsMap.put("胰岛面积占比", createNameIndicator("Pancreatic islet area%", getProportion(organArea1, O).toString(), PERCENTAGE, "105077,105111"));
         List<Annotation> annotationList = getStructureContourList(jsonTask, "105077");
         List<BigDecimal> dataList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(annotationList)) {
@@ -212,7 +159,10 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
                 }
             }
         }
-        indicatorResultsMap.put("胰岛细胞核密度（单个）", createComplexIndicator(dataList, "Nucleus density of pancreatic islet（per）", SQ_UM_PICE, CommonConstant.NUMBER_0));
+        indicatorResultsMap.put("胰岛细胞核密度（单个）", createComplexIndicator(dataList, "Nucleus density of pancreatic islet（per）", SQ_UM_PICE, CommonConstant.NUMBER_0, "105077,105078"));
+        indicatorResultsMap.put("间质面积占比", createNameIndicator("Interstitial area%", getProportion(organArea2, O).toString(), PERCENTAGE, "105027,105111"));
+        indicatorResultsMap.put("导管面积占比", createNameIndicator("Vascular area%", getProportion(organArea3, O).toString(), PERCENTAGE, "10506F,105111"));
+
         annotationList = getStructureContourList(jsonTask, "10506F");
         if (CollectionUtils.isNotEmpty(annotationList)) {
             dataList.clear();
@@ -225,7 +175,13 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
                 }
             }
         }
-        indicatorResultsMap.put("导管细胞核密度（单个）", createComplexIndicator(dataList, "Nucleus density of duct（per）", SQ_UM_PICE, CommonConstant.NUMBER_0));
+        indicatorResultsMap.put("导管细胞核密度（单个）", createComplexIndicator(dataList, "Nucleus density of duct（per）", SQ_UM_PICE, CommonConstant.NUMBER_0, "10506F,10507B"));
+        indicatorResultsMap.put("血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", getProportion(annotationInner.getStructureAreaNum(), O).toString(), PERCENTAGE, "105003,105004,105111"));
+        indicatorResultsMap.put("血管外红细胞面积占比", createNameIndicator("Extravascular erythrocyte area%", getProportion(annotationOuter.getStructureAreaNum(), O).toString(), PERCENTAGE, "105003,105004,105111"));
+        indicatorResultsMap.put("血管面积占比", createNameIndicator("Vessel area%", result, PERCENTAGE, "105003,105111"));
+        indicatorResultsMap.put("腺泡面积占比", createNameIndicator("Pancreatic acinus area%", result, PERCENTAGE, "105077,105027,105111"));
+        indicatorResultsMap.put("胰岛细胞核密度（全片）", createNameIndicator("Nucleus density of pancreatic islet（all）", result, SQ_MM_PIECE, "105077,105078"));
+        indicatorResultsMap.put("胰腺面积", createNameIndicator("Pancreas area", result, SQ_MM, "105111"));
         Annotation annotationBy = new Annotation();
         annotationBy.setCountName("胰岛细胞核数量（单个）");
         commonJsonParser.putAnnotationDynamicData(jsonTask, "105077", "105078", annotationBy);

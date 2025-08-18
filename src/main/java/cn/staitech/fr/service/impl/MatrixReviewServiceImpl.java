@@ -63,6 +63,10 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     public void algorithmDownload(AiDownloadIn req) throws Exception {
         log.info("ai预测报告导出接口开始：");
         List<Long> ids = req.getIds();
+        if (CollectionUtils.isEmpty(ids)) {
+            List<Slide> slideList = slideMapper.selectList(new LambdaQueryWrapper<>(Slide.class).eq(Slide::getProjectId, req.getSpecialId()).eq(Slide::getDelFlag, CommonConstant.NUMBER_0));
+            ids = slideList.stream().map(Slide::getSlideId).collect(Collectors.toList());
+        }
         //存放单脏器切片id和脏器id
         Map<Long, Long> categorys = new HashMap<>();
         //判断是不是存在对照组
@@ -99,7 +103,6 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
                         if (StringUtils.isNotEmpty(genderFlag)) {
                             setReferenceScope(special, id, exportAiListVO, categorys, genderFlag);
                         }
-
                     }
                     ExprotAiExcelVO exportAiExcelVO = new ExprotAiExcelVO();
                     exportAiExcelVO.setQuantitativeIndicators(exportAiListVO.getQuantitativeIndicators());
@@ -120,7 +123,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         if (!file.exists() && !file.isDirectory()) {
             file.mkdirs();
         }
-        //生成word
+        //生成Excel文件
         EasyExcel.write(s, ExprotAiExcelVO.class).sheet("AI量化指标数据").doWrite(collect);
         log.info("结束");
 

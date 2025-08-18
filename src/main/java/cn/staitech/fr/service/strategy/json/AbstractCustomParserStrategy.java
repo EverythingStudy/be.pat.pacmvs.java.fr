@@ -21,7 +21,7 @@ import java.util.List;
  */
 @Slf4j
 @Data
-public abstract class AbstractCustomParserStrategy implements CustomParserStrategy{
+public abstract class AbstractCustomParserStrategy implements CustomParserStrategy {
 
     private CommonJsonParser commonJsonParser;
     private CommonJsonCheck commonJsonCheck;
@@ -35,7 +35,7 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
 //    protected static final String SQ_MM_PIECE = "个/平方毫米";
 //    protected static final String SQ_UM_THOUSAND = "×10³平方微米";
 //    protected static final String MM_PIECE = "个/毫米";
-    
+
     protected static final String MM = "mm";
     protected static final String UM = "μm";
     protected static final String SQ_MM = "mm²";
@@ -44,12 +44,11 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
     protected static final String SQ_UM_THOUSAND = "10³ μm²";
     protected static final String MM_PIECE = "个/mm";
     protected static final String SQ_UM_PICE = "个/10³μm²";
-    
+
     protected static final String PERCENTAGE = "%";
     protected static final String A = "3.141";
     protected static final String NOT = "无";
 
-    
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
@@ -69,26 +68,37 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
      * @return 脏器面积-平方毫米
      */
     protected Annotation getOrganArea(JsonTask jsonTask, String structureId) {
-        return commonJsonParser.getOrganArea(jsonTask,structureId);
+        return commonJsonParser.getOrganArea(jsonTask, structureId);
     }
 
-    protected Annotation getInsideOrOutside(JsonTask jsonTask, String structureId, String structureIds, Boolean InsideOrOutside){
-        return commonJsonParser.getInsideOrOutside(jsonTask,structureId,structureIds,InsideOrOutside);
+    /**
+     * 获取脏器轮廓面积
+     *
+     * @param jsonTask    jsonTask
+     * @param structureId 结构ID
+     * @return 脏器面积10³平方微米
+     */
+    protected BigDecimal getOrganAreaMicron(JsonTask jsonTask, String structureId) {
+        return commonJsonParser.getOrganAreaMicron(jsonTask, structureId);
     }
 
-    protected List<Annotation> getStructureContourList(JsonTask jsonTask, String structureId){
-        return commonJsonParser.getStructureContourList(jsonTask,structureId);
+    protected Annotation getInsideOrOutside(JsonTask jsonTask, String structureId, String structureIds, Boolean InsideOrOutside) {
+        return commonJsonParser.getInsideOrOutside(jsonTask, structureId, structureIds, InsideOrOutside);
     }
 
-    protected Annotation getContourInsideOrOutside(JsonTask jsonTask, String contour, String structureIds, Boolean InsideOrOutside){
-        return commonJsonParser.getContourInsideOrOutside(jsonTask,contour,structureIds,InsideOrOutside);
+    protected List<Annotation> getStructureContourList(JsonTask jsonTask, String structureId) {
+        return commonJsonParser.getStructureContourList(jsonTask, structureId);
     }
 
-    protected Annotation getOrganArea(JsonTask jsonTask, String structureId,BigDecimal unit) {
-        Annotation annotation = commonJsonParser.getOrganArea(jsonTask,structureId);
+    protected Annotation getContourInsideOrOutside(JsonTask jsonTask, String contour, String structureIds, Boolean InsideOrOutside) {
+        return commonJsonParser.getContourInsideOrOutside(jsonTask, contour, structureIds, InsideOrOutside);
+    }
+
+    protected Annotation getOrganArea(JsonTask jsonTask, String structureId, BigDecimal unit) {
+        Annotation annotation = commonJsonParser.getOrganArea(jsonTask, structureId);
         BigDecimal bigDecimal = annotation.getStructureAreaNum();
-        if (bigDecimal!=null){
-        	bigDecimal = bigDecimal.multiply(unit).setScale(3, RoundingMode.HALF_UP);
+        if (bigDecimal != null) {
+            bigDecimal = bigDecimal.multiply(unit).setScale(3, RoundingMode.HALF_UP);
             annotation.setStructureAreaNum(bigDecimal);
         }
         return annotation;
@@ -102,7 +112,7 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
      * @return 脏器轮廓数量
      */
     protected Integer getOrganAreaCount(JsonTask jsonTask, String structureId) {
-        return commonJsonParser.getOrganAreaCount(jsonTask,structureId);
+        return commonJsonParser.getOrganAreaCount(jsonTask, structureId);
     }
 
     /**
@@ -112,6 +122,10 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
      */
     protected IndicatorAddIn createDefaultIndicator() {
         return new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1);
+    }
+
+    protected IndicatorAddIn createDefaultIndicator(String structureId) {
+        return createIndicator(CommonConstant.SINGLE_RESULT, "", structureId);
     }
 
     /**
@@ -127,6 +141,14 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
             return new IndicatorAddIn("", String.valueOf(roundedResult), unit, CommonConstant.NUMBER_1);
         }
         return new IndicatorAddIn("", String.valueOf(result), unit, CommonConstant.NUMBER_1);
+    }
+
+    protected IndicatorAddIn createIndicator(Object result, String unit, String structureIds) {
+        if (result instanceof BigDecimal) {
+            BigDecimal roundedResult = ((BigDecimal) result).setScale(3, RoundingMode.HALF_UP);
+            return new IndicatorAddIn("", String.valueOf(roundedResult), unit, CommonConstant.NUMBER_1, structureIds);
+        }
+        return new IndicatorAddIn("", String.valueOf(result), unit, CommonConstant.NUMBER_1, structureIds);
     }
 
     /**
@@ -145,9 +167,42 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
         return new IndicatorAddIn(enName, String.valueOf(result), unit, CommonConstant.NUMBER_0);
     }
 
-    protected IndicatorAddIn createComplexIndicator(List<BigDecimal> dataList,String enName,String unit,String type) {
+
+    protected IndicatorAddIn createComplexIndicator(List<BigDecimal> dataList, String enName, String unit, String type) {
         String result = MathUtils.getConfidenceInterval(dataList);
-        return new IndicatorAddIn(enName, result, unit,type);
+        return new IndicatorAddIn(enName, result, unit, type);
     }
 
+    /**
+     * 创建指标对象（产品呈现指标）
+     *
+     * @param enName 指标英文名称
+     * @param result 结果
+     * @param unit   单位
+     * @return 指标对象
+     */
+    protected IndicatorAddIn createNameIndicator(String enName, Object result, String unit, String structureIds) {
+        if (result instanceof BigDecimal) {
+            BigDecimal roundedResult = ((BigDecimal) result).setScale(3, RoundingMode.HALF_UP);
+            return new IndicatorAddIn(enName, String.valueOf(roundedResult), unit, CommonConstant.NUMBER_0, structureIds);
+        }
+        return new IndicatorAddIn(enName, String.valueOf(result), unit, CommonConstant.NUMBER_0, structureIds);
+    }
+
+    protected IndicatorAddIn createComplexIndicator(List<BigDecimal> dataList, String enName, String unit, String type, String structureIds) {
+        String result = MathUtils.getConfidenceInterval(dataList);
+        return new IndicatorAddIn(enName, result, unit, type, structureIds);
+    }
+    /**
+     * 占比计算（保留三位小数）
+     *
+     * @param numerator
+     * @param denominator
+     */
+    protected BigDecimal getProportion(BigDecimal numerator, BigDecimal denominator) {
+        return commonJsonParser.getProportion(numerator, denominator);
+    }
+    protected BigDecimal bigDecimalDivideCheck(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
+        return commonJsonParser.bigDecimalDivideCheck(bigDecimal1, bigDecimal2);
+    }
 }

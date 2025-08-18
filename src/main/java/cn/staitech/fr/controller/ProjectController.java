@@ -25,6 +25,7 @@ import cn.staitech.fr.vo.project.ProjectVo;
 import cn.staitech.fr.vo.project.slide.ChangeControlGroupReq;
 import cn.staitech.system.api.RemoteUserService;
 import cn.staitech.system.api.domain.SysUser;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -34,6 +35,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 
@@ -63,8 +67,9 @@ public class ProjectController extends BaseController {
     @ApiOperation(value = "获取项目详情，添加项目访问记录",tags = {"V2.6.0"})
     @GetMapping("/info")
     public R<Project> info(@RequestParam("projectId") @ApiParam(name = "projectId", value = "项目id") Long projectId) {
-        AccessProjectRecords record = AccessProjectRecords.builder().projectId(projectId).userId(SecurityUtils.getUserId()).accessTime(new Date()).build();
-        accessProjectRecordsService.save(record);
+        Long userId = SecurityUtils.getUserId();
+        AccessProjectRecords record = AccessProjectRecords.builder().projectId(projectId).userId(userId).accessTime(new Date()).build();
+        accessProjectRecordsService.saveAccessProjectRecords(record);
         return projectService.getInfoById(projectId);
     }
 

@@ -141,7 +141,8 @@
           and faf.quantitative_indicators = #{quantitativeIndicators}
           and faf.struct_type = #{structType}
           and fs.gender_flag = #{genderFlag}
-        group by faf.forecast_id;
+        group by faf.forecast_id
+        order by  faf.results desc;
 
     </select>
     <select id="getGender" resultType="java.lang.String">
