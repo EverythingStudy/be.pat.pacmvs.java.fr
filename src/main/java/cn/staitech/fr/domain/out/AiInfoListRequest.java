@@ -14,4 +14,6 @@ public class AiInfoListRequest {
     private Long singleId;
     @ApiModelProperty(value = "", hidden = true)
     private String controlGroup;
+    @ApiModelProperty(value = "", hidden = true)
+    private Long singleSlideId;
 }

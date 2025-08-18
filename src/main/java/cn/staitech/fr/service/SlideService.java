@@ -67,7 +67,7 @@ public interface SlideService extends IService<Slide> {
 
     List<AiInfoListResp> getAiInfoList(AiInfoListRequest request);
 
-    Boolean getAiInfoListCheck(Long projectId, Long slideId);
+    Boolean getAiInfoListCheck(Long projectId, Long singleSlideId);
 
     Long addSingleSlide(AddSingleSlide req);
 

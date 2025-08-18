@@ -624,12 +624,12 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 	}
 
 	@Override
-	public Boolean getAiInfoListCheck(Long projectId, Long slideId) {
+	public Boolean getAiInfoListCheck(Long projectId, Long singleSlideId) {
 		//判断是不是存在对照组
 		Project special = projectMapper.selectById(projectId);
 
 		AiInfoListRequest request = new AiInfoListRequest();
-		request.setSlideId(slideId);
+		request.setSingleSlideId(singleSlideId);
 		request.setProjectId(projectId);
 		List<AiInfoListVO> aiInfoList = baseMapper.getAiInfoList(request);
 		request.setControlGroup(special.getControlGroup());

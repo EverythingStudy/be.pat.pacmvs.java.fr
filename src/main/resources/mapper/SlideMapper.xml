@@ -348,6 +348,9 @@
         <if test="slideId != null">
             and fs.slide_id=#{slideId}
         </if>
+        <if test="singleSlideId != null">
+            and af.single_slide_id=#{singleSlideId}
+        </if>
     </select>
 
 </mapper>
