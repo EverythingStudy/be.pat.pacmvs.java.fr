@@ -1,7 +1,11 @@
 package cn.staitech.fr.mapper;
 
 import cn.staitech.fr.domain.AccessProjectRecords;
+import cn.staitech.fr.vo.AccessProjectRecordsVo;
+import cn.staitech.fr.vo.project.AccessProjectRecordReq;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface AccessProjectRecordsMapper extends BaseMapper<AccessProjectRecords> {
 
+    List<AccessProjectRecordsVo> accessProjectStatistics(AccessProjectRecordReq req);
 }

@@ -18,9 +18,25 @@ import lombok.NoArgsConstructor;
 @Data
 public class AccessProjectRecordsVo {
 
-    @ApiModelProperty(value = "访问数量")
-   private Integer num;
+    @ApiModelProperty(value = "专题编号")
+    private String topicName;
+
+    @ApiModelProperty(value = "项目名称")
+    private String specialName;
+
+    @ApiModelProperty(value = "种属名称")
+    private String speciesName;
+
+    @ApiModelProperty(value = "试验类型")
+    private String trialType;
+
+    @ApiModelProperty(value = "图片数量")
+    private Long imageNumber;
+
+    @ApiModelProperty(value = "Ai分析数量")
+    private String aiAnalysisNumber;
 
     @ApiModelProperty(value = "访问时间")
     private String accessTime;
+
 }

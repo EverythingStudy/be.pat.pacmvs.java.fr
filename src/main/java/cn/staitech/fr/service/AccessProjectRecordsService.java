@@ -18,4 +18,6 @@ import java.util.List;
 public interface AccessProjectRecordsService extends IService<AccessProjectRecords> {
 
     R<List<AccessProjectRecordsVo>> accessProjectStatistics() throws Exception;
+
+    public R saveAccessProjectRecords(AccessProjectRecords accessProjectRecords);
 }
