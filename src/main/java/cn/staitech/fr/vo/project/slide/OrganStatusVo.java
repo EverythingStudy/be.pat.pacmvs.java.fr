@@ -26,7 +26,7 @@ public class OrganStatusVo {
     /**
      * AI分析状态
      */
-    @ApiModelProperty(value = "AI分析状态：3-结构未分析、4-结构分析中、5-结构分析完成、6-结构分析失败-V2.6.1")
+    @ApiModelProperty(value = "AI分析状态：4-结构未分析、5-结构分析中、6-结构分析完成、7-结构分析失败-V2.6.1")
     private Integer aiStatus;
     /**
      * 是否指标异常
