@@ -17,57 +17,57 @@ public class SlidePageReq extends PageRequest {
     /**
      * 项目id
      */
-    @ApiModelProperty(value = "项目id-V2.6.1", position = 0)
+    @ApiModelProperty(value = "项目id-V2.6.1")
     private Long projectId;
     /**
      * 切片编号
      */
-    @ApiModelProperty(value = "切片编号-V2.6.1", position = 1)
+    @ApiModelProperty(value = "切片编号-V2.6.1")
     private String fileName;
     /**
      * 动物编号集合
      */
-    @ApiModelProperty(value = "动物编号集合-V2.6.1", position = 2)
+    @ApiModelProperty(value = "动物编号集合-V2.6.1")
     private List<String> animalCodes;
     /**
      * 蜡块编号集合
      */
-    @ApiModelProperty(value = "蜡块编号集合-V2.6.1", position = 3)
+    @ApiModelProperty(value = "蜡块编号集合-V2.6.1")
     private List<String> waxCodes;
     /**
      * 组号集合
      */
-    @ApiModelProperty(value = "组号集合-V2.6.1", position = 4)
+    @ApiModelProperty(value = "组号集合-V2.6.1")
     private List<String> groupCodes;
     /**
      * 性别
      */
-    @ApiModelProperty(value = "性别，单选F、M-V2.6.1", position = 5)
+    @ApiModelProperty(value = "性别，单选F、M-V2.6.1")
     private String genderFlag;
     /**
      * 脏器标签ID集合
      */
-    @ApiModelProperty(value = "脏器标签ID集合-V2.6.1", position = 6)
+    @ApiModelProperty(value = "脏器标签ID集合-V2.6.1")
     private List<Long> organTagIds;
     /**
      * 阅片状态集合
      */
-    @ApiModelProperty(value = "阅片状态集合：0-未阅片；1-已阅片-V2.6.1", position = 7)
+    @ApiModelProperty(value = "阅片状态集合：0-未阅片；1-已阅片-V2.6.1")
     private List<Integer> viewStatus;
     /**
      * AI分析状态
      */
-    @ApiModelProperty(value = "AI分析状态：0-未分析、1-脏器识别中、2-脏器识别异常、3-结构未分析、4-结构分析中、5-结构分析完成、6-结构分析失败-V2.6.1", position = 8)
+    @ApiModelProperty(value = "AI分析状态：0-未分析、1-脏器识别中、2-脏器识别异常、3-结构未分析、4-结构分析中、5-结构分析完成、6-结构分析失败-V2.6.1")
     private List<Integer> aiStatus;
     /**
      * 描述
      */
-    @ApiModelProperty(value = "描述-V2.6.1", position = 9)
+    @ApiModelProperty(value = "描述-V2.6.1")
     private String description;
     /**
      * 创建时间
      */
-    @ApiModelProperty(value = "创建时间-V2.6.1", position = 10)
+    @ApiModelProperty(value = "创建时间-V2.6.1")
     private DateRangeReq createTimeParams;
 
 
