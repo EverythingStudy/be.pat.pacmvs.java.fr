@@ -97,7 +97,6 @@ public class TracheaParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal cartilageArea = commonJsonParser.getOrganArea(jsonTask, "14D00B").getStructureAreaNum();
 
 
-
         // 黏膜上皮层平均厚度
         BigDecimal multiplyArea2 = mucosaArea.multiply(BigDecimal.valueOf(2)).setScale(3, BigDecimal.ROUND_HALF_UP);
 
@@ -113,17 +112,17 @@ public class TracheaParserStrategyImpl extends AbstractCustomParserStrategy {
 
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-        indicatorResultsMap.put("气管腔面积", new IndicatorAddIn("气管腔面积", String.valueOf(organArea.setScale(3, RoundingMode.HALF_UP)), SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("黏膜上皮层面积", new IndicatorAddIn("黏膜上皮层面积", String.valueOf(mucosaArea.setScale(3, RoundingMode.HALF_UP)), SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("黏膜上皮层周长", new IndicatorAddIn("黏膜上皮层周长", String.valueOf(mucosaPerimeter.setScale(3, RoundingMode.HALF_UP)), MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("黏膜上皮细胞核数量", new IndicatorAddIn("黏膜上皮细胞核数量", String.valueOf(mucosaCount), PIECE, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("软骨面积", new IndicatorAddIn("软骨面积", String.valueOf(cartilageArea.setScale(3, RoundingMode.HALF_UP)), SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("组织轮廓面积", accurateArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("气管腔面积", new IndicatorAddIn("气管腔面积", String.valueOf(organArea.setScale(3, RoundingMode.HALF_UP)), SQ_MM, CommonConstant.NUMBER_1, "14D007"));
+        indicatorResultsMap.put("黏膜上皮层面积", new IndicatorAddIn("黏膜上皮层面积", String.valueOf(mucosaArea.setScale(3, RoundingMode.HALF_UP)), SQ_MM, CommonConstant.NUMBER_1, "14D035"));
+        indicatorResultsMap.put("黏膜上皮层周长", new IndicatorAddIn("黏膜上皮层周长", String.valueOf(mucosaPerimeter.setScale(3, RoundingMode.HALF_UP)), MM, CommonConstant.NUMBER_1, "14D035"));
+        indicatorResultsMap.put("黏膜上皮细胞核数量", new IndicatorAddIn("黏膜上皮细胞核数量", String.valueOf(mucosaCount), PIECE, CommonConstant.NUMBER_1, "14D036"));
+        indicatorResultsMap.put("软骨面积", new IndicatorAddIn("软骨面积", String.valueOf(cartilageArea.setScale(3, RoundingMode.HALF_UP)), SQ_MM, CommonConstant.NUMBER_1, "14D00B"));
+        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("组织轮廓面积", accurateArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "14D111"));
 
-        indicatorResultsMap.put("黏膜上皮层平均厚度", new IndicatorAddIn("Average thickness of mucosal epithelium", areaUtils.convertToSquareMicrometer(String.valueOf(averageThicknessOfMucosalEpithelium)), UM));
-        indicatorResultsMap.put("黏膜上皮细胞核密度", new IndicatorAddIn("Nucleus density of mucosal epithelium", String.valueOf(BigDecimal.valueOf(nucleusDensityOfMucosalEpithelium).setScale(3, RoundingMode.HALF_UP)), SQ_MM_PIECE));
-        indicatorResultsMap.put("软骨面积占比", new IndicatorAddIn("Cartilage area%", String.valueOf(cartilageAreas.setScale(3, RoundingMode.HALF_UP)), PERCENTAGE));
-        indicatorResultsMap.put("气管面积", new IndicatorAddIn("Tracheal area", String.valueOf(areaNum.setScale(3, RoundingMode.HALF_UP)), SQ_MM));
+        indicatorResultsMap.put("黏膜上皮层平均厚度", new IndicatorAddIn("Average thickness of mucosal epithelium", areaUtils.convertToSquareMicrometer(String.valueOf(averageThicknessOfMucosalEpithelium)), UM, CommonConstant.NUMBER_0, "14D035"));
+        indicatorResultsMap.put("黏膜上皮细胞核密度", new IndicatorAddIn("Nucleus density of mucosal epithelium", String.valueOf(BigDecimal.valueOf(nucleusDensityOfMucosalEpithelium).setScale(3, RoundingMode.HALF_UP)), SQ_MM_PIECE, CommonConstant.NUMBER_0, "14D036,14D035"));
+        indicatorResultsMap.put("软骨面积占比", new IndicatorAddIn("Cartilage area%", String.valueOf(cartilageAreas.setScale(3, RoundingMode.HALF_UP)), PERCENTAGE, CommonConstant.NUMBER_0, "14D00B,14D111,14D007"));
+        indicatorResultsMap.put("气管面积", new IndicatorAddIn("Tracheal area", String.valueOf(areaNum.setScale(3, RoundingMode.HALF_UP)), SQ_MM, CommonConstant.NUMBER_0, "14D007,14D111"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 

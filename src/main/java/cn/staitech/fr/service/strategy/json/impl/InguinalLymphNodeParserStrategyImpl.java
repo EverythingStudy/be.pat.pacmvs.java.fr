@@ -1,6 +1,5 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
-import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
@@ -72,45 +71,45 @@ public class InguinalLymphNodeParserStrategyImpl extends AbstractCustomParserStr
         //        淋巴结面积	5	平方毫米	Lymph node area	5=D
 
         // 生发中心数量	1	个	 Number of germinal center	1=A  147051
-        Integer germinalCenterCount = commonJsonParser.getOrganAreaCount(jsonTask, "147051");
+        Integer areaCountA = commonJsonParser.getOrganAreaCount(jsonTask, "147051");
         // 生发中心面积（全片）	B	平方毫米	数据相加输出
-        BigDecimal germinalCenterArea = commonJsonParser.getOrganArea(jsonTask, "147051").getStructureAreaNum();
+        BigDecimal organAreaB = commonJsonParser.getOrganArea(jsonTask, "147051").getStructureAreaNum();
         // 髓质面积	C	平方毫米
-        BigDecimal medullaArea = commonJsonParser.getOrganArea(jsonTask, "14703E").getStructureAreaNum();
+        BigDecimal organAreaC = commonJsonParser.getOrganArea(jsonTask, "14703E").getStructureAreaNum();
         // 5=D:淋巴结面积-平方毫米
 //        String accurateArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
 //        BigDecimal accurateAreaDecimal = new BigDecimal(accurateArea);
-        BigDecimal accurateAreaDecimal = commonJsonParser.getOrganArea(jsonTask, "147111").getStructureAreaNum();
+        BigDecimal organAreaD = commonJsonParser.getOrganArea(jsonTask, "147111").getStructureAreaNum();
 
         // 算法输出指标 -------------------------------------------------------------
         // B
-        map.put("生发中心面积（全片）", new IndicatorAddIn("Number of germinal center", DecimalUtils.setScale3(germinalCenterArea), SQ_MM, CommonConstant.NUMBER_1));
+        map.put("生发中心面积（全片）", createIndicator(DecimalUtils.setScale3(organAreaB), SQ_MM, "147051"));
         // C
-        map.put("髓质面积", new IndicatorAddIn("Medulla area", DecimalUtils.setScale3(medullaArea), SQ_MM, CommonConstant.NUMBER_1));
+        map.put("髓质面积", createIndicator(DecimalUtils.setScale3(organAreaC), SQ_MM, "14703E"));
 
         // 产品呈现指标 -------------------------------------------------------------
         // A 生发中心数量	1	个	 Number of germinal center	1=A
-        map.put("生发中心数量", new IndicatorAddIn("Number of germinal center", germinalCenterCount.toString(), "个"));
+        map.put("生发中心数量", createNameIndicator("Number of germinal center", areaCountA.toString(), "个", "147051"));
 
-        if (accurateAreaDecimal.compareTo(BigDecimal.ZERO) != 0) {
+        if (organAreaD.compareTo(BigDecimal.ZERO) != 0) {
             // 生发中心占比	2	%	Germinal center area%	2=B/D
-            BigDecimal germinalCenterAreaRate = germinalCenterArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
-            map.put("生发中心占比", new IndicatorAddIn("Germinal center area%", DecimalUtils.percentScale3(germinalCenterAreaRate), PERCENTAGE));
+            BigDecimal germinalCenterAreaRate = organAreaB.divide(organAreaD, 7, RoundingMode.HALF_UP);
+            map.put("生发中心占比", createNameIndicator("Germinal center area%", DecimalUtils.percentScale3(germinalCenterAreaRate), PERCENTAGE, "147051,147111"));
 
             // 髓质占比	3	%	Medulla area%	3=C/D
-            BigDecimal medullaAreaRate = medullaArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
-            map.put("髓质占比", new IndicatorAddIn("Medulla area%", DecimalUtils.percentScale3(medullaAreaRate), PERCENTAGE));
+            BigDecimal medullaAreaRate = organAreaC.divide(organAreaD, 7, RoundingMode.HALF_UP);
+            map.put("髓质占比", createNameIndicator("Medulla area%", DecimalUtils.percentScale3(medullaAreaRate), PERCENTAGE, "14703E,147111"));
 
             // 皮质和副皮质占比	4	%	Cortex and paracortex area%	4=（D-C）/D
-            BigDecimal cortexAndParacortexAreaRate = accurateAreaDecimal.subtract(medullaArea).divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
-            map.put("皮质和副皮质占比", new IndicatorAddIn("Cortex and paracortex area%", DecimalUtils.percentScale3(cortexAndParacortexAreaRate), PERCENTAGE));
+            BigDecimal cortexAndParacortexAreaRate = organAreaD.subtract(organAreaC).divide(organAreaD, 7, RoundingMode.HALF_UP);
+            map.put("皮质和副皮质占比", createNameIndicator("Cortex and paracortex area%", DecimalUtils.percentScale3(cortexAndParacortexAreaRate), PERCENTAGE, "14703E,147111"));
         } else {
-            map.put("生发中心占比", new IndicatorAddIn("Germinal center area%", "0.000", PERCENTAGE));
-            map.put("髓质占比", new IndicatorAddIn("Medulla area%", "0.000", "%"));
-            map.put("皮质和副皮质占比", new IndicatorAddIn("Cortex and paracortex area%", "0.000", PERCENTAGE));
+            map.put("生发中心占比", createNameIndicator("Germinal center area%", "0.000", PERCENTAGE, "147051,147111"));
+            map.put("髓质占比", createNameIndicator("Medulla area%", "0.000", PERCENTAGE, "14703E,147111"));
+            map.put("皮质和副皮质占比", createNameIndicator("Cortex and paracortex area%", "0.000", PERCENTAGE, "14703E,147111"));
         }
         // D 淋巴结面积	5	平方毫米	Lymph node area	5=D
-        map.put("淋巴结面积", new IndicatorAddIn("Lymph node area", DecimalUtils.setScale3(accurateAreaDecimal), SQ_MM));
+        map.put("淋巴结面积", createNameIndicator("Lymph node area", DecimalUtils.setScale3(organAreaD), SQ_MM, "147111"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
         log.info("指标计算结束-腹股沟淋巴结");
