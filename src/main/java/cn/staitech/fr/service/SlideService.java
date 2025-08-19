@@ -74,4 +74,5 @@ public interface SlideService extends IService<Slide> {
     int delSingleSlide(DelSingleSlide req);
 
 
+    R<CustomPage<SlidePageVo>> pageNew(SlidePageReq req);
 }

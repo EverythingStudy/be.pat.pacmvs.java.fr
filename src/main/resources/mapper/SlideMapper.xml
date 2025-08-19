@@ -370,5 +370,98 @@
         WHERE
         a.slide_id = #{slideId}
     </select>
+    <select id="pageNew" resultType="cn.staitech.fr.vo.project.slide.SlidePageVo" parameterType="cn.staitech.fr.vo.project.slide.SlidePageReq">
+        SELECT
+        b.slide_id AS slideId,
+        c.thumb_url AS thumbUrl,
+        c.image_name AS fileName,
+        c.animal_code AS animalCode,
+        c.wax_code AS waxCode,
+        c.group_code AS groupCode,
+        c.sex_flag AS genderFlag,
+        ${params.currentUserId} AS viewStatus,
+        b.ai_status AS aiStatus,
+        b.description AS description,
+        b.create_time AS createTime
+        FROM
+        (SELECT a.slide_id
+        FROM
+        fr_slide a LEFT JOIN tb_image b ON a.image_id = b.image_id
+        LEFT JOIN fr_single_slide c ON a.slide_id = c.slide_id
+        WHERE
+        a.del_flag = '0'
+        AND a.special_id = #{params.projectId}
+        <if test="params.fileName != null and params.fileName != ''">
+            and b.image_name like concat('%',#{params.fileName},'%')
+        </if>
+        <if test = "params.animalCodes != null and params.animalCodes.size() > 0">
+            AND b.animal_code IN
+            <foreach collection="params.animalCodes" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test = "params.waxCodes != null and params.waxCodes.size() > 0">
+            AND b.wax_code IN
+            <foreach collection="params.waxCodes" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test = "params.groupCodes != null and params.groupCodes.size() > 0">
+            AND b.group_code IN
+            <foreach collection="params.groupCodes" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="params.genderFlag != null and params.genderFlag != ''">
+            AND b.sex_flag = #{params.genderFlag}
+        </if>
+        <if test = "params.organTagIds != null and params.organTagIds.size() > 0">
+            AND c.category_id IN
+            <foreach collection="params.organTagIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test = "params.viewStatus != null and params.viewStatus.size() > 0">
+            AND ${params.currentUserId} IN
+            <foreach collection="params.viewStatus" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test = "params.aiStatus != null and params.aiStatus.size() > 0">
+            AND (a.ai_status IN
+            <foreach collection="params.aiStatus" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            OR
+            CASE WHEN c.forecast_status = 3 OR c.ai_status_fine = 3 THEN 5
+            WHEN c.forecast_status = 1 OR c.ai_status_fine = 1 THEN 6
+            WHEN c.forecast_status = 2 OR c.ai_status_fine = 2 THEN 7
+            WHEN c.single_id IS NOT NULL THEN 4
+            ELSE NULL END IN
+            <foreach collection="params.aiStatus" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="params.description != null and params.description != ''">
+            and a.description like concat('%',#{params.description},'%')
+        </if>
+        <if test="params.createTimeParams!=null">
+            <if test="params.createTimeParams.beginTime != null ">
+                AND date_format(a.create_time,'%Y%m%d') &gt;= date_format(#{params.createTimeParams.beginTime},'%Y%m%d')
+            </if>
+            <if test="params.createTimeParams.endTime != null ">
+                AND date_format(a.create_time,'%Y%m%d') &lt;= date_format(#{params.createTimeParams.endTime},'%Y%m%d')
+            </if>
+        </if>
+        GROUP BY a.slide_id) a
+        JOIN fr_slide b ON a.slide_id = b.slide_id
+        LEFT JOIN tb_image c ON b.image_id = c.image_id
+        ORDER BY
+        c.animal_code ASC,
+        c.wax_code_order ASC,
+        c.group_code ASC,
+        c.sex_flag ASC
+    </select>
 
 </mapper>

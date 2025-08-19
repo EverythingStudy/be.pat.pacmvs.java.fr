@@ -41,6 +41,8 @@ public interface SlideMapper extends BaseMapper<Slide> {
     List<AiInfoListVO> getAiInfoList(AiInfoListRequest request);
 
     List<OrganCheckConfirmBO> selectOrganCheckConfirmBO(Long slideId);
+
+    CustomPage<SlidePageVo> pageNew(CustomPage<SlidePageVo> page, @Param("params") SlidePageReq req);
 }
 
 

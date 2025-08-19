@@ -77,7 +77,7 @@ public class SlideController  extends BaseController {
     @ApiOperation(value = "项目阅片-已选切片分页查询")
     @PostMapping("/page")
     public R<CustomPage<SlidePageVo>> page(@Validated @RequestBody SlidePageReq req) {
-        return slideService.page(req,false,true);
+        return slideService.pageNew(req);
     }
 
     @ApiOperation(value = "项目阅片-已选切片无权限分页")

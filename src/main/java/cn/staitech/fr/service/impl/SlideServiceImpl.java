@@ -710,7 +710,34 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 		return this.singleSlideMapper.delete(wrapper);
 	}
 
-	@Override
+    @Override
+    public R<CustomPage<SlidePageVo>> pageNew(SlidePageReq req) {
+        log.info("分页查询切片信息，请求参数: {}", JSON.toJSONString(req));
+        Long userId = SecurityUtils.getUserId();
+        Project project = projectMapper.selectById(req.getProjectId());
+        if (project == null) {
+            return R.fail("您没有该项目的访问权限，请联系该项目负责人或机构管理员");
+        }
+
+        // 检查用户是否为成员
+        long isMember = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, req.getProjectId()).eq(ProjectMember::getUserId, userId).eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
+        // 权限校验
+        if (!hasAccessPermission(project, userId, isMember)) {
+            return R.fail("您没有该项目的访问权限，请联系该项目负责人或机构管理员");
+        }
+        // 检查项目状态
+        if (Constants.STATUS_RUNNING != project.getStatus()) {
+            return R.fail("非进行中的项目不可阅片，请联系该项目负责人或机构管理员");
+        }
+
+        // 分页查询
+        CustomPage<SlidePageVo> page = new CustomPage<>(req);
+        req.setCurrentUserId("JSON_CONTAINS(a.viewers, '" + userId + "')");
+        baseMapper.pageNew(page, req);
+        return R.ok(page);
+    }
+
+    @Override
 	public boolean checkAiExecuted(Long projectId) {
 		LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
 		wrapper.eq(Slide::getProjectId, projectId);
