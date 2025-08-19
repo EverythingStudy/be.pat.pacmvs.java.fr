@@ -35,7 +35,6 @@ public class OrganController extends BaseController {
     public R<List<Organ>> list() throws ExecutionException, InterruptedException {
         LambdaQueryWrapper<Organ> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Organ::getOrganizationId, SecurityUtils.getOrganizationId());
-
         List<Organ> list = organService.list(queryWrapper);
         return R.ok(list);
     }
