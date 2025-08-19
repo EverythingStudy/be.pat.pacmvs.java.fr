@@ -195,7 +195,7 @@ public class SlideController  extends BaseController {
 
     @ApiOperation(value = "AI分析列表数据")
     @PostMapping("/getAiInfoList")
-    public R<List<AiInfoListResp>> getAiInfoList(@RequestBody AiInfoListRequest request) {
+    public R<AiInfoAnalyzeVo> getAiInfoList(@RequestBody AiInfoListRequest request) {
         return R.ok(slideService.getAiInfoList(request));
     }
 

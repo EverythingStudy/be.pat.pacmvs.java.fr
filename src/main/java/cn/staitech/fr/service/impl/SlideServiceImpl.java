@@ -26,6 +26,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -70,6 +71,10 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
     private String organCheckConfirmUrl;
 	@Value("${ai.timeout:5000}")
 	private Integer timeout;
+    @Autowired
+    private StructureTagMapper structureTagMapper;
+    @Autowired
+    private SlideMapper slideMapper;
 
 	@Override
 	public R<CustomPage<SlidePageVo>> page(SlidePageReq req, boolean isPageConfigSlide, boolean isAccessPermission) {
@@ -599,7 +604,13 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 	}
 
 	@Override
-	public List<AiInfoListResp> getAiInfoList(AiInfoListRequest request) {
+	public AiInfoAnalyzeVo getAiInfoList(AiInfoListRequest request) {
+		AiInfoAnalyzeVo aiInfoAnalyzeVo = new AiInfoAnalyzeVo();
+		Slide slide = slideMapper.selectById(request.getSlideId());
+
+		//if(slide != null && slide.getAiStatus()) {}
+		aiInfoAnalyzeVo.setAiStatus(slide.getAiStatus());
+
 		//判断是不是存在对照组
 		Project special = projectMapper.selectById(request.getProjectId());
 		List<AiInfoListVO> aiInfoList = baseMapper.getAiInfoList(request);
@@ -636,11 +647,27 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 					setStr.addAll(set);
 				}
 			}
+			if(CollectionUtils.isNotEmpty(setStr)) {
+				LambdaQueryWrapper<StructureTag> in = new LambdaQueryWrapper<StructureTag>()
+						.in(StructureTag::getStructureId, setStr)
+						.eq(StructureTag::getOrganizationId, SecurityUtils.getOrganizationId());
+				List<StructureTag> structureTags = structureTagMapper.selectList(in);
+				if(CollectionUtils.isNotEmpty(structureTags)) {
+					List<StructureTagVo> structureTagVos = new ArrayList<>();
+					for (StructureTag structureTag : structureTags) {
+						StructureTagVo structureTagVo = new StructureTagVo();
+						BeanUtils.copyProperties(structureTag, structureTagVo);
+						structureTagVos.add(structureTagVo);
+					}
+					resp.setStructTagList(structureTagVos);
+				}
+			}
 			resp.setAiInfoList(value);
-			resp.setStructCode(setStr);
 			aiInfoListResps.add(resp);
 		});
-		return aiInfoListResps;
+
+		aiInfoAnalyzeVo.setAiInfoList(aiInfoListResps);
+		return aiInfoAnalyzeVo;
 	}
 
 	@Override
