@@ -379,12 +379,12 @@
         c.wax_code AS waxCode,
         c.group_code AS groupCode,
         c.sex_flag AS genderFlag,
-        ${params.currentUserId} AS viewStatus,
+        a.viewStatus AS viewStatus,
         b.ai_status AS aiStatus,
         b.description AS description,
         b.create_time AS createTime
         FROM
-        (SELECT a.slide_id
+        (SELECT a.slide_id, ${params.currentUserId} AS viewStatus
         FROM
         fr_slide a LEFT JOIN tb_image b ON a.image_id = b.image_id
         LEFT JOIN fr_single_slide c ON a.slide_id = c.slide_id
