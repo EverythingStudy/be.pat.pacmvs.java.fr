@@ -63,9 +63,11 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 	@Resource
 	private SingleSlideMapper singleSlideMapper;
 	@Resource
-	private OrganTagMapper organTagMapper;
-	@Value("${ai.url:http://172.30.10.79:8003/CreateAIwtr}")
-	private String aiUrl;
+    private OrganTagMapper organTagMapper;
+    @Value("${ai.url:http://172.30.10.79:8003/CreateAIwtr/}")
+    private String aiUrl;
+    @Value("${organ.check.confirm.url:http://172.30.10.79:8003/CreateAIwtfc/}")
+    private String organCheckConfirmUrl;
 	@Value("${ai.timeout:5000}")
 	private Integer timeout;
 
@@ -542,19 +544,37 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         return vo;
     }
 
-	@Override
-	public void organCheckConfirm(OrganCheckViewReq req) {
-		// 查询切片信息
-		Slide slide = this.baseMapper.selectById(req.getSlideId());
-		if (slide != null) {
-			// 修改状态
-			Slide update = new Slide();
-			update.setSlideId(req.getSlideId());
-			update.setAiStatus(3);
-			this.baseMapper.updateById(update);
-			// TODO 调用python
-		}
-	}
+    @Override
+    public R<String> organCheckConfirm(OrganCheckViewReq req) {
+        // 加锁
+        String key = "organ_confirm_slideId_" + req.getSlideId();
+        Boolean result = this.redisTemplate.opsForValue().setIfAbsent(key, req.getSlideId());
+        if (Boolean.FALSE.equals(result)) {
+            return R.fail("处理中，请稍后");
+        }
+        try {
+            // 修改状态
+            Slide update = new Slide();
+            update.setSlideId(req.getSlideId());
+            update.setAiStatus(3);
+            this.baseMapper.updateById(update);
+            // 查询需要的参数
+            List<OrganCheckConfirmBO> confirms = this.baseMapper.selectOrganCheckConfirmBO(req.getSlideId());
+            for (OrganCheckConfirmBO bo : confirms) {
+                try {
+                    log.info("脏器识别校对-确认修改，请求参数：{}", JSON.toJSONString(bo));
+                    String aiResult = HttpUtil.post(this.organCheckConfirmUrl, JSON.toJSONString(bo), this.timeout);
+                    log.info("脏器识别校对-确认修改，返回结果：{}", aiResult);
+                } catch (Exception e) {
+                    log.info("脏器识别校对-确认修改，异常", e);
+                }
+            }
+            return R.ok();
+        } finally {
+            // 释放锁
+            this.redisTemplate.delete(key);
+        }
+    }
 
 	@Override
 	public List<OrganTagVO> organList(Long projectId) {

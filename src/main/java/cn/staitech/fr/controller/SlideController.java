@@ -181,8 +181,7 @@ public class SlideController  extends BaseController {
     @ApiOperation(value = "脏器识别校对-确认修改")
     @PostMapping("/organCheckConfirm")
     public R<String> organCheckConfirm(@RequestBody @Validated OrganCheckViewReq req) {
-        this.slideService.organCheckConfirm(req);
-        return R.ok();
+        return this.slideService.organCheckConfirm(req);
     }
 
 //    @ApiOperation(value = "导出AI指标信息")

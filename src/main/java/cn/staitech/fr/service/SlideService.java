@@ -61,7 +61,7 @@ public interface SlideService extends IService<Slide> {
 
     OrganCheckViewVo organCheckView(OrganCheckViewReq req);
 
-    void organCheckConfirm(OrganCheckViewReq req);
+    R<String> organCheckConfirm(OrganCheckViewReq req);
 
     List<OrganTagVO> organList(Long projectId);
 

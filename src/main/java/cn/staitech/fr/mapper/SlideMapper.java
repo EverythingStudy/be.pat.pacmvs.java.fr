@@ -4,6 +4,7 @@ import java.util.List;
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.fr.domain.out.AiInfoListRequest;
 import cn.staitech.fr.vo.project.AiAnalysisBO;
+import cn.staitech.fr.vo.project.OrganCheckConfirmBO;
 import cn.staitech.fr.vo.project.slide.*;
 import org.apache.ibatis.annotations.Param;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -38,6 +39,8 @@ public interface SlideMapper extends BaseMapper<Slide> {
     List<ExportAiInfoVo> exportAiInfo(ExportAiInfoReq req);
 
     List<AiInfoListVO> getAiInfoList(AiInfoListRequest request);
+
+    List<OrganCheckConfirmBO> selectOrganCheckConfirmBO(Long slideId);
 }
 
 

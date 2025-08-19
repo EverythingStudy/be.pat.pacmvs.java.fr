@@ -352,5 +352,23 @@
             and af.single_slide_id=#{singleSlideId}
         </if>
     </select>
+    <select id="selectOrganCheckConfirmBO" resultType="cn.staitech.fr.vo.project.OrganCheckConfirmBO">
+        SELECT
+        a.image_id AS imageId,
+        b.image_path AS imagePath,
+        a.slide_id AS slideId,
+        f.single_id AS singleId,
+        f.category_id AS categoryId,
+        e.organization_id AS organizationId,
+        e.organization_name AS organizationName,
+        d.topic_name AS topicName
+        FROM fr_slide a LEFT JOIN tb_image b ON a.image_id = b.image_id
+        LEFT JOIN fr_special c ON a.special_id = c.special_id
+        LEFT JOIN tb_topic d ON c.topic_id = d.topic_id
+        LEFT JOIN sys_organization e ON c.organization_id = e.organization_id
+        LEFT JOIN fr_single_slide f ON a.slide_id = f.slide_id
+        WHERE
+        a.slide_id = #{slideId}
+    </select>
 
 </mapper>
