@@ -60,13 +60,20 @@ public class SciaticNerveParserStrategyImpl extends AbstractCustomParserStrategy
 		//		即神经外膜结缔组织面积
 		
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+		/**
+		 A	神经纤维束面积	1400BB
+		 B	神经外膜结缔组织面积	1400BA
+		 
+		 神经纤维束面积	1=A
+		 神经外膜结缔组织面积	2=B-A
+		 */
 
 		//神经纤维束面积	1	10³平方微米	Nerve fiber bundles area	1=A
 		 BigDecimal pituitaryA = getOrganArea(jsonTask, "1400BB").getStructureAreaNum();
 		if(null != pituitaryA){
 			String accurateArea = areaUtils.convertToSquareMicrometer(pituitaryA.toString());
 			//神经纤维束面积	1	10³平方微米	Nerve fiber bundles area	1=A
-			indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("Nerve fiber bundles area", accurateArea, SQ_UM_THOUSAND, "0"));
+			indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("Nerve fiber bundles area", accurateArea, SQ_UM_THOUSAND, "0","1400BB"));
 		}
 
 
@@ -75,13 +82,13 @@ public class SciaticNerveParserStrategyImpl extends AbstractCustomParserStrategy
 		if(null != bigDecimalB){
 			bigDecimalB = bigDecimalB.setScale(3, RoundingMode.HALF_UP);
 			bigDecimalB = commonJsonParser.getBigDecimalValue(bigDecimalB);
-			indicatorResultsMap.put("神经外膜结缔组织面积", new IndicatorAddIn("", String.valueOf(bigDecimalB.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "1"));
+			indicatorResultsMap.put("神经外膜结缔组织面积", new IndicatorAddIn("", String.valueOf(bigDecimalB.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "1","1400BA"));
 			
 		}
 		//结缔组织面积	2	平方毫米	Connective tissue area	2=B-A
 		if(bigDecimalB.compareTo(BigDecimal.ZERO) != 0 && pituitaryA.compareTo(BigDecimal.ZERO) != 0){
 			BigDecimal BigDecimalB_A = bigDecimalB.subtract(pituitaryA);
-			indicatorResultsMap.put("结缔组织面积", new IndicatorAddIn("Connective tissue area", String.valueOf(BigDecimalB_A.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "0"));
+			indicatorResultsMap.put("结缔组织面积", new IndicatorAddIn("Connective tissue area", String.valueOf(BigDecimalB_A.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "0",areaUtils.getStructureIds("1400BB","1400BA")));
 		}
 
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);

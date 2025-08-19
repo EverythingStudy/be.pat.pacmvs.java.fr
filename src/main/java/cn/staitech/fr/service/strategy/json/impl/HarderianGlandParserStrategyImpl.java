@@ -11,10 +11,12 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import cn.staitech.fr.utils.AreaUtils;
 import cn.staitech.fr.utils.DecimalUtils;
 import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -47,7 +49,8 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
     private CommonJsonParser commonJsonParser;
     @Resource
     private CommonJsonCheck commonJsonCheck;
-
+    @Autowired
+    private AreaUtils areaUtils;
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         commonJsonParser.parseJson(jsonTask, jsonFileS);
@@ -136,40 +139,54 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "10206D", annotationC, 1);
 
         // 算法输出指标 -------------------------------------------------------------
+        /**
+	        A	腺泡面积（单个）	10206D
+			B	腺泡细胞核数量（单个）	10206D、10206E
+			C	色素面积	102071
+			D	组织轮廓面积	102111
+			E	腺泡面积（全片）	10206D
+			F	腺泡细胞核数量（全片）	10206E
+			
+			腺泡面积占比（全片）	1=E/D
+			腺泡细胞核密度(单个)	2=B/A
+			色素面积占比	3=C/D
+			腺泡细胞核密度（全片）	4=F/E
+			哈氏腺面积	5=D
+         */
         // A
-        map.put("腺泡面积（单个）", new IndicatorAddIn());
+        map.put("腺泡面积（单个）", new IndicatorAddIn("10206D"));
         // B
-        map.put("腺泡细胞核数量（单个）", new IndicatorAddIn());
+        map.put("腺泡细胞核数量（单个）", new IndicatorAddIn(areaUtils.getStructureIds("10206D","10206E")));
         // C
-        // map.put("色素面积", new IndicatorAddIn("Pigment area", pigmentArea.toString(),CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1));
+        // map.put("色素面积", new IndicatorAddIn("Pigment area", pigmentArea.toString(),CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"102071"));
         // E
-        map.put("腺泡面积（全片）", new IndicatorAddIn("Acinus area (all)", DecimalUtils.setScale3(acinusArea),CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1));
+        map.put("腺泡面积（全片）", new IndicatorAddIn("Acinus area (all)", DecimalUtils.setScale3(acinusArea),CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"10206D"));
         // F
-        map.put("腺泡细胞核数量（全片）", new IndicatorAddIn("Nucleus counts of acinus (all)", nucleusCount.toString(), "个", CommonConstant.NUMBER_1));
+        map.put("腺泡细胞核数量（全片）", new IndicatorAddIn("Nucleus counts of acinus (all)", nucleusCount.toString(), "个", CommonConstant.NUMBER_1,"10206E"));
 
         // 产品呈现指标 -------------------------------------------------------------
         if (accurateAreaBigDecimal.compareTo(BigDecimal.ZERO) != 0) {
             //   腺泡面积占比（全片）	1	%	Acinus area%（all）	1=E/D
             BigDecimal acinusDivideArea = acinusArea.divide(accurateAreaBigDecimal, 7, BigDecimal.ROUND_HALF_UP);
-            map.put("腺泡面积占比（全片）", new IndicatorAddIn("Acinus area %（all）", DecimalUtils.percentScale3(acinusDivideArea), "%"));
+            map.put("腺泡面积占比（全片）", new IndicatorAddIn("Acinus area %（all）", DecimalUtils.percentScale3(acinusDivideArea), "%",areaUtils.getStructureIds("10206D","102111")));
 
             // 色素面积占比 3 % Pigment area % 3 = C / D
             // BigDecimal pigmentDivideArea = pigmentArea.divide(accurateAreaBigDecimal, 7, BigDecimal.ROUND_HALF_UP);
             // map.put("色素面积占比", new IndicatorAddIn("Pigment area %", DecimalUtils.percentScale3(pigmentDivideArea), "%"));
         } else {
-            map.put("腺泡面积占比（全片）", new IndicatorAddIn("Acinus area %（all）", "0.000", "%"));
+            map.put("腺泡面积占比（全片）", new IndicatorAddIn("Acinus area %（all）", "0.000", "%",areaUtils.getStructureIds("10206D","102111")));
             // map.put("色素面积占比", new IndicatorAddIn("Pigment area %", "0.000", "%"));
         }
 
         // 腺泡细胞核密度(单个) 2 个 / 103 平方微米 Nucleus density of acinus(per) 2 = B / A 95 % 置信区间和均数±标准差
-        map.put("腺泡细胞核密度(单个)", new IndicatorAddIn("Nucleus density of acinus(per)", confidenceInterval,CommonConstant.SQ_SQUARE_MICROMETER_PIECE_EN));
+        map.put("腺泡细胞核密度(单个)", new IndicatorAddIn("Nucleus density of acinus(per)", confidenceInterval,CommonConstant.SQ_SQUARE_MICROMETER_PIECE_EN,areaUtils.getStructureIds("10206D","10206E","10206D")));
 
         // 腺泡细胞核密度（全片）4 个 / 平方毫米 Nucleus density of acinus (all) 4 = F / E
         BigDecimal nucleusCountDivideacinusArea = new BigDecimal(nucleusCount).divide(acinusArea, 7, BigDecimal.ROUND_HALF_UP);
-        map.put("腺泡细胞核密度（全片）", new IndicatorAddIn("Nucleus density of acinus (all)", DecimalUtils.setScale3(nucleusCountDivideacinusArea), CommonConstant.SQ_MM_PIECE_EN));
+        map.put("腺泡细胞核密度（全片）", new IndicatorAddIn("Nucleus density of acinus (all)", DecimalUtils.setScale3(nucleusCountDivideacinusArea), CommonConstant.SQ_MM_PIECE_EN,areaUtils.getStructureIds("10206E","10206D")));
 
         // D
-        map.put("哈氏腺面积", new IndicatorAddIn("Acinus area", DecimalUtils.setScale3(accurateAreaBigDecimal),CommonConstant.SQUARE_MILLIMETRE));
+        map.put("哈氏腺面积", new IndicatorAddIn("Acinus area", DecimalUtils.setScale3(accurateAreaBigDecimal),CommonConstant.SQUARE_MILLIMETRE,"102111"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
         log.info("指标计算结束-哈氏腺");

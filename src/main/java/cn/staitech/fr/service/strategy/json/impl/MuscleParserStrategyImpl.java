@@ -108,7 +108,7 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
 
 
         // 算法输出指标
-        resultsMap.put("肌纤维面积（单个）", createDefaultIndicator());// A肌纤维面积（单个）
+        resultsMap.put("肌纤维面积（单个）", createDefaultIndicator("15C02A"));// A肌纤维面积（单个）
         resultsMap.put("间质面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaB.toString()), SQ_UM_THOUSAND, "15C027"));
         resultsMap.put("血管面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaC.toString()), SQ_UM_THOUSAND, "15C003"));
         resultsMap.put("红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaD.toString()), SQ_UM, "15C004"));

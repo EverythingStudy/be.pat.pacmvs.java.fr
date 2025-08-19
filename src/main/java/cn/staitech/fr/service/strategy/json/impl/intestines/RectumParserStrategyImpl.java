@@ -12,8 +12,11 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import cn.staitech.fr.utils.AreaUtils;
 import cn.staitech.fr.utils.DecimalUtils;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -45,7 +48,8 @@ public class RectumParserStrategyImpl implements ParserStrategy {
     private CommonJsonParser commonJsonParser;
     @Resource
     private CommonJsonCheck commonJsonCheck;
-
+    @Autowired
+    private AreaUtils areaUtils;
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         commonJsonParser.parseJson(jsonTask, jsonFileS);
@@ -100,20 +104,33 @@ public class RectumParserStrategyImpl implements ParserStrategy {
         // 黏膜下层面积	C	平方毫米	以C型或双层环状输出
         // 肌层面积	D	平方毫米	以C型或双层环状输出
         // 组织轮廓面积	E	平方毫米	无
+        
+        /**
+        A	肠腔面积	116156
+		B	黏膜层面积	116008
+		C	黏膜下层面积	116009
+		D	肌层面积	11600C
+		E	组织轮廓面积	116111
+	
+		黏膜层面积占比	1=B/(E-A)
+		黏膜下层面积占比	2=C/(E-A)
+		肌层面积占比	3=D/(E-A)
+		直肠面积	4=E-A
+         */
 
         // 肠腔面积	A	平方毫米
-        map.put("肠腔面积", new IndicatorAddIn("Intestinal cavity area", DecimalUtils.setScale3(colonArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1));
+        map.put("肠腔面积", new IndicatorAddIn("Intestinal cavity area", DecimalUtils.setScale3(colonArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"116156"));
 
         // 黏膜层面积	B	平方毫米	以C型或双层环状输出
-        map.put("黏膜层面积", new IndicatorAddIn("Mucosal layer area", DecimalUtils.setScale3(areaNum), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1));
+        map.put("黏膜层面积", new IndicatorAddIn("Mucosal layer area", DecimalUtils.setScale3(areaNum), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"116008"));
 
         // 黏膜下层面积	C	平方毫米	以C型或双层环状输出
-        map.put("黏膜下层面积", new IndicatorAddIn("Submucosal area", DecimalUtils.setScale3(areaNum2), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1));
+        map.put("黏膜下层面积", new IndicatorAddIn("Submucosal area", DecimalUtils.setScale3(areaNum2), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"116009"));
 
         // 肌层面积	D	平方毫米	以C型或双层环状输出
-        map.put("肌层面积", new IndicatorAddIn("Muscle layer area", DecimalUtils.setScale3(areaNum3), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1));
+        map.put("肌层面积", new IndicatorAddIn("Muscle layer area", DecimalUtils.setScale3(areaNum3), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"11600C"));
         // 组织轮廓面积	E	平方毫米	无
-        map.put("组织轮廓面积", new IndicatorAddIn("Tissue area", DecimalUtils.setScale3(areaNum4), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1));
+        map.put("组织轮廓面积", new IndicatorAddIn("Tissue area", DecimalUtils.setScale3(areaNum4), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"116111"));
 
         // 产品呈现指标 -------------------------------------------------------------
         // 黏膜层面积占比	1	%	Mucosal area%	1=B/（E-A）	无
@@ -123,23 +140,23 @@ public class RectumParserStrategyImpl implements ParserStrategy {
         if (eSubtractA.compareTo(BigDecimal.ZERO) != 0) {
             // 黏膜层面积占比	1	%	Mucosal area%	1=B/（E-A）	无
             BigDecimal mucosalAreaRate = areaNum.divide(eSubtractA, 7, RoundingMode.HALF_UP);
-            map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", DecimalUtils.percentScale3(mucosalAreaRate), "%"));
+            map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", DecimalUtils.percentScale3(mucosalAreaRate), "%",areaUtils.getStructureIds("116008","116111","116156")));
 
             // 黏膜下层面积占比	2	%	Submucosal area%	2=C/（E-A）	无
             BigDecimal submucosalAreaRate = areaNum2.divide(eSubtractA, 7, RoundingMode.HALF_UP);
-            map.put("黏膜下层面积占比", new IndicatorAddIn("Submucosal area%", DecimalUtils.percentScale3(submucosalAreaRate), "%"));
+            map.put("黏膜下层面积占比", new IndicatorAddIn("Submucosal area%", DecimalUtils.percentScale3(submucosalAreaRate), "%",areaUtils.getStructureIds("116009","116111","116156")));
 
             // 肌层面积占比	3	%	Muscular area%	3=D/（E-A）	无
             BigDecimal muscularAreaRate = areaNum3.divide(eSubtractA, 7, RoundingMode.HALF_UP);
-            map.put("肌层面积占比", new IndicatorAddIn("Muscular area%", DecimalUtils.percentScale3(muscularAreaRate), "%"));
+            map.put("肌层面积占比", new IndicatorAddIn("Muscular area%", DecimalUtils.percentScale3(muscularAreaRate), "%",areaUtils.getStructureIds("11600C","116111","116156")));
         } else {
-            map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", "0.000", "%"));
-            map.put("黏膜下层面积占比", new IndicatorAddIn("Submucosal area%", "0.000", "%"));
-            map.put("肌层面积占比", new IndicatorAddIn("Muscular area%", "0.000", "%"));
+            map.put("黏膜层面积占比", new IndicatorAddIn("Mucosal area%", "0.000", "%",areaUtils.getStructureIds("116008","116111","116156")));
+            map.put("黏膜下层面积占比", new IndicatorAddIn("Submucosal area%", "0.000", "%",areaUtils.getStructureIds("116009","116111","116156")));
+            map.put("肌层面积占比", new IndicatorAddIn("Muscular area%", "0.000", "%",areaUtils.getStructureIds("11600C","116111","116156")));
         }
 
         // 直肠面积	4	平方毫米	Rectum area	4=E-A	无
-        map.put("直肠面积", new IndicatorAddIn("Rectum area", DecimalUtils.setScale3(eSubtractA), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_0));
+        map.put("直肠面积", new IndicatorAddIn("Rectum area", DecimalUtils.setScale3(eSubtractA), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_0,areaUtils.getStructureIds("116111","116156")));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
         log.info("指标计算结束-大鼠直肠");

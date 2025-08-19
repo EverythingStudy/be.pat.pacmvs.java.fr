@@ -10,7 +10,10 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -44,6 +47,8 @@ public class TongueParserStrategyImpl extends AbstractCustomParserStrategy {
     private SingleSlideMapper singleSlideMapper;
     @Resource
     private CommonJsonCheck commonJsonCheck;
+    @Autowired
+    private AreaUtils areaUtils;
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -66,21 +71,32 @@ public class TongueParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal organArea1 = commonJsonParser.getOrganAreaMicron(jsonTask, "10D12F");
         BigDecimal organArea2 = commonJsonParser.getOrganArea(jsonTask, "10D01C").getStructureAreaNum();
         BigDecimal bigDecimal = new BigDecimal(singleSlide.getArea());
+        /**
+        A	角质层面积	10D12E
+		B	颗粒层+棘层+基底细胞层面积	10D12F
+		C	固有层+肌层面积	10D01C
+		D	组织轮廓	10D111
+		
+		角质层面积占比	1=A/D
+		颗粒层+棘层+基底细胞层面积占比	2=B/D
+		固有层+肌层面积占比	3=C/D
+		舌面积	4=D
+         */
         if(bigDecimal.signum() == 0){
-            indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum corneum area%", "0", "%"));
-            indicatorResultsMap.put("颗粒层+棘层+基底细胞层面积占比", new IndicatorAddIn("Nucleated cell layer area%", "0", "%"));
-            indicatorResultsMap.put("固有层和肌层面积占比", new IndicatorAddIn("Lamina propria and Muscularis area%", "0", "%"));
+            indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum corneum area%", "0", "%",areaUtils.getStructureIds("10D12E","10D111")));
+            indicatorResultsMap.put("颗粒层+棘层+基底细胞层面积占比", new IndicatorAddIn("Nucleated cell layer area%", "0", "%",areaUtils.getStructureIds("10D12F","10D111")));
+            indicatorResultsMap.put("固有层和肌层面积占比", new IndicatorAddIn("Lamina propria and Muscularis area%", "0", "%",areaUtils.getStructureIds("10D01C","10D111")));
         }else{
             BigDecimal multiply = bigDecimal.multiply(new BigDecimal("1000"));
-            indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum corneum area%", organArea.divide(multiply,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(),"%"));
-            indicatorResultsMap.put("颗粒层+棘层+基底细胞层面积占比", new IndicatorAddIn("Nucleated cell layer area%", organArea1.divide(multiply,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
-            indicatorResultsMap.put("固有层和肌层面积占比", new IndicatorAddIn("Lamina propria and Muscularis area%", organArea2.divide(bigDecimal,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum corneum area%", organArea.divide(multiply,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(),"%",areaUtils.getStructureIds("10D12E","10D111")));
+            indicatorResultsMap.put("颗粒层+棘层+基底细胞层面积占比", new IndicatorAddIn("Nucleated cell layer area%", organArea1.divide(multiply,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("10D12F","10D111")));
+            indicatorResultsMap.put("固有层和肌层面积占比", new IndicatorAddIn("Lamina propria and Muscularis area%", organArea2.divide(bigDecimal,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("10D01C","10D111")));
         }
 
-        indicatorResultsMap.put("舌面积", new IndicatorAddIn("Tongue area", new BigDecimal(singleSlide.getArea()).setScale(3,RoundingMode.HALF_UP).toString(), SQ_MM));
-        indicatorResultsMap.put("角质层面积", new IndicatorAddIn("Stratum corneum area", organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("颗粒层+棘层+基底细胞层面积", new IndicatorAddIn("Nucleated cell layer area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("固有层+肌层面积", new IndicatorAddIn("Lamina propria and Muscularis area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("舌面积", new IndicatorAddIn("Tongue area", new BigDecimal(singleSlide.getArea()).setScale(3,RoundingMode.HALF_UP).toString(), SQ_MM,"10D111"));
+        indicatorResultsMap.put("角质层面积", new IndicatorAddIn("Stratum corneum area", organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1,"10D12E"));
+        indicatorResultsMap.put("颗粒层+棘层+基底细胞层面积", new IndicatorAddIn("Nucleated cell layer area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1,"10D12F"));
+        indicatorResultsMap.put("固有层+肌层面积", new IndicatorAddIn("Lamina propria and Muscularis area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,"10D01C"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
         //aiForecastService.addOutIndicators(jsonTask.getSingleId(), indicatorResultsMap);
 

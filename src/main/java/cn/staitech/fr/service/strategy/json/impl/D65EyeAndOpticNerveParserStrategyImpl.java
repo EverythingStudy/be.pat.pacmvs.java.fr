@@ -7,7 +7,10 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -35,6 +38,8 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
     private CommonJsonParser commonJsonParser;
     @Resource
     private CommonJsonCheck commonJsonCheck;
+    @Autowired
+    private AreaUtils areaUtils;
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -81,6 +86,17 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
+    	/**
+    	A	晶状体面积	15F101
+		B	睫状体-虹膜面积	15F102
+		C	视网膜面积	15F103
+		D	视网膜周长	15F103
+		
+		晶状体面积	1=A
+		睫状体-虹膜面积	2=B
+		视网膜面积	3=C
+		视网膜平均厚度	4=2C/D
+    	 */
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         BigDecimal organArea = getOrganArea(jsonTask, "15F101").getStructureAreaNum();
         BigDecimal organArea1 = getOrganArea(jsonTask, "15F102", BigDecimal.valueOf(1000)).getStructureAreaNum();
@@ -89,12 +105,12 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
         BigDecimal organArea3 = getOrganArea(jsonTask, "13F0BB").getStructureAreaNum();
         BigDecimal organArea4 = getOrganArea(jsonTask, "13F0BA").getStructureAreaNum();
         //indicatorResultsMap.put("晶状体面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("晶状体面积", new IndicatorAddIn("Crystalline lens area", organArea.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_0));
+        indicatorResultsMap.put("晶状体面积", new IndicatorAddIn("Crystalline lens area", organArea.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_0,"15F101"));
         //todo 精度丢失
-        indicatorResultsMap.put("睫状体-虹膜面积", new IndicatorAddIn("Ciliary body-Iris area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("睫状体-虹膜面积", new IndicatorAddIn("Ciliary body-Iris area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1,"15F102"));
         //indicatorResultsMap.put("视网膜面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("视网膜面积", new IndicatorAddIn("Retina area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_0));
-        indicatorResultsMap.put("视网膜周长", new IndicatorAddIn("", organPerimeter.setScale(3, RoundingMode.HALF_UP).toString(), MM, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("视网膜面积", new IndicatorAddIn("Retina area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_0,"15F103"));
+        indicatorResultsMap.put("视网膜周长", new IndicatorAddIn("", organPerimeter.setScale(3, RoundingMode.HALF_UP).toString(), MM, CommonConstant.NUMBER_1,"15F103"));
         //indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), SQUARE_MICROMETER, CommonConstant.NUMBER_1));
 //        indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("Nerve fiber bundles area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_0));
 //        indicatorResultsMap.put("神经外膜结缔组织面积", new IndicatorAddIn("", organArea4.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_1));
@@ -110,7 +126,7 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
         if (D.compareTo(BigDecimal.ZERO) != 0 && C.compareTo(BigDecimal.ZERO) != 0){
             b = C.multiply(BigDecimal.valueOf(2)).divide(D, 3, RoundingMode.HALF_UP);
         }
-        indicatorResultsMap.put("视网膜平均厚度", new IndicatorAddIn("Average thickness of retina", b.toString(), MM, CommonConstant.NUMBER_0));
+        indicatorResultsMap.put("视网膜平均厚度", new IndicatorAddIn("Average thickness of retina", b.toString(), MM, CommonConstant.NUMBER_0,"15F103"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 

@@ -97,19 +97,27 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 			bigDecimalC =  new BigDecimal(singleSlide.getPerimeter());
 		}
 
-
+		/**
+		A	空腔面积	15D113
+		B	空腔周长	15D113
+		C	组织轮廓周长	15D111
+		D	组织轮廓面积	15D111
+	
+		主动脉壁面积	1=D-A
+		主动脉壁平均厚度	2=2*(D-A)/(B+C)
+		 */
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-		indicatorResultsMap.put("空腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA.setScale(3, RoundingMode.HALF_UP)), SQ_UM_THOUSAND, "1"));
+		indicatorResultsMap.put("空腔面积", new IndicatorAddIn("", String.valueOf(bigDecimalA.setScale(3, RoundingMode.HALF_UP)), SQ_UM_THOUSAND, "1","15D113"));
 
-		indicatorResultsMap.put("空腔周长", new IndicatorAddIn("", String.valueOf(bigDecimalB.setScale(3, RoundingMode.HALF_UP)),MM, "1"));
+		indicatorResultsMap.put("空腔周长", new IndicatorAddIn("", String.valueOf(bigDecimalB.setScale(3, RoundingMode.HALF_UP)),MM, "1","15D113"));
 
 
-		indicatorResultsMap.put("组织轮廓周长", new IndicatorAddIn("", String.valueOf(bigDecimalC.setScale(3, RoundingMode.HALF_UP)),MM, "1"));
+		indicatorResultsMap.put("组织轮廓周长", new IndicatorAddIn("", String.valueOf(bigDecimalC.setScale(3, RoundingMode.HALF_UP)),MM, "1","15D111"));
 
-		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDecimalD.setScale(3, RoundingMode.HALF_UP)), SQ_UM_THOUSAND, "1"));
+		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDecimalD.setScale(3, RoundingMode.HALF_UP)), SQ_UM_THOUSAND, "1","15D111"));
 		//1=D-A
 		if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0 && bigDecimalA.compareTo(BigDecimal.ZERO) != 0){
-			indicatorResultsMap.put("主动脉壁面积", new IndicatorAddIn("Aorta wall area", String.valueOf(bigDecimalD.subtract(bigDecimalA)), SQ_UM_THOUSAND, "0"));
+			indicatorResultsMap.put("主动脉壁面积", new IndicatorAddIn("Aorta wall area", String.valueOf(bigDecimalD.subtract(bigDecimalA)), SQ_UM_THOUSAND, "0",areaUtils.getStructureIds("15D111","15D113")));
 		}
 		//2=2*（D-A）/(B+C)
 		if(bigDecimalD.compareTo(BigDecimal.ZERO) != 0 && bigDecimalA.compareTo(BigDecimal.ZERO) != 0&& bigDecimalB.compareTo(BigDecimal.ZERO) != 0&& bigDecimalC.compareTo(BigDecimal.ZERO) != 0){
@@ -119,7 +127,7 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 			bigDecimalBC= bigDecimalBC.multiply(new BigDecimal("1000"));
 			BigDecimal  bigDecimal2 = new BigDecimal(2);
 			BigDecimal mal =  bigDecimal2.multiply(commonJsonParser.getProportionMultiply(bigDecimalDA, bigDecimalBC));
-			indicatorResultsMap.put("主动脉壁平均厚度", new IndicatorAddIn("Average thickness of aorta wall", String.valueOf(mal.setScale(3, RoundingMode.HALF_UP)),UM, "0"));
+			indicatorResultsMap.put("主动脉壁平均厚度", new IndicatorAddIn("Average thickness of aorta wall", String.valueOf(mal.setScale(3, RoundingMode.HALF_UP)),UM, "0",areaUtils.getStructureIds("15D111","15D113","15D113")));
 		}
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 	}

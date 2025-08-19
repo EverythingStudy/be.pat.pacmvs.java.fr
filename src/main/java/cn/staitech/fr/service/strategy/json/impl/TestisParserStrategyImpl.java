@@ -86,15 +86,41 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12E0FB",annotationBy1,1);
 
         // 算法输出指标
-        resultsMap.put("生精小管面积（单个）", createDefaultIndicator());// A生精小管面积（单个）
-        resultsMap.put("生精小管面积（全片）", createIndicator(organAreaB.setScale(3, RoundingMode.HALF_UP), SQ_MM));
-        resultsMap.put("生精小管周长（单个）", createDefaultIndicator());
-        resultsMap.put("生精小管数量", createIndicator(areaCountD, PIECE));
-        resultsMap.put("生精小管内腔面积（单个）", createDefaultIndicator());// E生精小管内腔面积（单个）
-        resultsMap.put("生精细胞核数量（单个）", createDefaultIndicator());
-        resultsMap.put("支持细胞核数量（单个）", createDefaultIndicator());
-        resultsMap.put("间质细胞核数量", createIndicator(areaCountH, PIECE));
-//        resultsMap.put("血管面积", createIndicator(organAreaI.setScale(3, RoundingMode.HALF_UP), SQ_MM));
+        /**
+            A	生精小管面积（单个）	12E0FA
+			B	生精小管面积（全片）	12E0FA
+			C	生精小管周长（单个）	12E0FA
+			D	生精小管数量	12E0FA
+			E	生精小管内腔面积（单个）	12E0FA、12E0FB
+			F	生精细胞核数量（单个）	12E0FA、12E0FC
+			G	支持细胞核数量（单个）	12E0FA、12E0FD
+			H	间质细胞核数量	12E0FA、12E0FE
+			I	血管面积	12E003
+			J	组织轮廓面积	12E111
+			
+			睾丸面积	1=J
+			生精小管面积（全片）	2=B
+			生精小管面积占比	3=B/J
+			生精小管面积（单个）	4=A
+			生精小管密度	5=D/J
+			生精小管厚度（单个）	6=\sqrt{\smash[b]{A/\pi}}-\sqrt{\smash[b]{E/\pi}}
+			生精细胞核密度（单个）	7=F/C
+			支持细胞核密度（单个）	8=G/C
+			生精细胞核：支持细胞核（单个）	9=F/G
+			血管面积占比	10=I/J
+			间质细胞核：生精小管	11=H/D
+			间质面积占比	12=(J-B)/J
+			间质细胞核密度	13=H/J
+         */
+        resultsMap.put("生精小管面积（单个）", createDefaultIndicator("12E0FA"));// A生精小管面积（单个）
+        resultsMap.put("生精小管面积（全片）", createIndicator(organAreaB.setScale(3, RoundingMode.HALF_UP), SQ_MM,"12E0FA"));
+        resultsMap.put("生精小管周长（单个）", createDefaultIndicator("12E0FA"));
+        resultsMap.put("生精小管数量", createIndicator(areaCountD, PIECE,"12E0FA"));
+        resultsMap.put("生精小管内腔面积（单个）", createDefaultIndicator(areaUtils.getStructureIds("12E0FA","12E0FB")));// E生精小管内腔面积（单个）
+        resultsMap.put("生精细胞核数量（单个）", createDefaultIndicator(areaUtils.getStructureIds("12E0FA","12E0FC")));
+        resultsMap.put("支持细胞核数量（单个）", createDefaultIndicator(areaUtils.getStructureIds("12E0FA","12E0FD")));
+        resultsMap.put("间质细胞核数量", createIndicator(areaCountH, PIECE,areaUtils.getStructureIds("12E0FA","12E0FE")));
+//        resultsMap.put("血管面积", createIndicator(organAreaI.setScale(3, RoundingMode.HALF_UP), SQ_MM,"12E003"));
 
 
 
@@ -161,19 +187,57 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
 
 
         // 产品呈现指标
-        resultsMap.put("睾丸面积", createNameIndicator("Testicular area", organAreaJ.setScale(3, RoundingMode.HALF_UP), SQ_MM));
-        resultsMap.put("生精小管面积（全片）", createNameIndicator("Seminiferous tubules area (all)", organAreaB.setScale(3, RoundingMode.HALF_UP), SQ_MM));
-        resultsMap.put("生精小管面积占比", createNameIndicator("Seminiferous tubules area%", seminiferousTubulesArea, PERCENTAGE));
-        resultsMap.put("生精小管面积（单个）", createNameIndicator("Seminiferous tubules area (per)", seminiferousTubulesAreaSingle, SQ_UM_THOUSAND));
-        resultsMap.put("生精小管密度", createNameIndicator("Density of seminiferous tubules", densityResult.setScale(3, RoundingMode.HALF_UP), SQ_MM_PIECE));
-        resultsMap.put("生精小管厚度（单个）", createNameIndicator("Average thickness of spermatogenic tubules (per)", averageThicknessOfSpermatogenicTubules, UM));
-        resultsMap.put("生精细胞核密度（单个）", createNameIndicator("Nucleus density of Spermatogenic cells (per)", nucleusDensityOfSpermatogenicCells, SQ_MM_PIECE));
-        resultsMap.put("支持细胞核密度（单个）", createNameIndicator("Nucleus density of Sertoli (per)", nucleusDensityOfSupportCells, SQ_MM_PIECE));
-        resultsMap.put("生精细胞核：支持细胞核（单个）", createNameIndicator("Spermatogenic nucleus:  Sertoli nucleus ratio (per)", nucleusDensityOfSpermatogenicCellsSupportCells, NOT));
-//        resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE));
-        resultsMap.put("间质细胞核：生精小管", createNameIndicator("Leydig nucleus: seminiferous tubules ratio", interstitialCellNuclei, NOT));
-        resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area%", interstitialArea, PERCENTAGE));
-        resultsMap.put("间质细胞核密度", createNameIndicator("Nucleus density of leydig cells", interstitialCellNucleiDensity, SQ_MM_PIECE));
+        /**
+        A	生精小管面积（单个）	12E0FA
+		B	生精小管面积（全片）	12E0FA
+		C	生精小管周长（单个）	12E0FA
+		D	生精小管数量	12E0FA
+		E	生精小管内腔面积（单个）	12E0FA、12E0FB
+		F	生精细胞核数量（单个）	12E0FA、12E0FC
+		G	支持细胞核数量（单个）	12E0FA、12E0FD
+		H	间质细胞核数量	12E0FA、12E0FE
+		I	血管面积	12E003
+		J	组织轮廓面积	12E111
+		
+		睾丸面积	1=J
+		生精小管面积（全片）	2=B
+		生精小管面积占比	3=B/J
+		生精小管面积（单个）	4=A
+		生精小管密度	5=D/J
+		生精小管厚度（单个）	6=\sqrt{\smash[b]{A/\pi}}-\sqrt{\smash[b]{E/\pi}}
+		生精细胞核密度（单个）	7=F/C
+		支持细胞核密度（单个）	8=G/C
+		生精细胞核：支持细胞核（单个）	9=F/G
+		血管面积占比	10=I/J
+		间质细胞核：生精小管	11=H/D
+		间质面积占比	12=(J-B)/J
+		间质细胞核密度	13=H/J
+     */
+        //睾丸面积	1=J
+        resultsMap.put("睾丸面积", createNameIndicator("Testicular area", organAreaJ.setScale(3, RoundingMode.HALF_UP), SQ_MM,"12E111"));
+        //生精小管面积（全片）	2=B
+        resultsMap.put("生精小管面积（全片）", createNameIndicator("Seminiferous tubules area (all)", organAreaB.setScale(3, RoundingMode.HALF_UP), SQ_MM,"12E0FA"));
+        //生精小管面积占比	3=B/J
+        resultsMap.put("生精小管面积占比", createNameIndicator("Seminiferous tubules area%", seminiferousTubulesArea, PERCENTAGE,areaUtils.getStructureIds("12E0FA","12E111")));
+        //生精小管面积（单个）	4=A
+        resultsMap.put("生精小管面积（单个）", createNameIndicator("Seminiferous tubules area (per)", seminiferousTubulesAreaSingle, SQ_UM_THOUSAND,"12E0FA"));
+        //生精小管密度	5=D/J
+        resultsMap.put("生精小管密度", createNameIndicator("Density of seminiferous tubules", densityResult.setScale(3, RoundingMode.HALF_UP), SQ_MM_PIECE,areaUtils.getStructureIds("12E0FA","12E111")));
+        //生精小管厚度（单个）	6=\sqrt{\smash[b]{A/\pi}}-\sqrt{\smash[b]{E/\pi}}
+        resultsMap.put("生精小管厚度（单个）", createNameIndicator("Average thickness of spermatogenic tubules (per)", averageThicknessOfSpermatogenicTubules, UM,areaUtils.getStructureIds("12E0FA","12E0FB")));
+        //生精细胞核密度（单个）	7=F/C
+        resultsMap.put("生精细胞核密度（单个）", createNameIndicator("Nucleus density of Spermatogenic cells (per)", nucleusDensityOfSpermatogenicCells, SQ_MM_PIECE,areaUtils.getStructureIds("12E0FA","12E0FC")));
+        //支持细胞核密度（单个）	8=G/C
+        resultsMap.put("支持细胞核密度（单个）", createNameIndicator("Nucleus density of Sertoli (per)", nucleusDensityOfSupportCells, SQ_MM_PIECE,areaUtils.getStructureIds("12E0FA","12E0FD")));
+        //生精细胞核：支持细胞核（单个）	9=F/G
+        resultsMap.put("生精细胞核：支持细胞核（单个）", createNameIndicator("Spermatogenic nucleus:  Sertoli nucleus ratio (per)", nucleusDensityOfSpermatogenicCellsSupportCells, NOT,areaUtils.getStructureIds("12E0FA","12E0FC","12E0FD")));
+//        resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE,areaUtils.getStructureIds("12E003","12E111")));
+        //间质细胞核：生精小管	11=H/D
+        resultsMap.put("间质细胞核：生精小管", createNameIndicator("Leydig nucleus: seminiferous tubules ratio", interstitialCellNuclei, NOT,areaUtils.getStructureIds("12E0FA","12E0FE")));
+        //间质面积占比	12=(J-B)/J
+        resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area%", interstitialArea, PERCENTAGE,areaUtils.getStructureIds("12E111","12E0FA")));
+        //间质细胞核密度	13=H/J
+        resultsMap.put("间质细胞核密度", createNameIndicator("Nucleus density of leydig cells", interstitialCellNucleiDensity, SQ_MM_PIECE,areaUtils.getStructureIds("12E0FA","12E0FA","12E111")));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }
 

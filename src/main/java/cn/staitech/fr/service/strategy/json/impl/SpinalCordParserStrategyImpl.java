@@ -93,15 +93,15 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 			bigDecimalE = annotationE.getStructureAreaNum();
 			bigDecimalE = bigDecimalE.setScale(3, BigDecimal.ROUND_HALF_UP);
 		}
-
+		
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-		indicatorResultsMap.put("灰质面积（全片 ）", new IndicatorAddIn("", bigDecimalA.toString(), SQ_MM, "1"));
-		indicatorResultsMap.put("白质面积（全片 ）", new IndicatorAddIn("", bigDecimalB.toString(), SQ_MM, "1"));
-		indicatorResultsMap.put("中央管面积（全片 ）", new IndicatorAddIn("", bigDecimalC.toString(), SQ_UM_THOUSAND, "1"));
-		indicatorResultsMap.put("室管膜细胞核数量（全片 ）", new IndicatorAddIn("", mucosaCountD.toString(), PIECE, "1"));
-		indicatorResultsMap.put("红细胞面积（全片 ）", new IndicatorAddIn("", bigDecimalE.toString(), SQ_MM, "1"));
-		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("",   String.valueOf(bigDSlideArea.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "1"));
+		indicatorResultsMap.put("灰质面积（全片 ）", new IndicatorAddIn("", bigDecimalA.toString(), SQ_MM, "1","1390B3"));
+		indicatorResultsMap.put("白质面积（全片 ）", new IndicatorAddIn("", bigDecimalB.toString(), SQ_MM, "1","1390B2"));
+		indicatorResultsMap.put("中央管面积（全片 ）", new IndicatorAddIn("", bigDecimalC.toString(), SQ_UM_THOUSAND, "1","1390B4"));
+		indicatorResultsMap.put("室管膜细胞核数量（全片 ）", new IndicatorAddIn("", mucosaCountD.toString(), PIECE, "1",areaUtils.getStructureIds("1390B4","1390B5")));
+		indicatorResultsMap.put("红细胞面积（全片 ）", new IndicatorAddIn("", bigDecimalE.toString(), SQ_MM, "1","139004"));
+		indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("",   String.valueOf(bigDSlideArea.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "1","139111"));
 
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 		
@@ -113,35 +113,62 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 
 		
 		//AI指标保存
+		/**
+	    A	灰质面积（单个）	1390B3
+		B	白质面积（单个）	1390B2
+		C	中央管面积（单个）	1390B4
+		D	室管膜细胞核数量（单个）	1390B4、1390B5
+		E	红细胞面积（单个）	139004
+		F	组织轮廓面积（单个）	139111
+		G	灰质面积（全片）	1390B3   ---
+		H	白质面积（全片）	1390B2   ---
+		I	中央管面积（全片）	1390B4   ---
+		J	室管膜细胞核数量（全片）	1390B4、1390B5  ---
+		K	红细胞面积（全片）	139004  ---
+		L	组织轮廓面积（全片）	139111  ---
+		
+		灰质面积占比（单个）	1=A/(A+B)
+		白质面积占比（单个）	2=B/(A+B)
+		中央管面积占比（单个）	3=C/(A+B)
+		室管膜细胞核密度（单个）	4=D/C
+		红细胞面积占比（单个）	5=E/(A+B)
+		脊髓面积（单个）	6=A+B
+		灰质面积占比（全片）	7=G/(G+H)  ---
+		白质面积占比（全片）	8=H/(G+H)  ---
+		中央管面积占比（全片）	9=I/(G+H)  ---
+		室管膜细胞核密度（全片）	10=J/I  ---
+		红细胞面积占比（全片）	11=K/(G+H)  ---
+		脊髓面积	12=G+H  ---
+	 */
 		//		灰质面积占比（单个）	1	%	Gray matter area（per）	1=A/(A+B)
 		if(bigDecimalA.compareTo(BigDecimal.ZERO) != 0 && BigDecimalA_add_B.compareTo(BigDecimal.ZERO) != 0) {
 			BigDecimal mucosaCountA_B = commonJsonParser.getProportion(bigDecimalA, BigDecimalA_add_B);
-			indicatorResultsMap.put("灰质面积占比（全片）", new IndicatorAddIn("Gray matter area", String.valueOf(mucosaCountA_B), "%", "0"));
+			indicatorResultsMap.put("灰质面积占比（全片）", new IndicatorAddIn("Gray matter area", String.valueOf(mucosaCountA_B), "%", "0",areaUtils.getStructureIds("1390B3","1390B2")));
 		}
 		//		白质面积占比（单个）	2	%	White matter area（per） 	2=B/(A+B)	
 		if(bigDecimalB.compareTo(BigDecimal.ZERO) != 0 && BigDecimalA_add_B.compareTo(BigDecimal.ZERO) != 0) {
 			BigDecimal bigDecimalB_A_B = commonJsonParser.getProportion(bigDecimalB, BigDecimalA_add_B);
-			indicatorResultsMap.put("白质面积占比（全片）", new IndicatorAddIn("White matter area", String.valueOf(bigDecimalB_A_B), "%", "0"));
+			indicatorResultsMap.put("白质面积占比（全片）", new IndicatorAddIn("White matter area", String.valueOf(bigDecimalB_A_B), "%", "0",areaUtils.getStructureIds("1390B3","1390B2")));
 		}
 		//		中央管面积占比（单个）	3	%	Central canal area（per）	3=C/A
 		if(bigDecimalC.compareTo(BigDecimal.ZERO) != 0 && bigDecimalA.compareTo(BigDecimal.ZERO) != 0) {
 			BigDecimal bigDecimalC_A = commonJsonParser.getProportion(bigDecimalC, bigDecimalA);
-			indicatorResultsMap.put("中央管面积占比（全片）", new IndicatorAddIn("Central canal area", String.valueOf(bigDecimalC_A), "%", "0"));
+			indicatorResultsMap.put("中央管面积占比（全片）", new IndicatorAddIn("Central canal area", String.valueOf(bigDecimalC_A), "%", "0",areaUtils.getStructureIds("1390B4","1390B3")));
 		}
 		//		室管膜细胞核密度（单个）	4	个/10³平方微米	Ependyma nucleus%(per)	4=D/C	
 		if(mucosaCountD != 0 && bigDecimalC.compareTo(BigDecimal.ZERO) != 0) {
 			BigDecimal bigDecimalD_C = commonJsonParser.bigDecimalDivideCheck(new BigDecimal(mucosaCountD), bigDecimalC); 	
-			indicatorResultsMap.put("室管膜细胞核密度（全片）", new IndicatorAddIn("Ependyma nucleus%", String.valueOf(bigDecimalD_C), SQ_UM_PICE, "0"));
+			indicatorResultsMap.put("室管膜细胞核密度（全片）", new IndicatorAddIn("Ependyma nucleus%", String.valueOf(bigDecimalD_C), SQ_UM_PICE, "0",areaUtils.getStructureIds("1390B4","1390B5")));
 		}
 		//		红细胞面积占比（单个）	5	%	Erythrocyte area%（per）	5=E/(A+B)	
 		if(bigDecimalE.compareTo(BigDecimal.ZERO) != 0 && BigDecimalA_add_B.compareTo(BigDecimal.ZERO) != 0) {
 			BigDecimal bigDecimalE_A_B = commonJsonParser.getProportion(bigDecimalE, BigDecimalA_add_B);
-			indicatorResultsMap.put("红细胞面积占比（全片）", new IndicatorAddIn("Erythrocyte area%", String.valueOf(bigDecimalE_A_B), "%", "0"));
+			indicatorResultsMap.put("红细胞面积占比（全片）", new IndicatorAddIn("Erythrocyte area%", String.valueOf(bigDecimalE_A_B), "%", "0",areaUtils.getStructureIds("139004","1390B3","1390B2")));
 		}
 		//		脊髓面积（单个）	6	平方毫米	Spinal cord area（per）	6=A+B
 
 		if(BigDecimalA_add_B.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("脊髓面积（全片）", new IndicatorAddIn("Sternum area", String.valueOf(BigDecimalA_add_B), SQ_MM, "0"));
+			indicatorResultsMap.put("脊髓面积（全片）", new IndicatorAddIn("Sternum area", String.valueOf(BigDecimalA_add_B), SQ_MM, "0",areaUtils.getStructureIds("1390B3","1390B2")));
 		}
 
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);

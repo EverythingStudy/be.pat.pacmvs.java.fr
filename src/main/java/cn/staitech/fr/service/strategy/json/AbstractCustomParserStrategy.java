@@ -120,9 +120,9 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
      *
      * @return 指标对象
      */
-    protected IndicatorAddIn createDefaultIndicator() {
-        return new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1);
-    }
+//    protected IndicatorAddIn createDefaultIndicator() {
+//        return new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1);
+//    }
 
     protected IndicatorAddIn createDefaultIndicator(String structureId) {
         return createIndicator(CommonConstant.SINGLE_RESULT, "", structureId);

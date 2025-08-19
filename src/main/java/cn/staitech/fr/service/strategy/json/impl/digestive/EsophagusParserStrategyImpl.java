@@ -63,7 +63,7 @@ public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("食管结构指标面积计算开始：");
-        //组织轮廓面积
+        //f 组织轮廓面积 10F111
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         BigDecimal bigDecimal = new BigDecimal(0);
         if(ObjectUtil.isNotEmpty(singleSlide)&& StringUtils.isNotEmpty(singleSlide.getArea())){
@@ -82,30 +82,34 @@ public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal organArea2 = commonJsonParser.getOrganAreaMicron(jsonTask, "10F13B");
         //e肌层面积
         BigDecimal organArea3 = commonJsonParser.getOrganArea(jsonTask, "10F00C").getStructureAreaNum();
-
-        indicatorResultsMap.put("食管腔面积", new IndicatorAddIn("Esophageal cavity area", area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("角质层面积", new IndicatorAddIn("Area of stratum corneum", organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("颗粒层+棘层+基底层面积", new IndicatorAddIn("Granular layer+spinous layer+basal layer", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("黏膜固有层+黏膜肌层+黏膜下层面积", new IndicatorAddIn("Mucosal lamina propria+mucosal muscle layer+submucosal submucosal area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("肌层面积", new IndicatorAddIn("Muscle layer area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("Organizational contour area", bigDecimal.setScale(3,RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("食管腔面积", new IndicatorAddIn("Esophageal cavity area", area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,"10F12E"));
+        indicatorResultsMap.put("角质层面积", new IndicatorAddIn("Area of stratum corneum", organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1,"10F12F"));
+        indicatorResultsMap.put("颗粒层+棘层+基底层面积", new IndicatorAddIn("Granular layer+spinous layer+basal layer", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1,"10F00C"));
+        indicatorResultsMap.put("黏膜固有层+黏膜肌层+黏膜下层面积", new IndicatorAddIn("Mucosal lamina propria+mucosal muscle layer+submucosal submucosal area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1,"10F120"));
+        indicatorResultsMap.put("肌层面积", new IndicatorAddIn("Muscle layer area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,"10F13B"));
+        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("Organizational contour area", bigDecimal.setScale(3,RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,"10F111"));
         //f-a
         BigDecimal subtract = bigDecimal.subtract(area);
         if(subtract.signum() == 0){
-            indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum Corneum area%", "0", "%"));
-            indicatorResultsMap.put("颗粒层+棘层+基底层面积占比", new IndicatorAddIn("Nucleated cell layer area%", "0", "%"));
-            indicatorResultsMap.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", new IndicatorAddIn("Subepithelium area %", "0", "%"));
-            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscularis area%", "0", "%"));
+        	//B/(F-A)
+            indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum Corneum area%", "0", "%",areaUtils.getStructureIds("10F12E","10F111","10F120")));
+            //C/(F-A)
+            indicatorResultsMap.put("颗粒层+棘层+基底层面积占比", new IndicatorAddIn("Nucleated cell layer area%", "0", "%",areaUtils.getStructureIds("10F12F","10F111","10F120")));
+            //D/(F-A)
+            indicatorResultsMap.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", new IndicatorAddIn("Subepithelium area %", "0", "%",areaUtils.getStructureIds("10F13B","10F111","10F120")));
+            //E/(F-A)
+            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscularis area%", "0", "%",areaUtils.getStructureIds("10F00C","10F111","10F120")));
 
         }else{
             BigDecimal multiply = subtract.multiply(new BigDecimal("1000"));
-            indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum Corneum area%", organArea.divide(multiply,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
-            indicatorResultsMap.put("颗粒层+棘层+基底层面积占比", new IndicatorAddIn("Nucleated cell layer area%", organArea1.divide(multiply,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
-            indicatorResultsMap.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", new IndicatorAddIn("Subepithelium area %", organArea2.divide(multiply,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
-            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscularis area%", organArea3.divide(subtract,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum Corneum area%", organArea.divide(multiply,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("10F12E","10F111","10F120")));
+            indicatorResultsMap.put("颗粒层+棘层+基底层面积占比", new IndicatorAddIn("Nucleated cell layer area%", organArea1.divide(multiply,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("10F12F","10F111","10F120")));
+            indicatorResultsMap.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", new IndicatorAddIn("Subepithelium area %", organArea2.divide(multiply,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("10F13B","10F111","10F120")));
+            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscularis area%", organArea3.divide(subtract,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("10F00C","10F111","10F120")));
 
         }
-        indicatorResultsMap.put("食管面积", new IndicatorAddIn("Tissue contour area", bigDecimal.subtract(area).setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM));
+        //F-A
+        indicatorResultsMap.put("食管面积", new IndicatorAddIn("Tissue contour area", bigDecimal.subtract(area).setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM,areaUtils.getStructureIds("10F111","10F120")));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
         //aiForecastService.addOutIndicators(jsonTask.getSingleId(), indicatorResultsMap);

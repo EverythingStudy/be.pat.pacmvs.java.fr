@@ -11,7 +11,10 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -40,6 +43,9 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
     private AiForecastService aiForecastService;
 
+    @Autowired
+    private AreaUtils areaUtils;
+    
     @Resource
     private CommonJsonParser commonJsonParser;
     @Resource
@@ -66,17 +72,22 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "10E035").getStructureAreaNum();
         //b
         BigDecimal organArea1 = commonJsonParser.getOrganArea(jsonTask, "10E133").getStructureAreaNum();
-        //c
+        //c 10E111
         BigDecimal bigDecimal = new BigDecimal(singleSlide.getArea());
-        indicatorResultsMap.put("喉面积", new IndicatorAddIn("Larynx area", new BigDecimal(singleSlide.getArea()).setScale(3,RoundingMode.HALF_UP).toString(), "平方毫米"));
-        indicatorResultsMap.put("黏膜上皮面积", new IndicatorAddIn("Muscular layer", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("腺体面积", new IndicatorAddIn("Glandular area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        //c 10E111
+        indicatorResultsMap.put("喉面积", new IndicatorAddIn("Larynx area", new BigDecimal(singleSlide.getArea()).setScale(3,RoundingMode.HALF_UP).toString(), "平方毫米","10E111"));
+        //a 10E035
+        indicatorResultsMap.put("黏膜上皮面积", new IndicatorAddIn("Muscular layer", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1,"10E035"));
+        //b
+        indicatorResultsMap.put("腺体面积", new IndicatorAddIn("Glandular area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1,"10E133"));
         if(bigDecimal.signum() == 0){
-            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", "0", "%"));
-            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", "0", "%"));
+        	//A/C
+            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", "0", "%",areaUtils.getStructureIds("10E035","10E111")));
+            //B/C
+            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", "0", "%",areaUtils.getStructureIds("10E133","10E111")));
         }else{
-            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", organArea.divide(bigDecimal,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
-            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", organArea1.divide(bigDecimal,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%"));
+            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", organArea.divide(bigDecimal,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("10E035","10E111")));
+            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", organArea1.divide(bigDecimal,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("10E133","10E111")));
 
         }
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);

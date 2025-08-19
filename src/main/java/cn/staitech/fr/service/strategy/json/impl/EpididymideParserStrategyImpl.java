@@ -125,15 +125,38 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12F0F7",annotationBy2,1);
 
         // 算法输出指标
-        resultsMap.put("输出小管/附睾管黏膜上皮面积（单个）", createDefaultIndicator());// A输出小管/附睾管黏膜上皮面积（单个）
-        resultsMap.put("输出小管/附睾管黏膜上皮面积（全片）", createIndicator(organAreaB, SQ_MM));
-        resultsMap.put("输出小管/附睾管黏膜上皮周长（单个）", createDefaultIndicator());
-        resultsMap.put("输出小管/附睾管管腔面积（全片）", createIndicator(organAreaE, SQ_MM));
-        resultsMap.put("精子面积（全片）", createIndicator(organAreaG, SQ_MM));
-        resultsMap.put("血管面积", createIndicator(organAreaI.setScale(3, RoundingMode.HALF_UP), SQ_MM));
-        resultsMap.put("黏膜上皮细胞核数量（单个）",createDefaultIndicator());
-        resultsMap.put("输出小管/附睾管管腔面积（单个）", createDefaultIndicator());// D输出小管/附睾管管腔面积（单个）
-        resultsMap.put("精子面积（单个）", createDefaultIndicator());// F精子面积（单个）
+        /**
+	        A	输出小管/附睾管黏膜上皮外轮廓面积（单个）	12F0F5
+			B	输出小管/附睾管黏膜上皮外轮廓面积（全片）	12F0F5
+			C	输出小管/附睾管黏膜上皮周长（单个）	12F0F5
+			D	输出小管/附睾管管腔面积（单个）	12F0F5、12F0F4
+			E	输出小管/附睾管管腔面积（全片）	12F0F5、12F0F4
+			F	精子面积（单个）	12F0F5、12F0F7
+			G	精子面积（全片）	12F0F5、12F0F7
+			H	黏膜上皮细胞核数量（单个）	12F0F5、12F0F6
+			I	血管面积	12F003
+			J	组织轮廓面积	12F111
+			K	输出小管/附睾管黏膜上皮面积（单个）	12F0F5
+			
+			附睾面积	1=J
+			输出小管和附睾管面积占比（全片）	2=B/J
+			间质面积占比	3=1-B/J
+			黏膜上皮面积占比（单个）	4=1-D/A
+			精子面积占比（单个）	5=F/D
+			精子面积占比（全片）	6=G/E
+			黏膜上皮细胞核密度（单个）	7=H/C
+			血管面积占比	8=I/J
+			黏膜上皮厚度（单个）	9=\sqrt{\smash[b]{A/\pi}}-\sqrt{\smash[b]{D/\pi}}
+         */
+        resultsMap.put("输出小管/附睾管黏膜上皮面积（单个）", createDefaultIndicator("12F0F5"));// A输出小管/附睾管黏膜上皮面积（单个）
+        resultsMap.put("输出小管/附睾管黏膜上皮面积（全片）", createIndicator(organAreaB, SQ_MM,"12F0F5"));
+        resultsMap.put("输出小管/附睾管黏膜上皮周长（单个）", createDefaultIndicator("12F0F5"));
+        resultsMap.put("输出小管/附睾管管腔面积（全片）", createIndicator(organAreaE, SQ_MM,areaUtils.getStructureIds("12F0F5","12F0F4")));
+        resultsMap.put("精子面积（全片）", createIndicator(organAreaG, SQ_MM,areaUtils.getStructureIds("12F0F5","12F0F7")));
+        resultsMap.put("血管面积", createIndicator(organAreaI.setScale(3, RoundingMode.HALF_UP), SQ_MM,"12F003"));
+        resultsMap.put("黏膜上皮细胞核数量（单个）",createDefaultIndicator(areaUtils.getStructureIds("12F0F5","12F0F6")));
+        resultsMap.put("输出小管/附睾管管腔面积（单个）", createDefaultIndicator(areaUtils.getStructureIds("12F0F5","12F0F4")));// D输出小管/附睾管管腔面积（单个）
+        resultsMap.put("精子面积（单个）", createDefaultIndicator(areaUtils.getStructureIds("12F0F5","12F0F7")));// F精子面积（单个）
 
         // 产品呈现指标
         BigDecimal one = new BigDecimal("1");
@@ -208,17 +231,41 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
             }
         }
         String mucosalThickness = MathUtils.getConfidenceInterval(list4);
+        /**
+	        A	输出小管/附睾管黏膜上皮外轮廓面积（单个）	12F0F5
+			B	输出小管/附睾管黏膜上皮外轮廓面积（全片）	12F0F5
+			C	输出小管/附睾管黏膜上皮周长（单个）	12F0F5
+			D	输出小管/附睾管管腔面积（单个）	12F0F5、12F0F4
+			E	输出小管/附睾管管腔面积（全片）	12F0F5、12F0F4
+			F	精子面积（单个）	12F0F5、12F0F7
+			G	精子面积（全片）	12F0F5、12F0F7
+			H	黏膜上皮细胞核数量（单个）	12F0F5、12F0F6
+			I	血管面积	12F003
+			J	组织轮廓面积	12F111
+			K	输出小管/附睾管黏膜上皮面积（单个）	12F0F5
+			
+			附睾面积	1=J
+			输出小管和附睾管面积占比（全片）	2=B/J
+			间质面积占比	3=1-B/J
+			黏膜上皮面积占比（单个）	4=1-D/A
+			精子面积占比（单个）	5=F/D
+			精子面积占比（全片）	6=G/E
+			黏膜上皮细胞核密度（单个）	7=H/C
+			血管面积占比	8=I/J
+			黏膜上皮厚度（单个）	9=\sqrt{\smash[b]{A/\pi}}-\sqrt{\smash[b]{D/\pi}}
+         */
+        resultsMap.put("输出小管和附睾管面积占比（全片）", createNameIndicator("Efferent ducts and epididymal ducts area%（all）",erythrocyteArea, PERCENTAGE,areaUtils.getStructureIds("12F0F5","12F111")));
+        resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area%", mucosalArea, PERCENTAGE,areaUtils.getStructureIds("12F0F5","12F0F4","12F003")));
+        resultsMap.put("黏膜上皮面积占比（单个）", createNameIndicator("Mucosal epithelium area% (per)", mucosalAreaPer, PERCENTAGE ,areaUtils.getStructureIds("12F003","12F0F5","12F0F5")));
+        resultsMap.put("精子面积占比（单个）", createNameIndicator("Sperm area% (per)", spermAreaPer, PERCENTAGE,areaUtils.getStructureIds("12F0F5","12F0F7","12F0F4")));
+        resultsMap.put("精子面积占比（全片）", createNameIndicator("Sperm area% (all)", spermArea, PERCENTAGE,areaUtils.getStructureIds("12F0F5","12F0F7","12F0F4")));
+        resultsMap.put("黏膜上皮细胞核密度（单个）", createNameIndicator("Mucosal epithelial nucleus% (per)", mucosalCellDensity, MM_PIECE,areaUtils.getStructureIds("12F003","12F0F5","12F0F4","12F0F5")));
+        resultsMap.put("附睾面积", createNameIndicator("Epididymal area", new BigDecimal(slideArea).setScale(3, RoundingMode.HALF_UP), SQ_MM,"12F111"));
+        resultsMap.put("黏膜上皮厚度（单个）", createNameIndicator("Average thickness of mucosal epithelium (per)", mucosalThickness, UM,areaUtils.getStructureIds("12F0F5","12F0F4")));
+        
+//        resultsMap.put("血管相对面积", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE,areaUtils.getStructureIds("12F0F5","12F0F4")));
+        resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE,areaUtils.getStructureIds("12F003","12F111")));
 
-        resultsMap.put("输出小管和附睾管面积占比（全片）", createNameIndicator("Efferent ducts and epididymal ducts area%（all）",erythrocyteArea, PERCENTAGE));
-        resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area%", mucosalArea, PERCENTAGE));
-        resultsMap.put("黏膜上皮面积占比（单个）", createNameIndicator("Mucosal epithelium area% (per)", mucosalAreaPer, PERCENTAGE ));
-        resultsMap.put("精子面积占比（单个）", createNameIndicator("Sperm area% (per)", spermAreaPer, PERCENTAGE));
-        resultsMap.put("精子面积占比（全片）", createNameIndicator("Sperm area% (all)", spermArea, PERCENTAGE));
-        resultsMap.put("黏膜上皮细胞核密度（单个）", createNameIndicator("Mucosal epithelial nucleus% (per)", mucosalCellDensity, MM_PIECE));
-        resultsMap.put("血管相对面积", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE));
-        resultsMap.put("黏膜上皮厚度（单个）", createNameIndicator("Average thickness of mucosal epithelium (per)", mucosalThickness, UM));
-
-        resultsMap.put("附睾面积", createNameIndicator("Epididymal area", new BigDecimal(slideArea).setScale(3, RoundingMode.HALF_UP), SQ_MM));
 
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(),  resultsMap);
