@@ -24,15 +24,13 @@ public class AiInfoListVO {
     @Excel(name = "单位")
     private String unit;
 
+    @ApiModelProperty(hidden = true)
     private Integer categoryId;
-
-    @ApiModelProperty(value = "对照组数值分布区间")
-    @Excel(name = "对照组数值分布区间")
-    private String forecastRange;
 
     @ApiModelProperty(name = "normalDistribution", value = "正态分布95%")
     private String normalDistribution;
 
+    @ApiModelProperty(hidden = true)
     private String structureIds;
 
     /**

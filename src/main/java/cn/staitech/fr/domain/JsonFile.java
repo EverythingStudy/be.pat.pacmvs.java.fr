@@ -27,7 +27,7 @@ public class JsonFile extends Model<JsonFile> {
     //任务ID
     private Long taskId;
     @ApiModelProperty(value = "结构编码")
-    private String structureCode;
+    private String structureId;
     @ApiModelProperty(value = "结构标识")
     private String structureName;
     //文件路径

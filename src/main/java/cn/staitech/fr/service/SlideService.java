@@ -65,7 +65,7 @@ public interface SlideService extends IService<Slide> {
 
     List<OrganTagVO> organList(Long projectId);
 
-    List<AiInfoListResp> getAiInfoList(AiInfoListRequest request);
+    AiInfoAnalyzeVo getAiInfoList(AiInfoListRequest request);
 
     Boolean getAiInfoListCheck(Long projectId, Long singleSlideId);
 

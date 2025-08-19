@@ -10,10 +10,10 @@ public class AiInfoListRequest {
     private Long slideId;
     @ApiModelProperty(value = "项目ID")
     private Long projectId;
-    @ApiModelProperty(value = "", hidden = true)
+    @ApiModelProperty(hidden = true)
     private Long singleId;
-    @ApiModelProperty(value = "", hidden = true)
+    @ApiModelProperty(hidden = true)
     private String controlGroup;
-    @ApiModelProperty(value = "", hidden = true)
+    @ApiModelProperty(hidden = true)
     private Long singleSlideId;
 }
