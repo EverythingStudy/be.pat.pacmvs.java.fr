@@ -22,6 +22,7 @@ import cn.staitech.fr.vo.project.ProjectPageReq;
 import cn.staitech.fr.vo.project.ProjectStatusVo;
 import cn.staitech.fr.vo.project.ProjectVo;
 import cn.staitech.fr.vo.project.slide.ChangeControlGroupReq;
+import cn.staitech.fr.vo.project.slide.GetControlGroupReq;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -459,4 +460,9 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         return baseMapper.updateById(project) > 0;
     }
 
+    @Override
+    public String getControlGroup(GetControlGroupReq req) {
+        Project project = getById(req.getProjectId());
+        return project.getControlGroup() == null ? "" : project.getControlGroup();
+    }
 }

@@ -23,6 +23,7 @@ import cn.staitech.fr.vo.project.ProjectPageReq;
 import cn.staitech.fr.vo.project.ProjectStatusVo;
 import cn.staitech.fr.vo.project.ProjectVo;
 import cn.staitech.fr.vo.project.slide.ChangeControlGroupReq;
+import cn.staitech.fr.vo.project.slide.GetControlGroupReq;
 import cn.staitech.system.api.RemoteUserService;
 import cn.staitech.system.api.domain.SysUser;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -226,6 +227,12 @@ public class ProjectController extends BaseController {
     @PostMapping("/changeControlGroup")
     public R<Boolean> changeControlGroup(@RequestBody @Validated ChangeControlGroupReq req) {
         return R.ok(this.projectService.changeControlGroup(req));
+    }
+
+    @ApiOperation(value = "查询已选对照组")
+    @PostMapping("/getControlGroup")
+    public R<String> getControlGroup(@RequestBody @Validated GetControlGroupReq req) {
+        return R.ok(this.projectService.getControlGroup(req));
     }
 
 }

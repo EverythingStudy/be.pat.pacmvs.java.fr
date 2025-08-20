@@ -6,6 +6,7 @@ import cn.staitech.fr.vo.project.ProjectPageReq;
 import cn.staitech.fr.vo.project.ProjectStatusVo;
 import cn.staitech.fr.vo.project.ProjectVo;
 import cn.staitech.fr.vo.project.slide.ChangeControlGroupReq;
+import cn.staitech.fr.vo.project.slide.GetControlGroupReq;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import cn.staitech.common.core.domain.R;
@@ -40,4 +41,5 @@ public interface ProjectService extends IService<Project> {
 
     Boolean changeControlGroup(ChangeControlGroupReq req);
 
+    String getControlGroup(GetControlGroupReq req);
 }
