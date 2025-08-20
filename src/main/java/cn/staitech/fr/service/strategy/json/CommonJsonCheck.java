@@ -45,6 +45,8 @@ public class CommonJsonCheck {
     private ImageMapper imageMapper;
     @Resource
     private OrganMapper organMapper;
+    @Resource
+    private OrganTagMapper organTagMapper;
 
 
     private static boolean handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
@@ -233,11 +235,11 @@ public class CommonJsonCheck {
      * @return
      */
     private boolean checkCategory(JsonTask jsonTask) {
-        QueryWrapper<Organ> wrapper1 = new QueryWrapper<>();
+        QueryWrapper<OrganTag> wrapper1 = new QueryWrapper<>();
         wrapper1.eq("organization_id", jsonTask.getOrganizationId());
         wrapper1.eq("del_flag", 0);
-        wrapper1.eq("organ_id", jsonTask.getCategoryId());
-        Organ category = organMapper.selectOne(wrapper1);
+        wrapper1.eq("organ_tag_id", jsonTask.getCategoryId());
+        OrganTag category = organTagMapper.selectOne(wrapper1);
         if (ObjectUtil.isEmpty(category)) {
             return true;
         }

@@ -62,7 +62,7 @@ public class JsonTaskParserService {
     @Autowired
     private JsonTaskMapper jsonTaskMapper;
     @Resource
-    private OrganMapper organMapper;
+    private OrganTagMapper organTagMapper;
     @Resource
     private StructureMapper structureMapper;
     @Autowired
@@ -137,13 +137,11 @@ public class JsonTaskParserService {
 
     public void input(String input) {
         String algorithmCode = "";
-        JsonTask jsonTask = new JsonTask();
-        List<JsonFile> jsonFileList = new ArrayList<>();
         try {
             JSONObject jsonObject = JSON.parseObject(input);
             Long singleSlideId = 0L;
             if (jsonObject != null && jsonObject.containsKey("singleId")) {
-                Integer singleId = (Integer) jsonObject.get("singleId");
+                Integer singleId = Integer.valueOf(jsonObject.get("singleId").toString());
                 singleSlideId = singleId.longValue();
             }
 
@@ -161,7 +159,7 @@ public class JsonTaskParserService {
                 updateSingleSlideStatus(singleSlideId, ForecastStatusEnum.FORECAST_FAIL.getCode());
                 return;
             }
-            jsonTask = parseJasonTask(jsonObject);
+            JsonTask jsonTask = parseJasonTask(jsonObject);
             if (jsonTask == null || jsonTask.getCode().equals("500")) {
                 log.info("singleSlide id:[{}],jsonTask :[{}] JSON解析失败!", singleSlideId, jsonTask);
                 updateSingleSlideStatus(singleSlideId, ForecastStatusEnum.FORECAST_FAIL.getCode());
@@ -176,15 +174,16 @@ public class JsonTaskParserService {
                 log.info("singleSlide id:[{}] 更新已执行成功或失败任务 [{}]", singleSlideId, jsonTask);
             } else if (taskOld != null && (JsonTaskStatusEnum.PARSE_ING.getCode().equals(taskOld.getStatus()) || JsonTaskStatusEnum.NO_PARSE.getCode().equals(taskOld.getStatus()))) {
                 log.info("singleSlide id:[{}] jsonTask 任务执行中,新任务不再执行; [{}]", singleSlideId, jsonObject);
-                return;
+                //return;
             } else {
                 jsonTaskService.save(jsonTask);
                 log.info("singleSlide id:[{}] 新增任务 [{}]", singleSlideId, jsonTask);
             }
             //校验脏器下所有结构是否解析完成
+            //AI识别每个脏器对应的结构JSON文件
             Boolean flag = verifyCategoryStructure(jsonTask);
             if (!flag) {
-                // 解析脏器结构文件路径，并存入MySQL
+                //解析脏器结构文件路径，并存入MySQL
                 parseSingleJsonFile(jsonTask, jsonObject);
             }
         } catch (Exception e) {
@@ -195,9 +194,11 @@ public class JsonTaskParserService {
     }
 
     private Boolean verifyCategoryStructure(JsonTask jsonTask) {
-        Organ category = organMapper.selectById(jsonTask.getCategoryId());
+        OrganTag category = organTagMapper.selectById(jsonTask.getCategoryId());
         //AI识别每个脏器对应的结构
-        List<Structure> structureList = structureMapper.selectList(Wrappers.<Structure>lambdaQuery().eq(Structure::getOrganCode, category.getOrganCode()));
+        Structure structure = new Structure();
+        structure.setOrganCode(category.getOrganTagCode());
+        List<Structure> structureList = structureMapper.selectList(structure);
         Set<String> structureIdSet = structureList.stream().map(e -> e.getStructureId()).collect(Collectors.toSet());
         //AI识别每个脏器对应的结构JSON文件
         List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
@@ -209,10 +210,11 @@ public class JsonTaskParserService {
                     //结构识别全部失败-->以脏器为单位 (指标计算)结构分析失败-->forecastStatus结构化状态：2
                     updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_FAIL.getCode());
                 } else {
+                    updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_ING.getCode());
                     //进行指标计算
                     JsonTaskAiHandler(jsonTask, fileList);
                     //部分成功-->以脏器为单位 (指标计算)结构分析完成-->forecastStatus结构化状态：1
-                    //updateSingleSlideStatus(jsonTask.getSingleId(), "1");
+                    updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_SUCCESS.getCode());
                 }
                 return Boolean.TRUE;
             }
@@ -273,10 +275,12 @@ public class JsonTaskParserService {
             for (JsonFile jsonFile : jsonFileList) {
                 log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析开始:{} {} {}", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName());
                 jsonFile.setStartTime(new Date());
+                jsonFile.setStatus(StructureJsonStatusEnum.PARSE_ING.getCode());
                 jsonFileService.updateById(jsonFile);
                 // 解析json文件
                 parser.parseJson(jsonTask, jsonFile);
                 log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析结束:{} {} {} {}", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName());
+                jsonFile.setStatus(StructureJsonStatusEnum.PARSE_SUCCESS.getCode());
                 jsonFile.setEndTime(new Date());
                 jsonFileService.updateById(jsonFile);
             }
@@ -449,13 +453,12 @@ public class JsonTaskParserService {
     private JsonTask parseJasonTask(JSONObject jsonObject) {
         try {
             //查询task是否存在
-            JsonTask jsonTask = new JsonTask();
-            jsonTask = jsonTaskMapper.selectById(jsonObject.containsKey("singleId") ? Long.parseLong(jsonObject.get("singleId").toString()) : 0L);
+            JsonTask jsonTask = jsonTaskMapper.selectOne(new LambdaQueryWrapper<>(JsonTask.class).eq(JsonTask::getSingleId, jsonObject.containsKey("singleId") ? Long.parseLong(jsonObject.get("singleId").toString()) : 0L));
             if (!Objects.isNull(jsonTask)) {
                 return jsonTask;
             }
+            jsonTask = new JsonTask();
             jsonTask.setAlgorithmCode(jsonObject.get("algorithmCode").toString());
-
             Long slideId = jsonObject.containsKey("slideId") ? Long.parseLong(jsonObject.get("slideId").toString()) : 0L;
             jsonTask.setSlideId(slideId);
             jsonTask.setImageId(jsonObject.containsKey("imageId") ? Long.parseLong(jsonObject.get("imageId").toString()) : 0L);
@@ -482,8 +485,7 @@ public class JsonTaskParserService {
             jsonTask.setStatus(JsonTaskStatusEnum.NO_PARSE.getCode());
 
             Slide slide = slideService.getById(slideId);
-            //todo 迁移注释
-            //jsonTask.setSpecialId(slide.getSpecialId());
+            jsonTask.setSpecialId(slide.getProjectId());
             SingleSlide singleSlide = singleSlideService.getById(jsonTask.getSingleId());
             jsonTask.setCategoryId(singleSlide.getCategoryId());
             return jsonTask;
@@ -545,29 +547,28 @@ public class JsonTaskParserService {
         JSONArray jsonArray;
         List<JsonFile> list = new ArrayList<>();
         try {
-            jsonArray = new JSONArray(jsonObject.get("data"));
-            for (int i = 0; i < jsonArray.length(); i++) {
-                org.json.JSONObject jsonSingleObject = jsonArray.getJSONObject(i);
-                JsonFile jsonFile = new JsonFile();
-
-                jsonFile.setStructureName(jsonSingleObject.has("structureCode") ? jsonObject.getString("structureCode") : "");
-                if (jsonSingleObject.has("fileUrl")) {
-                    String fileUrl = jsonObject.getString("fileUrl");
-                    if (fileUrl.toLowerCase().endsWith(".json")) {
-                        jsonFile.setFileUrl(fileUrl);
-                        jsonFile.setAiStatus(StructureAiStatusEnum.SUCCESS.getCode());
-                    } else {
-                        //continue;
-                        jsonFile.setAiStatus(StructureAiStatusEnum.FAIL.getCode());
-                    }
+            // jsonArray = new JSONArray(jsonObject.get("data").toString());
+            //for (int i = 0; i < jsonArray.length(); i++) {
+            // org.json.JSONObject jsonSingleObject = jsonArray.getJSONObject(i);
+            JsonFile jsonFile = new JsonFile();
+            jsonFile.setStructureName(jsonObject.containsKey("structureCode") ? jsonObject.getString("structureCode") : "");
+            if (jsonObject.containsKey("file_url")) {
+                String fileUrl = jsonObject.getString("file_url");
+                if (fileUrl.toLowerCase().endsWith(".json")) {
+                    jsonFile.setFileUrl(fileUrl);
+                    jsonFile.setAiStatus(StructureAiStatusEnum.SUCCESS.getCode());
+                } else {
+                    //continue;
+                    jsonFile.setAiStatus(StructureAiStatusEnum.FAIL.getCode());
                 }
-                jsonFile.setTaskId(task.getTaskId());
-                jsonFile.setStatus(StructureJsonStatusEnum.NO_PARSE.getCode());
-                jsonFile.setCreateTime(new Date());
-                jsonFile.setStartTime(new Date());
-
-                list.add(jsonFile);
             }
+            jsonFile.setTaskId(task.getTaskId());
+            jsonFile.setStatus(StructureJsonStatusEnum.NO_PARSE.getCode());
+            jsonFile.setCreateTime(new Date());
+            jsonFile.setStartTime(new Date());
+
+            list.add(jsonFile);
+            // }
             jsonFileService.saveBatch(list);
             log.info("jsonTask id:[{}] singleSlide id:[{}] json list:[{}]", task.getTaskId(), task.getSingleId(), list);
 
