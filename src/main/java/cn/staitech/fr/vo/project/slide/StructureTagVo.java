@@ -3,6 +3,8 @@ package cn.staitech.fr.vo.project.slide;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.Objects;
+
 @Data
 public class StructureTagVo {
 
@@ -29,4 +31,17 @@ public class StructureTagVo {
 
     @ApiModelProperty(value = "图层顺序")
     private Integer orderNumber;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        StructureTagVo that = (StructureTagVo) o;
+        return Objects.equals(structureTagId, that.structureTagId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(structureTagId);
+    }
 }

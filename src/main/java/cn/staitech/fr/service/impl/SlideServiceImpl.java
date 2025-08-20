@@ -627,7 +627,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			}
 
 			List<AiInfoListVO> aiInfoListVOS = value;
-			Set<String> setStr = new HashSet<>();
+			Set<String> structureIdsSet = new HashSet<>();
+			Set<StructureTagVo> structureTagVosSet = new HashSet<>();
 			for (AiInfoListVO aiInfoListVO : aiInfoListVOS) {
 				String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : "1";
 
@@ -645,23 +646,29 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 				String structureIds = aiInfoListVO.getStructureIds();
 				if(null != structureIds) {
 					Set<String> set = Arrays.stream(structureIds.split(",")).collect(Collectors.toSet());
-					setStr.addAll(set);
+					structureIdsSet.addAll(set);
+				}
+
+				if(CollectionUtils.isNotEmpty(structureIdsSet)) {
+					LambdaQueryWrapper<StructureTag> in = new LambdaQueryWrapper<StructureTag>()
+							.in(StructureTag::getStructureId, structureIdsSet)
+							.eq(StructureTag::getOrganizationId, SecurityUtils.getOrganizationId());
+					List<StructureTag> structureTags = structureTagMapper.selectList(in);
+					if(CollectionUtils.isNotEmpty(structureTags)) {
+						List<Long> structureTagIds = structureTags.stream().map(StructureTag::getStructureTagId).collect(Collectors.toList());
+						aiInfoListVO.setStructureTagIds(structureTagIds);
+
+						for (StructureTag structureTag : structureTags) {
+							StructureTagVo structureTagVo = new StructureTagVo();
+							BeanUtils.copyProperties(structureTag, structureTagVo);
+							structureTagVosSet.add(structureTagVo);
+						}
+					}
 				}
 			}
-			if(CollectionUtils.isNotEmpty(setStr)) {
-				LambdaQueryWrapper<StructureTag> in = new LambdaQueryWrapper<StructureTag>()
-						.in(StructureTag::getStructureId, setStr)
-						.eq(StructureTag::getOrganizationId, SecurityUtils.getOrganizationId());
-				List<StructureTag> structureTags = structureTagMapper.selectList(in);
-				if(CollectionUtils.isNotEmpty(structureTags)) {
-					List<StructureTagVo> structureTagVos = new ArrayList<>();
-					for (StructureTag structureTag : structureTags) {
-						StructureTagVo structureTagVo = new StructureTagVo();
-						BeanUtils.copyProperties(structureTag, structureTagVo);
-						structureTagVos.add(structureTagVo);
-					}
-					resp.setStructTagList(structureTagVos);
-				}
+			if(CollectionUtils.isNotEmpty(structureTagVosSet)) {
+				List<StructureTagVo> structureTagVos = new ArrayList<>(structureTagVosSet);
+				resp.setStructTagList(structureTagVos);
 			}
 			resp.setAiInfoList(value);
 			aiInfoListResps.add(resp);
