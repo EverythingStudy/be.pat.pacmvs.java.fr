@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @Date 2024/4/10 15:50
  * @desc
  */
-@Api(value = "专题阅片-矩阵阅片", tags = "专题阅片-矩阵阅片")
+@Api(value = "专题阅片-矩阵阅片", tags = "V2.6.1")
 @RestController
 @RequestMapping("/matrixReview")
 public class MatrixReviewController {

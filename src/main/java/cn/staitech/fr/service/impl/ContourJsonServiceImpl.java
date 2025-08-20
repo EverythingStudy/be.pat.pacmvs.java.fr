@@ -126,7 +126,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
 
         // 创建保存的目录
 //        String outputDir = OUTPUT_FILTERED_FILE_PATH + File.separator + specialId + File.separator + singleId;
-        String outputDir = OUTPUT_FILTERED_FILE_PATH + File.separator + specialId + File.separator + slideId;
+        String outputDir = OUTPUT_FILTERED_FILE_PATH + File.separator + specialId + File.separator + slideId+ File.separator + jsonTask.getCategoryId();
         try {
             Files.createDirectories(Paths.get(outputDir));
         } catch (IOException e) {

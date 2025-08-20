@@ -27,7 +27,7 @@ public class StructureServiceImpl extends ServiceImpl<StructureMapper, Structure
     }
 
     private Map<String, Integer> selectStructureSize() {
-        List<Structure> list = structureMapper.selectList(new Structure());
+        List<Structure> list = structureMapper.queryList(new Structure());
         return list.stream().collect(HashMap::new, (m, node) -> m.put(node.getOrganizationId().toString() + node.getStructureId(), node.getStructureSize()), HashMap::putAll);
     }
 }

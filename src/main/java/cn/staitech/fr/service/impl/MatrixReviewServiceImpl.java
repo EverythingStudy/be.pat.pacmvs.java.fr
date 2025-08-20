@@ -64,13 +64,13 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         log.info("ai预测报告导出接口开始：");
         List<Long> ids = req.getIds();
         if (CollectionUtils.isEmpty(ids)) {
-            List<Slide> slideList = slideMapper.selectList(new LambdaQueryWrapper<>(Slide.class).eq(Slide::getProjectId, req.getSpecialId()).eq(Slide::getDelFlag, CommonConstant.NUMBER_0));
+            List<Slide> slideList = slideMapper.selectList(new LambdaQueryWrapper<>(Slide.class).eq(Slide::getProjectId, req.getProjectId()).eq(Slide::getDelFlag, CommonConstant.NUMBER_0));
             ids = slideList.stream().map(Slide::getSlideId).collect(Collectors.toList());
         }
         //存放单脏器切片id和脏器id
         Map<Long, Long> categorys = new HashMap<>();
         //判断是不是存在对照组
-        Project special = projectMapper.selectById(req.getSpecialId());
+        Project special = projectMapper.selectById(req.getProjectId());
         LambdaQueryWrapper<Slide> wrapperSlide = new LambdaQueryWrapper<>();
         wrapperSlide.in(Slide::getSlideId, ids);
         List<Slide> slides = slideMapper.selectList(wrapperSlide);

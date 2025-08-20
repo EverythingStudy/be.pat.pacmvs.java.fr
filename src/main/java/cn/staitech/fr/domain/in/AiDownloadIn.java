@@ -14,9 +14,9 @@ import java.util.List;
 @Data
 public class AiDownloadIn {
     @ApiModelProperty(value = "切片id")
-    @Size(max = 10, message = "{MAX.TEN.DATA}")
+    @Size(max = 10, message = "")
     private List<Long> ids;
 
-    @ApiModelProperty(value = "专题id")
-    private Long specialId;
+    @ApiModelProperty(value = "项目Id")
+    private Long projectId;
 }

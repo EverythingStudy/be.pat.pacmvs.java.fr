@@ -25,7 +25,6 @@ public class ParkDataProducer {
     private  RabbitTemplate rabbitTemplate;
 
     public void sendMessage(String message) {
-
         // 设置消息属性，如需持久化可以设置消息类型为AMQP.BasicProperties.Type.PERSISTENT_TEXT_PLAIN
         rabbitTemplate.convertAndSend(ALGO_MSG_QUEUE, message);
         log.info("生产者发送消息成功: " + message);
