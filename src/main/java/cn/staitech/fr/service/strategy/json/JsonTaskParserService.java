@@ -202,7 +202,7 @@ public class JsonTaskParserService {
         //AI识别每个脏器对应的结构JSON文件
         List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
         if (CollectionUtils.isNotEmpty(fileList)) {
-            Set<String> structureIdSet1 = fileList.stream().map(e -> e.getStructureCode()).collect(Collectors.toSet());
+            Set<String> structureIdSet1 = fileList.stream().map(e -> e.getStructureId()).collect(Collectors.toSet());
             if (structureIdSet1.containsAll(structureIdSet)) {
                 List<JsonFile> list = fileList.stream().filter(e -> e.getAiStatus() == 0).collect(Collectors.toList());
                 if (CollectionUtils.isEmpty(list)) {
@@ -244,7 +244,7 @@ public class JsonTaskParserService {
             String fileUrl = jsonFile.getFileUrl();
             File file = new File(fileUrl);
             if (!file.exists()) {
-                log.info("AI预测切片id:{},算法名称标识:{},目录不存在，结构：{},地址{}", jsonTask.getSingleId(), jsonTask.getAlgorithmCode(), jsonFile.getStructureCode(), fileUrl);
+                log.info("AI预测切片id:{},算法名称标识:{},目录不存在，结构：{},地址{}", jsonTask.getSingleId(), jsonTask.getAlgorithmCode(), jsonFile.getStructureId(), fileUrl);
             }
         }
 
