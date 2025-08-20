@@ -558,11 +558,11 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
             return R.fail("处理中，请稍后");
         }
         try {
-            // 修改状态
+         /*   // 修改状态
             Slide update = new Slide();
             update.setSlideId(req.getSlideId());
             update.setAiStatus(3);
-            this.baseMapper.updateById(update);
+            this.baseMapper.updateById(update);*/
             // 查询需要的参数
             List<OrganCheckConfirmBO> confirms = this.baseMapper.selectOrganCheckConfirmBO(req.getSlideId());
             for (OrganCheckConfirmBO bo : confirms) {
