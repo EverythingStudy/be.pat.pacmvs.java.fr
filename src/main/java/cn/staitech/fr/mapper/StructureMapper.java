@@ -12,7 +12,7 @@ import java.util.List;
 * @Entity cn.staitech.fr.domain.Structure
 */
 public interface StructureMapper extends BaseMapper<Structure> {
-    List<Structure> selectList(Structure structure);
+    List<Structure> queryList(Structure structure);
 }
 
 

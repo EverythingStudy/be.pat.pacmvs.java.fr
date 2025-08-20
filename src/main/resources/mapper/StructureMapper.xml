@@ -21,7 +21,7 @@
         name,name_en,structure_size,
         type,organization_id
     </sql>
-    <select id="selectList" parameterType="cn.staitech.fr.domain.Structure"
+    <select id="queryList" parameterType="cn.staitech.fr.domain.Structure"
             resultType="cn.staitech.fr.domain.Structure">
         SELECT organ_code,`name`, `name_en`, species_id, structure_id,organization_id,type,structure_size FROM
         tb_structure
