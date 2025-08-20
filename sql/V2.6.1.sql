@@ -150,3 +150,8 @@ ALTER TABLE `fr_slide`
     ADD COLUMN `group_code` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '组别号',
     ADD COLUMN `gender_flag` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '性别（M:雄；F:雌）',
     ADD COLUMN `wax_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '蜡块编号';
+-- postgresql
+ALTER TABLE "fr_annotation" ADD COLUMN "contour_type" int2 DEFAULT 0;
+COMMENT ON COLUMN "fr_annotation"."contour_type" IS '标注类型：默认 0  1 粗轮廓 2 精细轮廓';
+ALTER TABLE "fr_annotation_del" ADD COLUMN "contour_type" int2 DEFAULT 0;
+COMMENT ON COLUMN "fr_annotation_del"."contour_type" IS '标注类型：默认 0  1 粗轮廓 2 精细轮廓';
