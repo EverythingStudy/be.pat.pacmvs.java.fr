@@ -25,12 +25,26 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/contourJson")
 public class ContourJsonController {
-
+	/**
+	 * 
+	* @Title: list
+	* @Description: 根据专题id(必须)+切片id(必须)+脏器id(非必填)
+	* @param @param slideId
+	* @param @param projectId
+	* @param @param organTagId
+	* @param @return
+	* @return R<JsonFileVo>
+	* @throws
+	 */
 	@GetMapping("/selectList")
     public R<JsonFileVo> list(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "切片ID", required = true) Long slideId,
-    		@RequestParam(value = "projectId") @ApiParam(name = "projectId", value = "项目id", required = true) Long projectId,
+    		@RequestParam(value = "projectId") @ApiParam(name = "projectId", value = "专题id", required = true) Long projectId,
     		@RequestParam(value = "organTagId") @ApiParam(name = "organTagId", value = "脏器id", required = true) Long organTagId) {
-        String filePath = File.separator + "home" + File.separator + "data" + File.separator + "aiJson" + File.separator + projectId + File.separator + slideId+ File.separator + organTagId;
+        String filePath = File.separator + "home" + File.separator + "data" + File.separator + "aiJson" + File.separator + projectId + File.separator + slideId;
+        if(null != organTagId) {
+        	//如果脏器id不为空，json目录需要拼接脏器id
+        	filePath =  filePath + File.separator + organTagId;
+        }
         // 检测filePath目录是否存在，如果存在，则返回该目录下的所有文件名称，如果不存在，则返回null
         JsonFileVo jsonFileVo = getFilesInDirectory(filePath);
         return R.ok(jsonFileVo);
