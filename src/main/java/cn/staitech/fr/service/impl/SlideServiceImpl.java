@@ -629,18 +629,19 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			List<AiInfoListVO> aiInfoListVOS = value;
 			Set<String> setStr = new HashSet<>();
 			for (AiInfoListVO aiInfoListVO : aiInfoListVOS) {
-				if (StringUtils.isNotEmpty(special.getControlGroup())) {
-					List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), request.getControlGroup(), CommonConstant.NUMBER_0);
-					aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
+				String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : "1";
 
-					if(null != aiInfoListVO.getNormalDistribution() && null != aiInfoListVO.getResults()) {
-						String[] s = aiInfoListVO.getNormalDistribution().split("-");
-						boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiInfoListVO.getResults()));
-						if(!inRange) {
-							aiInfoListVO.setRedHighlight(true);
-						}
+				List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup, CommonConstant.NUMBER_0);
+				aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
+
+				if(null != aiInfoListVO.getNormalDistribution() && null != aiInfoListVO.getResults()) {
+					String[] s = aiInfoListVO.getNormalDistribution().split("-");
+					boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiInfoListVO.getResults()));
+					if(!inRange) {
+						aiInfoListVO.setRedHighlight(true);
 					}
 				}
+
 				String structureIds = aiInfoListVO.getStructureIds();
 				if(null != structureIds) {
 					Set<String> set = Arrays.stream(structureIds.split(",")).collect(Collectors.toSet());
@@ -688,17 +689,17 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			Integer key = entry.getKey();
 			List<AiInfoListVO> aiInfoListVOS = entry.getValue();
 			for (AiInfoListVO aiInfoListVO : aiInfoListVOS) {
-				if (StringUtils.isNotEmpty(special.getControlGroup())) {
-					List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), request.getControlGroup(), CommonConstant.NUMBER_0);
-					String firstAndLastOfMiddle95Percent = MathUtils.getFirstAndLastOfMiddle95Percent(dataList);
+				String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : "1";
 
-					if (null != firstAndLastOfMiddle95Percent && null != aiInfoListVO.getResults()) {
-						String[] s = aiInfoListVO.getNormalDistribution().split("-");
-						boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiInfoListVO.getResults()));
-						if (!inRange) {
-							flag = true;
-							break;
-						}
+				List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup, CommonConstant.NUMBER_0);
+				String firstAndLastOfMiddle95Percent = MathUtils.getFirstAndLastOfMiddle95Percent(dataList);
+				aiInfoListVO.setNormalDistribution(firstAndLastOfMiddle95Percent);
+				if (null != firstAndLastOfMiddle95Percent && null != aiInfoListVO.getResults()) {
+					String[] s = aiInfoListVO.getNormalDistribution().split("-");
+					boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiInfoListVO.getResults()));
+					if (!inRange) {
+						flag = true;
+						break;
 					}
 				}
 			}
