@@ -9,6 +9,8 @@ import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Constants;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.out.AiInfoListRequest;
+import cn.staitech.fr.enums.AiStatusEnum;
+import cn.staitech.fr.enums.StructureAiStatusEnum;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.MathUtils;
@@ -75,6 +77,10 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
     private StructureTagMapper structureTagMapper;
     @Autowired
     private SlideMapper slideMapper;
+
+	//默认对照组值
+	private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
+
 
 	@Override
 	public R<CustomPage<SlidePageVo>> page(SlidePageReq req, boolean isPageConfigSlide, boolean isAccessPermission) {
@@ -608,12 +614,14 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 		AiInfoAnalyzeVo aiInfoAnalyzeVo = new AiInfoAnalyzeVo();
 		Slide slide = slideMapper.selectById(request.getSlideId());
 
-		//if(slide != null && slide.getAiStatus()) {}
-		aiInfoAnalyzeVo.setAiStatus(slide.getAiStatus());
+		if(slide != null && slide.getAiStatus() < AiStatusEnum.ORGAN_IDENTIFICATION_COMPLETED.getCode()) {
+			aiInfoAnalyzeVo.setAiStatus(slide.getAiStatus());
+		}
 
 		//判断是不是存在对照组
 		Project special = projectMapper.selectById(request.getProjectId());
 		List<AiInfoListVO> aiInfoList = baseMapper.getAiInfoList(request);
+
 		request.setControlGroup(special.getControlGroup());
 		List<AiInfoListResp> aiInfoListResps = new ArrayList<>();
 		Map<Integer, List<AiInfoListVO>> aiInfoListMap = aiInfoList.stream().collect(Collectors.groupingBy(AiInfoListVO::getCategoryId));
@@ -626,11 +634,18 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 				resp.setOrganName(organTag.getOrganName());
 			}
 
-			List<AiInfoListVO> aiInfoListVOS = value;
+			// 查询脏器信息
+			LambdaQueryWrapper<SingleSlide> singleSlideWrapper = new LambdaQueryWrapper<>();
+			singleSlideWrapper.eq(SingleSlide::getSlideId, slide.getSlideId());
+			singleSlideWrapper.eq(SingleSlide::getCategoryId, key);
+			SingleSlide singleSlide = this.singleSlideMapper.selectOne(singleSlideWrapper);
+			if (Objects.nonNull(singleSlide)) {
+				resp.setAiStatus(this.handleOrganStatus(singleSlide));
+			}
 			Set<String> structureIdsSet = new HashSet<>();
 			Set<StructureTagVo> structureTagVosSet = new HashSet<>();
-			for (AiInfoListVO aiInfoListVO : aiInfoListVOS) {
-				String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : "1";
+			for (AiInfoListVO aiInfoListVO : value) {
+				String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
 
 				List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup, CommonConstant.NUMBER_0);
 				aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
@@ -666,6 +681,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 					}
 				}
 			}
+
 			if(CollectionUtils.isNotEmpty(structureTagVosSet)) {
 				List<StructureTagVo> structureTagVos = new ArrayList<>(structureTagVosSet);
 				resp.setStructTagList(structureTagVos);
