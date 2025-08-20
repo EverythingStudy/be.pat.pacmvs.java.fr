@@ -1,6 +1,8 @@
 package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.R;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.annotations.ApiParam;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +20,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Api(value = "查询数据整体大小", tags = {"V2.6.1"})
 @Slf4j
 @RestController
 @RequestMapping("/contourJson")
@@ -49,7 +51,9 @@ public class ContourJsonController {
     @Data
     @Builder
     static class JsonFileVo{
+        @ApiModelProperty(value = "总大小")
         private Long totalSize;
+        @ApiModelProperty(value = "文件列表")
         private List<String> files;
     }
 
