@@ -87,4 +87,24 @@ public class Constants {
             .put("6", "Complete Review")
             .put("7", "Delivered")
             .build();
+    /**
+     * 0未预测
+     */
+    public static final String FORECAST_STATUS_WAIT = "0";
+    public static final int AI_STATUS_FINE_WAIT = 0;
+    /**
+     * 1预测成功
+     */
+    public static final String FORECAST_STATUS_SUCCESS = "1";
+    public static final int AI_STATUS_FINE_SUCCESS = 1;
+    /**
+     * 2预测失败
+     */
+    public static final String FORECAST_STATUS_FAIL = "2";
+    public static final int AI_STATUS_FINE_FAIL = 2;
+    /**
+     * 3预测中
+     */
+    public static final String FORECAST_STATUS_PROCESS = "3";
+    public static final int AI_STATUS_FINE_PROCESS = 3;
 }
