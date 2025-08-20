@@ -336,11 +336,11 @@ public class CommonJsonParser {
      * @return
      */
     private boolean checkCategory(JsonTask jsonTask) {
-        QueryWrapper<Organ> wrapper1 = new QueryWrapper<>();
+        QueryWrapper<OrganTag> wrapper1 = new QueryWrapper<>();
         wrapper1.eq("organization_id", jsonTask.getOrganizationId());
         wrapper1.eq("del_flag", 0);
-        wrapper1.eq("organ_code", jsonTask.getCategoryId());
-        Organ category = organMapper.selectOne(wrapper1);
+        wrapper1.eq("organ_tag_id", jsonTask.getCategoryId());
+        OrganTag category = organTagMapper.selectOne(wrapper1);
         if (ObjectUtil.isEmpty(category)) {
             return true;
         }

@@ -8,6 +8,7 @@ import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.out.AiInfoListRequest;
 import cn.staitech.fr.domain.out.ExportAiListVO;
 import cn.staitech.fr.mapper.SlideMapper;
+import cn.staitech.fr.service.AccessViewRecordsService;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.fr.service.SlideService;
@@ -18,6 +19,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +44,8 @@ public class SlideController  extends BaseController {
     private SlideService slideService;
     @Resource
     private SlideMapper slideMapper;
+    @Autowired
+    private AccessViewRecordsService accessViewRecordsService;
 
     @ApiOperation(value = "获取动物编号下拉列表")
     @PostMapping("/getAnimalCode")
@@ -156,6 +160,7 @@ public class SlideController  extends BaseController {
     @ApiOperation(value = "阅片记录")
     @GetMapping("/visit")
     public R visit(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "标注id", required = true) Long slideId) {
+        accessViewRecordsService.saveAccessViewRecords(slideId);
         return R.ok(slideService.getSlideInfo(slideId));
     }
 

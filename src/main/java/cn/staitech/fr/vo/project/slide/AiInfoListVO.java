@@ -4,6 +4,8 @@ import cn.staitech.common.core.annotation.Excel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class AiInfoListVO {
 
@@ -32,6 +34,9 @@ public class AiInfoListVO {
 
     @ApiModelProperty(hidden = true)
     private String structureIds;
+
+    @ApiModelProperty(name = "structureTagIds", value = "结构ID列表")
+    private List<Long> structureTagIds;
 
     /**
      * 是否红色底纹高亮整行
