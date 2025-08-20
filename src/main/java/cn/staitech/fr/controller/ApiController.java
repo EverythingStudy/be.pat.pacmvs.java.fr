@@ -20,7 +20,7 @@ import java.util.Map;
  * @description 外部调用api
  * @date 2024/5/10 10:37:32
  */
-@Api(value = "对外api", tags = "对外api")
+@Api(value = "对外api", tags = {"V2.6.1"})
 @Slf4j
 @RestController
 @RequestMapping("/api")
@@ -34,8 +34,8 @@ public class ApiController {
     @ApiOperation(value = "py任务结果")
     @PostMapping("/pyResult")
     public void pyResult(@RequestBody Map params) {
-    	String retData = JSONUtil.toJsonStr(params);
-    	log.info("Ai回调数据: " + retData);
+        String retData = JSONUtil.toJsonStr(params);
+        log.info("Ai回调数据: " + retData);
         parkDataProducer.sendMessage(retData);
         //jsonTaskParserService.input(retData);
     }

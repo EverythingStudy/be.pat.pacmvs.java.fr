@@ -27,8 +27,8 @@ import java.util.stream.Collectors;
 public class ContourJsonController {
 
 	@GetMapping("/selectList")
-    public R<JsonFileVo> list(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "切片ID", required = true) Long slideId,@RequestParam(value = "specialId") @ApiParam(name = "specialId", value = "专题id", required = true) Long specialId) {
-        String filePath = File.separator + "home" + File.separator + "data" + File.separator + "aiJson" + File.separator + specialId + File.separator + slideId;
+    public R<JsonFileVo> list(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "切片ID", required = true) Long slideId,@RequestParam(value = "projectId") @ApiParam(name = "projectId", value = "项目id", required = true) Long projectId) {
+        String filePath = File.separator + "home" + File.separator + "data" + File.separator + "aiJson" + File.separator + projectId + File.separator + slideId;
         // 检测filePath目录是否存在，如果存在，则返回该目录下的所有文件名称，如果不存在，则返回null
         JsonFileVo jsonFileVo = getFilesInDirectory(filePath);
         return R.ok(jsonFileVo);
