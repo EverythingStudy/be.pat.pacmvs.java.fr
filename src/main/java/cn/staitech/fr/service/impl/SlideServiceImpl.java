@@ -65,9 +65,9 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 	private SingleSlideMapper singleSlideMapper;
 	@Resource
     private OrganTagMapper organTagMapper;
-    @Value("${ai.url:http://172.30.10.79:8003/CreateAIwtr/}")
+    @Value("${ai.url:http://192.168.160.112:8003/CreateAIwtr/}")
     private String aiUrl;
-    @Value("${organ.check.confirm.url:http://172.30.10.79:8003/CreateAIwtfc/}")
+    @Value("${organ.check.confirm.url:http://192.168.160.112:8003/CreateAIwtfc/}")
     private String organCheckConfirmUrl;
 	@Value("${ai.timeout:5000}")
 	private Integer timeout;
