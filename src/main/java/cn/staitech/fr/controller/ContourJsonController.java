@@ -60,7 +60,7 @@ public class ContourJsonController {
 	@GetMapping("/getContourJsonSize")
 	public R<ContourFileVo> getContourJsonSize(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "切片ID", required = true) Long slideId,
 			@RequestParam(value = "projectId") @ApiParam(name = "projectId", value = "专题id", required = true) Long projectId,
-			@RequestParam(value = "organTagId") @ApiParam(name = "organTagId", value = "脏器id", required = true) List<Long> organTagIds) {
+			@RequestParam(value = "organTagIds") @ApiParam(name = "organTagIds", value = "脏器id", required = true) List<Long> organTagIds) {
 		return contourJsonService.getContourJsonSize(slideId, projectId, organTagIds);
 	}
 }
