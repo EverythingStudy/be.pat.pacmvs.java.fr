@@ -2,13 +2,16 @@ package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
+import cn.staitech.common.core.utils.SysRoleUtil;
 import cn.staitech.common.core.utils.poi.ExcelUtil;
 import cn.staitech.common.core.web.controller.BaseController;
+import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.out.AiInfoListRequest;
 import cn.staitech.fr.domain.out.ExportAiListVO;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.service.AccessViewRecordsService;
+import cn.staitech.fr.utils.SysRoleUtils;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.fr.service.SlideService;
@@ -154,6 +157,10 @@ public class SlideController  extends BaseController {
     @GetMapping("/slideInfo")
     public R<SlideDetailVo> slideInfo(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "标注id", required = true) Long slideId) {
         SlideDetailVo slideInfo = slideMapper.getSlideInfo(slideId);
+        Long organizationId = SecurityUtils.getOrganizationId();
+        if(null != organizationId) {
+            slideInfo.setOrganizationCode(SysRoleUtils.getOrganization03Code(organizationId));
+        }
         return R.ok(slideInfo);
     }
 
