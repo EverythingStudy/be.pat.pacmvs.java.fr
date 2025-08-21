@@ -44,4 +44,7 @@ public class AccessProjectRecordsVo {
     @ApiModelProperty(hidden = true)
     private Long specialId;
 
+    @JsonIgnore
+    @ApiModelProperty(hidden = true)
+    private Integer trialId;
 }

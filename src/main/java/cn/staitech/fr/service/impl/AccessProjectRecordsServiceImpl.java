@@ -55,8 +55,10 @@ public class AccessProjectRecordsServiceImpl extends ServiceImpl<AccessProjectRe
         for (AccessProjectRecordsVo accessProjectRecordsVo : accessProjectRecordsVos) {
             if(rmap.containsKey(accessProjectRecordsVo.getSpecialId())) {
                 Map<Integer, String> trialType = DictData.TRIAL_TYPE;
-                accessProjectRecordsVo.setTrialType(trialType.get(Integer.parseInt(accessProjectRecordsVo.getTrialType())));
+                accessProjectRecordsVo.setTrialType(trialType.get(accessProjectRecordsVo.getTrialId()));
                 accessProjectRecordsVo.setAccessTime(DateUtil.formatDateTime(rmap.get(accessProjectRecordsVo.getSpecialId())));
+                accessProjectRecordsVo.setAnalysisCount(accessProjectRecordsVo.getAnalysisCount() == null ? "0" : accessProjectRecordsVo.getAnalysisCount());
+                accessProjectRecordsVo.setAnalysisSum(accessProjectRecordsVo.getAnalysisSum() == null ? "0" : accessProjectRecordsVo.getAnalysisSum());
             }
         }
         return R.ok(accessProjectRecordsVos);

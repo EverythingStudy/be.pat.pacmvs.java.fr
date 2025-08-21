@@ -336,8 +336,8 @@
     </select>
     <select id="getAiInfoList" resultType="cn.staitech.fr.vo.project.slide.AiInfoListVO">
         select af.structure_ids,fss.category_id,tg.organ_name,af.quantitative_indicators,af.unit,af.results,af.forecast_range
-        from fr_ai_forecast af
-        left join fr_single_slide fss on af.single_slide_id=fss.single_id
+        from fr_single_slide fss
+        left join fr_ai_forecast af on af.single_slide_id=fss.single_id
         left join fr_slide fs on fs.slide_id=fss.slide_id
         left join tb_image ti on fs.image_id = ti.image_id
         left join fr_special frs on fs.special_id=frs.special_id

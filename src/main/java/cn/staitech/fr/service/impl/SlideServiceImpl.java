@@ -614,6 +614,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
 		if(slide != null && slide.getAiStatus() < AiStatusEnum.ORGAN_IDENTIFICATION_COMPLETED.getCode()) {
 			aiInfoAnalyzeVo.setAiStatus(slide.getAiStatus());
+			return aiInfoAnalyzeVo;
 		}
 
 		//判断是不是存在对照组
