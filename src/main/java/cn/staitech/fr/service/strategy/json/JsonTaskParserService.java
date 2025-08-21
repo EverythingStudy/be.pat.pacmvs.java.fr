@@ -198,6 +198,7 @@ public class JsonTaskParserService {
         //AI识别每个脏器对应的结构
         Structure structure = new Structure();
         structure.setOrganCode(category.getOrganTagCode());
+        structure.setOrganizationId(jsonTask.getOrganizationId());
         List<Structure> structureList = structureMapper.queryList(structure);
         Set<String> structureIdSet = structureList.stream().map(e -> e.getStructureId()).collect(Collectors.toSet());
         //AI识别每个脏器对应的结构JSON文件
