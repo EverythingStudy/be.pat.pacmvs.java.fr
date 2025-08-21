@@ -33,10 +33,16 @@ public class AccessProjectRecordsVo {
     @ApiModelProperty(value = "图片数量")
     private Long imageNumber;
 
-    @ApiModelProperty(value = "Ai分析数量")
-    private String aiAnalysisNumber;
+    @ApiModelProperty(value = "图像数量")
+    private String analysisSum;
+
+    @ApiModelProperty(value = "分析数量")
+    private String analysisCount;
 
     @ApiModelProperty(value = "访问时间")
     private String accessTime;
+
+    @ApiModelProperty(hidden = true)
+    private Long specialId;
 
 }

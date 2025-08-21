@@ -47,38 +47,16 @@ public class AccessProjectRecordsServiceImpl extends ServiceImpl<AccessProjectRe
                 .orderByDesc(AccessProjectRecords::getAccessTime)).stream().limit(5).collect(Collectors.toList());
 
         List<Long> projectIds = accessProjectRecordsList.stream().map(AccessProjectRecords::getProjectId).collect(Collectors.toList());
-
+        Map<Long, Date> rmap = accessProjectRecordsList.stream().collect(Collectors.toMap(AccessProjectRecords::getProjectId, AccessProjectRecords::getAccessTime));
         AccessProjectRecordReq req = new AccessProjectRecordReq();
         req.setProjectIds(projectIds);
         List<AccessProjectRecordsVo> accessProjectRecordsVos = this.getBaseMapper().accessProjectStatistics(req);
+        for (AccessProjectRecordsVo accessProjectRecordsVo : accessProjectRecordsVos) {
+            if(rmap.containsKey(accessProjectRecordsVo.getSpecialId())) {
+                accessProjectRecordsVo.setAccessTime(DateUtil.formatDateTime(rmap.get(accessProjectRecordsVo.getSpecialId())));
+            }
+        }
         return R.ok(accessProjectRecordsVos);
-//        Date endDate = new Date();
-//        Date startDate = DateUtil.offsetMonth(endDate, -1);
-//        List<String> dateStrings = DateUtil.rangeToList(startDate, endDate, DateField.DAY_OF_MONTH).stream().map(DateUtil::formatDate).collect(Collectors.toList());
-//        List<AccessProjectRecords> accessProjectRecordsList = list(Wrappers.<AccessProjectRecords>lambdaQuery().between(AccessProjectRecords::getAccessTime, startDate, endDate)
-//                .eq(AccessProjectRecords::getUserId, SecurityUtils.getUserId()));
-//        Map<String, Integer> accessProjectRecordsMap = new HashMap<>();
-//        if (CollectionUtils.isNotEmpty(accessProjectRecordsList)){
-//            //accessProjectRecordsList将访问时间转换为日期，并按日期分组，计算访问数量
-//            for (AccessProjectRecords accessProjectRecords : accessProjectRecordsList) {
-//                String accessDate = DateUtil.formatDate(accessProjectRecords.getAccessTime());
-//                if (accessProjectRecordsMap.containsKey(accessDate)) {
-//                    accessProjectRecordsMap.put(accessDate, accessProjectRecordsMap.get(accessDate) + 1);
-//                } else {
-//                    accessProjectRecordsMap.put(accessDate, 1);
-//                }
-//            }
-//        }
-//        List<AccessProjectRecordsVo> accessProjectRecordsOuts = new ArrayList<>();
-//        for (String dateString : dateStrings) {
-//            AccessProjectRecordsVo accessProjectRecordsOut = new AccessProjectRecordsVo(0,dateString);
-//            if (accessProjectRecordsMap.containsKey(dateString)) {
-//                accessProjectRecordsOut.setNum(accessProjectRecordsMap.get(dateString));
-//            }
-//            accessProjectRecordsOuts.add(accessProjectRecordsOut);
-//        }
- //       return R.ok(accessProjectRecordsOuts);
- //       return R.ok();
     }
 
     @Override
