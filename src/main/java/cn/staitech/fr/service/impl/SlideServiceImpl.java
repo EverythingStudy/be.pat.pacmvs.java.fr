@@ -468,6 +468,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                 }
             }
         }
+        log.info("脏器识别校对-python服务使用，返回：{}", JSON.toJSONString(vo));
         return vo;
     }
 
