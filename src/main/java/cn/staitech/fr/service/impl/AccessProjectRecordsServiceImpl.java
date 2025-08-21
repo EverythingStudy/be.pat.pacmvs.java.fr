@@ -4,6 +4,7 @@ import cn.hutool.core.date.DateField;
 import cn.hutool.core.date.DateUtil;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
+import cn.staitech.fr.constant.DictData;
 import cn.staitech.fr.domain.AccessProjectRecords;
 import cn.staitech.fr.vo.AccessProjectRecordsVo;
 import cn.staitech.fr.mapper.AccessProjectRecordsMapper;
@@ -53,6 +54,8 @@ public class AccessProjectRecordsServiceImpl extends ServiceImpl<AccessProjectRe
         List<AccessProjectRecordsVo> accessProjectRecordsVos = this.getBaseMapper().accessProjectStatistics(req);
         for (AccessProjectRecordsVo accessProjectRecordsVo : accessProjectRecordsVos) {
             if(rmap.containsKey(accessProjectRecordsVo.getSpecialId())) {
+                Map<Integer, String> trialType = DictData.TRIAL_TYPE;
+                accessProjectRecordsVo.setTrialType(trialType.get(Integer.parseInt(accessProjectRecordsVo.getTrialType())));
                 accessProjectRecordsVo.setAccessTime(DateUtil.formatDateTime(rmap.get(accessProjectRecordsVo.getSpecialId())));
             }
         }

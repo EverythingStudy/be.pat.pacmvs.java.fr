@@ -1,5 +1,6 @@
 package cn.staitech.fr.vo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,9 +31,6 @@ public class AccessProjectRecordsVo {
     @ApiModelProperty(value = "试验类型")
     private String trialType;
 
-    @ApiModelProperty(value = "图片数量")
-    private Long imageNumber;
-
     @ApiModelProperty(value = "图像数量")
     private String analysisSum;
 
@@ -42,6 +40,7 @@ public class AccessProjectRecordsVo {
     @ApiModelProperty(value = "访问时间")
     private String accessTime;
 
+    @JsonIgnore
     @ApiModelProperty(hidden = true)
     private Long specialId;
 
