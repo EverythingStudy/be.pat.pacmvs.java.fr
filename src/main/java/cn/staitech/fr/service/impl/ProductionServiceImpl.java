@@ -67,18 +67,21 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                     list.add(vo);
                 }
             } else {
+                Set<String> waxCodes = new HashSet<>();
                 // 查询模板表
                 LambdaQueryWrapper<SpeciesWaxCodeTemplate> wrapper = new LambdaQueryWrapper<>();
                 wrapper.eq(SpeciesWaxCodeTemplate::getSpeciesId, project.getSpeciesId());
                 List<SpeciesWaxCodeTemplate> templates = speciesWaxCodeTemplateMapper.selectList(wrapper);
                 if (!CollectionUtils.isEmpty(templates)) {
                     for (SpeciesWaxCodeTemplate template : templates) {
+                        waxCodes.add(template.getWaxCode());
                         ProductionVO vo = new ProductionVO();
                         BeanUtils.copyProperties(template, vo);
                         // 查询脏器标签ID
                         LambdaQueryWrapper<OrganTag> organTagWrapper = new LambdaQueryWrapper<>();
                         organTagWrapper.eq(OrganTag::getOrganTagCode, template.getOrganCode());
                         organTagWrapper.eq(OrganTag::getOrganizationId, project.getOrganizationId());
+                        organTagWrapper.eq(OrganTag::getSpeciesId, project.getSpeciesId());
                         organTagWrapper.eq(OrganTag::getDelFlag, false);
                         OrganTag tag = organTagMapper.selectOne(organTagWrapper);
                         if (tag != null) {
@@ -95,10 +98,13 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                 List<String> projectWaxCodes = this.slideMapper.selectWaxCodes(req.getProjectId());
                 if (!CollectionUtils.isEmpty(projectWaxCodes)) {
                     for (String code : projectWaxCodes) {
-                        ProductionVO vo = new ProductionVO();
-                        vo.setSpeciesId(project.getSpeciesId());
-                        vo.setWaxCode(code);
-                        list.add(vo);
+                        // 不在模板内的新增
+                        if (!waxCodes.contains(code)) {
+                            ProductionVO vo = new ProductionVO();
+                            vo.setSpeciesId(project.getSpeciesId());
+                            vo.setWaxCode(code);
+                            list.add(vo);
+                        }
                     }
                 }
             }

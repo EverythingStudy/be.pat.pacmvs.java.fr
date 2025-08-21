@@ -421,11 +421,8 @@
                 #{item}
             </foreach>
         </if>
-        <if test = "params.viewStatus != null and params.viewStatus.size() > 0">
-            AND ${params.currentUserId} IN
-            <foreach collection="params.viewStatus" item="item" separator="," open="(" close=")">
-                #{item}
-            </foreach>
+        <if test = "params.viewStatus != null">
+            AND ${params.currentUserId} = #{params.viewStatus}
         </if>
         <if test = "params.aiStatus != null and params.aiStatus.size() > 0">
             AND (a.ai_status IN

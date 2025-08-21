@@ -1,8 +1,11 @@
 package cn.staitech.fr.service.impl;
 
+import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.constant.Constants;
 import cn.staitech.fr.domain.*;
+import cn.staitech.fr.domain.out.ContourFileVo;
+import cn.staitech.fr.domain.out.JsonFileVo;
 import cn.staitech.fr.domain.out.SingleSlideSelectBy;
 import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.ContourJsonMapper;
@@ -10,7 +13,6 @@ import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.ContourJsonService;
 import cn.staitech.fr.utils.AreaUtils;
-import cn.staitech.fr.utils.FileUtils;
 import cn.staitech.fr.utils.GeometryUtil;
 import cn.staitech.fr.utils.ThreadLocalUtils;
 import cn.staitech.fr.vo.geojson.Features;
@@ -31,7 +33,6 @@ import org.geotools.geojson.geom.GeometryJSON;
 import org.json.JSONException;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.index.strtree.STRtree;
-import org.locationtech.jts.io.ParseException;
 import org.locationtech.jts.io.WKTReader;
 import org.springframework.stereotype.Service;
 
@@ -817,6 +818,77 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             }
         }
         return tiles;
+    }
+
+    // 根据专题id(必须)+切片id(必须)+脏器id(多个脏器)用于获取脏器文件大小使用
+	@Override
+	public R<ContourFileVo> getContourJsonSize(Long slideId,Long projectId,List<Long> organTagIds) {
+		String filePath = File.separator + "home" + File.separator + "data" + File.separator + "aiJson" + File.separator + projectId ;
+        List<String> dataFiles = new ArrayList<>();
+        long totalSize = 0;
+        if(null != slideId) {
+        	//如果切片id不为空，json目录需要拼接切片id
+        	filePath =  filePath + File.separator + slideId;
+        	if(CollectionUtils.isNotEmpty(organTagIds)) {
+        		for(Long tagId:organTagIds) {
+        			//如果脏器id不为空，json目录需要拼接脏器id
+        			String tagPath  =  filePath + File.separator + tagId;
+        			List<String> files = getFilesDirectory(tagPath);
+        			dataFiles.addAll(files);
+        		}
+        		totalSize = (long)dataFiles.size();
+        	}
+        }
+        // 检测filePath目录是否存在，如果存在，则返回该目录下的所有文件名称，如果不存在，则返回null
+        ContourFileVo contourFileVo = ContourFileVo.builder().totalSize(totalSize).build();
+        return R.ok(contourFileVo);
+	}
+	
+	@SuppressWarnings("finally")
+	public static List<String> getFilesDirectory(String directoryPath) {
+        Path directory = Paths.get(directoryPath);
+        List<String> files = new ArrayList<>();
+        //获取文件夹下所有文件
+        try {
+//            files = Files.walk(directory).filter(Files::isRegularFile).map(path -> path.getFileName().toString()).collect(Collectors.toList());
+        	files = Files.walk(directory).filter(Files::isRegularFile).map(path -> path.toString()).collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+        	return files;
+		}
+    }
+
+	//根据专题id(必须)+切片id(必须)+脏器id(非必填)用于单脏器下载使用
+	@Override
+	public R<cn.staitech.fr.domain.out.JsonFileVo> selectList(Long slideId, Long projectId, Long organTagId) {
+		String filePath = File.separator + "home" + File.separator + "data" + File.separator + "aiJson" + File.separator + projectId ;
+        if(null != slideId) {
+        	//如果脏器id不为空，json目录需要拼接脏器id
+        	filePath =  filePath + File.separator + slideId;
+        }
+        if(null != organTagId) {
+        	//如果脏器id不为空，json目录需要拼接脏器id
+        	filePath =  filePath + File.separator + organTagId;
+        }
+        // 检测filePath目录是否存在，如果存在，则返回该目录下的所有文件名称，如果不存在，则返回null
+        JsonFileVo jsonFileVo = getFilesInDirectory(filePath);
+        return R.ok(jsonFileVo);
+	}
+	
+	
+	public static JsonFileVo getFilesInDirectory(String directoryPath) {
+        Path directory = Paths.get(directoryPath);
+        List<String> files = new ArrayList<>();
+        //获取文件夹下所有文件总size
+        long totalSize = 0;
+        try {
+            totalSize = Files.walk(directory).filter(Files::isRegularFile).mapToLong(path -> path.toFile().length()).sum();
+            files = Files.walk(directory).filter(Files::isRegularFile).map(path -> path.getFileName().toString()).collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return JsonFileVo.builder().files(files).totalSize(totalSize).build();
     }
 
 }
