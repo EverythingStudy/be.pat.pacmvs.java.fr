@@ -375,60 +375,55 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
 	@Override
 	public R<String> aiAnalysis(AiAnalysisReq req) {
-		// 加锁
-		String key = "ai_analysis_projectId_" + req.getProjectId();
-		Boolean result = this.redisTemplate.opsForValue().setIfAbsent(key, req.getProjectId());
-		if (Boolean.FALSE.equals(result)) {
-			return R.fail("处理中，请稍后");
-		}
-		try {
-			// 查询项目信息
-			Project project = this.projectMapper.selectById(req.getProjectId());
-			// 校验：制片信息包含的蜡块编号是否覆盖项目内所有切片包含的所有蜡块编号
-			// 查询项目切片蜡块号
-			List<String> projectWaxCodes = this.baseMapper.selectWaxCodes(req.getProjectId());
-			// 不为空才进行校验
-			if (!CollectionUtils.isEmpty(projectWaxCodes)) {
-				boolean match = false;
-				// 查询制片信息蜡块编号
-				LambdaQueryWrapper<Production> wrapper = new LambdaQueryWrapper<>();
-				wrapper.eq(Production::getSpecialId, req.getProjectId());
-				wrapper.eq(Production::getSpeciesId, project.getSpeciesId());
-				List<Production> productions = this.productionMapper.selectList(wrapper);
-				if (!CollectionUtils.isEmpty(productions)) {
-					Set<String> productionWaxCodes = productions.stream().map(Production::getWaxCode).collect(Collectors.toSet());
-					projectWaxCodes.removeAll(productionWaxCodes);
-					if (CollectionUtils.isEmpty(projectWaxCodes)) {
-						match = true;
-					}
-				}
-				if (!match) {
-					return R.fail("制片信息缺失，无法启动AI分析，请在项目配置中检查制片信息。");
-				}
-			}
+        // 加锁
+        String key = "ai_analysis_projectId_" + req.getProjectId();
+        Boolean result = this.redisTemplate.opsForValue().setIfAbsent(key, req.getProjectId());
+        if (Boolean.FALSE.equals(result)) {
+            return R.fail("处理中，请稍后");
+        }
+        try {
+            // 查询项目信息
+            Project project = this.projectMapper.selectById(req.getProjectId());
+            // 校验：制片信息包含的蜡块编号是否覆盖项目内所有切片包含的所有蜡块编号
+            // 查询项目切片蜡块号
+            List<String> projectWaxCodes = this.baseMapper.selectWaxCodes(req.getProjectId());
+            // 不为空才进行校验
+            if (!CollectionUtils.isEmpty(projectWaxCodes)) {
+                boolean match = false;
+                // 查询制片信息蜡块编号
+                LambdaQueryWrapper<Production> wrapper = new LambdaQueryWrapper<>();
+                wrapper.eq(Production::getSpecialId, req.getProjectId());
+                wrapper.eq(Production::getSpeciesId, project.getSpeciesId());
+                List<Production> productions = this.productionMapper.selectList(wrapper);
+                if (!CollectionUtils.isEmpty(productions)) {
+                    Set<String> productionWaxCodes = productions.stream().map(Production::getWaxCode).collect(Collectors.toSet());
+                    projectWaxCodes.removeAll(productionWaxCodes);
+                    if (CollectionUtils.isEmpty(projectWaxCodes)) {
+                        match = true;
+                    }
+                }
+                if (!match) {
+                    return R.fail("制片信息缺失，无法启动AI分析，请在项目配置中检查制片信息。");
+                }
+            }
 
-			// 查询所有未分析的切片
-			List<AiAnalysisBO> list = this.baseMapper.selectAiAnalysis(req.getProjectId());
-			for (AiAnalysisBO bo : list) {
-				try {
-					log.info("脏器识别请求参数：{}", JSON.toJSONString(bo));
-					String aiResult = HttpUtil.post(this.aiUrl, JSON.toJSONString(bo), this.timeout);
-					log.info("脏器识别返回结果：{}", aiResult);
-					// 更新切片状态为：脏器识别中
-					Slide slide = new Slide();
-					slide.setSlideId(bo.getSlideId());
-					slide.setAiStatus(1);
-					this.baseMapper.updateById(slide);
-				} catch (Exception e) {
-					log.info("脏器识别异常", e);
-				}
-			}
-			return R.ok();
-		} finally {
-			// 释放锁
-			this.redisTemplate.delete(key);
-		}
-	}
+            // 查询所有未分析的切片
+            List<AiAnalysisBO> list = this.baseMapper.selectAiAnalysis(req.getProjectId());
+            for (AiAnalysisBO bo : list) {
+                try {
+                    log.info("脏器识别请求参数：{}", JSON.toJSONString(bo));
+                    String aiResult = HttpUtil.post(this.aiUrl, JSON.toJSONString(bo), this.timeout);
+                    log.info("脏器识别返回结果：{}", aiResult);
+                } catch (Exception e) {
+                    log.info("脏器识别异常", e);
+                }
+            }
+            return R.ok();
+        } finally {
+            // 释放锁
+            this.redisTemplate.delete(key);
+        }
+    }
 
 	@Override
 	public OrganCheckVo organCheck(OrganCheckReq req) {
