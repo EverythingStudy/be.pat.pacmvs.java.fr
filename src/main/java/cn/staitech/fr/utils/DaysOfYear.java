@@ -21,8 +21,21 @@ public class DaysOfYear {
                         .collect(Collectors.toList());
     }
 
+    public static List<String> getAllDaysOfCurrentYear(Integer year) {
+        if(year == null) {
+            return getAllDaysOfCurrentYear();
+        }
+        int length = Year.of(year).length();            // 当年天数
+        return IntStream.rangeClosed(1, length)
+                .mapToObj(dayOfYear ->
+                        LocalDate.ofYearDay(year, dayOfYear).toString())
+                .collect(Collectors.toList());
+    }
+
     public static void main(String[] args) {
-        List<String> days = getAllDaysOfCurrentYear();
-        days.forEach(System.out::println);              // 2025-01-01 … 2025-12-31
+        int year = LocalDate.now().getYear();
+        System.out.println(year);
+        //List<String> days = getAllDaysOfCurrentYear();
+        //days.forEach(System.out::println);              // 2025-01-01 … 2025-12-31
     }
 }

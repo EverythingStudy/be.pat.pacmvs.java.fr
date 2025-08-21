@@ -291,9 +291,9 @@
         ) t
     </select>
     <select id="getOrganCode" resultType="cn.staitech.fr.vo.project.slide.SlideOrganTagVo">
-        select tg.organ_tag_id,tg.organ_tag_code,tg.organ_name from fr_single_slide fss
-            left join fr_slide fs on fs.slide_id=fss.slide_id
-            left join tb_organ_tag tg on fss.category_id=tg.organ_tag_id
+        select tg.organ_tag_id,tg.organ_tag_code,tg.organ_name from tb_organ_tag tg
+                left join  fr_single_slide fss on fss.category_id=tg.organ_tag_id
+                left join fr_slide fs on fs.slide_id=fss.slide_id
         where fs.del_flag='0' and fs.special_id=#{projectId}
     </select>
     <select id="selectAiAnalysis" resultType="cn.staitech.fr.vo.project.AiAnalysisBO">
@@ -336,12 +336,12 @@
     </select>
     <select id="getAiInfoList" resultType="cn.staitech.fr.vo.project.slide.AiInfoListVO">
         select af.structure_ids,fss.category_id,tg.organ_name,af.quantitative_indicators,af.unit,af.results,af.forecast_range
-        from fr_slide fs
+        from fr_ai_forecast af
+        left join fr_single_slide fss on af.single_slide_id=fss.single_id
+        left join fr_slide fs on fs.slide_id=fss.slide_id
         left join tb_image ti on fs.image_id = ti.image_id
         left join fr_special frs on fs.special_id=frs.special_id
-        left join fr_single_slide fss on fs.slide_id=fss.slide_id
         left join tb_organ_tag tg on fss.category_id=tg.organ_tag_id
-        left join fr_ai_forecast af on af.single_slide_id=fss.single_id
         where fs.del_flag='0'
         <if test="projectId != null">
             and fs.special_id=#{projectId}
