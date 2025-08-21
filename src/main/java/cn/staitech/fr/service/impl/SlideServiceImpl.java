@@ -80,6 +80,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
 	//默认对照组值
 	private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
+    @Autowired
+    private AiForecastMapper aiForecastMapper;
 
 
 	@Override
@@ -613,6 +615,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 		AiInfoAnalyzeVo aiInfoAnalyzeVo = new AiInfoAnalyzeVo();
 		Slide slide = slideMapper.selectById(request.getSlideId());
 
+		aiInfoAnalyzeVo.setAiStatus(slide.getAiStatus());
 		if(slide != null && slide.getAiStatus() < AiStatusEnum.ORGAN_IDENTIFICATION_COMPLETED.getCode()) {
 			aiInfoAnalyzeVo.setAiStatus(slide.getAiStatus());
 			return aiInfoAnalyzeVo;
@@ -644,21 +647,29 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			}
 			Set<String> structureIdsSet = new HashSet<>();
 			Set<StructureTagVo> structureTagVosSet = new HashSet<>();
-			for (AiInfoListVO aiInfoListVO : value) {
+
+			//AI指标
+			LambdaQueryWrapper<AiForecast> aiForecastLambdaQueryWrapper = new LambdaQueryWrapper<>();
+			aiForecastLambdaQueryWrapper.eq(AiForecast::getSingleSlideId, singleSlide.getSlideId());
+			List<AiForecast> aiForecasts = aiForecastMapper.selectList(aiForecastLambdaQueryWrapper);
+			List<AiInfoListVO> aiInfoListVOArrayList = new ArrayList<>();
+			for (AiForecast aiCast : aiForecasts) {
+				AiInfoListVO aiInfoListVO = new AiInfoListVO();
+				BeanUtils.copyProperties(aiCast, aiInfoListVO);
 				String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
 
-				List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup, CommonConstant.NUMBER_0);
+				List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiCast.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup, CommonConstant.NUMBER_0);
 				aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
 
-				if(null != aiInfoListVO.getNormalDistribution() && null != aiInfoListVO.getResults()) {
+				if(null != aiInfoListVO.getNormalDistribution() && null != aiCast.getResults()) {
 					String[] s = aiInfoListVO.getNormalDistribution().split("-");
-					boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiInfoListVO.getResults()));
+					boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiCast.getResults()));
 					if(!inRange) {
 						aiInfoListVO.setRedHighlight(true);
 					}
 				}
 
-				String structureIds = aiInfoListVO.getStructureIds();
+				String structureIds = aiCast.getStructureIds();
 				if(null != structureIds) {
 					Set<String> set = Arrays.stream(structureIds.split(",")).collect(Collectors.toSet());
 					structureIdsSet.addAll(set);
@@ -680,13 +691,14 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 						}
 					}
 				}
+				aiInfoListVOArrayList.add(aiInfoListVO);
 			}
 
 			if(CollectionUtils.isNotEmpty(structureTagVosSet)) {
 				List<StructureTagVo> structureTagVos = new ArrayList<>(structureTagVosSet);
 				resp.setStructTagList(structureTagVos);
 			}
-			resp.setAiInfoList(value);
+			resp.setAiInfoList(aiInfoListVOArrayList);
 			aiInfoListResps.add(resp);
 		});
 
