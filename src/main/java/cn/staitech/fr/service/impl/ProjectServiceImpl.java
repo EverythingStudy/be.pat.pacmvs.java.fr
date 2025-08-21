@@ -124,7 +124,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
      * @return
      */
     @Override
-    @Transactional(rollbackFor = Exception.class)
+    //@Transactional(rollbackFor = Exception.class)
     public R addProject(ProjectVo req) {
         log.info("添加项目接口开始：");
         long archivedCount = count(Wrappers.<Project>lambdaQuery().eq(Project::getOrganizationId, SecurityUtils.getOrganizationId()).eq(Project::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).and(wrapper -> wrapper.eq(Project::getProjectName, req.getProjectName()).or().eq(Project::getTopicId, req.getTopicId())).eq(Project::getStatus, Constants.STATUS_ARCHIVED));
