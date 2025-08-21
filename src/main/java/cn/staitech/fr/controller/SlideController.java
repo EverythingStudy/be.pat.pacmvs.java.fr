@@ -6,9 +6,11 @@ import cn.staitech.common.core.utils.SysRoleUtil;
 import cn.staitech.common.core.utils.poi.ExcelUtil;
 import cn.staitech.common.core.web.controller.BaseController;
 import cn.staitech.common.security.utils.SecurityUtils;
+import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.out.AiInfoListRequest;
 import cn.staitech.fr.domain.out.ExportAiListVO;
+import cn.staitech.fr.mapper.ProjectMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.service.AccessViewRecordsService;
 import cn.staitech.fr.utils.SysRoleUtils;
@@ -49,6 +51,8 @@ public class SlideController  extends BaseController {
     private SlideMapper slideMapper;
     @Autowired
     private AccessViewRecordsService accessViewRecordsService;
+    @Autowired
+    private ProjectMapper projectMapper;
 
     @ApiOperation(value = "获取动物编号下拉列表")
     @PostMapping("/getAnimalCode")
@@ -157,9 +161,11 @@ public class SlideController  extends BaseController {
     @GetMapping("/slideInfo")
     public R<SlideDetailVo> slideInfo(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "标注id", required = true) Long slideId) {
         SlideDetailVo slideInfo = slideMapper.getSlideInfo(slideId);
-        Long organizationId = SecurityUtils.getOrganizationId();
-        if(null != organizationId) {
-            slideInfo.setOrganizationCode(SysRoleUtils.getOrganization03Code(organizationId));
+        Slide slide = slideMapper.selectById(slideId);
+        Project project = projectMapper.selectById(slide.getProjectId());
+
+        if(null != project.getOrganizationId()) {
+            slideInfo.setOrganizationCode(SysRoleUtils.getOrganization03Code(project.getOrganizationId()));
         }
         return R.ok(slideInfo);
     }

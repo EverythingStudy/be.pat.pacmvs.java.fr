@@ -81,7 +81,7 @@ public class AccessViewRecordsServiceImpl extends ServiceImpl<AccessViewRecordsM
         QueryWrapper<AccessViewRecords> accessViewRecordsWrapper = new QueryWrapper<>();
         accessViewRecordsWrapper.select("DATE(access_time) as mtime", "count(*) as mcount");
         accessViewRecordsWrapper.eq("user_id", SecurityUtils.getUserId());
-        accessViewRecordsWrapper.apply(String.format("YEAR(access_time) = YEAR(%S)", req.getYear() == null ? "NOW()" : req.getYear()));
+        accessViewRecordsWrapper.apply(String.format("YEAR(access_time) = %S", req.getYear() == null ? "YEAR(NOW())" : req.getYear()));
         accessViewRecordsWrapper.groupBy("DATE(access_time)");
 
         List<AccessViewRecords> accessViewRecords = this.list(accessViewRecordsWrapper);
