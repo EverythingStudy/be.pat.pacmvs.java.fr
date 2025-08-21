@@ -71,3 +71,29 @@ INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbr
 UPDATE tb_organ_tag SET algorithm_support_status = 0;
 -- 同步数据到脏器表
 INSERT INTO tb_organ (organ_code, name, name_en, species_id, organization_id) SELECT organ_tag_code, organ_name, organ_en, species_id, organization_id FROM tb_organ_tag;
+
+-- 删除tb_structure_tag_set中不在tb_organ中的记录
+DELETE FROM tb_structure_tag_set
+WHERE (organ_code, species_id, organization_id) NOT IN (
+    SELECT organ_code, species_id, organization_id
+    FROM tb_organ
+)
+AND type = 0;
+-- 更新tb_structure_tag_set中已存在的记录
+UPDATE tb_structure_tag_set a
+JOIN tb_organ b
+ON a.organ_code = b.organ_code
+AND a.species_id = b.species_id
+AND a.organization_id = b.organization_id
+AND a.type = 0
+SET a.structure_tag_set_name = b.name, a.structure_tag_set_name_en = b.name_en;
+-- 插入tb_organ中不存在于tb_structure_tag_set的记录
+INSERT INTO tb_structure_tag_set (structure_tag_set_name, structure_tag_set_name_en, species_id, organ_code, organization_id, create_by,update_by)
+SELECT a.name, a.name_en, a.species_id, a.organ_code, a.organization_id, 1, 1
+FROM tb_organ a
+LEFT JOIN tb_structure_tag_set b
+ON a.organ_code = b.organ_code
+AND a.species_id = b.species_id
+AND a.organization_id = b.organization_id
+AND b.type = 0
+WHERE b.structure_tag_set_id IS NULL;
