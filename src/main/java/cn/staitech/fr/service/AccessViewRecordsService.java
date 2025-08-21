@@ -1,6 +1,8 @@
 package cn.staitech.fr.service;
 
+import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.AccessViewRecords;
+import cn.staitech.fr.vo.project.AccessViewStatisticsReq;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -14,4 +16,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface AccessViewRecordsService extends IService<AccessViewRecords> {
 
     void saveAccessViewRecords(Long slideId);
+
+    R accessViewStatistics(AccessViewStatisticsReq req);
 }

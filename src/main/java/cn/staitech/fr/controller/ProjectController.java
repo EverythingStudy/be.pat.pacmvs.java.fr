@@ -12,16 +12,13 @@ import cn.staitech.fr.constant.DictData;
 import cn.staitech.fr.domain.AccessProjectRecords;
 import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.ProjectLockLog;
+import cn.staitech.fr.service.AccessViewRecordsService;
 import cn.staitech.fr.vo.AccessProjectRecordsVo;
-import cn.staitech.fr.vo.project.ProjectPageVo;
+import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.service.AccessProjectRecordsService;
 import cn.staitech.fr.service.SpecialLockLogService;
 import cn.staitech.fr.service.ProjectService;
 import cn.staitech.fr.utils.LanguageUtils;
-import cn.staitech.fr.vo.project.ProjectEditVo;
-import cn.staitech.fr.vo.project.ProjectPageReq;
-import cn.staitech.fr.vo.project.ProjectStatusVo;
-import cn.staitech.fr.vo.project.ProjectVo;
 import cn.staitech.fr.vo.project.slide.ChangeControlGroupReq;
 import cn.staitech.fr.vo.project.slide.GetControlGroupReq;
 import cn.staitech.system.api.RemoteUserService;
@@ -65,6 +62,9 @@ public class ProjectController extends BaseController {
     @Resource
     private RemoteUserService remoteUserService;
 
+    @Resource
+    private AccessViewRecordsService accessViewRecordsService;
+
     @ApiOperation(value = "获取项目详情，添加项目访问记录",tags = {"V2.6.0"})
     @GetMapping("/info")
     public R<Project> info(@RequestParam("projectId") @ApiParam(name = "projectId", value = "项目id") Long projectId) {
@@ -84,6 +84,12 @@ public class ProjectController extends BaseController {
     @GetMapping("/accessProjectStatistics")
     public R<List<AccessProjectRecordsVo>> accessProjectStatistics()throws Exception{
         return accessProjectRecordsService.accessProjectStatistics();
+    }
+
+    @ApiOperation(value = "首页访问view信息")
+    @PostMapping("/accessViewStatistics")
+    public R accessViewStatistics(@RequestBody AccessViewStatisticsReq req) {
+        return accessViewRecordsService.accessViewStatistics(req);
     }
 
     @ApiOperation(value = "项目列表分页查询", tags = {"V2.6.0"})

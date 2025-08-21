@@ -1,5 +1,6 @@
 package cn.staitech.fr.domain;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -46,5 +47,8 @@ public class AccessViewRecords implements Serializable {
     @ApiModelProperty(value = "访问时间")
     private Date accessTime;
 
-
+    @TableField(exist = false)
+    private Long mcount;
+    @TableField(exist = false)
+    private String mtime;
 }
