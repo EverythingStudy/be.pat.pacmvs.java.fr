@@ -14,6 +14,7 @@ import cn.staitech.fr.domain.out.ContourFileVo;
 import cn.staitech.fr.domain.out.JsonFileVo;
 import cn.staitech.fr.service.ContourJsonService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 @Api(value = "查询数据整体大小", tags = {"V2.6.1"})
@@ -36,6 +37,7 @@ public class ContourJsonController {
 	 * @return R<JsonFileVo>
 	 * @throws
 	 */
+	@ApiOperation(value = "单脏器json下载", notes = "单脏器json下载")
 	@GetMapping("/selectList")
 	public R<JsonFileVo> list(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "切片ID", required = true) Long slideId,
 			@RequestParam(value = "projectId") @ApiParam(name = "projectId", value = "专题id", required = true) Long projectId,
@@ -54,6 +56,7 @@ public class ContourJsonController {
 	 * @return R<ContourFileVo>
 	 * @throws
 	 */
+	@ApiOperation(value = "多脏器获取文件大小", notes = "多脏器获取文件大小")
 	@GetMapping("/getContourJsonSize")
 	public R<ContourFileVo> getContourJsonSize(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "切片ID", required = true) Long slideId,
 			@RequestParam(value = "projectId") @ApiParam(name = "projectId", value = "专题id", required = true) Long projectId,
