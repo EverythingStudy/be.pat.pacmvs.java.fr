@@ -1,0 +1,108 @@
+feign:
+  httpclient:
+    connection-timeout: 30000
+# spring配置
+spring:
+  profiles: local
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+  redis:
+    host: 192.168.52.201
+    port: 6379
+    password: shengtong
+  datasource:
+    dynamic:
+      datasource:
+        # 主库数据源
+        master:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://192.168.52.224:3306/pacmvs?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8
+          username: shengtong
+          password: shengtong
+          type: com.zaxxer.hikari.HikariDataSource
+          hikari:
+            max-pool-size: 20
+            #minimum-idle: 5
+            min-idle: 5
+            idle-timeout: 300000
+            max-lifetime: 1800000
+            connection-timeout: 5000
+            validation-timeout: 5000
+            is_auto-commit: true
+            pool-name: "bizHikariCP"
+            connection-test-query: "SELECT 1"
+            is_register-mbeans: true
+        # 从库数据源
+        slave:
+          url: jdbc:postgresql://192.168.52.224:5500/pacmvs
+          username: postgres
+          password: stdev123
+          driver-class-name: org.postgresql.Driver
+          type: com.zaxxer.hikari.HikariDataSource
+          hikari:
+            max-pool-size: 20
+            min-idle: 5
+            idle-timeout: 300000
+            max-lifetime: 1800000
+            connection-timeout: 5000
+            validation-timeout: 5000
+            is_auto-commit: true
+            pool-name: "bizHikariCP"
+            connection-test-query: "SELECT 1"
+            is_register-mbeans: true
+      # 指定默认数据源名称
+      primary: master
+  rabbitmq:
+    host: 192.168.180.131
+    port: 5672
+    username: guest
+    password: admin
+    virtual-host: /
+    publisher-returns: true
+    publisher-confirm-type: correlated
+    listener:
+      simple:
+        default-requeue-rejected: false
+        acknowledge-mode: manual
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 2000
+      direct:
+        acknowledge-mode: manual
+# mybatis配置
+mybatis:
+  # 搜索指定包别名
+  typeAliasesPackage: cn.staitech.fr
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath:mapper/**/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+# swagger配置
+swagger:
+  title: 标注模块接口文档
+  license: Powered By staitech
+  licenseUrl: http://www.staitech.cn
+
+logging:
+  level:
+    # Spring Boot 2.4+ 使用 ConfigDataEnvironment
+    org.springframework.boot.context.config.ConfigDataEnvironment: DEBUG
+    # 如果还看不到，可以同时打开更底层的 ConfigFileApplicationListener
+    org.springframework.boot.context.config.ConfigFileApplicationListener: TRACE
+    org.springframework.amqp.rabbit.core.RabbitTemplate: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: env,health,info  # 只放必要的
+  endpoint:
+    env:
+      enabled: true
+waxPath: /home/pat_saas/temp/
+queues:
+  algoMsg: test
+  algoMsgRetry: algo.message.retry.queue
