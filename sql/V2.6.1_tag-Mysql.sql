@@ -4,8 +4,8 @@ DELETE FROM tb_organ_tag;
 DELETE FROM tb_organ;
 -- 初始化脏器标签（64条）
 INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'00','Others','其他','AA','rgb(0, 0, 0)','#000000',1,1,1);
-INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'01','Adrenal gland','肾上腺','AG','rgb(255, 0, 0)','#FF0000',1,1,1);
-INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'02','Harderian gland','哈德氏腺','HG','rgb(0, 255, 0)','#00FF00',1,1,1);
+INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'01','Adrenal glands','肾上腺','AG','rgb(255, 0, 0)','#FF0000',1,1,1);
+INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'02','Harderian glands','哈德氏腺','HG','rgb(0, 255, 0)','#00FF00',1,1,1);
 INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'05','Pancreas','胰腺','PA','rgb(0, 0, 255)','#0000FF',1,1,1);
 INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'06','Pituitary','垂体','PI','rgb(255, 255, 0)','#FFFF00',1,1,1);
 INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'07','Thyroid gland','甲状腺','TG','rgb(255, 0, 255)','#FF00FF',1,1,1);
@@ -58,7 +58,7 @@ INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbr
 INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'5D','Aorta','主动脉','AO','rgb(200, 255, 200)','#C8FFC8',1,1,1);
 INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'5E','Heart','心脏','HE','rgb(200, 200, 255)','#C8C8FF',1,1,1);
 INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'5F','Eye','眼睛','EY','rgb(255, 255, 200)','#FFFFC8',1,1,1);
-INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'69','Lacrimal gland','泪腺','LG','rgb(255, 200, 255)','#FFC8FF',1,1,1);
+INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'69','Lacrimal glands','泪腺','LG','rgb(255, 200, 255)','#FFC8FF',1,1,1);
 INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'77','Gross lesions observed at necropsy','大体损伤','GL','rgb(128, 128, 255)','#8080FF',1,1,1);
 INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'78','Injection site','注射局部','IS','rgb(255, 0, 128)','#FF0080',1,1,1);
 INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbreviation, rgb, chromatic_value, organization_id, create_by, update_by) VALUES ( "1",'7A','Skin (close to mammary) with mammary gland','皮肤（乳腺附近）及乳腺','IN_MG','rgb(128, 128, 255)','#C8FFC8',1,1,1);
