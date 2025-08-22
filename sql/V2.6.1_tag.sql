@@ -75,8 +75,8 @@ INSERT INTO tb_organ (organ_code, name, name_en, species_id, organization_id) SE
 DELETE FROM tb_structure where structure_id IN ('15000E','15000F','150010','150011','15001A','150022','150012','150004','150014');
 -- 删除organ_code=50的结构标签数据（50已改为7E）
 DELETE FROM tb_structure_tag where structure_id IN ('15000E','15000F','150010','150011','15001A','150022','150012','150004','150014');
-
-
+-- 删除tb_structure_tag_set的1130（与1068重复）
+DELETE FROM tb_structure_tag_set WHERE structure_tag_set_id = 1130;
 -- 删除tb_structure_tag_set中不在tb_organ中的记录
 DELETE FROM tb_structure_tag_set
 WHERE (organ_code, species_id, organization_id) NOT IN (
