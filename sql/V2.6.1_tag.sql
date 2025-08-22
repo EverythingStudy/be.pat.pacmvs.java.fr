@@ -71,6 +71,11 @@ INSERT INTO tb_organ_tag (species_id, organ_tag_code, organ_en, organ_name, abbr
 UPDATE tb_organ_tag SET algorithm_support_status = 0;
 -- 同步数据到脏器表
 INSERT INTO tb_organ (organ_code, name, name_en, species_id, organization_id) SELECT organ_tag_code, organ_name, organ_en, species_id, organization_id FROM tb_organ_tag;
+-- 删除organ_code=50的结构数据（50已改为7E）
+DELETE FROM tb_structure where structure_id IN ('15000E','15000F','150010','150011','15001A','150022','150012','150004','150014');
+-- 删除organ_code=50的结构标签数据（50已改为7E）
+DELETE FROM tb_structure_tag where structure_id IN ('15000E','15000F','150010','150011','15001A','150022','150012','150004','150014');
+
 
 -- 删除tb_structure_tag_set中不在tb_organ中的记录
 DELETE FROM tb_structure_tag_set
@@ -97,3 +102,12 @@ AND a.species_id = b.species_id
 AND a.organization_id = b.organization_id
 AND b.type = 0
 WHERE b.structure_tag_set_id IS NULL;
+-- 更新结构标签名称
+UPDATE tb_structure_tag a
+JOIN tb_structure_tag_set b
+ON a.structure_tag_set_id = b.structure_tag_set_id AND a.type = 0 AND b.type = 0
+JOIN tb_species c
+ON b.species_id = c.species_id AND b.organization_id = c.organization_id
+JOIN tb_structure d
+ON a.structure_id = d.structure_id AND a.organization_id = d.organization_id AND b.organ_code = d.organ_code AND b.species_id = d.species_id
+SET a.structure_tag_name = CONCAT(c.name, b.structure_tag_set_name, d.name)
