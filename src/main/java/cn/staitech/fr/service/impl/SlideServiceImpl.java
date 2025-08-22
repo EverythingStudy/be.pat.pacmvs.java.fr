@@ -634,6 +634,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			AiInfoListResp resp = new AiInfoListResp();
 			OrganTag organTag = organTagMapper.selectById(key);
 			if(null != organTag) {
+				resp.setOrganTagId(organTag.getOrganTagId());
 				resp.setOrganName(organTag.getOrganName());
 			}
 
