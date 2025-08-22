@@ -1,6 +1,7 @@
 package cn.staitech.fr.vo.project.slide;
 
 import cn.staitech.common.core.annotation.Excel;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -9,10 +10,6 @@ import java.util.List;
 @Data
 public class AiInfoListVO {
 
-
-    @ApiModelProperty(value = "脏器名称")
-    @Excel(name = "脏器名称")
-    private String organName;
 
     @ApiModelProperty(value = "量化指标")
     @Excel(name = "量化指标")
@@ -26,6 +23,7 @@ public class AiInfoListVO {
     @Excel(name = "单位")
     private String unit;
 
+    @JsonIgnore
     @ApiModelProperty(hidden = true)
     private Integer categoryId;
 
@@ -33,6 +31,7 @@ public class AiInfoListVO {
     private String normalDistribution;
 
     @ApiModelProperty(hidden = true)
+    @JsonIgnore
     private String structureIds;
 
     @ApiModelProperty(name = "structureTagIds", value = "结构ID列表")
