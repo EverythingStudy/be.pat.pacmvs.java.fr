@@ -183,3 +183,4 @@ update sys_menu set icon='/menuIcons/config_create_slice.svg' where menu_id='709
 update sys_menu set icon='/menuIcons/project_recovery.svg' where menu_id='670';
 update sys_menu set icon='/menuIcons/archived_project.svg' where menu_id='698';
 update sys_menu set icon='/menuIcons/read_slice_list.svg' where menu_id='699';
+update sys_menu set icon='/menuIcons/read_slice_list.svg' where menu_id='681';
