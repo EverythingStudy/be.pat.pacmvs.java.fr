@@ -55,6 +55,8 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
 
     @Resource
     private ProjectMapper specialMapper;
+    @Resource
+    private OrganTagMapper organTagMapper;
 
     @Override
     public Boolean forecastResults(Long singleSlideId, Long imageId) {
@@ -70,14 +72,15 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             Annotation annotation = new Annotation();
             annotation.setSingleSlideId(singleSlideId);
             annotation.setFiligreeContour(true);
-            Category category = categoryMapper.selectById(singleSlideBy.getCategoryId());
-            if (category != null && Objects.equals(category.getOrganId(), "08") && category.getSpecies() == 1) {
+
+            OrganTag category = organTagMapper.selectById(singleSlideBy.getCategoryId());
+            if (category != null && Objects.equals(category.getOrganTagCode(), "08") && category.getSpeciesId() == "1") {
                 // 甲状旁腺
                 annotation.setCategoryId(singleSlideBy.getCategoryId());
             }
             Annotation annotationBy = annotationMapper.getOrganArea(annotation);
 
-            if (category != null && Objects.equals(category.getOrganId(), "07") && category.getSpecies() == 1) {
+            if (category != null && Objects.equals(category.getOrganTagCode(), "07") && category.getSpeciesId() == "1") {
                 // 甲状腺
                 annotationBy = annotationMapper.unionGeometryArea(singleSlideId);
             }
@@ -113,6 +116,7 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
                 return false;
             }
         } catch (Exception ex) {
+            log.error("forecastResults异常:{}", ex.getMessage());
             return false;
         }
 
