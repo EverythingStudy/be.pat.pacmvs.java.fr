@@ -2,6 +2,7 @@ package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
+import cn.staitech.common.core.utils.StringUtils;
 import cn.staitech.common.core.utils.SysRoleUtil;
 import cn.staitech.common.core.utils.poi.ExcelUtil;
 import cn.staitech.common.core.web.controller.BaseController;
@@ -97,6 +98,7 @@ public class SlideController  extends BaseController {
         return slideService.page(req,true,false);
     }
 
+
     @ApiOperation(value = "项目配置-已选切片分页查询")
     @PostMapping("/pageConfigSlide")
     public R<CustomPage<SlidePageVo>> pageConfigSlide(@Validated @RequestBody SlidePageReq req) {
@@ -161,14 +163,26 @@ public class SlideController  extends BaseController {
     @GetMapping("/slideInfo")
     public R<SlideDetailVo> slideInfo(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "标注id", required = true) Long slideId) {
         SlideDetailVo slideInfo = slideMapper.getSlideInfo(slideId);
-        Slide slide = slideMapper.selectById(slideId);
-        Project project = projectMapper.selectById(slide.getProjectId());
-
-        if(null != project.getOrganizationId()) {
-            slideInfo.setOrganizationCode(SysRoleUtils.getOrganization03Code(project.getOrganizationId()));
-        }
         return R.ok(slideInfo);
     }
+
+    @ApiOperation(value = "查询机构编码数据")
+    @PostMapping("/getOrganizationCode")
+    public R<String> getOrganizationCode(@RequestBody OrganizationCodeReq req) {
+        String organizationCode = StringUtils.EMPTY;
+        if(null != req.getSlideId()) {
+            Slide slide = slideMapper.selectById(req.getSlideId());
+            req.setProjectId(slide.getProjectId());
+        }
+        if(req.getProjectId() != null) {
+            Project project = projectMapper.selectById(req.getProjectId());
+            if (null != project.getOrganizationId()) {
+                organizationCode = SysRoleUtils.getOrganization03Code(project.getOrganizationId());
+            }
+        }
+        return R.ok(organizationCode);
+    }
+
 
     @ApiOperation(value = "阅片记录")
     @GetMapping("/visit")
