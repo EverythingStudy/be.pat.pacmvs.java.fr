@@ -61,6 +61,7 @@ public class AccessProjectRecordsServiceImpl extends ServiceImpl<AccessProjectRe
                 accessProjectRecordsVo.setAnalysisSum(accessProjectRecordsVo.getAnalysisSum() == null ? "0" : accessProjectRecordsVo.getAnalysisSum());
             }
         }
+        accessProjectRecordsVos.sort((o1, o2) -> o2.getAccessTime().compareTo(o1.getAccessTime()));
         return R.ok(accessProjectRecordsVos);
     }
 
