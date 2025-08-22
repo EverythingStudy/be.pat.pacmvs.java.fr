@@ -160,3 +160,26 @@ CREATE TABLE `tb_access_view_records` (
                                           `access_time` datetime DEFAULT NULL COMMENT '访问时间',
                                           PRIMARY KEY (`view_record_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=126 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='访问view页面次数记录首页日活';
+
+
+
+
+update sys_menu set icon='/menuIcons/index_system_management.svg' where menu_id='1';
+update sys_menu set icon='/menuIcons/system_user.svg' where menu_id='5';
+update sys_menu set icon='/menuIcons/system_role.svg' where menu_id='6';
+update sys_menu set icon='/menuIcons/system_org.svg' where menu_id='8';
+update sys_menu set icon='/menuIcons/system_log.svg' where menu_id='7';
+update sys_menu set icon='/menuIcons/index_slice_management.svg' where menu_id='2';
+update sys_menu set icon='/menuIcons/orginal_slice.svg' where menu_id='57';
+update sys_menu set icon='/menuIcons/index_tag_management.svg' where menu_id='3';
+update sys_menu set icon='/menuIcons/indicator.svg' where menu_id='32';
+update sys_menu set icon='/menuIcons/org_tag.svg' where menu_id='703';
+update sys_menu set icon='/menuIcons/index_readFilm.svg' where menu_id='651';
+update sys_menu set icon='/menuIcons/project_read.svg' where menu_id='652';
+update sys_menu set icon='/menuIcons/config_base_info.svg' where menu_id='701';
+update sys_menu set icon='/menuIcons/config_slice.svg' where menu_id='654';
+update sys_menu set icon='/menuIcons/config_user.svg' where menu_id='663';
+update sys_menu set icon='/menuIcons/config_create_slice.svg' where menu_id='709';
+update sys_menu set icon='/menuIcons/project_recovery.svg' where menu_id='670';
+update sys_menu set icon='/menuIcons/archived_project.svg' where menu_id='698';
+update sys_menu set icon='/menuIcons/read_slice_list.svg' where menu_id='699';
