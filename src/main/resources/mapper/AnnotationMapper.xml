@@ -648,8 +648,8 @@
 
     <select id="unionGeometryArea" parameterType="long" resultMap="BaseResultMap">
         SELECT
-            st_area ( st_union ( contour40000 ) ) AS area,
-            ST_Perimeter ( ST_Collect ( contour40000 ) ) AS perimeter
+            st_area ( st_union ( contour ) ) AS area,
+            ST_Perimeter ( ST_Collect ( contour ) ) AS perimeter
         FROM
             fr_annotation
         WHERE
@@ -733,14 +733,14 @@
 
     <select id="getOrganArea" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
-        SELECT ST_Area(ST_Collect(contour40000))      AS area,
-               ST_Perimeter(ST_Collect(contour40000)) AS perimeter
+        SELECT ST_Area(ST_Collect(contour))      AS area,
+               ST_Perimeter(ST_Collect(contour)) AS perimeter
         from fr_annotation
         where single_slide_id = #{singleSlideId}
         <if test="categoryId != null">
           and category_id = #{categoryId}
         </if>
-          and contour_type = 3
+          and contour_type = 2
     </select>
 
     <select id="getStructureArea" parameterType="cn.staitech.fr.domain.Annotation"
