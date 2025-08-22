@@ -4,6 +4,7 @@ import cn.staitech.common.core.annotation.Excel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -21,7 +22,7 @@ public class AiInfoListResp {
     private Integer aiStatus;
 
     @ApiModelProperty(value = "指标计算机构编码")
-    private List<StructureTagVo> structTagList;
+    private List<StructureTagVo> structTagList = new ArrayList<>();
 
     @ApiModelProperty(value = "脏器下量化指标")
     private List<AiInfoListVO> aiInfoList;
