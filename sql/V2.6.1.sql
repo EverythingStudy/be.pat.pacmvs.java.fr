@@ -155,3 +155,13 @@ ALTER TABLE "fr_annotation" ADD COLUMN "contour_type" int2 DEFAULT 0;
 COMMENT ON COLUMN "fr_annotation"."contour_type" IS '标注类型：默认 0  1 粗轮廓 2 精细轮廓';
 ALTER TABLE "fr_annotation_del" ADD COLUMN "contour_type" int2 DEFAULT 0;
 COMMENT ON COLUMN "fr_annotation_del"."contour_type" IS '标注类型：默认 0  1 粗轮廓 2 精细轮廓';
+
+
+CREATE TABLE `tb_access_view_records` (
+                                          `view_record_id` bigint NOT NULL AUTO_INCREMENT COMMENT '记录id',
+                                          `user_id` bigint DEFAULT NULL COMMENT '用户id',
+                                          `slide_id` bigint DEFAULT NULL COMMENT '切片id',
+                                          `project_id` bigint DEFAULT NULL COMMENT '项目id',
+                                          `access_time` datetime DEFAULT NULL COMMENT '访问时间',
+                                          PRIMARY KEY (`view_record_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=126 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='访问view页面次数记录首页日活';
