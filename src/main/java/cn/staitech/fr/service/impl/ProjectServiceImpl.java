@@ -407,7 +407,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
         //增加种属名称
         if (null != project.getSpeciesId()) {
-            Species species = speciesMapper.selectById(project.getSpeciesId());
+            LambdaQueryWrapper<Species> lambdaQueryWrapper = Wrappers.<Species>lambdaQuery()
+                    .eq(Species::getSpeciesId, project.getSpeciesId())
+                    .eq(Species::getOrganizationId, SecurityUtils.getOrganizationId());
+            Species species = speciesMapper.selectOne(lambdaQueryWrapper);
             project.setSpeciesName(species.getName());
         }
         //ai是否执行
