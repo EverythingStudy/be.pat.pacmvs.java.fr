@@ -120,7 +120,7 @@ public class Annotation implements Serializable {
 
     private Long singleSlideId;
 
-    private int single;
+    //private int single;
 
     @TableField(exist = false)
     private String  operation;

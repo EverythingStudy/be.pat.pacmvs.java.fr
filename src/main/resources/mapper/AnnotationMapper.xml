@@ -364,9 +364,8 @@
         slide_id,
         id,
         contour_type,
-        ST_AsGeoJSON(contour${magnification}) as contour,
-        single_slide_id,
-        single
+        ST_AsGeoJSON(contour) as contour,
+        single_slide_id
         from fr_annotation
         <where>
             contour_type != 1
@@ -533,12 +532,12 @@
             resultMap="BaseResultMap">
         <if test="operation != null and operation == 'UNION'">
             select
-            ST_AsGeoJSON(ST_Union((select contour40000 from fr_annotation where annotation_id =
+            ST_AsGeoJSON(ST_Union((select contour from fr_annotation where annotation_id =
             #{annotationId}),st_geomfromgeojson(#{contour}))) as contour
         </if>
         <if test="operation != null and operation == 'DIFFERENCE'">
             select
-            ST_AsGeoJSON(ST_Difference((select contour40000 from fr_annotation where annotation_id =
+            ST_AsGeoJSON(ST_Difference((select contour from fr_annotation where annotation_id =
             #{annotationId}),st_geomfromgeojson(#{contour}))) as contour
         </if>
     </select>
@@ -640,7 +639,7 @@
     </select>
 
     <select id="collectGeometry" parameterType="long" resultMap="BaseResultMap">
-        SELECT st_asgeojson(st_union(contour40000)) as collectContour
+        SELECT st_asgeojson(st_union(contour)) as collectContour
         FROM fr_annotation
         WHERE single_slide_id = #{singleSlideId}
           AND contour_type = 3
@@ -659,8 +658,8 @@
 
 
     <select id="stUnionContourArea" parameterType="long" resultMap="BaseResultMap">
-        SELECT st_area(st_asgeojson(ST_Collect(contour40000))) as area,
-               st_asgeojson(ST_Collect(contour40000)) as collectContour
+        SELECT st_area(st_asgeojson(ST_Collect(contour))) as area,
+               st_asgeojson(ST_Collect(contour)) as collectContour
         FROM fr_annotation
         WHERE single_slide_id = #{singleSlideId}
           AND category_id = #{categoryId}
