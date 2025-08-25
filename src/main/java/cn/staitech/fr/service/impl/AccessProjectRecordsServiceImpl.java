@@ -48,7 +48,6 @@ public class AccessProjectRecordsServiceImpl extends ServiceImpl<AccessProjectRe
                 .orderByDesc(AccessProjectRecords::getAccessTime)).stream().limit(5).collect(Collectors.toList());
 
         List<Long> projectIds = accessProjectRecordsList.stream().map(AccessProjectRecords::getProjectId).collect(Collectors.toList());
-        Map<Long, Integer> statusMap = accessProjectRecordsList.stream().collect(Collectors.toMap(AccessProjectRecords::getProjectId, AccessProjectRecords::getStatus));
         Map<Long, Date> rmap = accessProjectRecordsList.stream().collect(Collectors.toMap(AccessProjectRecords::getProjectId, AccessProjectRecords::getAccessTime));
         AccessProjectRecordReq req = new AccessProjectRecordReq();
         req.setProjectIds(projectIds);
@@ -60,7 +59,6 @@ public class AccessProjectRecordsServiceImpl extends ServiceImpl<AccessProjectRe
                 accessProjectRecordsVo.setAccessTime(DateUtil.formatDateTime(rmap.get(accessProjectRecordsVo.getSpecialId())));
                 accessProjectRecordsVo.setAnalysisCount(accessProjectRecordsVo.getAnalysisCount() == null ? "0" : accessProjectRecordsVo.getAnalysisCount());
                 accessProjectRecordsVo.setAnalysisSum(accessProjectRecordsVo.getAnalysisSum() == null ? "0" : accessProjectRecordsVo.getAnalysisSum());
-                accessProjectRecordsVo.setStatus(statusMap.get(accessProjectRecordsVo.getSpecialId()));
             }
         }
         accessProjectRecordsVos.sort((o1, o2) -> o2.getAccessTime().compareTo(o1.getAccessTime()));
