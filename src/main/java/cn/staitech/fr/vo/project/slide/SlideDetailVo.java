@@ -138,7 +138,5 @@ public class SlideDetailVo {
     private Integer sourceLens;
     @ApiModelProperty(value = "已阅片用户")
     private List<Long> viewers;
-    @ApiModelProperty(value = "机构编号")
-    private String organizationCode;
 
 }

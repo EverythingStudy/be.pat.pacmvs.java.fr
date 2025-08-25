@@ -48,5 +48,7 @@ public class AccessProjectRecords implements Serializable {
     @ApiModelProperty(value = "访问时间")
     private Date accessTime;
 
+    @ApiModelProperty(value = "状态(0待启动，1进行中，2暂停，3已完成，4锁定)")
+    private Integer status;
 
 }
