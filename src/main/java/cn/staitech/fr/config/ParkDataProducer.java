@@ -18,7 +18,7 @@ import javax.annotation.Resource;
 @Component
 public class ParkDataProducer {
 
-    @Value("${queues.algoMsg:test}")
+    @Value("${queues.algoMsg:test2}")
     private String ALGO_MSG_QUEUE;
 
     @Resource

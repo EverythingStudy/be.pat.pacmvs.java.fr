@@ -126,7 +126,6 @@ public class JsonTaskParserService {
 //        }
 //        return true;
 //    }
-
     private boolean updateSingleSlideStatus(Long singleSlideId, String forecastStatus) {
         SingleSlide singleSlide = new SingleSlide();
         singleSlide.setSingleId(singleSlideId);
@@ -545,7 +544,10 @@ public class JsonTaskParserService {
     }
 
     private List<JsonFile> parseSingleJsonFile(JsonTask task, JSONObject jsonObject) {
-        JSONArray jsonArray;
+        List<JsonFile> jsonFileList = jsonFileService.list(new LambdaQueryWrapper<>(JsonFile.class).eq(JsonFile::getTaskId, task.getTaskId()).eq(JsonFile::getStructureName, jsonObject.getString("structureCode")));
+        if (CollectionUtils.isNotEmpty(jsonFileList)) {
+            return jsonFileList;
+        }
         List<JsonFile> list = new ArrayList<>();
         try {
             // jsonArray = new JSONArray(jsonObject.get("data").toString());
