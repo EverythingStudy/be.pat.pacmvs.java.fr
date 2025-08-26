@@ -480,9 +480,8 @@ public class JsonTaskParserService {
             }
             jsonTask.setStructureTime(structureTime);
             //jsonTask.setCode(jsonObject.containsKey("code") ? jsonObject.get("code").toString() : "");
-            jsonTask.setMsg(jsonObject.containsKey("msg") ? jsonObject.get("msg").toString() : "");
+            //jsonTask.setMsg(jsonObject.containsKey("msg") ? jsonObject.get("msg").toString() : "");
             //jsonTask.setData(jsonObject.containsKey("data") ? jsonObject.get("data").toString() : "");
-
             jsonTask.setCreateTime(new Date());
             jsonTask.setStartTime(new Date());
             jsonTask.setStatus(JsonTaskStatusEnum.NO_PARSE.getCode());
