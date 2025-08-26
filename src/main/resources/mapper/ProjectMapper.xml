@@ -28,6 +28,9 @@
         where fs.del_flag = #{params.delFlag}
         and fs.organization_id = #{params.organizationId}
         and fs.is_permanent_del = 0
+        <if test="params.projectId != null">
+            and fs.special_id = #{params.projectId}
+        </if>
         <if test="params.topicName != null and params.topicName != ''">
             and tt.topic_name like concat('%', #{params.topicName}, '%')
         </if>

@@ -59,6 +59,7 @@ public class AccessProjectRecordsServiceImpl extends ServiceImpl<AccessProjectRe
                 accessProjectRecordsVo.setAccessTime(DateUtil.formatDateTime(rmap.get(accessProjectRecordsVo.getSpecialId())));
                 accessProjectRecordsVo.setAnalysisCount(accessProjectRecordsVo.getAnalysisCount() == null ? "0" : accessProjectRecordsVo.getAnalysisCount());
                 accessProjectRecordsVo.setAnalysisSum(accessProjectRecordsVo.getAnalysisSum() == null ? "0" : accessProjectRecordsVo.getAnalysisSum());
+                accessProjectRecordsVo.setProjectId(accessProjectRecordsVo.getSpecialId());
             }
         }
         accessProjectRecordsVos.sort((o1, o2) -> o2.getAccessTime().compareTo(o1.getAccessTime()));

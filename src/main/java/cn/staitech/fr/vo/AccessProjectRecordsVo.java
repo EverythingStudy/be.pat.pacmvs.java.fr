@@ -19,6 +19,9 @@ import lombok.NoArgsConstructor;
 @Data
 public class AccessProjectRecordsVo {
 
+    @ApiModelProperty(value = "项目id")
+    private Long projectId;
+
     @ApiModelProperty(value = "专题编号")
     private String topicName;
 

@@ -17,6 +17,9 @@ import java.util.List;
 @Data
 public class ProjectPageReq extends PageRequest {
 
+    @ApiModelProperty(value = "项目id")
+    private Long projectId;
+
     @ApiModelProperty("项目编号")
     private String topicName;
 
