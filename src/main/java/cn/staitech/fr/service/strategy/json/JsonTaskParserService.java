@@ -554,6 +554,7 @@ public class JsonTaskParserService {
         try {
             JsonFile jsonFile = new JsonFile();
             jsonFile.setStructureName(jsonObject.containsKey("structureCode") ? jsonObject.getString("structureCode") : "");
+            jsonFile.setStructureId(jsonObject.containsKey("structureCode") ? jsonObject.getString("structureCode") : "");
             if (jsonObject.containsKey("file_url")) {
                 String fileUrl = jsonObject.getString("file_url");
                 if (fileUrl.toLowerCase().endsWith(".json")) {
