@@ -159,11 +159,11 @@ public class JsonTaskParserService {
                 return;
             }
             JsonTask jsonTask = parseJasonTask(jsonObject);
-            if (jsonTask == null || jsonTask.getCode().equals("500")) {
-                log.info("singleSlide id:[{}],jsonTask :[{}] JSON解析失败!", singleSlideId, jsonTask);
-                updateSingleSlideStatus(singleSlideId, ForecastStatusEnum.FORECAST_FAIL.getCode());
-                return;
-            }
+//            if (jsonTask == null || jsonTask.getCode().equals("500")) {
+//                log.info("singleSlide id:[{}],jsonTask :[{}] JSON解析失败!", singleSlideId, jsonTask);
+//                updateSingleSlideStatus(singleSlideId, ForecastStatusEnum.FORECAST_FAIL.getCode());
+//                //return;
+//            }
 
             JsonTask taskOld = jsonTaskMapper.selectOne(Wrappers.<JsonTask>lambdaQuery().eq(JsonTask::getSingleId, singleSlideId));
             log.info("singleSlide id:[{}] 查询已存在任务 [{}]", singleSlideId, taskOld);
@@ -179,11 +179,25 @@ public class JsonTaskParserService {
                 log.info("singleSlide id:[{}] 新增任务 [{}]", singleSlideId, jsonTask);
             }
             //校验脏器下所有结构是否解析完成
-            //AI识别每个脏器对应的结构JSON文件
             Boolean flag = verifyCategoryStructure(jsonTask);
             if (!flag) {
                 //解析脏器结构文件路径，并存入MySQL
                 parseSingleJsonFile(jsonTask, jsonObject);
+                Boolean flag1 = verifyCategoryStructure(jsonTask);
+                if (flag1) {
+                    List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
+                    List<JsonFile> list = fileList.stream().filter(e -> e.getAiStatus() == 0).collect(Collectors.toList());
+                    if (CollectionUtils.isEmpty(list)) {
+                        //结构识别全部失败-->以脏器为单位 (指标计算)结构分析失败-->forecastStatus结构化状态：2
+                        updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_FAIL.getCode());
+                    } else {
+                        updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_ING.getCode());
+                        //进行指标计算
+                        JsonTaskAiHandler(jsonTask, fileList);
+                        //部分成功-->以脏器为单位 (指标计算)结构分析完成-->forecastStatus结构化状态：1
+                        updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_SUCCESS.getCode());
+                    }
+                }
             }
         } catch (Exception e) {
             log.error("Unexpected error occurred: [{}]", e.getMessage());
@@ -205,17 +219,6 @@ public class JsonTaskParserService {
         if (CollectionUtils.isNotEmpty(fileList)) {
             Set<String> structureIdSet1 = fileList.stream().map(e -> e.getStructureId()).collect(Collectors.toSet());
             if (structureIdSet1.containsAll(structureIdSet)) {
-                List<JsonFile> list = fileList.stream().filter(e -> e.getAiStatus() == 0).collect(Collectors.toList());
-                if (CollectionUtils.isEmpty(list)) {
-                    //结构识别全部失败-->以脏器为单位 (指标计算)结构分析失败-->forecastStatus结构化状态：2
-                    updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_FAIL.getCode());
-                } else {
-                    updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_ING.getCode());
-                    //进行指标计算
-                    JsonTaskAiHandler(jsonTask, fileList);
-                    //部分成功-->以脏器为单位 (指标计算)结构分析完成-->forecastStatus结构化状态：1
-                    updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_SUCCESS.getCode());
-                }
                 return Boolean.TRUE;
             }
         }
@@ -476,9 +479,9 @@ public class JsonTaskParserService {
                 }
             }
             jsonTask.setStructureTime(structureTime);
-            jsonTask.setCode(jsonObject.containsKey("code") ? jsonObject.get("code").toString() : "");
+            //jsonTask.setCode(jsonObject.containsKey("code") ? jsonObject.get("code").toString() : "");
             jsonTask.setMsg(jsonObject.containsKey("msg") ? jsonObject.get("msg").toString() : "");
-            jsonTask.setData(jsonObject.containsKey("data") ? jsonObject.get("data").toString() : "");
+            //jsonTask.setData(jsonObject.containsKey("data") ? jsonObject.get("data").toString() : "");
 
             jsonTask.setCreateTime(new Date());
             jsonTask.setStartTime(new Date());
@@ -550,9 +553,6 @@ public class JsonTaskParserService {
         }
         List<JsonFile> list = new ArrayList<>();
         try {
-            // jsonArray = new JSONArray(jsonObject.get("data").toString());
-            //for (int i = 0; i < jsonArray.length(); i++) {
-            // org.json.JSONObject jsonSingleObject = jsonArray.getJSONObject(i);
             JsonFile jsonFile = new JsonFile();
             jsonFile.setStructureName(jsonObject.containsKey("structureCode") ? jsonObject.getString("structureCode") : "");
             if (jsonObject.containsKey("file_url")) {
@@ -561,17 +561,17 @@ public class JsonTaskParserService {
                     jsonFile.setFileUrl(fileUrl);
                     jsonFile.setAiStatus(StructureAiStatusEnum.SUCCESS.getCode());
                 } else {
-                    //continue;
-                    jsonFile.setAiStatus(StructureAiStatusEnum.FAIL.getCode());
+                    if (jsonObject.getString("code").equals("500")) {
+                        jsonFile.setAiStatus(StructureAiStatusEnum.FAIL.getCode());
+                    }
+                    jsonFile.setAiStatus(StructureAiStatusEnum.SUCCESS.getCode());
                 }
             }
             jsonFile.setTaskId(task.getTaskId());
             jsonFile.setStatus(StructureJsonStatusEnum.NO_PARSE.getCode());
             jsonFile.setCreateTime(new Date());
             jsonFile.setStartTime(new Date());
-
             list.add(jsonFile);
-            // }
             jsonFileService.saveBatch(list);
             log.info("jsonTask id:[{}] singleSlide id:[{}] json list:[{}]", task.getTaskId(), task.getSingleId(), list);
 
