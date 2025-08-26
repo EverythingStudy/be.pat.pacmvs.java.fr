@@ -247,7 +247,7 @@ public class CommonJsonParser {
             }
 
             Annotation annotation = new Annotation();
-            annotation.setMagnification(40000L);
+            //annotation.setMagnification(40000L);
             annotation.setFiligreeContour(true);
             annotation.setSingleSlideId(jsonTask.getSingleId());
             List<Annotation> annotations = annotationMapper.selectListBy(annotation);

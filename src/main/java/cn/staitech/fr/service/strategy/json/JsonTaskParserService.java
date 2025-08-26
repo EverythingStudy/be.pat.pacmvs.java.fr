@@ -8,7 +8,7 @@ import cn.staitech.fr.enums.StructureAiStatusEnum;
 import cn.staitech.fr.enums.StructureJsonStatusEnum;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.*;
-import cn.staitech.fr.utils.ThreadLocalUtils;
+//import cn.staitech.fr.utils.ThreadLocalUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -75,28 +75,28 @@ public class JsonTaskParserService {
      *
      * @return 总是返回true，表示执行了创建操作
      */
-    public boolean createCalculateTable() {
-        // 从ThreadLocal中获取序列号，用于标识临时表
-        Long sequenceNumber = ThreadLocalUtils.get(Constants.TEMP_TABLE_KEY);
-        if (sequenceNumber == null) {
-            return false;
-        }
-        // 创建一个Annotation对象，用于存储临时表的相关信息
-        Annotation annotation = new Annotation();
-        annotation.setSequenceNumber(sequenceNumber);
-        // 先确认是否存在这个表了，如果存在就不新建表了
-        Integer existTable = annotationMapper.selectExistTable(annotation);
-        if (existTable != 0) {
-            annotationMapper.dropTable(annotation);
-        }
-        // 1、Sequence
-        // 创建表的序列号，为数据插入提供唯一的标识
-        annotationMapper.createTableSequence(annotation);
-        // 2、建表
-        // 根据Annotation对象中的信息创建临时表
-        annotationMapper.createTable(annotation);
-        return true;
-    }
+//    public boolean createCalculateTable() {
+//        // 从ThreadLocal中获取序列号，用于标识临时表
+//        Long sequenceNumber = ThreadLocalUtils.get(Constants.TEMP_TABLE_KEY);
+//        if (sequenceNumber == null) {
+//            return false;
+//        }
+//        // 创建一个Annotation对象，用于存储临时表的相关信息
+//        Annotation annotation = new Annotation();
+//        annotation.setSequenceNumber(sequenceNumber);
+//        // 先确认是否存在这个表了，如果存在就不新建表了
+//        Integer existTable = annotationMapper.selectExistTable(annotation);
+//        if (existTable != 0) {
+//            annotationMapper.dropTable(annotation);
+//        }
+//        // 1、Sequence
+//        // 创建表的序列号，为数据插入提供唯一的标识
+//        annotationMapper.createTableSequence(annotation);
+//        // 2、建表
+//        // 根据Annotation对象中的信息创建临时表
+//        annotationMapper.createTable(annotation);
+//        return true;
+//    }
 
     /**
      * 删除计算临时表
@@ -105,27 +105,27 @@ public class JsonTaskParserService {
      *
      * @return 总是返回true，表示执行了删除操作
      */
-    public boolean dropCalculateTable() {
-        // 从ThreadLocal中获取序列号，用于标识临时表
-        Long sequenceNumber = ThreadLocalUtils.get(Constants.TEMP_TABLE_KEY);
-        return dropCalculateTable(sequenceNumber);
-    }
+//    public boolean dropCalculateTable() {
+//        // 从ThreadLocal中获取序列号，用于标识临时表
+//        Long sequenceNumber = ThreadLocalUtils.get(Constants.TEMP_TABLE_KEY);
+//        return dropCalculateTable(sequenceNumber);
+//    }
 
-    public boolean dropCalculateTable(Long sequenceNumber) {
-        // 从ThreadLocal中获取序列号，用于标识临时表
-        if (sequenceNumber == null) {
-            return false;
-        }
-        // 创建一个Annotation对象，用于存储临时表的相关信息
-        Annotation annotation = new Annotation();
-        annotation.setSequenceNumber(sequenceNumber);
-        // 先确认是否存在这个表了，如果存在就不新建表了
-        Integer existTable = annotationMapper.selectExistTable(annotation);
-        if (existTable != 0) {
-            annotationMapper.dropTable(annotation);
-        }
-        return true;
-    }
+//    public boolean dropCalculateTable(Long sequenceNumber) {
+//        // 从ThreadLocal中获取序列号，用于标识临时表
+//        if (sequenceNumber == null) {
+//            return false;
+//        }
+//        // 创建一个Annotation对象，用于存储临时表的相关信息
+//        Annotation annotation = new Annotation();
+//        annotation.setSequenceNumber(sequenceNumber);
+//        // 先确认是否存在这个表了，如果存在就不新建表了
+//        Integer existTable = annotationMapper.selectExistTable(annotation);
+//        if (existTable != 0) {
+//            annotationMapper.dropTable(annotation);
+//        }
+//        return true;
+//    }
 
     private boolean updateSingleSlideStatus(Long singleSlideId, String forecastStatus) {
         SingleSlide singleSlide = new SingleSlide();
@@ -267,11 +267,11 @@ public class JsonTaskParserService {
                 return;
             }
             log.info("jsonTask id:[{}] singleSlide id:[{}] 创建临时计算表", jsonTask.getTaskId(), jsonTask.getSingleId());
-            ThreadLocalUtils.set(Constants.TEMP_TABLE_KEY, jsonTask.getTaskId());
-            if (!createCalculateTable()) {
-                log.warn("jsonTask id:[{}] singleSlide id:[{}] 创建临时表失败", jsonTask.getTaskId(), jsonTask.getSingleId());
-                return;
-            }
+//            ThreadLocalUtils.set(Constants.TEMP_TABLE_KEY, jsonTask.getTaskId());
+//            if (!createCalculateTable()) {
+//                log.warn("jsonTask id:[{}] singleSlide id:[{}] 创建临时表失败", jsonTask.getTaskId(), jsonTask.getSingleId());
+//                return;
+//            }
             log.info("jsonTask id:[{}] singleSlide id:[{}] 开始解析json。", jsonTask.getTaskId(), jsonTask.getSingleId());
             for (JsonFile jsonFile : jsonFileList) {
                 log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析开始:{} {} {}", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName());
@@ -301,9 +301,9 @@ public class JsonTaskParserService {
                 log.error("jsonTask id:[{}] singleSlide id:[{}] 执行anno数据存储失败。", jsonTask.getTaskId(), jsonTask.getSingleId());
             }
             log.info("jsonTask id:[{}] singleSlide id:[{}] 删除临时计算表", jsonTask.getTaskId(), jsonTask.getSingleId());
-            dropCalculateTable();
+//            dropCalculateTable();
             //transferData(jsonTask.getSpecialId(),ThreadLocalUtils.get(Constants.TEMP_TABLE_KEY));
-            ThreadLocalUtils.delete(Constants.TEMP_TABLE_KEY);
+//            ThreadLocalUtils.delete(Constants.TEMP_TABLE_KEY);
             log.info("jsonTask id:[{}] singleSlide id:[{}] 处理完成[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask);
             // 修改任务状态
             jsonTask.setStatus(JsonTaskStatusEnum.PARSE_SUCCESS.getCode());
@@ -328,112 +328,112 @@ public class JsonTaskParserService {
         }
     }
 
-    private void JsonTaskHandler(JsonTask jsonTask, List<JsonFile> jsonFileList) {
-        // 获取解析器
-        ParserStrategy parser = parserStrategyFactory.getParserStrategy(jsonTask.getAlgorithmCode());
-        if (parser == null) {
-            for (CustomParserStrategy parserStrategy : customParserStrategies) {
-                if (parserStrategy.getAlgorithmCode().equals(jsonTask.getAlgorithmCode())) {
-                    parser = parserStrategy;
-                }
-            }
-        }
-
-        if (null == parser) {
-            updateSingleSlideStatus(jsonTask.getSingleId(), "2");
-            jsonTask.setStatus(JsonTaskStatusEnum.PARSE_FAIL.getCode());
-            jsonTaskService.updateById(jsonTask);
-            log.info("AI预测切片id:{},算法名称标识:{},当前标签无法解析", jsonTask.getSingleId(), jsonTask.getAlgorithmCode());
-            return;
-        }
-
-        //判断json数据目录是否存在
-        for (JsonFile jsonFile : jsonFileList) {
-            String fileUrl = jsonFile.getFileUrl();
-            File file = new File(fileUrl);
-            if (!file.exists()) {
-                log.info("AI预测切片id:{},算法名称标识:{},目录不存在，地址{}", jsonTask.getSingleId(), jsonTask.getAlgorithmCode(), fileUrl);
-                updateSingleSlideStatus(jsonTask.getSingleId(), "2");
-                jsonTask.setStatus(JsonTaskStatusEnum.PARSE_FAIL.getCode());
-                jsonTaskService.updateById(jsonTask);
-                return;
-            }
-        }
-
-        // 修改任务状态
-        jsonTask.setStatus(JsonTaskStatusEnum.PARSE_ING.getCode());
-        jsonTaskService.updateById(jsonTask);
-
-        try {
-            log.info("jsonTask id:[{}] singleSlide id:[{}] checkJson 开始", jsonTask.getTaskId(), jsonTask.getSingleId());
-            boolean b = parser.checkJson(jsonTask, jsonFileList);
-            log.info("jsonTask id:[{}] singleSlide id:[{}] checkJson 结束", jsonTask.getTaskId(), jsonTask.getSingleId());
-            if (!b) {
-                log.info("AI预测切片id:{},算法名称标识:{},JSON校验失败!", jsonTask.getSingleId(), jsonTask.getAlgorithmCode());
-                updateSingleSlideStatus(jsonTask.getSingleId(), "2");
-                jsonTask.setStatus(3);
-                jsonTaskService.updateById(jsonTask);
-                return;
-            }
-            log.info("jsonTask id:[{}] singleSlide id:[{}] 创建临时计算表", jsonTask.getTaskId(), jsonTask.getSingleId());
-            ThreadLocalUtils.set(Constants.TEMP_TABLE_KEY, jsonTask.getTaskId());
-            if (!createCalculateTable()) {
-                log.warn("jsonTask id:[{}] singleSlide id:[{}] 创建临时表失败", jsonTask.getTaskId(), jsonTask.getSingleId());
-                return;
-            }
-            log.info("jsonTask id:[{}] singleSlide id:[{}] 开始解析json。", jsonTask.getTaskId(), jsonTask.getSingleId());
-            for (JsonFile jsonFile : jsonFileList) {
-                log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析开始:{} {} {}", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName());
-                jsonFile.setStartTime(new Date());
-                jsonFileService.updateById(jsonFile);
-                // 解析json文件
-                parser.parseJson(jsonTask, jsonFile);
-                log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析结束:{} {} {} {}", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName());
-                jsonFile.setEndTime(new Date());
-                jsonFileService.updateById(jsonFile);
-            }
-            log.info("jsonTask id:[{}] singleSlide id:[{}] 开始删除原有指标。", jsonTask.getTaskId(), jsonTask.getSingleId());
-            //删除原有指标
-            LambdaQueryWrapper<AiForecast> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(AiForecast::getSingleSlideId, jsonTask.getSingleId());
-            aiForecastService.remove(wrapper);
-            log.info("jsonTask id:[{}] singleSlide id:[{}] 开始计算指标。", jsonTask.getTaskId(), jsonTask.getSingleId());
-            // 指标计算
-            parser.alculationIndicators(jsonTask);
-
-            try {
-                log.info("jsonTask id:[{}] singleSlide id:[{}] 开始执行新的anno数据存储。", jsonTask.getTaskId(), jsonTask.getSingleId());
-                contourJsonService.aiJson(jsonFileList, jsonTask);
-            } catch (Exception e) {
-                log.error("jsonTask id:[{}] singleSlide id:[{}] 执行anno数据存储失败。", jsonTask.getTaskId(), jsonTask.getSingleId());
-            }
-            log.info("jsonTask id:[{}] singleSlide id:[{}] 删除临时计算表", jsonTask.getTaskId(), jsonTask.getSingleId());
-            dropCalculateTable();
-            //transferData(jsonTask.getSpecialId(),ThreadLocalUtils.get(Constants.TEMP_TABLE_KEY));
-            ThreadLocalUtils.delete(Constants.TEMP_TABLE_KEY);
-            log.info("jsonTask id:[{}] singleSlide id:[{}] 处理完成[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask);
-            // 修改任务状态
-            jsonTask.setStatus(JsonTaskStatusEnum.PARSE_SUCCESS.getCode());
-            jsonTask.setEndTime(new Date());
-            jsonTaskService.updateById(jsonTask);
-            log.info("jsonTask id:[{}] singleSlide id:[{}] 修改状态：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), 2);
-            SingleSlide singleSlide = new SingleSlide();
-            singleSlide.setSingleId(jsonTask.getSingleId());
-            //0未预测、1预测成功、2预测失败、3预测中
-            singleSlide.setForecastStatus("1");
-            singleSlide.setStructureTime(jsonTask.getStructureTime());
-            singleSlideService.updateById(singleSlide);
-            log.info("jsonTask id:[{}] singleSlide id:[{}] 修改状态：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), 1);
-        } catch (Exception e) {
-            updateSingleSlideStatus(jsonTask.getSingleId(), "2");
-            jsonTask.setStatus(JsonTaskStatusEnum.PARSE_FAIL.getCode());
-            jsonTaskService.updateById(jsonTask);
-            log.error("jsonTask id:[{}] singleSlide id:[{}] 处理失败:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask);
-            if (log.isDebugEnabled()) {
-                e.printStackTrace();
-            }
-        }
-    }
+//    private void JsonTaskHandler(JsonTask jsonTask, List<JsonFile> jsonFileList) {
+//        // 获取解析器
+//        ParserStrategy parser = parserStrategyFactory.getParserStrategy(jsonTask.getAlgorithmCode());
+//        if (parser == null) {
+//            for (CustomParserStrategy parserStrategy : customParserStrategies) {
+//                if (parserStrategy.getAlgorithmCode().equals(jsonTask.getAlgorithmCode())) {
+//                    parser = parserStrategy;
+//                }
+//            }
+//        }
+//
+//        if (null == parser) {
+//            updateSingleSlideStatus(jsonTask.getSingleId(), "2");
+//            jsonTask.setStatus(JsonTaskStatusEnum.PARSE_FAIL.getCode());
+//            jsonTaskService.updateById(jsonTask);
+//            log.info("AI预测切片id:{},算法名称标识:{},当前标签无法解析", jsonTask.getSingleId(), jsonTask.getAlgorithmCode());
+//            return;
+//        }
+//
+//        //判断json数据目录是否存在
+//        for (JsonFile jsonFile : jsonFileList) {
+//            String fileUrl = jsonFile.getFileUrl();
+//            File file = new File(fileUrl);
+//            if (!file.exists()) {
+//                log.info("AI预测切片id:{},算法名称标识:{},目录不存在，地址{}", jsonTask.getSingleId(), jsonTask.getAlgorithmCode(), fileUrl);
+//                updateSingleSlideStatus(jsonTask.getSingleId(), "2");
+//                jsonTask.setStatus(JsonTaskStatusEnum.PARSE_FAIL.getCode());
+//                jsonTaskService.updateById(jsonTask);
+//                return;
+//            }
+//        }
+//
+//        // 修改任务状态
+//        jsonTask.setStatus(JsonTaskStatusEnum.PARSE_ING.getCode());
+//        jsonTaskService.updateById(jsonTask);
+//
+//        try {
+//            log.info("jsonTask id:[{}] singleSlide id:[{}] checkJson 开始", jsonTask.getTaskId(), jsonTask.getSingleId());
+//            boolean b = parser.checkJson(jsonTask, jsonFileList);
+//            log.info("jsonTask id:[{}] singleSlide id:[{}] checkJson 结束", jsonTask.getTaskId(), jsonTask.getSingleId());
+//            if (!b) {
+//                log.info("AI预测切片id:{},算法名称标识:{},JSON校验失败!", jsonTask.getSingleId(), jsonTask.getAlgorithmCode());
+//                updateSingleSlideStatus(jsonTask.getSingleId(), "2");
+//                jsonTask.setStatus(3);
+//                jsonTaskService.updateById(jsonTask);
+//                return;
+//            }
+//            log.info("jsonTask id:[{}] singleSlide id:[{}] 创建临时计算表", jsonTask.getTaskId(), jsonTask.getSingleId());
+//            ThreadLocalUtils.set(Constants.TEMP_TABLE_KEY, jsonTask.getTaskId());
+//            if (!createCalculateTable()) {
+//                log.warn("jsonTask id:[{}] singleSlide id:[{}] 创建临时表失败", jsonTask.getTaskId(), jsonTask.getSingleId());
+//                return;
+//            }
+//            log.info("jsonTask id:[{}] singleSlide id:[{}] 开始解析json。", jsonTask.getTaskId(), jsonTask.getSingleId());
+//            for (JsonFile jsonFile : jsonFileList) {
+//                log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析开始:{} {} {}", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName());
+//                jsonFile.setStartTime(new Date());
+//                jsonFileService.updateById(jsonFile);
+//                // 解析json文件
+//                parser.parseJson(jsonTask, jsonFile);
+//                log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析结束:{} {} {} {}", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName());
+//                jsonFile.setEndTime(new Date());
+//                jsonFileService.updateById(jsonFile);
+//            }
+//            log.info("jsonTask id:[{}] singleSlide id:[{}] 开始删除原有指标。", jsonTask.getTaskId(), jsonTask.getSingleId());
+//            //删除原有指标
+//            LambdaQueryWrapper<AiForecast> wrapper = new LambdaQueryWrapper<>();
+//            wrapper.eq(AiForecast::getSingleSlideId, jsonTask.getSingleId());
+//            aiForecastService.remove(wrapper);
+//            log.info("jsonTask id:[{}] singleSlide id:[{}] 开始计算指标。", jsonTask.getTaskId(), jsonTask.getSingleId());
+//            // 指标计算
+//            parser.alculationIndicators(jsonTask);
+//
+//            try {
+//                log.info("jsonTask id:[{}] singleSlide id:[{}] 开始执行新的anno数据存储。", jsonTask.getTaskId(), jsonTask.getSingleId());
+//                contourJsonService.aiJson(jsonFileList, jsonTask);
+//            } catch (Exception e) {
+//                log.error("jsonTask id:[{}] singleSlide id:[{}] 执行anno数据存储失败。", jsonTask.getTaskId(), jsonTask.getSingleId());
+//            }
+//            log.info("jsonTask id:[{}] singleSlide id:[{}] 删除临时计算表", jsonTask.getTaskId(), jsonTask.getSingleId());
+//            dropCalculateTable();
+//            //transferData(jsonTask.getSpecialId(),ThreadLocalUtils.get(Constants.TEMP_TABLE_KEY));
+//            ThreadLocalUtils.delete(Constants.TEMP_TABLE_KEY);
+//            log.info("jsonTask id:[{}] singleSlide id:[{}] 处理完成[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask);
+//            // 修改任务状态
+//            jsonTask.setStatus(JsonTaskStatusEnum.PARSE_SUCCESS.getCode());
+//            jsonTask.setEndTime(new Date());
+//            jsonTaskService.updateById(jsonTask);
+//            log.info("jsonTask id:[{}] singleSlide id:[{}] 修改状态：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), 2);
+//            SingleSlide singleSlide = new SingleSlide();
+//            singleSlide.setSingleId(jsonTask.getSingleId());
+//            //0未预测、1预测成功、2预测失败、3预测中
+//            singleSlide.setForecastStatus("1");
+//            singleSlide.setStructureTime(jsonTask.getStructureTime());
+//            singleSlideService.updateById(singleSlide);
+//            log.info("jsonTask id:[{}] singleSlide id:[{}] 修改状态：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), 1);
+//        } catch (Exception e) {
+//            updateSingleSlideStatus(jsonTask.getSingleId(), "2");
+//            jsonTask.setStatus(JsonTaskStatusEnum.PARSE_FAIL.getCode());
+//            jsonTaskService.updateById(jsonTask);
+//            log.error("jsonTask id:[{}] singleSlide id:[{}] 处理失败:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask);
+//            if (log.isDebugEnabled()) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
 
     private Annotation getAnnotation(JsonTask jsonTask) {
         Long sequenceNumber = commonJsonParser.getSequenceNumber(jsonTask.getSpecialId());

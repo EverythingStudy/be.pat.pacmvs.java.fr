@@ -12,9 +12,9 @@ import cn.staitech.fr.mapper.ContourJsonMapper;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.ContourJsonService;
+import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import cn.staitech.fr.utils.GeometryUtil;
-import cn.staitech.fr.utils.ThreadLocalUtils;
 import cn.staitech.fr.vo.geojson.Features;
 import cn.staitech.fr.vo.geojson.GeoJson;
 import com.alibaba.fastjson.JSON;
@@ -77,6 +77,9 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
 
     // 批量提交数量
     public static final int BATCH_SIZE = 4000;
+    
+    @Resource
+    private CommonJsonParser commonJsonParser;
 
 
     ExecutorService EXECUTOR = new ThreadPoolExecutor(
@@ -239,10 +242,13 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
      * @param features
      * @return
      */
-    private Map<String, String> preDynamicDataMap(List<Features> features) {
+    private Map<String, String> preDynamicDataMap(List<Features> features,Long specialId) {
         List<String> idList = features.stream().map(Features::getId).collect(Collectors.toList());
         Map<String, String> dynamicDataMap = new HashMap<>();
-        Long seqId = ThreadLocalUtils.get(Constants.TEMP_TABLE_KEY);
+//        Long seqId = ThreadLocalUtils.get(Constants.TEMP_TABLE_KEY);
+        Long seqId = commonJsonParser.getSequenceNumber(specialId);
+        
+        
         Annotation annotation = new Annotation();
         annotation.setSequenceNumber(seqId);
         annotation.setIdList(idList);
@@ -278,7 +284,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                           ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir) {
         log.info("singleSlide id:[{}] 轮廓标签:[{}] 轮廓数量:[{}] 开始解析轮廓数据", single.getSingleId(), jsonName, featuresJson.size());
         List<Features> features = featuresJson.toJavaList(Features.class);
-        Map<String, String> dynamicDataMap = preDynamicDataMap(features);
+        Map<String, String> dynamicDataMap = preDynamicDataMap(features,single.getSpecialId());
         List<String> filteredFilePathList;
         Map<Geometry, Features> geometryMap = new ConcurrentHashMap<>();
         STRtree tree = new STRtree();
