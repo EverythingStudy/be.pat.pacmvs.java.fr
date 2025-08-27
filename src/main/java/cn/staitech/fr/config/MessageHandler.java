@@ -32,7 +32,7 @@ public class MessageHandler {
     @Resource
     private JsonTaskParserService jsonTaskParserService;
 
-    @RabbitListener(queues = "${queues.algoMsg:test}")
+    @RabbitListener(queues = "${queues.algoMsg:test2}")
     public void handleMessage(Message message) {
         String msg = new String(message.getBody(), StandardCharsets.UTF_8);
         log.info("MessageHandler received: {}", msg);

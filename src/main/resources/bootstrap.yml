@@ -1,7 +1,6 @@
 # Tomcat
 server:
   port: 9701
-
 knife4j:
   enable: true
 # Spring
@@ -26,7 +25,7 @@ spring:
         namespace: @nacosNamespace@
         # nacos group
         group: @nacosGroup@
-       # register-enabled: false
+        # register-enabled: false
       config:
         # 配置中心地址
         server-addr: @serverAddr@

@@ -103,6 +103,6 @@ management:
     env:
       enabled: true
 waxPath: /home/pat_saas/temp/
-queues:
-  algoMsg: test
-  algoMsgRetry: algo.message.retry.queue
+#queues:
+#  algoMsg: test
+#  algoMsgRetry: algo.message.retry.queue
