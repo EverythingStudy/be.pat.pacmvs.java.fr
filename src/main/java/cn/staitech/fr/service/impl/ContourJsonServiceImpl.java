@@ -497,8 +497,10 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
         int trueSize = TILE_SIZE * (int) Math.pow(2, (maxZ - zoomLevel));
         // 计算瓦片的起始坐标
         int sx = x * trueSize;
-        int sy = -(y * trueSize);
-        int sy1 = -(y * trueSize + trueSize);
+//        int sy = -(y * trueSize);
+//        int sy1 = -(y * trueSize + trueSize);
+        int sy = y * trueSize;
+        int sy1 = y * trueSize + trueSize;
         Coordinate[] coordinates = new Coordinate[]{new Coordinate(sx, sy), new Coordinate(sx + trueSize, sy), new Coordinate(sx + trueSize, sy1), new Coordinate(sx, sy1), new Coordinate(sx, sy),};
 
         // 创建Polygon并将其转换为Geometry
