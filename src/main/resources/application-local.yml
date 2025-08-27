@@ -108,73 +108,73 @@ organ-structures:
   structures:
     # 脏器ID: [结构列表]
     "01": # 肾上腺
-      - structure-id: 10103D,10103E,101004,101111
+      - structure-id: 10103D,10103E,101004
     08: # 甲状旁腺
-      - structure-id: 108091,108111
+      - structure-id: 108091
     09: # 唾液腺，腮腺
-      - structure-id: 10906F,109111
+      - structure-id: 10906F
     0A: # 唾液腺，舌下腺
-      - structure-id: 10A06F,10A111,10A06D
+      - structure-id: 10A06F,10A06D
     0B: #  唾液腺，颌下腺
-      - structure-id: 10B125,10B128,10B126,10B111
+      - structure-id: 10B125,10B128,10B126
     0D: # 舌
-      - structure-id: 10D12E,10D12F,10D01C,10D111
+      - structure-id: 10D12E,10D12F,10D01C
     10: #  胃（腺胃和非腺胃）
-      - structure-id: 11012E,11012F,110035,110111
+      - structure-id: 11012E,11012F,110035
     12: #  肝脏
-      - structure-id: 11214D,112111
+      - structure-id: 11214D
     14: #  肠，盲肠
-      - structure-id: 114156,114008,114009,11400C,114049,114111
+      - structure-id: 114156,114008,114009,11400C,114049
     15: #  肠，结肠
-      - structure-id: 115156,115008,115009,11500C,115111
+      - structure-id: 115156,115008,115009,11500C
     16: #  肠，直肠
-      - structure-id: 116156,116008,116009,11600C,116111
+      - structure-id: 116156,116008,116009,11600C
     17: #  肠，回肠（含派氏结）
-      - structure-id: 117156,117008,117009,11700C,117111,117049
+      - structure-id: 117156,117008,117009,11700C,117049
     18: #  肠，空肠
-      - structure-id: 118156,118008,118009,11800C,118111
+      - structure-id: 118156,118008,118009,11800C
     19: #  肠，十二指肠
-      - structure-id: 11900C,119111,11901E
+      - structure-id: 11900C,11901E
     1B: #  肾脏
-      - structure-id: 11B02D,11B111
+      - structure-id: 11B02D
     1E: #  膀胱
-      - structure-id: 11E034,11E035,11E111
+      - structure-id: 11E034,11E035
     2B: #  凝固腺
-      - structure-id: 12B074,12B111
+      - structure-id: 12B074
     2C: #  前列腺
-      - structure-id: 12C06D,12C0E9,12C111
+      - structure-id: 12C06D,12C0E9
     2D: #  精囊腺
-      - structure-id: 12D074,12D111
+      - structure-id: 12D074
     2E: #  睾丸
-      - structure-id: 12E0FA,12E111
+      - structure-id: 12E0FA
     2F: #  附睾
-      - structure-id: 12F0F5,12F0F4,12F0F6,12F111
+      - structure-id: 12F0F5,12F0F4,12F0F6
     32: #  大脑
-      - structure-id: 13209C,132004,132111
+      - structure-id: 13209C,132004
     39: #  脊髓（颈、胸、腰）
-      - structure-id: 1390B3,1390B2,1390B4,139111
+      - structure-id: 1390B3,1390B2,1390B4
     45: #  脾脏
-      - structure-id: 145047,145045,145048,14504D,145004,145111
+      - structure-id: 145047,145045,145048,14504D,145004
     46: #  淋巴结，肠系膜
-      - structure-id: 14603E,146111
+      - structure-id: 14603E
     47: #  淋巴结，腹股沟
-      - structure-id: 14703E,147111
+      - structure-id: 14703E
     48: #  淋巴结，下颌
-      - structure-id: 14803E,148111
+      - structure-id: 14803E
     4C: #  肺（含支气管）
-      - structure-id: 14C004,14C006,14C111
+      - structure-id: 14C004,14C006
     4D: #  气管
-      - structure-id: 14D007,14D035,14D00B,14D111
+      - structure-id: 14D007,14D035,14D00B
     5C: #  骨骼肌
-      - structure-id: 15C02A,15C111
+      - structure-id: 15C02A
     69: #  泪腺
-      - structure-id: 16906F,169111
+      - structure-id: 16906F
     7A: #  皮肤（乳腺附近）及乳腺
-      - structure-id: 123005,1230C3,12306C,1230C7,123111
+      - structure-id: 123005,1230C3,12306C,1230C7
     7C: #  卵巢与输卵管
-      - structure-id: 1240CA,124111
+      - structure-id: 1240CA
     7D: #  小脑与脑干
-      - structure-id: 17D003,17D004,17D0A5,17D111
+      - structure-id: 17D003,17D004,17D0A5
 
 #queues:
 #  algoMsg: test
