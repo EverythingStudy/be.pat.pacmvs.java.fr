@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json;
 
+import cn.staitech.fr.config.OrganStructureConfig;
 import cn.staitech.fr.constant.Constants;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.enums.ForecastStatusEnum;
@@ -67,6 +68,8 @@ public class JsonTaskParserService {
     private StructureMapper structureMapper;
     @Autowired
     private JsonFileMapper jsonFileMapper;
+    @Resource
+    private OrganStructureConfig organStructureConfig;
 
     /**
      * 创建计算临时表
@@ -209,20 +212,43 @@ public class JsonTaskParserService {
     private Boolean verifyCategoryStructure(JsonTask jsonTask) {
         OrganTag category = organTagMapper.selectById(jsonTask.getCategoryId());
         //AI识别每个脏器对应的结构
-        Structure structure = new Structure();
-        structure.setOrganCode(category.getOrganTagCode());
-        structure.setOrganizationId(jsonTask.getOrganizationId());
-        List<Structure> structureList = structureMapper.queryList(structure);
-        Set<String> structureIdSet = structureList.stream().map(e -> e.getStructureId()).collect(Collectors.toSet());
+//        Structure structure = new Structure();
+//        structure.setOrganCode(category.getOrganTagCode());
+//        structure.setOrganizationId(jsonTask.getOrganizationId());
+//        List<Structure> structureList = structureMapper.queryList(structure);
+//        Set<String> structureIdSet = structureList.stream().map(e -> e.getStructureId()).collect(Collectors.toSet());
         //AI识别每个脏器对应的结构JSON文件
         List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
         if (CollectionUtils.isNotEmpty(fileList)) {
-            Set<String> structureIdSet1 = fileList.stream().map(e -> e.getStructureId()).collect(Collectors.toSet());
-            if (structureIdSet1.containsAll(structureIdSet)) {
-                return Boolean.TRUE;
-            }
+            //Set<String> structureIdSet1 = fileList.stream().map(e -> e.getStructureId()).collect(Collectors.toSet());
+            List<String> structureIdSet1 = fileList.stream().map(e -> e.getStructureId()).collect(Collectors.toList());
+            return isOrganRecognitionComplete(category.getOrganTagCode(), structureIdSet1);
+//            if (structureIdSet1.containsAll(structureIdSet)) {
+//                return Boolean.TRUE;
+//            }
         }
         return Boolean.FALSE;
+    }
+
+    /**
+     * 判断指定脏器的所有启用结构是否都已完成识别
+     *
+     * @param organId             脏器ID
+     * @param completedStructures 已完成识别的结构列表
+     * @return 是否完成所有结构识别
+     */
+    public boolean isOrganRecognitionComplete(String organId, List<String> completedStructures) {
+        List<OrganStructureConfig.OrganStructure> structures = organStructureConfig.getStructures().get(organId);
+        if (structures == null || structures.isEmpty()) {
+            return false;
+        }
+
+        // 获取该脏器所有启用的结构
+        List<String> enabledStructures = Arrays.asList(structures.get(0).getStructureId().split(","));
+        //Set<String> enabledStructures = structures.stream().filter(OrganStructureConfig.OrganStructure::getEnabled).map(OrganStructureConfig.OrganStructure::getStructureId).collect(Collectors.toSet());
+
+        // 检查所有启用的结构是否都已完成识别
+        return completedStructures.containsAll(enabledStructures);
     }
 
     private void JsonTaskAiHandler(JsonTask jsonTask, List<JsonFile> jsonFileList) {
