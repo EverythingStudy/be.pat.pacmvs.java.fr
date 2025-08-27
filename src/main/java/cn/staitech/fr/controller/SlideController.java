@@ -168,18 +168,8 @@ public class SlideController  extends BaseController {
 
     @ApiOperation(value = "查询机构编码数据")
     @PostMapping("/getOrganizationCode")
-    public R<String> getOrganizationCode(@RequestBody OrganizationCodeReq req) {
-        String organizationCode = StringUtils.EMPTY;
-        if(null != req.getSlideId()) {
-            Slide slide = slideMapper.selectById(req.getSlideId());
-            req.setProjectId(slide.getProjectId());
-        }
-        if(req.getProjectId() != null) {
-            Project project = projectMapper.selectById(req.getProjectId());
-            if (null != project.getOrganizationId()) {
-                organizationCode = SysRoleUtils.getOrganization03Code(project.getOrganizationId());
-            }
-        }
+    public R<String> getOrganizationCode() {
+        String organizationCode = SysRoleUtils.getOrganization03Code(SecurityUtils.getOrganizationId());
         return R.ok(organizationCode);
     }
 
