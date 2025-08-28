@@ -110,4 +110,13 @@ JOIN tb_species c
 ON b.species_id = c.species_id AND b.organization_id = c.organization_id
 JOIN tb_structure d
 ON a.structure_id = d.structure_id AND a.organization_id = d.organization_id AND b.organ_code = d.organ_code AND b.species_id = d.species_id
-SET a.structure_tag_name = CONCAT(c.name, b.structure_tag_set_name, d.name)
+SET a.structure_tag_name = CONCAT(c.name, b.structure_tag_set_name, d.name);
+-- tb_organ_tag加入算法支持状态
+ALTER TABLE tb_organ_tag
+ADD COLUMN organ_recognition_status tinyint NOT NULL DEFAULT 1 COMMENT '脏器识别：0-不可用；1-可用' AFTER update_time;
+ALTER TABLE tb_organ_tag
+ADD COLUMN organ fine_contour tinyint NOT NULL DEFAULT 1 COMMENT '精细轮廓：0-不可用；1-可用' AFTER organ_recognition_status;
+ALTER TABLE tb_organ_tag
+ADD COLUMN organ structured_analysis tinyint NOT NULL DEFAULT 1 COMMENT '结构化分析：0-不可用；1-可用' AFTER fine_contour;
+ALTER TABLE tb_organ_tag
+ADD COLUMN organ screening_difference tinyint NOT NULL DEFAULT 1 COMMENT '筛差：0-不可用；1-可用' AFTER structured_analysis;
