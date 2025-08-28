@@ -203,7 +203,7 @@ public class JsonTaskParserService {
                 }
             }
         } catch (Exception e) {
-            log.error("Unexpected error occurred: [{}]", e.getMessage());
+            log.error("Unexpected error occurred: [{}]", e);
             throw new JsonTaskParserException(e.getMessage());
         }
 
