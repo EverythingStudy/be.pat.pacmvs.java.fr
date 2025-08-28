@@ -42,16 +42,22 @@ public class AccessProjectRecordsServiceImpl extends ServiceImpl<AccessProjectRe
 
     @Override
     public R<List<AccessProjectRecordsVo>> accessProjectStatistics() throws Exception {
+        List<AccessProjectRecordsVo> accessProjectRecordsVoList = new ArrayList<>();
+
         List<AccessProjectRecords> accessProjectRecordsList = list(Wrappers.<AccessProjectRecords>lambdaQuery()
                 .eq(AccessProjectRecords::getUserId, SecurityUtils.getUserId())
                 .groupBy(AccessProjectRecords::getProjectId)
                 .orderByDesc(AccessProjectRecords::getAccessTime)).stream().limit(5).collect(Collectors.toList());
 
+        if(CollectionUtils.isEmpty(accessProjectRecordsList)) {
+            return R.ok(accessProjectRecordsVoList);
+        }
         List<Long> projectIds = accessProjectRecordsList.stream().map(AccessProjectRecords::getProjectId).collect(Collectors.toList());
         Map<Long, Date> rmap = accessProjectRecordsList.stream().collect(Collectors.toMap(AccessProjectRecords::getProjectId, AccessProjectRecords::getAccessTime));
         AccessProjectRecordReq req = new AccessProjectRecordReq();
         req.setProjectIds(projectIds);
         req.setOrganizationId(SecurityUtils.getOrganizationId());
+
         List<AccessProjectRecordsVo> accessProjectRecordsVos = this.getBaseMapper().accessProjectStatistics(req);
         for (AccessProjectRecordsVo accessProjectRecordsVo : accessProjectRecordsVos) {
             if(rmap.containsKey(accessProjectRecordsVo.getSpecialId())) {
@@ -61,12 +67,13 @@ public class AccessProjectRecordsServiceImpl extends ServiceImpl<AccessProjectRe
                 accessProjectRecordsVo.setAnalysisCount(accessProjectRecordsVo.getAnalysisCount() == null ? "0" : accessProjectRecordsVo.getAnalysisCount());
                 accessProjectRecordsVo.setAnalysisSum(accessProjectRecordsVo.getAnalysisSum() == null ? "0" : accessProjectRecordsVo.getAnalysisSum());
                 accessProjectRecordsVo.setProjectId(accessProjectRecordsVo.getSpecialId());
+                accessProjectRecordsVoList.add(accessProjectRecordsVo);
             }
         }
-        if(!accessProjectRecordsVos.isEmpty()) {
-            accessProjectRecordsVos.sort((o1, o2) -> o2.getAccessTime().compareTo(o1.getAccessTime()));
+        if(!accessProjectRecordsVoList.isEmpty()) {
+            accessProjectRecordsVoList.sort((o1, o2) -> o2.getAccessTime().compareTo(o1.getAccessTime()));
         }
-        return R.ok(accessProjectRecordsVos);
+        return R.ok(accessProjectRecordsVoList);
     }
 
     @Override
