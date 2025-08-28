@@ -35,6 +35,9 @@
                     #{id}
                 </foreach>
             </if>
+            <if test="organizationId != null">
+                fs.organization_id=#{organizationId}
+            </if>
         </where>
     </select>
 
