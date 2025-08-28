@@ -51,6 +51,7 @@ public class AccessProjectRecordsServiceImpl extends ServiceImpl<AccessProjectRe
         Map<Long, Date> rmap = accessProjectRecordsList.stream().collect(Collectors.toMap(AccessProjectRecords::getProjectId, AccessProjectRecords::getAccessTime));
         AccessProjectRecordReq req = new AccessProjectRecordReq();
         req.setProjectIds(projectIds);
+        req.setOrganizationId(SecurityUtils.getOrganizationId());
         List<AccessProjectRecordsVo> accessProjectRecordsVos = this.getBaseMapper().accessProjectStatistics(req);
         for (AccessProjectRecordsVo accessProjectRecordsVo : accessProjectRecordsVos) {
             if(rmap.containsKey(accessProjectRecordsVo.getSpecialId())) {
@@ -62,7 +63,9 @@ public class AccessProjectRecordsServiceImpl extends ServiceImpl<AccessProjectRe
                 accessProjectRecordsVo.setProjectId(accessProjectRecordsVo.getSpecialId());
             }
         }
-        accessProjectRecordsVos.sort((o1, o2) -> o2.getAccessTime().compareTo(o1.getAccessTime()));
+        if(!accessProjectRecordsVos.isEmpty()) {
+            accessProjectRecordsVos.sort((o1, o2) -> o2.getAccessTime().compareTo(o1.getAccessTime()));
+        }
         return R.ok(accessProjectRecordsVos);
     }
 
