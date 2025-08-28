@@ -195,3 +195,7 @@ INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `pa
 
 update sys_menu set status='1' where menu_id=59;
 update sys_menu set status='1' where menu_id=61;
+
+-- fr_single_slide加入筛差状态
+ALTER TABLE fr_single_slide
+ADD COLUMN screening_difference_status tinyint NOT NULL DEFAULT 0 COMMENT '筛差状态：0未预测、1预测成功、2预测失败、3预测中' AFTER ai_status_fine;
