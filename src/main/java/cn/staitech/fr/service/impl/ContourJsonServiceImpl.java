@@ -57,15 +57,14 @@ import static cn.staitech.common.core.utils.DateUtils.parseDate;
  */
 @Slf4j
 @Service
-public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, ContourJson>
-        implements ContourJsonService {
+public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, ContourJson> implements ContourJsonService {
 
     @Resource
     private AnnotationMapper annotationMapper;
 
     @Resource
     private SingleSlideMapper singleSlideMapper;
-    
+
     @Resource
     private ImageMapper imageMapper;
 
@@ -77,19 +76,12 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
 
     // 批量提交数量
     public static final int BATCH_SIZE = 4000;
-    
+
     @Resource
     private CommonJsonParser commonJsonParser;
 
 
-    ExecutorService EXECUTOR = new ThreadPoolExecutor(
-            (int) (Runtime.getRuntime().availableProcessors() * 1.5),
-            Runtime.getRuntime().availableProcessors() * 2,
-            0L,
-            TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>(),
-            new CustomRejectedExecutionHandler()
-    );
+    ExecutorService EXECUTOR = new ThreadPoolExecutor((int) (Runtime.getRuntime().availableProcessors() * 1.5), Runtime.getRuntime().availableProcessors() * 2, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), new CustomRejectedExecutionHandler());
 
 
     static class CustomRejectedExecutionHandler implements RejectedExecutionHandler {
@@ -130,7 +122,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
 
         // 创建保存的目录
 //        String outputDir = OUTPUT_FILTERED_FILE_PATH + File.separator + specialId + File.separator + singleId;
-        String outputDir = OUTPUT_FILTERED_FILE_PATH + File.separator + specialId + File.separator + slideId+ File.separator + jsonTask.getCategoryId();
+        String outputDir = OUTPUT_FILTERED_FILE_PATH + File.separator + specialId + File.separator + slideId + File.separator + jsonTask.getCategoryId();
         try {
             Files.createDirectories(Paths.get(outputDir));
         } catch (IOException e) {
@@ -141,7 +133,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             File f = new File(fileUrl);
             String fileName = f.getName().substring(0, f.getName().lastIndexOf("."));
             if (MapConstant.getStructureSize(jsonTask.getOrganizationId() + fileName) == null) {
-                log.warn("jsonTask id:[{}] singleSlide id:[{}]  structureSize is null； jsonFile:[{}]",jsonTask.getTaskId(),jsonTask.getSingleId(),fileUrl);
+                log.warn("jsonTask id:[{}] singleSlide id:[{}]  structureSize is null； jsonFile:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), fileUrl);
                 continue;
             }
             jsonParser(f.getPath(), zoomLevels, fileName, singleSlideSelectBy, geometryIdMap, outputDir);
@@ -152,14 +144,13 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
      * 解析JSON文件并处理地理数据
      *
      * @param inputGeoJsonFilePath 输入的GeoJSON文件路径
-     * @param zoomLevels 缩放级别列表
-     * @param jsonName JSON文件名称
-     * @param single 单滑块选择器对象
-     * @param tileGeometryMap 瓦片几何图形映射表
-     * @param outputDir 输出目录路径
+     * @param zoomLevels           缩放级别列表
+     * @param jsonName             JSON文件名称
+     * @param single               单滑块选择器对象
+     * @param tileGeometryMap      瓦片几何图形映射表
+     * @param outputDir            输出目录路径
      */
-    public void jsonParser(String inputGeoJsonFilePath, List<String> zoomLevels, String jsonName,
-                           SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir) {
+    public void jsonParser(String inputGeoJsonFilePath, List<String> zoomLevels, String jsonName, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir) {
         JSONArray featuresJson = new JSONArray();
         JsonFactory jsonFactory = new MappingJsonFactory();
         //ObjectMapper mapper = new ObjectMapper();
@@ -242,13 +233,13 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
      * @param features
      * @return
      */
-    private Map<String, String> preDynamicDataMap(List<Features> features,Long specialId) {
+    private Map<String, String> preDynamicDataMap(List<Features> features, Long specialId) {
         List<String> idList = features.stream().map(Features::getId).collect(Collectors.toList());
         Map<String, String> dynamicDataMap = new HashMap<>();
 //        Long seqId = ThreadLocalUtils.get(Constants.TEMP_TABLE_KEY);
         Long seqId = commonJsonParser.getSequenceNumber(specialId);
-        
-        
+
+
         Annotation annotation = new Annotation();
         annotation.setSequenceNumber(seqId);
         annotation.setIdList(idList);
@@ -273,22 +264,21 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
     /**
      * 解析JSON数据并处理地理要素信息
      *
-     * @param featuresJson 包含地理要素的JSON数组
-     * @param zoomLevels 缩放级别列表
-     * @param jsonName JSON文件名称
-     * @param single 单滑块选择器对象
+     * @param featuresJson    包含地理要素的JSON数组
+     * @param zoomLevels      缩放级别列表
+     * @param jsonName        JSON文件名称
+     * @param single          单滑块选择器对象
      * @param tileGeometryMap 瓦片几何图形映射表
-     * @param outputDir 输出目录路径
+     * @param outputDir       输出目录路径
      */
-    public void parseJson(JSONArray featuresJson, List<String> zoomLevels, String jsonName, SingleSlideSelectBy single,
-                          ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir) {
+    public void parseJson(JSONArray featuresJson, List<String> zoomLevels, String jsonName, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir) {
         log.info("singleSlide id:[{}] 轮廓标签:[{}] 轮廓数量:[{}] 开始解析轮廓数据", single.getSingleId(), jsonName, featuresJson.size());
         List<Features> features = featuresJson.toJavaList(Features.class);
-        Map<String, String> dynamicDataMap = preDynamicDataMap(features,single.getSpecialId());
+        Map<String, String> dynamicDataMap = preDynamicDataMap(features, single.getSpecialId());
         List<String> filteredFilePathList;
         Map<Geometry, Features> geometryMap = new ConcurrentHashMap<>();
         STRtree tree = new STRtree();
-        Integer size = MapConstant.getStructureSize(single.getOrganizationId()+jsonName);
+        Integer size = MapConstant.getStructureSize(single.getOrganizationId() + jsonName);
 
         // 对大文件进行特殊处理,单独存储一个文件
         if (size == 1) {
@@ -302,7 +292,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                 if (dynamicDataMap.containsKey(feature.getId())) {
                     // 处理单个元素,将json文件中的数据转化为Features对象
                     double resolutions = Double.parseDouble(single.getResolutionX());
-                    Features features1 = handleSingleJsonElement(feature, MapConstant.getPathologicalIndicatorCategory(single.getOrganizationId(),jsonName), resolutions, 10, dynamicDataMap.get(feature.getId()));
+                    Features features1 = handleSingleJsonElement(feature, MapConstant.getPathologicalIndicatorCategory(single.getOrganizationId(), jsonName), resolutions, 10, dynamicDataMap.get(feature.getId()));
                     if (features1 != null) {
                         list.add(features1);
                     }
@@ -356,8 +346,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
      * @param zoom                 缩放级别，用于指定处理的缩放级别
      * @param dynamicDataMap       动态数据映射，用于存储和处理动态数据
      */
-    public void submitPathList(List<String> filteredFilePathList, String jsonName, STRtree tree, Map<Geometry, Features> geometryMap,
-                               SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir, int zoom, Map<String, String> dynamicDataMap) {
+    public void submitPathList(List<String> filteredFilePathList, String jsonName, STRtree tree, Map<Geometry, Features> geometryMap, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir, int zoom, Map<String, String> dynamicDataMap) {
         // 检查文件路径列表是否非空
         if (CollectionUtils.isNotEmpty(filteredFilePathList)) {
             // 初始化计数器，用于同步任务完成状态
@@ -460,7 +449,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                     if (features1 != null) {
                         // 处理单个元素,将json文件中的数据转化为Features对象
                         double resolutions = Double.parseDouble(single.getResolutionX());
-                        Features fs = handleSingleJsonElement(features1,MapConstant.getPathologicalIndicatorCategory(single.getOrganizationId(),jsonName) ,resolutions, zoom, MapUtils.getString(dynamicDataMap, features1.getId()));
+                        Features fs = handleSingleJsonElement(features1, MapConstant.getPathologicalIndicatorCategory(single.getOrganizationId(), jsonName), resolutions, zoom, MapUtils.getString(dynamicDataMap, features1.getId()));
                         filteredFeatures.add(fs);
                     }
                 }
@@ -660,7 +649,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             outputStream.write(jsonString.getBytes());
             outputStream.close();
         } catch (Exception e) {
-            log.error("Error occurred while writing to file: [{}]; error msg:[{}]" ,fileUrl, e.getMessage());
+            log.error("Error occurred while writing to file: [{}]; error msg:[{}]", fileUrl, e.getMessage());
             e.printStackTrace();
         }
     }
@@ -829,63 +818,63 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
     }
 
     // 根据专题id(必须)+切片id(必须)+脏器id(多个脏器)用于获取脏器文件大小使用
-	@Override
-	public R<ContourFileVo> getContourJsonSize(Long slideId,Long projectId,List<Long> organTagIds) {
-		String filePath = File.separator + "home" + File.separator + "data" + File.separator + "aiJson" + File.separator + projectId ;
+    @Override
+    public R<ContourFileVo> getContourJsonSize(Long slideId, Long projectId, List<Long> organTagIds) {
+        String filePath = File.separator + "home" + File.separator + "data" + File.separator + "aiJson" + File.separator + projectId;
         List<String> dataFiles = new ArrayList<>();
         long totalSize = 0;
-        if(null != slideId) {
-        	//如果切片id不为空，json目录需要拼接切片id
-        	filePath =  filePath + File.separator + slideId;
-        	if(CollectionUtils.isNotEmpty(organTagIds)) {
-        		for(Long tagId:organTagIds) {
-        			//如果脏器id不为空，json目录需要拼接脏器id
-        			String tagPath  =  filePath + File.separator + tagId;
-        			List<String> files = getFilesDirectory(tagPath);
-        			dataFiles.addAll(files);
-        		}
-        		totalSize = (long)dataFiles.size();
-        	}
+        if (null != slideId) {
+            //如果切片id不为空，json目录需要拼接切片id
+            filePath = filePath + File.separator + slideId;
+            if (CollectionUtils.isNotEmpty(organTagIds)) {
+                for (Long tagId : organTagIds) {
+                    //如果脏器id不为空，json目录需要拼接脏器id
+                    String tagPath = filePath + File.separator + tagId;
+                    List<String> files = getFilesDirectory(tagPath);
+                    dataFiles.addAll(files);
+                }
+                totalSize = (long) dataFiles.size();
+            }
         }
         // 检测filePath目录是否存在，如果存在，则返回该目录下的所有文件名称，如果不存在，则返回null
         ContourFileVo contourFileVo = ContourFileVo.builder().totalSize(totalSize).build();
         return R.ok(contourFileVo);
-	}
-	
-	@SuppressWarnings("finally")
-	public static List<String> getFilesDirectory(String directoryPath) {
+    }
+
+    @SuppressWarnings("finally")
+    public static List<String> getFilesDirectory(String directoryPath) {
         Path directory = Paths.get(directoryPath);
         List<String> files = new ArrayList<>();
         //获取文件夹下所有文件
         try {
 //            files = Files.walk(directory).filter(Files::isRegularFile).map(path -> path.getFileName().toString()).collect(Collectors.toList());
-        	files = Files.walk(directory).filter(Files::isRegularFile).map(path -> path.toString()).collect(Collectors.toList());
+            files = Files.walk(directory).filter(Files::isRegularFile).map(path -> path.toString()).collect(Collectors.toList());
         } catch (IOException e) {
             e.printStackTrace();
-        }finally {
-        	return files;
-		}
+        } finally {
+            return files;
+        }
     }
 
-	//根据专题id(必须)+切片id(必须)+脏器id(非必填)用于单脏器下载使用
-	@Override
-	public R<cn.staitech.fr.domain.out.JsonFileVo> selectList(Long slideId, Long projectId, Long organTagId) {
-		String filePath = File.separator + "home" + File.separator + "data" + File.separator + "aiJson" + File.separator + projectId ;
-        if(null != slideId) {
-        	//如果脏器id不为空，json目录需要拼接脏器id
-        	filePath =  filePath + File.separator + slideId;
+    //根据专题id(必须)+切片id(必须)+脏器id(非必填)用于单脏器下载使用
+    @Override
+    public R<cn.staitech.fr.domain.out.JsonFileVo> selectList(Long slideId, Long projectId, Long organTagId) {
+        String filePath = File.separator + "home" + File.separator + "data" + File.separator + "aiJson" + File.separator + projectId;
+        if (null != slideId) {
+            //如果脏器id不为空，json目录需要拼接脏器id
+            filePath = filePath + File.separator + slideId;
         }
-        if(null != organTagId) {
-        	//如果脏器id不为空，json目录需要拼接脏器id
-        	filePath =  filePath + File.separator + organTagId;
+        if (null != organTagId) {
+            //如果脏器id不为空，json目录需要拼接脏器id
+            filePath = filePath + File.separator + organTagId;
         }
         // 检测filePath目录是否存在，如果存在，则返回该目录下的所有文件名称，如果不存在，则返回null
         JsonFileVo jsonFileVo = getFilesInDirectory(filePath);
         return R.ok(jsonFileVo);
-	}
-	
-	
-	public static JsonFileVo getFilesInDirectory(String directoryPath) {
+    }
+
+
+    public static JsonFileVo getFilesInDirectory(String directoryPath) {
         Path directory = Paths.get(directoryPath);
         List<String> files = new ArrayList<>();
         //获取文件夹下所有文件总size
