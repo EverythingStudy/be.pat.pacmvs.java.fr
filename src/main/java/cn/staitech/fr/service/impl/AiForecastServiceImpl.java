@@ -48,9 +48,6 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
     private SlideMapper slideMapper;
 
     @Resource
-    private CategoryMapper categoryMapper;
-
-    @Resource
     private AiForecastMapper aiForecastMapper;
 
     @Resource

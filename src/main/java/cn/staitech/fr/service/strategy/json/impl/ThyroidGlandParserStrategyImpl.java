@@ -55,8 +55,6 @@ public class ThyroidGlandParserStrategyImpl extends AbstractCustomParserStrategy
     private AnnotationMapper annotationMapper;
 
     @Resource
-    private CategoryMapper categoryMapper;
-    @Resource
     private OrganTagMapper organTagMapper;
 
     @PostConstruct
