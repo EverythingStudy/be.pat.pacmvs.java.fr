@@ -4,6 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.service.strategy.json.impl.TestisParserStrategyImpl;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -17,6 +18,7 @@ import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -38,15 +40,13 @@ public class CommonJsonCheck {
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
-    private PathologicalIndicatorCategoryMapper pathologicalIndicatorCategoryMapper;
-    @Resource
     private AnnotationMapper annotationMapper;
     @Resource
     private ImageMapper imageMapper;
     @Resource
-    private OrganMapper organMapper;
-    @Resource
     private OrganTagMapper organTagMapper;
+    @Resource
+    private StructureTagMapper structureTagMapper;
 
 
     private static boolean handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
@@ -163,7 +163,7 @@ public class CommonJsonCheck {
         }
     }
 
-    public boolean checkJson(JsonTask jsonTask,List<JsonFile> jsonFileList) {
+    public boolean checkJson(JsonTask jsonTask, List<JsonFile> jsonFileList) {
         if (checkCategory(jsonTask)) {
             return false;
         }
@@ -254,11 +254,15 @@ public class CommonJsonCheck {
      * @return 指标的结构ID和类别ID
      */
     public Map<String, Long> getPathologicalMap(Long organizationId) {
-        LambdaQueryWrapper<PathologicalIndicatorCategory> CategoryQueryWrapper = new LambdaQueryWrapper<>();
-        CategoryQueryWrapper.eq(PathologicalIndicatorCategory::getDelFlag, 0).eq(PathologicalIndicatorCategory::getOrganizationId, organizationId);
-        List<PathologicalIndicatorCategory> list = pathologicalIndicatorCategoryMapper.selectList(CategoryQueryWrapper);
-
-        return list.stream().collect(Collectors.toMap(PathologicalIndicatorCategory::getStructureId, PathologicalIndicatorCategory::getCategoryId, (entity1, entity2) -> entity1));
+        List<StructureTag> list = structureTagMapper.selectList(new LambdaQueryWrapper<>(StructureTag.class).eq(StructureTag::getOrganizationId, organizationId));
+//        LambdaQueryWrapper<OrganTag> categoryQueryWrapper = new LambdaQueryWrapper<>();
+//        categoryQueryWrapper.eq(OrganTag::getDelFlag, 0).eq(OrganTag::getOrganizationId, organizationId);
+//        List<OrganTag> list = organTagMapper.selectList(categoryQueryWrapper);
+//        Map<String, Long> map = list.stream().collect(Collectors.toMap(OrganTag::getOrganTagCode, OrganTag::getOrganTagId, (entity1, entity2) -> entity1));
+//        Structure structure = new Structure();
+//        structure.setOrganizationId(organizationId);
+//        List<Structure> structureList = structureMapper.queryList(structure);
+        return list.stream().collect(Collectors.toMap(StructureTag::getStructureId, StructureTag::getStructureTagId, (entity1, entity2) -> entity1));
     }
 
 
