@@ -37,6 +37,7 @@
             </if>
             <if test="organizationId != null">
                and fs.organization_id=#{organizationId}
+               and ts.organization_id=#{organizationId}
             </if>
         </where>
     </select>
