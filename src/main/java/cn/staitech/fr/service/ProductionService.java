@@ -2,10 +2,7 @@ package cn.staitech.fr.service;
 
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Production;
-import cn.staitech.fr.vo.project.OrganVO;
-import cn.staitech.fr.vo.project.ProductionReq;
-import cn.staitech.fr.vo.project.ProductionSaveReq;
-import cn.staitech.fr.vo.project.ProductionVO;
+import cn.staitech.fr.vo.project.*;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.List;
@@ -47,4 +44,12 @@ public interface ProductionService extends IService<Production> {
      * @return 种属脏器下拉列表（取自种属蜡块模板数据）
      */
     List<OrganVO> organList(ProductionReq req);
+
+    /**
+     * 制片信息是否保存过
+     *
+     * @param req 制片信息是否保存过
+     * @return 制片信息是否保存过
+     */
+    R<ProductionHasSaveVO> productionHasSave(ProductionHasSaveReq req);
 }
