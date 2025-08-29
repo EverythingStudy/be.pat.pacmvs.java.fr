@@ -231,6 +231,11 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
             }
             this.saveBatch(productions);
         }
+        // 制片信息是否保存过
+        Project update = new Project();
+        update.setProjectId(req.getProjectId());
+        update.setProductionSave(1);
+        this.projectMapper.updateById(update);
         return R.ok("保存成功");
     }
 
@@ -262,6 +267,24 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
             }
         }
         return list;
+    }
+
+    /**
+     * 制片信息是否保存过
+     *
+     * @param req 制片信息是否保存过
+     * @return 制片信息是否保存过
+     */
+    @Override
+    public R<ProductionHasSaveVO> productionHasSave(ProductionHasSaveReq req) {
+        ProductionHasSaveVO vo = new ProductionHasSaveVO();
+        vo.setHasSave(false);
+        // 查询项目信息
+        Project project = this.projectMapper.selectById(req.getProjectId());
+        if (project != null && project.getProductionSave() != null && project.getProductionSave() == 1) {
+            vo.setHasSave(true);
+        }
+        return R.ok(vo);
     }
 }
 

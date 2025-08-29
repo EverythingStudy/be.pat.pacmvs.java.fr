@@ -3,10 +3,7 @@ package cn.staitech.fr.controller;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.service.ProductionService;
-import cn.staitech.fr.vo.project.OrganVO;
-import cn.staitech.fr.vo.project.ProductionReq;
-import cn.staitech.fr.vo.project.ProductionSaveReq;
-import cn.staitech.fr.vo.project.ProductionVO;
+import cn.staitech.fr.vo.project.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -62,5 +59,11 @@ public class ProductionController {
     @PostMapping("/save")
     public R<String> save(@RequestBody @Validated ProductionSaveReq req) {
         return this.productionService.save(req);
+    }
+
+    @ApiOperation(value = "制片信息是否保存过")
+    @PostMapping("/productionHasSave")
+    public R<ProductionHasSaveVO> productionHasSave(@RequestBody @Validated ProductionHasSaveReq req) {
+        return this.productionService.productionHasSave(req);
     }
 }

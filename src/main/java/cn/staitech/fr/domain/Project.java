@@ -108,6 +108,6 @@ public class Project implements Serializable {
     /**
      * 制片信息是否保存过：0-未保存过；1-保存过
      */
-    private  Integer productionSave;
+    private Integer productionSave;
 
 }
