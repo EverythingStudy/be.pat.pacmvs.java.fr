@@ -33,4 +33,9 @@ public class OrganStatusVo {
      */
     @ApiModelProperty(value = "是否指标异常")
     private Boolean abnormalIndicator;
+    /**
+     * 结构化状态 0未预测、1预测成功、2预测失败、3预测中
+     */
+    @ApiModelProperty(value = "结构化状态 0未预测、1预测成功、2预测失败、3预测中")
+    private String forecastStatus;
 }
