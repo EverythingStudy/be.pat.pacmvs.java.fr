@@ -645,6 +645,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			SingleSlide singleSlide = this.singleSlideMapper.selectOne(singleSlideWrapper);
 			if (Objects.nonNull(singleSlide)) {
 				resp.setAiStatus(this.handleOrganStatus(singleSlide));
+				resp.setForecastStatus(singleSlide.getForecastStatus());
 			}
 			Set<String> structureIdsSet = new HashSet<>();
 			Set<StructureTagVo> structureTagVosSet = new HashSet<>();
