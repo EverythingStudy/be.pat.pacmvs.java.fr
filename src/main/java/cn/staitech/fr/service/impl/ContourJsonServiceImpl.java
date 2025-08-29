@@ -128,6 +128,15 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        //判断是否有这个目录
+        Path path = Paths.get(outputDir);
+        // 直接使用 Files.isDirectory，它内部会检查路径是否存在
+        if (Files.isDirectory(path)) {
+            log.warn("目录存在::[{}]", outputDir);
+        } else {
+            log.warn("目录不存在或不是目录::[{}]", outputDir);
+        }
+        
         for (JsonFile jsonFile : jsonFileList) {
             String fileUrl = jsonFile.getFileUrl();
             File f = new File(fileUrl);
@@ -437,7 +446,9 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                 // 获取符合条件的数据
                 Envelope envelope = geometry.getEnvelopeInternal();
                 List<Geometry> query = tree.query(envelope);
-
+                if(CollectionUtils.isEmpty(query)) {
+                	log.warn("singleSlide id:[{}]]", single.getSingleId()+" 匹配不到数据，无法写入瓦片数据~");
+                }
                 List<Features> filteredFeatures = new ArrayList<>();
                 for (Geometry g : query) {
 
@@ -458,6 +469,8 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                     String outputPath = outputDir + "/" + fileName + ".json";
                     // 写入文件
                     writeFilteredGeoJson(filteredFeatures, outputPath);
+                }else {
+                	log.warn("singleSlide id:[{}]]", single.getSingleId()+" filteredFeatures为空，无法写入瓦片数据~");
                 }
             } catch (JSONException e) {
                 log.error("Error processing file: [{}]", e.getMessage());
