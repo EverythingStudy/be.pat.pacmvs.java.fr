@@ -645,6 +645,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			SingleSlide singleSlide = this.singleSlideMapper.selectOne(singleSlideWrapper);
 			if (Objects.nonNull(singleSlide)) {
 				resp.setAiStatus(this.handleOrganStatus(singleSlide));
+				resp.setForecastStatus(singleSlide.getForecastStatus());
 			}
 			Set<String> structureIdsSet = new HashSet<>();
 			Set<StructureTagVo> structureTagVosSet = new HashSet<>();
@@ -836,6 +837,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                             statusVo.setAiStatus(aiStatus);
                             boolean red = this.getAiInfoListCheck(req.getProjectId(), singleSlide.getSingleId());
                             statusVo.setAbnormalIndicator(red);
+                            // 结构化状态
+                            statusVo.setForecastStatus(singleSlide.getForecastStatus());
                             // 只显示搜索的脏器
                             if (CollectionUtils.isEmpty(organTagIds) || organTagIds.contains(singleSlide.getCategoryId())) {
                                 organStatusVos.add(statusVo);
