@@ -206,5 +206,5 @@ INSERT INTO tb_structure (species_id,organ_code,structure_id,name,type,organizat
 INSERT INTO tb_structure (species_id,organ_code,structure_id,name,type,organization_id) VALUES ('1','44','144F0B','差异区域（中等疑似）','RO',1);
 INSERT INTO tb_structure (species_id,organ_code,structure_id,name,type,organization_id) VALUES ('1','1B','11BF0A','差异区域（高度疑似）','RO',1);
 INSERT INTO tb_structure (species_id,organ_code,structure_id,name,type,organization_id) VALUES ('1','1B','11BF0B','差异区域（中等疑似）','RO',1);
-INSERT INTO tb_structure (species_id,organ_code,structure_id,name,type,organization_id) VALUES ('1','5','105F0A','差异区域（高度疑似）','RO',1);
-INSERT INTO tb_structure (species_id,organ_code,structure_id,name,type,organization_id) VALUES ('1','5','105F0B','差异区域（中等疑似）','RO',1);
+INSERT INTO tb_structure (species_id,organ_code,structure_id,name,type,organization_id) VALUES ('1','05','105F0A','差异区域（高度疑似）','RO',1);
+INSERT INTO tb_structure (species_id,organ_code,structure_id,name,type,organization_id) VALUES ('1','05','105F0B','差异区域（中等疑似）','RO',1);
