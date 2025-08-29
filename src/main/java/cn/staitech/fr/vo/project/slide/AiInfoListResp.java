@@ -3,6 +3,7 @@ package cn.staitech.fr.vo.project.slide;
 import cn.staitech.common.core.annotation.Excel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,9 @@ public class AiInfoListResp {
 
     @ApiModelProperty(value = "AI分析状态：4-结构未分析、5-结构分析中、6-结构分析完成、7-结构分析失败")
     private Integer aiStatus;
+
+    @ApiModelProperty(value = "结构化状态 0未预测、1预测成功、2预测失败、3预测中")
+    private String forecastStatus;
 
     @ApiModelProperty(value = "指标计算机构编码")
     private List<StructureTagVo> structTagList = new ArrayList<>();
