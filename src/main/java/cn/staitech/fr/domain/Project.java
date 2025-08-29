@@ -105,5 +105,9 @@ public class Project implements Serializable {
     @TableField(exist = false)
     @ApiModelProperty(value = "SOP")
     private String sop = "PATH001";
+    /**
+     * 制片信息是否保存过：0-未保存过；1-保存过
+     */
+    private  Integer productionSave;
 
 }
