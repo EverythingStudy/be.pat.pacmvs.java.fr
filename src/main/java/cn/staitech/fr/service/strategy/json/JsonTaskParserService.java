@@ -201,6 +201,13 @@ public class JsonTaskParserService {
                         updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_SUCCESS.getCode());
                     }
                 }
+            } else {
+                List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
+                updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_ING.getCode());
+                //进行指标计算
+                JsonTaskAiHandler(jsonTask, fileList);
+                //部分成功-->以脏器为单位 (指标计算)结构分析完成-->forecastStatus结构化状态：1
+                updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_SUCCESS.getCode());
             }
         } catch (Exception e) {
             log.error("Unexpected error occurred: [{}]", e);
@@ -321,6 +328,7 @@ public class JsonTaskParserService {
             log.info("jsonTask id:[{}] singleSlide id:[{}] 开始计算指标。", jsonTask.getTaskId(), jsonTask.getSingleId());
             // 指标计算
             parser.alculationIndicators(jsonTask);
+
 
             try {
                 log.info("jsonTask id:[{}] singleSlide id:[{}] 开始执行新的anno数据存储。", jsonTask.getTaskId(), jsonTask.getSingleId());

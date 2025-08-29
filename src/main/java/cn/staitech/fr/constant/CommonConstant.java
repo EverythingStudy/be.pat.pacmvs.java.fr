@@ -28,7 +28,7 @@ public class CommonConstant {
 
     public static final String SINGLE_RESULT ="详情见单个标注轮廓详情弹窗！";
     public static final String EXCEL_FILE = ".xlsx";
-    
+    public static final String ZIP_FILE = ".zip";
     
     //指标单位
     public static final String SQUARE_MILLIMETRE = "mm²";

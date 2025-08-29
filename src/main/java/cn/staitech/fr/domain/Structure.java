@@ -2,14 +2,16 @@ package cn.staitech.fr.domain;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+
 import java.io.Serializable;
+import java.util.Map;
+
 import lombok.Data;
 
 /**
- * 
  * @TableName tb_structure
  */
-@TableName(value ="tb_structure")
+@TableName(value = "tb_structure")
 @Data
 public class Structure implements Serializable {
     /**
@@ -67,14 +69,7 @@ public class Structure implements Serializable {
             return false;
         }
         Structure other = (Structure) that;
-        return (this.getSpeciesId() == null ? other.getSpeciesId() == null : this.getSpeciesId().equals(other.getSpeciesId()))
-            && (this.getOrganCode() == null ? other.getOrganCode() == null : this.getOrganCode().equals(other.getOrganCode()))
-            && (this.getStructureId() == null ? other.getStructureId() == null : this.getStructureId().equals(other.getStructureId()))
-            && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName()))
-            && (this.getNameEn() == null ? other.getNameEn() == null : this.getNameEn().equals(other.getNameEn()))
-            && (this.getStructureSize() == null ? other.getStructureSize() == null : this.getStructureSize().equals(other.getStructureSize()))
-            && (this.getType() == null ? other.getType() == null : this.getType().equals(other.getType()))
-            && (this.getOrganizationId() == null ? other.getOrganizationId() == null : this.getOrganizationId().equals(other.getOrganizationId()));
+        return (this.getSpeciesId() == null ? other.getSpeciesId() == null : this.getSpeciesId().equals(other.getSpeciesId())) && (this.getOrganCode() == null ? other.getOrganCode() == null : this.getOrganCode().equals(other.getOrganCode())) && (this.getStructureId() == null ? other.getStructureId() == null : this.getStructureId().equals(other.getStructureId())) && (this.getName() == null ? other.getName() == null : this.getName().equals(other.getName())) && (this.getNameEn() == null ? other.getNameEn() == null : this.getNameEn().equals(other.getNameEn())) && (this.getStructureSize() == null ? other.getStructureSize() == null : this.getStructureSize().equals(other.getStructureSize())) && (this.getType() == null ? other.getType() == null : this.getType().equals(other.getType())) && (this.getOrganizationId() == null ? other.getOrganizationId() == null : this.getOrganizationId().equals(other.getOrganizationId()));
     }
 
     @Override
@@ -109,5 +104,9 @@ public class Structure implements Serializable {
         sb.append(", serialVersionUID=").append(serialVersionUID);
         sb.append("]");
         return sb.toString();
+    }
+
+    public Long getLong(Map<String, Long> map) {
+        return map.get(this.organCode) == null ? null : map.get(this.organCode);
     }
 }

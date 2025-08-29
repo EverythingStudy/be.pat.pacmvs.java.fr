@@ -15,11 +15,14 @@ import cn.staitech.fr.mapper.ProjectMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.service.MatrixReviewService;
+import cn.staitech.fr.utils.DateUtils;
+import cn.staitech.fr.utils.ExportPdfUtils;
 import cn.staitech.fr.utils.MathUtils;
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -57,11 +61,14 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
     @Value("${waxPath}")
     private String waxPath;
-
+    @Resource
+    private HttpServletResponse response;
 
     @Override
     public void algorithmDownload(AiDownloadIn req) throws Exception {
         log.info("ai预测报告导出接口开始：");
+        List<String> pdfName = new ArrayList<>();
+        String topicName = "";
         List<Long> ids = req.getIds();
         if (CollectionUtils.isEmpty(ids)) {
             List<Slide> slideList = slideMapper.selectList(new LambdaQueryWrapper<>(Slide.class).eq(Slide::getProjectId, req.getProjectId()).eq(Slide::getDelFlag, CommonConstant.NUMBER_0));
@@ -125,8 +132,22 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         }
         //生成Excel文件
         EasyExcel.write(s, ExprotAiExcelVO.class).sheet("AI量化指标数据").doWrite(collect);
-        log.info("结束");
+        pdfName.add(s);
+        if (singleSlideIds.size() > 1) {
+            log.info("走的压缩包");
+            ExportPdfUtils.writePdfZip(pdfName, response, topicName + DateUtils.getCurrentHHmmssString("yyyy-MM-dd HH:mm:ss") + CommonConstant.ZIP_FILE);
 
+        } else {
+            ExportPdfUtils.downloadLocal(pdfName.get(0), response);
+        }
+        for (String s1 : pdfName) {
+            if (new File(s1).exists()) {
+                FileUtils.delete(new File(s1));
+                //FileUtils.delete(new File(s1.replace(CommonConstant.PDF_FILE, CommonConstant.WROD_FILE)));
+            }
+
+        }
+        log.info("结束");
     }
 
 
