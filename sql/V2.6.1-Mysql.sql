@@ -202,3 +202,6 @@ ADD COLUMN screening_difference_status int NOT NULL DEFAULT 0 COMMENT '筛差状
 -- 制片信息是否保存过
 ALTER TABLE fr_special
 ADD COLUMN production_save tinyint NOT NULL DEFAULT 0 COMMENT '制片信息是否保存过：0-未保存过；1-保存过' AFTER `is_permanent_del`;
+-- viewers默认值
+ALTER TABLE fr_slide MODIFY COLUMN viewers JSON DEFAULT (JSON_ARRAY()) COMMENT '已阅片用户';
+UPDATE fr_slide SET viewers = JSON_ARRAY() WHERE viewers IS NULL;

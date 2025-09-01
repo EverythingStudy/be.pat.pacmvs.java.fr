@@ -595,7 +595,7 @@ public class JsonTaskParserService {
                     jsonFile.setFileUrl(fileUrl);
                     jsonFile.setAiStatus(StructureAiStatusEnum.SUCCESS.getCode());
                 } else {
-                    if (jsonObject.getString("code").equals("500")) {
+                    if ("500".equals(jsonObject.getString("code"))) {
                         jsonFile.setAiStatus(StructureAiStatusEnum.FAIL.getCode());
                     }
                     jsonFile.setAiStatus(StructureAiStatusEnum.SUCCESS.getCode());
