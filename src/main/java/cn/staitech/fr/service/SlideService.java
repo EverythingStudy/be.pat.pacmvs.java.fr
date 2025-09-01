@@ -44,7 +44,7 @@ public interface SlideService extends IService<Slide> {
 
     List<String> getGroupCode(SlideSelectListReq req);
 
-    List<SlideOrganTagVo>  getOrganCode(SlideSelectListReq req);
+    List<SlideOrganTagVo> getOrganCode(SlideSelectListReq req);
 
     /**
      * 查看Ai切片是否分析完成，没有完成返回false，完成返回true

@@ -291,10 +291,10 @@
         ) t
     </select>
     <select id="getOrganCode" resultType="cn.staitech.fr.vo.project.slide.SlideOrganTagVo">
-        select tg.organ_tag_id,tg.organ_tag_code,tg.organ_name from tb_organ_tag tg
+        select distinct tg.organ_tag_id,tg.organ_tag_code,tg.organ_name from tb_organ_tag tg
                 left join  fr_single_slide fss on fss.category_id=tg.organ_tag_id
                 left join fr_slide fs on fs.slide_id=fss.slide_id
-        where fs.del_flag='0' and fs.special_id=#{projectId}
+        where fs.del_flag='0' and fs.special_id=#{projectId} and tg.organization_id=#{organizationId}
     </select>
     <select id="selectAiAnalysis" resultType="cn.staitech.fr.vo.project.AiAnalysisBO">
         SELECT
