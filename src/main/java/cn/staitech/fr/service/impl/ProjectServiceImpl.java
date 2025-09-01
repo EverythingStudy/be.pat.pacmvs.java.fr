@@ -299,11 +299,25 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         if (count > 0) {
             return R.fail(MessageSource.M("EXISTS_SPECIAL_DATA"));
         }
+
+        // 项目启动后，仅在暂停时可以修改基础信息部分的项目名称和负责人外，其他信息不允许修改
         Project project = new Project();
-        BeanUtils.copyProperties(req, project);
-        project.setUpdateBy(SecurityUtils.getUserId());
-        project.setUpdateTime(new Date());
-        baseMapper.updateById(project);//添加项目成员
+        if(status == Constants.STATUS_PAUSED){
+            project.setProjectId(req.getProjectId());
+            // 项目名称
+            project.setProjectName(req.getProjectName());
+            // 负责人
+            project.setPrincipal(req.getPrincipal());
+            project.setUpdateBy(SecurityUtils.getUserId());
+            project.setUpdateTime(new Date());
+            baseMapper.updateById(project);
+        }else {
+            BeanUtils.copyProperties(req, project);
+            project.setUpdateBy(SecurityUtils.getUserId());
+            project.setUpdateTime(new Date());
+            baseMapper.updateById(project);
+        }
+        // 添加项目成员
         Long memberCount = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, project.getProjectId()).eq(ProjectMember::getUserId, req.getPrincipal()).eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
         if (memberCount == 0) {
             addProjectMember(project.getProjectId(), req.getPrincipal());
