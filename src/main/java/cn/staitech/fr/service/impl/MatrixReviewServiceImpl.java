@@ -132,21 +132,22 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         }
         //生成Excel文件
         EasyExcel.write(s, ExprotAiExcelVO.class).sheet("AI量化指标数据").doWrite(collect);
-        pdfName.add(s);
-        if (singleSlideIds.size() > 1) {
-            log.info("走的压缩包");
-            ExportPdfUtils.writePdfZip(pdfName, response, topicName + DateUtils.getCurrentHHmmssString("yyyy-MM-dd HH:mm:ss") + CommonConstant.ZIP_FILE);
-
-        } else {
-            ExportPdfUtils.downloadLocal(pdfName.get(0), response);
-        }
-        for (String s1 : pdfName) {
-            if (new File(s1).exists()) {
-                FileUtils.delete(new File(s1));
-                //FileUtils.delete(new File(s1.replace(CommonConstant.PDF_FILE, CommonConstant.WROD_FILE)));
-            }
-
-        }
+        ExportPdfUtils.downloadLocal(s, response);
+//        pdfName.add(s);
+//        if (singleSlideIds.size() > 1) {
+//            log.info("走的压缩包");
+//            ExportPdfUtils.writePdfZip(pdfName, response, topicName + DateUtils.getCurrentHHmmssString("yyyy-MM-dd HH:mm:ss") + CommonConstant.ZIP_FILE);
+//
+//        } else {
+//            ExportPdfUtils.downloadLocal(pdfName.get(0), response);
+//        }
+//        for (String s1 : pdfName) {
+//            if (new File(s1).exists()) {
+//                FileUtils.delete(new File(s1));
+//                //FileUtils.delete(new File(s1.replace(CommonConstant.PDF_FILE, CommonConstant.WROD_FILE)));
+//            }
+//
+//        }
         log.info("结束");
     }
 
