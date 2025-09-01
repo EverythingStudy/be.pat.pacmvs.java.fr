@@ -362,7 +362,8 @@
         f.category_id AS categoryId,
         e.organization_id AS organizationId,
         e.organization_name AS organizationName,
-        d.topic_name AS topicName
+        d.topic_name AS topicName,
+        c.species_id AS speciesId
         FROM fr_slide a LEFT JOIN tb_image b ON a.image_id = b.image_id
         LEFT JOIN fr_special c ON a.special_id = c.special_id
         LEFT JOIN tb_topic d ON c.topic_id = d.topic_id
