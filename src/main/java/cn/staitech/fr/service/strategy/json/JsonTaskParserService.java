@@ -202,12 +202,8 @@ public class JsonTaskParserService {
                     }
                 }
             } else {
-                List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
-                updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_ING.getCode());
-                //进行指标计算
-                JsonTaskAiHandler(jsonTask, fileList);
-                //部分成功-->以脏器为单位 (指标计算)结构分析完成-->forecastStatus结构化状态：1
-                updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_SUCCESS.getCode());
+                //解析脏器结构文件路径，并存入MySQL
+                parseSingleJsonFile(jsonTask, jsonObject);
             }
         } catch (Exception e) {
             log.error("Unexpected error occurred: [{}]", e);
@@ -345,14 +341,14 @@ public class JsonTaskParserService {
             jsonTask.setStatus(JsonTaskStatusEnum.PARSE_SUCCESS.getCode());
             jsonTask.setEndTime(new Date());
             jsonTaskService.updateById(jsonTask);
-            log.info("jsonTask id:[{}] singleSlide id:[{}] 修改状态：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), 2);
+            log.info("jsonTask id:[{}] singleSlide id:[{}] 修改状态：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), JsonTaskStatusEnum.PARSE_SUCCESS.getCode());
             SingleSlide singleSlide = new SingleSlide();
             singleSlide.setSingleId(jsonTask.getSingleId());
             //0未预测、1预测成功、2预测失败、3预测中
             singleSlide.setForecastStatus(ForecastStatusEnum.FORECAST_SUCCESS.getCode());
             singleSlide.setStructureTime(jsonTask.getStructureTime());
             singleSlideService.updateById(singleSlide);
-            log.info("jsonTask id:[{}] singleSlide id:[{}] 修改状态：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), 1);
+            log.info("jsonTask id:[{}] singleSlide id:[{}] 修改状态：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_SUCCESS.getCode());
         } catch (Exception e) {
             updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_FAIL.getCode());
             jsonTask.setStatus(JsonTaskStatusEnum.PARSE_FAIL.getCode());
