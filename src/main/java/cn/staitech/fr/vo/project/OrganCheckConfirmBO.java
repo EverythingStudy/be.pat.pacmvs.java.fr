@@ -43,4 +43,8 @@ public class OrganCheckConfirmBO implements Serializable {
      * 专题名称
      */
     private String topicName;
+    /**
+     * 种属id
+     */
+    private String speciesId;
 }
