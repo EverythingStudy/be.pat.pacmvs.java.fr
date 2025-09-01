@@ -1,7 +1,6 @@
 package cn.staitech.fr.service.strategy.json;
 
 import cn.staitech.fr.config.OrganStructureConfig;
-import cn.staitech.fr.constant.Constants;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.enums.ForecastStatusEnum;
 import cn.staitech.fr.enums.JsonTaskStatusEnum;
@@ -9,7 +8,6 @@ import cn.staitech.fr.enums.StructureAiStatusEnum;
 import cn.staitech.fr.enums.StructureJsonStatusEnum;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.*;
-//import cn.staitech.fr.utils.ThreadLocalUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -46,8 +44,6 @@ public class JsonTaskParserService {
     ParserStrategyFactory parserStrategyFactory;
     @Resource
     private List<CustomParserStrategy> customParserStrategies;
-    @Resource
-    private AnnotationMapper annotationMapper;
 
     @Resource
     private SingleSlideService singleSlideService;
@@ -64,8 +60,7 @@ public class JsonTaskParserService {
     private JsonTaskMapper jsonTaskMapper;
     @Resource
     private OrganTagMapper organTagMapper;
-    @Resource
-    private StructureMapper structureMapper;
+
     @Autowired
     private JsonFileMapper jsonFileMapper;
     @Resource
