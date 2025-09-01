@@ -76,6 +76,7 @@ public class SlideController  extends BaseController {
     @ApiOperation(value = "获取脏器下拉列表")
     @PostMapping("/getOrganCode")
     public R<List<SlideOrganTagVo> > getOrganCode(@RequestBody SlideSelectListReq req) {
+        req.setOrganizationId(SecurityUtils.getOrganizationId());
         return R.ok(slideService.getOrganCode(req));
     }
 
