@@ -120,28 +120,32 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
      */
     @Override
     public List<String> waxCodeList(ProductionReq req) {
-        Set<String> set = new HashSet<>(16);
+        List<String> list = new ArrayList<>();
         // 查询项目信息
         Project project = this.projectMapper.selectById(req.getProjectId());
         if (project != null) {
-            // 项目切片蜡块号
-            List<String> projectWaxCodes = this.slideMapper.selectWaxCodes(req.getProjectId());
-            if (!CollectionUtils.isEmpty(projectWaxCodes)) {
-                set.addAll(projectWaxCodes);
-            }
             // 模板蜡块号
             if (StringUtils.isNotBlank(project.getSpeciesId())) {
                 LambdaQueryWrapper<SpeciesWaxCodeTemplate> wrapper = new LambdaQueryWrapper<>();
                 wrapper.eq(SpeciesWaxCodeTemplate::getSpeciesId, project.getSpeciesId());
+                wrapper.orderByAsc(SpeciesWaxCodeTemplate::getWaxCode);
                 List<SpeciesWaxCodeTemplate> templates = speciesWaxCodeTemplateMapper.selectList(wrapper);
                 if (!CollectionUtils.isEmpty(templates)) {
-                    Set<String> templateWaxCodes = templates.stream().map(SpeciesWaxCodeTemplate::getWaxCode).filter(StringUtils::isNotBlank).collect(Collectors.toSet());
-                    set.addAll(templateWaxCodes);
+                    Set<String> templateWaxCodes = templates.stream().map(SpeciesWaxCodeTemplate::getWaxCode).filter(StringUtils::isNotBlank).collect(Collectors.toCollection(LinkedHashSet::new));
+                    list.addAll(templateWaxCodes);
                 }
-
+            }
+            // 项目切片蜡块号
+            List<String> projectWaxCodes = this.slideMapper.selectWaxCodes(req.getProjectId());
+            if (!CollectionUtils.isEmpty(projectWaxCodes)) {
+                for (String waxCode : projectWaxCodes) {
+                    if (!list.contains(waxCode)) {
+                        list.add(waxCode);
+                    }
+                }
             }
         }
-        return new ArrayList<>(set);
+        return list;
     }
 
     /**
