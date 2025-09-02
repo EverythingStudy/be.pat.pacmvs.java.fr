@@ -656,6 +656,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 			//AI指标
 			LambdaQueryWrapper<AiForecast> aiForecastLambdaQueryWrapper = new LambdaQueryWrapper<>();
 			aiForecastLambdaQueryWrapper.eq(AiForecast::getSingleSlideId, singleSlide.getSingleId());
+            aiForecastLambdaQueryWrapper.eq(AiForecast::getStructType, CommonConstant.NUMBER_0);
 			List<AiForecast> aiForecasts = aiForecastMapper.selectList(aiForecastLambdaQueryWrapper);
 			List<AiInfoListVO> aiInfoListVOArrayList = new ArrayList<>();
 			for (AiForecast aiCast : aiForecasts) {
@@ -666,12 +667,16 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 				List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiCast.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup, CommonConstant.NUMBER_0);
 				aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
 
-				if(null != aiInfoListVO.getNormalDistribution() && null != aiCast.getResults()) {
-					String[] s = aiInfoListVO.getNormalDistribution().split("-");
-					boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiCast.getResults()));
-					if(!inRange) {
-						aiInfoListVO.setRedHighlight(true);
-					}
+                if (null != aiInfoListVO.getNormalDistribution() && null != aiCast.getResults()) {
+                    String[] s = aiInfoListVO.getNormalDistribution().split("-");
+                    if (!"详情见单个标注轮廓详情弹窗！".equals(aiCast.getResults()) && aiCast.getResults().split(";").length == 0) {
+                        boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiCast.getResults()));
+                        if (!inRange) {
+                            aiInfoListVO.setRedHighlight(true);
+                        }
+                    } else {
+                        aiInfoListVO.setRedHighlight(false);
+                    }
 				}
 
 				String structureIds = aiCast.getStructureIds();
