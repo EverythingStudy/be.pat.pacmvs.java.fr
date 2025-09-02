@@ -354,7 +354,7 @@
         area,
         perimeter,
         description,
-        category_id,
+--         category_id,
         location_type,
         annotation_type,
         create_by,
