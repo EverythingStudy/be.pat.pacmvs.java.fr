@@ -128,11 +128,11 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
             if (StringUtils.isNotBlank(project.getSpeciesId())) {
                 LambdaQueryWrapper<SpeciesWaxCodeTemplate> wrapper = new LambdaQueryWrapper<>();
                 wrapper.eq(SpeciesWaxCodeTemplate::getSpeciesId, project.getSpeciesId());
-                wrapper.orderByAsc(SpeciesWaxCodeTemplate::getWaxCode);
                 List<SpeciesWaxCodeTemplate> templates = speciesWaxCodeTemplateMapper.selectList(wrapper);
                 if (!CollectionUtils.isEmpty(templates)) {
-                    Set<String> templateWaxCodes = templates.stream().map(SpeciesWaxCodeTemplate::getWaxCode).filter(StringUtils::isNotBlank).collect(Collectors.toCollection(LinkedHashSet::new));
+                    Set<String> templateWaxCodes = templates.stream().map(SpeciesWaxCodeTemplate::getWaxCode).filter(StringUtils::isNotBlank).collect(Collectors.toSet());
                     list.addAll(templateWaxCodes);
+                    list.sort(Comparator.comparing(Integer::valueOf));
                 }
             }
             // 项目切片蜡块号
