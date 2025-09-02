@@ -28,12 +28,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 
-* @ClassName: LiverParserStrategyImpl
-* @Description-d:肝脏
-* @author wanglibei
-* @date 2025年7月21日
-* @version V1.0
+ * @author wanglibei
+ * @version V1.0
+ * @ClassName: LiverParserStrategyImpl
+ * @Description-d:肝脏
+ * @date 2025年7月21日
  */
 @Slf4j
 @Component("Liver")
@@ -89,7 +88,8 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         //        组织轮廓面积	H	平方毫米	若多个数据则相加输出 (H:精细轮廓总面积（肝脏面积）-平方毫米)
         String accurateArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
         BigDecimal accurateAreaDecimal = new BigDecimal(accurateArea);
-
+        //红细胞面积 I 所有轮廓面积之和
+        BigDecimal centralVeinsI = commonJsonParser.getOrganAreaMicron(jsonTask, "112004");
         // 胆管密度（单个）	4	个/103平方微米	Density of bile duct (per)	4=E/A	单个为单个门管区  以95%置信区间和均数±标准差呈现
         // 胆管面积占比（单个）	5	%	Bile duct area%    (per)	5=F/A	单个为单个门管区  以95%置信区间和均数±标准差呈现； 运算前统一单位
         List<Annotation> structureContourList = commonJsonParser.getStructureContourList(jsonTask, "112145");
@@ -148,11 +148,11 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         log.info("计算完成");
         map.put("门管区面积（单个）", new IndicatorAddIn("112145"));
         // B
-        map.put("中央静脉面积", new IndicatorAddIn("central veins area", DecimalUtils.setScale3(centralVeinsArea), CommonConstant.SQUARE_MICROMETER, CommonConstant.NUMBER_1,"112146"));
+        map.put("中央静脉面积", new IndicatorAddIn("central veins area", DecimalUtils.setScale3(centralVeinsArea), CommonConstant.SQUARE_MICROMETER, CommonConstant.NUMBER_1, "112146"));
         // C
-        map.put("大静脉面积", new IndicatorAddIn("vena cava area", DecimalUtils.setScale3(venaCavaArea), CommonConstant.SQUARE_MICROMETER, CommonConstant.NUMBER_1,"112147"));
+        map.put("大静脉面积", new IndicatorAddIn("vena cava area", DecimalUtils.setScale3(venaCavaArea), CommonConstant.SQUARE_MICROMETER, CommonConstant.NUMBER_1, "112147"));
         // D
-        map.put("肝细胞核数量", new IndicatorAddIn("Nucleus count of hepatocyte", nucleusCount.toString(), "个", CommonConstant.NUMBER_1,"112149"));
+        map.put("肝细胞核数量", new IndicatorAddIn("Nucleus count of hepatocyte", nucleusCount.toString(), "个", CommonConstant.NUMBER_1, "112149"));
 
         // 胆管数量（单个门管区）	E	个	单个门管区内胆管数量
         // 胆管面积（单个门管区）	F	103平方微米	若单个门管区内有多个胆管，则相加输出
@@ -162,64 +162,62 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         annotationBy.setCountName("胆管数量（单个门管区）");
         annotationBy.setCountUnit("个");
         commonJsonParser.putAnnotationDynamicData(jsonTask, "112145", "11214A", annotationBy, 1);
-
-
         // E
-        map.put("胆管数量（单个）", new IndicatorAddIn(areaUtils.getStructureIds("112145","11214A")));
+        map.put("胆管数量（单个）", new IndicatorAddIn(areaUtils.getStructureIds("112145", "11214A")));
         // F
-        map.put("胆管面积（单个）", new IndicatorAddIn(areaUtils.getStructureIds("112145","11214A")));
+        map.put("胆管面积（单个）", new IndicatorAddIn(areaUtils.getStructureIds("112145", "11214A")));
         // G
-        map.put("窦内细胞核数量", new IndicatorAddIn("Sinus nucleus count", sinusNnucleusCount.toString(), "个", CommonConstant.NUMBER_1,"11214D"));
+        map.put("窦内细胞核数量", new IndicatorAddIn("Sinus nucleus count", sinusNnucleusCount.toString(), "个", CommonConstant.NUMBER_1, "11214D"));
 
         // 产品呈现指标 -------------------------------------------------------------
         // H 肝脏面积	1	平方毫米	Liver area	1=H
-        map.put("肝脏面积", new IndicatorAddIn("Liver area", DecimalUtils.setScale3(accurateAreaDecimal), CommonConstant.SQUARE_MILLIMETRE,"112111"));
-
+        map.put("肝脏面积", new IndicatorAddIn("Liver area", DecimalUtils.setScale3(accurateAreaDecimal), CommonConstant.SQUARE_MILLIMETRE, "112111"));
+        map.put("红细胞面积", new IndicatorAddIn("红细胞面积", DecimalUtils.setScale3(centralVeinsI), CommonConstant.SQUARE_MICROMETER, "112004"));
         /**
-	        A	门管区面积（单个）	112145
-			B	中央静脉面积	112146
-			C	大静脉面积	112147
-			D	肝细胞核数量	112149
-			E	胆管数量（单个）	112145、11214A 
-			F	胆管面积（单个）	112145、11214A 
-			G	窦内细胞核数量	11214D
-			H	组织轮廓面积	112111
-			
-			肝脏面积	1=H
-			静脉面积占比	2=(B+C)/H
-			肝细胞核密度	3=D/H
-			胆管密度（单个）	4=E/A
-			胆管面积占比（单个）	5=F/A
-			窦内细胞核密度	6=G/H
-	     * 
-	     */
+         A	门管区面积（单个）	112145
+         B	中央静脉面积	112146
+         C	大静脉面积	112147
+         D	肝细胞核数量	112149
+         E	胆管数量（单个）	112145、11214A
+         F	胆管面积（单个）	112145、11214A
+         G	窦内细胞核数量	11214D
+         H	组织轮廓面积	112111
+
+         肝脏面积	1=H
+         静脉面积占比	2=(B+C)/H
+         肝细胞核密度	3=D/H
+         胆管密度（单个）	4=E/A
+         胆管面积占比（单个）	5=F/A
+         窦内细胞核密度	6=G/H
+         *
+         */
         if (accurateAreaDecimal.compareTo(BigDecimal.ZERO) != 0) {
             // 静脉面积占比	2	%	Vein area%	2=(B+C)/H	运算前注意统一单位  （10³平方微米/平方毫米）
-//            BigDecimal accurateAreaDecimalRate = centralVeinsArea.add(venaCavaArea)
-//                    .divide(accurateAreaDecimal.multiply(new BigDecimal(1000)), 7, RoundingMode.HALF_UP);
             BigDecimal accurateAreaDecimalRate = commonJsonParser.getProportion(centralVeinsArea.add(venaCavaArea), accurateAreaDecimal.multiply(new BigDecimal(1000)));
-            map.put("静脉面积占比", new IndicatorAddIn("Vein area%", DecimalUtils.percentScale3(accurateAreaDecimalRate), "%",areaUtils.getStructureIds("112146","112147","112111")));
+            map.put("静脉面积占比", new IndicatorAddIn("Vein area%", DecimalUtils.percentScale3(accurateAreaDecimalRate), "%", areaUtils.getStructureIds("112146", "112147", "112111")));
 
             // 肝细胞核密度	3	个/平方毫米	Nucleus density of hepatocyte	3=D/H
             //BigDecimal density = new BigDecimal(nucleusCount).divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
             BigDecimal density = commonJsonParser.bigDecimalDivideCheck(new BigDecimal(nucleusCount), accurateAreaDecimal);
-            map.put("肝细胞核密度", new IndicatorAddIn("Nucleus density of hepatocyte", DecimalUtils.setScale3(density), CommonConstant.SQ_MM_PIECE_EN,areaUtils.getStructureIds("112149","112111")));
+            map.put("肝细胞核密度", new IndicatorAddIn("Nucleus density of hepatocyte", DecimalUtils.setScale3(density), CommonConstant.SQ_MM_PIECE_EN, areaUtils.getStructureIds("112149", "112111")));
 
             // 窦内细胞核密度	6	个/平方毫米	Nucleus density of Sinus cell	6=G/H
             //BigDecimal nucleusDensityOfSinusCellRate = new BigDecimal(sinusNnucleusCount).divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
             BigDecimal nucleusDensityOfSinusCellRate = commonJsonParser.bigDecimalDivideCheck(new BigDecimal(sinusNnucleusCount), accurateAreaDecimal);
-            map.put("窦内细胞核密度", new IndicatorAddIn("Nucleus density of Sinus cell", DecimalUtils.setScale3(nucleusDensityOfSinusCellRate), CommonConstant.SQ_MM_PIECE_EN,areaUtils.getStructureIds("11214D","112111")));
+            map.put("窦内细胞核密度", new IndicatorAddIn("Nucleus density of Sinus cell", DecimalUtils.setScale3(nucleusDensityOfSinusCellRate), CommonConstant.SQ_MM_PIECE_EN, areaUtils.getStructureIds("11214D", "112111")));
+            BigDecimal erythrocyteArea = commonJsonParser.bigDecimalDivideCheck(centralVeinsI, accurateAreaDecimal);
+            map.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area", DecimalUtils.setScale3(erythrocyteArea), CommonConstant.SQ_MM_PIECE_EN, areaUtils.getStructureIds("11214D", "112111")));
         } else {
-            map.put("静脉面积占比", new IndicatorAddIn("Vein area%", "0.000", "%",areaUtils.getStructureIds("112146","112147","112111")));
-            map.put("肝细胞核密度", new IndicatorAddIn("Nucleus density of hepatocyte", "0.000", CommonConstant.SQ_MM_PIECE_EN,areaUtils.getStructureIds("112149","112111")));
-            map.put("窦内细胞核密度", new IndicatorAddIn("Nucleus density of Sinus cell", "0.000", CommonConstant.SQ_MM_PIECE_EN,areaUtils.getStructureIds("11214D","112111")));
+            map.put("静脉面积占比", new IndicatorAddIn("Vein area%", "0.000", "%", areaUtils.getStructureIds("112146", "112147", "112111")));
+            map.put("肝细胞核密度", new IndicatorAddIn("Nucleus density of hepatocyte", "0.000", CommonConstant.SQ_MM_PIECE_EN, areaUtils.getStructureIds("112149", "112111")));
+            map.put("窦内细胞核密度", new IndicatorAddIn("Nucleus density of Sinus cell", "0.000", CommonConstant.SQ_MM_PIECE_EN, areaUtils.getStructureIds("11214D", "112111")));
         }
 
         // 胆管密度（单个）	4	个/103平方微米	Density of bile duct (per)	4=E/A	单个为单个门管区  以95%置信区间和均数±标准差呈现
-        map.put("胆管密度（单个）", new IndicatorAddIn("Density of bile duct (per)", confidenceInterval, "个/10³平方毫米",areaUtils.getStructureIds("112145","11214A","112145")));
+        map.put("胆管密度（单个）", new IndicatorAddIn("Density of bile duct (per)", confidenceInterval, "个/10³平方毫米", areaUtils.getStructureIds("112145", "11214A", "112145")));
 
         // 胆管面积占比（单个）	5	%	Bile duct area%    (per)	5=F/A	单个为单个门管区  以95%置信区间和均数±标准差呈现； 运算前统一单位
-        map.put("胆管面积占比（单个）", new IndicatorAddIn("Bile duct area", confidenceInterval1, "%",areaUtils.getStructureIds("112145","11214A","112145")));
+        map.put("胆管面积占比（单个）", new IndicatorAddIn("Bile duct area", confidenceInterval1, "%", areaUtils.getStructureIds("112145", "11214A", "112145")));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
         log.info("指标计算结束-大鼠肝脏");
