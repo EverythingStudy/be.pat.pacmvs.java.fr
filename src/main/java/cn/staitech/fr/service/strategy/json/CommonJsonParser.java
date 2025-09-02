@@ -604,6 +604,7 @@ public class CommonJsonParser {
                 jsonObject.put("dynamicData", jsonArray);
                 i.setSequenceNumber(sequenceNumber);
                 i.setDynamicData(jsonObject.toString());
+                i.setSingleSlideId(jsonTask.getSingleId());
                 annotationMapper.aiUpdateById(i);
             }
         }
@@ -661,6 +662,7 @@ public class CommonJsonParser {
                 jsonObject.put("dynamicData", jsonArray);
                 i.setSequenceNumber(sequenceNumber);
                 i.setDynamicData(jsonObject.toString());
+                i.setSingleSlideId(jsonTask.getSingleId());
                 annotationMapper.aiUpdateById(i);
             }
         }
