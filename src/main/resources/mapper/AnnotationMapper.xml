@@ -364,7 +364,7 @@
         slide_id,
 --         json_id,
         contour_type,
-        ST_AsGeoJSON(contour) as contour,
+        ST_AsGeoJSON(contour) as contour
 --         single_slide_id
         from fr_annotation
         <where>
