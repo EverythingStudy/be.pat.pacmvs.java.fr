@@ -141,9 +141,9 @@
             "location_type"   VARCHAR(100) COLLATE "pg_catalog"."default",
             "annotation_type" VARCHAR(50) COLLATE "pg_catalog"."default",
             "create_by"       INT8,
-            "create_time"     DATE,
+            "create_time"     timestamp,
             "update_by"       INT8,
-            "update_time"     DATE,
+            "update_time"     timestamp,
             "slide_id"        INT8,
             "single_slide_id" INT8,
             "single"          INT2          DEFAULT 1,
@@ -179,45 +179,65 @@
             "contour10000" "public"."gist_geometry_ops_2d"
             );
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."annotation_id" IS '主键id';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."annotation_id" IS '主键id';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."area" IS '面积';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."area" IS '面积';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."perimeter" IS '周长';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."perimeter" IS '周长';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."description" IS '轮廓描述';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."description" IS '轮廓描述';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."category_id" IS '轮廓标签id';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."category_id" IS '轮廓标签id';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour40000" IS '轮廓坐标';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour40000" IS '轮廓坐标';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour625" IS '轮廓坐标625';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour625" IS '轮廓坐标625';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour2500" IS '轮廓坐标2500';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour2500" IS '轮廓坐标2500';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour10000" IS '轮廓坐标10000';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour10000" IS '轮廓坐标10000';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."location_type" IS '轮廓类型';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."location_type" IS '轮廓类型';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."annotation_type" IS '标注类型(AI表示AI算出的标注，Draw表示前端绘制的标注)';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."annotation_type" IS '标注类型(AI表示AI算出的标注，Draw表示前端绘制的标注)';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."create_by" IS '标注创建者';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."create_by" IS '标注创建者';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."create_time" IS '创建时间';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."create_time" IS '创建时间';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."update_by" IS '更新者';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."update_by" IS '更新者';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."update_time" IS '更新时间';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."update_time" IS '更新时间';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."slide_id" IS '切片id';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."slide_id" IS '切片id';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."single_slide_id" IS '单切片id';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."single_slide_id" IS '单切片id';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."single" IS '单切片id标识';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."single" IS '单切片id标识';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour_type" IS '轮廓类型标识';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour_type" IS '轮廓类型标识';
 
-        COMMENT ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."id" IS 'geojson中数据id';
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."id" IS 'geojson中数据id';
     </insert>
 
 
@@ -364,7 +384,7 @@
         slide_id,
 --         json_id,
         contour_type,
-        ST_AsGeoJSON(contour) as contour,
+        ST_AsGeoJSON(contour) as contour
 --         single_slide_id
         from fr_annotation
         <where>

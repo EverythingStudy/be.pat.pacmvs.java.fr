@@ -655,7 +655,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
 			//AI指标
 			LambdaQueryWrapper<AiForecast> aiForecastLambdaQueryWrapper = new LambdaQueryWrapper<>();
-			aiForecastLambdaQueryWrapper.eq(AiForecast::getSingleSlideId, singleSlide.getSlideId());
+			aiForecastLambdaQueryWrapper.eq(AiForecast::getSingleSlideId, singleSlide.getSingleId());
 			List<AiForecast> aiForecasts = aiForecastMapper.selectList(aiForecastLambdaQueryWrapper);
 			List<AiInfoListVO> aiInfoListVOArrayList = new ArrayList<>();
 			for (AiForecast aiCast : aiForecasts) {
