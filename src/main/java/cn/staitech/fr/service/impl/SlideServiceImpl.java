@@ -51,332 +51,334 @@ import static cn.staitech.common.security.utils.SecurityUtils.isAdmin;
 @Slf4j
 public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements SlideService {
 
-	@Resource
-	private ProjectMapper projectMapper;
-	@Resource
-	private ProjectMemberMapper projectMemberMapper;
-	@Resource
-	private ImageMapper imageMapper;
-	@Resource
-	private RemoteAnnotationService remoteAnnotationService;
-	@Resource
-	private RedisTemplate<String,Object> redisTemplate;
-	@Resource
-	private ProductionMapper productionMapper;
-	@Resource
-	private SingleSlideMapper singleSlideMapper;
-	@Resource
+    @Resource
+    private ProjectMapper projectMapper;
+    @Resource
+    private ProjectMemberMapper projectMemberMapper;
+    @Resource
+    private ImageMapper imageMapper;
+    @Resource
+    private RemoteAnnotationService remoteAnnotationService;
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
+    @Resource
+    private ProductionMapper productionMapper;
+    @Resource
+    private SingleSlideMapper singleSlideMapper;
+    @Resource
     private OrganTagMapper organTagMapper;
     @Value("${ai.url:http://192.168.160.112:8003/CreateAIwtr/}")
     private String aiUrl;
     @Value("${organ.check.confirm.url:http://192.168.160.112:8003/CreateAIwtfc/}")
     private String organCheckConfirmUrl;
-	@Value("${ai.timeout:5000}")
-	private Integer timeout;
+    @Value("${ai.timeout:5000}")
+    private Integer timeout;
     @Autowired
     private StructureTagMapper structureTagMapper;
     @Autowired
     private SlideMapper slideMapper;
 
-	//默认对照组值
-	private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
+    //默认对照组值
+    private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
     @Autowired
     private AiForecastMapper aiForecastMapper;
 
 
-	@Override
-	public R<CustomPage<SlidePageVo>> page(SlidePageReq req, boolean isPageConfigSlide, boolean isAccessPermission) {
-		log.info("项目下切片列表查询接口开始，请求参数: {}", req);
+    @Override
+    public R<CustomPage<SlidePageVo>> page(SlidePageReq req, boolean isPageConfigSlide, boolean isAccessPermission) {
+        log.info("项目下切片列表查询接口开始，请求参数: {}", req);
 
-		Long userId = SecurityUtils.getUserId();
-		Project project = projectMapper.selectById(req.getProjectId());
+        Long userId = SecurityUtils.getUserId();
+        Project project = projectMapper.selectById(req.getProjectId());
 
-		if (project == null) {
-			log.warn("项目不存在，projectId: {}", req.getProjectId());
-			return R.fail("您没有该项目的访问权限，请联系该项目负责人或机构管理员");
-		}
+        if (project == null) {
+            log.warn("项目不存在，projectId: {}", req.getProjectId());
+            return R.fail("您没有该项目的访问权限，请联系该项目负责人或机构管理员");
+        }
 
-		if (isAccessPermission){
-			// 检查用户是否为成员
-			long isMember = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery()
-					.eq(ProjectMember::getProjectId, req.getProjectId())
-					.eq(ProjectMember::getUserId, userId)
-					.eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
+        if (isAccessPermission) {
+            // 检查用户是否为成员
+            long isMember = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery()
+                    .eq(ProjectMember::getProjectId, req.getProjectId())
+                    .eq(ProjectMember::getUserId, userId)
+                    .eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
 
-			// 权限校验
-			if (!hasAccessPermission(project, userId, isMember)) {
-				log.warn("用户无访问权限，userId: {}, projectId: {}", userId, req.getProjectId());
-				return R.fail("您没有该项目的访问权限，请联系该项目负责人或机构管理员");
-			}
-		}
+            // 权限校验
+            if (!hasAccessPermission(project, userId, isMember)) {
+                log.warn("用户无访问权限，userId: {}, projectId: {}", userId, req.getProjectId());
+                return R.fail("您没有该项目的访问权限，请联系该项目负责人或机构管理员");
+            }
+        }
 
-		// 检查项目状态
-		Integer status = project.getStatus();
-		if (!isPageConfigSlide) {
-			if (status != Constants.STATUS_RUNNING) {
-				log.warn("项目状态不可访问，projectId: {}, status: {}", req.getProjectId(), status);
-				return R.fail("非进行中的项目不可阅片，请联系该项目负责人或机构管理员");
-			}
-		}
-		// 分页查询
-		CustomPage<SlidePageVo> page = new CustomPage<>(req);
-		req.setCurrentUserId("JSON_CONTAINS(fs.viewers, '"+userId+"', '$')");
-		baseMapper.page(page, req);
-		log.info("项目下切片列表查询接口结束");
-		return R.ok(page);
-	}
+        // 检查项目状态
+        Integer status = project.getStatus();
+        if (!isPageConfigSlide) {
+            if (status != Constants.STATUS_RUNNING) {
+                log.warn("项目状态不可访问，projectId: {}, status: {}", req.getProjectId(), status);
+                return R.fail("非进行中的项目不可阅片，请联系该项目负责人或机构管理员");
+            }
+        }
+        // 分页查询
+        CustomPage<SlidePageVo> page = new CustomPage<>(req);
+        req.setCurrentUserId("JSON_CONTAINS(fs.viewers, '" + userId + "', '$')");
+        baseMapper.page(page, req);
+        log.info("项目下切片列表查询接口结束");
+        return R.ok(page);
+    }
 
-	/**
-	 * 判断用户是否有访问权限
-	 */
-	private boolean hasAccessPermission(Project project, Long userId, long isMember) {
-		return project.getOrganizationId() == SecurityUtils.getOrganizationId()
-				|| userId == project.getPrincipal()
-				|| SecurityUtils.isOrgAdmin()
-				|| isMember > 0;
-	}
+    /**
+     * 判断用户是否有访问权限
+     */
+    private boolean hasAccessPermission(Project project, Long userId, long isMember) {
+        return project.getOrganizationId() == SecurityUtils.getOrganizationId()
+                || userId == project.getPrincipal()
+                || SecurityUtils.isOrgAdmin()
+                || isMember > 0;
+    }
 
-	@Override
-	public R<CustomPage<ImageVO>> choiceImageList(ChoiceImagePageReq image) {
-		Objects.requireNonNull(image, "请求参数不能为空");
+    @Override
+    public R<CustomPage<ImageVO>> choiceImageList(ChoiceImagePageReq image) {
+        Objects.requireNonNull(image, "请求参数不能为空");
 
-		R validationResult = validateProjectStatus(image.getProjectId());
-		if (validationResult != null) {
-			return validationResult;
-		}
+        R validationResult = validateProjectStatus(image.getProjectId());
+        if (validationResult != null) {
+            return validationResult;
+        }
 
-		if (!isAdmin(SecurityUtils.getUserId())) {
-			image.setOrgId(SecurityUtils.getOrganizationId());
-		}
+        if (!isAdmin(SecurityUtils.getUserId())) {
+            image.setOrgId(SecurityUtils.getOrganizationId());
+        }
 
-		CustomPage<ImageVO> page = new CustomPage<>(image);
-		imageMapper.choiceImageList(page, image);
-		return R.ok(page);
-	}
+        CustomPage<ImageVO> page = new CustomPage<>(image);
+        imageMapper.choiceImageList(page, image);
+        return R.ok(page);
+    }
 
-	@Override
-	@Transactional(rollbackFor = Exception.class)
-	public R choiceSave(ProjectImageVo req) {
-		Objects.requireNonNull(req, "请求参数不能为空");
-		List<ImageVO> images = req.getImages();
-		Objects.requireNonNull(images, "图片列表不能为空");
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public R choiceSave(ProjectImageVo req) {
+        Objects.requireNonNull(req, "请求参数不能为空");
+        List<ImageVO> images = req.getImages();
+        Objects.requireNonNull(images, "图片列表不能为空");
 
-		log.info("切片选择保存接口开始，用户ID：{}，ProjectId：{}", SecurityUtils.getUserId(), req.getProjectId());
+        log.info("切片选择保存接口开始，用户ID：{}，ProjectId：{}", SecurityUtils.getUserId(), req.getProjectId());
 
-		R validationResult = validateProjectStatus(req.getProjectId());
-		if (validationResult != null) {
-			return validationResult;
-		}
+        R validationResult = validateProjectStatus(req.getProjectId());
+        if (validationResult != null) {
+            return validationResult;
+        }
 
-		List<Slide> slidesToSave = new ArrayList<>();
-		Long userId = SecurityUtils.getUserId();
-		List<Long> imageIds = imageIdsFilter(images.stream().map(ImageVO::getImageId).collect(Collectors.toList()), req.getProjectId());
-		for (Long imageId : imageIds) {
-			Slide slide = new Slide();
-			slide.setCreateBy(userId);
-			slide.setCreateTime(new Date());
-			slide.setImageId(imageId);
-			slide.setProjectId(req.getProjectId());
-			slidesToSave.add(slide);
-		}
-		saveBatch(slidesToSave);
-		return R.ok();
-	}
+        List<Slide> slidesToSave = new ArrayList<>();
+        Long userId = SecurityUtils.getUserId();
+        List<Long> imageIds = imageIdsFilter(images.stream().map(ImageVO::getImageId).collect(Collectors.toList()), req.getProjectId());
+        for (Long imageId : imageIds) {
+            Slide slide = new Slide();
+            slide.setCreateBy(userId);
+            slide.setCreateTime(new Date());
+            slide.setImageId(imageId);
+            slide.setProjectId(req.getProjectId());
+            slidesToSave.add(slide);
+        }
+        saveBatch(slidesToSave);
+        return R.ok();
+    }
 
-	@Override
-	public R choiceAll(Long projectId) throws Exception{
+    @Override
+    public R choiceAll(Long projectId) throws Exception {
 
-		R validationResult = validateProjectStatus(projectId);
+        R validationResult = validateProjectStatus(projectId);
 
-		if (validationResult != null) {
-			return validationResult;
-		}
-		Project project = projectMapper.selectById(projectId);
-		Long topicId = project.getTopicId();
-		List<Image> images = imageMapper.selectList(Wrappers.<Image>lambdaQuery().eq(Image::getTopicId, topicId)
-				.eq(Image::getStatus, Constants.IMAGE_STATUS_ENABLE)
-				.eq(Image::getAnalyzeStatus, Constants.IMAGE_NAME_PARSE_SUCC));
-		if (CollectionUtils.isEmpty(images)){
-			return R.fail("没有可关联的新切片");
-		}
-		List<Slide> slidesToSave = new ArrayList<>();
-		Long userId = SecurityUtils.getUserId();
-		List<Long> imageIds = imageIdsFilter(images.stream().map(Image::getImageId).collect(Collectors.toList()), projectId);
-		for (Long imageId : imageIds) {
-			Slide slide = new Slide();
-			slide.setCreateBy(userId);
-			slide.setCreateTime(new Date());
-			slide.setImageId(imageId);
-			slide.setProjectId(projectId);
-			slidesToSave.add(slide);
-		}
-		saveBatch(slidesToSave);
-		return R.ok();
-	}
+        if (validationResult != null) {
+            return validationResult;
+        }
+        Project project = projectMapper.selectById(projectId);
+        Long topicId = project.getTopicId();
+        List<Image> images = imageMapper.selectList(Wrappers.<Image>lambdaQuery().eq(Image::getTopicId, topicId)
+                .eq(Image::getStatus, Constants.IMAGE_STATUS_ENABLE)
+                .eq(Image::getAnalyzeStatus, Constants.IMAGE_NAME_PARSE_SUCC));
+        if (CollectionUtils.isEmpty(images)) {
+            return R.fail("没有可关联的新切片");
+        }
+        List<Slide> slidesToSave = new ArrayList<>();
+        Long userId = SecurityUtils.getUserId();
+        List<Long> imageIds = imageIdsFilter(images.stream().map(Image::getImageId).collect(Collectors.toList()), projectId);
+        for (Long imageId : imageIds) {
+            Slide slide = new Slide();
+            slide.setCreateBy(userId);
+            slide.setCreateTime(new Date());
+            slide.setImageId(imageId);
+            slide.setProjectId(projectId);
+            slidesToSave.add(slide);
+        }
+        saveBatch(slidesToSave);
+        return R.ok();
+    }
 
-	private List<Long> imageIdsFilter(List<Long> imageIds,  Long projectId) {
-		List<Slide> slides = list(Wrappers.<Slide>lambdaQuery().eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL)
-				.eq(Slide::getProjectId, projectId)
-				.in(Slide::getImageId, imageIds).select(Slide::getImageId));
-		if (CollectionUtils.isNotEmpty(slides)) {
-			List<Long> temp = slides.stream().map(Slide::getImageId).collect(Collectors.toList());
-			imageIds.removeAll(temp);
-		}
-		return imageIds;
-	}
+    private List<Long> imageIdsFilter(List<Long> imageIds, Long projectId) {
+        List<Slide> slides = list(Wrappers.<Slide>lambdaQuery().eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL)
+                .eq(Slide::getProjectId, projectId)
+                .in(Slide::getImageId, imageIds).select(Slide::getImageId));
+        if (CollectionUtils.isNotEmpty(slides)) {
+            List<Long> temp = slides.stream().map(Slide::getImageId).collect(Collectors.toList());
+            imageIds.removeAll(temp);
+        }
+        return imageIds;
+    }
 
-	@Override
-	public R deleteSlide(Long projectId, List<Long> slideIds) throws Exception{
-		log.info("删除全部切片接口开始：");
-		R validationResult = validateProjectStatus(projectId);
-		if (validationResult != null) {
-			return validationResult;
-		}
-		List<Slide> slideList = list(Wrappers.<Slide>lambdaQuery().eq(ObjectUtil.isNotEmpty(projectId),Slide::getProjectId,projectId)
-				.in(CollectionUtils.isNotEmpty(slideIds),Slide::getSlideId,slideIds)
-				.eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).select(Slide::getSlideId));
-		if(CollectionUtils.isNotEmpty(slideList)){
-			slideList.forEach(slide -> {slide.setDelFlag(cn.staitech.common.core.constant.Constants.DEL_FLAG_DELETED);});
-			updateBatchById(slideList);
-			R<Boolean> deleteResult = remoteAnnotationService.deleteBySlide(slideList.stream().map(Slide::getSlideId).collect(Collectors.toList()));
-		}
-		return R.ok();
-	}
+    @Override
+    public R deleteSlide(Long projectId, List<Long> slideIds) throws Exception {
+        log.info("删除全部切片接口开始：");
+        R validationResult = validateProjectStatus(projectId);
+        if (validationResult != null) {
+            return validationResult;
+        }
+        List<Slide> slideList = list(Wrappers.<Slide>lambdaQuery().eq(ObjectUtil.isNotEmpty(projectId), Slide::getProjectId, projectId)
+                .in(CollectionUtils.isNotEmpty(slideIds), Slide::getSlideId, slideIds)
+                .eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).select(Slide::getSlideId));
+        if (CollectionUtils.isNotEmpty(slideList)) {
+            slideList.forEach(slide -> {
+                slide.setDelFlag(cn.staitech.common.core.constant.Constants.DEL_FLAG_DELETED);
+            });
+            updateBatchById(slideList);
+            R<Boolean> deleteResult = remoteAnnotationService.deleteBySlide(slideList.stream().map(Slide::getSlideId).collect(Collectors.toList()));
+        }
+        return R.ok();
+    }
 
-	@Override
-	public R checkDeleteSlide(Long projectId, List<Long> slideIds) throws  Exception{
-		List<Slide> slideList = list(Wrappers.<Slide>lambdaQuery().eq(ObjectUtil.isNotEmpty(projectId),Slide::getProjectId,projectId)
-				.in(CollectionUtils.isNotEmpty(slideIds),Slide::getSlideId,slideIds)
-				.eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).select(Slide::getSlideId));
-		if (CollectionUtils.isEmpty(slideList)){
-			return R.fail("未找到要删除的切片");
-		}
-		R<Long> resp = remoteAnnotationService.countAnnoBySlides(slideList.stream().map(Slide::getSlideId).collect(Collectors.toList()));
-		if (resp.getCode() == 500){
-			return resp;
-		}else{
-			return R.ok(resp.getData()>0);
-		}
-	}
+    @Override
+    public R checkDeleteSlide(Long projectId, List<Long> slideIds) throws Exception {
+        List<Slide> slideList = list(Wrappers.<Slide>lambdaQuery().eq(ObjectUtil.isNotEmpty(projectId), Slide::getProjectId, projectId)
+                .in(CollectionUtils.isNotEmpty(slideIds), Slide::getSlideId, slideIds)
+                .eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).select(Slide::getSlideId));
+        if (CollectionUtils.isEmpty(slideList)) {
+            return R.fail("未找到要删除的切片");
+        }
+        R<Long> resp = remoteAnnotationService.countAnnoBySlides(slideList.stream().map(Slide::getSlideId).collect(Collectors.toList()));
+        if (resp.getCode() == 500) {
+            return resp;
+        } else {
+            return R.ok(resp.getData() > 0);
+        }
+    }
 
-	/**
-	 * 验证项目状态是否允许配置
-	 *
-	 * @param projectId 项目对象
-	 * @return 如果状态不合法，返回错误 R.fail；否则继续执行
-	 */
-	private R validateProjectStatus(Long projectId) {
-		Project project = projectMapper.selectById(projectId);
-		Integer status = project.getStatus();
+    /**
+     * 验证项目状态是否允许配置
+     *
+     * @param projectId 项目对象
+     * @return 如果状态不合法，返回错误 R.fail；否则继续执行
+     */
+    private R validateProjectStatus(Long projectId) {
+        Project project = projectMapper.selectById(projectId);
+        Integer status = project.getStatus();
 
-		if (status == Constants.STATUS_RUNNING) {
+        if (status == Constants.STATUS_RUNNING) {
 //			return R.fail("项目状态为“进行中”时，不能配置项目基础信息和切片");
-			return R.fail("项目进行中，除配置用户外不可修改其他配置");
-		}
+            return R.fail("项目进行中，除配置用户外不可修改其他配置");
+        }
 
-		if (status == Constants.STATUS_COMPLETED) {
+        if (status == Constants.STATUS_COMPLETED) {
 //			return R.fail("项目状态为“完成”时，任何用户不能再配置项目任何信息");
-			return R.fail("项目已完成，不可修改配置");
-		}
+            return R.fail("项目已完成，不可修改配置");
+        }
 
-		if (status == Constants.STATUS_PAUSED
-				&& !(SecurityUtils.getUserId() == project.getPrincipal() || SecurityUtils.isOrgAdmin())) {
+        if (status == Constants.STATUS_PAUSED
+                && !(SecurityUtils.getUserId() == project.getPrincipal() || SecurityUtils.isOrgAdmin())) {
 //			return R.fail("项目状态为“暂停”时，机构管理员和项目负责人可以配置项目基础信息");
-			return R.fail("您没有该项目的配置权限，请联系该项目负责人或机构管理员");
-		}
+            return R.fail("您没有该项目的配置权限，请联系该项目负责人或机构管理员");
+        }
 
-		return null; // 表示通过校验
-	}
+        return null; // 表示通过校验
+    }
 
 
-	@Override
-	public HashMap<String, SlidePageVo> slideAdjacent(SlidePageReq req) {
-		req.setCurrentUserId("JSON_CONTAINS(fs.viewers, '"+SecurityUtils.getUserId()+"', '$')");
-		List<SlidePageVo> waxList = baseMapper.slideListQuery(req);
+    @Override
+    public HashMap<String, SlidePageVo> slideAdjacent(SlidePageReq req) {
+        req.setCurrentUserId("JSON_CONTAINS(fs.viewers, '" + SecurityUtils.getUserId() + "', '$')");
+        List<SlidePageVo> waxList = baseMapper.slideListQuery(req);
 
-		// 防止 waxList 为 null
-		if (waxList == null) {
-			waxList = Collections.emptyList();
-		}
+        // 防止 waxList 为 null
+        if (waxList == null) {
+            waxList = Collections.emptyList();
+        }
 
-		int index = -1;
-		Long targetSlideId = req.getSlideId();
+        int index = -1;
+        Long targetSlideId = req.getSlideId();
 
-		// 查找目标 slideId 所在位置
-		for (int i = 0; i < waxList.size(); i++) {
-			if (targetSlideId.equals(waxList.get(i).getSlideId())) {
-				index = i;
-				break;
-			}
-		}
+        // 查找目标 slideId 所在位置
+        for (int i = 0; i < waxList.size(); i++) {
+            if (targetSlideId.equals(waxList.get(i).getSlideId())) {
+                index = i;
+                break;
+            }
+        }
 
-		HashMap<String, SlidePageVo> map = new HashMap<>();
-		map.put("prev", null);
-		map.put("next", null);
+        HashMap<String, SlidePageVo> map = new HashMap<>();
+        map.put("prev", null);
+        map.put("next", null);
 
-		if (index != -1) {
-			if (index > 0) {
-				map.put("prev", waxList.get(index - 1));
-			}
-			if (index < waxList.size() - 1) {
-				map.put("next", waxList.get(index + 1));
-			}
-		}
+        if (index != -1) {
+            if (index > 0) {
+                map.put("prev", waxList.get(index - 1));
+            }
+            if (index < waxList.size() - 1) {
+                map.put("next", waxList.get(index + 1));
+            }
+        }
 
-		return map;
-	}
+        return map;
+    }
 
-	@Override
-	public SlideDetailVo getSlideInfo(Long slideId) {
-		SlideDetailVo slideInfo = baseMapper.getSlideInfo(slideId);
-		if (Objects.nonNull(slideInfo)){
-			List<Long> viewers = slideInfo.getViewers();
-			if (CollectionUtils.isNotEmpty(viewers) && !viewers.contains(SecurityUtils.getUserId())){
-				viewers.add(SecurityUtils.getUserId());
-			}
-			if (CollectionUtils.isEmpty(viewers)){
-				viewers = new ArrayList<>();
-				viewers.add(SecurityUtils.getUserId());
-			}
-			update(Wrappers.<Slide>lambdaUpdate().eq(Slide::getSlideId,slideId).set(Slide::getViewers, viewers, "typeHandler=com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"));
-		}
-		return slideInfo;
-	}
+    @Override
+    public SlideDetailVo getSlideInfo(Long slideId) {
+        SlideDetailVo slideInfo = baseMapper.getSlideInfo(slideId);
+        if (Objects.nonNull(slideInfo)) {
+            List<Long> viewers = slideInfo.getViewers();
+            if (CollectionUtils.isNotEmpty(viewers) && !viewers.contains(SecurityUtils.getUserId())) {
+                viewers.add(SecurityUtils.getUserId());
+            }
+            if (CollectionUtils.isEmpty(viewers)) {
+                viewers = new ArrayList<>();
+                viewers.add(SecurityUtils.getUserId());
+            }
+            update(Wrappers.<Slide>lambdaUpdate().eq(Slide::getSlideId, slideId).set(Slide::getViewers, viewers, "typeHandler=com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"));
+        }
+        return slideInfo;
+    }
 
-	@Override
-	public List<String> getAnimalCode(SlideSelectListReq req) {
-		List<SlidePageVo> slideSelectList = this.baseMapper.getSlideSelectList(req);
-		List<String> animalCodes = slideSelectList.stream().map(SlidePageVo::getAnimalCode).distinct().sorted().collect(Collectors.toList());
-		return animalCodes;
-	}
+    @Override
+    public List<String> getAnimalCode(SlideSelectListReq req) {
+        List<SlidePageVo> slideSelectList = this.baseMapper.getSlideSelectList(req);
+        List<String> animalCodes = slideSelectList.stream().map(SlidePageVo::getAnimalCode).distinct().sorted().collect(Collectors.toList());
+        return animalCodes;
+    }
 
-	@Override
-	public List<String> getWaxCode(SlideSelectListReq req) {
-		List<SlidePageVo> slideSelectList = this.baseMapper.getSlideSelectList(req);
-		List<String> waxCode = slideSelectList.stream().map(SlidePageVo::getWaxCode).distinct().sorted().collect(Collectors.toList());
-		return waxCode;
-	}
+    @Override
+    public List<String> getWaxCode(SlideSelectListReq req) {
+        List<SlidePageVo> slideSelectList = this.baseMapper.getSlideSelectList(req);
+        List<String> waxCode = slideSelectList.stream().map(SlidePageVo::getWaxCode).distinct().sorted().collect(Collectors.toList());
+        return waxCode;
+    }
 
-	@Override
-	public List<String> getGroupCode(SlideSelectListReq req) {
-		List<SlidePageVo> slideSelectList = this.baseMapper.getSlideSelectList(req);
-		List<String> groupCode = slideSelectList.stream().map(SlidePageVo::getGroupCode).distinct().sorted().collect(Collectors.toList());
-		return groupCode;
-	}
+    @Override
+    public List<String> getGroupCode(SlideSelectListReq req) {
+        List<SlidePageVo> slideSelectList = this.baseMapper.getSlideSelectList(req);
+        List<String> groupCode = slideSelectList.stream().map(SlidePageVo::getGroupCode).distinct().sorted().collect(Collectors.toList());
+        return groupCode;
+    }
 
-	@Override
-	public List<SlideOrganTagVo> getOrganCode(SlideSelectListReq req) {
-		List<SlideOrganTagVo> organCode = baseMapper.getOrganCode(req);
-		return organCode;
-	}
+    @Override
+    public List<SlideOrganTagVo> getOrganCode(SlideSelectListReq req) {
+        List<SlideOrganTagVo> organCode = baseMapper.getOrganCode(req);
+        return organCode;
+    }
 
-	@Override
-	public boolean isAiSlideFinished(Long projectId) {
-		return baseMapper.isAiSlideFinished(projectId);
-	}
+    @Override
+    public boolean isAiSlideFinished(Long projectId) {
+        return baseMapper.isAiSlideFinished(projectId);
+    }
 
-	@Override
-	public R<String> aiAnalysis(AiAnalysisReq req) {
+    @Override
+    public R<String> aiAnalysis(AiAnalysisReq req) {
         // 加锁
         String key = "ai_analysis_projectId_" + req.getProjectId();
         Boolean result = this.redisTemplate.opsForValue().setIfAbsent(key, req.getProjectId());
@@ -430,8 +432,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         }
     }
 
-	@Override
-	public OrganCheckVo organCheck(OrganCheckReq req) {
+    @Override
+    public OrganCheckVo organCheck(OrganCheckReq req) {
         log.info("脏器识别校对-python服务使用，入参：{}", JSON.toJSONString(req));
         OrganCheckVo vo = new OrganCheckVo();
         vo.setSuccess(false);
@@ -477,8 +479,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         return vo;
     }
 
-	@Override
-	public OrganCheckViewVo organCheckView(OrganCheckViewReq req) {
+    @Override
+    public OrganCheckViewVo organCheckView(OrganCheckViewReq req) {
         OrganCheckViewVo vo = new OrganCheckViewVo();
         List<OrganCheckAiVo> aiVos = new ArrayList<>();
         List<OrganCheckProductionVo> productionVos = new ArrayList<>();
@@ -487,17 +489,17 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         // 查询切片信息
         Slide slide = this.baseMapper.selectById(req.getSlideId());
         if (slide != null) {
-            Map<Long,SingleSlide> singleSlideMap = new HashMap<>(16);
+            Map<Long, SingleSlide> singleSlideMap = new HashMap<>(16);
             // 查询AI脏器识别信息
             LambdaQueryWrapper<SingleSlide> singleSlideWrapper = new LambdaQueryWrapper<>();
             singleSlideWrapper.eq(SingleSlide::getSlideId, req.getSlideId());
             List<SingleSlide> singleSlides = this.singleSlideMapper.selectList(singleSlideWrapper);
             if (!CollectionUtils.isEmpty(singleSlides)) {
-				// 脏器标签集合
-				singleSlideMap = singleSlides.stream().collect(Collectors.toMap(SingleSlide::getCategoryId, singleSlide -> singleSlide, (existing, replacement) -> existing));
-			}
+                // 脏器标签集合
+                singleSlideMap = singleSlides.stream().collect(Collectors.toMap(SingleSlide::getCategoryId, singleSlide -> singleSlide, (existing, replacement) -> existing));
+            }
 
-            Map<Long,Production> productionMap = new HashMap<>(16);
+            Map<Long, Production> productionMap = new HashMap<>(16);
             // 查询图片信息
             Image image = this.imageMapper.selectById(slide.getImageId());
             // 查询项目信息
@@ -513,48 +515,48 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
             wrapper.eq(Production::getWaxCode, image.getWaxCode());
             wrapper.in(Production::getSexFlag, sexFlags);
             List<Production> productions = this.productionMapper.selectList(wrapper);
-			if (!CollectionUtils.isEmpty(productions)) {
-				productionMap = productions.stream().collect(Collectors.toMap(Production::getOrganTagId, production -> production, (existing, replacement) -> existing));
-			}
+            if (!CollectionUtils.isEmpty(productions)) {
+                productionMap = productions.stream().collect(Collectors.toMap(Production::getOrganTagId, production -> production, (existing, replacement) -> existing));
+            }
 
-			// 查询标签信息
-			Map<Long, OrganTag> tagMap = new HashMap<>(16);
-			Set<Long> tagIds = new HashSet<>(16);
-			tagIds.addAll(singleSlideMap.keySet());
-			tagIds.addAll(productionMap.keySet());
-			if (!CollectionUtils.isEmpty(tagIds)) {
-				LambdaQueryWrapper<OrganTag> tagWrapper = new LambdaQueryWrapper<>();
-				tagWrapper.in(OrganTag::getOrganTagId, tagIds);
-				List<OrganTag> tags = organTagMapper.selectList(tagWrapper);
-				if (!CollectionUtils.isEmpty(tags)) {
-					tagMap = tags.stream().collect(Collectors.toMap(OrganTag::getOrganTagId, tag -> tag));
-				}
-			}
+            // 查询标签信息
+            Map<Long, OrganTag> tagMap = new HashMap<>(16);
+            Set<Long> tagIds = new HashSet<>(16);
+            tagIds.addAll(singleSlideMap.keySet());
+            tagIds.addAll(productionMap.keySet());
+            if (!CollectionUtils.isEmpty(tagIds)) {
+                LambdaQueryWrapper<OrganTag> tagWrapper = new LambdaQueryWrapper<>();
+                tagWrapper.in(OrganTag::getOrganTagId, tagIds);
+                List<OrganTag> tags = organTagMapper.selectList(tagWrapper);
+                if (!CollectionUtils.isEmpty(tags)) {
+                    tagMap = tags.stream().collect(Collectors.toMap(OrganTag::getOrganTagId, tag -> tag));
+                }
+            }
 
             // 组装信息
             for (SingleSlide singleSlide : singleSlideMap.values()) {
-				OrganTag organTag = tagMap.get(singleSlide.getCategoryId());
-				OrganCheckAiVo aiVo = new OrganCheckAiVo();
-				aiVo.setSingleId(singleSlide.getSingleId());
-				aiVo.setOrganTagId(singleSlide.getCategoryId());
-				aiVo.setOrganName(organTag.getOrganName());
-				aiVo.setOrganEn(organTag.getOrganEn());
-				aiVo.setRgb(organTag.getRgb());
-				aiVo.setChromaticValue(organTag.getChromaticValue());
-				aiVo.setRedHighlight(!productionMap.containsKey(singleSlide.getCategoryId()));
-				aiVos.add(aiVo);
-			}
-			for (Production production : productionMap.values()) {
-				OrganTag organTag = tagMap.get(production.getOrganTagId());
-				OrganCheckProductionVo productionVo = new OrganCheckProductionVo();
-				productionVo.setId(production.getId());
-				productionVo.setOrganTagId(production.getOrganTagId());
-				productionVo.setOrganName(organTag.getOrganName());
-				productionVo.setOrganEn(organTag.getOrganEn());
-				productionVo.setWaxCode(production.getWaxCode());
-				productionVo.setRedHighlight(!singleSlideMap.containsKey(production.getOrganTagId()));
-				productionVos.add(productionVo);
-			}
+                OrganTag organTag = tagMap.get(singleSlide.getCategoryId());
+                OrganCheckAiVo aiVo = new OrganCheckAiVo();
+                aiVo.setSingleId(singleSlide.getSingleId());
+                aiVo.setOrganTagId(singleSlide.getCategoryId());
+                aiVo.setOrganName(organTag.getOrganName());
+                aiVo.setOrganEn(organTag.getOrganEn());
+                aiVo.setRgb(organTag.getRgb());
+                aiVo.setChromaticValue(organTag.getChromaticValue());
+                aiVo.setRedHighlight(!productionMap.containsKey(singleSlide.getCategoryId()));
+                aiVos.add(aiVo);
+            }
+            for (Production production : productionMap.values()) {
+                OrganTag organTag = tagMap.get(production.getOrganTagId());
+                OrganCheckProductionVo productionVo = new OrganCheckProductionVo();
+                productionVo.setId(production.getId());
+                productionVo.setOrganTagId(production.getOrganTagId());
+                productionVo.setOrganName(organTag.getOrganName());
+                productionVo.setOrganEn(organTag.getOrganEn());
+                productionVo.setWaxCode(production.getWaxCode());
+                productionVo.setRedHighlight(!singleSlideMap.containsKey(production.getOrganTagId()));
+                productionVos.add(productionVo);
+            }
         }
         return vo;
     }
@@ -591,81 +593,80 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         }
     }
 
-	@Override
-	public List<OrganTagVO> organList(Long projectId) {
-		List<OrganTagVO> list = new ArrayList<>();
-		// 查询项目信息
-		Project project = this.projectMapper.selectById(projectId);
-		if (project != null && StringUtils.isNotBlank(project.getSpeciesId())) {
-			LambdaQueryWrapper<OrganTag> wrapper = new LambdaQueryWrapper<>();
-			wrapper.eq(OrganTag::getSpeciesId, project.getSpeciesId());
-			wrapper.eq(OrganTag::getOrganizationId, project.getOrganizationId());
-			wrapper.eq(OrganTag::getDelFlag, false);
-			List<OrganTag> tags = organTagMapper.selectList(wrapper);
-			if (!CollectionUtils.isEmpty(tags)) {
-				for (OrganTag tag : tags) {
-					OrganTagVO vo = new OrganTagVO();
-					BeanUtils.copyProperties(tag, vo);
-					list.add(vo);
-				}
-			}
-		}
-		return list;
-	}
+    @Override
+    public List<OrganTagVO> organList(Long projectId) {
+        List<OrganTagVO> list = new ArrayList<>();
+        // 查询项目信息
+        Project project = this.projectMapper.selectById(projectId);
+        if (project != null && StringUtils.isNotBlank(project.getSpeciesId())) {
+            LambdaQueryWrapper<OrganTag> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(OrganTag::getSpeciesId, project.getSpeciesId());
+            wrapper.eq(OrganTag::getOrganizationId, project.getOrganizationId());
+            wrapper.eq(OrganTag::getDelFlag, false);
+            List<OrganTag> tags = organTagMapper.selectList(wrapper);
+            if (!CollectionUtils.isEmpty(tags)) {
+                for (OrganTag tag : tags) {
+                    OrganTagVO vo = new OrganTagVO();
+                    BeanUtils.copyProperties(tag, vo);
+                    list.add(vo);
+                }
+            }
+        }
+        return list;
+    }
 
-	@Override
-	public AiInfoAnalyzeVo getAiInfoList(AiInfoListRequest request) {
-		AiInfoAnalyzeVo aiInfoAnalyzeVo = new AiInfoAnalyzeVo();
-		Slide slide = slideMapper.selectById(request.getSlideId());
+    @Override
+    public AiInfoAnalyzeVo getAiInfoList(AiInfoListRequest request) {
+        AiInfoAnalyzeVo aiInfoAnalyzeVo = new AiInfoAnalyzeVo();
+        Slide slide = slideMapper.selectById(request.getSlideId());
 
-		aiInfoAnalyzeVo.setAiStatus(slide.getAiStatus());
-		if(slide != null && slide.getAiStatus() < AiStatusEnum.ORGAN_IDENTIFICATION_COMPLETED.getCode()) {
-			aiInfoAnalyzeVo.setAiStatus(slide.getAiStatus());
-			return aiInfoAnalyzeVo;
-		}
+        aiInfoAnalyzeVo.setAiStatus(slide.getAiStatus());
+        if (slide != null && slide.getAiStatus() < AiStatusEnum.ORGAN_IDENTIFICATION_COMPLETED.getCode()) {
+            aiInfoAnalyzeVo.setAiStatus(slide.getAiStatus());
+            return aiInfoAnalyzeVo;
+        }
 
-		//判断是不是存在对照组
-		Project special = projectMapper.selectById(request.getProjectId());
-		List<AiInfoListVO> aiInfoList = baseMapper.getAiInfoList(request);
+        //判断是不是存在对照组
+        Project special = projectMapper.selectById(request.getProjectId());
+        List<AiInfoListVO> aiInfoList = baseMapper.getAiInfoList(request);
 
-		request.setControlGroup(special.getControlGroup());
-		List<AiInfoListResp> aiInfoListResps = new ArrayList<>();
-		Map<Integer, List<AiInfoListVO>> aiInfoListMap = aiInfoList.stream().collect(Collectors.groupingBy(AiInfoListVO::getCategoryId));
+        request.setControlGroup(special.getControlGroup());
+        List<AiInfoListResp> aiInfoListResps = new ArrayList<>();
+        Map<Integer, List<AiInfoListVO>> aiInfoListMap = aiInfoList.stream().collect(Collectors.groupingBy(AiInfoListVO::getCategoryId));
 
-		//判断ai分析数据有没有全部完成
-		aiInfoListMap.forEach((key, value) -> {
-			AiInfoListResp resp = new AiInfoListResp();
-			OrganTag organTag = organTagMapper.selectById(key);
-			if(null != organTag) {
-				resp.setOrganTagId(organTag.getOrganTagId());
-				resp.setOrganName(organTag.getOrganName());
-			}
+        //判断ai分析数据有没有全部完成
+        aiInfoListMap.forEach((key, value) -> {
+            AiInfoListResp resp = new AiInfoListResp();
+            OrganTag organTag = organTagMapper.selectById(key);
+            if (null != organTag) {
+                resp.setOrganTagId(organTag.getOrganTagId());
+                resp.setOrganName(organTag.getOrganName());
+            }
 
-			// 查询脏器信息
-			LambdaQueryWrapper<SingleSlide> singleSlideWrapper = new LambdaQueryWrapper<>();
-			singleSlideWrapper.eq(SingleSlide::getSlideId, slide.getSlideId());
-			singleSlideWrapper.eq(SingleSlide::getCategoryId, key);
-			SingleSlide singleSlide = this.singleSlideMapper.selectOne(singleSlideWrapper);
-			if (Objects.nonNull(singleSlide)) {
-				resp.setAiStatus(this.handleOrganStatus(singleSlide));
-				resp.setForecastStatus(singleSlide.getForecastStatus());
-			}
-			Set<String> structureIdsSet = new HashSet<>();
-			Set<StructureTagVo> structureTagVosSet = new HashSet<>();
+            // 查询脏器信息
+            LambdaQueryWrapper<SingleSlide> singleSlideWrapper = new LambdaQueryWrapper<>();
+            singleSlideWrapper.eq(SingleSlide::getSlideId, slide.getSlideId());
+            singleSlideWrapper.eq(SingleSlide::getCategoryId, key);
+            SingleSlide singleSlide = this.singleSlideMapper.selectOne(singleSlideWrapper);
+            if (Objects.nonNull(singleSlide)) {
+                resp.setAiStatus(this.handleOrganStatus(singleSlide));
+                resp.setForecastStatus(singleSlide.getForecastStatus());
+            }
+            Set<String> structureIdsSet = new HashSet<>();
+            Set<StructureTagVo> structureTagVosSet = new HashSet<>();
 
-			//AI指标
-			LambdaQueryWrapper<AiForecast> aiForecastLambdaQueryWrapper = new LambdaQueryWrapper<>();
-			aiForecastLambdaQueryWrapper.eq(AiForecast::getSingleSlideId, singleSlide.getSingleId());
-            aiForecastLambdaQueryWrapper.eq(AiForecast::getStructType, CommonConstant.NUMBER_0);
-			List<AiForecast> aiForecasts = aiForecastMapper.selectList(aiForecastLambdaQueryWrapper);
-			List<AiInfoListVO> aiInfoListVOArrayList = new ArrayList<>();
-			for (AiForecast aiCast : aiForecasts) {
-				AiInfoListVO aiInfoListVO = new AiInfoListVO();
-				BeanUtils.copyProperties(aiCast, aiInfoListVO);
-				String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
+            //AI指标
+            LambdaQueryWrapper<AiForecast> aiForecastLambdaQueryWrapper = new LambdaQueryWrapper<>();
+            aiForecastLambdaQueryWrapper.eq(AiForecast::getSingleSlideId, singleSlide.getSingleId());
+            List<AiForecast> aiForecasts = aiForecastMapper.selectList(aiForecastLambdaQueryWrapper);
+            List<AiInfoListVO> aiInfoListVOArrayList = new ArrayList<>();
+            for (AiForecast aiCast : aiForecasts) {
+                AiInfoListVO aiInfoListVO = new AiInfoListVO();
+                BeanUtils.copyProperties(aiCast, aiInfoListVO);
+                String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
 
-				List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiCast.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup, CommonConstant.NUMBER_0);
-				aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
+                List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiCast.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup, CommonConstant.NUMBER_0);
+                aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
 
                 if (null != aiInfoListVO.getNormalDistribution() && null != aiCast.getResults()) {
                     String[] s = aiInfoListVO.getNormalDistribution().split("-");
@@ -677,111 +678,111 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                     } else {
                         aiInfoListVO.setRedHighlight(false);
                     }
-				}
+                }
 
-				String structureIds = aiCast.getStructureIds();
-				if(null != structureIds) {
-					Set<String> set = Arrays.stream(structureIds.split(",")).collect(Collectors.toSet());
-					structureIdsSet.addAll(set);
-				}
+                String structureIds = aiCast.getStructureIds();
+                if (null != structureIds) {
+                    Set<String> set = Arrays.stream(structureIds.split(",")).collect(Collectors.toSet());
+                    structureIdsSet.addAll(set);
+                }
 
-				if(CollectionUtils.isNotEmpty(structureIdsSet)) {
-					LambdaQueryWrapper<StructureTag> in = new LambdaQueryWrapper<StructureTag>()
-							.in(StructureTag::getStructureId, structureIdsSet)
-							.eq(StructureTag::getOrganizationId, SecurityUtils.getOrganizationId());
-					List<StructureTag> structureTags = structureTagMapper.selectList(in);
-					if(CollectionUtils.isNotEmpty(structureTags)) {
-						List<Long> structureTagIds = structureTags.stream().map(StructureTag::getStructureTagId).collect(Collectors.toList());
-						aiInfoListVO.setStructureTagIds(structureTagIds);
+                if (CollectionUtils.isNotEmpty(structureIdsSet)) {
+                    LambdaQueryWrapper<StructureTag> in = new LambdaQueryWrapper<StructureTag>()
+                            .in(StructureTag::getStructureId, structureIdsSet)
+                            .eq(StructureTag::getOrganizationId, SecurityUtils.getOrganizationId());
+                    List<StructureTag> structureTags = structureTagMapper.selectList(in);
+                    if (CollectionUtils.isNotEmpty(structureTags)) {
+                        List<Long> structureTagIds = structureTags.stream().map(StructureTag::getStructureTagId).collect(Collectors.toList());
+                        aiInfoListVO.setStructureTagIds(structureTagIds);
 
-						for (StructureTag structureTag : structureTags) {
-							StructureTagVo structureTagVo = new StructureTagVo();
-							BeanUtils.copyProperties(structureTag, structureTagVo);
-							structureTagVosSet.add(structureTagVo);
-						}
-					}
-				}
-				aiInfoListVOArrayList.add(aiInfoListVO);
-			}
+                        for (StructureTag structureTag : structureTags) {
+                            StructureTagVo structureTagVo = new StructureTagVo();
+                            BeanUtils.copyProperties(structureTag, structureTagVo);
+                            structureTagVosSet.add(structureTagVo);
+                        }
+                    }
+                }
+                aiInfoListVOArrayList.add(aiInfoListVO);
+            }
 
-			if(CollectionUtils.isNotEmpty(structureTagVosSet)) {
-				List<StructureTagVo> structureTagVos = new ArrayList<>(structureTagVosSet);
-				resp.setStructTagList(structureTagVos);
-			}
-			resp.setAiInfoList(aiInfoListVOArrayList);
-			aiInfoListResps.add(resp);
-		});
+            if (CollectionUtils.isNotEmpty(structureTagVosSet)) {
+                List<StructureTagVo> structureTagVos = new ArrayList<>(structureTagVosSet);
+                resp.setStructTagList(structureTagVos);
+            }
+            resp.setAiInfoList(aiInfoListVOArrayList);
+            aiInfoListResps.add(resp);
+        });
 
-		aiInfoAnalyzeVo.setAiInfoList(aiInfoListResps);
-		return aiInfoAnalyzeVo;
-	}
+        aiInfoAnalyzeVo.setAiInfoList(aiInfoListResps);
+        return aiInfoAnalyzeVo;
+    }
 
-	@Override
-	public Boolean getAiInfoListCheck(Long projectId, Long singleSlideId) {
-		//判断是不是存在对照组
-		Project special = projectMapper.selectById(projectId);
+    @Override
+    public Boolean getAiInfoListCheck(Long projectId, Long singleSlideId) {
+        //判断是不是存在对照组
+        Project special = projectMapper.selectById(projectId);
 
-		AiInfoListRequest request = new AiInfoListRequest();
-		request.setSingleSlideId(singleSlideId);
-		request.setProjectId(projectId);
-		List<AiInfoListVO> aiInfoList = baseMapper.getAiInfoList(request);
-		request.setControlGroup(special.getControlGroup());
-		Map<Integer, List<AiInfoListVO>> aiInfoListMap = aiInfoList.stream().collect(Collectors.groupingBy(AiInfoListVO::getCategoryId));
+        AiInfoListRequest request = new AiInfoListRequest();
+        request.setSingleSlideId(singleSlideId);
+        request.setProjectId(projectId);
+        List<AiInfoListVO> aiInfoList = baseMapper.getAiInfoList(request);
+        request.setControlGroup(special.getControlGroup());
+        Map<Integer, List<AiInfoListVO>> aiInfoListMap = aiInfoList.stream().collect(Collectors.groupingBy(AiInfoListVO::getCategoryId));
 
-		boolean flag = false;
-		//判断ai分析数据有没有全部完成
-		for (Map.Entry<Integer, List<AiInfoListVO>> entry : aiInfoListMap.entrySet()) {
-			Integer key = entry.getKey();
-			List<AiInfoListVO> aiInfoListVOS = entry.getValue();
-			for (AiInfoListVO aiInfoListVO : aiInfoListVOS) {
-				String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : "1";
+        boolean flag = false;
+        //判断ai分析数据有没有全部完成
+        for (Map.Entry<Integer, List<AiInfoListVO>> entry : aiInfoListMap.entrySet()) {
+            Integer key = entry.getKey();
+            List<AiInfoListVO> aiInfoListVOS = entry.getValue();
+            for (AiInfoListVO aiInfoListVO : aiInfoListVOS) {
+                String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : "1";
 
-				List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup, CommonConstant.NUMBER_0);
-				String firstAndLastOfMiddle95Percent = MathUtils.getFirstAndLastOfMiddle95Percent(dataList);
-				aiInfoListVO.setNormalDistribution(firstAndLastOfMiddle95Percent);
-				if (null != firstAndLastOfMiddle95Percent && null != aiInfoListVO.getResults()) {
-					String[] s = aiInfoListVO.getNormalDistribution().split("-");
-					boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiInfoListVO.getResults()));
-					if (!inRange) {
-						flag = true;
-						break;
-					}
-				}
-			}
-			if (flag) {
-				break;
-			}
-		}
-		return flag;
-	}
+                List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup, CommonConstant.NUMBER_0);
+                String firstAndLastOfMiddle95Percent = MathUtils.getFirstAndLastOfMiddle95Percent(dataList);
+                aiInfoListVO.setNormalDistribution(firstAndLastOfMiddle95Percent);
+                if (null != firstAndLastOfMiddle95Percent && null != aiInfoListVO.getResults()) {
+                    String[] s = aiInfoListVO.getNormalDistribution().split("-");
+                    boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiInfoListVO.getResults()));
+                    if (!inRange) {
+                        flag = true;
+                        break;
+                    }
+                }
+            }
+            if (flag) {
+                break;
+            }
+        }
+        return flag;
+    }
 
-	@Override
-	public Long addSingleSlide(AddSingleSlide req) {
-		Long id = null;
-		// 先查询是否存在，不存在插入
-		LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
-		wrapper.eq(SingleSlide::getSlideId, req.getSlideId());
-		wrapper.eq(SingleSlide::getCategoryId, req.getCategoryId());
-		List<SingleSlide> singleSlides = this.singleSlideMapper.selectList(wrapper);
-		if (CollectionUtils.isEmpty(singleSlides)) {
-			SingleSlide singleSlide = new SingleSlide();
-			singleSlide.setSlideId(req.getSlideId());
-			singleSlide.setCategoryId(req.getCategoryId());
-			singleSlide.setThumbUrl("");
-			this.singleSlideMapper.insert(singleSlide);
-			id = singleSlide.getSingleId();
-		}
-		return id;
-	}
+    @Override
+    public Long addSingleSlide(AddSingleSlide req) {
+        Long id = null;
+        // 先查询是否存在，不存在插入
+        LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SingleSlide::getSlideId, req.getSlideId());
+        wrapper.eq(SingleSlide::getCategoryId, req.getCategoryId());
+        List<SingleSlide> singleSlides = this.singleSlideMapper.selectList(wrapper);
+        if (CollectionUtils.isEmpty(singleSlides)) {
+            SingleSlide singleSlide = new SingleSlide();
+            singleSlide.setSlideId(req.getSlideId());
+            singleSlide.setCategoryId(req.getCategoryId());
+            singleSlide.setThumbUrl("");
+            this.singleSlideMapper.insert(singleSlide);
+            id = singleSlide.getSingleId();
+        }
+        return id;
+    }
 
-	@Override
-	public int delSingleSlide(DelSingleSlide req) {
-		// 删除脏器
-		LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
-		wrapper.eq(SingleSlide::getSlideId, req.getSlideId());
-		wrapper.eq(SingleSlide::getCategoryId, req.getCategoryId());
-		return this.singleSlideMapper.delete(wrapper);
-	}
+    @Override
+    public int delSingleSlide(DelSingleSlide req) {
+        // 删除脏器
+        LambdaQueryWrapper<SingleSlide> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SingleSlide::getSlideId, req.getSlideId());
+        wrapper.eq(SingleSlide::getCategoryId, req.getCategoryId());
+        return this.singleSlideMapper.delete(wrapper);
+    }
 
     @Override
     public R<CustomPage<SlidePageVo>> pageNew(SlidePageReq req) {
@@ -904,19 +905,19 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
     }
 
     @Override
-	public boolean checkAiExecuted(Long projectId) {
-		LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
-		wrapper.eq(Slide::getProjectId, projectId);
-		wrapper.eq(Slide::getDelFlag, "0");
-		wrapper.gt(Slide::getAiStatus, 0);
-		List<Slide> slides = this.baseMapper.selectList(wrapper);
-		return !org.springframework.util.CollectionUtils.isEmpty(slides);
-	}
+    public boolean checkAiExecuted(Long projectId) {
+        LambdaQueryWrapper<Slide> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Slide::getProjectId, projectId);
+        wrapper.eq(Slide::getDelFlag, "0");
+        wrapper.gt(Slide::getAiStatus, 0);
+        List<Slide> slides = this.baseMapper.selectList(wrapper);
+        return !org.springframework.util.CollectionUtils.isEmpty(slides);
+    }
 
-	@Override
-	public List<ExportAiInfoVo> exportAiInfo(ExportAiInfoReq req) {
-		return baseMapper.exportAiInfo(req);
-	}
+    @Override
+    public List<ExportAiInfoVo> exportAiInfo(ExportAiInfoReq req) {
+        return baseMapper.exportAiInfo(req);
+    }
 
 
 }
