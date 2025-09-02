@@ -33,9 +33,9 @@ public class MessageRetryHandler {
 
     public void processMessage(String message) {
         try {
-            log.info("业务开始处理消息: {}" , message);
+            log.info("业务开始处理重试队列消息: {}" , message);
             jsonTaskParserService.input(message);
-            log.info("业务处理完成: {}" , message);
+            log.info("业务处理重试队列完成: {}" , message);
         } catch (Exception e) {
             log.error("业务解析消息异常：[{}]，消息内容：[{}]",e.getMessage(),message);
         }
