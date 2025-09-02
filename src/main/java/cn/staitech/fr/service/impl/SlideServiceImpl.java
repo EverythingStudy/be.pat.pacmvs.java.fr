@@ -411,6 +411,9 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
             // 查询所有未分析的切片
             List<AiAnalysisBO> list = this.baseMapper.selectAiAnalysis(req.getProjectId());
+            if (CollectionUtils.isEmpty(list)) {
+                return R.fail("没有可分析的切片");
+            }
             for (AiAnalysisBO bo : list) {
                 try {
                     log.info("脏器识别请求参数：{}", JSON.toJSONString(bo));
