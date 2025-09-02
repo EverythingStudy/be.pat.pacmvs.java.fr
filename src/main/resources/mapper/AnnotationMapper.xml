@@ -362,10 +362,10 @@
         update_by,
         update_time,
         slide_id,
-        id,
+--         json_id,
         contour_type,
         ST_AsGeoJSON(contour) as contour,
-        single_slide_id
+--         single_slide_id
         from fr_annotation
         <where>
             contour_type != 1
