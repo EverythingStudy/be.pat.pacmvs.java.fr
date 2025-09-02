@@ -2,7 +2,6 @@ package cn.staitech.fr.controller;
 
 import cn.hutool.json.JSONUtil;
 import cn.staitech.fr.config.ParkDataProducer;
-import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -28,8 +27,6 @@ public class ApiController {
 
     @Resource
     private ParkDataProducer parkDataProducer;
-    @Resource
-    private JsonTaskParserService jsonTaskParserService;
 
     @ApiOperation(value = "py任务结果")
     @PostMapping("/pyResult")
@@ -37,6 +34,5 @@ public class ApiController {
         String retData = JSONUtil.toJsonStr(params);
         log.info("Ai回调数据: " + retData);
         parkDataProducer.sendMessage(retData);
-        //jsonTaskParserService.input(retData);
     }
 }
