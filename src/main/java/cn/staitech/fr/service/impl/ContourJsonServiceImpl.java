@@ -2,7 +2,6 @@ package cn.staitech.fr.service.impl;
 
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.config.MapConstant;
-import cn.staitech.fr.constant.Constants;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.out.ContourFileVo;
 import cn.staitech.fr.domain.out.JsonFileVo;
@@ -64,9 +63,6 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
 
     @Resource
     private SingleSlideMapper singleSlideMapper;
-
-    @Resource
-    private ImageMapper imageMapper;
 
     // json文件存储路径
     private final static String OUTPUT_FILTERED_FILE_PATH = File.separator + "home" + File.separator + "data" + File.separator + "aiJson";
@@ -136,7 +132,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
         } else {
             log.warn("目录不存在或不是目录::[{}]", outputDir);
         }
-        
+
         for (JsonFile jsonFile : jsonFileList) {
             String fileUrl = jsonFile.getFileUrl();
             File f = new File(fileUrl);
@@ -446,8 +442,8 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                 // 获取符合条件的数据
                 Envelope envelope = geometry.getEnvelopeInternal();
                 List<Geometry> query = tree.query(envelope);
-                if(CollectionUtils.isEmpty(query)) {
-                	log.warn("singleSlide id:[{}]]", single.getSingleId()+" 匹配不到数据，无法写入瓦片数据~");
+                if (CollectionUtils.isEmpty(query)) {
+                    log.warn("singleSlide id:[{}]]", single.getSingleId() + " 匹配不到数据，无法写入瓦片数据~");
                 }
                 List<Features> filteredFeatures = new ArrayList<>();
                 for (Geometry g : query) {
@@ -469,8 +465,8 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                     String outputPath = outputDir + "/" + fileName + ".json";
                     // 写入文件
                     writeFilteredGeoJson(filteredFeatures, outputPath);
-                }else {
-                	log.warn("singleSlide id:[{}]]", single.getSingleId()+" filteredFeatures为空，无法写入瓦片数据~");
+                } else {
+                    log.warn("singleSlide id:[{}]]", single.getSingleId() + " filteredFeatures为空，无法写入瓦片数据~");
                 }
             } catch (JSONException e) {
                 log.error("Error processing file: [{}]", e.getMessage());
