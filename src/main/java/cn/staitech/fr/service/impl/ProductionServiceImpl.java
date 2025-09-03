@@ -53,20 +53,24 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
         // 查询项目信息
         Project project = this.projectMapper.selectById(req.getProjectId());
         if (project != null && StringUtils.isNotBlank(project.getSpeciesId())) {
-            // 先查询制片信息表，为空，再查询模板表+项目蜡块号
-            LambdaQueryWrapper<Production> pWrapper = new LambdaQueryWrapper<>();
-            pWrapper.eq(Production::getSpecialId, req.getProjectId());
-            pWrapper.eq(Production::getSpeciesId, project.getSpeciesId());
-            List<Production> productions = this.baseMapper.selectList(pWrapper);
-            if (!CollectionUtils.isEmpty(productions)) {
-                for (Production p : productions) {
-                    ProductionVO vo = new ProductionVO();
-                    BeanUtils.copyProperties(p, vo);
-                    // 脏器标签ID
-                    vo.setTemplateId(p.getOrganTagId());
-                    list.add(vo);
+            // 保存过：直接查询制片信息表
+            if (project.getProductionSave() != null && project.getProductionSave() == 1) {
+                LambdaQueryWrapper<Production> pWrapper = new LambdaQueryWrapper<>();
+                pWrapper.eq(Production::getSpecialId, req.getProjectId());
+                pWrapper.eq(Production::getSpeciesId, project.getSpeciesId());
+                List<Production> productions = this.baseMapper.selectList(pWrapper);
+                if (!CollectionUtils.isEmpty(productions)) {
+                    for (Production p : productions) {
+                        ProductionVO vo = new ProductionVO();
+                        BeanUtils.copyProperties(p, vo);
+                        // 脏器标签ID
+                        vo.setTemplateId(p.getOrganTagId());
+                        list.add(vo);
+                    }
                 }
-            } else {
+            }
+            // 没有保存过：查询模板表+项目蜡块号
+            else {
                 Set<String> waxCodes = new HashSet<>();
                 // 查询模板表
                 LambdaQueryWrapper<SpeciesWaxCodeTemplate> wrapper = new LambdaQueryWrapper<>();
