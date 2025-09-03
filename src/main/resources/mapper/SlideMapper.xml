@@ -377,6 +377,7 @@
         b.slide_id AS slideId,
         c.thumb_url AS thumbUrl,
         c.image_name AS fileName,
+        c.image_name AS imageName,
         c.animal_code AS animalCode,
         c.wax_code AS waxCode,
         c.group_code AS groupCode,
