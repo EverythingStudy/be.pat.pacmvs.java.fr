@@ -89,34 +89,34 @@ public class StomachParserStrategyImpl extends AbstractCustomParserStrategy {
 		前胃有核层面积占比	4=C/E
 		腺胃黏膜上皮+固有层面积占比	5=D/F
          */
-        indicatorResultsMap.put("前胃肌层面积", new IndicatorAddIn("Forestomach Muscularis area", organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,"110023"));
+//        indicatorResultsMap.put("前胃肌层面积", new IndicatorAddIn("Forestomach Muscularis area", organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,"110023"));
         indicatorResultsMap.put("前胃角质层面积", new IndicatorAddIn("Stratum Corneum area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1,"11012E"));
-        indicatorResultsMap.put("腺胃黏膜上皮+固有层面积", new IndicatorAddIn("Glandular area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,"110035"));
         indicatorResultsMap.put("前胃有核层面积", new IndicatorAddIn("Nucleated cell laye area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1,"11012F"));
-        indicatorResultsMap.put("腺胃肌层面积", new IndicatorAddIn("Glandular Muscularis area", organArea4.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,"110024"));
+        indicatorResultsMap.put("腺胃黏膜上皮+固有层面积", new IndicatorAddIn("Glandular area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,"110035"));
+//        indicatorResultsMap.put("腺胃肌层面积", new IndicatorAddIn("Glandular Muscularis area", organArea4.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,"110024"));
         if(organArea5.signum() == 0){
-            indicatorResultsMap.put("前胃肌层面积占比", new IndicatorAddIn("Forestomach Muscularis area%","0", "%",areaUtils.getStructureIds("110023","11013F")));
-            indicatorResultsMap.put("前胃角质层面积占比", new IndicatorAddIn("Stratum Corneum  area%","0", "%",areaUtils.getStructureIds("11012E","11013F")));
-            indicatorResultsMap.put("前胃有核层面积占比", new IndicatorAddIn("Nucleated cell laye area%","0", "%",areaUtils.getStructureIds("11012F","11013F")));
+//            indicatorResultsMap.put("前胃肌层面积占比", new IndicatorAddIn("Forestomach Muscularis area%","0", "%",areaUtils.getStructureIds("110023","11013F")));
+//            indicatorResultsMap.put("前胃角质层面积占比", new IndicatorAddIn("Stratum Corneum  area%","0", "%",areaUtils.getStructureIds("11012E","11013F")));
+//            indicatorResultsMap.put("前胃有核层面积占比", new IndicatorAddIn("Nucleated cell laye area%","0", "%",areaUtils.getStructureIds("11012F","11013F")));
 
         }else{
-            indicatorResultsMap.put("前胃肌层面积占比", new IndicatorAddIn("Forestomach Muscularis area%",organArea.divide(organArea5,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("110023","11013F")));
+//            indicatorResultsMap.put("前胃肌层面积占比", new IndicatorAddIn("Forestomach Muscularis area%",organArea.divide(organArea5,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("110023","11013F")));
             BigDecimal multiply = organArea5.multiply(new BigDecimal("1000"));
-            indicatorResultsMap.put("前胃角质层面积占比", new IndicatorAddIn("Stratum Corneum  area%",organArea1.divide(multiply,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("11012E","11013F")));
-            indicatorResultsMap.put("前胃有核层面积占比", new IndicatorAddIn("Nucleated cell laye area%",organArea3.divide(multiply,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("11012F","11013F")));
+//            indicatorResultsMap.put("前胃角质层面积占比", new IndicatorAddIn("Stratum Corneum  area%",organArea1.divide(multiply,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("11012E","11013F")));
+//            indicatorResultsMap.put("前胃有核层面积占比", new IndicatorAddIn("Nucleated cell laye area%",organArea3.divide(multiply,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("11012F","11013F")));
 
         }
-        if(organArea6.signum() == 0){
-            indicatorResultsMap.put("腺胃肌层面积占比", new IndicatorAddIn("Glandular Muscularis area%","0", "%",areaUtils.getStructureIds("110024","110140")));
-            indicatorResultsMap.put("腺胃黏膜上皮+固有层面积占比", new IndicatorAddIn("Glandular area%","0", "%",areaUtils.getStructureIds("110035","110140")));
-
-        }else{
-            indicatorResultsMap.put("腺胃肌层面积占比", new IndicatorAddIn("Glandular Muscularis area%",organArea4.divide(organArea6,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("110024","110140")));
-            indicatorResultsMap.put("腺胃黏膜上皮+固有层面积占比", new IndicatorAddIn("Glandular area%",organArea2.divide(organArea6,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("110035","110140")));
-
-        }
-        indicatorResultsMap.put("前胃面积", new IndicatorAddIn("Forestomach area",organArea5.setScale(3,RoundingMode.HALF_UP).toString(), "平方毫米","11013F"));
-        indicatorResultsMap.put("腺胃面积", new IndicatorAddIn("Glandular area",organArea6.setScale(3,RoundingMode.HALF_UP).toString(), "平方毫米","110140"));
+//        if(organArea6.signum() == 0){
+//            indicatorResultsMap.put("腺胃肌层面积占比", new IndicatorAddIn("Glandular Muscularis area%","0", "%",areaUtils.getStructureIds("110024","110140")));
+//            indicatorResultsMap.put("腺胃黏膜上皮+固有层面积占比", new IndicatorAddIn("Glandular area%","0", "%",areaUtils.getStructureIds("110035","110140")));
+//
+//        }else{
+//            indicatorResultsMap.put("腺胃肌层面积占比", new IndicatorAddIn("Glandular Muscularis area%",organArea4.divide(organArea6,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("110024","110140")));
+//            indicatorResultsMap.put("腺胃黏膜上皮+固有层面积占比", new IndicatorAddIn("Glandular area%",organArea2.divide(organArea6,5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("110035","110140")));
+//
+//        }
+//        indicatorResultsMap.put("前胃面积", new IndicatorAddIn("Forestomach area",organArea5.setScale(3,RoundingMode.HALF_UP).toString(), "平方毫米","11013F"));
+//        indicatorResultsMap.put("腺胃面积", new IndicatorAddIn("Glandular area",organArea6.setScale(3,RoundingMode.HALF_UP).toString(), "平方毫米","110140"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
         //aiForecastService.addOutIndicators(jsonTask.getSingleId(), indicatorResultsMap);

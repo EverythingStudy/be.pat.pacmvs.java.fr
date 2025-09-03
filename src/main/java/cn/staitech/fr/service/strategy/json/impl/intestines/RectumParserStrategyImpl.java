@@ -130,7 +130,7 @@ public class RectumParserStrategyImpl implements ParserStrategy {
         // 肌层面积	D	平方毫米	以C型或双层环状输出
         map.put("肌层面积", new IndicatorAddIn("Muscle layer area", DecimalUtils.setScale3(areaNum3), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"11600C"));
         // 组织轮廓面积	E	平方毫米	无
-        map.put("组织轮廓面积", new IndicatorAddIn("Tissue area", DecimalUtils.setScale3(areaNum4), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"116111"));
+//        map.put("组织轮廓面积", new IndicatorAddIn("Tissue area", DecimalUtils.setScale3(areaNum4), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"116111"));
 
         // 产品呈现指标 -------------------------------------------------------------
         // 黏膜层面积占比	1	%	Mucosal area%	1=B/（E-A）	无

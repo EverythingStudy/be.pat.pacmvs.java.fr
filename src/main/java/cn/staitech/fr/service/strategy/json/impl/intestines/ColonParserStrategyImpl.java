@@ -125,7 +125,7 @@ public class ColonParserStrategyImpl implements ParserStrategy {
         map.put("肌层面积", new IndicatorAddIn("Muscle layer area", DecimalUtils.setScale3(areaNum3), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"11500C"));
 
         // 组织轮廓面积	E	平方毫米	无
-        map.put("组织轮廓面积", new IndicatorAddIn("Tissue area", DecimalUtils.setScale3(areaNum4), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"115111"));
+//        map.put("组织轮廓面积", new IndicatorAddIn("Tissue area", DecimalUtils.setScale3(areaNum4), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"115111"));
 
         // 产品呈现指标 -------------------------------------------------------------
         if (eSubtractA.compareTo(BigDecimal.ZERO) != 0) {

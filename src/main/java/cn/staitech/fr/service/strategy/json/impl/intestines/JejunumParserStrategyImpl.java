@@ -122,7 +122,7 @@ public class JejunumParserStrategyImpl implements ParserStrategy {
         map.put("肌层面积", new IndicatorAddIn("Muscle layer area", DecimalUtils.setScale3(areaNumD), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"11800C"));
 
         // 组织轮廓面积	E	平方毫米	无
-        map.put("组织轮廓面积", new IndicatorAddIn("Tissue area", DecimalUtils.setScale3(tissueArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"118111"));
+//        map.put("组织轮廓面积", new IndicatorAddIn("Tissue area", DecimalUtils.setScale3(tissueArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"118111"));
 
         // 产品呈现指标 -------------------------------------------------------------
         if (subtractEA.compareTo(BigDecimal.ZERO) != 0) {
