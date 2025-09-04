@@ -295,7 +295,7 @@ public class JsonTaskParserService {
                 jsonTaskService.updateById(jsonTask);
                 return;
             }
-            log.info("jsonTask id:[{}] singleSlide id:[{}] 创建临时计算表", jsonTask.getTaskId(), jsonTask.getSingleId());
+            //log.info("jsonTask id:[{}] singleSlide id:[{}] 创建临时计算表", jsonTask.getTaskId(), jsonTask.getSingleId());
 //            ThreadLocalUtils.set(Constants.TEMP_TABLE_KEY, jsonTask.getTaskId());
 //            if (!createCalculateTable()) {
 //                log.warn("jsonTask id:[{}] singleSlide id:[{}] 创建临时表失败", jsonTask.getTaskId(), jsonTask.getSingleId());
