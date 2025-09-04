@@ -740,12 +740,15 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                 List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup, CommonConstant.NUMBER_0);
                 String firstAndLastOfMiddle95Percent = MathUtils.getFirstAndLastOfMiddle95Percent(dataList);
                 aiInfoListVO.setNormalDistribution(firstAndLastOfMiddle95Percent);
-                if (null != firstAndLastOfMiddle95Percent && null != aiInfoListVO.getResults()) {
+
+                if (null != aiInfoListVO.getNormalDistribution() && null != aiInfoListVO.getResults()) {
                     String[] s = aiInfoListVO.getNormalDistribution().split("-");
-                    boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiInfoListVO.getResults()));
-                    if (!inRange) {
-                        flag = true;
-                        break;
+                    if (!"详情见单个标注轮廓详情弹窗！".equals(aiInfoListVO.getResults()) && aiInfoListVO.getResults().split(";").length == 0) {
+                        boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiInfoListVO.getResults()));
+                        if (!inRange) {
+                            flag = true;
+                            break;
+                        }
                     }
                 }
             }
