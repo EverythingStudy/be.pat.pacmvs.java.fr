@@ -84,8 +84,8 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
         BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "12D074").getStructureAreaNum();
        //d腺腔面积（全片）
         BigDecimal organArea1 = commonJsonParser.getOrganArea(jsonTask, "12D0E9").getStructureAreaNum();
-
-        indicatorResultsMap.put("腺腔面积（全片）", new IndicatorAddIn("Glandular cavity area (all)", organArea1.setScale(3,RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,areaUtils.getStructureIds("12D074","12D0E9")));
+      //TODO 算法不支持，暂时先注释，待支持后再次放开
+//        indicatorResultsMap.put("腺腔面积（全片）", new IndicatorAddIn("Glandular cavity area (all)", organArea1.setScale(3,RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,areaUtils.getStructureIds("12D074","12D0E9")));
 
         Annotation annotation1 = new Annotation();
         annotation1.setAreaName("腺上皮面积（单个）");
@@ -97,12 +97,14 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
         annotationBy.setAreaName("腺腔面积（单个）");
         annotationBy.setAreaUnit(SQ_MM);
         commonJsonParser.putAnnotationDynamicData(jsonTask,"12D074","12D0E9",annotationBy);
-        indicatorResultsMap.put("腺腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,areaUtils.getStructureIds("12D074","12D0E9")));
+      //TODO 算法不支持，暂时先注释，待支持后再次放开
+//        indicatorResultsMap.put("腺腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,areaUtils.getStructureIds("12D074","12D0E9")));
 
         Annotation annotationBy2 = new Annotation();
         annotationBy2.setCountName("腺上皮细胞核数量（单个）");
         commonJsonParser.putAnnotationDynamicData(jsonTask,"12D074","12D0ED",annotationBy2);
-        indicatorResultsMap.put("腺上皮细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,areaUtils.getStructureIds("12D074","12D0ED")));
+      //TODO 算法不支持，暂时先注释，待支持后再次放开
+//        indicatorResultsMap.put("腺上皮细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,areaUtils.getStructureIds("12D074","12D0ED")));
 
 
 
@@ -152,18 +154,21 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
         String confidenceInterval = MathUtils.getConfidenceInterval(lists);
         String confidenceInterval1 = MathUtils.getConfidenceInterval(listNum);
         indicatorResultsMap.put("精囊腺面积", new IndicatorAddIn("Seminal vesicle area", new BigDecimal(singleSlide.getArea()).setScale(3,RoundingMode.HALF_UP).toString(), SQ_MM,"12D111"));
+        indicatorResultsMap.put("腺上皮面积（全片）", new IndicatorAddIn(organArea.setScale(3,RoundingMode.HALF_UP).toString(), CommonConstant.NUMBER_1,areaUtils.getStructureIds("12D074")));
         indicatorResultsMap.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", organArea.setScale(3,RoundingMode.HALF_UP).toString(), SQ_MM,"12D074"));
-        indicatorResultsMap.put("腺上皮面积占比（单个）", new IndicatorAddIn("Acinar epithelial area% (per)", confidenceInterval, "%",areaUtils.getStructureIds("12D074","12D074","12D0E9")));
-        indicatorResultsMap.put("腺泡上皮细胞核密度（单个）", new IndicatorAddIn("Nucleus density of acinar epithelium (per)", confidenceInterval1, SQ_MM_PIECE,areaUtils.getStructureIds("12D074","12D0ED","12D074")));
+      //TODO 算法不支持，暂时先注释，待支持后再次放开
+//        indicatorResultsMap.put("腺上皮面积占比（单个）", new IndicatorAddIn("Acinar epithelial area% (per)", confidenceInterval, "%",areaUtils.getStructureIds("12D074","12D074","12D0E9")));
+//        indicatorResultsMap.put("腺泡上皮细胞核密度（单个）", new IndicatorAddIn("Nucleus density of acinar epithelium (per)", confidenceInterval1, SQ_MM_PIECE,areaUtils.getStructureIds("12D074","12D0ED","12D074")));
         //F
-        BigDecimal bigDecimal = new BigDecimal(singleSlide.getArea());
-        if(bigDecimal.signum() == 0){
-            indicatorResultsMap.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", "0", "%",areaUtils.getStructureIds("12D111","12D074","12D074","12D0E9")));
-        }else{
-            BigDecimal divide = (bigDecimal.subtract(organArea).subtract(organArea1)).divide(bigDecimal, 5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
-            indicatorResultsMap.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", divide.toString(), "%",areaUtils.getStructureIds("12D111","12D074","12D074","12D0E9")));
-
-        }
+      //TODO 算法不支持，暂时先注释，待支持后再次放开
+//        BigDecimal bigDecimal = new BigDecimal(singleSlide.getArea());
+//        if(bigDecimal.signum() == 0){
+//            indicatorResultsMap.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", "0", "%",areaUtils.getStructureIds("12D111","12D074","12D074","12D0E9")));
+//        }else{
+//            BigDecimal divide = (bigDecimal.subtract(organArea).subtract(organArea1)).divide(bigDecimal, 5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3);
+//            indicatorResultsMap.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", divide.toString(), "%",areaUtils.getStructureIds("12D111","12D074","12D074","12D0E9")));
+//
+//        }
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
         //aiForecastService.addOutIndicators(jsonTask.getSingleId(), indicatorResultsMap);

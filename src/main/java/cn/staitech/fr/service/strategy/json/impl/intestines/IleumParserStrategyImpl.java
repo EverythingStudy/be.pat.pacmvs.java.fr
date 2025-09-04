@@ -131,7 +131,7 @@ public class IleumParserStrategyImpl implements ParserStrategy {
         map.put("淋巴小结面积", new IndicatorAddIn("Lymph nodule area", DecimalUtils.setScale3(areaNumE),CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"117049"));
 
         // 组织轮廓面积	F	平方毫米	无
-        map.put("组织轮廓面积", new IndicatorAddIn("Tissue area", DecimalUtils.setScale3(tissueArea),CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"117111"));
+//        map.put("组织轮廓面积", new IndicatorAddIn("Tissue area", DecimalUtils.setScale3(tissueArea),CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"117111"));
 
         // 产品呈现指标 -------------------------------------------------------------
         if (subtractFA.compareTo(BigDecimal.ZERO) != 0) {

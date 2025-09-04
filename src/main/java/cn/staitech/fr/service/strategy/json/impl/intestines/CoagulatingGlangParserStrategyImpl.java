@@ -167,13 +167,13 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         map.put("腺上皮面积（单个）", new IndicatorAddIn("12B074"));
 
         // 腺腔面积（单个）C 平方毫米 单个腺上皮内所有腺腔面积
-        map.put("腺腔面积（单个）", new IndicatorAddIn(areaUtils.getStructureIds("12B074","12B0E9")));
+//        map.put("腺腔面积（单个）", new IndicatorAddIn(areaUtils.getStructureIds("12B074","12B0E9")));
 
         // 腺腔面积（全片）D 平方毫米 若多个数据则相加输出
-        map.put("腺腔面积（全片）", new IndicatorAddIn("Gland cavity area (all)", DecimalUtils.setScale3(areaNum2), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,areaUtils.getStructureIds("12B074","12B0E9")));
+//        map.put("腺腔面积（全片）", new IndicatorAddIn("Gland cavity area (all)", DecimalUtils.setScale3(areaNum2), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,areaUtils.getStructureIds("12B074","12B0E9")));
 
         // 腺上皮细胞核数量（单个）E 个 单个腺上皮细胞核数量
-        map.put("腺上皮细胞核数量（单个）", new IndicatorAddIn(areaUtils.getStructureIds("12B074","12B0ED")));
+//        map.put("腺上皮细胞核数量（单个）", new IndicatorAddIn(areaUtils.getStructureIds("12B074","12B0ED")));
 
         // 产品呈现指标 -------------------------------------------------------------
         // F 组织轮廓的面积 凝固腺面积	1	平方毫米	Coagulating gland area	1=F
@@ -182,19 +182,20 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         //        腺上皮面积（全片）	2	平方毫米	Acinar epithelial area (all)	2=B
         // 腺上皮面积（全片）B 平方毫米 若多个数据则相加输出
         map.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", DecimalUtils.setScale3(colonArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_0,"12B074"));
+        map.put("腺上皮面积（全片）", new IndicatorAddIn(DecimalUtils.setScale3(colonArea), CommonConstant.NUMBER_1,"12B074"));
 
         // 腺上皮面积占比（单个）	3	%	Acinar epithelial area% (per)	3=A/(A+C) 以95%置信区间和均数±标准差呈现
         map.put("腺上皮面积占比（单个）", new IndicatorAddIn("Acinar epithelial area% (per)", confidenceInterval, "%",areaUtils.getStructureIds("12B074","12B0E9")));
 
         // 腺泡上皮细胞核密度（单个）	4	个/平方毫米	Nucleus density of acinar epithelium (per)	4=E/A 以95%置信区间和均数±标准差呈现
-        map.put("腺泡上皮细胞核密度（单个）", new IndicatorAddIn("Nucleus density of acinar epithelium (per)", confidenceInterval1, CommonConstant.SQ_MM_PIECE_EN,areaUtils.getStructureIds("12B074","12B0ED")));
+//        map.put("腺泡上皮细胞核密度（单个）", new IndicatorAddIn("Nucleus density of acinar epithelium (per)", confidenceInterval1, CommonConstant.SQ_MM_PIECE_EN,areaUtils.getStructureIds("12B074","12B0ED")));
 
         if (tissueArea.compareTo(BigDecimal.ZERO) != 0) {
             // 间质和肌层面积占比	5	%	Mesenchyme and muscular area%	5=(F-B-D)/F
-            BigDecimal mesenchymeAndMuscularAreaRate = tissueArea.subtract(colonArea).subtract(areaNum2).divide(tissueArea, 7, RoundingMode.HALF_UP);
-            map.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", DecimalUtils.percentScale3(mesenchymeAndMuscularAreaRate), "%",areaUtils.getStructureIds("12B111","12B074","12B0E9")));
+//            BigDecimal mesenchymeAndMuscularAreaRate = tissueArea.subtract(colonArea).subtract(areaNum2).divide(tissueArea, 7, RoundingMode.HALF_UP);
+//            map.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", DecimalUtils.percentScale3(mesenchymeAndMuscularAreaRate), "%",areaUtils.getStructureIds("12B111","12B074","12B0E9")));
         } else {
-            map.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", "0.000", "%",areaUtils.getStructureIds("12B111","12B074","12B0E9")));
+//            map.put("间质和肌层面积占比", new IndicatorAddIn("Mesenchyme and muscular area%", "0.000", "%",areaUtils.getStructureIds("12B111","12B074","12B0E9")));
         }
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
