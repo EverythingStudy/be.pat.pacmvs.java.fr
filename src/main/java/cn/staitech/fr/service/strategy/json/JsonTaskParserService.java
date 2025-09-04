@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -294,7 +295,7 @@ public class JsonTaskParserService {
                 jsonTaskService.updateById(jsonTask);
                 return;
             }
-            log.info("jsonTask id:[{}] singleSlide id:[{}] 创建临时计算表", jsonTask.getTaskId(), jsonTask.getSingleId());
+            //log.info("jsonTask id:[{}] singleSlide id:[{}] 创建临时计算表", jsonTask.getTaskId(), jsonTask.getSingleId());
 //            ThreadLocalUtils.set(Constants.TEMP_TABLE_KEY, jsonTask.getTaskId());
 //            if (!createCalculateTable()) {
 //                log.warn("jsonTask id:[{}] singleSlide id:[{}] 创建临时表失败", jsonTask.getTaskId(), jsonTask.getSingleId());
@@ -322,12 +323,18 @@ public class JsonTaskParserService {
             // 指标计算
             parser.alculationIndicators(jsonTask);
             log.info("jsonTask id:[{}] singleSlide id:[{}] 开始计算指标。endTime:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+            long start = System.nanoTime();
             try {
-                log.info("jsonTask id:[{}] singleSlide id:[{}] 开始执行新的anno数据存储。startTime:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
-                contourJsonService.aiJson(jsonFileList, jsonTask);
-                log.info("jsonTask id:[{}] singleSlide id:[{}] 结束执行新的anno数据存储。endTime:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+            	log.info("jsonTask id:[{}] singleSlide id:[{}] 开始执行新的anno数据存储。startTime:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+            	contourJsonService.aiJson(jsonFileList, jsonTask);
+            	// 计算耗时（秒）
+            	long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+            	long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
+            	log.info("jsonTaskAiJson id:[{}] singleSlide id:[{}] 结束执行新的anno数据存储。endTime:[{}], 耗时: {} 秒",jsonTask.getTaskId(), jsonTask.getSingleId(), new Date(), costSeconds);
             } catch (Exception e) {
-                log.error("jsonTask id:[{}] singleSlide id:[{}] 执行anno数据存储失败。", jsonTask.getTaskId(), jsonTask.getSingleId());
+            	long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+            	long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
+            	log.error("jsonTaskAiJson id:[{}] singleSlide id:[{}] 执行anno数据存储失败，耗时: {} 秒",jsonTask.getTaskId(), jsonTask.getSingleId(), costSeconds, e);
             }
             //log.info("jsonTask id:[{}] singleSlide id:[{}] 删除临时计算表", jsonTask.getTaskId(), jsonTask.getSingleId());
 //            dropCalculateTable();
