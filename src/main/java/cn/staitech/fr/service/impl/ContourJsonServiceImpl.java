@@ -124,21 +124,12 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        //判断是否有这个目录
-        Path path = Paths.get(outputDir);
-        // 直接使用 Files.isDirectory，它内部会检查路径是否存在
-        if (Files.isDirectory(path)) {
-            log.warn("目录存在::[{}]", outputDir);
-        } else {
-            log.warn("目录不存在或不是目录::[{}]", outputDir);
-        }
-
         for (JsonFile jsonFile : jsonFileList) {
             String fileUrl = jsonFile.getFileUrl();
             File f = new File(fileUrl);
             String fileName = f.getName().substring(0, f.getName().lastIndexOf("."));
             if (MapConstant.getStructureSize(jsonTask.getOrganizationId() + fileName) == null) {
-                log.warn("jsonTask id:[{}] singleSlide id:[{}]  structureSize is null； jsonFile:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), fileUrl);
+               // log.warn("jsonTask id:[{}] singleSlide id:[{}]  structureSize is null； jsonFile:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), fileUrl);
                 continue;
             }
             jsonParser(f.getPath(), zoomLevels, fileName, singleSlideSelectBy, geometryIdMap, outputDir);
@@ -277,7 +268,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
      * @param outputDir       输出目录路径
      */
     public void parseJson(JSONArray featuresJson, List<String> zoomLevels, String jsonName, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir) {
-        log.info("singleSlide id:[{}] 轮廓标签:[{}] 轮廓数量:[{}] 开始解析轮廓数据", single.getSingleId(), jsonName, featuresJson.size());
+        //log.info("singleSlide id:[{}] 轮廓标签:[{}] 轮廓数量:[{}] 开始解析轮廓数据", single.getSingleId(), jsonName, featuresJson.size());
         List<Features> features = featuresJson.toJavaList(Features.class);
         Map<String, String> dynamicDataMap = preDynamicDataMap(features, single.getSpecialId());
         List<String> filteredFilePathList;
@@ -303,7 +294,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                     }
                 }
             }
-            log.info("singleSlide id:[{}] 大轮廓处理数量:[{}]", single.getSingleId(), list.size());
+            //log.info("singleSlide id:[{}] 大轮廓处理数量:[{}]", single.getSingleId(), list.size());
             // 写入文件
             writeFilteredGeoJson(list, outputPath);
         } else if (size == 2) {
@@ -332,7 +323,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             filteredFilePathList = zoomLevels.stream().filter(filePath -> isFirstDigit(filePath, zoom)).collect(Collectors.toList());
             submitPathList(filteredFilePathList, jsonName, tree, geometryMap, single, tileGeometryMap, outputDir, 10, dynamicDataMap);
         }
-        log.info("singleSlide id:[{}] 轮廓标签:[{}] 轮廓数量:[{}] 结束解析轮廓数据", single.getSingleId(), jsonName, features.size());
+       // log.info("singleSlide id:[{}] 轮廓标签:[{}] 轮廓数量:[{}] 结束解析轮廓数据", single.getSingleId(), jsonName, features.size());
     }
 
 
@@ -442,9 +433,6 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                 // 获取符合条件的数据
                 Envelope envelope = geometry.getEnvelopeInternal();
                 List<Geometry> query = tree.query(envelope);
-                if (CollectionUtils.isEmpty(query)) {
-                    log.warn("singleSlide id:[{}]]", single.getSingleId() + " 匹配不到数据，无法写入瓦片数据~");
-                }
                 List<Features> filteredFeatures = new ArrayList<>();
                 for (Geometry g : query) {
 
@@ -465,8 +453,6 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                     String outputPath = outputDir + "/" + fileName + ".json";
                     // 写入文件
                     writeFilteredGeoJson(filteredFeatures, outputPath);
-                } else {
-                    log.warn("singleSlide id:[{}]]", single.getSingleId() + " filteredFeatures为空，无法写入瓦片数据~");
                 }
             } catch (JSONException e) {
                 log.error("Error processing file: [{}]", e.getMessage());
