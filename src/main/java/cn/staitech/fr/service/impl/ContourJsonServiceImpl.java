@@ -596,27 +596,28 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
         String type = geometry.getString("type");
         JSONArray coords = geometry.getJSONArray("coordinates");
 
-        // 创建新的 coordinates 结构
         JSONArray transformedCoords = new JSONArray();
 
         switch (type.toLowerCase()) {
             case "polygon":
-                // Polygon: [[[x,y], [x,y], ...]]
                 for (int i = 0; i < coords.size(); i++) {
                     JSONArray ring = coords.getJSONArray(i);
                     JSONArray newRing = new JSONArray();
                     for (int j = 0; j < ring.size(); j++) {
                         JSONArray point = ring.getJSONArray(j);
                         double x = point.getDouble(0);
-                        double y = point.getDouble(1);
-                        newRing.add(new double[]{x, -y}); // y 取反
+                        double y = -point.getDouble(1);
+
+                        JSONArray newPoint = new JSONArray();
+                        newPoint.add(toNumber(x));
+                        newPoint.add(toNumber(y));
+                        newRing.add(newPoint);
                     }
                     transformedCoords.add(newRing);
                 }
                 break;
 
             case "multipolygon":
-                // MultiPolygon: [[[[x,y], ...]]]
                 for (int i = 0; i < coords.size(); i++) {
                     JSONArray polygon = coords.getJSONArray(i);
                     JSONArray newPolygon = new JSONArray();
@@ -626,8 +627,12 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                         for (int k = 0; k < ring.size(); k++) {
                             JSONArray point = ring.getJSONArray(k);
                             double x = point.getDouble(0);
-                            double y = point.getDouble(1);
-                            newRing.add(new double[]{x, -y});
+                            double y = -point.getDouble(1);
+
+                            JSONArray newPoint = new JSONArray();
+                            newPoint.add(toNumber(x));
+                            newPoint.add(toNumber(y));
+                            newRing.add(newPoint);
                         }
                         newPolygon.add(newRing);
                     }
@@ -639,11 +644,21 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                 throw new IllegalArgumentException("不支持的 geometry 类型: " + type);
         }
 
-        // 构造新对象，避免修改原对象
         JSONObject result = new JSONObject();
         result.put("type", geometry.getString("type"));
         result.put("coordinates", transformedCoords);
         return result;
+    }    
+    
+    /**
+     * 将数字转为最合适的类型：整数用 Integer，小数用 Double
+     */
+    private static Number toNumber(double value) {
+        if (value == (long) value) {
+            return (long) value; // 自动转为 long，序列化时不会带 .0
+        } else {
+            return value; // 保留 double
+        }
     }
     
     /**
