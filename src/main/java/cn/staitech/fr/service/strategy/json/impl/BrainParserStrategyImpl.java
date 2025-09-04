@@ -28,7 +28,7 @@ import java.util.Map;
  * @author wanglibei
  * @version V1.0
  * @ClassName: BrainParserStrategyImpl
- * @Description-d:大鼠-神经系统-大脑
+ * @Description-d:神经系统-大脑
  * @date 2025年7月22日
  */
 @Slf4j
