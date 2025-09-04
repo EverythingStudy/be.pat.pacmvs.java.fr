@@ -1,6 +1,5 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
-import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -20,9 +19,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author mugw
+ * @author chenly
  * @version 1.0
- * @description 大鼠-内分泌系统-肾上腺
+ * @description -u 大鼠-内分泌系统-肾上腺
  * @date 2024/5/13 10:06:53
  */
 @Slf4j
@@ -81,12 +80,11 @@ public class AdrenalGlandParserStrategyImpl extends AbstractCustomParserStrategy
         BigDecimal F = getOrganArea(jsonTask, "101111").getStructureAreaNum();
         indicatorResultsMap.put("皮质面积", createIndicator(organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "10103D"));
         indicatorResultsMap.put("髓质面积", createIndicator(organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "10103E"));
-        indicatorResultsMap.put("皮质细胞核数量", createIndicator(String.valueOf(C), PIECE, "10103D,101068"));
-        indicatorResultsMap.put("髓质细胞核数量", createIndicator(String.valueOf(D), PIECE, "10103E,101068"));
-        indicatorResultsMap.put("红细胞面积（全片）", createIndicator(organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "101004"));
+       // indicatorResultsMap.put("皮质细胞核数量", createIndicator(String.valueOf(C), PIECE, "10103D,101068"));
+        //indicatorResultsMap.put("髓质细胞核数量", createIndicator(String.valueOf(D), PIECE, "10103E,101068"));
+        indicatorResultsMap.put("红细胞面积", createIndicator(organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "101004"));
 
         //皮质面积占比 % Cortex area %  1=A/F
-        //BigDecimal F = new BigDecimal(singleSlide.getArea());
         BigDecimal b1 = getProportion(organArea, F);
         indicatorResultsMap.put("皮质面积占比", createNameIndicator("Cortex area %", String.valueOf(b1), PERCENTAGE, "10103D,101111"));
         //2=B/F %
@@ -95,11 +93,11 @@ public class AdrenalGlandParserStrategyImpl extends AbstractCustomParserStrategy
         BigDecimal b3 = getProportion(organArea, organArea2);
         indicatorResultsMap.put("皮髓比", createNameIndicator("Cortex:Medulla ratio", String.valueOf(b3), PERCENTAGE, "10103D,10103E"));
         //4=C/A 个/mm2
-        BigDecimal b4 = bigDecimalDivideCheck(new BigDecimal(C), organArea);
-        indicatorResultsMap.put("皮质细胞核密度", createNameIndicator("Nucleus density of adrenal cortex", String.valueOf(b4), SQ_MM_PIECE, "10103D,101068"));
+        //BigDecimal b4 = bigDecimalDivideCheck(new BigDecimal(C), organArea);
+        //indicatorResultsMap.put("皮质细胞核密度", createNameIndicator("Nucleus density of adrenal cortex", String.valueOf(b4), SQ_MM_PIECE, "10103D,101068"));
         //5=D/B 个/mm2
-        BigDecimal b5 = bigDecimalDivideCheck(new BigDecimal(D), organArea2);
-        indicatorResultsMap.put("髓质细胞核密度", createNameIndicator("Nucleus density of adrenal medulla", String.valueOf(b5), SQ_MM_PIECE, "10103E,101068"));
+        //BigDecimal b5 = bigDecimalDivideCheck(new BigDecimal(D), organArea2);
+       // indicatorResultsMap.put("髓质细胞核密度", createNameIndicator("Nucleus density of adrenal medulla", String.valueOf(b5), SQ_MM_PIECE, "10103E,101068"));
         //6=E/F %
         BigDecimal b6 = getProportion(organArea1, F);
         indicatorResultsMap.put("红细胞面积占比", createNameIndicator("Erythrocyte area%", String.valueOf(b6), PERCENTAGE, "101004,101111"));
