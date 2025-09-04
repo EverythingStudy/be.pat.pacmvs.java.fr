@@ -564,7 +564,9 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
         } else {
             geometry = element.getGeometry();
         }
-
+        
+       geometry = negateYCoordinates(geometry);
+        
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 8307);
         WKTReader reader = new WKTReader(geometryFactory);
         //Geometry geom = reader.read(evaluate(geometry.toString()));
@@ -577,7 +579,73 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
         features.setProperties(newProperties);
         return features;
     }
+    
+    
 
+    /**
+     * 将 FastJSON 的 GeoJSON Geometry 对象中所有 coordinates 的 y 坐标取反（加负号）
+     * 支持 Polygon 和 MultiPolygon 类型
+     * @param geometry JSONObject，格式如 {"type": "Polygon", "coordinates": [...]}
+     * @return 新的 JSONObject，y 坐标已取反
+     */
+    public static JSONObject negateYCoordinates(JSONObject geometry) {
+        if (geometry == null || !geometry.containsKey("coordinates")) {
+            return geometry;
+        }
+
+        String type = geometry.getString("type");
+        JSONArray coords = geometry.getJSONArray("coordinates");
+
+        // 创建新的 coordinates 结构
+        JSONArray transformedCoords = new JSONArray();
+
+        switch (type.toLowerCase()) {
+            case "polygon":
+                // Polygon: [[[x,y], [x,y], ...]]
+                for (int i = 0; i < coords.size(); i++) {
+                    JSONArray ring = coords.getJSONArray(i);
+                    JSONArray newRing = new JSONArray();
+                    for (int j = 0; j < ring.size(); j++) {
+                        JSONArray point = ring.getJSONArray(j);
+                        double x = point.getDouble(0);
+                        double y = point.getDouble(1);
+                        newRing.add(new double[]{x, -y}); // y 取反
+                    }
+                    transformedCoords.add(newRing);
+                }
+                break;
+
+            case "multipolygon":
+                // MultiPolygon: [[[[x,y], ...]]]
+                for (int i = 0; i < coords.size(); i++) {
+                    JSONArray polygon = coords.getJSONArray(i);
+                    JSONArray newPolygon = new JSONArray();
+                    for (int j = 0; j < polygon.size(); j++) {
+                        JSONArray ring = polygon.getJSONArray(j);
+                        JSONArray newRing = new JSONArray();
+                        for (int k = 0; k < ring.size(); k++) {
+                            JSONArray point = ring.getJSONArray(k);
+                            double x = point.getDouble(0);
+                            double y = point.getDouble(1);
+                            newRing.add(new double[]{x, -y});
+                        }
+                        newPolygon.add(newRing);
+                    }
+                    transformedCoords.add(newPolygon);
+                }
+                break;
+
+            default:
+                throw new IllegalArgumentException("不支持的 geometry 类型: " + type);
+        }
+
+        // 构造新对象，避免修改原对象
+        JSONObject result = new JSONObject();
+        result.put("type", geometry.getString("type"));
+        result.put("coordinates", transformedCoords);
+        return result;
+    }
+    
     /**
      * 写入geojson文件
      *

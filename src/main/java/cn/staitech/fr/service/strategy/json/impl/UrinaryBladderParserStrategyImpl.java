@@ -138,7 +138,7 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
      * 计算指标
      */
     private String getArea(String accurateAreaB, BigDecimal organAreaA) {
-        String result = "";
+        String result = "0";
         if (!"0".equals(accurateAreaB)) {
             BigDecimal areaNum = new BigDecimal(accurateAreaB).subtract(organAreaA);
             result = areaNum.setScale(3, RoundingMode.HALF_UP).toString();// B-A
