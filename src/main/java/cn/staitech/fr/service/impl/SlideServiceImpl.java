@@ -651,6 +651,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
             if (Objects.nonNull(singleSlide)) {
                 resp.setAiStatus(this.handleOrganStatus(singleSlide));
                 resp.setForecastStatus(singleSlide.getForecastStatus());
+                resp.setScreeningDifferenceStatus(singleSlide.getScreeningDifferenceStatus());
             }
             Set<String> structureIdsSet = new HashSet<>();
             Set<StructureTagVo> structureTagVosSet = new HashSet<>();

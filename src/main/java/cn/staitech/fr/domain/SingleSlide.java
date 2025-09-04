@@ -71,5 +71,6 @@ public class SingleSlide implements Serializable {
     @ApiModelProperty(value = "ai算法开始时间")
     private Date startTime;
 
+    private Long screeningDifferenceStatus;
 
 }
