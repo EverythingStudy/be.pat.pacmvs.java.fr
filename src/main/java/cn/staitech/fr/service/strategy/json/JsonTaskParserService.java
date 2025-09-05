@@ -192,9 +192,13 @@ public class JsonTaskParserService {
                     } else {
                         updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_ING.getCode());
                         //进行指标计算
-                        log.info("jsonTask id:[{}] singleSlide id:[{}] checkJson 进入指标开始 startTime:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+                        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+                        long start = System.nanoTime();
                         JsonTaskAiHandler(jsonTask, fileList);
-                        log.info("jsonTask id:[{}] singleSlide id:[{}] checkJson 进入指标结束 endTime:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+                        // 计算耗时（秒）
+                        long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+                        long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
+                        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标结束 endTime:{} 耗时:{} 秒", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date(), costSeconds);
                         //部分成功-->以脏器为单位 (指标计算)结构分析完成-->forecastStatus结构化状态：1
                         updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_SUCCESS.getCode());
                     }
@@ -285,9 +289,7 @@ public class JsonTaskParserService {
         jsonTaskService.updateById(jsonTask);
 
         try {
-            log.info("jsonTask id:[{}] singleSlide id:[{}] checkJson开始 startTime:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
             boolean b = parser.checkJson(jsonTask, jsonFileList);
-            log.info("jsonTask id:[{}] singleSlide id:[{}] checkJson结束 endTime:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
             if (!b) {
                 log.info("AI预测切片id:{},算法名称标识:{},JSON校验失败!", jsonTask.getSingleId(), jsonTask.getAlgorithmCode());
                 updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_FAIL.getCode());
@@ -301,40 +303,46 @@ public class JsonTaskParserService {
 //                log.warn("jsonTask id:[{}] singleSlide id:[{}] 创建临时表失败", jsonTask.getTaskId(), jsonTask.getSingleId());
 //                return;
 //            }
-            //log.info("jsonTask id:[{}] singleSlide id:[{}] 开始解析json。", jsonTask.getTaskId(), jsonTask.getSingleId());
+            long starts = System.nanoTime();
             for (JsonFile jsonFile : jsonFileList) {
-                log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析开始:{} {} {} startTime:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName(), new Date());
+                log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析开始:{} {} {}", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName());
                 jsonFile.setStartTime(new Date());
                 jsonFile.setStatus(StructureJsonStatusEnum.PARSE_ING.getCode());
                 jsonFileService.updateById(jsonFile);
                 // 解析json文件
                 parser.parseJson(jsonTask, jsonFile);
-                log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析结束:{} {} {} endTime:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName(), new Date());
+                log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析结束:{} {} {}", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName());
                 jsonFile.setStatus(StructureJsonStatusEnum.PARSE_SUCCESS.getCode());
                 jsonFile.setEndTime(new Date());
                 jsonFileService.updateById(jsonFile);
             }
+            long costMilli = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - starts);
+            long costSecond = TimeUnit.MILLISECONDS.toSeconds(costMilli);
+            log.info("Json文件解析 jsonTask id:{} singleSlide id:{} ,耗时:{}秒", jsonTask.getTaskId(), jsonTask.getSingleId(), costSecond);
             log.info("jsonTask id:[{}] singleSlide id:[{}] 开始删除原有指标。", jsonTask.getTaskId(), jsonTask.getSingleId());
             //删除原有指标
             LambdaQueryWrapper<AiForecast> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(AiForecast::getSingleSlideId, jsonTask.getSingleId());
             aiForecastService.remove(wrapper);
-            log.info("jsonTask id:[{}] singleSlide id:[{}] 开始计算指标。startTime:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+            log.info("jsonTask id:[{}] singleSlide id:[{}] 开始计算指标。", jsonTask.getTaskId(), jsonTask.getSingleId());
             // 指标计算
+            long alculationTime = System.nanoTime();
             parser.alculationIndicators(jsonTask);
-            log.info("jsonTask id:[{}] singleSlide id:[{}] 开始计算指标。endTime:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+            long alculationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - alculationTime);
+            long alculationSeconds = TimeUnit.MILLISECONDS.toSeconds(alculationMillis);
+            log.info("jsonTask id:[{}] singleSlide id:[{}] 结束计算指标。耗时:{} 秒", jsonTask.getTaskId(), jsonTask.getSingleId(), alculationSeconds);
             long start = System.nanoTime();
             try {
-            	log.info("jsonTask id:[{}] singleSlide id:[{}] 开始执行新的anno数据存储。startTime:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
-            	contourJsonService.aiJson(jsonFileList, jsonTask);
-            	// 计算耗时（秒）
-            	long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
-            	long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
-            	log.info("jsonTaskAiJson id:[{}] singleSlide id:[{}] 结束执行新的anno数据存储。endTime:[{}], 耗时: {} 秒",jsonTask.getTaskId(), jsonTask.getSingleId(), new Date(), costSeconds);
+                log.info("jsonTask id:[{}] singleSlide id:[{}] 开始执行新的anno数据存储。startTime:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+                contourJsonService.aiJson(jsonFileList, jsonTask);
+                // 计算耗时（秒）
+                long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+                long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
+                log.info("jsonTaskAiJson id:[{}] singleSlide id:[{}] 结束执行新的anno数据存储。endTime:[{}], 耗时: {} 秒", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date(), costSeconds);
             } catch (Exception e) {
-            	long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
-            	long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
-            	log.error("jsonTaskAiJson id:[{}] singleSlide id:[{}] 执行anno数据存储失败，耗时: {} 秒",jsonTask.getTaskId(), jsonTask.getSingleId(), costSeconds, e);
+                long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+                long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
+                log.error("jsonTaskAiJson id:[{}] singleSlide id:[{}] 执行anno数据存储失败，耗时: {} 秒", jsonTask.getTaskId(), jsonTask.getSingleId(), costSeconds, e);
             }
             //log.info("jsonTask id:[{}] singleSlide id:[{}] 删除临时计算表", jsonTask.getTaskId(), jsonTask.getSingleId());
 //            dropCalculateTable();
