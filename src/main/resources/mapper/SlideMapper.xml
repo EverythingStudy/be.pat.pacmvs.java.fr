@@ -461,7 +461,8 @@
         c.animal_code ASC,
         c.wax_code_order ASC,
         c.group_code ASC,
-        c.sex_flag ASC
+        c.sex_flag ASC,
+        a.slide_id DESC
     </select>
 
 </mapper>
