@@ -83,18 +83,18 @@ public class InguinalLymphNodeParserStrategyImpl extends AbstractCustomParserStr
 
         // 算法输出指标 -------------------------------------------------------------
         // B
-        map.put("生发中心面积（全片）", createIndicator(DecimalUtils.setScale3(organAreaB), SQ_MM, "147051"));
+        //map.put("生发中心面积（全片）", createIndicator(DecimalUtils.setScale3(organAreaB), SQ_MM, "147051"));
         // C
         map.put("髓质面积", createIndicator(DecimalUtils.setScale3(organAreaC), SQ_MM, "14703E"));
 
         // 产品呈现指标 -------------------------------------------------------------
         // A 生发中心数量	1	个	 Number of germinal center	1=A
-        map.put("生发中心数量", createNameIndicator("Number of germinal center", areaCountA.toString(), "个", "147051"));
+        //map.put("生发中心数量", createNameIndicator("Number of germinal center", areaCountA.toString(), "个", "147051"));
 
         if (organAreaD.compareTo(BigDecimal.ZERO) != 0) {
             // 生发中心占比	2	%	Germinal center area%	2=B/D
             BigDecimal germinalCenterAreaRate = organAreaB.divide(organAreaD, 7, RoundingMode.HALF_UP);
-            map.put("生发中心占比", createNameIndicator("Germinal center area%", DecimalUtils.percentScale3(germinalCenterAreaRate), PERCENTAGE, "147051,147111"));
+            //map.put("生发中心占比", createNameIndicator("Germinal center area%", DecimalUtils.percentScale3(germinalCenterAreaRate), PERCENTAGE, "147051,147111"));
 
             // 髓质占比	3	%	Medulla area%	3=C/D
             BigDecimal medullaAreaRate = organAreaC.divide(organAreaD, 7, RoundingMode.HALF_UP);
@@ -102,11 +102,11 @@ public class InguinalLymphNodeParserStrategyImpl extends AbstractCustomParserStr
 
             // 皮质和副皮质占比	4	%	Cortex and paracortex area%	4=（D-C）/D
             BigDecimal cortexAndParacortexAreaRate = organAreaD.subtract(organAreaC).divide(organAreaD, 7, RoundingMode.HALF_UP);
-            map.put("皮质和副皮质占比", createNameIndicator("Cortex and paracortex area%", DecimalUtils.percentScale3(cortexAndParacortexAreaRate), PERCENTAGE, "14703E,147111"));
+            //map.put("皮质和副皮质占比", createNameIndicator("Cortex and paracortex area%", DecimalUtils.percentScale3(cortexAndParacortexAreaRate), PERCENTAGE, "14703E,147111"));
         } else {
-            map.put("生发中心占比", createNameIndicator("Germinal center area%", "0.000", PERCENTAGE, "147051,147111"));
+           // map.put("生发中心占比", createNameIndicator("Germinal center area%", "0.000", PERCENTAGE, "147051,147111"));
             map.put("髓质占比", createNameIndicator("Medulla area%", "0.000", PERCENTAGE, "14703E,147111"));
-            map.put("皮质和副皮质占比", createNameIndicator("Cortex and paracortex area%", "0.000", PERCENTAGE, "14703E,147111"));
+            //map.put("皮质和副皮质占比", createNameIndicator("Cortex and paracortex area%", "0.000", PERCENTAGE, "14703E,147111"));
         }
         // D 淋巴结面积	5	平方毫米	Lymph node area	5=D
         map.put("淋巴结面积", createNameIndicator("Lymph node area", DecimalUtils.setScale3(organAreaD), SQ_MM, "147111"));
