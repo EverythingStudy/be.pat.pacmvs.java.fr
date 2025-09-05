@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @author mugw
+ * @author chenly
  * @version 1.0
- * @description 肾脏
+ * @description 大鼠-肾脏
  * @date 2024/5/13 10:06:53
  */
 @Slf4j
@@ -91,26 +91,26 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         Integer count = getOrganAreaCount(jsonTask, "11B031");
         //一级指标（算法输出指标）
         //A mm2 11B03D
-        indicatorResultsMap.put("肾皮质面积", createIndicator(b11B03D.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "11B03D"));
+       // indicatorResultsMap.put("肾皮质面积", createIndicator(b11B03D.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "11B03D"));
         //B、103平方微米 11B02D
         indicatorResultsMap.put("肾小球面积（单个）", createDefaultIndicator("11B02D"));
         //C、个 11B02D、11B02E
-        indicatorResultsMap.put("球内细胞核数量（单个）", createDefaultIndicator("11B02D,11B02E"));
+        //indicatorResultsMap.put("球内细胞核数量（单个）", createDefaultIndicator("11B02D,11B02E"));
         //D、103平方微米 11B02D、11B02F
-        indicatorResultsMap.put("球内红细胞面积（单个）", createDefaultIndicator("11B02D,11B02F"));
+        //indicatorResultsMap.put("球内红细胞面积（单个）", createDefaultIndicator("11B02D,11B02F"));
         //E、个 11B031
-        indicatorResultsMap.put("肾小管数量", createIndicator(String.valueOf(count), "个", "11B031"));
+        //indicatorResultsMap.put("肾小管数量", createIndicator(String.valueOf(count), "个", "11B031"));
         //F、103平方微米 11B031
-        indicatorResultsMap.put("肾小管面积（单个）", createDefaultIndicator("11B031"));
+        //indicatorResultsMap.put("肾小管面积（单个）", createDefaultIndicator("11B031"));
         //G、平方毫米 11B111
-        indicatorResultsMap.put("组织轮廓面积", createIndicator(new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.DOWN).toString(), SQ_MM, "11B111"));
+        //indicatorResultsMap.put("组织轮廓面积", createIndicator(new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.DOWN).toString(), SQ_MM, "11B111"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
         indicatorResultsMap.clear();
         //1=G
         indicatorResultsMap.put("肾脏面积", createNameIndicator("", new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.DOWN).toString(), SQ_MM, "11B111"));
         //2=(G-A)/G
-        indicatorResultsMap.put("髓质面积占比", createNameIndicator("Medulla area%", String.valueOf(getProportion(b11B111.subtract(b11B03D), b11B111)), PERCENTAGE, "11B111,11B03D"));
+        //indicatorResultsMap.put("髓质面积占比", createNameIndicator("Medulla area%", String.valueOf(getProportion(b11B111.subtract(b11B03D), b11B111)), PERCENTAGE, "11B111,11B03D"));
         //肾小球面积（单个）3=B
         List<Annotation> bs = getStructureContourList(jsonTask, "11B02D");
         List<BigDecimal> bsb = bs.stream().map(annotation -> {
@@ -129,7 +129,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
                 cb.add(result);
             }
         }
-        indicatorResultsMap.put("球内细胞核密度（单个）", createComplexIndicator(cb, "Nucleus density of glomerulus (per)", SQ_MM_PIECE, CommonConstant.NUMBER_0, "11B02D,11B02E"));
+       // indicatorResultsMap.put("球内细胞核密度（单个）", createComplexIndicator(cb, "Nucleus density of glomerulus (per)", SQ_MM_PIECE, CommonConstant.NUMBER_0, "11B02D,11B02E"));
         //5=D/B
         List<BigDecimal> db = bs.stream().map(annotation -> {
             Annotation temp = getContourInsideOrOutside(jsonTask, annotation.getContour(), "11B02F", true);
@@ -140,13 +140,13 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
             }
             return result;
         }).collect(Collectors.toList());
-        indicatorResultsMap.put("球内红细胞面积占比（单个）", createComplexIndicator(db, "Erythrocyte of glomerulus area% (per)", PERCENTAGE, CommonConstant.NUMBER_0, "11B02D,11B02F"));
+        //indicatorResultsMap.put("球内红细胞面积占比（单个）", createComplexIndicator(db, "Erythrocyte of glomerulus area% (per)", PERCENTAGE, CommonConstant.NUMBER_0, "11B02D,11B02F"));
         //6=E/A
         BigDecimal b1 = BigDecimal.ZERO;
         if (count != 0 && b11B03D.compareTo(BigDecimal.ZERO) != 0) {
             b1 = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(count), b11B03D);
         }
-        indicatorResultsMap.put("皮质肾小管密度", createNameIndicator("Density of renal cortical tubules", String.valueOf(b1), SQ_MM_PIECE, "11B031,11B03D"));
+        //indicatorResultsMap.put("皮质肾小管密度", createNameIndicator("Density of renal cortical tubules", String.valueOf(b1), SQ_MM_PIECE, "11B031,11B03D"));
         //7=F
         List<Annotation> f = getStructureContourList(jsonTask, "11B031");
         if (CollectionUtils.isNotEmpty(f)) {
@@ -154,7 +154,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
                 BigDecimal temp = annotation.getStructureAreaNum();
                 return temp.multiply(BigDecimal.valueOf(1000));
             }).collect(Collectors.toList());
-            indicatorResultsMap.put("肾小管面积(单个)", createComplexIndicator(fb, "Renal tubule area (per)", SQ_UM_THOUSAND, CommonConstant.NUMBER_0, "11B031"));
+            //indicatorResultsMap.put("肾小管面积(单个)", createComplexIndicator(fb, "Renal tubule area (per)", SQ_UM_THOUSAND, CommonConstant.NUMBER_0, "11B031"));
         }
         Annotation annotationBy = new Annotation();
         annotationBy.setCountName("球内细胞核数量（单个）");

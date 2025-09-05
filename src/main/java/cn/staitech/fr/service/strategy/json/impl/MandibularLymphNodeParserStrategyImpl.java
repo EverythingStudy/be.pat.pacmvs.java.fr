@@ -88,17 +88,17 @@ public class MandibularLymphNodeParserStrategyImpl extends AbstractCustomParserS
 
         // 算法输出指标 -------------------------------------------------------------
         // B
-        map.put("生发中心面积（全片）", createIndicator(DecimalUtils.setScale3(organAreaB), SQ_UM, "148051"));
+        //map.put("生发中心面积（全片）", createIndicator(DecimalUtils.setScale3(organAreaB), SQ_UM, "148051"));
         // C
         map.put("髓质面积", createIndicator(DecimalUtils.setScale3(organAreaC), SQ_UM, "14803E"));
         // 产品呈现指标 -------------------------------------------------------------
         // A
-        map.put("生发中心数量", createNameIndicator("Number of germinal center", areaCountA.toString(), "个", "148051"));
+       // map.put("生发中心数量", createNameIndicator("Number of germinal center", areaCountA.toString(), "个", "148051"));
 
         if (organAreaD.compareTo(BigDecimal.ZERO) != 0) {
             //  生发中心占比	2	%	Germinal center area%	2=B/D
             BigDecimal germinalCenterAreaRateDecimal = organAreaB.divide(organAreaD, 6, RoundingMode.HALF_UP);
-            map.put("生发中心占比", createNameIndicator("Germinal center area%", DecimalUtils.percentScale3(germinalCenterAreaRateDecimal), PERCENTAGE, "148051,148111"));
+            //map.put("生发中心占比", createNameIndicator("Germinal center area%", DecimalUtils.percentScale3(germinalCenterAreaRateDecimal), PERCENTAGE, "148051,148111"));
 
             //  髓质占比	3	%	Medulla area%	3=C/D
             BigDecimal medullaAreaRateDecimal = organAreaC.divide(organAreaD, 6, RoundingMode.HALF_UP);
@@ -106,11 +106,11 @@ public class MandibularLymphNodeParserStrategyImpl extends AbstractCustomParserS
 
             //  皮质和副皮质占比	4	%	Cortex and paracortex area%	4=（D-C）/D
             BigDecimal cortexAndParacortexAreaRateDecimal = organAreaD.subtract(organAreaC).divide(organAreaD, 6, RoundingMode.HALF_UP);
-            map.put("皮质和副皮质占比", createNameIndicator("Cortex and paracortex area%", DecimalUtils.percentScale3(cortexAndParacortexAreaRateDecimal), PERCENTAGE, "14803E,148111"));
+           // map.put("皮质和副皮质占比", createNameIndicator("Cortex and paracortex area%", DecimalUtils.percentScale3(cortexAndParacortexAreaRateDecimal), PERCENTAGE, "14803E,148111"));
         } else {
-            map.put("生发中心占比", new IndicatorAddIn("Germinal center area%", "0.000", PERCENTAGE, "148051,148111"));
+           // map.put("生发中心占比", new IndicatorAddIn("Germinal center area%", "0.000", PERCENTAGE, "148051,148111"));
             map.put("髓质占比", new IndicatorAddIn("Medulla area%", "0.000", PERCENTAGE, "14803E,148111"));
-            map.put("皮质和副皮质占比", new IndicatorAddIn("Cortex and paracortex area%", "0.000", PERCENTAGE, "14803E,148111"));
+            //map.put("皮质和副皮质占比", new IndicatorAddIn("Cortex and paracortex area%", "0.000", PERCENTAGE, "14803E,148111"));
         }
 
         // D
