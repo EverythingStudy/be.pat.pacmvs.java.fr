@@ -227,7 +227,7 @@ public class MathUtils {
 
     public static <T> String getFirstAndLastOfMiddle95Percent(List<T> dataList) {
         if (dataList == null || dataList.size() < 2) {
-            //log.error("数据不足两个");
+            log.error("数据不足两个");
             return "0-0";
         }
         // 计算前 2.5% 和后 2.5% 的数据量
@@ -238,7 +238,7 @@ public class MathUtils {
         int endIndex = totalSize - removeCount;
         // 确保剩余数据量至少为 1
         if (totalSize - 2 * removeCount < 1) {
-            //log.error("剩余数量小于1");
+            log.error("剩余数量小于1");
             return dataList.get(startIndex - 1) + "-" + dataList.get(endIndex - 1);
         }
         // 截取中间 95% 的数据
