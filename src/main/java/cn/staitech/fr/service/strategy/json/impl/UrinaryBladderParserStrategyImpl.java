@@ -94,13 +94,13 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
 
             // 算法输出指标
             resultsMap.put("膀胱腔面积", createIndicator(organAreaA.setScale(3, RoundingMode.UP), SQ_MM, "11E034"));
-            resultsMap.put("组织轮廓面积", createIndicator(organAreaB.setScale(3, RoundingMode.UP), SQ_MM, "11E111"));
+            //resultsMap.put("组织轮廓面积", createIndicator(organAreaB.setScale(3, RoundingMode.UP), SQ_MM, "11E111"));
             resultsMap.put("黏膜上皮面积", createIndicator(organAreaC.setScale(3, RoundingMode.UP), SQ_MM, "11E035"));
-            resultsMap.put("黏膜固有层+黏膜下层面积", createIndicator(organAreaD.setScale(3, RoundingMode.UP), SQ_MM, "11E037"));
-            resultsMap.put("黏膜上皮细胞核数量", createIndicator(areaCountE, PIECE, "11E036"));
-            resultsMap.put("血管面积", createIndicator(organAreaF.setScale(3, RoundingMode.UP), SQ_MM, "11E003"));
-            resultsMap.put("血管外红细胞面积", createIndicator(organAreaG.setScale(3, RoundingMode.UP), SQ_MM, "11E003,00E004"));
-            resultsMap.put("血管内红细胞面积", createIndicator(organAreaH.setScale(3, RoundingMode.UP), SQ_MM, "11E003,00E004"));
+//            resultsMap.put("黏膜固有层+黏膜下层面积", createIndicator(organAreaD.setScale(3, RoundingMode.UP), SQ_MM, "11E037"));
+//            resultsMap.put("黏膜上皮细胞核数量", createIndicator(areaCountE, PIECE, "11E036"));
+//            resultsMap.put("血管面积", createIndicator(organAreaF.setScale(3, RoundingMode.UP), SQ_MM, "11E003"));
+//            resultsMap.put("血管外红细胞面积", createIndicator(organAreaG.setScale(3, RoundingMode.UP), SQ_MM, "11E003,00E004"));
+//            resultsMap.put("血管内红细胞面积", createIndicator(organAreaH.setScale(3, RoundingMode.UP), SQ_MM, "11E003,00E004"));
 
             // 计算指标
 
@@ -120,11 +120,11 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
 
             // 产品呈现指标
             resultsMap.put("黏膜上皮面积占比", createNameIndicator("Mucosa epithelium area %", mucosaEpitheliumArea, PERCENTAGE, "11E035,11E111,11E034"));
-            resultsMap.put("黏膜固有层和黏膜下层面积占比", createNameIndicator("Lamina propria and submucosa area %", laminaPropriaAndSubmucosaArea, PERCENTAGE, "11E037,11E111,11E034"));
-            resultsMap.put("黏膜上皮细胞核密度", createNameIndicator("Nucleus density of mucosal epithelial nucleus", nucleusDensityOfMucosalEpithelialNucleus, SQ_MM_PIECE, "11E036,11E035"));
-            resultsMap.put("血管面积占比", createNameIndicator("Vessel area %", vesselArea, PERCENTAGE, "11E003,11E111,11E034"));
-            resultsMap.put("血管外红细胞面积占比", createNameIndicator("Extravascular erythrocyte area%", extravascularErythrocyteArea, PERCENTAGE, "11E003,00E004,11E111,11E034"));
-            resultsMap.put("血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", intravascularErythrocyteArea, PERCENTAGE, "11E003,00E004,11E111,11E034"));
+            //resultsMap.put("黏膜固有层和黏膜下层面积占比", createNameIndicator("Lamina propria and submucosa area %", laminaPropriaAndSubmucosaArea, PERCENTAGE, "11E037,11E111,11E034"));
+            //resultsMap.put("黏膜上皮细胞核密度", createNameIndicator("Nucleus density of mucosal epithelial nucleus", nucleusDensityOfMucosalEpithelialNucleus, SQ_MM_PIECE, "11E036,11E035"));
+            //resultsMap.put("血管面积占比", createNameIndicator("Vessel area %", vesselArea, PERCENTAGE, "11E003,11E111,11E034"));
+            //resultsMap.put("血管外红细胞面积占比", createNameIndicator("Extravascular erythrocyte area%", extravascularErythrocyteArea, PERCENTAGE, "11E003,00E004,11E111,11E034"));
+           // resultsMap.put("血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", intravascularErythrocyteArea, PERCENTAGE, "11E003,00E004,11E111,11E034"));
             resultsMap.put("膀胱面积", createNameIndicator("Urinary bladder area", result, "11E111,11E034"));
             aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
         } catch (Exception e) {
