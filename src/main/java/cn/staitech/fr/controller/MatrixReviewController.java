@@ -2,6 +2,7 @@ package cn.staitech.fr.controller;
 
 import cn.staitech.fr.domain.in.AiDownloadIn;
 import cn.staitech.fr.service.MatrixReviewService;
+import cn.staitech.fr.vo.project.slide.SlidePageReq;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +26,15 @@ public class MatrixReviewController {
     private MatrixReviewService matrixReviewService;
 
 
+//    @ApiOperation(value = "算法报告下载")
+//    @PostMapping("/algorithmDownload")
+//    public void algorithmDownload(@Validated @RequestBody AiDownloadIn req) throws Exception {
+//        matrixReviewService.algorithmDownload(req);
+//    }
     @ApiOperation(value = "算法报告下载")
     @PostMapping("/algorithmDownload")
-    public void algorithmDownload(@Validated @RequestBody AiDownloadIn req) throws Exception {
+    public void algorithmDownload(@Validated @RequestBody SlidePageReq req) throws Exception {
         matrixReviewService.algorithmDownload(req);
     }
-
 
 }

@@ -1,6 +1,7 @@
 package cn.staitech.fr.service;
 
 import cn.staitech.fr.domain.in.AiDownloadIn;
+import cn.staitech.fr.vo.project.slide.SlidePageReq;
 
 /**
  * @Author wudi
@@ -9,6 +10,6 @@ import cn.staitech.fr.domain.in.AiDownloadIn;
  */
 public interface MatrixReviewService {
 
-    void algorithmDownload(AiDownloadIn req) throws Exception;
+    void algorithmDownload(SlidePageReq req) throws Exception;
 
 }

@@ -18,6 +18,8 @@ import cn.staitech.fr.service.MatrixReviewService;
 import cn.staitech.fr.utils.DateUtils;
 import cn.staitech.fr.utils.ExportPdfUtils;
 import cn.staitech.fr.utils.MathUtils;
+import cn.staitech.fr.vo.project.slide.SlidePageReq;
+import cn.staitech.fr.vo.project.slide.SlidePageVo;
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
@@ -65,24 +67,24 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     private HttpServletResponse response;
 
     @Override
-    public void algorithmDownload(AiDownloadIn req) throws Exception {
+    public void algorithmDownload(SlidePageReq req) throws Exception {
         log.info("ai预测报告导出接口开始：");
-        List<String> pdfName = new ArrayList<>();
-        String topicName = "";
-        List<Long> ids = req.getIds();
-        if (CollectionUtils.isEmpty(ids)) {
-            List<Slide> slideList = slideMapper.selectList(new LambdaQueryWrapper<>(Slide.class).eq(Slide::getProjectId, req.getProjectId()).eq(Slide::getDelFlag, CommonConstant.NUMBER_0));
-            ids = slideList.stream().map(Slide::getSlideId).collect(Collectors.toList());
-        }
+        //List<Long> ids = req.getIds();
+//        if (CollectionUtils.isEmpty(ids)) {
+//            List<Slide> slideList = slideMapper.selectList(new LambdaQueryWrapper<>(Slide.class).eq(Slide::getProjectId, req.getProjectId()).eq(Slide::getDelFlag, CommonConstant.NUMBER_0));
+//            ids = slideList.stream().map(Slide::getSlideId).collect(Collectors.toList());
+//        }
         //存放单脏器切片id和脏器id
         Map<Long, Long> categorys = new HashMap<>();
         //判断是不是存在对照组
         Project special = projectMapper.selectById(req.getProjectId());
-        LambdaQueryWrapper<Slide> wrapperSlide = new LambdaQueryWrapper<>();
-        wrapperSlide.in(Slide::getSlideId, ids);
-        List<Slide> slides = slideMapper.selectList(wrapperSlide);
-        List<SingleSlide> singleSlides = singleSlideMapper.selectList(new LambdaQueryWrapper<>(SingleSlide.class).in(SingleSlide::getSlideId, slides.stream().map(Slide::getSlideId).collect(Collectors.toList())));
-        List<Long> singleSlideIds = singleSlides.stream().map(SingleSlide::getSingleId).collect(Collectors.toList());
+        SlidePageReq slidePageReq = new SlidePageReq();
+        List<SlidePageVo> list = slideMapper.exportStructureList(slidePageReq);
+//        LambdaQueryWrapper<Slide> wrapperSlide = new LambdaQueryWrapper<>();
+//        wrapperSlide.in(Slide::getSlideId, ids);
+        List<Long> singleSlideIds = new ArrayList<>();
+        list.stream().map(e -> singleSlideIds.addAll(e.getOrganStatusVos().stream().map(s -> s.getSingleId()).collect(Collectors.toList())));
+        List<SingleSlide> singleSlides = singleSlideMapper.selectList(new LambdaQueryWrapper<>(SingleSlide.class).in(SingleSlide::getSlideId, list.stream().map(SlidePageVo::getSlideId).collect(Collectors.toList())));
         if (StringUtils.isNotEmpty(special.getControlGroup())) {
             categorys = singleSlides.stream().collect(Collectors.toMap(SingleSlide::getSingleId, SingleSlide::getCategoryId));
         }
@@ -99,7 +101,6 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
                 for (AiForecast aiForecast : aiForecasts) {
                     ExportAiListVO exportAiListVO = new ExportAiListVO();
                     BeanUtils.copyProperties(aiForecast, exportAiListVO);
-
                     if (!CommonConstant.SINGLE_RESULT.equals(aiForecast.getResults()) && !(aiForecast.getResults().contains("±")) && new BigDecimal(aiForecast.getResults()).compareTo(BigDecimal.ZERO) < 0) {
                         exportAiListVO.setResults("?");
                     }
@@ -133,21 +134,6 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         //生成Excel文件
         EasyExcel.write(s, ExprotAiExcelVO.class).sheet("AI量化指标数据").doWrite(collect);
         ExportPdfUtils.downloadLocal(s, response);
-//        pdfName.add(s);
-//        if (singleSlideIds.size() > 1) {
-//            log.info("走的压缩包");
-//            ExportPdfUtils.writePdfZip(pdfName, response, topicName + DateUtils.getCurrentHHmmssString("yyyy-MM-dd HH:mm:ss") + CommonConstant.ZIP_FILE);
-//
-//        } else {
-//            ExportPdfUtils.downloadLocal(pdfName.get(0), response);
-//        }
-//        for (String s1 : pdfName) {
-//            if (new File(s1).exists()) {
-//                FileUtils.delete(new File(s1));
-//                //FileUtils.delete(new File(s1.replace(CommonConstant.PDF_FILE, CommonConstant.WROD_FILE)));
-//            }
-//
-//        }
         log.info("结束");
     }
 

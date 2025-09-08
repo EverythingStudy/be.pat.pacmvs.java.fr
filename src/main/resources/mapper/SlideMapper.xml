@@ -35,8 +35,8 @@
         <result property="imageName" column="image_name"/>
         <result property="isView" column="is_view"/>
         <result property="viewers" column="viewers"
-                 typeHandler="cn.staitech.fr.mapper.handler.ListLongTypeHandler"
-                 javaType="java.util.List"/>
+                typeHandler="cn.staitech.fr.mapper.handler.ListLongTypeHandler"
+                javaType="java.util.List"/>
     </resultMap>
 
     <resultMap id="SlideDetailVoMap" type="cn.staitech.fr.vo.project.slide.SlideDetailVo">
@@ -68,9 +68,9 @@
 
         <!-- JSON 字段：需要指定 JacksonTypeHandler 解析为 List<Long> -->
         <result property="viewers" column="viewers"
-                 typeHandler="cn.staitech.fr.mapper.handler.ListLongTypeHandler"
-                 javaType="java.util.List"/>
-</resultMap>
+                typeHandler="cn.staitech.fr.mapper.handler.ListLongTypeHandler"
+                javaType="java.util.List"/>
+    </resultMap>
 
     <select id="selectBySpecialId" parameterType="java.lang.Long" resultType="java.lang.String">
         select tt.topic_name
@@ -78,8 +78,8 @@
                  left join tb_topic tt on fsl.topic_id = tt.topic_id
         where special_id = #{specialId}
     </select>
-    
-    <sql id = "slideList">
+
+    <sql id="slideList">
         select ti.thumb_url,
         ti.image_name fileName,
         ti.image_path,
@@ -133,17 +133,19 @@
             </if>
             <if test="params.waxCode != null and params.waxCode != ''">
                 <!--  and ti.wax_code like concat('%',#{waxCode},'%') -->
-                and ti.wax_code =  #{params.waxCode}
+                and ti.wax_code = #{params.waxCode}
             </if>
             <if test="params.createBy != null and params.createBy != ''">
                 and su.nick_name like concat('%',#{params.createBy},'%')
             </if>
             <if test="params.createTimeParams!=null">
                 <if test="params.createTimeParams.beginTime != null "><!-- 开始时间检索 -->
-                    AND date_format(fs.create_time,'%Y%m%d') &gt;= date_format(#{params.createTimeParams.beginTime},'%Y%m%d')
+                    AND date_format(fs.create_time,'%Y%m%d') &gt;=
+                    date_format(#{params.createTimeParams.beginTime},'%Y%m%d')
                 </if>
                 <if test="params.createTimeParams.endTime != null "><!-- 结束时间检索 -->
-                    AND date_format(fs.create_time,'%Y%m%d') &lt;= date_format(#{params.createTimeParams.endTime},'%Y%m%d')
+                    AND date_format(fs.create_time,'%Y%m%d') &lt;=
+                    date_format(#{params.createTimeParams.endTime},'%Y%m%d')
                 </if>
             </if>
         </where>
@@ -172,36 +174,36 @@
     <select id="slideQueryBy" parameterType="long"
             resultType="cn.staitech.fr.vo.project.slide.SlidePageVo">
         select ti.thumb_url,
-        ti.image_name fileName,
-        ti.group_code,
-        ti.wax_code,
-        ti.animal_code,
-        ti.sex_flag gender_flag,
-        su.user_name createUser,
-        fs.create_time,
-        fs.description,
-        fs.slide_id
+               ti.image_name fileName,
+               ti.group_code,
+               ti.wax_code,
+               ti.animal_code,
+               ti.sex_flag   gender_flag,
+               su.user_name  createUser,
+               fs.create_time,
+               fs.description,
+               fs.slide_id
         from fr_slide fs
-        left join tb_image ti on fs.image_id = ti.image_id
-        left join sys_user su on fs.create_by = su.user_id
+                 left join tb_image ti on fs.image_id = ti.image_id
+                 left join sys_user su on fs.create_by = su.user_id
         where fs.slide_id = #{slideId}
     </select>
-    
+
 
     <select id="selectListByWax" resultType="cn.staitech.fr.domain.Slide">
-        select fs.slide_id,t2.wax_code
+        select fs.slide_id, t2.wax_code
         from fr_slide fs
-          left join fr_special fsl on fs.special_id = fsl.special_id
-          left join tb_image t2 on fs.image_id = t2.image_id 
-        where fsl.topic_id= #{topicId}
-          and fsl.species_id= #{speciesId}
-          and fsl.del_flag='0'
+                 left join fr_special fsl on fs.special_id = fsl.special_id
+                 left join tb_image t2 on fs.image_id = t2.image_id
+        where fsl.topic_id = #{topicId}
+          and fsl.species_id = #{speciesId}
+          and fsl.del_flag = '0'
     </select>
-    
+
 
     <select id="getSlideInfo" parameterType="long"
             resultMap="SlideDetailVoMap">
-        select 
+        select
         s.slide_id,
         s.special_id,
         s.image_id,
@@ -241,11 +243,11 @@
     </select>
     <select id="selectWaxCodes" resultType="java.lang.String">
         SELECT DISTINCT b.wax_code
-        FROM fr_slide a JOIN tb_image b ON a.image_id = b.image_id
-        WHERE
-            a.special_id = #{projectId}
-        AND a.del_flag = '0'
-        ORDER BY b.wax_code_order asc,b.wax_code asc
+        FROM fr_slide a
+                 JOIN tb_image b ON a.image_id = b.image_id
+        WHERE a.special_id = #{projectId}
+          AND a.del_flag = '0'
+        ORDER BY b.wax_code_order asc, b.wax_code asc
     </select>
 
     <select id="getSlideSelectList" resultType="cn.staitech.fr.vo.project.slide.SlidePageVo">
@@ -277,52 +279,62 @@
         </where>
     </select>
     <select id="isAiSlideFinished" resultType="java.lang.Boolean">
-        select t.* from (
-            select case WHEN
-                (select count(fss.single_id) from fr_slide fs
-                                                      left join fr_single_slide fss on fss.slide_id = fs.slide_id
-                 where fs.special_id = #{projectId} and fs.del_flag = '0' and fss.single_id is null) = 0  then 'false'
-            WHEN
-                (select count(fss.single_id) from fr_slide fs
-                                                      left join fr_single_slide fss on fss.slide_id = fs.slide_id
-                 where fs.special_id = #{projectId} and fs.del_flag = '0' and (fss.forecast_status in('0','3') or fss.ai_status_fine in(0,3))) > 0 then 'false'
+        select t.*
+        from (select case
+                         WHEN
+                             (select count(fss.single_id)
+                              from fr_slide fs
+                                       left join fr_single_slide fss on fss.slide_id = fs.slide_id
+                              where fs.special_id = #{projectId}
+                                and fs.del_flag = '0'
+                                and fss.single_id is null) = 0 then 'false'
+                         WHEN
+                             (select count(fss.single_id)
+                              from fr_slide fs
+                                       left join fr_single_slide fss on fss.slide_id = fs.slide_id
+                              where fs.special_id = #{projectId}
+                                and fs.del_flag = '0'
+                                and (fss.forecast_status in ('0', '3') or fss.ai_status_fine in (0, 3))) > 0
+                             then 'false'
 
-            else 'true' end as aa
-        ) t
+                         else 'true' end as aa) t
     </select>
     <select id="getOrganCode" resultType="cn.staitech.fr.vo.project.slide.SlideOrganTagVo">
-        select distinct tg.organ_tag_id,tg.organ_tag_code,tg.organ_name from tb_organ_tag tg
-                left join  fr_single_slide fss on fss.category_id=tg.organ_tag_id
-                left join fr_slide fs on fs.slide_id=fss.slide_id
-        where fs.del_flag='0' and fs.special_id=#{projectId} and tg.organization_id=#{organizationId}
+        select distinct tg.organ_tag_id, tg.organ_tag_code, tg.organ_name
+        from tb_organ_tag tg
+                 left join fr_single_slide fss on fss.category_id = tg.organ_tag_id
+                 left join fr_slide fs on fs.slide_id = fss.slide_id
+        where fs.del_flag = '0'
+          and fs.special_id = #{projectId}
+          and tg.organization_id = #{organizationId}
     </select>
     <select id="selectAiAnalysis" resultType="cn.staitech.fr.vo.project.AiAnalysisBO">
-        SELECT
-            a.slide_id AS slideId,
-            a.image_id AS imageId,
-            b.image_path AS imagePath,
-            b.file_name AS fileName,
-            d.topic_name AS topicName,
-            e.organization_id AS organizationId,
-            e.organization_name AS organizationName,
-            c.species_id AS speciesId
-        FROM fr_slide a LEFT JOIN tb_image b ON a.image_id = b.image_id
-        LEFT JOIN fr_special c ON a.special_id = c.special_id
-        LEFT JOIN tb_topic d ON c.topic_id = d.topic_id
-        LEFT JOIN sys_organization e ON c.organization_id = e.organization_id
-        WHERE
-            a.del_flag = '0'
-        AND a.ai_status = 0
-        AND a.special_id = #{projectId}
+        SELECT a.slide_id          AS slideId,
+               a.image_id          AS imageId,
+               b.image_path        AS imagePath,
+               b.file_name         AS fileName,
+               d.topic_name        AS topicName,
+               e.organization_id   AS organizationId,
+               e.organization_name AS organizationName,
+               c.species_id        AS speciesId
+        FROM fr_slide a
+                 LEFT JOIN tb_image b ON a.image_id = b.image_id
+                 LEFT JOIN fr_special c ON a.special_id = c.special_id
+                 LEFT JOIN tb_topic d ON c.topic_id = d.topic_id
+                 LEFT JOIN sys_organization e ON c.organization_id = e.organization_id
+        WHERE a.del_flag = '0'
+          AND a.ai_status = 0
+          AND a.special_id = #{projectId}
     </select>
     <select id="exportAiInfo" resultType="cn.staitech.fr.vo.project.slide.ExportAiInfoVo">
-        select frs.topic_name,frs.special_name,ti.image_name,tg.organ_name,af.quantitative_indicators,af.unit,af.results,af.forecast_range
+        select
+        frs.topic_name,frs.special_name,ti.image_name,tg.organ_name,af.quantitative_indicators,af.unit,af.results,af.forecast_range
         from fr_slide fs
-                 left join tb_image ti on fs.image_id = ti.image_id
-                 left join fr_special frs on fs.special_id=frs.special_id
-                 left join fr_single_slide fss on fs.slide_id=fss.slide_id
-                 left join tb_organ_tag tg on fss.category_id=tg.organ_tag_id
-                 left join fr_ai_forecast af on af.single_slide_id=fss.single_id
+        left join tb_image ti on fs.image_id = ti.image_id
+        left join fr_special frs on fs.special_id=frs.special_id
+        left join fr_single_slide fss on fs.slide_id=fss.slide_id
+        left join tb_organ_tag tg on fss.category_id=tg.organ_tag_id
+        left join fr_ai_forecast af on af.single_slide_id=fss.single_id
         where fs.special_id=#{projectId}
         <if test="singleId != null">
             and fss.single_id=#{singleId}
@@ -335,7 +347,8 @@
         </if>
     </select>
     <select id="getAiInfoList" resultType="cn.staitech.fr.vo.project.slide.AiInfoListVO">
-        select af.structure_ids,fss.category_id,tg.organ_name,af.quantitative_indicators,af.unit,af.results,af.forecast_range
+        select
+        af.structure_ids,fss.category_id,tg.organ_name,af.quantitative_indicators,af.unit,af.results,af.forecast_range
         from fr_single_slide fss
         left join fr_ai_forecast af on af.single_slide_id=fss.single_id
         left join fr_slide fs on fs.slide_id=fss.slide_id
@@ -354,25 +367,25 @@
         </if>
     </select>
     <select id="selectOrganCheckConfirmBO" resultType="cn.staitech.fr.vo.project.OrganCheckConfirmBO">
-        SELECT
-        a.image_id AS imageId,
-        b.image_path AS imagePath,
-        a.slide_id AS slideId,
-        f.single_id AS singleId,
-        f.category_id AS categoryId,
-        e.organization_id AS organizationId,
-        e.organization_name AS organizationName,
-        d.topic_name AS topicName,
-        c.species_id AS speciesId
-        FROM fr_slide a LEFT JOIN tb_image b ON a.image_id = b.image_id
-        LEFT JOIN fr_special c ON a.special_id = c.special_id
-        LEFT JOIN tb_topic d ON c.topic_id = d.topic_id
-        LEFT JOIN sys_organization e ON c.organization_id = e.organization_id
-        LEFT JOIN fr_single_slide f ON a.slide_id = f.slide_id
-        WHERE
-        a.slide_id = #{slideId}
+        SELECT a.image_id          AS imageId,
+               b.image_path        AS imagePath,
+               a.slide_id          AS slideId,
+               f.single_id         AS singleId,
+               f.category_id       AS categoryId,
+               e.organization_id   AS organizationId,
+               e.organization_name AS organizationName,
+               d.topic_name        AS topicName,
+               c.species_id        AS speciesId
+        FROM fr_slide a
+                 LEFT JOIN tb_image b ON a.image_id = b.image_id
+                 LEFT JOIN fr_special c ON a.special_id = c.special_id
+                 LEFT JOIN tb_topic d ON c.topic_id = d.topic_id
+                 LEFT JOIN sys_organization e ON c.organization_id = e.organization_id
+                 LEFT JOIN fr_single_slide f ON a.slide_id = f.slide_id
+        WHERE a.slide_id = #{slideId}
     </select>
-    <select id="pageNew" resultType="cn.staitech.fr.vo.project.slide.SlidePageVo" parameterType="cn.staitech.fr.vo.project.slide.SlidePageReq">
+    <select id="pageNew" resultType="cn.staitech.fr.vo.project.slide.SlidePageVo"
+            parameterType="cn.staitech.fr.vo.project.slide.SlidePageReq">
         SELECT
         b.slide_id AS slideId,
         c.thumb_url AS thumbUrl,
@@ -397,19 +410,19 @@
         <if test="params.fileName != null and params.fileName != ''">
             and b.image_name like concat('%',#{params.fileName},'%')
         </if>
-        <if test = "params.animalCodes != null and params.animalCodes.size() > 0">
+        <if test="params.animalCodes != null and params.animalCodes.size() > 0">
             AND b.animal_code IN
             <foreach collection="params.animalCodes" item="item" separator="," open="(" close=")">
                 #{item}
             </foreach>
         </if>
-        <if test = "params.waxCodes != null and params.waxCodes.size() > 0">
+        <if test="params.waxCodes != null and params.waxCodes.size() > 0">
             AND b.wax_code IN
             <foreach collection="params.waxCodes" item="item" separator="," open="(" close=")">
                 #{item}
             </foreach>
         </if>
-        <if test = "params.groupCodes != null and params.groupCodes.size() > 0">
+        <if test="params.groupCodes != null and params.groupCodes.size() > 0">
             AND b.group_code IN
             <foreach collection="params.groupCodes" item="item" separator="," open="(" close=")">
                 #{item}
@@ -418,16 +431,16 @@
         <if test="params.genderFlag != null and params.genderFlag != ''">
             AND b.sex_flag = #{params.genderFlag}
         </if>
-        <if test = "params.organTagIds != null and params.organTagIds.size() > 0">
+        <if test="params.organTagIds != null and params.organTagIds.size() > 0">
             AND c.category_id IN
             <foreach collection="params.organTagIds" item="item" separator="," open="(" close=")">
                 #{item}
             </foreach>
         </if>
-        <if test = "params.viewStatus != null">
+        <if test="params.viewStatus != null">
             AND ${params.currentUserId} = #{params.viewStatus}
         </if>
-        <if test = "params.aiStatus != null and params.aiStatus.size() > 0">
+        <if test="params.aiStatus != null and params.aiStatus.size() > 0">
             AND (a.ai_status IN
             <foreach collection="params.aiStatus" item="item" separator="," open="(" close=")">
                 #{item}
@@ -463,5 +476,96 @@
         c.group_code ASC,
         c.sex_flag ASC
     </select>
-
+    <select id="exportStructureList" resultType="cn.staitech.fr.vo.project.slide.SlidePageVo" parameterType="cn.staitech.fr.vo.project.slide.SlidePageReq">
+        SELECT
+        b.slide_id AS slideId,
+        c.thumb_url AS thumbUrl,
+        c.image_name AS fileName,
+        c.image_name AS imageName,
+        c.animal_code AS animalCode,
+        c.wax_code AS waxCode,
+        c.group_code AS groupCode,
+        c.sex_flag AS genderFlag,
+        a.viewStatus AS viewStatus,
+        b.ai_status AS aiStatus,
+        b.description AS description,
+        b.create_time AS createTime
+        FROM
+        (SELECT a.slide_id, ${params.currentUserId} AS viewStatus
+        FROM
+        fr_slide a LEFT JOIN tb_image b ON a.image_id = b.image_id
+        LEFT JOIN fr_single_slide c ON a.slide_id = c.slide_id
+        WHERE
+        a.del_flag = '0'
+        AND a.special_id = #{params.projectId}
+        <if test="params.fileName != null and params.fileName != ''">
+            and b.image_name like concat('%',#{params.fileName},'%')
+        </if>
+        <if test="params.animalCodes != null and params.animalCodes.size() > 0">
+            AND b.animal_code IN
+            <foreach collection="params.animalCodes" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="params.waxCodes != null and params.waxCodes.size() > 0">
+            AND b.wax_code IN
+            <foreach collection="params.waxCodes" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="params.groupCodes != null and params.groupCodes.size() > 0">
+            AND b.group_code IN
+            <foreach collection="params.groupCodes" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="params.genderFlag != null and params.genderFlag != ''">
+            AND b.sex_flag = #{params.genderFlag}
+        </if>
+        <if test="params.organTagIds != null and params.organTagIds.size() > 0">
+            AND c.category_id IN
+            <foreach collection="params.organTagIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+        <if test="params.viewStatus != null">
+            AND ${params.currentUserId} = #{params.viewStatus}
+        </if>
+        <if test="params.aiStatus != null and params.aiStatus.size() > 0">
+            AND (a.ai_status IN
+            <foreach collection="params.aiStatus" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            OR
+            CASE WHEN c.forecast_status = '3' OR c.ai_status_fine = 3 THEN 5
+            WHEN c.forecast_status = '1' OR c.ai_status_fine = 1 THEN 6
+            WHEN c.forecast_status = '2' OR c.ai_status_fine = 2 THEN 7
+            WHEN c.single_id IS NOT NULL THEN 4
+            ELSE NULL END IN
+            <foreach collection="params.aiStatus" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+            )
+        </if>
+        <if test="params.description != null and params.description != ''">
+            and a.description like concat('%',#{params.description},'%')
+        </if>
+        <if test="params.createTimeParams!=null">
+            <if test="params.createTimeParams.beginTime != null ">
+                AND date_format(a.create_time,'%Y%m%d') &gt;= date_format(#{params.createTimeParams.beginTime},'%Y%m%d')
+            </if>
+            <if test="params.createTimeParams.endTime != null ">
+                AND date_format(a.create_time,'%Y%m%d') &lt;= date_format(#{params.createTimeParams.endTime},'%Y%m%d')
+            </if>
+        </if>
+        GROUP BY a.slide_id) a
+        JOIN fr_slide b ON a.slide_id = b.slide_id
+        LEFT JOIN tb_image c ON b.image_id = c.image_id
+        ORDER BY
+        c.animal_code ASC,
+        c.wax_code_order ASC,
+        c.group_code ASC,
+        c.sex_flag ASC,
+        a.slide_id DESC
+    </select>
 </mapper>
