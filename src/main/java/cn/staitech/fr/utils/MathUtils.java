@@ -205,11 +205,11 @@ public class MathUtils {
         }
         if (CollectionUtil.isNotEmpty(dataList)) {
             BigDecimal bigDecimal = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
-            log.info("平均值" + bigDecimal);
+            //log.info("平均值" + bigDecimal);
             BigDecimal variance = MathUtils.variance(dataList.toArray(new BigDecimal[dataList.size()]), 3);
-            log.info("总体方差" + variance);
+            //log.info("总体方差" + variance);
             BigDecimal sqrt = MathUtils.sqrt(variance, 3);
-            log.info("总体标准差" + sqrt);
+           // log.info("总体标准差" + sqrt);
 
             //正态分布(下限)
 //            BigDecimal subtract2 = bigDecimal.subtract(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
@@ -227,7 +227,7 @@ public class MathUtils {
 
     public static <T> String getFirstAndLastOfMiddle95Percent(List<T> dataList) {
         if (dataList == null || dataList.size() < 2) {
-            log.error("数据不足两个");
+            //log.error("数据不足两个");
             return "0-0";
         }
         // 计算前 2.5% 和后 2.5% 的数据量
@@ -238,7 +238,7 @@ public class MathUtils {
         int endIndex = totalSize - removeCount;
         // 确保剩余数据量至少为 1
         if (totalSize - 2 * removeCount < 1) {
-            log.error("剩余数量小于1");
+            //log.error("剩余数量小于1");
             return dataList.get(startIndex - 1) + "-" + dataList.get(endIndex - 1);
         }
         // 截取中间 95% 的数据
