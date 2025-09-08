@@ -152,11 +152,11 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         resultsMap.put("输出小管/附睾管黏膜上皮面积（全片）", createIndicator(organAreaB, SQ_MM,"12F0F5"));
         resultsMap.put("输出小管/附睾管黏膜上皮周长（单个）", createDefaultIndicator("12F0F5"));
         resultsMap.put("输出小管/附睾管管腔面积（全片）", createIndicator(organAreaE, SQ_MM,areaUtils.getStructureIds("12F0F5","12F0F4")));
-        resultsMap.put("精子面积（全片）", createIndicator(organAreaG, SQ_MM,areaUtils.getStructureIds("12F0F5","12F0F7")));
-        resultsMap.put("血管面积", createIndicator(organAreaI.setScale(3, RoundingMode.HALF_UP), SQ_MM,"12F003"));
+        //resultsMap.put("精子面积（全片）", createIndicator(organAreaG, SQ_MM,areaUtils.getStructureIds("12F0F5","12F0F7")));
+        //resultsMap.put("血管面积", createIndicator(organAreaI.setScale(3, RoundingMode.HALF_UP), SQ_MM,"12F003"));
         resultsMap.put("黏膜上皮细胞核数量（单个）",createDefaultIndicator(areaUtils.getStructureIds("12F0F5","12F0F6")));
         resultsMap.put("输出小管/附睾管管腔面积（单个）", createDefaultIndicator(areaUtils.getStructureIds("12F0F5","12F0F4")));// D输出小管/附睾管管腔面积（单个）
-        resultsMap.put("精子面积（单个）", createDefaultIndicator(areaUtils.getStructureIds("12F0F5","12F0F7")));// F精子面积（单个）
+//        resultsMap.put("精子面积（单个）", createDefaultIndicator(areaUtils.getStructureIds("12F0F5","12F0F7")));// F精子面积（单个）
 
         // 产品呈现指标
         BigDecimal one = new BigDecimal("1");
@@ -257,14 +257,14 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         resultsMap.put("输出小管和附睾管面积占比（全片）", createNameIndicator("Efferent ducts and epididymal ducts area%（all）",erythrocyteArea, PERCENTAGE,areaUtils.getStructureIds("12F0F5","12F111")));
         resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area%", mucosalArea, PERCENTAGE,areaUtils.getStructureIds("12F0F5","12F0F4","12F003")));
         resultsMap.put("黏膜上皮面积占比（单个）", createNameIndicator("Mucosal epithelium area% (per)", mucosalAreaPer, PERCENTAGE ,areaUtils.getStructureIds("12F003","12F0F5","12F0F5")));
-        resultsMap.put("精子面积占比（单个）", createNameIndicator("Sperm area% (per)", spermAreaPer, PERCENTAGE,areaUtils.getStructureIds("12F0F5","12F0F7","12F0F4")));
-        resultsMap.put("精子面积占比（全片）", createNameIndicator("Sperm area% (all)", spermArea, PERCENTAGE,areaUtils.getStructureIds("12F0F5","12F0F7","12F0F4")));
+       // resultsMap.put("精子面积占比（单个）", createNameIndicator("Sperm area% (per)", spermAreaPer, PERCENTAGE,areaUtils.getStructureIds("12F0F5","12F0F7","12F0F4")));
+        //resultsMap.put("精子面积占比（全片）", createNameIndicator("Sperm area% (all)", spermArea, PERCENTAGE,areaUtils.getStructureIds("12F0F5","12F0F7","12F0F4")));
         resultsMap.put("黏膜上皮细胞核密度（单个）", createNameIndicator("Mucosal epithelial nucleus% (per)", mucosalCellDensity, MM_PIECE,areaUtils.getStructureIds("12F003","12F0F5","12F0F4","12F0F5")));
         resultsMap.put("附睾面积", createNameIndicator("Epididymal area", new BigDecimal(slideArea).setScale(3, RoundingMode.HALF_UP), SQ_MM,"12F111"));
         resultsMap.put("黏膜上皮厚度（单个）", createNameIndicator("Average thickness of mucosal epithelium (per)", mucosalThickness, UM,areaUtils.getStructureIds("12F0F5","12F0F4")));
         
 //        resultsMap.put("血管相对面积", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE,areaUtils.getStructureIds("12F0F5","12F0F4")));
-        resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE,areaUtils.getStructureIds("12F003","12F111")));
+        //resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE,areaUtils.getStructureIds("12F003","12F111")));
 
 
 
