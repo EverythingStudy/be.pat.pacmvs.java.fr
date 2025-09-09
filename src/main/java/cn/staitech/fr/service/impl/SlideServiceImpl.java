@@ -649,7 +649,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
             singleSlideWrapper.eq(SingleSlide::getCategoryId, key);
             SingleSlide singleSlide = this.singleSlideMapper.selectOne(singleSlideWrapper);
             if (Objects.nonNull(singleSlide)) {
-                resp.setSingleId(singleSlide.getSlideId());
+                resp.setSingleId(singleSlide.getSingleId());
                 resp.setAiStatus(this.handleOrganStatus(singleSlide));
                 resp.setForecastStatus(singleSlide.getForecastStatus());
                 resp.setScreeningDifferenceStatus(singleSlide.getScreeningDifferenceStatus());
