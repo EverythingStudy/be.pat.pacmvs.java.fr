@@ -144,7 +144,7 @@ public class JsonTaskParserService {
             }
 
             if (jsonObject == null || singleSlideId.equals(0)) {
-                log.info("singleSlide id:[{}] jsonTask 任务为空,新任务不再执行; [{}]", singleSlideId, jsonObject);
+                log.info("singleSlide id:{} jsonTask 任务为空,新任务不再执行; {}", singleSlideId, jsonObject);
                 return;
             }
 
@@ -165,13 +165,13 @@ public class JsonTaskParserService {
 //            }
 
             JsonTask taskOld = jsonTaskMapper.selectOne(Wrappers.<JsonTask>lambdaQuery().eq(JsonTask::getSingleId, singleSlideId));
-            log.info("singleSlide id:[{}] 查询已存在任务 [{}]", singleSlideId, taskOld);
+            log.info("singleSlide id:{} 查询已存在任务 {}", singleSlideId, taskOld);
             if (taskOld != null && (JsonTaskStatusEnum.PARSE_FAIL.getCode().equals(taskOld.getStatus()) || JsonTaskStatusEnum.PARSE_SUCCESS.getCode().equals(taskOld.getStatus()))) {
                 jsonTask.setTaskId(taskOld.getTaskId());
                 jsonTaskService.updateById(jsonTask);
-                log.info("singleSlide id:[{}] 更新已执行成功或失败任务 [{}]", singleSlideId, jsonTask);
+                log.info("singleSlide id:{} 更新已执行成功或失败任务 {}", singleSlideId, jsonTask);
             } else if (taskOld != null && (JsonTaskStatusEnum.PARSE_ING.getCode().equals(taskOld.getStatus()) || JsonTaskStatusEnum.NO_PARSE.getCode().equals(taskOld.getStatus()))) {
-                log.info("singleSlide id:[{}] jsonTask 任务执行中,新任务不再执行; [{}]", singleSlideId, jsonObject);
+                log.info("singleSlide id:{} jsonTask 任务执行中,新任务不再执行; {}", singleSlideId, jsonObject);
                 //return;
             } else {
                 jsonTaskService.save(jsonTask);
@@ -365,10 +365,8 @@ public class JsonTaskParserService {
             updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_FAIL.getCode());
             jsonTask.setStatus(JsonTaskStatusEnum.PARSE_FAIL.getCode());
             jsonTaskService.updateById(jsonTask);
-            log.error("jsonTask id:[{}] singleSlide id:[{}] 处理失败:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask);
-            if (log.isDebugEnabled()) {
-                e.printStackTrace();
-            }
+            log.error("jsonTask id:[{}] singleSlide id:[{}] 处理失败:[{}] ,{}", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask);
+            e.printStackTrace();
         }
     }
 

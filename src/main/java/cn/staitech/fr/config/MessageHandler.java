@@ -3,6 +3,7 @@ package cn.staitech.fr.config;
 import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 /**
  * @author mugw
@@ -34,6 +36,8 @@ public class MessageHandler {
 
     @RabbitListener(queues = "${queues.algoMsg:test2}")
     public void handleMessage(Message message, Channel channel) {
+        String messageId = UUID.randomUUID().toString().substring(0, 8);
+        MDC.put("threadId", messageId);
         String msg = new String(message.getBody(), StandardCharsets.UTF_8);
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         log.info("MessageHandler received: {}", msg);
@@ -59,6 +63,9 @@ public class MessageHandler {
                     log.error("拒绝消息失败: {}", nackException.getMessage());
                 }
             }
+        }
+        finally {
+            MDC.clear();
         }
     }
 
