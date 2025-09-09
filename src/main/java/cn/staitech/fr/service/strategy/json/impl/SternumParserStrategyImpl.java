@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.common.core.utils.StringUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -100,11 +101,11 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy {
 
         //        组织轮廓面积	H	平方毫米	无
         BigDecimal bigDecimalH = BigDecimal.ZERO;
-        bigDecimalH = getOrganArea(jsonTask, "14E111").getStructureAreaNum();
-	//	String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
-//		if(StringUtils.isNotEmpty(slideArea)){
-//			bigDecimalH = new BigDecimal(slideArea);
-//		}
+        //bigDecimalH = getOrganArea(jsonTask, "14E111").getStructureAreaNum();
+        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+        if (StringUtils.isNotEmpty(slideArea)) {
+            bigDecimalH = new BigDecimal(slideArea);
+        }
 
         //开始计算
         /**
