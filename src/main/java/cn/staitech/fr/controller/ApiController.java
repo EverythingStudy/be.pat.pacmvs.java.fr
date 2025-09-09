@@ -1,6 +1,7 @@
 package cn.staitech.fr.controller;
 
 import cn.hutool.json.JSONUtil;
+import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.config.ParkDataProducer;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,9 +31,15 @@ public class ApiController {
 
     @ApiOperation(value = "py任务结果")
     @PostMapping("/pyResult")
-    public void pyResult(@RequestBody Map params) {
+    public R<String> pyResult(@RequestBody Map params) {
         String retData = JSONUtil.toJsonStr(params);
         log.info("Ai回调数据: " + retData);
-        parkDataProducer.sendMessage(retData);
+        try {
+            parkDataProducer.sendMessage(retData);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return R.fail(e.getMessage(), "失败");
+        }
+        return R.ok("", "成功");
     }
 }
