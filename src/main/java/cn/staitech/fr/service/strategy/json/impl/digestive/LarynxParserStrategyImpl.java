@@ -75,12 +75,12 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
         //c 10E111
         BigDecimal bigDecimal = new BigDecimal(singleSlide.getArea());
         //c 10E111
-        indicatorResultsMap.put("喉面积", new IndicatorAddIn("Larynx area", new BigDecimal(singleSlide.getArea()).setScale(3,RoundingMode.HALF_UP).toString(), "平方毫米","10E111"));
+        indicatorResultsMap.put("喉面积", new IndicatorAddIn("Larynx area", new BigDecimal(singleSlide.getArea()).setScale(3,RoundingMode.HALF_UP).toString(), SQ_MM,"10E111"));
       //TODO 算法不支持，暂时先注释，待支持后再次放开
         //a 10E035
 //        indicatorResultsMap.put("黏膜上皮面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1,"10E035"));
         //b
-        indicatorResultsMap.put("腺体面积", new IndicatorAddIn("", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1,"10E133"));
+        indicatorResultsMap.put("腺体面积", new IndicatorAddIn("", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,"10E133"));
         if(bigDecimal.signum() == 0){
         	////TODO 算法不支持，暂时先注释，待支持后再次放开
         	//A/C
