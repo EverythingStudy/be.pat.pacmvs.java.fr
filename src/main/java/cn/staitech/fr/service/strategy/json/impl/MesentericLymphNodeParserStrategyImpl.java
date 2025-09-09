@@ -71,9 +71,9 @@ public class MesentericLymphNodeParserStrategyImpl extends AbstractCustomParserS
         // C髓质面积
         BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask, "14603E");
         // D组织轮廓
-//        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
-//        BigDecimal organAreaD = BigDecimal.valueOf(Double.parseDouble(slideArea));
-        BigDecimal organAreaD = areaUtils.getOrganArea(jsonTask, "146111");
+        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
+        BigDecimal organAreaD = BigDecimal.valueOf(Double.parseDouble(slideArea));
+        // BigDecimal organAreaD = areaUtils.getOrganArea(jsonTask, "146111");
         // 算法输出指标
         //resultsMap.put("生发中心面积（全片）", createIndicator(organAreaB.setScale(3, RoundingMode.HALF_UP), SQ_MM, "146051"));
         resultsMap.put("髓质面积", createIndicator(organAreaC.setScale(3, RoundingMode.HALF_UP), SQ_MM, "14603E"));
