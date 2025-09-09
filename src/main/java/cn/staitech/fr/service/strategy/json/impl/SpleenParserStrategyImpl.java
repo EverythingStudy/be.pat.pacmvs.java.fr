@@ -72,9 +72,9 @@ public class SpleenParserStrategyImpl extends AbstractCustomParserStrategy {
         //        红细胞面积	E	平方毫米	数据相加输出
         BigDecimal erythrocyteArea = getOrganArea(jsonTask, "145004").getStructureAreaNum();
         //        组织轮廓面积	F	平方毫米(H:精细轮廓总面积（脾脏）-平方毫米)
-//        String accurateArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
-//        BigDecimal accurateAreaDecimal = new BigDecimal(accurateArea);
-        BigDecimal accurateAreaDecimal = getOrganArea(jsonTask, "145111").getStructureAreaNum();
+        String accurateArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
+        BigDecimal accurateAreaDecimal = new BigDecimal(accurateArea);
+        //BigDecimal accurateAreaDecimal = getOrganArea(jsonTask, "145111").getStructureAreaNum();
         //        边缘区面积	G	平方毫米	数据相加输出（算法直接输出）(WORD无数据，JSON有数据！)
         BigDecimal marginalZoneArea = getOrganArea(jsonTask, "14504A").getStructureAreaNum();
         //        红髓	H	平方毫米	算法直接输出 (WORD无数据，JSON有数据！)

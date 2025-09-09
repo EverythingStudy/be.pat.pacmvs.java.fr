@@ -133,27 +133,27 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
 			indicatorResultsMap.put("黄体面积（全片）", new IndicatorAddIn("Corpus luteum area(all)", String.valueOf(bigDecimalC.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "0","1240CA"));
 		}
 		if(mucosaCountD > 0){
-			indicatorResultsMap.put("卵泡数量", new IndicatorAddIn("Follicle numbers", String.valueOf(mucosaCountD), PIECE, "0","1240CB"));
+//			indicatorResultsMap.put("卵泡数量", new IndicatorAddIn("Follicle numbers", String.valueOf(mucosaCountD), PIECE, "0","1240CB"));
 		}
 
 
 		if(bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("卵泡面积（全片）", new IndicatorAddIn("Follicle area", String.valueOf(bigDecimalF.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "0","1240CB"));
+//			indicatorResultsMap.put("卵泡面积（全片）", new IndicatorAddIn("Follicle area", String.valueOf(bigDecimalF.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "0","1240CB"));
 		}
 
 		if(bigDecimalH.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("血管面积", new IndicatorAddIn("Vessel area", String.valueOf(bigDecimalH.setScale(3, RoundingMode.HALF_UP)), SQ_UM, "0","124003"));
+//			indicatorResultsMap.put("血管面积", new IndicatorAddIn("Vessel area", String.valueOf(bigDecimalH.setScale(3, RoundingMode.HALF_UP)), SQ_UM, "0","124003"));
 		}
 
 		if(bigDecimalI.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", String.valueOf(bigDecimalI.setScale(3, RoundingMode.HALF_UP)), SQ_UM, "0",areaUtils.getStructureIds("124003","124004")));
+//			indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", String.valueOf(bigDecimalI.setScale(3, RoundingMode.HALF_UP)), SQ_UM, "0",areaUtils.getStructureIds("124003","124004")));
 		}
 		if(bigDecimalJ.compareTo(BigDecimal.ZERO) != 0) {
-			indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", String.valueOf(bigDecimalJ.setScale(3, RoundingMode.HALF_UP)), SQ_UM, "0",areaUtils.getStructureIds("124003","124004")));
+//			indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", String.valueOf(bigDecimalJ.setScale(3, RoundingMode.HALF_UP)), SQ_UM, "0",areaUtils.getStructureIds("124003","124004")));
 		}
 
 		if(StringUtils.isNotEmpty(slideArea)) {
-			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDSlideArea.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "1","124111"));
+//			indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDSlideArea.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "1","124111"));
 		}
 
 

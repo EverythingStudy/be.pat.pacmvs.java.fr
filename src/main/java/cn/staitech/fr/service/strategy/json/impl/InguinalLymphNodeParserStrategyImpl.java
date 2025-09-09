@@ -77,9 +77,9 @@ public class InguinalLymphNodeParserStrategyImpl extends AbstractCustomParserStr
         // 髓质面积	C	平方毫米
         BigDecimal organAreaC = commonJsonParser.getOrganArea(jsonTask, "14703E").getStructureAreaNum();
         // 5=D:淋巴结面积-平方毫米
-//        String accurateArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
-//        BigDecimal accurateAreaDecimal = new BigDecimal(accurateArea);
-        BigDecimal organAreaD = commonJsonParser.getOrganArea(jsonTask, "147111").getStructureAreaNum();
+        String accurateArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
+        BigDecimal organAreaD = new BigDecimal(accurateArea);
+       // BigDecimal organAreaD = commonJsonParser.getOrganArea(jsonTask, "147111").getStructureAreaNum();
 
         // 算法输出指标 -------------------------------------------------------------
         // B

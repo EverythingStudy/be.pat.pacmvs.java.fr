@@ -2,6 +2,7 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
@@ -81,10 +82,10 @@ public class MandibularLymphNodeParserStrategyImpl extends AbstractCustomParserS
         // 髓质面积	C	平方毫米
         BigDecimal organAreaC = commonJsonParser.getOrganArea(jsonTask, "14803E").getStructureAreaNum();
         // 5=D:淋巴结面积-平方毫米
-//        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-//        String accurateArea = singleSlide.getArea();
-//        BigDecimal accurateAreaDecimal = new BigDecimal(accurateArea);
-        BigDecimal organAreaD = commonJsonParser.getOrganArea(jsonTask, "148111").getStructureAreaNum();
+        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+        String accurateArea = singleSlide.getArea();
+        BigDecimal organAreaD = new BigDecimal(accurateArea);
+        //BigDecimal organAreaD = commonJsonParser.getOrganArea(jsonTask, "148111").getStructureAreaNum();
 
         // 算法输出指标 -------------------------------------------------------------
         // B
@@ -105,7 +106,7 @@ public class MandibularLymphNodeParserStrategyImpl extends AbstractCustomParserS
             map.put("髓质占比", createNameIndicator("Medulla area%", DecimalUtils.percentScale3(medullaAreaRateDecimal), PERCENTAGE, "14803E,148111"));
 
             //  皮质和副皮质占比	4	%	Cortex and paracortex area%	4=（D-C）/D
-            BigDecimal cortexAndParacortexAreaRateDecimal = organAreaD.subtract(organAreaC).divide(organAreaD, 6, RoundingMode.HALF_UP);
+            //BigDecimal cortexAndParacortexAreaRateDecimal = organAreaD.subtract(organAreaC).divide(organAreaD, 6, RoundingMode.HALF_UP);
            // map.put("皮质和副皮质占比", createNameIndicator("Cortex and paracortex area%", DecimalUtils.percentScale3(cortexAndParacortexAreaRateDecimal), PERCENTAGE, "14803E,148111"));
         } else {
            // map.put("生发中心占比", new IndicatorAddIn("Germinal center area%", "0.000", PERCENTAGE, "148051,148111"));

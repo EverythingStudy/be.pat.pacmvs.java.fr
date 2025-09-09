@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -82,11 +83,12 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
         Annotation annotation = commonJsonParser.getInsideOrOutside(jsonTask, "15C003", "15C004", true);
         // E血管内红细胞面积
         BigDecimal organAreaE = annotation.getStructureAreaNum();
-//        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// F精细轮廓总面积
-//
-//        BigDecimal organF = BigDecimal.valueOf(Double.parseDouble(slideArea));
         // F精细轮廓总面积
-        BigDecimal organF = commonJsonParser.getOrganArea(jsonTask, "15C111").getStructureAreaNum();
+        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// F精细轮廓总面积
+
+        BigDecimal organF = BigDecimal.valueOf(Double.parseDouble(slideArea));
+
+        // BigDecimal organF = commonJsonParser.getOrganArea(jsonTask, "15C111").getStructureAreaNum();
         // 间质面积占比
         BigDecimal mesenchymeArea = commonJsonParser.getProportion(organAreaB, organF);
         // 血管面积占比
@@ -108,7 +110,7 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
 
 
         // 算法输出指标
-        resultsMap.put("肌纤维面积（单个）", createDefaultIndicator("15C02A"));// A肌纤维面积（单个）
+        resultsMap.put("肌纤维面积（单个）", createComplexIndicator(annotationAreaList, "Muscle fiber area (per)", SQ_MM, CommonConstant.NUMBER_0, "15C02A"));// A肌纤维面积（单个）
 //        resultsMap.put("间质面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaB.toString()), SQ_UM_THOUSAND, "15C027"));
 //        resultsMap.put("血管面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaC.toString()), SQ_UM_THOUSAND, "15C003"));
 //        resultsMap.put("红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaD.toString()), SQ_UM, "15C004"));

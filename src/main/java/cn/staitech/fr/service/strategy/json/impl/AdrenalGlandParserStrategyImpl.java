@@ -77,7 +77,10 @@ public class AdrenalGlandParserStrategyImpl extends AbstractCustomParserStrategy
         BigDecimal organArea2 = getOrganArea(jsonTask, "10103E").getStructureAreaNum();
         Integer C = getInsideOrOutside(jsonTask, "10103D", "101068", true).getCount();
         Integer D = getInsideOrOutside(jsonTask, "10103E", "101068", true).getCount();
-        BigDecimal F = getOrganArea(jsonTask, "101111").getStructureAreaNum();
+       // BigDecimal F = getOrganArea(jsonTask, "101111").getStructureAreaNum();
+        //        组织轮廓面积	H	平方毫米	若多个数据则相加输出 (H:精细轮廓总面积（肝脏面积）-平方毫米)
+        String accurateArea = singleSlide.getArea();
+        BigDecimal F = new BigDecimal(accurateArea);
         indicatorResultsMap.put("皮质面积", createIndicator(organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "10103D"));
         indicatorResultsMap.put("髓质面积", createIndicator(organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "10103E"));
        // indicatorResultsMap.put("皮质细胞核数量", createIndicator(String.valueOf(C), PIECE, "10103D,101068"));

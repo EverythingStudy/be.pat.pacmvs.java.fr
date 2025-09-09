@@ -3,6 +3,7 @@ package cn.staitech.fr.service.strategy.json.impl;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
@@ -75,9 +76,9 @@ public class TracheaParserStrategyImpl extends AbstractCustomParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         // 查询精细轮廓面积
-//        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-//        String accurateArea = singleSlide.getArea();
-        BigDecimal accurateArea = commonJsonParser.getOrganArea(jsonTask, "14D111").getStructureAreaNum();
+        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+        BigDecimal accurateArea = new BigDecimal(singleSlide.getArea());
+        //BigDecimal accurateArea = commonJsonParser.getOrganArea(jsonTask, "14D111").getStructureAreaNum();
         // 查询气管腔面积
         BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "14D007").getStructureAreaNum();
 
