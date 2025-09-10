@@ -185,7 +185,7 @@ UPDATE tb_organ_tag SET organ_recognition = 0, fine_contour = 0, screening_diffe
 -- UPDATE tb_organ_tag SET organ_recognition = , fine_contour = , screening_difference = , structured_analysis =  WHERE organ_tag_code = '79';
 UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 0, structured_analysis = 1 WHERE organ_tag_code = '7A';
 UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 0, structured_analysis = 0 WHERE organ_tag_code = '7B';
-UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 0, structured_analysis = 1 WHERE organ_tag_code = '7C';
+UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 0, structured_analysis = 1 WHERE organ_tag_code = '24';
 UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 0, structured_analysis = 1 WHERE organ_tag_code = '7D';
 UPDATE tb_organ_tag SET organ_recognition = 0, fine_contour = 0, screening_difference = 0, structured_analysis = 0 WHERE organ_tag_code = '7F';
 UPDATE tb_organ_tag SET organ_recognition = 0, fine_contour = 0, screening_difference = 0, structured_analysis = 0 WHERE organ_tag_code = '80';
