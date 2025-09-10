@@ -129,7 +129,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             File f = new File(fileUrl);
             String fileName = f.getName().substring(0, f.getName().lastIndexOf("."));
             if (MapConstant.getStructureSize(jsonTask.getOrganizationId() + fileName) == null) {
-               // log.warn("jsonTask id:[{}] singleSlide id:[{}]  structureSize is null； jsonFile:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), fileUrl);
+                // log.warn("jsonTask id:[{}] singleSlide id:[{}]  structureSize is null； jsonFile:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), fileUrl);
                 continue;
             }
             jsonParser(f.getPath(), zoomLevels, fileName, singleSlideSelectBy, geometryIdMap, outputDir);
@@ -176,7 +176,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                                 }
                             } catch (Exception e) {
                                 e.printStackTrace();
-                                log.error("jsonParser:[{}],json-task-parser-service解析任务元数据异常:[{}]", jsonParser, e.getMessage());
+                                log.error("filePath:[{}],json-task-parser-service解析任务元数据异常:[{}]", inputGeoJsonFilePath, e.getMessage());
                             }
                         }
                     } else {
@@ -323,7 +323,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             filteredFilePathList = zoomLevels.stream().filter(filePath -> isFirstDigit(filePath, zoom)).collect(Collectors.toList());
             submitPathList(filteredFilePathList, jsonName, tree, geometryMap, single, tileGeometryMap, outputDir, 10, dynamicDataMap);
         }
-       // log.info("singleSlide id:[{}] 轮廓标签:[{}] 轮廓数量:[{}] 结束解析轮廓数据", single.getSingleId(), jsonName, features.size());
+        // log.info("singleSlide id:[{}] 轮廓标签:[{}] 轮廓数量:[{}] 结束解析轮廓数据", single.getSingleId(), jsonName, features.size());
     }
 
 
@@ -564,9 +564,9 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
         } else {
             geometry = element.getGeometry();
         }
-        
-       geometry = negateYCoordinates(geometry);
-        
+
+        geometry = negateYCoordinates(geometry);
+
         GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 8307);
         WKTReader reader = new WKTReader(geometryFactory);
         //Geometry geom = reader.read(evaluate(geometry.toString()));
@@ -579,12 +579,12 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
         features.setProperties(newProperties);
         return features;
     }
-    
-    
+
 
     /**
      * 将 FastJSON 的 GeoJSON Geometry 对象中所有 coordinates 的 y 坐标取反（加负号）
      * 支持 Polygon 和 MultiPolygon 类型
+     *
      * @param geometry JSONObject，格式如 {"type": "Polygon", "coordinates": [...]}
      * @return 新的 JSONObject，y 坐标已取反
      */
@@ -648,8 +648,8 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
         result.put("type", geometry.getString("type"));
         result.put("coordinates", transformedCoords);
         return result;
-    }    
-    
+    }
+
     /**
      * 将数字转为最合适的类型：整数用 Integer，小数用 Double
      */
@@ -660,7 +660,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             return value; // 保留 double
         }
     }
-    
+
     /**
      * 写入geojson文件
      *
