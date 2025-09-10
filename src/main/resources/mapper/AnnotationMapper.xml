@@ -662,7 +662,7 @@
         SELECT st_asgeojson(st_union(contour)) as collectContour
         FROM fr_annotation
         WHERE single_slide_id = #{singleSlideId}
-          AND contour_type = 3
+          AND contour_type = 2
     </select>
 
     <select id="unionGeometryArea" parameterType="long" resultMap="BaseResultMap">
@@ -1017,7 +1017,7 @@
         SELECT ST_IsValid(st_asgeojson(st_union(contour))) as results
         FROM fr_annotation
         WHERE single_slide_id = #{singleSlideId}
-          AND contour_type = 3
+          AND contour_type = 2
     </select>
 	
 
