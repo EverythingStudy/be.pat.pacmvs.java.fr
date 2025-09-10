@@ -27,7 +27,11 @@ INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_e
 INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'9','唾液腺，腮腺','Salivary glands, parotid',1,'N','09','PG',1,1);
 INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'9','泪腺','Lacrimal glands',2,'N','69','LG',1,1);
 INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'10','皮肤（乳腺周围）与乳腺','Skin (close to mammary) with mammary gland',1,'N','7A','IN_MG',1,1);
-INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'10','骨骼肌（股二头肌）与神经（坐骨神经）','Skeletal muscle (biceps femoris) with nerve (sciatic)',1,'N','80','MU_SE',1,1);
+
+-- INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'10','骨骼肌（股二头肌）与神经（坐骨神经）','Skeletal muscle (biceps femoris) with nerve (sciatic)',1,'N','80','MU_SE',1,1);
+INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'10','骨骼肌','Muscle',1,'N','5C','MU',1,1);
+INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'10','神经，坐骨','Nerve, sciatic',1,'N','40','SE',1,1);
+
 INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'10','淋巴结，腹股沟','Lymph node, inguinal',1,'N','47','IE',1,1);
 INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'11','甲状腺与甲状旁腺','Thyroid glands with parathyroids',2,'N','7F','TG_PD',1,1);
 INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'12','气管','Trachea',1,'N','4D','TR',1,1);
