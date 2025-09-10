@@ -123,8 +123,8 @@ public class LiverParserStrategyImpl implements ParserStrategy {
             }
         }
 
-        String confidenceInterval = MathUtils.getConfidenceInterval(listNum);
-        String confidenceInterval1 = MathUtils.getConfidenceInterval(lists);
+        //String confidenceInterval = MathUtils.getConfidenceInterval(listNum);
+        //String confidenceInterval1 = MathUtils.getConfidenceInterval(lists);
 
         //        产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
         //        肝脏面积	1	平方毫米	Liver area	1=H

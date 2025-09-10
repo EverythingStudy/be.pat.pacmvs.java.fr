@@ -86,13 +86,13 @@ public class LungParserStrategyImpl extends AbstractCustomParserStrategy {
 //        indicatorResultsMap.put("血管面积", new IndicatorAddIn("血管面积", String.valueOf(vesselArea.setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM, CommonConstant.NUMBER_1));
 //        indicatorResultsMap.put("血管内红细胞面积", new IndicatorAddIn("血管内红细胞面积", String.valueOf(intravascularErythrocyteArea.setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM, CommonConstant.NUMBER_1));
 //        indicatorResultsMap.put("血管外红细胞面积", new IndicatorAddIn("血管外红细胞面积", String.valueOf(extravascularErythrocyteArea.setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("肺泡上皮细胞核数量", new IndicatorAddIn("肺泡上皮细胞核数量", String.valueOf(count), PIECE, CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("肺泡上皮细胞核数量", new IndicatorAddIn("肺泡上皮细胞核数量", String.valueOf(count), PIECE, CommonConstant.NUMBER_1, "14C006"));
 
         //  indicatorResultsMap.put("支气管面积占比", new IndicatorAddIn("Bronchi area%", String.valueOf(bronchiAreas), PERCENTAGE, CommonConstant.NUMBER_0, "14C002,14C111"));
         //  indicatorResultsMap.put("血管面积占比", new IndicatorAddIn("Vessel area%", String.valueOf(vesselAreas), PERCENTAGE, CommonConstant.NUMBER_0, "14C003,14C111"));
 //        indicatorResultsMap.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular erythrocyte area%", String.valueOf(intravascularErythrocyteAreas), PERCENTAGE));
 //        indicatorResultsMap.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", String.valueOf(extravascularErythrocyteAreas), PERCENTAGE));
-        indicatorResultsMap.put("肺泡上皮细胞核密度", new IndicatorAddIn("Nucleus density of alveolar epithelial cell", String.valueOf(new BigDecimal(density).setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM_PIECE));
+        indicatorResultsMap.put("肺泡上皮细胞核密度", new IndicatorAddIn("Nucleus density of alveolar epithelial cell", String.valueOf(new BigDecimal(density).setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM_PIECE, "14C006,14C111"));
         indicatorResultsMap.put("肺脏面积", new IndicatorAddIn("Lung area", String.valueOf(outlineArea.setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM, CommonConstant.NUMBER_0, "14C111"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
