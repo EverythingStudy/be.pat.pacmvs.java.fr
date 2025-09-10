@@ -246,27 +246,45 @@ public class CommonJsonParser {
                 annotationService.batchProcessAndSave(anno, 1000);
             }
 
+//            Annotation annotation = new Annotation();
+//            //annotation.setMagnification(40000L);
+//            annotation.setFiligreeContour(true);
+//            annotation.setSingleSlideId(jsonTask.getSingleId());
+//            List<Annotation> annotations = annotationMapper.selectListBy(annotation);
+//            Annotation annotation3 = annotationMapper.collectGeometry(jsonTask.getSingleId());
+//
+//            // 循环annotations并执行删除操作
+//            if (CollectionUtil.isNotEmpty(annotations)) {
+//                annotation3.setContour(annotation3.getCollectContour());
+//                Annotation annotation2 = annotationMapper.stIsValid(annotation3);
+//                if (ObjectUtil.equals(annotation2.getResults(), "t")) {
+//                    // 查询有效精细轮廓列表
+////                    List<Annotation> annotationType3 = annotationMapper.selectAnnotationIsValid(annotation);
+////                    List<String> contourList = annotationType3.stream().map(Annotation::getContour).collect(Collectors.toList());
+////                    annotation3.setContourList(contourList);
+//                    annotation3.setSequenceNumber(sequenceNumber);
+//                    annotation3.setSingleSlideId(jsonTask.getSingleId());
+//                    annotation3.setInsideOrOutside(false);
+//                    annotationMapper.deleteAiAnnotation(annotation3);
+//                }
+//            }
+            
             Annotation annotation = new Annotation();
-            //annotation.setMagnification(40000L);
+            annotation.setMagnification(40000L);
             annotation.setFiligreeContour(true);
             annotation.setSingleSlideId(jsonTask.getSingleId());
-            List<Annotation> annotations = annotationMapper.selectListBy(annotation);
-            Annotation annotation3 = annotationMapper.collectGeometry(jsonTask.getSingleId());
+            Annotation annotationIsValid = annotationMapper.collectGeometryStIsValid(jsonTask.getSingleId());
 
-            // 循环annotations并执行删除操作
-            if (CollectionUtil.isNotEmpty(annotations)) {
+            // 校验合并后是否合规
+            if (ObjectUtil.equals(annotationIsValid.getResults(), "t")) {
+                // 合并轮廓
+                Annotation annotation3 = annotationMapper.collectGeometry(jsonTask.getSingleId());
                 annotation3.setContour(annotation3.getCollectContour());
-                Annotation annotation2 = annotationMapper.stIsValid(annotation3);
-                if (ObjectUtil.equals(annotation2.getResults(), "t")) {
-                    // 查询有效精细轮廓列表
-//                    List<Annotation> annotationType3 = annotationMapper.selectAnnotationIsValid(annotation);
-//                    List<String> contourList = annotationType3.stream().map(Annotation::getContour).collect(Collectors.toList());
-//                    annotation3.setContourList(contourList);
-                    annotation3.setSequenceNumber(sequenceNumber);
-                    annotation3.setSingleSlideId(jsonTask.getSingleId());
-                    annotation3.setInsideOrOutside(false);
-                    annotationMapper.deleteAiAnnotation(annotation3);
-                }
+                // 查询有效精细轮廓列表
+                annotation3.setSequenceNumber(sequenceNumber);
+                annotation3.setSingleSlideId(jsonTask.getSingleId());
+                annotation3.setInsideOrOutside(false);
+                annotationMapper.deleteAiAnnotation(annotation3);
             }
             // 删除甲状旁腺内所有数据
             // 查询甲状旁腺精细轮廓进行合并
