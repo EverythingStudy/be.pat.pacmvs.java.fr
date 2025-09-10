@@ -662,7 +662,7 @@
         SELECT st_asgeojson(st_union(contour)) as collectContour
         FROM fr_annotation
         WHERE single_slide_id = #{singleSlideId}
-          AND contour_type = 3
+          AND contour_type = 2
     </select>
 
     <select id="unionGeometryArea" parameterType="long" resultMap="BaseResultMap">
@@ -683,7 +683,7 @@
         FROM fr_annotation
         WHERE single_slide_id = #{singleSlideId}
           AND category_id = #{categoryId}
-          AND contour_type = 3
+          AND contour_type = 2
     </select>
 
     <select id="intersectsGeometry" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
@@ -720,7 +720,7 @@
         WHERE
         single_slide_id = #{singleSlideId}
         <if test="contour != null">
-            AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = #{insideOrOutside}
+            AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000) = #{insideOrOutside}
     <!-- <if test="contourList != null and contourList.size() > 0">
         <foreach collection="contourList" item="item" index="index">
             OR ST_Contains ( contour40000,st_geomfromgeojson(#{item})) = 't'
@@ -1011,6 +1011,13 @@
         <foreach collection="idList" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
+    </select>
+    
+    <select id="collectGeometryStIsValid" parameterType="long" resultType="cn.staitech.fr.domain.Annotation">
+        SELECT ST_IsValid(st_asgeojson(st_union(contour))) as results
+        FROM fr_annotation
+        WHERE single_slide_id = #{singleSlideId}
+          AND contour_type = 2
     </select>
 	
 
