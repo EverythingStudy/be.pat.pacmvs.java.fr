@@ -5,6 +5,7 @@ import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.fr.domain.out.AiInfoListRequest;
 import cn.staitech.fr.vo.project.AiAnalysisBO;
 import cn.staitech.fr.vo.project.OrganCheckConfirmBO;
+import cn.staitech.fr.vo.project.SlideDownLoadReq;
 import cn.staitech.fr.vo.project.slide.*;
 import org.apache.ibatis.annotations.Param;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -44,7 +45,7 @@ public interface SlideMapper extends BaseMapper<Slide> {
 
     CustomPage<SlidePageVo> pageNew(CustomPage<SlidePageVo> page, @Param("params") SlidePageReq req);
 
-    List<SlidePageVo> exportStructureList(SlidePageReq req);
+    List<SlidePageVo> exportStructureList(@Param("params") SlideDownLoadReq req);
 }
 
 

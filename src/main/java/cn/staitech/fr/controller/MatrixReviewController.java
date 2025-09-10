@@ -2,6 +2,7 @@ package cn.staitech.fr.controller;
 
 import cn.staitech.fr.domain.in.AiDownloadIn;
 import cn.staitech.fr.service.MatrixReviewService;
+import cn.staitech.fr.vo.project.SlideDownLoadReq;
 import cn.staitech.fr.vo.project.slide.SlidePageReq;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,7 +34,7 @@ public class MatrixReviewController {
 //    }
     @ApiOperation(value = "算法报告下载")
     @PostMapping("/algorithmDownload")
-    public void algorithmDownload(@Validated @RequestBody SlidePageReq req) throws Exception {
+    public void algorithmDownload(@Validated @RequestBody SlideDownLoadReq req) throws Exception {
         matrixReviewService.algorithmDownload(req);
     }
 
