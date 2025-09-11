@@ -654,7 +654,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                 resp.setForecastStatus(singleSlide.getForecastStatus());
                 resp.setScreeningDifferenceStatus(singleSlide.getScreeningDifferenceStatus());
             }
-            Set<String> structureIdsSet = new HashSet<>();
+
             Set<StructureTagVo> structureTagVosSet = new HashSet<>();
 
             //AI指标
@@ -682,6 +682,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                     }
                 }
 
+                Set<String> structureIdsSet = new HashSet<>();
                 String structureIds = aiCast.getStructureIds();
                 if (null != structureIds) {
                     Set<String> set = Arrays.stream(structureIds.split(",")).collect(Collectors.toSet());
