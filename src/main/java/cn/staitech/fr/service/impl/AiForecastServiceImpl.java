@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.*;
@@ -123,8 +124,11 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             if (res > 0) {
                 JsonTask jsonTask = jsonTaskService.getOne(new LambdaQueryWrapper<>(JsonTask.class).eq(JsonTask::getSingleId, singleSlideId));
                 if (JsonTaskStatusEnum.PARSE_NOT_START.getCode().equals(jsonTask.getStatus())) {
+                    Date startTime = new Date();
+                    log.info("jsonTask id:{} singleSlide id:{} checkJson 精细轮廓进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.formatDateTime(startTime));
                     List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
                     jsonTaskParserService.structureFileCalculate(jsonTask, fileList);
+                    log.info("jsonTask id:{} singleSlide id:{} checkJson 精细轮廓进入指标结束 endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime, new Date(), DateUnit.SECOND));
                 }
                 return true;
             } else {
