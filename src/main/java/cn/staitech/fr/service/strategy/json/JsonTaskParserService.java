@@ -6,7 +6,10 @@ import cn.staitech.fr.enums.ForecastStatusEnum;
 import cn.staitech.fr.enums.JsonTaskStatusEnum;
 import cn.staitech.fr.enums.StructureAiStatusEnum;
 import cn.staitech.fr.enums.StructureJsonStatusEnum;
-import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.mapper.AiForecastMapper;
+import cn.staitech.fr.mapper.JsonFileMapper;
+import cn.staitech.fr.mapper.JsonTaskMapper;
+import cn.staitech.fr.mapper.OrganTagMapper;
 import cn.staitech.fr.service.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -53,7 +56,7 @@ public class JsonTaskParserService {
     private CommonJsonParser commonJsonParser;
 
     @Resource
-    private AiForecastService aiForecastService;
+    private AiForecastMapper aiForecastMapper;
 
     @Resource
     private ContourJsonService contourJsonService;
@@ -190,17 +193,25 @@ public class JsonTaskParserService {
                         //结构识别全部失败-->以脏器为单位 (指标计算)结构分析失败-->forecastStatus结构化状态：2
                         updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_FAIL.getCode());
                     } else {
-                        updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_ING.getCode());
-                        //进行指标计算
-                        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
-                        long start = System.nanoTime();
-                        JsonTaskAiHandler(jsonTask, fileList);
-                        // 计算耗时（秒）
-                        long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
-                        long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
-                        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标结束 endTime:{} 耗时:{} 秒", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date(), costSeconds);
-                        //部分成功-->以脏器为单位 (指标计算)结构分析完成-->forecastStatus结构化状态：1
-                        updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_SUCCESS.getCode());
+                        //验证精细轮廓是否存在
+                        SingleSlide singleSlide = singleSlideService.getById(singleSlideId);
+                        if (singleSlide != null && singleSlide.getAiStatusFine().equals(1)) {
+                            jsonTask.setStatus(JsonTaskStatusEnum.PARSE_NOT_START.getCode());
+                            jsonTaskService.updateById(jsonTask);
+                            return;
+                        }
+                        structureFileCalculate(jsonTask, fileList);
+//                        updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_ING.getCode());
+//                        //进行指标计算
+//                        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+//                        long start = System.nanoTime();
+//                        JsonTaskAiHandler(jsonTask, fileList);
+//                        // 计算耗时（秒）
+//                        long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+//                        long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
+//                        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标结束 endTime:{} 耗时:{} 秒", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date(), costSeconds);
+//                        //部分成功-->以脏器为单位 (指标计算)结构分析完成-->forecastStatus结构化状态：1
+//                        updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_SUCCESS.getCode());
                     }
                 }
             } else {
@@ -212,6 +223,20 @@ public class JsonTaskParserService {
             throw new JsonTaskParserException(e.getMessage());
         }
 
+    }
+
+    public void structureFileCalculate(JsonTask jsonTask, List<JsonFile> fileList) {
+        updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_ING.getCode());
+        //进行指标计算
+        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+        long start = System.nanoTime();
+        JsonTaskAiHandler(jsonTask, fileList);
+        // 计算耗时（秒）
+        long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+        long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
+        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标结束 endTime:{} 耗时:{} 秒", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date(), costSeconds);
+        //部分成功-->以脏器为单位 (指标计算)结构分析完成-->forecastStatus结构化状态：1
+        updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_SUCCESS.getCode());
     }
 
     private Boolean verifyCategoryStructure(JsonTask jsonTask) {
@@ -323,7 +348,7 @@ public class JsonTaskParserService {
             //删除原有指标
             LambdaQueryWrapper<AiForecast> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(AiForecast::getSingleSlideId, jsonTask.getSingleId());
-            aiForecastService.remove(wrapper);
+            aiForecastMapper.delete(wrapper);
             log.info("jsonTask id:[{}] singleSlide id:[{}] 开始计算指标。", jsonTask.getTaskId(), jsonTask.getSingleId());
             // 指标计算
             long alculationTime = System.nanoTime();

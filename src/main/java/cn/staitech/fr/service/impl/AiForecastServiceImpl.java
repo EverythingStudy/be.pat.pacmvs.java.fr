@@ -7,15 +7,21 @@ import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.domain.out.AiForecastListOut;
 import cn.staitech.fr.domain.out.ExportAiListVO;
+import cn.staitech.fr.enums.JsonTaskStatusEnum;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
+import cn.staitech.fr.service.JsonTaskService;
+import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
 import cn.staitech.fr.utils.MathUtils;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -54,6 +60,13 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
     private ProjectMapper specialMapper;
     @Resource
     private OrganTagMapper organTagMapper;
+    @Resource
+    private JsonTaskService jsonTaskService;
+    @Resource
+    @Lazy
+    private JsonTaskParserService jsonTaskParserService;
+    @Autowired
+    private JsonFileMapper jsonFileMapper;
 
     @Override
     public Boolean forecastResults(Long singleSlideId, Long imageId) {
@@ -108,6 +121,11 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             singleSlide.setPerimeter(perimeter);
             int res = singleSlideMapper.updateById(singleSlide);
             if (res > 0) {
+                JsonTask jsonTask = jsonTaskService.getOne(new LambdaQueryWrapper<>(JsonTask.class).eq(JsonTask::getSingleId, singleSlideId));
+                if (JsonTaskStatusEnum.PARSE_NOT_START.getCode().equals(jsonTask.getStatus())) {
+                    List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
+                    jsonTaskParserService.structureFileCalculate(jsonTask, fileList);
+                }
                 return true;
             } else {
                 return false;
