@@ -292,7 +292,7 @@ public class CommonJsonParser {
                     }
             	}
             }else {
-            	log.error("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],无法查询到精细轮廓", jsonTask.getTaskId(), jsonTask.getSlideId());
+            	log.error("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],无法查询到精细轮廓", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId());
             }
             // 删除甲状旁腺内所有数据
             // 查询甲状旁腺精细轮廓进行合并
