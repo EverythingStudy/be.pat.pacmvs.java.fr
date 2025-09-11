@@ -474,9 +474,11 @@
         c.animal_code ASC,
         c.wax_code_order ASC,
         c.group_code ASC,
-        c.sex_flag ASC
+        c.sex_flag ASC,
+        a.slide_id DESC
     </select>
-    <select id="exportStructureList" resultType="cn.staitech.fr.vo.project.slide.SlidePageVo" parameterType="cn.staitech.fr.vo.project.slide.SlidePageReq">
+    <select id="exportStructureList" resultType="cn.staitech.fr.vo.project.slide.SlidePageVo"
+            parameterType="cn.staitech.fr.vo.project.SlideDownLoadReq">
         SELECT
         b.slide_id AS slideId,
         c.thumb_url AS thumbUrl,
@@ -486,12 +488,12 @@
         c.wax_code AS waxCode,
         c.group_code AS groupCode,
         c.sex_flag AS genderFlag,
-        a.viewStatus AS viewStatus,
+--         a.viewStatus AS viewStatus,
         b.ai_status AS aiStatus,
         b.description AS description,
         b.create_time AS createTime
         FROM
-        (SELECT a.slide_id, ${params.currentUserId} AS viewStatus
+        (SELECT a.slide_id
         FROM
         fr_slide a LEFT JOIN tb_image b ON a.image_id = b.image_id
         LEFT JOIN fr_single_slide c ON a.slide_id = c.slide_id
@@ -519,6 +521,13 @@
                 #{item}
             </foreach>
         </if>
+        <if test="params.slideIds != null and params.slideIds .size() > 0">
+            and a.slide_id IN
+            <foreach collection="params.slideIds" item="item" separator="," open="(" close=")">
+                #{item}
+            </foreach>
+        </if>
+
         <if test="params.genderFlag != null and params.genderFlag != ''">
             AND b.sex_flag = #{params.genderFlag}
         </if>
@@ -528,9 +537,9 @@
                 #{item}
             </foreach>
         </if>
-        <if test="params.viewStatus != null">
-            AND ${params.currentUserId} = #{params.viewStatus}
-        </if>
+<!--        <if test="params.viewStatus != null">-->
+<!--            AND ${params.currentUserId} = #{params.viewStatus}-->
+<!--        </if>-->
         <if test="params.aiStatus != null and params.aiStatus.size() > 0">
             AND (a.ai_status IN
             <foreach collection="params.aiStatus" item="item" separator="," open="(" close=")">
@@ -565,7 +574,6 @@
         c.animal_code ASC,
         c.wax_code_order ASC,
         c.group_code ASC,
-        c.sex_flag ASC,
-        a.slide_id DESC
+        c.sex_flag ASC
     </select>
 </mapper>

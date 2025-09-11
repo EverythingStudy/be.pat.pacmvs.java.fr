@@ -18,6 +18,7 @@ import cn.staitech.fr.service.MatrixReviewService;
 import cn.staitech.fr.utils.DateUtils;
 import cn.staitech.fr.utils.ExportPdfUtils;
 import cn.staitech.fr.utils.MathUtils;
+import cn.staitech.fr.vo.project.SlideDownLoadReq;
 import cn.staitech.fr.vo.project.slide.SlidePageReq;
 import cn.staitech.fr.vo.project.slide.SlidePageVo;
 import com.alibaba.excel.EasyExcel;
@@ -67,24 +68,27 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
     private HttpServletResponse response;
 
     @Override
-    public void algorithmDownload(SlidePageReq req) throws Exception {
+    public void algorithmDownload(SlideDownLoadReq req) throws Exception {
         log.info("ai预测报告导出接口开始：");
-        //List<Long> ids = req.getIds();
-//        if (CollectionUtils.isEmpty(ids)) {
-//            List<Slide> slideList = slideMapper.selectList(new LambdaQueryWrapper<>(Slide.class).eq(Slide::getProjectId, req.getProjectId()).eq(Slide::getDelFlag, CommonConstant.NUMBER_0));
-//            ids = slideList.stream().map(Slide::getSlideId).collect(Collectors.toList());
-//        }
         //存放单脏器切片id和脏器id
         Map<Long, Long> categorys = new HashMap<>();
+        // 显示的脏器
+        List<Long> organTagIds = req.getOrganTagIds();
         //判断是不是存在对照组
+        List<SingleSlide> singleSlides = new ArrayList<>();
         Project special = projectMapper.selectById(req.getProjectId());
-        SlidePageReq slidePageReq = new SlidePageReq();
-        List<SlidePageVo> list = slideMapper.exportStructureList(slidePageReq);
-//        LambdaQueryWrapper<Slide> wrapperSlide = new LambdaQueryWrapper<>();
-//        wrapperSlide.in(Slide::getSlideId, ids);
+        if (CollectionUtils.isEmpty(req.getSingleSlideIds())) {
+            List<SlidePageVo> list = slideMapper.exportStructureList(req);
+            singleSlides = singleSlideMapper.selectList(new LambdaQueryWrapper<>(SingleSlide.class).in(SingleSlide::getSlideId, list.stream().map(SlidePageVo::getSlideId).collect(Collectors.toList())));
+        } else {
+            singleSlides = singleSlideMapper.selectList(new LambdaQueryWrapper<>(SingleSlide.class).in(SingleSlide::getSingleId, req.getSingleSlideIds()));
+        }
         List<Long> singleSlideIds = new ArrayList<>();
-        list.stream().map(e -> singleSlideIds.addAll(e.getOrganStatusVos().stream().map(s -> s.getSingleId()).collect(Collectors.toList())));
-        List<SingleSlide> singleSlides = singleSlideMapper.selectList(new LambdaQueryWrapper<>(SingleSlide.class).in(SingleSlide::getSlideId, list.stream().map(SlidePageVo::getSlideId).collect(Collectors.toList())));
+        for (SingleSlide singleSlide : singleSlides) {
+            if (CollectionUtils.isEmpty(organTagIds) || organTagIds.contains(singleSlide.getCategoryId())) {
+                singleSlideIds.add(singleSlide.getSingleId());
+            }
+        }
         if (StringUtils.isNotEmpty(special.getControlGroup())) {
             categorys = singleSlides.stream().collect(Collectors.toMap(SingleSlide::getSingleId, SingleSlide::getCategoryId));
         }
@@ -94,7 +98,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             //算法结果数据填充
             LambdaQueryWrapper<AiForecast> wrapper = new LambdaQueryWrapper<>();
             wrapper.eq(AiForecast::getSingleSlideId, id);
-            wrapper.eq(AiForecast::getStructType, CommonConstant.NUMBER_0);
+            //wrapper.eq(AiForecast::getStructType, CommonConstant.NUMBER_0);
             List<AiForecast> aiForecasts = aiForecastMapper.selectList(wrapper);
 
             if (CollectionUtils.isNotEmpty(aiForecasts)) {
