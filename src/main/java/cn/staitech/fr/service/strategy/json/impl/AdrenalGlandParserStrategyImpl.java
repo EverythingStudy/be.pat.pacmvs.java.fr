@@ -94,7 +94,7 @@ public class AdrenalGlandParserStrategyImpl extends AbstractCustomParserStrategy
         BigDecimal b2 = commonJsonParser.getProportion(organArea2, F);
         indicatorResultsMap.put("髓质面积占比", createNameIndicator("Medulla area%", String.valueOf(b2), PERCENTAGE, "10103E,101111"));
         BigDecimal b3 = getProportion(organArea, organArea2);
-        indicatorResultsMap.put("皮髓比", createNameIndicator("Cortex:Medulla ratio", String.valueOf(b3), PERCENTAGE, "10103D,10103E"));
+        indicatorResultsMap.put("皮髓比", createNameIndicator("Cortex:Medulla ratio", String.valueOf(b3), "无", "10103D,10103E"));
         //4=C/A 个/mm2
         //BigDecimal b4 = bigDecimalDivideCheck(new BigDecimal(C), organArea);
         //indicatorResultsMap.put("皮质细胞核密度", createNameIndicator("Nucleus density of adrenal cortex", String.valueOf(b4), SQ_MM_PIECE, "10103D,101068"));
