@@ -90,7 +90,7 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
         }else{
         	//TODO 算法不支持，暂时先注释，待支持后再次放开
 //            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", organArea.divide(bigDecimal,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("10E035","10E111")));
-            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", organArea1.divide(bigDecimal,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("10E133","10E111")));
+            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", organArea1.divide(bigDecimal,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), PERCENTAGE,areaUtils.getStructureIds("10E133","10E111")));
 
         }
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);

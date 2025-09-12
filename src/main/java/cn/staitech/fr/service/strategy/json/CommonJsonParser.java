@@ -45,11 +45,8 @@ public class CommonJsonParser {
     private AnnotationMapper annotationMapper;
     @Resource
     private ImageMapper imageMapper;
-
     @Resource
     private AnnotationService annotationService;
-    @Resource
-    private OrganMapper organMapper;
     @Resource
     private OrganTagMapper organTagMapper;
 
