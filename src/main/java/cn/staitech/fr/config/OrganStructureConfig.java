@@ -19,6 +19,7 @@ public class OrganStructureConfig {
      * value: 对应结构列表
      */
     private Map<String, List<OrganStructure>> structures;
+    private Map<String, List<OrganStructure>> outline;
 
     public Map<String, List<OrganStructure>> getStructures() {
         return structures;
@@ -26,6 +27,14 @@ public class OrganStructureConfig {
 
     public void setStructures(Map<String, List<OrganStructure>> structures) {
         this.structures = structures;
+    }
+
+    public Map<String, List<OrganStructure>> getOutline() {
+        return outline;
+    }
+
+    public void setOutline(Map<String, List<OrganStructure>> outline) {
+        this.outline = outline;
     }
 
     @Data
@@ -37,7 +46,7 @@ public class OrganStructureConfig {
 
     @PostConstruct
     public void init() {
-        log.info("OrganStructureConfig initialized with organs: {}", structures);
+        log.info("OrganStructureConfig initialized with organs: {}", outline);
         if (structures != null) {
             List<OrganStructureConfig.OrganStructure> structuress = structures.get("08");
             List<OrganStructureConfig.OrganStructure> structuress1 = structures.get("12");
@@ -47,8 +56,7 @@ public class OrganStructureConfig {
 
             // 获取该脏器所有启用的结构
             List<String> enabledStructures = Arrays.asList(structuress.get(0).getStructureId().split(","));
-            structures.forEach((organ, structures) ->
-                    log.info("Organ: {}, Structures count: {}", organ, structures != null ? structures.size() : 0));
+            structures.forEach((organ, structures) -> log.info("Organ: {}, Structures count: {}", organ, structures != null ? structures.size() : 0));
         }
     }
 }

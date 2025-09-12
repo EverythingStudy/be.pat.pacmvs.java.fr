@@ -123,7 +123,6 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
 //    protected IndicatorAddIn createDefaultIndicator() {
 //        return new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1);
 //    }
-
     protected IndicatorAddIn createDefaultIndicator(String structureId) {
         return createIndicator(CommonConstant.SINGLE_RESULT, "", structureId);
     }
@@ -193,6 +192,7 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
         String result = MathUtils.getConfidenceInterval(dataList);
         return new IndicatorAddIn(enName, result, unit, type, structureIds);
     }
+
     /**
      * 占比计算（保留三位小数）
      *
@@ -202,6 +202,7 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
     protected BigDecimal getProportion(BigDecimal numerator, BigDecimal denominator) {
         return commonJsonParser.getProportion(numerator, denominator);
     }
+
     protected BigDecimal bigDecimalDivideCheck(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
         return commonJsonParser.bigDecimalDivideCheck(bigDecimal1, bigDecimal2);
     }

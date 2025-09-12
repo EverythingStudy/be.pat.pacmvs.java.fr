@@ -4,13 +4,12 @@ import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
-import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
-import cn.staitech.fr.service.strategy.json.CommonJsonParser;
-import cn.staitech.fr.service.strategy.json.ParserStrategy;
+import cn.staitech.fr.service.strategy.json.*;
 import cn.staitech.fr.utils.AreaUtils;
 import cn.staitech.fr.utils.DecimalUtils;
 import cn.staitech.fr.utils.MathUtils;
@@ -37,7 +36,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component("Harderian_gland")
-public class HarderianGlandParserStrategyImpl implements ParserStrategy {
+public class HarderianGlandParserStrategyImpl extends AbstractCustomParserStrategy implements OutlineCustom {
 
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
@@ -190,5 +189,19 @@ public class HarderianGlandParserStrategyImpl implements ParserStrategy {
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
         log.info("指标计算结束-哈氏腺");
+    }
+
+    @Override
+    public void getCustomOutLine(JsonTask jsonTask) {
+        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+        BigDecimal pituitaryH = new BigDecimal(singleSlide.getArea());
+        indicatorResultsMap.put("哈氏腺面积", createNameIndicator("Acinus area", String.valueOf(pituitaryH.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "102111"));
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+    }
+
+    @Override
+    public String getAlgorithmCode() {
+        return "Harderian_gland";
     }
 }

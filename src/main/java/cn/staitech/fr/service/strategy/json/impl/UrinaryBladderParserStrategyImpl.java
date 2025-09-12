@@ -22,7 +22,7 @@ import java.util.Map;
  */
 @Slf4j
 @Service("Urinary_bladder")
-public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrategy {
+public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrategy  {
     @Resource
     private AiForecastService aiForecastService;
     @Resource

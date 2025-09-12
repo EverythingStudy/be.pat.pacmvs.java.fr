@@ -1,9 +1,7 @@
 package cn.staitech.fr.controller;
 
-import cn.staitech.fr.domain.in.AiDownloadIn;
 import cn.staitech.fr.service.MatrixReviewService;
 import cn.staitech.fr.vo.project.SlideDownLoadReq;
-import cn.staitech.fr.vo.project.slide.SlidePageReq;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;

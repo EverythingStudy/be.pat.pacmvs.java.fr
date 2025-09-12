@@ -1,12 +1,16 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.common.core.utils.StringUtils;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.service.strategy.json.OutlineCustom;
 import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -27,7 +31,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component("Parathyroid")
-public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy {
+public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy{
     @Resource
     private AnnotationMapper annotationMapper;
     @Resource
@@ -38,7 +42,8 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy 
     private AreaUtils areaUtils;
     @Resource
     private CommonJsonCheck commonJsonCheck;
-
+    @Resource
+    private SingleSlideMapper singleSlideMapper;
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -66,12 +71,11 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy 
         Integer mucosaCountA = commonJsonParser.getOrganAreaCount(jsonTask, "108091");
         mucosaCountA = commonJsonParser.getIntegerValue(mucosaCountA);
         //组织轮廓面积==>甲状旁腺面积 B 10³平方微米
-//		BigDecimal areaDecimalB = BigDecimal.ZERO;
-//		if (StringUtils.isNotEmpty(slideArea)) {
-//			String area = areaUtils.convertToSquareMicrometer(slideArea);
-//			areaDecimalB  = new BigDecimal(area);
-//		}
-        BigDecimal areaDecimalB = getOrganAreaMicron(jsonTask, "108111");
+		BigDecimal areaDecimalB = BigDecimal.ZERO;
+		if (StringUtils.isNotEmpty(slideArea)) {
+			String area = areaUtils.convertToSquareMicrometer(slideArea);
+			areaDecimalB  = new BigDecimal(area);
+		}
         areaDecimalB = areaDecimalB.setScale(3, RoundingMode.HALF_UP);
         areaDecimalB = commonJsonParser.getBigDecimalValue(areaDecimalB);
 

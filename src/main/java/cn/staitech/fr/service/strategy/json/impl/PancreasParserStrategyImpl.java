@@ -10,6 +10,7 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.service.strategy.json.OutlineCustom;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,7 @@ import java.util.Map;
  */
 @Slf4j
 @Service("Pancreas")
-public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
+public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy implements OutlineCustom {
     @Resource
     private SingleSlideMapper singleSlideMapper;
     @Resource
@@ -124,6 +125,8 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal organAreaO = getOrganArea(jsonTask, "105111").getStructureAreaNum();
         //P 胰岛细胞核数量（全片）105077、105078
         Integer countP = getOrganAreaCount(jsonTask, "105078");
+        //Q 红细胞面积 105004
+        BigDecimal organAreaQ = getOrganArea(jsonTask, "105004").getStructureAreaNum();
         //算法输出指标
 //        indicatorResultsMap.put("上皮细胞核数量", createIndicator(String.valueOf(countA), PIECE, "105075"));
 //        indicatorResultsMap.put("酶原颗粒面积", createIndicator(organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "105076"));
@@ -184,6 +187,7 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
         // indicatorResultsMap.put("腺泡面积占比", createNameIndicator("Pancreatic acinus area%", getProportion(O.subtract(organArea1).subtract(organArea2), O).toString(), PERCENTAGE, "105077,105027,105111"));
         //indicatorResultsMap.put("胰岛细胞核密度（全片）", createNameIndicator("Nucleus density of pancreatic islet（all）", bigDecimalDivideCheck(new BigDecimal(countP), organArea1).toString(), SQ_MM_PIECE, "105077,105078"));
         indicatorResultsMap.put("胰腺面积", createNameIndicator("Pancreas area", organAreaO, SQ_MM, "105111"));
+        indicatorResultsMap.put("红细胞面积", createNameIndicator("Erythrocyte area", organAreaQ, SQ_MM, "105004"));
         Annotation annotationBy = new Annotation();
         annotationBy.setCountName("胰岛细胞核数量（单个）");
         commonJsonParser.putAnnotationDynamicData(jsonTask, "105077", "105078", annotationBy);
@@ -203,5 +207,14 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy {
     @Override
     public String getAlgorithmCode() {
         return "Pancreas";
+    }
+
+    @Override
+    public void getCustomOutLine(JsonTask jsonTask) {
+        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+        BigDecimal pituitaryH = new BigDecimal(singleSlide.getArea());
+        indicatorResultsMap.put("胰腺面积", createNameIndicator("Pancreas area", String.valueOf(pituitaryH.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "105111"));
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 }
