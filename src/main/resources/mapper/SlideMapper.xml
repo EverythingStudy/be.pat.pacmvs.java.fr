@@ -398,7 +398,18 @@
         a.viewStatus AS viewStatus,
         b.ai_status AS aiStatus,
         b.description AS description,
-        b.create_time AS createTime
+        b.create_time AS createTime,
+
+        d.user_name AS createUser,
+        c.image_path AS imagePath,
+        c.format AS format,
+        c.width AS width,
+        c.height AS height,
+        c.resolution_x AS resolutionX,
+        c.resolution_y AS resolutionY,
+        c.source_lens AS sourceLens,
+        c.image_id AS imageId
+
         FROM
         (SELECT a.slide_id, ${params.currentUserId} AS viewStatus
         FROM
@@ -470,6 +481,8 @@
         GROUP BY a.slide_id) a
         JOIN fr_slide b ON a.slide_id = b.slide_id
         LEFT JOIN tb_image c ON b.image_id = c.image_id
+        LEFT JOIN sys_user d on b.create_by = d.user_id
+
         ORDER BY
         c.animal_code ASC,
         c.wax_code_order ASC,
