@@ -182,7 +182,7 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
         //        腺上皮面积（全片）	2	平方毫米	Acinar epithelial area (all)	2=B
         // 腺上皮面积（全片）B 平方毫米 若多个数据则相加输出
         map.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", DecimalUtils.setScale3(colonArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_0,"12B074"));
-        map.put("腺上皮面积（全片）", new IndicatorAddIn(DecimalUtils.setScale3(colonArea), CommonConstant.NUMBER_1,"12B074"));
+        //map.put("腺上皮面积（全片）", new IndicatorAddIn(DecimalUtils.setScale3(colonArea), CommonConstant.NUMBER_1,"12B074"));
 
         // 腺上皮面积占比（单个）	3	%	Acinar epithelial area% (per)	3=A/(A+C) 以95%置信区间和均数±标准差呈现
 //        map.put("腺上皮面积占比（单个）", new IndicatorAddIn("Acinar epithelial area% (per)", confidenceInterval, "%",areaUtils.getStructureIds("12B074","12B0E9")));
