@@ -11,6 +11,7 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.service.strategy.json.OutlineCustom;
 import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +35,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component("Esophagus")
-public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy {
+public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy implements OutlineCustom {
 
     @Resource
     public SpecialAnnotationRelMapper specialAnnotationRelMapper;
@@ -117,5 +118,16 @@ public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy {
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
         //aiForecastService.addOutIndicators(jsonTask.getSingleId(), indicatorResultsMap);
 
+    }
+
+    @Override
+    public void getCustomOutLine(JsonTask jsonTask) {
+        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+        BigDecimal bigDecimal = new BigDecimal(singleSlide.getArea());
+        //A食管腔面积
+        BigDecimal area = areaUtils.getOrganArea(jsonTask, "10F120");
+        indicatorResultsMap.put("食管面积", createNameIndicator("Tissue contour area", bigDecimal.subtract(area).setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, areaUtils.getStructureIds("10F111","10F120")));
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 }

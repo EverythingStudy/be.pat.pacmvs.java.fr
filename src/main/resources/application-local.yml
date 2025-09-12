@@ -175,6 +175,20 @@ organ-structures:
       - structure-id: 1240CA
     7D: #  小脑与脑干
       - structure-id: 17D003,17D004,17D0A5
+  outline: # 脏器结构轮廓
+    "02": #哈德氏腺
+      - structure-id: 102111
+    "0F": # 食管
+      - structure-id: 10F111
+    3F: # 视神经
+      - structure-id: 13F0BA
+    40: # 神经，坐骨
+      - structure-id: 1400BA
+    5D: # 主动脉
+      - structure-id: 15D111
+    5E: # 心脏
+      - structure-id: 15E111
+
 
 #queues:
 #  algoMsg: test

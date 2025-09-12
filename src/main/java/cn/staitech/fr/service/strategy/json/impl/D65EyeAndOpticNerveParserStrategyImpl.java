@@ -2,11 +2,14 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
+import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.service.strategy.json.OutlineCustom;
 import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,7 +33,7 @@ import java.util.Map;
  */
 @Slf4j
 @Service("EyeOpticNerve")
-public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserStrategy {
+public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserStrategy implements OutlineCustom {
 
     @Resource
     private AiForecastService aiForecastService;
@@ -40,6 +43,8 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
     private CommonJsonCheck commonJsonCheck;
     @Autowired
     private AreaUtils areaUtils;
+    @Resource
+    private SingleSlideMapper singleSlideMapper;
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -133,5 +138,14 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
     @Override
     public String getAlgorithmCode() {
         return "EyeOpticNerve";
+    }
+
+    @Override
+    public void getCustomOutLine(JsonTask jsonTask) {
+        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+        BigDecimal pituitaryH = new BigDecimal(singleSlide.getArea());
+        indicatorResultsMap.put("胰腺面积", createNameIndicator("Pancreas area", String.valueOf(pituitaryH.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "105111"));
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 }

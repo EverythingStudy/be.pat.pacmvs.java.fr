@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -8,6 +9,7 @@ import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.service.strategy.json.OutlineCustom;
 import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +32,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component("Aorta")
-public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
+public class AortaParserStrategyImpl extends AbstractCustomParserStrategy implements OutlineCustom {
 
 	@Resource
 	private SingleSlideMapper singleSlideMapper;
@@ -135,5 +137,14 @@ public class AortaParserStrategyImpl extends AbstractCustomParserStrategy {
 	@Override
 	public String getAlgorithmCode() {
 		return "Aorta";
+	}
+
+	@Override
+	public void getCustomOutLine(JsonTask jsonTask) {
+		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+		SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+		BigDecimal pituitaryH = new BigDecimal(singleSlide.getArea());
+		indicatorResultsMap.put("组织轮廓面积", createNameIndicator("Thyroid gland area", String.valueOf(pituitaryH.setScale(3, RoundingMode.HALF_UP)), SQ_UM_THOUSAND,"15D111"));
+		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 	}
 }

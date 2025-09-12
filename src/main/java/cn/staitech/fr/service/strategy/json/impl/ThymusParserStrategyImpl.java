@@ -1,13 +1,16 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.service.strategy.json.OutlineCustom;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +29,7 @@ import java.util.Map;
  */
 @Slf4j
 @Service("Thymus")
-public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
+public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy implements OutlineCustom {
     @Resource
     private SingleSlideMapper singleSlideMapper;
     @Resource
@@ -72,18 +75,20 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        //SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         BigDecimal organArea = getOrganArea(jsonTask, "14403D").getStructureAreaNum();
         BigDecimal organArea1 = getOrganArea(jsonTask, "14403F").getStructureAreaNum();
         BigDecimal organArea2 = getOrganArea(jsonTask, "14403E").getStructureAreaNum();
         //F
         BigDecimal organArea3 = getOrganArea(jsonTask, "145004").getStructureAreaNum();
-        BigDecimal outLine = getOrganArea(jsonTask, "144111").getStructureAreaNum();
+        BigDecimal outLine = new BigDecimal(singleSlide.getArea());
         //A
         //indicatorResultsMap.put("皮质外轮廓面积", createIndicator(organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "14403D"));
         //B
         //indicatorResultsMap.put("髓质外轮廓面积", createIndicator(organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "14403E"));
+        //C
+        indicatorResultsMap.put("结缔组织面积", createIndicator(organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "14403F"));
         //D
         Annotation annotation = commonJsonParser.getInsideOrOutside(jsonTask, "14403E", "14403F", true);
         BigDecimal organArea4 = annotation.getStructureAreaNum();
@@ -93,7 +98,7 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal organArea5 = annotation1.getStructureAreaNum();
         //indicatorResultsMap.put("髓质外结缔组织面积", createIndicator(organArea5.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "14403E,14403F"));
         //F
-        //indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1));
+        indicatorResultsMap.put("红细胞面积", createIndicator(organArea3.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "145004"));
         //G
         //indicatorResultsMap.put("组织轮廓", createIndicator(outLine, "平方毫米", "144111"));
 
@@ -111,10 +116,10 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
         //6=F/A
         BigDecimal F = outLine;
         BigDecimal b6 = getProportion(F, organArea);
-        //indicatorResultsMap.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", String.valueOf(b6), "%", CommonConstant.NUMBER_0));
+        indicatorResultsMap.put("红细胞面积占比", createNameIndicator("Erythrocyte area%", String.valueOf(b6), PERCENTAGE, "145004,14403D"));
         //7=C/A
         BigDecimal b7 = getProportion(organArea1, organArea);
-        //indicatorResultsMap.put("结缔组织面积占比", createNameIndicator("Connective tissue area%", String.valueOf(b7), PERCENTAGE, "14403D,14403F"));
+        indicatorResultsMap.put("结缔组织面积占比", createNameIndicator("Connective tissue area%", String.valueOf(b7), PERCENTAGE, "14403D,14403F"));
         //8=G
         indicatorResultsMap.put("胸腺面积", createNameIndicator("Thymus area", outLine.setScale(3, RoundingMode.DOWN).toString(), SQ_MM, "144111"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
@@ -123,5 +128,14 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy {
     @Override
     public String getAlgorithmCode() {
         return "Thymus";
+    }
+
+    @Override
+    public void getCustomOutLine(JsonTask jsonTask) {
+        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
+        BigDecimal pituitaryH = new BigDecimal(singleSlide.getArea());
+        indicatorResultsMap.put("胸腺面积", createNameIndicator("Thymus area", String.valueOf(pituitaryH.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "144111"));
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 }

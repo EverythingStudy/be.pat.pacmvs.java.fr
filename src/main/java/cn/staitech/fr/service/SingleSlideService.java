@@ -10,7 +10,5 @@ import java.util.List;
 
 public interface SingleSlideService extends IService<SingleSlide> {
 
-    List<OrganDisassemblyOut> getSingleList(OrganDisassemblyQueryIn req);
-
-    SingleSlideSelectBy singleSlideBy(Long singleId);
+    Boolean forecastResults(Long singleSlideId, Long imageId);
 }

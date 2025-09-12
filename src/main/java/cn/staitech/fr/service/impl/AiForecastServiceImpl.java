@@ -3,6 +3,7 @@ package cn.staitech.fr.service.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
+import cn.staitech.fr.config.OrganStructureConfig;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -12,8 +13,10 @@ import cn.staitech.fr.enums.JsonTaskStatusEnum;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.JsonTaskService;
-import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
+import cn.staitech.fr.service.strategy.json.*;
 import cn.staitech.fr.utils.MathUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.nacos.shaded.com.google.gson.JsonObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -26,10 +29,15 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -41,7 +49,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForecast> implements AiForecastService {
 
-
+    Executor executor = new ThreadPoolExecutor(2, 20, 1000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(1000), new ThreadPoolExecutor.DiscardOldestPolicy());
     @Resource
     private AnnotationMapper annotationMapper;
 
@@ -68,6 +76,9 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
     private JsonTaskParserService jsonTaskParserService;
     @Autowired
     private JsonFileMapper jsonFileMapper;
+    @Resource
+    private OrganStructureConfig organStructureConfig;
+
 
     @Override
     public Boolean forecastResults(Long singleSlideId, Long imageId) {
@@ -127,10 +138,17 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
                     Date startTime = new Date();
                     log.info("jsonTask id:{} singleSlide id:{} checkJson 精细轮廓进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.formatDateTime(startTime));
                     List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
-                    jsonTaskParserService.structureFileCalculate(jsonTask, fileList);
+                    executor.execute(() -> {
+                        jsonTaskParserService.structureFileCalculate(jsonTask, fileList);
+                    });
                     log.info("jsonTask id:{} singleSlide id:{} checkJson 精细轮廓进入指标结束 endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime, new Date(), DateUnit.SECOND));
                 }
-                return true;
+                Map<String, List<OrganStructureConfig.OrganStructure>> outline = organStructureConfig.getOutline();
+                List<OrganStructureConfig.OrganStructure> organStructureList = outline.get(category.getOrganTagCode());
+                if (!CollectionUtils.isEmpty(organStructureList)) {
+                    //OutlineCustom parser = map.get(jsonTask.getAlgorithmCode());
+
+                } return true;
             } else {
                 return false;
             }
@@ -338,8 +356,6 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
         return null;
 
     }
-
-
 }
 
 

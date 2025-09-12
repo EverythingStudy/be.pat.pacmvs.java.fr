@@ -1,8 +1,6 @@
 package cn.staitech.fr.service;
 
-import cn.staitech.fr.domain.in.AiDownloadIn;
 import cn.staitech.fr.vo.project.SlideDownLoadReq;
-import cn.staitech.fr.vo.project.slide.SlidePageReq;
 
 /**
  * @Author wudi
