@@ -116,7 +116,7 @@ public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, Singl
                 if (!Objects.isNull(jsonTask) && JsonTaskStatusEnum.PARSE_NOT_START.getCode().equals(jsonTask.getStatus())) {
                     Date startTime = new Date();
                     log.info("jsonTask id:{} singleSlide id:{} checkJson 精细轮廓进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.formatDateTime(startTime));
-                    List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
+                    List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()).eq(JsonFile::getAiStatus, 0).isNotNull(JsonFile::getFileUrl));
                     executor.execute(() -> {
                         jsonTaskParserService.structureFileCalculate(jsonTask, fileList);
                     });
