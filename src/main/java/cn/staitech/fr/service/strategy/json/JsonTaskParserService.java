@@ -187,7 +187,7 @@ public class JsonTaskParserService {
                 parseSingleJsonFile(jsonTask, jsonObject);
                 Boolean flag1 = verifyCategoryStructure(jsonTask);
                 if (flag1) {
-                    List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
+                    List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()).isNotNull(JsonFile::getFileUrl));
                     List<JsonFile> list = fileList.stream().filter(e -> e.getAiStatus() == 0).collect(Collectors.toList());
                     if (CollectionUtils.isEmpty(list)) {
                         //结构识别全部失败-->以脏器为单位 (指标计算)结构分析失败-->forecastStatus结构化状态：2
@@ -243,7 +243,7 @@ public class JsonTaskParserService {
     private Boolean verifyCategoryStructure(JsonTask jsonTask) {
         OrganTag category = organTagMapper.selectById(jsonTask.getCategoryId());
         //AI识别每个脏器对应的结构
-       //AI识别每个脏器对应的结构JSON文件
+        //AI识别每个脏器对应的结构JSON文件
         List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
         if (CollectionUtils.isNotEmpty(fileList)) {
             //Set<String> structureIdSet1 = fileList.stream().map(e -> e.getStructureId()).collect(Collectors.toSet());
