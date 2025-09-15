@@ -195,7 +195,7 @@ public class JsonTaskParserService {
                     } else {
                         //验证精细轮廓是否存在
                         SingleSlide singleSlide = singleSlideService.getById(singleSlideId);
-                        if (singleSlide != null && singleSlide.getAiStatusFine().equals(1)) {
+                        if (singleSlide != null && !singleSlide.getAiStatusFine().equals(1)) {
                             jsonTask.setStatus(JsonTaskStatusEnum.PARSE_NOT_START.getCode());
                             jsonTaskService.updateById(jsonTask);
                             log.info("singleSlide id:{} 待开始结构化任务 {}", singleSlideId, jsonTask);
