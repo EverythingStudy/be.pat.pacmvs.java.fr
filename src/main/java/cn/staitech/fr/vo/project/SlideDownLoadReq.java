@@ -67,9 +67,7 @@ public class SlideDownLoadReq {
     private DateRangeReq createTimeParams;
 
     @ApiModelProperty(value = "选片id集合")
-    @NotNull(message = "选片编号不能为空")
     private List<Long> slideIds;
     @ApiModelProperty(value = "切片id集合")
-    @NotNull(message = "切片编号不能为空")
     private List<Long> singleSlideIds;
 }
