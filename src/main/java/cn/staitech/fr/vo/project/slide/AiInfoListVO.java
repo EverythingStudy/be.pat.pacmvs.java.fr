@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -35,7 +36,7 @@ public class AiInfoListVO {
     private String structureIds;
 
     @ApiModelProperty(name = "structureTagIds", value = "结构ID列表")
-    private List<Long> structureTagIds;
+    private List<Long> structureTagIds = new ArrayList<>();
 
     /**
      * 是否红色底纹高亮整行
