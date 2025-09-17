@@ -1360,8 +1360,10 @@ public class AnnotationServiceImpl extends ServiceImpl<AnnotationMapper, Annotat
             annotation1.setSequenceNumber(annotation.getSequenceNumber());
             annotation1.setList(batch);
             try {
+                log.info("开始批量保存");
                 annotationMapper.batchSave(annotation1);
             } catch (Exception e) {
+                log.info("开始批量保存异常");
                 // 处理异常，例如记录日志
                 List<Annotation> annotationList = new ArrayList<>();
                 for(Annotation annotationBy:batch){

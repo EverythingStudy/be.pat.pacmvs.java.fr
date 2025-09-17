@@ -218,7 +218,7 @@ public class CommonJsonParser {
                                     return null;
                                 }).filter(Objects::nonNull).collect(Collectors.toList());
                                 anno.setList(processedAnnotations);
-                                annotationService.batchProcessAndSave(anno, 1000);
+                                annotationService.batchProcessAndSave(anno, 1);
                                 elementsList = new ArrayList<>();
                             }
                         }
@@ -229,7 +229,7 @@ public class CommonJsonParser {
                 }
             }
 
-            log.info("parseJson --------------> Json文件解析 while loop end:{} {} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
+            log.info("parseJson --------------> Json文件解析 while loop end:{} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
 
             if (CollectionUtil.isNotEmpty(elementsList)) {
                 processedAnnotations = elementsList.parallelStream().map(element -> {
@@ -316,7 +316,7 @@ public class CommonJsonParser {
             		}
             	}
             }
-            log.info("parseJson --------------> Json文件解析结束:{} {} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
+            log.info("parseJson --------------> Json文件解析结束:{} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
