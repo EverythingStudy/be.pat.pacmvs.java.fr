@@ -283,7 +283,9 @@ public class CommonJsonParser {
             			annotation3.setSequenceNumber(sequenceNumber);
             			annotation3.setSingleSlideId(jsonTask.getSingleId());
             			annotation3.setInsideOrOutside(false);
-            			annotationMapper.deleteAiAnnotation(annotation3);
+                        log.info("删除开始");
+            			//annotationMapper.deleteAiAnnotation(annotation3);
+                        log.info("删除结束");
             		}else {
             			log.error("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],不合规", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId());
                     }
