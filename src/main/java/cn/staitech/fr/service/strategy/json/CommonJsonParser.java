@@ -283,7 +283,7 @@ public class CommonJsonParser {
                         annotation3.setSequenceNumber(sequenceNumber);
                         annotation3.setSingleSlideId(jsonTask.getSingleId());
                         annotation3.setInsideOrOutside(false);
-                        annotationMapper.deleteAiAnnotation(annotation3);
+                        //annotationMapper.deleteAiAnnotation(annotation3);
                     } else {
                         log.error("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],不合规", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId());
                     }
@@ -311,7 +311,7 @@ public class CommonJsonParser {
                             annotation4.setSequenceNumber(sequenceNumber);
                             annotation4.setSingleSlideId(jsonTask.getSingleId());
                             annotation4.setInsideOrOutside(true);
-                            annotationMapper.deleteAiAnnotation(annotation4);
+                            //annotationMapper.deleteAiAnnotation(annotation4);
                         }
                     }
                 }
