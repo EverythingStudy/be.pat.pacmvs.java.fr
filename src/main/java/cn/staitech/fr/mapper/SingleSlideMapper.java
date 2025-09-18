@@ -27,6 +27,7 @@ public interface SingleSlideMapper extends BaseMapper<SingleSlide> {
                                            @Param("categoryId") Long categoryId,
                                            @Param("specialId") Long specialId,
                                            @Param("groupCode") String groupCode,
+
                                            @Param("structType") String structType);
 
     String getGender(Long id);

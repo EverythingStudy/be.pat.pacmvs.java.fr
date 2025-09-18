@@ -229,7 +229,7 @@ public class CommonJsonParser {
                 }
             }
 
-            log.info("parseJson --------------> Json文件解析 while loop end:{} {} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
+            log.info("parseJson --------------> Json文件解析 while loop end:{} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
 
             if (CollectionUtil.isNotEmpty(elementsList)) {
                 processedAnnotations = elementsList.parallelStream().map(element -> {
@@ -265,7 +265,7 @@ public class CommonJsonParser {
 //                    annotationMapper.deleteAiAnnotation(annotation3);
 //                }
 //            }
-            
+
             Annotation annotation = new Annotation();
             annotation.setMagnification(40000L);
             annotation.setFiligreeContour(true);
@@ -273,50 +273,50 @@ public class CommonJsonParser {
             Annotation annotationIsValid = annotationMapper.collectGeometryStIsValid(jsonTask.getSingleId());
 
             // 校验合并后是否合规
-            if(null != annotationIsValid) {
-            	if(StringUtils.isNotEmpty(annotationIsValid.getResults())) {
-            		if (ObjectUtil.equals(annotationIsValid.getResults(), "t")) {
-            			// 合并轮廓
-            			Annotation annotation3 = annotationMapper.collectGeometry(jsonTask.getSingleId());
-            			annotation3.setContour(annotation3.getCollectContour());
-            			// 查询有效精细轮廓列表
-            			annotation3.setSequenceNumber(sequenceNumber);
-            			annotation3.setSingleSlideId(jsonTask.getSingleId());
-            			annotation3.setInsideOrOutside(false);
-            			annotationMapper.deleteAiAnnotation(annotation3);
-            		}else {
-            			log.error("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],不合规", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId());
+            if (null != annotationIsValid) {
+                if (StringUtils.isNotEmpty(annotationIsValid.getResults())) {
+                    if (ObjectUtil.equals(annotationIsValid.getResults(), "t")) {
+                        // 合并轮廓
+                        Annotation annotation3 = annotationMapper.collectGeometry(jsonTask.getSingleId());
+                        annotation3.setContour(annotation3.getCollectContour());
+                        // 查询有效精细轮廓列表
+                        annotation3.setSequenceNumber(sequenceNumber);
+                        annotation3.setSingleSlideId(jsonTask.getSingleId());
+                        annotation3.setInsideOrOutside(false);
+                        annotationMapper.deleteAiAnnotation(annotation3);
+                    } else {
+                        log.error("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],不合规", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId());
                     }
-            	}
-            }else {
-            	log.error("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],无法查询到精细轮廓", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId());
+                }
+            } else {
+                log.error("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],无法查询到精细轮廓", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId());
             }
             // 删除甲状旁腺内所有数据
             // 查询甲状旁腺精细轮廓进行合并
             if (Objects.equals(jsonTask.getAlgorithmCode(), "Thyroid_gland")) {
-            	Annotation annotation1 = new Annotation();
-            	annotation1.setMagnification(40000L);
-            	annotation1.setFiligreeContour(true);
-            	annotation1.setSingleSlideId(jsonTask.getSingleId());
-            	LambdaQueryWrapper<OrganTag> categoryLambdaQueryWrapper = new LambdaQueryWrapper<>();
-            	categoryLambdaQueryWrapper.eq(OrganTag::getOrganEn, "Parathyroid").eq(OrganTag::getSpeciesId, 1);
-            	OrganTag organTag = organTagMapper.selectOne(categoryLambdaQueryWrapper);
-            	annotation1.setCategoryId(organTag.getOrganTagId());
-            	Annotation annotation4 = annotationMapper.stUnionContourArea(annotation1);
-            	annotation4.setContour(annotation4.getCollectContour());
-            	Annotation annotation2 = annotationMapper.stIsValid(annotation4);
-            	if(null != annotation2) {
-            		if(StringUtils.isNotEmpty(annotation2.getResults())) {
-            			if (ObjectUtil.equals(annotation2.getResults(), "t")) {
-            				annotation4.setSequenceNumber(sequenceNumber);
-            				annotation4.setSingleSlideId(jsonTask.getSingleId());
-            				annotation4.setInsideOrOutside(true);
-            				annotationMapper.deleteAiAnnotation(annotation4);
-            			}
-            		}
-            	}
+                Annotation annotation1 = new Annotation();
+                annotation1.setMagnification(40000L);
+                annotation1.setFiligreeContour(true);
+                annotation1.setSingleSlideId(jsonTask.getSingleId());
+                LambdaQueryWrapper<OrganTag> categoryLambdaQueryWrapper = new LambdaQueryWrapper<>();
+                categoryLambdaQueryWrapper.eq(OrganTag::getOrganEn, "Parathyroid").eq(OrganTag::getSpeciesId, 1);
+                OrganTag organTag = organTagMapper.selectOne(categoryLambdaQueryWrapper);
+                annotation1.setCategoryId(organTag.getOrganTagId());
+                Annotation annotation4 = annotationMapper.stUnionContourArea(annotation1);
+                annotation4.setContour(annotation4.getCollectContour());
+                Annotation annotation2 = annotationMapper.stIsValid(annotation4);
+                if (null != annotation2) {
+                    if (StringUtils.isNotEmpty(annotation2.getResults())) {
+                        if (ObjectUtil.equals(annotation2.getResults(), "t")) {
+                            annotation4.setSequenceNumber(sequenceNumber);
+                            annotation4.setSingleSlideId(jsonTask.getSingleId());
+                            annotation4.setInsideOrOutside(true);
+                            annotationMapper.deleteAiAnnotation(annotation4);
+                        }
+                    }
+                }
             }
-            log.info("parseJson --------------> Json文件解析结束:{} {} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
+            log.info("parseJson --------------> Json文件解析结束:{} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }

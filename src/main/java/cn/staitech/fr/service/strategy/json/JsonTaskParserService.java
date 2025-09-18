@@ -25,6 +25,10 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -326,13 +330,18 @@ public class JsonTaskParserService {
 //            }
             long starts = System.nanoTime();
             for (JsonFile jsonFile : jsonFileList) {
+            	long start = System.nanoTime();
                 log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析开始:{} {} {}", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName());
                 jsonFile.setStartTime(new Date());
                 jsonFile.setStatus(StructureJsonStatusEnum.PARSE_ING.getCode());
                 jsonFileService.updateById(jsonFile);
                 // 解析json文件
                 parser.parseJson(jsonTask, jsonFile);
-                log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析结束:{} {} {}", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName());
+                // 计算耗时（秒）
+                long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+                long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
+                double fileSize = getFileSizeInMB(jsonFile.getFileUrl());
+                log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析结束:{} {} {},文件大小为:[{}M],解析存储pg总共耗时[{}]秒", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName(),fileSize,costSeconds);
                 jsonFile.setStatus(StructureJsonStatusEnum.PARSE_SUCCESS.getCode());
                 jsonFile.setEndTime(new Date());
                 jsonFileService.updateById(jsonFile);
@@ -388,6 +397,40 @@ public class JsonTaskParserService {
             jsonTaskService.updateById(jsonTask);
             log.error("jsonTask id:[{}] singleSlide id:[{}] 处理失败:[{}] ,{}", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask);
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * 获取指定文件的大小，单位为 MB（保留两位小数）
+     *
+     * @param filePath 文件路径（JSON 文件或其他）
+     * @return 文件大小（以 MB 为单位），如 5.23 MB；若文件不存在或出错，返回 -1
+     */
+    public static double getFileSizeInMB(String filePath) {
+        if (filePath == null || filePath.trim().isEmpty()) {
+        	log.error("文件路径为空");
+            return -1;
+        }
+
+        Path path = Paths.get(filePath);
+
+        try {
+            if (!Files.exists(path)) {
+            	log.error("文件不存在: " + filePath);
+                return -1;
+            }
+
+            if (Files.isDirectory(path)) {
+            	log.error("路径是一个目录，不是文件: " + filePath);
+                return -1;
+            }
+
+            long sizeInBytes = Files.size(path);
+            return Math.round((sizeInBytes / 1024.0 / 1024.0) * 100.0) / 100.0; // 保留两位小数
+
+        } catch (IOException e) {
+        	log.error("读取文件大小时发生 I/O 错误: " + e.getMessage());
+            return -1;
         }
     }
 
