@@ -9,8 +9,6 @@ import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.system.api.domain.biz.AddSingleSlide;
 import cn.staitech.system.api.domain.biz.DelSingleSlide;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -75,4 +73,11 @@ public interface SlideService extends IService<Slide> {
 
 
     R<CustomPage<SlidePageVo>> pageNew(SlidePageReq req);
+
+    /**
+     * 根据切片ID集合查询切片信息
+     * @param req
+     * @return
+     */
+    List<SlidePageVo> list(SlideListReq req);
 }

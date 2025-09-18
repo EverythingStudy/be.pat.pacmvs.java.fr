@@ -46,6 +46,8 @@ public interface SlideMapper extends BaseMapper<Slide> {
     CustomPage<SlidePageVo> pageNew(CustomPage<SlidePageVo> page, @Param("params") SlidePageReq req);
 
     List<SlidePageVo> exportStructureList(@Param("params") SlideDownLoadReq req);
+
+    List<SlidePageVo> list(@Param("params") SlideListReq req);
 }
 
 
