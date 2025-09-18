@@ -93,6 +93,13 @@ public class SlideController  extends BaseController {
         return slideService.pageNew(req);
     }
 
+    @ApiOperation(value = "根据切片ID集合查询切片信息")
+    @PostMapping("/list")
+    public R<List<SlidePageVo>> list(@Validated @RequestBody SlideListReq req) {
+        List<SlidePageVo> list = this.slideService.list(req);
+        return R.ok(list);
+    }
+
     @ApiOperation(value = "项目阅片-已选切片无权限分页")
     @PostMapping("/pageNoAccessPermission")
     public R<CustomPage<SlidePageVo>> pageNoAccessPermission(@Validated @RequestBody SlidePageReq req) {

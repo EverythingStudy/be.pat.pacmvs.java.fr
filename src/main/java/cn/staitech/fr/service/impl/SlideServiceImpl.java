@@ -889,6 +889,96 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
     }
 
     /**
+     * 根据切片ID集合查询切片信息
+     *
+     * @param req
+     * @return
+     */
+    @Override
+    public List<SlidePageVo> list(SlideListReq req) {
+        List<SlidePageVo> list = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(req.getSlideIds())) {
+            Long userId = SecurityUtils.getUserId();
+            // 显示的脏器
+            List<Long> organTagIds = req.getOrganTagIds();
+            // 查询
+            req.setCurrentUserId("JSON_CONTAINS(b.viewers, '" + userId + "')");
+            list = this.baseMapper.list(req);
+            // 特殊字段处理
+            if (CollectionUtils.isNotEmpty(list)) {
+                for (SlidePageVo slidePageVo : list) {
+                    // 是否指标异常：矩阵阅片模式下专属：默认false
+                    boolean abnormalIndicator = false;
+                    // 脏器识别完成（算法接口成功并且核对一致），才能查询脏器信息（防止查询到脏器识别异常核对时的数据）
+                    if (slidePageVo.getAiStatus() == 3) {
+                        // 查询脏器信息
+                        LambdaQueryWrapper<SingleSlide> singleSlideWrapper = new LambdaQueryWrapper<>();
+                        singleSlideWrapper.eq(SingleSlide::getSlideId, slidePageVo.getSlideId());
+                        List<SingleSlide> singleSlides = this.singleSlideMapper.selectList(singleSlideWrapper);
+                        if (CollectionUtils.isNotEmpty(singleSlides)) {
+                            Map<Long, OrganTag> tagMap = new HashMap<>(16);
+                            List<Long> categoryIds = singleSlides.stream().map(SingleSlide::getCategoryId).collect(Collectors.toList());
+                            LambdaQueryWrapper<OrganTag> tagWrapper = new LambdaQueryWrapper<>();
+                            tagWrapper.in(OrganTag::getOrganTagId, categoryIds);
+                            List<OrganTag> tags = organTagMapper.selectList(tagWrapper);
+                            if (!CollectionUtils.isEmpty(tags)) {
+                                tagMap = tags.stream().collect(Collectors.toMap(OrganTag::getOrganTagId, tag -> tag));
+                            }
+                            // 脏器状态集合：4-结构未分析、5-结构分析中、6-结构分析完成、7-结构分析失败-V2.6.1
+                            Set<Integer> aiStatusSet = new HashSet<>();
+                            List<OrganStatusVo> organStatusVos = new ArrayList<>();
+                            for (SingleSlide singleSlide : singleSlides) {
+                                OrganStatusVo statusVo = new OrganStatusVo();
+                                statusVo.setSingleId(singleSlide.getSingleId());
+                                statusVo.setOrganTagId(singleSlide.getCategoryId());
+                                OrganTag tag = tagMap.get(singleSlide.getCategoryId());
+                                if (tag != null) {
+                                    statusVo.setOrganName(tag.getOrganName());
+                                }
+                                // 处理脏器状态
+                                Integer aiStatus = this.handleOrganStatus(singleSlide);
+                                aiStatusSet.add(aiStatus);
+                                statusVo.setAiStatus(aiStatus);
+                                boolean red = this.getAiInfoListCheck(req.getProjectId(), singleSlide.getSingleId());
+                                statusVo.setAbnormalIndicator(red);
+                                // 结构化状态
+                                statusVo.setForecastStatus(singleSlide.getForecastStatus());
+                                // 只显示搜索的脏器
+                                if (CollectionUtils.isEmpty(organTagIds) || organTagIds.contains(singleSlide.getCategoryId())) {
+                                    organStatusVos.add(statusVo);
+                                }
+                                // 是否指标异常：矩阵阅片模式下专属
+                                if (red) {
+                                    abnormalIndicator = true;
+                                }
+                            }
+                            // 脏器信息状态集合（列表阅片模式下：aiStatus非0、1、2状态使用，目前就是3使用）
+                            slidePageVo.setOrganStatusVos(organStatusVos);
+                            // 矩阵阅片模式下，AI分析状态使用维护：状态一致，直接使用；状态不一致，排除4-结构未分析，其他按照5-结构分析中、6-结构分析完成、7-结构分析失败顺序存在就匹配
+                            if (aiStatusSet.size() == 1) {
+                                slidePageVo.setAiStatus(aiStatusSet.iterator().next());
+                            } else {
+                                // 排除4-结构未分析
+                                aiStatusSet.remove(4);
+                                if (aiStatusSet.contains(5)) {
+                                    slidePageVo.setAiStatus(5);
+                                } else if (aiStatusSet.contains(6)) {
+                                    slidePageVo.setAiStatus(6);
+                                } else {
+                                    slidePageVo.setAiStatus(7);
+                                }
+                            }
+                        }
+                    }
+                    // 是否指标异常：矩阵阅片模式下专属
+                    slidePageVo.setAbnormalIndicator(abnormalIndicator);
+                }
+            }
+        }
+        return list;
+    }
+
+    /**
      * 处理脏器状态：4-结构未分析、5-结构分析中、6-结构分析完成、7-结构分析失败
      *
      * @param singleSlide 单脏器切片

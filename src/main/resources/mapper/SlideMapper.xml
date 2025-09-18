@@ -589,4 +589,38 @@
         c.group_code ASC,
         c.sex_flag ASC
     </select>
+    <select id="list" resultType="cn.staitech.fr.vo.project.slide.SlidePageVo" parameterType="cn.staitech.fr.vo.project.slide.SlideListReq">
+        SELECT
+        b.slide_id AS slideId,
+        c.thumb_url AS thumbUrl,
+        c.image_name AS fileName,
+        c.image_name AS imageName,
+        c.animal_code AS animalCode,
+        c.wax_code AS waxCode,
+        c.group_code AS groupCode,
+        c.sex_flag AS genderFlag,
+        ${params.currentUserId} AS viewStatus,
+        b.ai_status AS aiStatus,
+        b.description AS description,
+        b.create_time AS createTime,
+
+        d.user_name AS createUser,
+        c.image_path AS imagePath,
+        c.format AS format,
+        c.width AS width,
+        c.height AS height,
+        c.resolution_x AS resolutionX,
+        c.resolution_y AS resolutionY,
+        c.source_lens AS sourceLens,
+        c.image_id AS imageId
+        FROM
+        fr_slide b
+        LEFT JOIN tb_image c ON b.image_id = c.image_id
+        LEFT JOIN sys_user d on b.create_by = d.user_id
+        WHERE
+        b.slide_id IN
+        <foreach collection="slideIds" item="item" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
 </mapper>
