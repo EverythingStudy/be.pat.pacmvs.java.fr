@@ -93,7 +93,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         //A mm2 11B03D
        // indicatorResultsMap.put("肾皮质面积", createIndicator(b11B03D.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "11B03D"));
         //B、103平方微米 11B02D
-        indicatorResultsMap.put("肾小球面积（单个）", createDefaultIndicator("11B02D"));
+        //indicatorResultsMap.put("肾小球面积（单个）", createDefaultIndicator("11B02D"));
         //C、个 11B02D、11B02E
         //indicatorResultsMap.put("球内细胞核数量（单个）", createDefaultIndicator("11B02D,11B02E"));
         //D、103平方微米 11B02D、11B02F
@@ -104,9 +104,6 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         //indicatorResultsMap.put("肾小管面积（单个）", createDefaultIndicator("11B031"));
         //G、平方毫米 11B111
         //indicatorResultsMap.put("组织轮廓面积", createIndicator(new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.DOWN).toString(), SQ_MM, "11B111"));
-
-        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
-        indicatorResultsMap.clear();
         //1=G
         indicatorResultsMap.put("肾脏面积", createNameIndicator("", new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.DOWN).toString(), SQ_MM, "11B111"));
         //2=(G-A)/G
@@ -160,6 +157,8 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationBy.setCountName("球内细胞核数量（单个）");
         commonJsonParser.putAnnotationDynamicData(jsonTask, "11B02D", "11B02E", annotationBy);
         annotationBy.setCountName(null);
+
+
         annotationBy.setAreaName("球内红细胞面积（单个）");
         annotationBy.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putAnnotationDynamicData(jsonTask, "11B02D", "11B02F", annotationBy, 1);
