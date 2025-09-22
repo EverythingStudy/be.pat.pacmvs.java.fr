@@ -30,7 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
 /**
@@ -41,7 +41,6 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class JsonTaskParserService {
-
     @Resource
     JsonTaskService jsonTaskService;
     @Resource
@@ -73,6 +72,8 @@ public class JsonTaskParserService {
     private JsonFileMapper jsonFileMapper;
     @Resource
     private OrganStructureConfig organStructureConfig;
+    @Autowired
+    private ExecutorService executorService;
 
     /**
      * 创建计算临时表
@@ -205,18 +206,9 @@ public class JsonTaskParserService {
                             log.info("singleSlide id:{} 待开始结构化任务 {}", singleSlideId, jsonTask);
                             return;
                         }
-                        structureFileCalculate(jsonTask, fileList);
-//                        updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_ING.getCode());
-//                        //进行指标计算
-//                        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
-//                        long start = System.nanoTime();
-//                        JsonTaskAiHandler(jsonTask, fileList);
-//                        // 计算耗时（秒）
-//                        long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
-//                        long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
-//                        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标结束 endTime:{} 耗时:{} 秒", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date(), costSeconds);
-//                        //部分成功-->以脏器为单位 (指标计算)结构分析完成-->forecastStatus结构化状态：1
-//                        updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_SUCCESS.getCode());
+                        executorService.execute(() -> {
+                            structureFileCalculate(jsonTask, fileList);
+                        });
                     }
                 }
             } else {
@@ -227,7 +219,6 @@ public class JsonTaskParserService {
             log.error("Unexpected error occurred: [{}]", e);
             throw new JsonTaskParserException(e.getMessage());
         }
-
     }
 
     public void structureFileCalculate(JsonTask jsonTask, List<JsonFile> fileList) {
@@ -330,7 +321,7 @@ public class JsonTaskParserService {
 //            }
             long starts = System.nanoTime();
             for (JsonFile jsonFile : jsonFileList) {
-            	long start = System.nanoTime();
+                long start = System.nanoTime();
                 log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析开始:{} {} {}", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName());
                 jsonFile.setStartTime(new Date());
                 jsonFile.setStatus(StructureJsonStatusEnum.PARSE_ING.getCode());
@@ -341,7 +332,7 @@ public class JsonTaskParserService {
                 long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
                 long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
                 double fileSize = getFileSizeInMB(jsonFile.getFileUrl());
-                log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析结束:{} {} {},文件大小为:[{}M],解析存储pg总共耗时[{}]秒", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName(),fileSize,costSeconds);
+                log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析结束:{} {} {},文件大小为:[{}M],解析存储pg总共耗时[{}]秒", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName(), fileSize, costSeconds);
                 jsonFile.setStatus(StructureJsonStatusEnum.PARSE_SUCCESS.getCode());
                 jsonFile.setEndTime(new Date());
                 jsonFileService.updateById(jsonFile);
@@ -408,7 +399,7 @@ public class JsonTaskParserService {
      */
     public static double getFileSizeInMB(String filePath) {
         if (filePath == null || filePath.trim().isEmpty()) {
-        	log.error("文件路径为空");
+            log.error("文件路径为空");
             return -1;
         }
 
@@ -416,12 +407,12 @@ public class JsonTaskParserService {
 
         try {
             if (!Files.exists(path)) {
-            	log.error("文件不存在: " + filePath);
+                log.error("文件不存在: " + filePath);
                 return -1;
             }
 
             if (Files.isDirectory(path)) {
-            	log.error("路径是一个目录，不是文件: " + filePath);
+                log.error("路径是一个目录，不是文件: " + filePath);
                 return -1;
             }
 
@@ -429,7 +420,7 @@ public class JsonTaskParserService {
             return Math.round((sizeInBytes / 1024.0 / 1024.0) * 100.0) / 100.0; // 保留两位小数
 
         } catch (IOException e) {
-        	log.error("读取文件大小时发生 I/O 错误: " + e.getMessage());
+            log.error("读取文件大小时发生 I/O 错误: " + e.getMessage());
             return -1;
         }
     }

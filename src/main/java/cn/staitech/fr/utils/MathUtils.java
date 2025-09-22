@@ -189,6 +189,7 @@ public class MathUtils {
      * @return 返回指标结果
      */
     public static String getConfidenceInterval(List<BigDecimal> dataList) {
+
         /*List<BigDecimal> objects = new ArrayList<>();
         objects.add(BigDecimal.ZERO);
         //筛掉为零的
@@ -209,7 +210,7 @@ public class MathUtils {
             BigDecimal variance = MathUtils.variance(dataList.toArray(new BigDecimal[dataList.size()]), 3);
             //log.info("总体方差" + variance);
             BigDecimal sqrt = MathUtils.sqrt(variance, 3);
-           // log.info("总体标准差" + sqrt);
+            // log.info("总体标准差" + sqrt);
 
             //正态分布(下限)
 //            BigDecimal subtract2 = bigDecimal.subtract(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
@@ -226,9 +227,12 @@ public class MathUtils {
     }
 
     public static <T> String getFirstAndLastOfMiddle95Percent(List<T> dataList) {
-        if (dataList == null || dataList.size() < 2) {
-            //log.error("数据不足两个");
-            return "0-0";
+        //数量[1,5)
+        if (dataList == null || dataList.size() < 5) {
+            return "数据量过少,无统计学意义";
+        }
+        if (dataList.size() < 40) {
+            return dataList.get(1) + "-" + dataList.get(dataList.size() - 2);
         }
         // 计算前 2.5% 和后 2.5% 的数据量
         int totalSize = dataList.size();
