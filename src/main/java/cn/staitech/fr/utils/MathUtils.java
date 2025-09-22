@@ -232,7 +232,14 @@ public class MathUtils {
             return "数据量过少,无统计学意义";
         }
         if (dataList.size() < 40) {
-            return dataList.get(1) + "-" + dataList.get(dataList.size() - 2);
+        	BigDecimal firstNumber = (BigDecimal) dataList.get(1);
+        	BigDecimal lastNumber = (BigDecimal) dataList.get(dataList.size() - 2);
+        	if(getCompTO(firstNumber, lastNumber) <= 0) {
+        		return firstNumber+ "-" +lastNumber;
+        	}else {
+        		return lastNumber+ "-" +firstNumber;
+        	}
+        	//        	return dataList.get(1) + "-" + dataList.get(dataList.size() - 2);
         }
         // 计算前 2.5% 和后 2.5% 的数据量
         int totalSize = dataList.size();
@@ -243,15 +250,32 @@ public class MathUtils {
         // 确保剩余数据量至少为 1
         if (totalSize - 2 * removeCount < 1) {
             //log.error("剩余数量小于1");
-            return dataList.get(startIndex - 1) + "-" + dataList.get(endIndex - 1);
+        	BigDecimal firstNumber = (BigDecimal) dataList.get(startIndex - 1);
+        	BigDecimal lastNumber = (BigDecimal) dataList.get(endIndex - 1);
+        	if(getCompTO(firstNumber, lastNumber) <= 0) {
+        		return firstNumber+ "-" +lastNumber;
+        	}else {
+        		return lastNumber+ "-" +firstNumber;
+        	}
+            //return dataList.get(startIndex - 1) + "-" + dataList.get(endIndex - 1);
         }
         // 截取中间 95% 的数据
         //List<T> middleSubList = dataList.subList(startIndex, endIndex);
 
         // 获取第一个数和最后一个数
-        T firstNumber = dataList.get(startIndex - 1);
-        T lastNumber = dataList.get(endIndex - 1);
-        return firstNumber + "-" + lastNumber;
+        BigDecimal firstNumber = (BigDecimal) dataList.get(startIndex - 1);
+        BigDecimal lastNumber = (BigDecimal) dataList.get(endIndex - 1);
+        if(getCompTO(firstNumber, lastNumber) <= 0) {
+    		return firstNumber+ "-" +lastNumber;
+    	}else {
+    		return lastNumber+ "-" +firstNumber;
+    	}
+        //return firstNumber + "-" + lastNumber;
+    }
+    
+    public static int getCompTO(BigDecimal startValue,BigDecimal endValue) {
+    	int result = startValue.compareTo(endValue);
+    	return result;
     }
 
 
