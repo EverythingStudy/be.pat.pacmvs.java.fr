@@ -129,9 +129,9 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 		
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 		
-		indicatorResultsMap.put("灰质面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,"1390B3"));
-		indicatorResultsMap.put("白质面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,"1390B2"));
-		indicatorResultsMap.put("中央管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,"1390B4"));
+//		indicatorResultsMap.put("灰质面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,"1390B3"));
+//		indicatorResultsMap.put("白质面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,"1390B2"));
+//		indicatorResultsMap.put("中央管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,"1390B4"));
 
 		indicatorResultsMap.put("灰质面积（全片 ）", new IndicatorAddIn("", bigDecimalG.toString(), SQ_MM, "1","1390B3"));
 		indicatorResultsMap.put("白质面积（全片 ）", new IndicatorAddIn("", bigDecimalH.toString(), SQ_MM, "1","1390B2"));
@@ -175,7 +175,7 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 //			BigDecimal mucosaCountA_B = commonJsonParser.getProportion(bigDecimalA, BigDecimalA_add_B);
 //			indicatorResultsMap.put("灰质面积占比（单个）", new IndicatorAddIn("Gray matter area", String.valueOf(mucosaCountA_B), "%", "0",areaUtils.getStructureIds("1390B3","1390B2")));
 //		}
-//		//		白质面积占比（单个）	2	%	White matter area（per） 	2=B/(A+B)	
+//		//		白质面积占比（单个）	2	%	White matter area（per） 	2=B/(A+B)
 //		if(bigDecimalB.compareTo(BigDecimal.ZERO) != 0 && BigDecimalA_add_B.compareTo(BigDecimal.ZERO) != 0) {
 //			BigDecimal bigDecimalB_A_B = commonJsonParser.getProportion(bigDecimalB, BigDecimalA_add_B);
 //			indicatorResultsMap.put("白质面积占比（单个）", new IndicatorAddIn("White matter area", String.valueOf(bigDecimalB_A_B), "%", "0",areaUtils.getStructureIds("1390B3","1390B2")));
