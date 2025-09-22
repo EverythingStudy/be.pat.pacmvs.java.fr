@@ -81,7 +81,7 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy imple
         BigDecimal organArea1 = getOrganArea(jsonTask, "14403F").getStructureAreaNum();
         BigDecimal organArea2 = getOrganArea(jsonTask, "14403E").getStructureAreaNum();
         //F
-        BigDecimal organArea3 = getOrganArea(jsonTask, "145004").getStructureAreaNum();
+        BigDecimal organArea3 = getOrganArea(jsonTask, "144004").getStructureAreaNum();
         BigDecimal outLine = new BigDecimal(singleSlide.getArea());
         //A
         //indicatorResultsMap.put("皮质外轮廓面积", createIndicator(organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "14403D"));
@@ -98,7 +98,7 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy imple
         BigDecimal organArea5 = annotation1.getStructureAreaNum();
         //indicatorResultsMap.put("髓质外结缔组织面积", createIndicator(organArea5.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "14403E,14403F"));
         //F
-        indicatorResultsMap.put("红细胞面积", createIndicator(organArea3.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "145004"));
+        indicatorResultsMap.put("红细胞面积", createIndicator(organArea3.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "144004"));
         //G
         //indicatorResultsMap.put("组织轮廓", createIndicator(outLine, "平方毫米", "144111"));
 
@@ -116,7 +116,7 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy imple
         //6=F/A
         BigDecimal F = outLine;
         BigDecimal b6 = getProportion(F, organArea);
-        indicatorResultsMap.put("红细胞面积占比", createNameIndicator("Erythrocyte area%", String.valueOf(b6), PERCENTAGE, "145004,14403D"));
+        indicatorResultsMap.put("红细胞面积占比", createNameIndicator("Erythrocyte area%", String.valueOf(b6), PERCENTAGE, "144004,14403D"));
         //7=C/A
         BigDecimal b7 = getProportion(organArea1, organArea);
         indicatorResultsMap.put("结缔组织面积占比", createNameIndicator("Connective tissue area%", String.valueOf(b7), PERCENTAGE, "14403D,14403F"));
