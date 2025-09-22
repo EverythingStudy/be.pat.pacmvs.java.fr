@@ -712,6 +712,16 @@
                ST_IsValid(st_geomfromgeojson(#{contour625})) as results625
 
     </select>
+    
+    <select id="getDelAnnotation" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+    	SELECT *
+			FROM fr_ai_annotation_${sequenceNumber}
+		WHERE single_slide_id = #{singleSlideId}
+	  <if test="contour != null">
+	    AND ST_Intersects(st_geomfromgeojson(#{contour}), contour40000) = #{insideOrOutside}
+	  </if>
+    </select>
+    
 
     <delete id="deleteAiAnnotation" parameterType="cn.staitech.fr.domain.Annotation">
         delete
@@ -721,12 +731,6 @@
         single_slide_id = #{singleSlideId}
         <if test="contour != null">
             AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000) = #{insideOrOutside}
-    <!-- <if test="contourList != null and contourList.size() > 0">
-        <foreach collection="contourList" item="item" index="index">
-            OR ST_Contains ( contour40000,st_geomfromgeojson(#{item})) = 't'
-        </foreach>
-    </if>
-    -->
         </if>
     </delete>
 

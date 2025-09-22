@@ -175,6 +175,8 @@ organ-structures:
       - structure-id: 1240CA
     7D: #  小脑与脑干
       - structure-id: 17D003,17D004,17D0A5
+    44: # 胸腺
+      - structure-id: 14403F,145004
   outline: # 脏器结构轮廓
     "02": #哈德氏腺
       - structure-id: 102111

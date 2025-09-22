@@ -106,7 +106,7 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
         // 算法输出指标
         resultsMap.put("颗粒管数量", createIndicator(organAreaCountA, PIECE,"10B125"));
         resultsMap.put("黏液腺细胞核数量", createIndicator(organAreaCountB, PIECE,"10B128"));
-        resultsMap.put("颗粒管内细胞核数量（单个）", createDefaultIndicator(areaUtils.getStructureIds("10B125","10B128")));
+        resultsMap.put("颗粒管内细胞核数量（单个）", createDefaultIndicator(areaUtils.getStructureIds("10B125","10B126")));
 //        resultsMap.put("血管面积", createIndicator(organAreaD, SQ_MM,"10B003"));
 //        resultsMap.put("血管数量", createIndicator(organAreaCountE, PIECE,"10B003"));
 //        resultsMap.put("红细胞面积", createIndicator(organAreaF, SQ_MM,"10B004"));
@@ -156,7 +156,7 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
         // 产品呈现指标
         resultsMap.put("颗粒管密度", createNameIndicator("Density of granular convoluted tubules (eosinophilic)", densityResult, SQ_MM_PIECE,areaUtils.getStructureIds("10B125","10B111")));
         resultsMap.put("黏液腺细胞核密度", createNameIndicator("Nucleus density of mucous gland", nucleusResult, SQ_MM_PIECE,areaUtils.getStructureIds("10B128","10B111")));
-        resultsMap.put("颗粒管细胞核密度(单个)", createNameIndicator("Nucleus density of granular convoluted tubule (per)", granularConvolutedTubules, SQ_MM_PIECE,areaUtils.getStructureIds("10B125","10B128","10B125")));
+        resultsMap.put("颗粒管细胞核密度(单个)", createNameIndicator("Nucleus density of granular convoluted tubule (per)", granularConvolutedTubules, SQ_MM_PIECE,areaUtils.getStructureIds("10B125","10B126")));
 //        resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE,areaUtils.getStructureIds("10B003","10B111")));
 //        resultsMap.put("红细胞面积占比", createNameIndicator("Erythrocyte area%", erythrocyteArea, PERCENTAGE,areaUtils.getStructureIds("10B004","10B111")));
         resultsMap.put("颌下腺面积", createNameIndicator("Submadibular gland area",String.valueOf(BigDecimal.valueOf(Double.parseDouble(slideArea)).setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM,"10B111"));

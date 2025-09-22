@@ -78,6 +78,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     Annotation stIsValid(Annotation annotation);
 
     Annotation stIsValidAnnotation(Annotation annotation);
+    
+    List<Annotation> getDelAnnotation(Annotation annotation);
 
     Integer deleteAiAnnotation(Annotation annotation);
 

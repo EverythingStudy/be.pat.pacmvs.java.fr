@@ -2,6 +2,7 @@ package cn.staitech.fr.service.strategy.json;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.json.JSONUtil;
 import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
@@ -19,6 +20,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -283,7 +286,38 @@ public class CommonJsonParser {
                         annotation3.setSequenceNumber(sequenceNumber);
                         annotation3.setSingleSlideId(jsonTask.getSingleId());
                         annotation3.setInsideOrOutside(false);
-                        annotationMapper.deleteAiAnnotation(annotation3);
+                        //预先查询下是否有需要删除的数据，主要是为了验证一些结构丢失问题
+                        List<Annotation> delAnnoList = annotationMapper.getDelAnnotation(annotation3);
+                        if(CollectionUtils.isNotEmpty(delAnnoList)) {
+                        	Map<Long,Long>  annoCategoryIdMap = delAnnoList.stream().collect(Collectors.toMap(Annotation::getAnnotationId, Annotation::getCategoryId));
+                        	Map<Long,String> annoStructureMap = new HashMap<>();
+                        	Set<String> structureIdSet = new HashSet<>();
+                        	for (Map.Entry<Long, Long> entry : annoCategoryIdMap.entrySet()) {
+                        	    Long annotationId = entry.getKey();
+                        	    Long categoryId = entry.getValue();
+                        	    if(pathologicalMap.containsValue(categoryId)) {
+                        	    	String structureId = findKeyByValue(pathologicalMap, categoryId);
+                        	    	if(StringUtils.isNotEmpty(structureId)) {
+                        	    		annoStructureMap.put(annotationId, structureId);
+                        	    		 structureIdSet.add(structureId);
+                        	    	}
+                        	    }
+                        	}
+                        	
+                        	//汇总下总共处理的结构标签id
+                        	log.info("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],结构指标待去除数据是：[{}],总条数是:[{}条],所有的结构标签id：[{}]", 
+                        	    jsonTask.getTaskId(), 
+                        	    jsonTask.getSingleId(), 
+                        	    jsonTask.getSlideId(),
+                        	    ObjectUtil.isNotEmpty(annoStructureMap) ? JSONUtil.toJsonStr(annoStructureMap) : "",
+                        	    delAnnoList.size(),
+                        	    ObjectUtil.isNotEmpty(structureIdSet) ? structureIdSet.toString() : ""
+                        	);
+                        }
+                        Integer delTotal = annotationMapper.deleteAiAnnotation(annotation3);
+                        if(null != delTotal) {
+                            log.info("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],精细轮廓和结构指标去除无效数据，删除的数据总条数是：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId(),delTotal);
+                        }
                     } else {
                         log.error("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],不合规", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId());
                     }
@@ -321,6 +355,24 @@ public class CommonJsonParser {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
         }
 
+    }
+    
+    /**
+     * 
+    * @Title: findKeyByValue
+    * @Description: 通过value获取key值
+    * @param @param map
+    * @param @param value
+    * @param @return
+    * @return String
+    * @throws
+     */
+    public static String findKeyByValue(Map<String, Long> map, Long value) {
+        return map.entrySet().stream()
+                  .filter(e -> Objects.equals(e.getValue(), value))
+                  .map(Map.Entry::getKey)
+                  .findFirst()
+                  .orElse(null);
     }
 
     /**
