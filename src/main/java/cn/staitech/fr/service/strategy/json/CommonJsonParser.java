@@ -150,7 +150,7 @@ public class CommonJsonParser {
             // 拿到categoryId
             Long categoryId = pathologicalMap.get(labelCode);
             if (null == categoryId) {
-                log.info("categoryId解析失败");
+                log.info("categoryId解析失败,labelCode:[{}]",labelCode);
                 return null;
             }
             annotation.setSlideId(jsonTask.getSlideId());
@@ -246,29 +246,6 @@ public class CommonJsonParser {
                 annotationService.batchProcessAndSave(anno, 1000);
             }
 
-//            Annotation annotation = new Annotation();
-//            //annotation.setMagnification(40000L);
-//            annotation.setFiligreeContour(true);
-//            annotation.setSingleSlideId(jsonTask.getSingleId());
-//            List<Annotation> annotations = annotationMapper.selectListBy(annotation);
-//            Annotation annotation3 = annotationMapper.collectGeometry(jsonTask.getSingleId());
-//
-//            // 循环annotations并执行删除操作
-//            if (CollectionUtil.isNotEmpty(annotations)) {
-//                annotation3.setContour(annotation3.getCollectContour());
-//                Annotation annotation2 = annotationMapper.stIsValid(annotation3);
-//                if (ObjectUtil.equals(annotation2.getResults(), "t")) {
-//                    // 查询有效精细轮廓列表
-////                    List<Annotation> annotationType3 = annotationMapper.selectAnnotationIsValid(annotation);
-////                    List<String> contourList = annotationType3.stream().map(Annotation::getContour).collect(Collectors.toList());
-////                    annotation3.setContourList(contourList);
-//                    annotation3.setSequenceNumber(sequenceNumber);
-//                    annotation3.setSingleSlideId(jsonTask.getSingleId());
-//                    annotation3.setInsideOrOutside(false);
-//                    annotationMapper.deleteAiAnnotation(annotation3);
-//                }
-//            }
-
             Annotation annotation = new Annotation();
             annotation.setMagnification(40000L);
             annotation.setFiligreeContour(true);
@@ -314,10 +291,10 @@ public class CommonJsonParser {
                         	    ObjectUtil.isNotEmpty(structureIdSet) ? structureIdSet.toString() : ""
                         	);
                         }
-                        Integer delTotal = annotationMapper.deleteAiAnnotation(annotation3);
-                        if(null != delTotal) {
-                            log.info("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],精细轮廓和结构指标去除无效数据，删除的数据总条数是：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId(),delTotal);
-                        }
+//                        Integer delTotal = annotationMapper.deleteAiAnnotation(annotation3);
+//                        if(null != delTotal) {
+//                            log.info("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],精细轮廓和结构指标去除无效数据，删除的数据总条数是：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId(),delTotal);
+//                        }
                     } else {
                         log.error("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],不合规", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId());
                     }
@@ -345,7 +322,7 @@ public class CommonJsonParser {
                             annotation4.setSequenceNumber(sequenceNumber);
                             annotation4.setSingleSlideId(jsonTask.getSingleId());
                             annotation4.setInsideOrOutside(true);
-                            annotationMapper.deleteAiAnnotation(annotation4);
+                           // annotationMapper.deleteAiAnnotation(annotation4);
                         }
                     }
                 }

@@ -24,12 +24,6 @@ public class MatrixReviewController {
     @Autowired
     private MatrixReviewService matrixReviewService;
 
-
-//    @ApiOperation(value = "算法报告下载")
-//    @PostMapping("/algorithmDownload")
-//    public void algorithmDownload(@Validated @RequestBody AiDownloadIn req) throws Exception {
-//        matrixReviewService.algorithmDownload(req);
-//    }
     @ApiOperation(value = "算法报告下载")
     @PostMapping("/algorithmDownload")
     public void algorithmDownload(@Validated @RequestBody SlideDownLoadReq req) throws Exception {

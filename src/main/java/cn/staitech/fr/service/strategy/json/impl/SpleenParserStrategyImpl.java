@@ -101,9 +101,9 @@ public class SpleenParserStrategyImpl extends AbstractCustomParserStrategy {
         // E
         map.put("红细胞面积", createIndicator(DecimalUtils.setScale3(erythrocyteArea), SQ_MM, "145004"));
         // G
-        map.put("边缘区面积", createIndicator(DecimalUtils.setScale3(marginalZoneArea), SQ_MM, "14504A"));
+        //map.put("边缘区面积", createIndicator(DecimalUtils.setScale3(marginalZoneArea), SQ_MM, "14504A"));
         // H
-        map.put("红髓面积", createIndicator(DecimalUtils.setScale3(redPulpArea), SQ_MM, "145046"));
+        //map.put("红髓面积", createIndicator(DecimalUtils.setScale3(redPulpArea), SQ_MM, "145046"));
 
         // 产品呈现指标 -------------------------------------------------------------
         if (accurateAreaDecimal.compareTo(BigDecimal.ZERO) != 0) {

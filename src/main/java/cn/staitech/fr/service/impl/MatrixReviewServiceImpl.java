@@ -109,13 +109,10 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
                         exportAiListVO.setResults("?");
                     }
                     //范围数据
-                    if (StringUtils.isNotEmpty(special.getControlGroup())) {
-                        String genderFlag = singleSlideMapper.getGender(id);
-                        //setRang(aiForecast.getQuantitativeIndicators(),special,id,exportAiListVO,categorys);
-                        if (StringUtils.isNotEmpty(genderFlag)) {
-                            setReferenceScope(special, id, exportAiListVO, categorys, genderFlag);
-                        }
+                    if (StringUtils.isEmpty(special.getControlGroup())) {
+                        special.setControlGroup("1");
                     }
+                    setReferenceScope(special, id, exportAiListVO, categorys);
                     ExprotAiExcelVO exportAiExcelVO = new ExprotAiExcelVO();
                     exportAiExcelVO.setQuantitativeIndicators(exportAiListVO.getQuantitativeIndicators());
                     exportAiExcelVO.setResults(exportAiListVO.getResults());
@@ -149,10 +146,9 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
      * @param singleId
      * @param exportAiListVO
      * @param categorys
-     * @param genderFlag
      */
-    private void setReferenceScope(Project special, Long singleId, ExportAiListVO exportAiListVO, Map<Long, Long> categorys, String genderFlag) {
-        List<BigDecimal> dataList = singleSlideMapper.getReferenceScope(exportAiListVO.getQuantitativeIndicators(), categorys.get(singleId), special.getProjectId(), special.getControlGroup(), genderFlag, CommonConstant.NUMBER_0);
+    private void setReferenceScope(Project special, Long singleId, ExportAiListVO exportAiListVO, Map<Long, Long> categorys) {
+        List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(exportAiListVO.getQuantitativeIndicators(), categorys.get(singleId), special.getProjectId(), special.getControlGroup(), CommonConstant.NUMBER_0);
         if (CollectionUtils.isNotEmpty(dataList)) {
             if (CollectionUtil.isNotEmpty(dataList)) {
                 List<BigDecimal> objects = new ArrayList<>(dataList);

@@ -91,13 +91,13 @@ public class ProstateGlandParserStrategyImpl extends AbstractCustomParserStrateg
         annotation1.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12C06D", annotation1, 3);
         Annotation annotation2 = new Annotation();
-        annotation1.setAreaName("腺泡周长（单个）");
-        annotation1.setAreaUnit(MM);
+        annotation2.setAreaName("腺泡周长（单个）");
+        annotation2.setAreaUnit(MM);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12C06D", annotation2, 3);
         Annotation annotation3 = new Annotation();
-        annotation1.setAreaName("腺腔面积（单个）");
-        annotation1.setAreaUnit(SQ_UM_THOUSAND);
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "12C0E9", "", annotation3, 3);
+        annotation3.setAreaName("腺腔面积（单个）");
+        annotation3.setAreaUnit(SQ_UM_THOUSAND);
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "12C0E9", "12C06D", annotation3, 3);
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
