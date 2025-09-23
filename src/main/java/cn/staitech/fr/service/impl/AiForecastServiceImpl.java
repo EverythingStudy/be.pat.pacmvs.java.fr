@@ -279,9 +279,7 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
                 }
                 //范围数据
                 if (StringUtils.isNotEmpty(special.getControlGroup()) && !CommonConstant.SINGLE_RESULT.equals(aiForecast.getResults())) {
-
                     setReferenceScope(special, singleSlideId, exportAiListVO, categorys, slide.getGenderFlag(), structType);
-
                 }
                 resp.add(exportAiListVO);
             }
