@@ -177,6 +177,8 @@ organ-structures:
       - structure-id: 17D003,17D004,17D0A5
     44: # 胸腺
       - structure-id: 14403F,145004
+    4E: #胸骨
+      - structure-id: 14E022,14E012
   outline: # 脏器结构轮廓
     "02": #哈德氏腺
       - structure-id: 102111
