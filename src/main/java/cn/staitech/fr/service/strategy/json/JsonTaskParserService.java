@@ -650,16 +650,15 @@ public class JsonTaskParserService {
             JsonFile jsonFile = new JsonFile();
             jsonFile.setStructureName(jsonObject.containsKey("structureCode") ? jsonObject.getString("structureCode") : "");
             jsonFile.setStructureId(jsonObject.containsKey("structureCode") ? jsonObject.getString("structureCode") : "");
-            if (jsonObject.containsKey("file_url")) {
-                String fileUrl = jsonObject.getString("file_url");
-                if (fileUrl.toLowerCase().endsWith(".json")) {
-                    jsonFile.setFileUrl(fileUrl);
-                    jsonFile.setAiStatus(StructureAiStatusEnum.SUCCESS.getCode());
-                } else {
-                    if ("500".equals(jsonObject.getString("code"))) {
-                        jsonFile.setAiStatus(StructureAiStatusEnum.FAIL.getCode());
+            if ("500".equals(jsonObject.getString("code"))) {
+                jsonFile.setAiStatus(StructureAiStatusEnum.FAIL.getCode());
+            } else {
+                jsonFile.setAiStatus(StructureAiStatusEnum.SUCCESS.getCode());
+                if (jsonObject.containsKey("file_url")) {
+                    String fileUrl = jsonObject.getString("file_url");
+                    if (fileUrl.toLowerCase().endsWith(".json")) {
+                        jsonFile.setFileUrl(fileUrl);
                     }
-                    jsonFile.setAiStatus(StructureAiStatusEnum.SUCCESS.getCode());
                 }
             }
             jsonFile.setTaskId(task.getTaskId());
