@@ -25,12 +25,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 
-* @ClassName: LarynxParserStrategyImpl
-* @Description-d:喉
-* @author wanglibei
-* @date 2025年7月21日
-* @version V1.0
+ * @author wanglibei
+ * @version V1.0
+ * @ClassName: LarynxParserStrategyImpl
+ * @Description-d:喉
+ * @date 2025年7月21日
  */
 @Slf4j
 @Component("Larynx")
@@ -45,11 +44,12 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Autowired
     private AreaUtils areaUtils;
-    
+
     @Resource
     private CommonJsonParser commonJsonParser;
     @Resource
     private CommonJsonCheck commonJsonCheck;
+
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -75,22 +75,22 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
         //c 10E111
         BigDecimal bigDecimal = new BigDecimal(singleSlide.getArea());
         //c 10E111
-        indicatorResultsMap.put("喉面积", new IndicatorAddIn("Larynx area", new BigDecimal(singleSlide.getArea()).setScale(3,RoundingMode.HALF_UP).toString(), SQ_MM,"10E111"));
-      //TODO 算法不支持，暂时先注释，待支持后再次放开
+        indicatorResultsMap.put("喉面积", new IndicatorAddIn("Larynx area", new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "10E111"));
+        //TODO 算法不支持，暂时先注释，待支持后再次放开
         //a 10E035
 //        indicatorResultsMap.put("黏膜上皮面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1,"10E035"));
         //b
-        indicatorResultsMap.put("腺体面积", new IndicatorAddIn("", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,"10E133"));
-        if(bigDecimal.signum() == 0){
-        	////TODO 算法不支持，暂时先注释，待支持后再次放开
-        	//A/C
+        indicatorResultsMap.put("腺体面积", new IndicatorAddIn("", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "10E133"));
+        if (bigDecimal.signum() == 0) {
+            ////TODO 算法不支持，暂时先注释，待支持后再次放开
+            //A/C
 //            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", "0", "%",areaUtils.getStructureIds("10E035","10E111")));
             //B/C
-            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", "0", "%",areaUtils.getStructureIds("10E133","10E111")));
-        }else{
-        	//TODO 算法不支持，暂时先注释，待支持后再次放开
+            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", "0", "%", areaUtils.getStructureIds("10E133", "10E111")));
+        } else {
+            //TODO 算法不支持，暂时先注释，待支持后再次放开
 //            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", organArea.divide(bigDecimal,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("10E035","10E111")));
-            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", organArea1.divide(bigDecimal,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), PERCENTAGE,areaUtils.getStructureIds("10E133","10E111")));
+            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", organArea1.divide(bigDecimal, 5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), PERCENTAGE, areaUtils.getStructureIds("10E133", "10E111")));
 
         }
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
