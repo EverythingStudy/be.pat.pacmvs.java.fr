@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
@@ -30,12 +31,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
-* @ClassName: MammaryGlandParserStrategyImpl
-* @Description-d:大鼠-乳腺-皮肤
-* @author wanglibei
-* @date 2025年7月22日
-* @version V1.0
+ * @author wanglibei
+ * @version V1.0
+ * @ClassName: MammaryGlandParserStrategyImpl
+ * @Description-d:大鼠-乳腺-皮肤
+ * @date 2025年7月22日
  */
 @Slf4j
 @Component("IntegumentMammaryGland")
@@ -53,6 +53,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
     private CommonJsonCheck commonJsonCheck;
     @Autowired
     private AreaUtils areaUtils;
+
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -69,6 +70,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("指标计算开始-乳腺皮肤");
         Map<String, IndicatorAddIn> map = new HashMap<>();
+        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         // 结构编码 皮肤 -------------------------------------------------------------
         // 结构	编码
         // 表皮角质层	121096
@@ -80,16 +82,15 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         Integer organAreaCount = commonJsonParser.getOrganAreaCount(jsonTask, "12306C");
         //淋巴结A
         BigDecimal organAreaA = commonJsonParser.getOrganArea(jsonTask, "123005").getStructureAreaNum();
-        //皮肤B (皮肤面积	G	平方毫米	此数据使用乳腺中皮肤数据)
-        BigDecimal organAreaB = commonJsonParser.getOrganArea(jsonTask, "1230C3").getStructureAreaNum();
-        //D乳腺腺泡/导管面积（全片）
-        BigDecimal organArea1 = commonJsonParser.getOrganArea(jsonTask, "12306C").getStructureAreaNum();
+        //皮肤B (皮肤面积	J	平方毫米	此数据使用乳腺中皮肤数据)
+        BigDecimal organAreaJ = commonJsonParser.getOrganArea(jsonTask, "1230C3").getStructureAreaNum();
+
         //f结缔组织面积
-        BigDecimal organArea2 = commonJsonParser.getOrganArea(jsonTask, "12303F").getStructureAreaNum();
+        //BigDecimal organArea2 = commonJsonParser.getOrganArea(jsonTask, "12303F").getStructureAreaNum();
         //I结缔组织面积
-        Integer organAreaCount2 = commonJsonParser.getOrganAreaCount(jsonTask, "1230C7");
+        //Integer organAreaCount2 = commonJsonParser.getOrganAreaCount(jsonTask, "1230C7");
         //H-组织轮廓
-        BigDecimal h = commonJsonParser.getOrganArea(jsonTask, "123111").getStructureAreaNum();
+        BigDecimal h = new BigDecimal(singleSlide.getArea());
 
         // A皮肤-表皮角质层面积
         BigDecimal organArea3 = commonJsonParser.getOrganArea(jsonTask, "121096").getStructureAreaNum();
@@ -97,39 +98,39 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         // B皮肤-表皮基底层+棘层+颗粒层面积
         BigDecimal organArea4 = commonJsonParser.getOrganArea(jsonTask, "121097").getStructureAreaNum();
         // D皮肤-毛囊数量
-        Integer areaCount = commonJsonParser.getOrganAreaCount(jsonTask, "121098");
+        //Integer areaCount = commonJsonParser.getOrganAreaCount(jsonTask, "121098");
         // E皮肤-皮脂腺面积
-        BigDecimal organAreaE = commonJsonParser.getOrganAreaMicron(jsonTask, "121099");
+        //BigDecimal organAreaE = commonJsonParser.getOrganAreaMicron(jsonTask, "121099");
         // F皮肤-皮脂腺数量
-        Integer organAreaCount1 = commonJsonParser.getOrganAreaCount(jsonTask, "121099");
+        //Integer organAreaCount1 = commonJsonParser.getOrganAreaCount(jsonTask, "121099");
         // H皮肤-毛囊面积（全片）
-        BigDecimal organAreaH = commonJsonParser.getOrganArea(jsonTask, "121098").getStructureAreaNum();
-        // G皮肤-皮肤面积
-        BigDecimal organAreaG = commonJsonParser.getOrganArea(jsonTask, "121111").getStructureAreaNum();
+        //BigDecimal organAreaH = commonJsonParser.getOrganArea(jsonTask, "121098").getStructureAreaNum();
+        //L乳腺腺泡/导管面积（全片）
+        BigDecimal organArea1 = commonJsonParser.getOrganArea(jsonTask, "12306C").getStructureAreaNum();
         // 毛囊密度 个/mm2 4=D/G
-        BigDecimal divide = new BigDecimal(0);
-        if (ObjectUtil.isNotEmpty(organAreaG) && !ObjectUtil.equals(organAreaG, new BigDecimal(0))) {
-            BigDecimal decimal = new BigDecimal(areaCount);
-            divide = decimal.divide(organAreaG, 3, RoundingMode.HALF_UP);
-        }
+//        BigDecimal divide = new BigDecimal(0);
+//        if (ObjectUtil.isNotEmpty(organAreaG) && !ObjectUtil.equals(organAreaG, new BigDecimal(0))) {
+//            BigDecimal decimal = new BigDecimal(areaCount);
+//            divide = decimal.divide(organAreaG, 3, RoundingMode.HALF_UP);
+//        }
         // 皮脂腺密度 个/mm2 5=F/G
-        BigDecimal divide1 = new BigDecimal(0);
-        if (ObjectUtil.isNotEmpty(organAreaG) && !ObjectUtil.equals(organAreaG, new BigDecimal(0))) {
-            BigDecimal decimal = new BigDecimal(organAreaCount1);
-            divide1 = decimal.divide(organAreaG, 3, RoundingMode.HALF_UP);
-        }
+//        BigDecimal divide1 = new BigDecimal(0);
+//        if (ObjectUtil.isNotEmpty(organAreaG) && !ObjectUtil.equals(organAreaG, new BigDecimal(0))) {
+//            BigDecimal decimal = new BigDecimal(organAreaCount1);
+//            divide1 = decimal.divide(organAreaG, 3, RoundingMode.HALF_UP);
+//        }
         //c 12306C
-        map.put("腺泡和导管数量", new IndicatorAddIn("Number of acinus and ducts", organAreaCount.toString(), "个","12306C"));
-        BigDecimal subtract = h.subtract(organAreaA).subtract(organAreaB);
+        //map.put("乳腺腺泡和导管数量", createNameIndicator("Number of acinus and ducts", organAreaCount.toString(), PIECE, "12306C"));
+        BigDecimal subtract = h.subtract(organAreaA).subtract(organAreaJ);
         if (subtract.signum() == 0) {
-        	//D/(H-A-B)
-            map.put("乳腺腺泡和导管面积占比", new IndicatorAddIn("Acinus and ducts area%", "0", "%",areaUtils.getStructureIds("121098","121098","123005","1230C3")));
+            //D/(H-A-B)
+            map.put("乳腺腺泡和导管面积占比", createNameIndicator("Acinus and ducts area%", "0", PERCENTAGE, areaUtils.getStructureIds("17A111", "121098", "123005", "1230C3")));
             //(F-D)/(H-A-B)
 //            map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", "0", "%",areaUtils.getStructureIds("121099","121098","121098","123005","1230C3")));
         } else {
             BigDecimal divide2 = organArea1.divide(subtract, 7, RoundingMode.HALF_UP);
-            map.put("乳腺腺泡和导管面积占比", new IndicatorAddIn("Acinus and ducts area%", DecimalUtils.percentScale3(divide2), "%",areaUtils.getStructureIds("121098","121098","123005","1230C3")));
-            BigDecimal subtract1 = organArea2.subtract(organArea1);
+            map.put("乳腺腺泡和导管面积占比", createNameIndicator("Acinus and ducts area%", DecimalUtils.percentScale3(divide2), PERCENTAGE, areaUtils.getStructureIds("17A111", "121098", "123005", "1230C3")));
+            //BigDecimal subtract1 = organArea2.subtract(organArea1);
 //            map.put("结缔组织面积占比", new IndicatorAddIn("Connective tissue area%", DecimalUtils.percentScale3(subtract1.divide(subtract, 7, RoundingMode.HALF_UP)), "%",areaUtils.getStructureIds("121099","121098","121098","123005","1230C3")));
         }
 
@@ -152,26 +153,26 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         }
         String confidenceInterval = MathUtils.getConfidenceInterval(lists);
         //L       乳腺腺泡和导管面积（全片）        mm2        12306C        所有轮廓面积之和
-        map.put("乳腺腺泡和导管面积（全片）", createIndicator(organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "12306C"));
-        //O        乳腺腺泡和导管面积（单个）        103 μm2        12306C        单个轮廓分别计算面积        辅助二级指标11的计算，不显示在指标表格里，显示在单个“乳腺腺泡/导管”轮廓详情弹窗中        v2.6.1
-        map.put(" 乳腺腺泡和导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,areaUtils.getStructureIds("12306C")));
-        
+        map.put("乳腺腺泡和导管面积（全片）", createNameIndicator(organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "12306C"));
+//        //O        乳腺腺泡和导管面积（单个）        103 μm2        12306C        单个轮廓分别计算面积        辅助二级指标11的计算，不显示在指标表格里，显示在单个“乳腺腺泡/导管”轮廓详情弹窗中        v2.6.1
+//        map.put(" 乳腺腺泡和导管面积（单个）", createNameIndicator(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1, areaUtils.getStructureIds("12306C")));
+
         //E/G
 //        map.put("腺泡或导管细胞核密度（单个）", new IndicatorAddIn("Nucleus density of acinus or ducts （per）", confidenceInterval, SQ_UM_PICE,areaUtils.getStructureIds("12306C","1230C7","12306C")));
-        BigDecimal divide2 = new BigDecimal(organAreaCount2).divide(organArea1, 3, RoundingMode.HALF_UP);
+        //BigDecimal divide2 = new BigDecimal(organAreaCount2).divide(organArea1, 3, RoundingMode.HALF_UP);
         //I/D
 //        map.put("细胞核密度（全片）", new IndicatorAddIn("Nucleus density of mammary gland（all）", divide2.toString(), SQ_MM_PIECE,areaUtils.getStructureIds("12306C","1230C7","12306C")));
         //H-A-B
-        map.put("乳腺面积", new IndicatorAddIn("Mammary gland area", DecimalUtils.setScale3(h.subtract(organAreaA).subtract(organAreaB)), SQ_MM,areaUtils.getStructureIds("123111","123005","1230C3")));
+        map.put("乳腺面积", createNameIndicator("Mammary gland area", DecimalUtils.setScale3(h.subtract(organAreaA).subtract(organAreaJ)), SQ_MM, areaUtils.getStructureIds("17A111", "123005", "1230C3")));
         //a 123005
 //        map.put("淋巴结面积", new IndicatorAddIn("Lymph node area", DecimalUtils.setScale3(organAreaA), SQ_MM, CommonConstant.NUMBER_1,"123005"));
         // 皮肤面积	G	平方毫米	此数据使用乳腺中皮肤数据 (乳腺皮肤公用)
         //b
 //        map.put("皮肤面积", new IndicatorAddIn("Skin area", DecimalUtils.setScale3(organAreaB), SQ_MM, CommonConstant.NUMBER_1,"1230C3"));
         //c
-        map.put("乳腺腺泡和导管数量", new IndicatorAddIn("Number of acinus and ducts", organAreaCount.toString(), "个", CommonConstant.NUMBER_1,"12306C"));
+        map.put("乳腺腺泡和导管数量", new IndicatorAddIn("Number of acinus and ducts", organAreaCount.toString(), "个", CommonConstant.NUMBER_1, "12306C"));
         //d
-        map.put("腺泡和导管面积（全片）", new IndicatorAddIn("Breast acinar/ductal area (all)", DecimalUtils.setScale3(organArea1), SQ_MM, CommonConstant.NUMBER_1,"12306C"));
+        //map.put("腺泡和导管面积（全片）", new IndicatorAddIn("Breast acinar/ductal area (all)", DecimalUtils.setScale3(organArea1), SQ_MM, CommonConstant.NUMBER_1, "12306C"));
         //f
 //        map.put("结缔组织面积", new IndicatorAddIn("Connective tissue area", DecimalUtils.setScale3(organArea2), SQ_MM, CommonConstant.NUMBER_1,"12303F"));
         //h
@@ -232,32 +233,32 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
                 skinLists.add(areaNum);
             }
         }
-        String confidenceHairFollicleArea = MathUtils.getConfidenceInterval(skinLists);
+        // String confidenceHairFollicleArea = MathUtils.getConfidenceInterval(skinLists);
 
-        
+
         // 产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
-        if (organAreaG.compareTo(BigDecimal.ZERO) != 0) {
-            // 表皮角质层面积占比	1	%	Stratum corneum area%	1=A/G
-            BigDecimal stratumCorneumAreaRate = organArea3.divide(organAreaG, 7, RoundingMode.HALF_UP);
-            map.put("表皮角质层面积占比", new IndicatorAddIn("Stratum corneum area%", DecimalUtils.percentScale3(stratumCorneumAreaRate), "%"));
+        // if (organAreaG.compareTo(BigDecimal.ZERO) != 0) {
+        // 表皮角质层面积占比	1	%	Stratum corneum area%	1=A/G
+        BigDecimal stratumCorneumAreaRate = organArea3.divide(organAreaJ, 7, RoundingMode.HALF_UP);
+        map.put("表皮角质层面积占比", createNameIndicator("Stratum corneum area%", DecimalUtils.percentScale3(stratumCorneumAreaRate), PERCENTAGE, "121096,1230C3"));
 
-            // 表皮基底层+棘层+颗粒层面积占比	2	%	 Nucleated cell layer area%	2=B/G
-            BigDecimal nucleatedCellLayerAreaRate = organArea4.divide(organAreaG, 7, RoundingMode.HALF_UP);
-            map.put("表皮基底层+棘层+颗粒层面积占比", new IndicatorAddIn("Nucleated cell layer area%", DecimalUtils.percentScale3(nucleatedCellLayerAreaRate), "%"));
+        // 表皮基底层+棘层+颗粒层面积占比	2	%	 Nucleated cell layer area%	2=B/G
+        BigDecimal nucleatedCellLayerAreaRate = organArea4.divide(organAreaJ, 7, RoundingMode.HALF_UP);
+        map.put("表皮基底层+棘层+颗粒层面积占比", createNameIndicator("Nucleated cell layer area%", DecimalUtils.percentScale3(nucleatedCellLayerAreaRate), PERCENTAGE, "121097,1230C3"));
 
-            // 皮脂腺面积占比	6	%	Sebaceous glands area%	6=E/G	运算前注意统一单位
+        // 皮脂腺面积占比	6	%	Sebaceous glands area%	6=E/G	运算前注意统一单位
 //            BigDecimal sebaceousGlandsAreaRate = organAreaE.divide(organAreaG.multiply(new BigDecimal(1000)), 7, RoundingMode.HALF_UP);
 //            map.put("皮脂腺面积占比", new IndicatorAddIn("Sebaceous glands area%", DecimalUtils.percentScale3(sebaceousGlandsAreaRate), "%"));
 
-            // 毛囊面积占比	7	%	Hair follicles area%	7=H/G
+        // 毛囊面积占比	7	%	Hair follicles area%	7=H/G
 //            BigDecimal hairFolliclesAreaRate = organAreaH.divide(organAreaG, 7, RoundingMode.HALF_UP);
 //            map.put("毛囊面积占比", new IndicatorAddIn("Hair follicles area%", DecimalUtils.percentScale3(hairFolliclesAreaRate), "%"));
-        } else {
-            map.put("表皮角质层面积占比", new IndicatorAddIn("Stratum corneum area%", "0", "%"));
-            map.put("表皮基底层+棘层+颗粒层面积占比", new IndicatorAddIn("Nucleated cell layer area%", "0", "%"));
+//        } else {
+//            map.put("表皮角质层面积占比", new IndicatorAddIn("Stratum corneum area%", "0", "%"));
+//            map.put("表皮基底层+棘层+颗粒层面积占比", new IndicatorAddIn("Nucleated cell layer area%", "0", "%"));
 //            map.put("皮脂腺面积占比", new IndicatorAddIn("Sebaceous glands area%", "0", "%"));
 //            map.put("毛囊面积占比", new IndicatorAddIn("Hair follicles area%", "0", "%"));
-        }
+        // }
 
         // 毛囊面积（单个）	3	103平方微米	Hair follicle area（per）	3=C	以95%置信区间和均数±标准差呈现
 //        map.put("毛囊面积（单个）", new IndicatorAddIn("Hair follicle area（per）", confidenceHairFollicleArea, SQ_UM_THOUSAND));
@@ -269,9 +270,9 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
 //        map.put("皮脂腺密度", new IndicatorAddIn("Sebaceous gland density", divide1.toString(), SQ_MM_PIECE));
 
         // 皮肤面积	8	平方毫米	Skin area	8=G  此数据使用乳腺中皮肤数据
-        map.put("皮肤面积", new IndicatorAddIn("Skin area", DecimalUtils.setScale3(organAreaB), SQ_MM));
-        
-        
+        map.put("皮肤面积", createNameIndicator("Skin area", DecimalUtils.setScale3(organAreaJ), SQ_MM, "1230C3"));
+
+
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
 
         log.info("指标计算结束-乳腺皮肤");
