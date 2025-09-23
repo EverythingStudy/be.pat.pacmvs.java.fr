@@ -921,17 +921,46 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
 
     @SuppressWarnings("finally")
     public static List<String> getFilesDirectory(String directoryPath) {
-        Path directory = Paths.get(directoryPath);
-        List<String> files = new ArrayList<>();
-        //获取文件夹下所有文件
-        try {
-//            files = Files.walk(directory).filter(Files::isRegularFile).map(path -> path.getFileName().toString()).collect(Collectors.toList());
-            files = Files.walk(directory).filter(Files::isRegularFile).map(path -> path.toString()).collect(Collectors.toList());
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            return files;
-        }
+    	// 1. 检查路径是否为空
+    	if (directoryPath == null || directoryPath.trim().isEmpty()) {
+    		log.error("目录路径:[{}] 为空或 null", directoryPath);
+    		return new ArrayList<>(); // 返回空列表，避免调用方出错
+    	}
+
+    	Path directory = Paths.get(directoryPath);
+
+    	// 2. 检查目录是否存在
+    	if (!Files.exists(directory)) {
+    		log.error("目录路径:[{}] 不存在", directoryPath);
+    		return new ArrayList<>();
+    	}
+
+    	// 3. 检查是否是一个目录
+    	if (!Files.isDirectory(directory)) {
+    		log.error("路径不是一个目录: " + directoryPath);
+    		return new ArrayList<>();
+    	}
+
+    	List<String> files = new ArrayList<>();
+    	try {
+    		// 遍历目录，只收集普通文件
+    		files = Files.walk(directory).filter(Files::isRegularFile).map(Path::toString).collect(Collectors.toList());
+    	} catch (IOException e) {
+    		// 捕获 IO 异常（如权限不足、文件被删除等）
+    		log.error("读取目录时发生 IO 错误,目录路径:[{}]", directoryPath);
+    		e.printStackTrace();
+    		// 返回当前已收集的文件（可能为空）
+    	} catch (SecurityException e) {
+    		// 防止因权限问题导致崩溃
+    		log.error("没有权限访问目录,目录路径:[{}]", directoryPath);
+    		e.printStackTrace();
+    	} catch (Exception e) {
+    		// 兜底异常
+    		log.error("未知错误读取目录,目录路径:[{}]", directoryPath);
+    		e.printStackTrace();
+    	} finally {
+    		return files; // 即使出错也返回一个 List（可能为空）
+    	}
     }
 
     //根据专题id(必须)+切片id(必须)+脏器id(非必填)用于单脏器下载使用
@@ -953,19 +982,65 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
 
 
     public static JsonFileVo getFilesInDirectory(String directoryPath) {
-        Path directory = Paths.get(directoryPath);
-        List<String> files = new ArrayList<>();
-        //获取文件夹下所有文件总size
-        long totalSize = 0;
-        try {
-            totalSize = Files.walk(directory).filter(Files::isRegularFile).mapToLong(path -> path.toFile().length()).sum();
-            files = Files.walk(directory).filter(Files::isRegularFile).map(path -> path.getFileName().toString()).collect(Collectors.toList());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return JsonFileVo.builder().files(files).totalSize(totalSize).build();
-    }
+    	// 1. 检查路径是否为空
+    	if (directoryPath == null || directoryPath.trim().isEmpty()) {
+    		log.error("目录路径:[{}] 为空或 null", directoryPath);
+    		return JsonFileVo.builder()
+    				.files(new ArrayList<>())
+    				.totalSize(0L)
+    				.build();
+    	}
 
+    	Path directory = Paths.get(directoryPath);
+
+    	// 2. 检查目录是否存在
+    	if (!Files.exists(directory)) {
+    		log.error("目录路径:[{}] 不存在", directoryPath);
+    		return JsonFileVo.builder()
+    				.files(new ArrayList<>())
+    				.totalSize(0L)
+    				.build();
+    	}
+
+    	// 3. 检查是否是一个目录
+    	if (!Files.isDirectory(directory)) {
+    		log.error("路径不是一个目录:[{}]", directoryPath);
+    		return JsonFileVo.builder()
+    				.files(new ArrayList<>())
+    				.totalSize(0L)
+    				.build();
+    	}
+
+    	// 用于收集文件名和累计大小
+    	List<String> files = new ArrayList<>();
+    	long[] totalSize = {0}; 
+
+    	try {
+    		Files.walk(directory)
+    		.filter(Files::isRegularFile)
+    		.forEach(path -> {
+    			files.add(path.getFileName().toString());
+    			try {
+    				totalSize[0] += Files.size(path);
+    			} catch (IOException e) {
+    				log.error("无法读取文件大小,目录路径:[{}]", path);
+    			}
+    		});
+    	} catch (IOException e) {
+    		log.error("读取目录时发生 IO 错误,目录路径:[{}]", directoryPath);
+    		e.printStackTrace();
+    		// 出错后仍返回已收集的数据（可能为空）
+    	} catch (SecurityException e) {
+    		log.error("没有权限访问目录,目录路径:[{}]", directoryPath);
+    		e.printStackTrace();
+    	}
+
+    	// 构建并返回结果
+    	return JsonFileVo.builder()
+    			.files(files)
+    			.totalSize(totalSize[0])
+    			.build();
+    }
 }
 
 
