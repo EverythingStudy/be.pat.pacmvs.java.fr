@@ -89,7 +89,7 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
         Integer organAreaCountA = areaUtils.getOrganAreaCount(jsonTask, "10B125");// A颗粒管（红色）数量
         Integer organAreaCountB = areaUtils.getOrganAreaCount(jsonTask, "10B128");// B黏液腺细胞核数量
         BigDecimal organAreaD = areaUtils.getOrganArea(jsonTask, "10B003");// D有血管壁的血管面积
-        Integer organAreaCountE = areaUtils.getOrganAreaCount(jsonTask, "10B003");// E有血管壁的血管数量
+        //Integer organAreaCountE = areaUtils.getOrganAreaCount(jsonTask, "10B003");// E有血管壁的血管数量
         BigDecimal organAreaF = areaUtils.getOrganArea(jsonTask, "10B004");// F红细胞面积
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId()); // H组织轮廓
         BigDecimal organAreaH = BigDecimal.valueOf(Double.parseDouble(slideArea));
