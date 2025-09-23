@@ -105,12 +105,12 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
          */
         // 脑干
         // A
-         map.put("血管内红细胞面积", new IndicatorAddIn("", DecimalUtils.setScale3(intravascularErythrocyteArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,areaUtils.getStructureIds("17D003","17D004")));
+         map.put("血管内红细胞面积", new IndicatorAddIn("", DecimalUtils.setScale3(intravascularErythrocyteArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,areaUtils.getStructureIds("13D003","13D004")));
         // B
-         map.put("血管外红细胞面积", new IndicatorAddIn("", DecimalUtils.setScale3(extravascularErythrocyteArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,areaUtils.getStructureIds("17D003","17D004")));
+         map.put("血管外红细胞面积", new IndicatorAddIn("", DecimalUtils.setScale3(extravascularErythrocyteArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,areaUtils.getStructureIds("13D003","13D004")));
         // 小脑
         // A
-        map.put("颗粒细胞层核浦肯野细胞层面积", new IndicatorAddIn("", DecimalUtils.setScale3(granulocyteAndPurkinjeArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"17D0A5"));
+        map.put("颗粒细胞层核浦肯野细胞层面积", new IndicatorAddIn("", DecimalUtils.setScale3(granulocyteAndPurkinjeArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,"13E0A5"));
         // B
         // map.put("分子层红细胞面积", new IndicatorAddIn("erythrocyte area", DecimalUtils.setScale3(molecularLevelerythrocyteArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1));
 
@@ -119,24 +119,24 @@ public class CerebellumParserStrategyImpl implements ParserStrategy {
             // 脑干
             // 血管外红细胞面积占比	1	%	Extravascular erythrocyte area%	1=B/D	无
             BigDecimal extravascularErythrocyteAreaRate = extravascularErythrocyteArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
-             map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", DecimalUtils.percentScale3(extravascularErythrocyteAreaRate), "%",areaUtils.getStructureIds("17D003","17D004","17D111")));
+             map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", DecimalUtils.percentScale3(extravascularErythrocyteAreaRate), "%",areaUtils.getStructureIds("13D003","13D004","17D111")));
 
             // 血管内红细胞面积	2	%	Intravascular Erythrocyte area%	A/D	无
             BigDecimal intravascularErythrocyteAreaRate = intravascularErythrocyteArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
-             map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", DecimalUtils.percentScale3(intravascularErythrocyteAreaRate), "%",areaUtils.getStructureIds("17D003","17D004","17D111")));
+             map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", DecimalUtils.percentScale3(intravascularErythrocyteAreaRate), "%",areaUtils.getStructureIds("13D003","13D004","17D111")));
 
             // 小脑
             // 颗粒细胞层和浦肯野细胞层面积占比	1	%	Granulocyte and Purkinje cell layer area % 	1=C/D	无
             BigDecimal granulocyteAndPurkinjeCellLayerAreaRate = granulocyteAndPurkinjeArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
-            map.put("颗粒细胞层和浦肯野细胞层面积占比", new IndicatorAddIn("Granulocyte and Purkinje cell layer area %", DecimalUtils.percentScale3(granulocyteAndPurkinjeCellLayerAreaRate), "%",areaUtils.getStructureIds("17D111","17D0A5")));
+            map.put("颗粒细胞层和浦肯野细胞层面积占比", new IndicatorAddIn("Granulocyte and Purkinje cell layer area %", DecimalUtils.percentScale3(granulocyteAndPurkinjeCellLayerAreaRate), "%",areaUtils.getStructureIds("17D111","13E0A5")));
 
             // 分子层红细胞面积占比	2	%	Molecular level erythrocyte area%	2=B/C	无
 //            BigDecimal molecularLevelErythrocyteAreaRate = molecularLevelerythrocyteArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
 //             map.put("分子层红细胞面积占比", new IndicatorAddIn("Molecular level erythrocyte area%", DecimalUtils.percentScale3(molecularLevelErythrocyteAreaRate), "%"));
         } else {
-             map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", "0.000", "%",areaUtils.getStructureIds("17D003","17D004","17D111")));
-            map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", "0.000", "%",areaUtils.getStructureIds("17D003","17D004","17D111")));
-            map.put("颗粒细胞层和浦肯野细胞层面积占比", new IndicatorAddIn("Granulocyte and Purkinje cell layer area %", "0.000", "%",areaUtils.getStructureIds("17D111","17D0A5")));
+             map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", "0.000", "%",areaUtils.getStructureIds("13D003","13D004","17D111")));
+            map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", "0.000", "%",areaUtils.getStructureIds("13D003","13D004","17D111")));
+            map.put("颗粒细胞层和浦肯野细胞层面积占比", new IndicatorAddIn("Granulocyte and Purkinje cell layer area %", "0.000", "%",areaUtils.getStructureIds("17D111","13E0A5")));
             // map.put("分子层红细胞面积占比", new IndicatorAddIn("Molecular level erythrocyte area%", "0.000", "%"));
         }
 

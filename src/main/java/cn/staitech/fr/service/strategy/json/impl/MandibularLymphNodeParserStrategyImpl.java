@@ -27,7 +27,7 @@ import java.util.Map;
  * @Description: Json Parser 大鼠-免疫系统-颌下淋巴结 Mandibular_lymph_node
  */
 @Slf4j
-@Component("Mandibular_lymph_node")
+@Component("Lymph_node_mandibular")
 public class MandibularLymphNodeParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Resource
@@ -122,6 +122,6 @@ public class MandibularLymphNodeParserStrategyImpl extends AbstractCustomParserS
 
     @Override
     public String getAlgorithmCode() {
-        return "Mandibular_lymph_node";
+        return "Lymph_node_mandibular";
     }
 }
