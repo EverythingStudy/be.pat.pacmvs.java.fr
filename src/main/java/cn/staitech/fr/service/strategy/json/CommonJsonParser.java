@@ -362,7 +362,14 @@ public class CommonJsonParser {
     private Annotation processAnnotation(String finalResolutionX, Annotation annotation) {
         annotation.setContour(annotation.getContour40000());
         Annotation area = annotationMapper.getArea(annotation);
-        BigDecimal decimal = new BigDecimal(ObjectUtil.isNotEmpty(area.getArea()) ? area.getArea() : "0");
+        //面积
+        String annoArea = area.getArea();
+        BigDecimal areaNumber = new BigDecimal(annoArea.trim()); 
+        // 面积为负数，需要获取有效的面积
+        if (areaNumber.compareTo(BigDecimal.ZERO) < 0) {
+        	annoArea = area.getEffectiveArea();
+        }
+        BigDecimal decimal = new BigDecimal(ObjectUtil.isNotEmpty(annoArea) ? annoArea : "0");
         annotation.setArea(decimal.multiply(new BigDecimal(finalResolutionX)).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString());
         String perimeter = ObjectUtil.isNotEmpty(area.getPerimeter()) ? area.getPerimeter() : "0";// 周长
         String multiply = new BigDecimal(perimeter).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString();

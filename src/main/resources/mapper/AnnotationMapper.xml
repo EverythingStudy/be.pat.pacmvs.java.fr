@@ -751,9 +751,10 @@
     <select id="getArea" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
         select ST_Perimeter(st_geomfromgeojson(#{contour})) as perimeter,
-               ST_Area(st_geomfromgeojson(#{contour}))      as area
+               ST_Area(st_geomfromgeojson(#{contour}))      as area,
+               ST_Area(ST_MakeValid(st_geomfromgeojson(#{contour})))   as  effectiveArea
     </select>
-
+    
     <select id="getOrganArea" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
         SELECT ST_Area(ST_Collect(contour))      AS area,
