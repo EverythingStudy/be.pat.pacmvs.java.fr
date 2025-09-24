@@ -77,7 +77,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
     private CommonJsonParser commonJsonParser;
 
 
-    ExecutorService EXECUTOR = new ThreadPoolExecutor((int) (Runtime.getRuntime().availableProcessors() * 1.5), Runtime.getRuntime().availableProcessors() * 2, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), new CustomRejectedExecutionHandler());
+    ExecutorService EXECUTOR = new ThreadPoolExecutor((int) (Runtime.getRuntime().availableProcessors() * 3), Runtime.getRuntime().availableProcessors() * 6, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), new CustomRejectedExecutionHandler());
 
 
     static class CustomRejectedExecutionHandler implements RejectedExecutionHandler {
@@ -99,7 +99,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
         //切片id
         Long slideId = jsonTask.getSlideId();
         //图片id
-        Long imageId = jsonTask.getImageId();
+        //Long imageId = jsonTask.getImageId();
         //原始图片信息
 //        Image image = imageMapper.selectById(imageId);
         //蜡块号
@@ -345,6 +345,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
     public void submitPathList(List<String> filteredFilePathList, String jsonName, STRtree tree, Map<Geometry, Features> geometryMap, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir, int zoom, Map<String, String> dynamicDataMap) {
         // 检查文件路径列表是否非空
         if (CollectionUtils.isNotEmpty(filteredFilePathList)) {
+        	long startTime = System.currentTimeMillis();
             // 初始化计数器，用于同步任务完成状态
             CountDownLatch countDownLatch = new CountDownLatch(filteredFilePathList.size());
             // 遍历文件路径列表，提交任务到线程池
@@ -365,6 +366,12 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                 log.error("Error waiting for tasks to complete: [{}]", e.getMessage());
                 e.printStackTrace();
             }
+            
+            long endTime = System.currentTimeMillis();
+            long duration = endTime - startTime;
+            
+            //输出总耗时（单位：毫秒）
+            log.info("项目处理所有瓦块的信息如下-专题id:[{}] ,slideId:[{}],singleSlideId:[{}] ，处理的瓦块文件总共： {} 个任务已执行完毕，总耗时: {} ms (约 {:.2f} 秒)", single.getSpecialId(),single.getSlideId(), single.getSingleId(), new Date(),filteredFilePathList.size(),duration, duration / 1000.0);
         }
     }
 
@@ -416,6 +423,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
 
         @Override
         public void run() {
+        	long start = System.nanoTime();
             try {
                 // 将名称根据-划分为在z,x,y
                 String[] split = fileName.split("-");
@@ -453,12 +461,51 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                     String outputPath = outputDir + "/" + fileName + ".json";
                     // 写入文件
                     writeFilteredGeoJson(filteredFeatures, outputPath);
+                    // 计算耗时（秒）
+                    long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+                    long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
+                    double fileSize = getFileSizeInMB(outputPath);
+                    log.info("切分瓦块本地存储专题id:[{}] ,slideId:[{}],singleSlideId:[{}] 。endTime:[{}],存储的瓦块json路径:[{}],文件大小为:[{}M], 耗时: {} 秒", single.getSpecialId(),single.getSlideId(), single.getSingleId(), new Date(),outputPath,fileSize, costSeconds);
                 }
             } catch (JSONException e) {
                 log.error("Error processing file: [{}]", e.getMessage());
             } finally {
                 countDownLatch.countDown();
             }
+        }
+    }
+    
+    /**
+     * 获取指定文件的大小，单位为 MB（保留两位小数）
+     *
+     * @param filePath 文件路径（JSON 文件或其他）
+     * @return 文件大小（以 MB 为单位），如 5.23 MB；若文件不存在或出错，返回 -1
+     */
+    public static double getFileSizeInMB(String filePath) {
+        if (filePath == null || filePath.trim().isEmpty()) {
+            log.error("文件路径为空");
+            return -1;
+        }
+
+        Path path = Paths.get(filePath);
+
+        try {
+            if (!Files.exists(path)) {
+                log.error("文件不存在: " + filePath);
+                return -1;
+            }
+
+            if (Files.isDirectory(path)) {
+                log.error("路径是一个目录，不是文件: " + filePath);
+                return -1;
+            }
+
+            long sizeInBytes = Files.size(path);
+            return Math.round((sizeInBytes / 1024.0 / 1024.0) * 100.0) / 100.0; // 保留两位小数
+
+        } catch (IOException e) {
+            log.error("读取文件大小时发生 I/O 错误: " + e.getMessage());
+            return -1;
         }
     }
 
