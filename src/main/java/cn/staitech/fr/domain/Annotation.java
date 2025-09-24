@@ -252,7 +252,8 @@ public class Annotation implements Serializable {
     private List<String> idList;
 
 
-
+    @TableField(exist = false)
+    private String effectiveArea;
 
 
     @Override
