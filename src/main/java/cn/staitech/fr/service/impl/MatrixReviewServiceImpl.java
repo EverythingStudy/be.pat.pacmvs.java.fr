@@ -89,9 +89,11 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
                 singleSlideIds.add(singleSlide.getSingleId());
             }
         }
-        if (StringUtils.isNotEmpty(special.getControlGroup())) {
-            categorys = singleSlides.stream().collect(Collectors.toMap(SingleSlide::getSingleId, SingleSlide::getCategoryId));
+        //范围数据
+        if (StringUtils.isEmpty(special.getControlGroup())) {
+            special.setControlGroup("1");
         }
+        categorys = singleSlides.stream().collect(Collectors.toMap(SingleSlide::getSingleId, SingleSlide::getCategoryId));
         List<ExprotAiExcelVO> collect = new ArrayList<>();
         for (Long id : singleSlideIds) {
             ExportAiDTO exportVO = singleSlideMapper.getExportSingleSlideInfoById(id);
@@ -107,10 +109,6 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
                     BeanUtils.copyProperties(aiForecast, exportAiListVO);
                     if (!CommonConstant.SINGLE_RESULT.equals(aiForecast.getResults()) && !(aiForecast.getResults().contains("±")) && new BigDecimal(aiForecast.getResults()).compareTo(BigDecimal.ZERO) < 0) {
                         exportAiListVO.setResults("?");
-                    }
-                    //范围数据
-                    if (StringUtils.isEmpty(special.getControlGroup())) {
-                        special.setControlGroup("1");
                     }
                     setReferenceScope(special, id, exportAiListVO, categorys);
                     ExprotAiExcelVO exportAiExcelVO = new ExprotAiExcelVO();
@@ -149,6 +147,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
      */
     private void setReferenceScope(Project special, Long singleId, ExportAiListVO exportAiListVO, Map<Long, Long> categorys) {
         List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(exportAiListVO.getQuantitativeIndicators(), categorys.get(singleId), special.getProjectId(), special.getControlGroup(), CommonConstant.NUMBER_0);
+        exportAiListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
         if (CollectionUtils.isNotEmpty(dataList)) {
             if (CollectionUtil.isNotEmpty(dataList)) {
                 List<BigDecimal> objects = new ArrayList<>(dataList);
@@ -166,7 +165,6 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
                 BigDecimal sqrt = MathUtils.sqrt(variance, 3);
                 log.info("总体标准差" + sqrt);
                 exportAiListVO.setAverageValue(bigDecimal + "±" + sqrt);
-                exportAiListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
 
             }
 
