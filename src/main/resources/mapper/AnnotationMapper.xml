@@ -1018,6 +1018,14 @@
         </foreach>
     </select>
     
+    
+    <select id="getAIDataList" parameterType="cn.staitech.fr.domain.Annotation"  resultMap="BaseResultMap">
+        select id,dynamic_data 
+          from fr_ai_annotation_${sequenceNumber}
+        where
+            single_slide_id = #{singleSlideId}
+    </select>
+    
     <select id="collectGeometryStIsValid" parameterType="long" resultType="cn.staitech.fr.domain.Annotation">
         SELECT ST_IsValid(st_asgeojson(st_union(contour))) as results
         FROM fr_annotation
