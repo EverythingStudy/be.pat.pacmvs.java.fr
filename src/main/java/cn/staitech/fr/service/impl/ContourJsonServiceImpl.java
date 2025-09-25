@@ -77,8 +77,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
     private CommonJsonParser commonJsonParser;
 
 
-    ExecutorService EXECUTOR = new ThreadPoolExecutor((int) (Runtime.getRuntime().availableProcessors() * 3), Runtime.getRuntime().availableProcessors() * 6, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(), new CustomRejectedExecutionHandler());
-
+    ExecutorService EXECUTOR = new ThreadPoolExecutor((int) (Runtime.getRuntime().availableProcessors() * 3), Runtime.getRuntime().availableProcessors() * 8, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new CustomRejectedExecutionHandler());
 
     static class CustomRejectedExecutionHandler implements RejectedExecutionHandler {
         @Override
@@ -194,7 +193,12 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
     }
 
     private void preFeature(List<Features> features, Map<String, String> dynamicDataMap, STRtree tree, Map<Geometry, Features> geometryMap) {
+    	long start = System.nanoTime();
         preFeature(features, dynamicDataMap, tree, geometryMap, "");
+     // 计算耗时（秒）
+        long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+        long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
+        log.info("preFeature处理 耗时: {} 秒",costSeconds);
     }
 
     /**
@@ -345,7 +349,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
     public void submitPathList(List<String> filteredFilePathList, String jsonName, STRtree tree, Map<Geometry, Features> geometryMap, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir, int zoom, Map<String, String> dynamicDataMap) {
         // 检查文件路径列表是否非空
         if (CollectionUtils.isNotEmpty(filteredFilePathList)) {
-        	long startTime = System.currentTimeMillis();
+        	long start = System.nanoTime();
             // 初始化计数器，用于同步任务完成状态
             CountDownLatch countDownLatch = new CountDownLatch(filteredFilePathList.size());
             // 遍历文件路径列表，提交任务到线程池
@@ -367,11 +371,13 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                 e.printStackTrace();
             }
             
-            long endTime = System.currentTimeMillis();
-            long duration = endTime - startTime;
+         // 计算耗时（秒）
+            long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+            long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
             
             //输出总耗时（单位：毫秒）
-            log.info("项目处理所有瓦块的信息如下-专题id:[{}] ,slideId:[{}],singleSlideId:[{}] ，处理的瓦块文件总共： {} 个任务已执行完毕，总耗时: {} ms (约 {:.2f} 秒)", single.getSpecialId(),single.getSlideId(), single.getSingleId(), new Date(),filteredFilePathList.size(),duration, duration / 1000.0);
+            log.info("项目处理所有瓦块的信息如下-专题jsonName:[{}],singleSlideId:[{}] ，处理的瓦块文件总共：[{}]个任务已执行完毕，总耗时: {}秒)", 
+            		                             jsonName, single.getSingleId(),filteredFilePathList.size(),costSeconds);
         }
     }
 
@@ -441,9 +447,14 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                 // 获取符合条件的数据
                 Envelope envelope = geometry.getEnvelopeInternal();
                 List<Geometry> query = tree.query(envelope);
+                if(CollectionUtils.isNotEmpty(query)) {
+                	log.info("query切分瓦块本地存储jsonName:[{}] ,fileName:[{}],singleSlideId:[{}] 。总的query 个数是 {} 个", 
+    		                jsonName,fileName, single.getSingleId(),query.size());
+                }
                 List<Features> filteredFeatures = new ArrayList<>();
+                long startF = System.nanoTime();
                 for (Geometry g : query) {
-
+                	long startG = System.nanoTime();
                     Features features1 = geometryMap.get(g);
                     // 同一层级下，获取数据后删除，避免重复数据产生,
                     if (z == 8 || (z == 6 && MapConstant.getStructureSize(single.getOrganizationId() + jsonName) == 3)) {
@@ -455,7 +466,18 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                         Features fs = handleSingleJsonElement(features1, MapConstant.getPathologicalIndicatorCategory(single.getOrganizationId(), jsonName), resolutions, zoom, MapUtils.getString(dynamicDataMap, features1.getId()));
                         filteredFeatures.add(fs);
                     }
+                    // 计算耗时（秒）
+                    long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startG);
+                    long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
+                    log.info("query数据处理-jsonName:[{}] ,fileName:[{}],singleSlideId:[{}] , 耗时: {} 秒", 
+    		                jsonName,fileName, single.getSingleId(), costSeconds);
                 }
+                //计算耗时（秒）
+                long costMillisF = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startF);
+                long costSecondsF = TimeUnit.MILLISECONDS.toSeconds(costMillisF);
+                log.info("queryTotal数据处理-jsonName:[{}] ,fileName:[{}],singleSlideId:[{}] , 耗时: {} 秒", 
+		                jsonName,fileName, single.getSingleId(), costSecondsF);
+                
                 if (filteredFeatures.size() > 0) {
                     // 将列表中得数据根据structureSize将structureId分成列表
                     String outputPath = outputDir + "/" + fileName + ".json";
@@ -465,7 +487,8 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                     long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
                     long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
                     double fileSize = getFileSizeInMB(outputPath);
-                    log.info("切分瓦块本地存储专题id:[{}] ,slideId:[{}],singleSlideId:[{}] 。endTime:[{}],存储的瓦块json路径:[{}],文件大小为:[{}M], 耗时: {} 秒", single.getSpecialId(),single.getSlideId(), single.getSingleId(), new Date(),outputPath,fileSize, costSeconds);
+                    log.info("切分瓦块本地存储jsonName:[{}] ,fileName:[{}],singleSlideId:[{}] 。存储的瓦块json路径:[{}],文件大小为:[{}M], 耗时: {} 秒", 
+                    		                jsonName,fileName, single.getSingleId(),outputPath,fileSize, costSeconds);
                 }
             } catch (JSONException e) {
                 log.error("Error processing file: [{}]", e.getMessage());
