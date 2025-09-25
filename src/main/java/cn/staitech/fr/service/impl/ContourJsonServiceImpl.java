@@ -122,15 +122,21 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        //一次性查询当前singleSlideId对应的所有fr_ai_annotation_X对应数据
+        Long seqId = commonJsonParser.getSequenceNumber(specialId);
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(seqId);
+        annotation.setSingleSlideId(singleId);
+        List<Annotation> aiAnnotationList = annotationMapper.getAIDataList(annotation);
+        
         for (JsonFile jsonFile : jsonFileList) {
             String fileUrl = jsonFile.getFileUrl();
             File f = new File(fileUrl);
             String fileName = f.getName().substring(0, f.getName().lastIndexOf("."));
             if (MapConstant.getStructureSize(jsonTask.getOrganizationId() + fileName) == null) {
-                // log.warn("jsonTask id:[{}] singleSlide id:[{}]  structureSize is null； jsonFile:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), fileUrl);
                 continue;
             }
-            jsonParser(f.getPath(), zoomLevels, fileName, singleSlideSelectBy, geometryIdMap, outputDir);
+            jsonParser(f.getPath(), zoomLevels, fileName, singleSlideSelectBy, geometryIdMap, outputDir,aiAnnotationList);
         }
     }
 
@@ -144,10 +150,9 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
      * @param tileGeometryMap      瓦片几何图形映射表
      * @param outputDir            输出目录路径
      */
-    public void jsonParser(String inputGeoJsonFilePath, List<String> zoomLevels, String jsonName, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir) {
+    public void jsonParser(String inputGeoJsonFilePath, List<String> zoomLevels, String jsonName, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir,List<Annotation> aiAnnotationList) {
         JSONArray featuresJson = new JSONArray();
         JsonFactory jsonFactory = new MappingJsonFactory();
-        //ObjectMapper mapper = new ObjectMapper();
         JsonToken current = null;
         try (FileInputStream fis = new FileInputStream(inputGeoJsonFilePath); JsonParser jsonParser = jsonFactory.createParser(fis)) {
             if (jsonParser == null) {
@@ -165,11 +170,10 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                         while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
                             try {
                                 String node = jsonParser.readValueAsTree().toString();
-                                //JsonNode jsonNode = mapper.readTree(node);
                                 JSONObject featureObject = JSONObject.parseObject(node);
                                 featuresJson.add(featureObject);
                                 if (featuresJson.size() > BATCH_SIZE) {
-                                    parseJson(featuresJson, zoomLevels, jsonName, single, tileGeometryMap, outputDir);
+                                    parseJson(featuresJson, zoomLevels, jsonName, single, tileGeometryMap, outputDir,aiAnnotationList);
                                     featuresJson = new JSONArray();
                                 }
                             } catch (Exception e) {
@@ -183,7 +187,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                 }
             }
             if (featuresJson.size() > 0) {
-                parseJson(featuresJson, zoomLevels, jsonName, single, tileGeometryMap, outputDir);
+                parseJson(featuresJson, zoomLevels, jsonName, single, tileGeometryMap, outputDir,aiAnnotationList);
             }
         } catch (Exception e) {
             log.error("inputGeoJsonFilePath:[{}] ,Unexpected error occurred: [{}]，[{}]", inputGeoJsonFilePath, e.getMessage(), e);
@@ -192,12 +196,12 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
     }
 
     private void preFeature(List<Features> features, Map<String, String> dynamicDataMap, STRtree tree, Map<Geometry, Features> geometryMap) {
-    	long start = System.nanoTime();
+//    	long start = System.nanoTime();
         preFeature(features, dynamicDataMap, tree, geometryMap, "");
      // 计算耗时（秒）
-        long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+//        long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
         //long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
-        log.info("preFeature处理 耗时: {} 毫秒",costMillis);
+//        log.info("preFeature处理 耗时: {} 毫秒",costMillis);
     }
 
     /**
@@ -232,20 +236,22 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
      * @param features
      * @return
      */
-    private Map<String, String> preDynamicDataMap(List<Features> features, Long specialId) {
+    private Map<String, String> preDynamicDataMap(List<Features> features, Long specialId,List<Annotation> aiAnnotationList) {
         List<String> idList = features.stream().map(Features::getId).collect(Collectors.toList());
         Map<String, String> dynamicDataMap = new HashMap<>();
-//        Long seqId = ThreadLocalUtils.get(Constants.TEMP_TABLE_KEY);
-        Long seqId = commonJsonParser.getSequenceNumber(specialId);
-
-
-        Annotation annotation = new Annotation();
-        annotation.setSequenceNumber(seqId);
-        annotation.setIdList(idList);
-        List<Annotation> annotationList = annotationMapper.selectIdList(annotation);
+//        Long seqId = commonJsonParser.getSequenceNumber(specialId);
+//        Annotation annotation = new Annotation();
+//        annotation.setSequenceNumber(seqId);
+//        annotation.setIdList(idList);
+//        List<Annotation> annotationList = annotationMapper.selectIdList(annotation);
+        Set<String> targetIdSet = new HashSet<>(idList);
+        List<Annotation> filteredList = aiAnnotationList.stream()
+            .filter(annotation -> targetIdSet.contains(annotation.getId()))
+            .collect(Collectors.toList());
+        
         //将annotationList转map,key为id,value为dynamicData
-        if (CollectionUtils.isNotEmpty(annotationList)) {
-            annotationList.forEach(x -> {
+        if (CollectionUtils.isNotEmpty(filteredList)) {
+        	filteredList.forEach(x -> {
                 dynamicDataMap.put(x.getId(), x.getDynamicData());
             });
         }
@@ -270,10 +276,9 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
      * @param tileGeometryMap 瓦片几何图形映射表
      * @param outputDir       输出目录路径
      */
-    public void parseJson(JSONArray featuresJson, List<String> zoomLevels, String jsonName, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir) {
-        //log.info("singleSlide id:[{}] 轮廓标签:[{}] 轮廓数量:[{}] 开始解析轮廓数据", single.getSingleId(), jsonName, featuresJson.size());
+    public void parseJson(JSONArray featuresJson, List<String> zoomLevels, String jsonName, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir,List<Annotation> aiAnnotationList) {
         List<Features> features = featuresJson.toJavaList(Features.class);
-        Map<String, String> dynamicDataMap = preDynamicDataMap(features, single.getSpecialId());
+        Map<String, String> dynamicDataMap = preDynamicDataMap(features, single.getSpecialId(),aiAnnotationList);
         List<String> filteredFilePathList;
         Map<Geometry, Features> geometryMap = new ConcurrentHashMap<>();
         STRtree tree = new STRtree();
@@ -297,7 +302,6 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                     }
                 }
             }
-            //log.info("singleSlide id:[{}] 大轮廓处理数量:[{}]", single.getSingleId(), list.size());
             // 写入文件
             writeFilteredGeoJson(list, outputPath);
         } else if (size == 2) {
@@ -306,9 +310,6 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             int zoom = (int) computeZoomForImageZoom(2.5, single.getSourceLens(), single.getMaxZ());
             // filePathList,获取文件名称,使用-将z-x-y进行分割，并筛选出z等于zoom的切片
             filteredFilePathList = zoomLevels.stream().filter(filePath -> isFirstDigit(filePath, zoom)).collect(Collectors.toList());
-            if(CollectionUtils.isNotEmpty(zoomLevels)&& CollectionUtils.isNotEmpty(filteredFilePathList)) {
-            	log.info("singleSlide id:[{}] jsonName:[{}] zoomLevels数量:[{}]  filteredFilePathList数量:[{}]", single.getSingleId(), jsonName, zoomLevels.size(),filteredFilePathList.size());
-            }
             submitPathList(filteredFilePathList, jsonName, tree, geometryMap, single, tileGeometryMap, outputDir, 40, dynamicDataMap);
         } else {
             preFeature(features, dynamicDataMap, tree, geometryMap);
@@ -316,9 +317,6 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             int zoom = (int) computeZoomForImageZoom(40, single.getSourceLens(), single.getMaxZ());
             // filePathList,获取文件名称,使用-将z-x-y进行分割，并筛选出z等于zoom的切片
             filteredFilePathList = zoomLevels.stream().filter(filePath -> isFirstDigit(filePath, zoom)).collect(Collectors.toList());
-            if(CollectionUtils.isNotEmpty(zoomLevels)&& CollectionUtils.isNotEmpty(filteredFilePathList)) {
-            	log.info("singleSlide id:[{}] jsonName:[{}] zoomLevels数量:[{}]  filteredFilePathList数量:[{}]", single.getSingleId(), jsonName, zoomLevels.size(),filteredFilePathList.size());
-            }
             submitPathList(filteredFilePathList, jsonName, tree, geometryMap, single, tileGeometryMap, outputDir, 40, dynamicDataMap);
         }
 
@@ -354,7 +352,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
     public void submitPathList(List<String> filteredFilePathList, String jsonName, STRtree tree, Map<Geometry, Features> geometryMap, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir, int zoom, Map<String, String> dynamicDataMap) {
         // 检查文件路径列表是否非空
         if (CollectionUtils.isNotEmpty(filteredFilePathList)) {
-        	long start = System.nanoTime();
+        	//long start = System.nanoTime();
             // 初始化计数器，用于同步任务完成状态
             CountDownLatch countDownLatch = new CountDownLatch(filteredFilePathList.size());
             // 遍历文件路径列表，提交任务到线程池
@@ -377,12 +375,12 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             }
             
          // 计算耗时（秒）
-            long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+//            long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
             //long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
             
             //输出总耗时（单位：毫秒）
-            log.info("项目处理所有瓦块的信息如下-专题jsonName:[{}],singleSlideId:[{}] ，处理的瓦块文件总共：[{}]个任务已执行完毕，总耗时: {}毫秒)", 
-            		                             jsonName, single.getSingleId(),filteredFilePathList.size(),costMillis);
+//            log.info("项目处理所有瓦块的信息如下-专题jsonName:[{}],singleSlideId:[{}] ，处理的瓦块文件总共：[{}]个任务已执行完毕，总耗时: {}毫秒)", 
+//            		                             jsonName, single.getSingleId(),filteredFilePathList.size(),costMillis);
         }
     }
 
@@ -434,7 +432,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
 
         @Override
         public void run() {
-        	long start = System.nanoTime();
+//        	long start = System.nanoTime();
             try {
                 // 将名称根据-划分为在z,x,y
                 String[] split = fileName.split("-");
@@ -452,12 +450,12 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                 // 获取符合条件的数据
                 Envelope envelope = geometry.getEnvelopeInternal();
                 List<Geometry> query = tree.query(envelope);
-                if(CollectionUtils.isNotEmpty(query)) {
-                	log.info("query切分瓦块本地存储jsonName:[{}] ,fileName:[{}],singleSlideId:[{}] 。总的query 个数是 {} 个", 
-    		                jsonName,fileName, single.getSingleId(),query.size());
-                }
+//                if(CollectionUtils.isNotEmpty(query)) {
+//                	log.info("query切分瓦块本地存储jsonName:[{}] ,fileName:[{}],singleSlideId:[{}] 。总的query 个数是 {} 个", 
+//    		                jsonName,fileName, single.getSingleId(),query.size());
+//                }
                 List<Features> filteredFeatures = new ArrayList<>();
-                long startF = System.nanoTime();
+                //long startF = System.nanoTime();
                 double resolutions = Double.parseDouble(single.getResolutionX());
                 StructureTag structureTag = MapConstant.getPathologicalIndicatorCategory(single.getOrganizationId(), jsonName);
                 boolean needRemove = (z == 8 || (z == 6 && MapConstant.getStructureSize(single.getOrganizationId() + jsonName) == 3));
@@ -485,10 +483,10 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                     }
                 }
                 //计算耗时（秒）
-                long costMillisF = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startF);
+//                long costMillisF = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startF);
                 //long costSecondsF = TimeUnit.MILLISECONDS.toSeconds(costMillisF);
-                log.info("queryTotal数据处理-jsonName:[{}] ,fileName:[{}],singleSlideId:[{}] , 耗时: {} 毫秒", 
-		                jsonName,fileName, single.getSingleId(), costMillisF);
+//                log.info("queryTotal数据处理-jsonName:[{}] ,fileName:[{}],singleSlideId:[{}] , 耗时: {} 毫秒", 
+//		                jsonName,fileName, single.getSingleId(), costMillisF);
                 
                 if (filteredFeatures.size() > 0) {
                     // 将列表中得数据根据structureSize将structureId分成列表
@@ -496,11 +494,11 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                     // 写入文件
                     writeFilteredGeoJson(filteredFeatures, outputPath);
                     // 计算耗时（秒）
-                    long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
-                    //long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
-                    double fileSize = getFileSizeInMB(outputPath);
-                    log.info("切分瓦块本地存储jsonName:[{}] ,fileName:[{}],singleSlideId:[{}] 。存储的瓦块json路径:[{}],文件大小为:[{}M], 耗时: {} 毫秒", 
-                    		                jsonName,fileName, single.getSingleId(),outputPath,fileSize, costMillis);
+//                    long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+//                    long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
+//                    double fileSize = getFileSizeInMB(outputPath);
+//                    log.info("切分瓦块本地存储jsonName:[{}] ,fileName:[{}],singleSlideId:[{}] 。存储的瓦块json路径:[{}],文件大小为:[{}M], 耗时: {} 毫秒", 
+//                    		                jsonName,fileName, single.getSingleId(),outputPath,fileSize, costMillis);
                 }
             } catch (JSONException e) {
                 log.error("Error processing file: [{}]", e.getMessage());
