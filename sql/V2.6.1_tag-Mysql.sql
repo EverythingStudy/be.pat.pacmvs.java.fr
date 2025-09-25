@@ -132,7 +132,7 @@ UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_diffe
 UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 0, structured_analysis = 1 WHERE organ_tag_code = '0A';
 UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 0, structured_analysis = 1 WHERE organ_tag_code = '0B';
 UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 0, structured_analysis = 1 WHERE organ_tag_code = '0D';
-UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 0, structured_analysis = 0 WHERE organ_tag_code = '0E';
+UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 0, structured_analysis = 1 WHERE organ_tag_code = '0E';
 UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 0, screening_difference = 0, structured_analysis = 0 WHERE organ_tag_code = '0F';
 UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 0, structured_analysis = 1 WHERE organ_tag_code = '10';
 UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 1, structured_analysis = 1 WHERE organ_tag_code = '12';
@@ -184,7 +184,7 @@ UPDATE tb_organ_tag SET organ_recognition = 0, fine_contour = 0, screening_diffe
 UPDATE tb_organ_tag SET organ_recognition = 0, fine_contour = 0, screening_difference = 0, structured_analysis = 0 WHERE organ_tag_code = '78';
 -- UPDATE tb_organ_tag SET organ_recognition = , fine_contour = , screening_difference = , structured_analysis =  WHERE organ_tag_code = '79';
 UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 0, structured_analysis = 1 WHERE organ_tag_code = '7A';
-UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 0, structured_analysis = 0 WHERE organ_tag_code = '7B';
+UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 0, screening_difference = 0, structured_analysis = 0 WHERE organ_tag_code = '7B';
 UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 0, structured_analysis = 1 WHERE organ_tag_code = '7C';
 UPDATE tb_organ_tag SET organ_recognition = 1, fine_contour = 1, screening_difference = 0, structured_analysis = 1 WHERE organ_tag_code = '7D';
 UPDATE tb_organ_tag SET organ_recognition = 0, fine_contour = 0, screening_difference = 0, structured_analysis = 0 WHERE organ_tag_code = '7F';
