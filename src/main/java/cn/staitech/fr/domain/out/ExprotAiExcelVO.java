@@ -34,7 +34,7 @@ public class ExprotAiExcelVO {
     @ExcelProperty(index = 6, value = "单位")
     private String unit;
 
-    @ApiModelProperty(name = "normalDistribution", value = "正态分布95%")
+    @ApiModelProperty(value = "正态分布95%")
     @ExcelProperty(index = 7, value = "正态分布95%")
     private String normalDistribution;
 

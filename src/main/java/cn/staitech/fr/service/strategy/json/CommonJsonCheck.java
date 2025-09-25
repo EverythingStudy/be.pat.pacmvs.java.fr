@@ -165,6 +165,7 @@ public class CommonJsonCheck {
 
     public boolean checkJson(JsonTask jsonTask, List<JsonFile> jsonFileList) {
         if (checkCategory(jsonTask)) {
+            log.info("checkCategory 为空");
             return false;
         }
 
@@ -184,7 +185,7 @@ public class CommonJsonCheck {
             try (FileInputStream fis = new FileInputStream(jsonFile); JsonParser jsonParser = jsonFactory.createParser(fis)) {
                 current = jsonParser.nextToken();
                 if (current != JsonToken.START_OBJECT) {
-                    log.error("json type error！ : {}", current);
+                    log.error("json type error！ : {},{}", current, jsonFileS.getFileUrl());
                     return false;
                 }
                 while (jsonParser.nextToken() != JsonToken.END_OBJECT) {

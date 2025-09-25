@@ -662,7 +662,8 @@
         SELECT st_asgeojson(st_union(contour)) as collectContour
         FROM fr_annotation
         WHERE single_slide_id = #{singleSlideId}
-          AND contour_type = 2
+        <!-- 标注类型：默认 0  1 粗轮廓 2 精细轮廓 -->
+          AND contour_type = 1
     </select>
 
     <select id="unionGeometryArea" parameterType="long" resultMap="BaseResultMap">
@@ -683,7 +684,8 @@
         FROM fr_annotation
         WHERE single_slide_id = #{singleSlideId}
           AND category_id = #{categoryId}
-          AND contour_type = 2
+          <!-- 标注类型：默认 0  1 粗轮廓 2 精细轮廓 -->
+          AND contour_type = 1
     </select>
 
     <select id="intersectsGeometry" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
@@ -1030,7 +1032,8 @@
         SELECT ST_IsValid(st_asgeojson(st_union(contour))) as results
         FROM fr_annotation
         WHERE single_slide_id = #{singleSlideId}
-          AND contour_type = 2
+        <!-- 标注类型：默认 0  1 粗轮廓 2 精细轮廓 -->
+          AND contour_type = 1
     </select>
 	
 

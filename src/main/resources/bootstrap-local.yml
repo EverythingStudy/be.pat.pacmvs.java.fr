@@ -1,9 +1,8 @@
 spring:
   profiles: local
-
   cloud:
     nacos:
       discovery:
         enabled: false
       config:
-        enabled: false
+        enabled: true

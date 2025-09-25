@@ -32,6 +32,7 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -150,7 +151,7 @@ public class CommonJsonParser {
             // 拿到categoryId
             Long categoryId = pathologicalMap.get(labelCode);
             if (null == categoryId) {
-                log.info("categoryId解析失败,labelCode:[{}]",labelCode);
+                log.info("categoryId解析失败,labelCode:[{}]", labelCode);
                 return null;
             }
             annotation.setSlideId(jsonTask.getSlideId());
@@ -221,7 +222,11 @@ public class CommonJsonParser {
                                     return null;
                                 }).filter(Objects::nonNull).collect(Collectors.toList());
                                 anno.setList(processedAnnotations);
+                                long start = System.nanoTime();
                                 annotationService.batchProcessAndSave(anno, 1000);
+                                long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
+                                long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);
+                                log.info("单次开始批量保存时间 singleId:{},url:{},time:{} 秒", jsonTask.getSingleId(), jsonFileS.getFileUrl(), costSeconds);
                                 elementsList = new ArrayList<>();
                             }
                         }
@@ -264,6 +269,7 @@ public class CommonJsonParser {
                         annotation3.setSingleSlideId(jsonTask.getSingleId());
                         annotation3.setInsideOrOutside(false);
                         //预先查询下是否有需要删除的数据，主要是为了验证一些结构丢失问题
+                        /**
                         List<Annotation> delAnnoList = annotationMapper.getDelAnnotation(annotation3);
                         if(CollectionUtils.isNotEmpty(delAnnoList)) {
                         	Map<Long,Long>  annoCategoryIdMap = delAnnoList.stream().collect(Collectors.toMap(Annotation::getAnnotationId, Annotation::getCategoryId));
@@ -291,10 +297,11 @@ public class CommonJsonParser {
                         	    ObjectUtil.isNotEmpty(structureIdSet) ? structureIdSet.toString() : ""
                         	);
                         }
-//                        Integer delTotal = annotationMapper.deleteAiAnnotation(annotation3);
-//                        if(null != delTotal) {
-//                            log.info("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],精细轮廓和结构指标去除无效数据，删除的数据总条数是：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId(),delTotal);
-//                        }
+                        */
+                        Integer delTotal = annotationMapper.deleteAiAnnotation(annotation3);
+                        if(null != delTotal) {
+                            log.info("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],精细轮廓和结构指标去除无效数据，删除的数据总条数是：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId(),delTotal);
+                        }
                     } else {
                         log.error("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],不合规", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId());
                     }
@@ -322,7 +329,7 @@ public class CommonJsonParser {
                             annotation4.setSequenceNumber(sequenceNumber);
                             annotation4.setSingleSlideId(jsonTask.getSingleId());
                             annotation4.setInsideOrOutside(true);
-                           // annotationMapper.deleteAiAnnotation(annotation4);
+                            annotationMapper.deleteAiAnnotation(annotation4);
                         }
                     }
                 }
@@ -333,7 +340,7 @@ public class CommonJsonParser {
         }
 
     }
-    
+
     /**
      * 
     * @Title: findKeyByValue
@@ -364,10 +371,10 @@ public class CommonJsonParser {
         Annotation area = annotationMapper.getArea(annotation);
         //面积
         String annoArea = area.getArea();
-        BigDecimal areaNumber = new BigDecimal(annoArea.trim()); 
+        BigDecimal areaNumber = new BigDecimal(annoArea.trim());
         // 面积为负数，需要获取有效的面积
         if (areaNumber.compareTo(BigDecimal.ZERO) < 0) {
-        	annoArea = area.getEffectiveArea();
+            annoArea = area.getEffectiveArea();
         }
         BigDecimal decimal = new BigDecimal(ObjectUtil.isNotEmpty(annoArea) ? annoArea : "0");
         annotation.setArea(decimal.multiply(new BigDecimal(finalResolutionX)).multiply(new BigDecimal(finalResolutionX)).setScale(3, RoundingMode.HALF_UP).toString());

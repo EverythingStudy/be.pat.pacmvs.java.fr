@@ -94,6 +94,7 @@ logging:
     # 如果还看不到，可以同时打开更底层的 ConfigFileApplicationListener
     org.springframework.boot.context.config.ConfigFileApplicationListener: TRACE
     org.springframework.amqp.rabbit.core.RabbitTemplate: DEBUG
+    cn.staitech.fr.mapper: DEBUG
 management:
   endpoints:
     web:
