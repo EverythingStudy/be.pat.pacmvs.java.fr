@@ -321,10 +321,10 @@ public class CommonJsonParser {
                         	);
                         }
                         */
-                        Integer delTotal = annotationMapper.deleteAiAnnotation(annotation3);
-                        if(null != delTotal) {
-                            log.info("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],精细轮廓和结构指标去除无效数据，删除的数据总条数是：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId(),delTotal);
-                        }
+//                        Integer delTotal = annotationMapper.deleteAiAnnotation(annotation3);
+//                        if(null != delTotal) {
+//                            log.info("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],精细轮廓和结构指标去除无效数据，删除的数据总条数是：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId(),delTotal);
+//                        }
                     } else {
                         log.error("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],不合规", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId());
                     }
