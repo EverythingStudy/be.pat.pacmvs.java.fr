@@ -241,9 +241,9 @@ public class CommonJsonCheck {
         wrapper1.eq("organ_tag_id", jsonTask.getCategoryId());
         OrganTag category = organTagMapper.selectOne(wrapper1);
         if (ObjectUtil.isEmpty(category)) {
+        	log.info("json标签id,校验失败(tb_structure_tag不存在这个标签),singleSlideId:{},标签id:{}", jsonTask.getSingleId(), jsonTask.getCategoryId());
             return true;
         }
-        log.info("json标签id,校验失败(tb_structure_tag不存在这个标签),singleSlideId:{},标签id:{}", jsonTask.getSingleId(), jsonTask.getCategoryId());
         return false;
     }
 
