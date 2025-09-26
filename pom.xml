@@ -184,6 +184,11 @@
             <artifactId>easyexcel</artifactId>
             <version>3.2.1</version>
         </dependency>
+        <dependency>
+            <groupId>net.postgis</groupId>
+            <artifactId>postgis-jdbc</artifactId>
+            <version>2.5.0</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>

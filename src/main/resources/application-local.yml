@@ -166,6 +166,8 @@ organ-structures:
       - structure-id: 14C004,14C006
     4D: #  气管
       - structure-id: 14D007,14D035,14D00B
+    0E: # 喉
+      - structure-id: "10E133"
     5C: #  骨骼肌
       - structure-id: 15C02A
     69: #  泪腺
