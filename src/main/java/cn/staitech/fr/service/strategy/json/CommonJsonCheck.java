@@ -146,7 +146,7 @@ public class CommonJsonCheck {
             // 拿到categoryId
             Long categoryId = pathologicalMap.get(labelCode);
             if (null == categoryId) {
-                log.info("categoryId解析失败");
+                log.info("categoryId获取失败,tb_structure_tag不存在这个标签,singleSlideId:{},labelCode:{},", jsonTask.getSingleId(), labelCode);
                 return false;
             }
             annotation.setSlideId(jsonTask.getSlideId());
@@ -165,7 +165,6 @@ public class CommonJsonCheck {
 
     public boolean checkJson(JsonTask jsonTask, List<JsonFile> jsonFileList) {
         if (checkCategory(jsonTask)) {
-            log.info("checkCategory 为空");
             return false;
         }
 
@@ -244,6 +243,7 @@ public class CommonJsonCheck {
         if (ObjectUtil.isEmpty(category)) {
             return true;
         }
+        log.info("json标签id,校验失败(tb_structure_tag不存在这个标签),singleSlideId:{},标签id:{}", jsonTask.getSingleId(), jsonTask.getCategoryId());
         return false;
     }
 

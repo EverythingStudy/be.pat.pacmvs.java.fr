@@ -1035,6 +1035,26 @@
         <!-- 标注类型：默认 0  1 粗轮廓 2 精细轮廓 -->
           AND contour_type = 1
     </select>
+    
+    <select id="getCollectGeometryStIsValid" parameterType="cn.staitech.fr.domain.Annotation" resultType="cn.staitech.fr.domain.Annotation">
+        SELECT ST_IsValid(st_asgeojson(st_union(contour))) as results
+        FROM fr_annotation
+        WHERE 
+        slide_id IN ( SELECT DISTINCT ( slide_id ) FROM fr_annotation WHERE single_slide_id = #{singleSlideId} )
+        AND tag_id = #{tagId} 
+        <!-- 标注类型：默认 0  1 粗轮廓 2 精细轮廓 -->
+         AND contour_type = 1
+    </select>
+    
+    <select id="getCollectGeometryIsValid" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT st_asgeojson(st_union(contour)) as collectContour
+        FROM fr_annotation
+        WHERE 
+        slide_id IN ( SELECT DISTINCT ( slide_id ) FROM fr_annotation WHERE single_slide_id = #{singleSlideId} )
+        AND tag_id = #{tagId} 
+        <!-- 标注类型：默认 0  1 粗轮廓 2 精细轮廓 -->
+         AND contour_type = 1
+    </select>
 	
 
 </mapper>

@@ -120,6 +120,10 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     Annotation collectGeometryStIsValid(Long singleSlideId);
     
     List<Annotation> getAIDataList(Annotation annotation);
+    
+    Annotation getCollectGeometryStIsValid(Annotation annotation);
+    
+    Annotation getCollectGeometryIsValid(Annotation annotation);
 }
 
 
