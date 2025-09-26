@@ -251,22 +251,29 @@ public class CommonJsonParser {
                 annotationService.batchProcessAndSave(anno, 1000);
             }
 
-            Annotation annotation = new Annotation();
-            annotation.setMagnification(40000L);
-            annotation.setFiligreeContour(true);
-            annotation.setSingleSlideId(jsonTask.getSingleId());
-            Annotation annotationIsValid = annotationMapper.collectGeometryStIsValid(jsonTask.getSingleId());
-
+//            Annotation annotation = new Annotation();
+//            annotation.setMagnification(40000L);
+//            annotation.setFiligreeContour(true);
+//            annotation.setSingleSlideId(jsonTask.getSingleId());
+            //精细
+//            Annotation annotationIsValid = annotationMapper.collectGeometryStIsValid(jsonTask.getSingleId());
+            //粗轮廓
+            Long singSlideId = jsonTask.getSingleId();
+            Annotation annoQuery = new Annotation();
+            annoQuery.setSingleSlideId(singSlideId);
+            annoQuery.setTagId(jsonTask.getCategoryId());
+            Annotation annotationIsValid = annotationMapper.getCollectGeometryStIsValid(annoQuery);
             // 校验合并后是否合规
             if (null != annotationIsValid) {
                 if (StringUtils.isNotEmpty(annotationIsValid.getResults())) {
                     if (ObjectUtil.equals(annotationIsValid.getResults(), "t")) {
                         // 合并轮廓
-                        Annotation annotation3 = annotationMapper.collectGeometry(jsonTask.getSingleId());
+//                        Annotation annotation3 = annotationMapper.collectGeometry(singSlideId);
+                    	 Annotation annotation3 = annotationMapper.getCollectGeometryIsValid(annoQuery);
                         annotation3.setContour(annotation3.getCollectContour());
                         // 查询有效精细轮廓列表
                         annotation3.setSequenceNumber(sequenceNumber);
-                        annotation3.setSingleSlideId(jsonTask.getSingleId());
+                        annotation3.setSingleSlideId(singSlideId);
                         annotation3.setInsideOrOutside(false);
                         //预先查询下是否有需要删除的数据，主要是为了验证一些结构丢失问题
                         /**
@@ -311,11 +318,13 @@ public class CommonJsonParser {
             }
             // 删除甲状旁腺内所有数据
             // 查询甲状旁腺精细轮廓进行合并
+            /**
+             * 
             if (Objects.equals(jsonTask.getAlgorithmCode(), "Thyroid_gland")) {
                 Annotation annotation1 = new Annotation();
                 annotation1.setMagnification(40000L);
                 annotation1.setFiligreeContour(true);
-                annotation1.setSingleSlideId(jsonTask.getSingleId());
+                annotation1.setSingleSlideId(singSlideId);
                 LambdaQueryWrapper<OrganTag> categoryLambdaQueryWrapper = new LambdaQueryWrapper<>();
                 categoryLambdaQueryWrapper.eq(OrganTag::getOrganEn, "Parathyroid").eq(OrganTag::getSpeciesId, 1);
                 OrganTag organTag = organTagMapper.selectOne(categoryLambdaQueryWrapper);
@@ -334,6 +343,7 @@ public class CommonJsonParser {
                     }
                 }
             }
+            */
             log.info("parseJson --------------> Json文件解析结束:{} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);

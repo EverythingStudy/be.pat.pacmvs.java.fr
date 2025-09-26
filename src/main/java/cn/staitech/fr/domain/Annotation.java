@@ -254,7 +254,9 @@ public class Annotation implements Serializable {
 
     @TableField(exist = false)
     private String effectiveArea;
-
+    
+    @TableField(exist = false)
+    private Long tagId;
 
     @Override
     public boolean equals(Object that) {
