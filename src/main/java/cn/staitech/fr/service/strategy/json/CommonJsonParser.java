@@ -7,6 +7,7 @@ import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AnnotationService;
+import cn.staitech.fr.vo.geojson.GeoJson;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.postgis.PGgeometry;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -132,20 +134,20 @@ public class CommonJsonParser {
             annotation.setProjectId(0L);
 
             if (null != geometry) {
-                annotation.setContour40000(geometry.toString());
+                annotation.setContour40000(JSONObject.toJSONString(convertGeoJsonToPGGeometry(geometry.toString())));
             }
             if (null != geometry10000) {
-                annotation.setContour10000(geometry10000.toString());
+                annotation.setContour10000(JSONObject.toJSONString(convertGeoJsonToPGGeometry(geometry10000.toString())));
             }
             if (null != geometry2500) {
-                annotation.setContour2500(geometry2500.toString());
+                annotation.setContour2500(JSONObject.toJSONString(convertGeoJsonToPGGeometry(geometry2500.toString())));
             }
             if (null != geometry625) {
-                annotation.setContour625(geometry625.toString());
+                annotation.setContour625(JSONObject.toJSONString(convertGeoJsonToPGGeometry(geometry625.toString())));
             }
             //
             if (null != geometry0) {
-                annotation.setContour5000(geometry0.toString());
+                annotation.setContour5000(JSONObject.toJSONString(convertGeoJsonToPGGeometry(geometry0.toString())));
             }
             annotation.setId(annotationId);
             // 拿到categoryId
@@ -167,7 +169,20 @@ public class CommonJsonParser {
             return null;
         }
     }
-
+    /**
+     * 将GeoJSON转换为PostGIS几何对象
+     */
+    private static PGgeometry convertGeoJsonToPGGeometry(String geoJson) {
+        if (StringUtils.isEmpty(geoJson)) {
+            return null;
+        }
+        try {
+            return new PGgeometry(geoJson);
+        } catch (Exception e) {
+            log.error("Failed to convert GeoJSON to PGGeometry: " + geoJson, e);
+            return null;
+        }
+    }
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         log.info("parseJson -------------->  Json文件解析开始:{} {} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
         if (checkCategory(jsonTask)) {

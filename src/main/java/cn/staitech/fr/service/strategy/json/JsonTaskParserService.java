@@ -237,16 +237,11 @@ public class JsonTaskParserService {
 
     private Boolean verifyCategoryStructure(JsonTask jsonTask) {
         OrganTag category = organTagMapper.selectById(jsonTask.getCategoryId());
-        //AI识别每个脏器对应的结构
         //AI识别每个脏器对应的结构JSON文件
         List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
         if (CollectionUtils.isNotEmpty(fileList)) {
-            //Set<String> structureIdSet1 = fileList.stream().map(e -> e.getStructureId()).collect(Collectors.toSet());
             List<String> structureIdSet1 = fileList.stream().map(e -> e.getStructureId()).collect(Collectors.toList());
             return isOrganRecognitionComplete(category.getOrganTagCode(), structureIdSet1);
-//            if (structureIdSet1.containsAll(structureIdSet)) {
-//                return Boolean.TRUE;
-//            }
         }
         return Boolean.FALSE;
     }
@@ -266,8 +261,6 @@ public class JsonTaskParserService {
 
         // 获取该脏器所有启用的结构
         List<String> enabledStructures = Arrays.asList(structures.get(0).getStructureId().split(","));
-        //Set<String> enabledStructures = structures.stream().filter(OrganStructureConfig.OrganStructure::getEnabled).map(OrganStructureConfig.OrganStructure::getStructureId).collect(Collectors.toSet());
-
         // 检查所有启用的结构是否都已完成识别
         return completedStructures.containsAll(enabledStructures);
     }

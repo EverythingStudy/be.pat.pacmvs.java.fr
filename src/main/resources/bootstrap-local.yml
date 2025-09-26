@@ -5,4 +5,4 @@ spring:
       discovery:
         enabled: false
       config:
-        enabled: true
+        enabled: false
