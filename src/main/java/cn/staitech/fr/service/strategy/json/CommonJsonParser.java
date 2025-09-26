@@ -134,20 +134,20 @@ public class CommonJsonParser {
             annotation.setProjectId(0L);
 
             if (null != geometry) {
-                annotation.setContour40000(JSONObject.toJSONString(convertGeoJsonToPGGeometry(geometry.toString())));
+                annotation.setContour40000(JSONObject.toJSONString(geometry.toString()));
             }
             if (null != geometry10000) {
-                annotation.setContour10000(JSONObject.toJSONString(convertGeoJsonToPGGeometry(geometry10000.toString())));
+                annotation.setContour10000(JSONObject.toJSONString(geometry10000.toString()));
             }
             if (null != geometry2500) {
-                annotation.setContour2500(JSONObject.toJSONString(convertGeoJsonToPGGeometry(geometry2500.toString())));
+                annotation.setContour2500(JSONObject.toJSONString(geometry2500.toString()));
             }
             if (null != geometry625) {
-                annotation.setContour625(JSONObject.toJSONString(convertGeoJsonToPGGeometry(geometry625.toString())));
+                annotation.setContour625(JSONObject.toJSONString(geometry625.toString()));
             }
             //
             if (null != geometry0) {
-                annotation.setContour5000(JSONObject.toJSONString(convertGeoJsonToPGGeometry(geometry0.toString())));
+                annotation.setContour5000(JSONObject.toJSONString(geometry0.toString()));
             }
             annotation.setId(annotationId);
             // 拿到categoryId
@@ -169,6 +169,7 @@ public class CommonJsonParser {
             return null;
         }
     }
+
     /**
      * 将GeoJSON转换为PostGIS几何对象
      */
@@ -320,10 +321,10 @@ public class CommonJsonParser {
                         	);
                         }
                         */
-                        Integer delTotal = annotationMapper.deleteAiAnnotation(annotation3);
-                        if(null != delTotal) {
-                            log.info("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],精细轮廓和结构指标去除无效数据，删除的数据总条数是：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId(),delTotal);
-                        }
+//                        Integer delTotal = annotationMapper.deleteAiAnnotation(annotation3);
+//                        if(null != delTotal) {
+//                            log.info("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],精细轮廓和结构指标去除无效数据，删除的数据总条数是：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId(),delTotal);
+//                        }
                     } else {
                         log.error("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],不合规", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId());
                     }
