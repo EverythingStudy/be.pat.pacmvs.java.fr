@@ -191,7 +191,7 @@ public class CommonJsonParser {
         GeometryJSON gjson = new GeometryJSON();
         Geometry geometry = null;
         try {
-            geometry = gjson.readGeometryCollection(geoJson);
+            geometry = gjson.read(geoJson);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
