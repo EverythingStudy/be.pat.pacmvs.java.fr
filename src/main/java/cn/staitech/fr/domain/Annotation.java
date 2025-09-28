@@ -104,16 +104,23 @@ public class Annotation implements Serializable {
     private String contour;
 
     private String contour40000;
-
+    @TableField(exist = false)
+    private byte[] contourB40000;
     private String contour10000;
-    
+    @TableField(exist = false)
+    private byte[] contourB10000;
     @TableField(exist = false)
     private String contour5000;
+    @TableField(exist = false)
+    private byte[] contourB5000;
 
     private String contour2500;
+    @TableField(exist = false)
+    private byte[] contourB2500;
 
     private String contour625;
-    
+    @TableField(exist = false)
+    private byte[] contourB625;
     /**
      * 轮廓类型 1：矩形 2：标注轮廓
      */

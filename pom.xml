@@ -131,8 +131,8 @@
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojson</artifactId>
             <version>19.0</version>
-<!--            <scope>system</scope>-->
-<!--            <systemPath>${project.basedir}/src/main/resources/lib/gt-geojson-19.0.jar</systemPath>-->
+            <!--            <scope>system</scope>-->
+            <!--            <systemPath>${project.basedir}/src/main/resources/lib/gt-geojson-19.0.jar</systemPath>-->
         </dependency>
         <dependency>
             <groupId>com.deepoove</groupId>
@@ -188,6 +188,11 @@
             <groupId>net.postgis</groupId>
             <artifactId>postgis-jdbc</artifactId>
             <version>2.5.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-geojson</artifactId>
+            <version>25.0</version>
         </dependency>
     </dependencies>
     <repositories>
@@ -306,17 +311,17 @@
                 <serverAddr>192.168.52.224:8848</serverAddr>
             </properties>
         </profile>
-<!--        <profile>-->
-<!--            &lt;!&ndash;开发环境&ndash;&gt;-->
-<!--            <id>pvcmvsdev1</id>-->
-<!--            <properties>-->
-<!--                <activatedProperties>pvcmvsdev1</activatedProperties>-->
-<!--                <nacosNamespace>18649c47-5206-4c52-9560-44c66d300d0f</nacosNamespace>-->
-<!--                <nacosAddress>http://192.168.52.224:8848</nacosAddress>-->
-<!--                <nacosGroup>DEFAULT_GROUP</nacosGroup>-->
-<!--                <serverAddr>192.168.52.224:8848</serverAddr>-->
-<!--            </properties>-->
-<!--        </profile>-->
+        <!--        <profile>-->
+        <!--            &lt;!&ndash;开发环境&ndash;&gt;-->
+        <!--            <id>pvcmvsdev1</id>-->
+        <!--            <properties>-->
+        <!--                <activatedProperties>pvcmvsdev1</activatedProperties>-->
+        <!--                <nacosNamespace>18649c47-5206-4c52-9560-44c66d300d0f</nacosNamespace>-->
+        <!--                <nacosAddress>http://192.168.52.224:8848</nacosAddress>-->
+        <!--                <nacosGroup>DEFAULT_GROUP</nacosGroup>-->
+        <!--                <serverAddr>192.168.52.224:8848</serverAddr>-->
+        <!--            </properties>-->
+        <!--        </profile>-->
 
         <profile>
             <!--测试环境-->

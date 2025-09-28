@@ -2,12 +2,10 @@ package cn.staitech.fr.service.strategy.json;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.json.JSONUtil;
 import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AnnotationService;
-import cn.staitech.fr.vo.geojson.GeoJson;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -21,15 +19,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.geotools.geojson.geom.GeometryJSON;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.WKBWriter;
 import org.postgis.PGgeometry;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
@@ -133,21 +133,37 @@ public class CommonJsonParser {
             annotation.setCreateTime(String.valueOf(new Date()));
             annotation.setProjectId(0L);
 
+//            if (null != geometry) {
+//                annotation.setContour40000(JSONObject.toJSONString(geometry.toString()));
+//            }
+//            if (null != geometry10000) {
+//                annotation.setContour10000(JSONObject.toJSONString(geometry10000.toString()));
+//            }
+//            if (null != geometry2500) {
+//                annotation.setContour2500(JSONObject.toJSONString(geometry2500.toString()));
+//            }
+//            if (null != geometry625) {
+//                annotation.setContour625(JSONObject.toJSONString(geometry625.toString()));
+//            }
+//            //
+//            if (null != geometry0) {
+//                annotation.setContour5000(JSONObject.toJSONString(geometry0.toString()));
+//            }
             if (null != geometry) {
-                annotation.setContour40000(JSONObject.toJSONString(geometry.toString()));
+                annotation.setContourB40000(geoJsonToWkb(geometry.toString()));
             }
             if (null != geometry10000) {
-                annotation.setContour10000(JSONObject.toJSONString(geometry10000.toString()));
+                annotation.setContourB10000(geoJsonToWkb(geometry10000.toString()));
             }
             if (null != geometry2500) {
-                annotation.setContour2500(JSONObject.toJSONString(geometry2500.toString()));
+                annotation.setContourB2500(geoJsonToWkb(geometry2500.toString()));
             }
             if (null != geometry625) {
-                annotation.setContour625(JSONObject.toJSONString(geometry625.toString()));
+                annotation.setContourB625(geoJsonToWkb(geometry625.toString()));
             }
             //
             if (null != geometry0) {
-                annotation.setContour5000(JSONObject.toJSONString(geometry0.toString()));
+                annotation.setContourB5000(geoJsonToWkb(geometry0.toString()));
             }
             annotation.setId(annotationId);
             // 拿到categoryId
@@ -170,6 +186,20 @@ public class CommonJsonParser {
         }
     }
 
+    public static byte[] geoJsonToWkb(String geoJson) {
+        // 使用GeoTools或JTS解析GeoJSON
+        GeometryJSON gjson = new GeometryJSON();
+        Geometry geometry = null;
+        try {
+            geometry = gjson.readGeometryCollection(geoJson);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        // 转换为WKB格式
+        WKBWriter wkbWriter = new WKBWriter();
+        return wkbWriter.write(geometry);
+    }
+
     /**
      * 将GeoJSON转换为PostGIS几何对象
      */
@@ -184,6 +214,7 @@ public class CommonJsonParser {
             return null;
         }
     }
+
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         log.info("parseJson -------------->  Json文件解析开始:{} {} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
         if (checkCategory(jsonTask)) {
@@ -285,7 +316,7 @@ public class CommonJsonParser {
                     if (ObjectUtil.equals(annotationIsValid.getResults(), "t")) {
                         // 合并轮廓
 //                        Annotation annotation3 = annotationMapper.collectGeometry(singSlideId);
-                    	 Annotation annotation3 = annotationMapper.getCollectGeometryIsValid(annoQuery);
+                        Annotation annotation3 = annotationMapper.getCollectGeometryIsValid(annoQuery);
                         annotation3.setContour(annotation3.getCollectContour());
                         // 查询有效精细轮廓列表
                         annotation3.setSequenceNumber(sequenceNumber);
@@ -335,31 +366,31 @@ public class CommonJsonParser {
             // 删除甲状旁腺内所有数据
             // 查询甲状旁腺精细轮廓进行合并
             /**
-             * 
-            if (Objects.equals(jsonTask.getAlgorithmCode(), "Thyroid_gland")) {
-                Annotation annotation1 = new Annotation();
-                annotation1.setMagnification(40000L);
-                annotation1.setFiligreeContour(true);
-                annotation1.setSingleSlideId(singSlideId);
-                LambdaQueryWrapper<OrganTag> categoryLambdaQueryWrapper = new LambdaQueryWrapper<>();
-                categoryLambdaQueryWrapper.eq(OrganTag::getOrganEn, "Parathyroid").eq(OrganTag::getSpeciesId, 1);
-                OrganTag organTag = organTagMapper.selectOne(categoryLambdaQueryWrapper);
-                annotation1.setCategoryId(organTag.getOrganTagId());
-                Annotation annotation4 = annotationMapper.stUnionContourArea(annotation1);
-                annotation4.setContour(annotation4.getCollectContour());
-                Annotation annotation2 = annotationMapper.stIsValid(annotation4);
-                if (null != annotation2) {
-                    if (StringUtils.isNotEmpty(annotation2.getResults())) {
-                        if (ObjectUtil.equals(annotation2.getResults(), "t")) {
-                            annotation4.setSequenceNumber(sequenceNumber);
-                            annotation4.setSingleSlideId(jsonTask.getSingleId());
-                            annotation4.setInsideOrOutside(true);
-                            annotationMapper.deleteAiAnnotation(annotation4);
-                        }
-                    }
-                }
-            }
-            */
+             *
+             if (Objects.equals(jsonTask.getAlgorithmCode(), "Thyroid_gland")) {
+             Annotation annotation1 = new Annotation();
+             annotation1.setMagnification(40000L);
+             annotation1.setFiligreeContour(true);
+             annotation1.setSingleSlideId(singSlideId);
+             LambdaQueryWrapper<OrganTag> categoryLambdaQueryWrapper = new LambdaQueryWrapper<>();
+             categoryLambdaQueryWrapper.eq(OrganTag::getOrganEn, "Parathyroid").eq(OrganTag::getSpeciesId, 1);
+             OrganTag organTag = organTagMapper.selectOne(categoryLambdaQueryWrapper);
+             annotation1.setCategoryId(organTag.getOrganTagId());
+             Annotation annotation4 = annotationMapper.stUnionContourArea(annotation1);
+             annotation4.setContour(annotation4.getCollectContour());
+             Annotation annotation2 = annotationMapper.stIsValid(annotation4);
+             if (null != annotation2) {
+             if (StringUtils.isNotEmpty(annotation2.getResults())) {
+             if (ObjectUtil.equals(annotation2.getResults(), "t")) {
+             annotation4.setSequenceNumber(sequenceNumber);
+             annotation4.setSingleSlideId(jsonTask.getSingleId());
+             annotation4.setInsideOrOutside(true);
+             annotationMapper.deleteAiAnnotation(annotation4);
+             }
+             }
+             }
+             }
+             */
             log.info("parseJson --------------> Json文件解析结束:{} {} {}", System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
         } catch (Exception e) {
             log.error("Unexpected error occurred: " + e.getMessage(), e);
@@ -368,21 +399,16 @@ public class CommonJsonParser {
     }
 
     /**
-     * 
-    * @Title: findKeyByValue
-    * @Description: 通过value获取key值
-    * @param @param map
-    * @param @param value
-    * @param @return
-    * @return String
-    * @throws
+     * @param @param  map
+     * @param @param  value
+     * @param @return
+     * @return String
+     * @throws
+     * @Title: findKeyByValue
+     * @Description: 通过value获取key值
      */
     public static String findKeyByValue(Map<String, Long> map, Long value) {
-        return map.entrySet().stream()
-                  .filter(e -> Objects.equals(e.getValue(), value))
-                  .map(Map.Entry::getKey)
-                  .findFirst()
-                  .orElse(null);
+        return map.entrySet().stream().filter(e -> Objects.equals(e.getValue(), value)).map(Map.Entry::getKey).findFirst().orElse(null);
     }
 
     /**
