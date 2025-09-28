@@ -31,7 +31,6 @@ import org.geotools.geojson.geom.GeometryJSON;
 import org.json.JSONException;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.index.strtree.STRtree;
-import org.locationtech.jts.io.WKTReader;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -836,7 +835,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
         String ret;
         GeometryJSON gJson = new GeometryJSON();
         Reader reader = new StringReader(geoJson);
-        com.vividsolutions.jts.geom.Geometry geometry = gJson.read(reader);
+        Geometry geometry = gJson.read(reader);
         ret = geometry.toText();
         return ret;
     }
