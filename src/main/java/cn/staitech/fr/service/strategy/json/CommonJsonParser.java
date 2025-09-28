@@ -132,39 +132,23 @@ public class CommonJsonParser {
             annotation.setCreateBy(0L);
             annotation.setCreateTime(String.valueOf(new Date()));
             annotation.setProjectId(0L);
-
-//            if (null != geometry) {
-//                annotation.setContour40000(JSONObject.toJSONString(geometry.toString()));
-//            }
-//            if (null != geometry10000) {
-//                annotation.setContour10000(JSONObject.toJSONString(geometry10000.toString()));
-//            }
-//            if (null != geometry2500) {
-//                annotation.setContour2500(JSONObject.toJSONString(geometry2500.toString()));
-//            }
-//            if (null != geometry625) {
-//                annotation.setContour625(JSONObject.toJSONString(geometry625.toString()));
-//            }
-//            //
-//            if (null != geometry0) {
-//                annotation.setContour5000(JSONObject.toJSONString(geometry0.toString()));
-//            }
             if (null != geometry) {
-                annotation.setContourB40000(geoJsonToWkb(geometry.toString()));
+                annotation.setContour40000(JSONObject.toJSONString(geometry.toString()));
             }
             if (null != geometry10000) {
-                annotation.setContourB10000(geoJsonToWkb(geometry10000.toString()));
+                annotation.setContour10000(JSONObject.toJSONString(geometry10000.toString()));
             }
             if (null != geometry2500) {
-                annotation.setContourB2500(geoJsonToWkb(geometry2500.toString()));
+                annotation.setContour2500(JSONObject.toJSONString(geometry2500.toString()));
             }
             if (null != geometry625) {
-                annotation.setContourB625(geoJsonToWkb(geometry625.toString()));
+                annotation.setContour625(JSONObject.toJSONString(geometry625.toString()));
             }
             //
             if (null != geometry0) {
-                annotation.setContourB5000(geoJsonToWkb(geometry0.toString()));
+                annotation.setContour5000(JSONObject.toJSONString(geometry0.toString()));
             }
+
             annotation.setId(annotationId);
             // 拿到categoryId
             Long categoryId = pathologicalMap.get(labelCode);
@@ -324,34 +308,34 @@ public class CommonJsonParser {
                         annotation3.setInsideOrOutside(false);
                         //预先查询下是否有需要删除的数据，主要是为了验证一些结构丢失问题
                         /**
-                        List<Annotation> delAnnoList = annotationMapper.getDelAnnotation(annotation3);
-                        if(CollectionUtils.isNotEmpty(delAnnoList)) {
-                        	Map<Long,Long>  annoCategoryIdMap = delAnnoList.stream().collect(Collectors.toMap(Annotation::getAnnotationId, Annotation::getCategoryId));
-                        	Map<Long,String> annoStructureMap = new HashMap<>();
-                        	Set<String> structureIdSet = new HashSet<>();
-                        	for (Map.Entry<Long, Long> entry : annoCategoryIdMap.entrySet()) {
-                        	    Long annotationId = entry.getKey();
-                        	    Long categoryId = entry.getValue();
-                        	    if(pathologicalMap.containsValue(categoryId)) {
-                        	    	String structureId = findKeyByValue(pathologicalMap, categoryId);
-                        	    	if(StringUtils.isNotEmpty(structureId)) {
-                        	    		annoStructureMap.put(annotationId, structureId);
-                        	    		 structureIdSet.add(structureId);
-                        	    	}
-                        	    }
-                        	}
-                        	
-                        	//汇总下总共处理的结构标签id
-                        	log.info("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],结构指标待去除数据是：[{}],总条数是:[{}条],所有的结构标签id：[{}]", 
-                        	    jsonTask.getTaskId(), 
-                        	    jsonTask.getSingleId(), 
-                        	    jsonTask.getSlideId(),
-                        	    ObjectUtil.isNotEmpty(annoStructureMap) ? JSONUtil.toJsonStr(annoStructureMap) : "",
-                        	    delAnnoList.size(),
-                        	    ObjectUtil.isNotEmpty(structureIdSet) ? structureIdSet.toString() : ""
-                        	);
-                        }
-                        */
+                         List<Annotation> delAnnoList = annotationMapper.getDelAnnotation(annotation3);
+                         if(CollectionUtils.isNotEmpty(delAnnoList)) {
+                         Map<Long,Long>  annoCategoryIdMap = delAnnoList.stream().collect(Collectors.toMap(Annotation::getAnnotationId, Annotation::getCategoryId));
+                         Map<Long,String> annoStructureMap = new HashMap<>();
+                         Set<String> structureIdSet = new HashSet<>();
+                         for (Map.Entry<Long, Long> entry : annoCategoryIdMap.entrySet()) {
+                         Long annotationId = entry.getKey();
+                         Long categoryId = entry.getValue();
+                         if(pathologicalMap.containsValue(categoryId)) {
+                         String structureId = findKeyByValue(pathologicalMap, categoryId);
+                         if(StringUtils.isNotEmpty(structureId)) {
+                         annoStructureMap.put(annotationId, structureId);
+                         structureIdSet.add(structureId);
+                         }
+                         }
+                         }
+
+                         //汇总下总共处理的结构标签id
+                         log.info("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],结构指标待去除数据是：[{}],总条数是:[{}条],所有的结构标签id：[{}]",
+                         jsonTask.getTaskId(),
+                         jsonTask.getSingleId(),
+                         jsonTask.getSlideId(),
+                         ObjectUtil.isNotEmpty(annoStructureMap) ? JSONUtil.toJsonStr(annoStructureMap) : "",
+                         delAnnoList.size(),
+                         ObjectUtil.isNotEmpty(structureIdSet) ? structureIdSet.toString() : ""
+                         );
+                         }
+                         */
 //                        Integer delTotal = annotationMapper.deleteAiAnnotation(annotation3);
 //                        if(null != delTotal) {
 //                            log.info("jsonTask id:[{}] singleSlide id:[{}] slideId id:[{}],精细轮廓和结构指标去除无效数据，删除的数据总条数是：[{}]", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getSlideId(),delTotal);
