@@ -133,22 +133,25 @@ public class CommonJsonParser {
             annotation.setCreateTime(String.valueOf(new Date()));
             annotation.setProjectId(0L);
             if (null != geometry) {
-                annotation.setContour40000(JSONObject.toJSONString(geometry.toString()));
+                annotation.setContour40000(geometry.toString());
+                annotation.setContourB40000(geoJsonToWkb(geometry.toString()));
             }
             if (null != geometry10000) {
-                annotation.setContour10000(JSONObject.toJSONString(geometry10000.toString()));
+                annotation.setContour10000(geometry10000.toString());
+                annotation.setContourB10000(geoJsonToWkb(geometry10000.toString()));
             }
             if (null != geometry2500) {
-                annotation.setContour2500(JSONObject.toJSONString(geometry2500.toString()));
+                annotation.setContour2500(geometry2500.toString());
+                annotation.setContourB2500(geoJsonToWkb(geometry2500.toString()));
             }
             if (null != geometry625) {
-                annotation.setContour625(JSONObject.toJSONString(geometry625.toString()));
+                annotation.setContour625(geometry625.toString());
+                annotation.setContourB625(geoJsonToWkb(geometry625.toString()));
             }
-            //
             if (null != geometry0) {
-                annotation.setContour5000(JSONObject.toJSONString(geometry0.toString()));
+                annotation.setContour5000(geometry0.toString());
+                annotation.setContourB5000(geoJsonToWkb(geometry0.toString()));
             }
-
             annotation.setId(annotationId);
             // 拿到categoryId
             Long categoryId = pathologicalMap.get(labelCode);
