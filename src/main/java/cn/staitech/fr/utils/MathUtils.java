@@ -239,8 +239,11 @@ public class MathUtils {
      */
     public static <T> String getFirstAndLastOfMiddle95Percent(List<T> dataList, Integer count) {
         //数量[1,5)
-        if (count == null || count < 5 || dataList.size() == 0) {
+        if (count == null || count < 5) {
             return "数据量过少,无统计学意义";
+        }
+        if (dataList.size() == 0) {
+            return "0-0";
         }
         if (count < 40) {
             BigDecimal firstNumber = (BigDecimal) dataList.get(0);
