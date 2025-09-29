@@ -652,7 +652,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                 BeanUtils.copyProperties(aiCast, aiInfoListVO);
                 String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
 
-                List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiCast.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup, CommonConstant.NUMBER_0);
+                List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiCast.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup);
                 Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(singleSlide.getCategoryId(), request.getProjectId(), controlGroup);
                 aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList, count));
 
@@ -724,7 +724,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
             for (AiInfoListVO aiInfoListVO : aiInfoListVOS) {
                 String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : "1";
 
-                List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup, CommonConstant.NUMBER_0);
+                List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup);
                 Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(key.longValue(), request.getProjectId(), controlGroup);
                 String firstAndLastOfMiddle95Percent = MathUtils.getFirstAndLastOfMiddle95Percent(dataList, count);
                 aiInfoListVO.setNormalDistribution(firstAndLastOfMiddle95Percent);
