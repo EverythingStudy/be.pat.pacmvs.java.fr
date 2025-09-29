@@ -379,8 +379,8 @@ public class JsonTaskParserService {
             updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_FAIL.getCode());
             jsonTask.setStatus(JsonTaskStatusEnum.PARSE_FAIL.getCode());
             jsonTaskService.updateById(jsonTask);
-            log.error("jsonTask id:[{}] singleSlide id:[{}] 处理失败:[{}] ,{}", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask);
             e.printStackTrace();
+            log.info("jsonTask id:[{}] singleSlide id:[{}] 处理失败:[{}] ,{}", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask, e.getMessage());
         }
     }
 
