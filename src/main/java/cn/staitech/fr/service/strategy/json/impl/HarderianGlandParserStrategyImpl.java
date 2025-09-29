@@ -122,7 +122,7 @@ public class HarderianGlandParserStrategyImpl extends AbstractCustomParserStrate
             }
         }
 
-        String confidenceInterval = MathUtils.getConfidenceInterval(listNum);
+        //String confidenceInterval = MathUtils.getConfidenceInterval(listNum);
 
         // B 腺泡细胞核数量（单个）	B	个	单个腺泡内数据相加输出
         Annotation annotationB = new Annotation();

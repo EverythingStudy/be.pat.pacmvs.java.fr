@@ -106,7 +106,7 @@ public class LacrimalGlandParserStrategyImpl implements ParserStrategy {
                 list.add(areaNum);
             }
         }
-        String confidence = MathUtils.getConfidenceInterval(list);
+       // String confidence = MathUtils.getConfidenceInterval(list);
         /**
             A	导管面积	16906F
 			B	腺泡细胞核数量	16906E

@@ -1,7 +1,10 @@
 package cn.staitech.fr.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.domain.JsonTask;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -20,7 +23,7 @@ import java.util.stream.Collectors;
 public class MathUtils {
     public static void main(String[] args) {
         BigDecimal[] data = {new BigDecimal("211"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("211"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("211"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("211"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("211"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("211"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("211"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("211"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("211"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("211"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("211"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426"), new BigDecimal("211"), new BigDecimal("275"), new BigDecimal("334"), new BigDecimal("383"), new BigDecimal("426")};
-        String string = getFirstAndLastOfMiddle95Percent(Arrays.asList(data).stream().sorted().collect(Collectors.toList()));
+        //String string = getFirstAndLastOfMiddle95Percent(Arrays.asList(data).stream().sorted().collect(Collectors.toList()));
         /*BigDecimal[] data = {new BigDecimal("23.6"),new BigDecimal("999999999.213")};
 
 
@@ -186,9 +189,11 @@ public class MathUtils {
      * 均值±标准差；中间95%数据分布区间
      *
      * @param dataList
+     * @param count    对应脏器对照组切片数量
      * @return 返回指标结果
      */
-    public static String getConfidenceInterval(List<BigDecimal> dataList) {
+    public static String getConfidenceInterval(List<BigDecimal> dataList, Integer count) {
+
 
         /*List<BigDecimal> objects = new ArrayList<>();
         objects.add(BigDecimal.ZERO);
@@ -219,27 +224,33 @@ public class MathUtils {
 //            }
 //            //正态分布(上限)
 //            BigDecimal add2 = bigDecimal.add(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
-            String middle95Percent = getFirstAndLastOfMiddle95Percent(dataList.stream().sorted().map(e -> e.setScale(3, RoundingMode.UP)).collect(Collectors.toList()));
+            String middle95Percent = getFirstAndLastOfMiddle95Percent(dataList.stream().sorted().map(e -> e.setScale(3, RoundingMode.UP)).collect(Collectors.toList()), count);
             return bigDecimal + "±" + sqrt + ";" + middle95Percent;
         } else {
             return 0 + "±" + 0 + ";" + 0 + "-" + 0;
         }
     }
 
-    public static <T> String getFirstAndLastOfMiddle95Percent(List<T> dataList) {
+    /**
+     * @param dataList
+     * @param count    对应脏器对照组切片数量
+     * @param <T>
+     * @return
+     */
+    public static <T> String getFirstAndLastOfMiddle95Percent(List<T> dataList, Integer count) {
         //数量[1,5)
-        if (dataList == null || dataList.size() < 5) {
+        if (count == null || count < 5 || dataList.size() <= 3) {
             return "数据量过少,无统计学意义";
         }
-        if (dataList.size() < 40) {
-        	BigDecimal firstNumber = (BigDecimal) dataList.get(1);
-        	BigDecimal lastNumber = (BigDecimal) dataList.get(dataList.size() - 2);
-        	if(getCompTO(firstNumber, lastNumber) <= 0) {
-        		return firstNumber+ "-" +lastNumber;
-        	}else {
-        		return lastNumber+ "-" +firstNumber;
-        	}
-        	//        	return dataList.get(1) + "-" + dataList.get(dataList.size() - 2);
+        if (count < 40) {
+            BigDecimal firstNumber = (BigDecimal) dataList.get(1);
+            BigDecimal lastNumber = (BigDecimal) dataList.get(dataList.size() - 2);
+            if (getCompTO(firstNumber, lastNumber) <= 0) {
+                return firstNumber + "-" + lastNumber;
+            } else {
+                return lastNumber + "-" + firstNumber;
+            }
+            //        	return dataList.get(1) + "-" + dataList.get(dataList.size() - 2);
         }
         // 计算前 2.5% 和后 2.5% 的数据量
         int totalSize = dataList.size();
@@ -250,13 +261,13 @@ public class MathUtils {
         // 确保剩余数据量至少为 1
         if (totalSize - 2 * removeCount < 1) {
             //log.error("剩余数量小于1");
-        	BigDecimal firstNumber = (BigDecimal) dataList.get(startIndex - 1);
-        	BigDecimal lastNumber = (BigDecimal) dataList.get(endIndex - 1);
-        	if(getCompTO(firstNumber, lastNumber) <= 0) {
-        		return firstNumber+ "-" +lastNumber;
-        	}else {
-        		return lastNumber+ "-" +firstNumber;
-        	}
+            BigDecimal firstNumber = (BigDecimal) dataList.get(startIndex - 1);
+            BigDecimal lastNumber = (BigDecimal) dataList.get(endIndex - 1);
+            if (getCompTO(firstNumber, lastNumber) <= 0) {
+                return firstNumber + "-" + lastNumber;
+            } else {
+                return lastNumber + "-" + firstNumber;
+            }
             //return dataList.get(startIndex - 1) + "-" + dataList.get(endIndex - 1);
         }
         // 截取中间 95% 的数据
@@ -265,17 +276,17 @@ public class MathUtils {
         // 获取第一个数和最后一个数
         BigDecimal firstNumber = (BigDecimal) dataList.get(startIndex - 1);
         BigDecimal lastNumber = (BigDecimal) dataList.get(endIndex - 1);
-        if(getCompTO(firstNumber, lastNumber) <= 0) {
-    		return firstNumber+ "-" +lastNumber;
-    	}else {
-    		return lastNumber+ "-" +firstNumber;
-    	}
+        if (getCompTO(firstNumber, lastNumber) <= 0) {
+            return firstNumber + "-" + lastNumber;
+        } else {
+            return lastNumber + "-" + firstNumber;
+        }
         //return firstNumber + "-" + lastNumber;
     }
-    
-    public static int getCompTO(BigDecimal startValue,BigDecimal endValue) {
-    	int result = startValue.compareTo(endValue);
-    	return result;
+
+    public static int getCompTO(BigDecimal startValue, BigDecimal endValue) {
+        int result = startValue.compareTo(endValue);
+        return result;
     }
 
 

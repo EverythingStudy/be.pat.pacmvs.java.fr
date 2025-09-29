@@ -6,6 +6,7 @@ import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.config.OrganStructureConfig;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
+import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -266,20 +267,20 @@ public class Test {
                 annotation.setContour5000(geometry0.toString());
             }
             if (null != geometry) {
-                annotation.setContourB40000(geoJsonToWkb(geometry.toString()));
+                annotation.setContourB40000(CommonJsonParser.geoJsonToWkb(geometry.toString()));
             }
             if (null != geometry10000) {
-                annotation.setContourB10000(geoJsonToWkb(geometry10000.toString()));
+                annotation.setContourB10000(CommonJsonParser.geoJsonToWkb(geometry10000.toString()));
             }
             if (null != geometry2500) {
-                annotation.setContourB2500(geoJsonToWkb(geometry2500.toString()));
+                annotation.setContourB2500(CommonJsonParser.geoJsonToWkb(geometry2500.toString()));
             }
             if (null != geometry625) {
-                annotation.setContourB625(geoJsonToWkb(geometry625.toString()));
+                annotation.setContourB625(CommonJsonParser.geoJsonToWkb(geometry625.toString()));
             }
             //
             if (null != geometry0) {
-                annotation.setContourB5000(geoJsonToWkb(geometry0.toString()));
+                annotation.setContourB5000(CommonJsonParser.geoJsonToWkb(geometry0.toString()));
             }
             annotation.setId(annotationId);
             return annotation;

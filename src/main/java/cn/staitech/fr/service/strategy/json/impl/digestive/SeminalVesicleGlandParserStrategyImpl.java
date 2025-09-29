@@ -151,8 +151,8 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
     		腺泡上皮细胞核密度（单个）	4=E/A
     		间质和肌层面积占比	5=(F-B-D)/F
          */
-        String confidenceInterval = MathUtils.getConfidenceInterval(lists);
-        String confidenceInterval1 = MathUtils.getConfidenceInterval(listNum);
+//        String confidenceInterval = MathUtils.getConfidenceInterval(lists);
+//        String confidenceInterval1 = MathUtils.getConfidenceInterval(listNum);
         indicatorResultsMap.put("精囊腺面积", new IndicatorAddIn("Seminal vesicle area", new BigDecimal(singleSlide.getArea()).setScale(3,RoundingMode.HALF_UP).toString(), SQ_MM,"12D111"));
         //indicatorResultsMap.put("腺上皮面积（全片）", new IndicatorAddIn(organArea.setScale(3,RoundingMode.HALF_UP).toString(), CommonConstant.NUMBER_1,areaUtils.getStructureIds("12D074")));
         indicatorResultsMap.put("腺上皮面积（全片）", new IndicatorAddIn("Acinar epithelial area (all)", organArea.setScale(3,RoundingMode.HALF_UP).toString(), SQ_MM,"12D074"));

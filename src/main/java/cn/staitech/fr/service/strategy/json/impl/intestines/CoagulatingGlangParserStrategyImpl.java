@@ -127,8 +127,8 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
             }
         }
 
-        String confidenceInterval = MathUtils.getConfidenceInterval(lists);
-        String confidenceInterval1 = MathUtils.getConfidenceInterval(listNum);
+//        String confidenceInterval = MathUtils.getConfidenceInterval(lists);
+//        String confidenceInterval1 = MathUtils.getConfidenceInterval(listNum);
 
         // 腺上皮面积（单个）A 平方毫米 单个腺上皮面积 1：面积转10（3）平方微米  2:平方微米 3默认平方毫米
         Annotation annotationA = new Annotation();

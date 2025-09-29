@@ -245,4 +245,14 @@
           group by faf.forecast_id
           order by faf.results desc
     </select>
+    <select id="getCategoryIdCountByGroupCode" resultType="java.lang.Integer">
+        select count(1)
+        from fr_single_slide fss
+        left join fr_slide fs
+        on fss.slide_id = fs.slide_id and fs.del_flag = '0'
+            left join tb_image tb on tb.image_id=fs.image_id
+        where fss.category_id = #{categoryId}
+          and fs.special_id = #{specialId}
+          and tb.group_code = #{groupCode}
+    </select>
 </mapper>

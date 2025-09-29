@@ -2,7 +2,10 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
+import cn.staitech.fr.mapper.ProjectMapper;
+import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
@@ -10,6 +13,7 @@ import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -40,6 +44,12 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
     private AreaUtils areaUtils;
     @Resource
     private CommonJsonCheck commonJsonCheck;
+    @Resource
+    private SingleSlideMapper singleSlideMapper;
+    @Resource
+    private ProjectMapper projectMapper;
+    //默认对照组值
+    private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
 
     @PostConstruct
     public void init() {
@@ -85,6 +95,9 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
      */
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
+        Project special = projectMapper.selectById(jsonTask.getSpecialId());
+        String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
+        Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
         Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
 
         // 获取各种指标
@@ -173,7 +186,8 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
             Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
             list1.add(one.subtract(commonJsonParser.bigDecimalDivideCheck(annotation2.getStructureAreaNum(), i.getStructureAreaNum())).multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP));
         }
-        String mucosalAreaPer = MathUtils.getConfidenceInterval(list1);
+
+        String mucosalAreaPer = MathUtils.getConfidenceInterval(list1, count);
 
         // 精子面积占比（单个）
         List<BigDecimal> list2 = new ArrayList<>();
@@ -204,7 +218,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
 //        }
 //        log.info("====================================================");
 
-        String spermAreaPer = MathUtils.getConfidenceInterval(list2);
+        //String spermAreaPer = MathUtils.getConfidenceInterval(list2);
 
         // 精子面积占比（全片）
         BigDecimal spermArea = commonJsonParser.getProportion(organAreaG, organAreaE);
@@ -215,7 +229,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
             BigDecimal res = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()), i.getStructurePerimeterNum());
             list3.add(res);
         }
-        String mucosalCellDensity = MathUtils.getConfidenceInterval(list3);
+        String mucosalCellDensity = MathUtils.getConfidenceInterval(list3,count);
         // 血管相对面积
         BigDecimal vesselArea = commonJsonParser.getProportion(organAreaI, organAreaJ);
         //黏膜上皮厚度（单个）
@@ -230,7 +244,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
                 list4.add(sqrt1.subtract(sqrt2));
             }
         }
-        String mucosalThickness = MathUtils.getConfidenceInterval(list4);
+        String mucosalThickness = MathUtils.getConfidenceInterval(list4,count);
         /**
          A	输出小管/附睾管黏膜上皮外轮廓面积（单个）	12F0F5
          B	输出小管/附睾管黏膜上皮外轮廓面积（全片）	12F0F5

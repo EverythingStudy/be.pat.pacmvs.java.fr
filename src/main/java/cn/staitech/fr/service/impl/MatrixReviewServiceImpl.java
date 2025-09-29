@@ -147,7 +147,8 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
      */
     private void setReferenceScope(Project special, Long singleId, ExportAiListVO exportAiListVO, Map<Long, Long> categorys) {
         List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(exportAiListVO.getQuantitativeIndicators(), categorys.get(singleId), special.getProjectId(), special.getControlGroup(), CommonConstant.NUMBER_0);
-        exportAiListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
+        Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(categorys.get(singleId), special.getProjectId(), special.getControlGroup());
+        exportAiListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList, count));
         if (CollectionUtils.isNotEmpty(dataList)) {
             if (CollectionUtil.isNotEmpty(dataList)) {
                 List<BigDecimal> objects = new ArrayList<>(dataList);

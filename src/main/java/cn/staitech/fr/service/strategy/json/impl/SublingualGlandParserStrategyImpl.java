@@ -99,7 +99,7 @@ public class SublingualGlandParserStrategyImpl extends AbstractCustomParserStrat
         BigDecimal organArea = getOrganArea(jsonTask, "10A06F", unit).getStructureAreaNum();
         BigDecimal organArea2 = getOrganArea(jsonTask, "10A06D").getStructureAreaNum();
         Integer count = getOrganAreaCount(jsonTask, "10A06D");
-        indicatorResultsMap.put("导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,"10A06F"));
+        //indicatorResultsMap.put("导管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,"10A06F"));
         indicatorResultsMap.put("导管面积（全片）", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1,"10A06F"));
 //        indicatorResultsMap.put("导管内腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,areaUtils.getStructureIds("10A06F","10A121")));
 
