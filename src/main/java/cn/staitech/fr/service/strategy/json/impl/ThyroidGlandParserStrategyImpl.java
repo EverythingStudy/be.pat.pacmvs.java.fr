@@ -168,10 +168,10 @@ public class ThyroidGlandParserStrategyImpl extends AbstractCustomParserStrategy
             }
         }
 
-        String confidenceInterval1 = MathUtils.getConfidenceInterval(list1);
-        String confidenceInterval2 = MathUtils.getConfidenceInterval(list2);
-        String confidenceInterval3 = MathUtils.getConfidenceInterval(list3);
-        String confidenceInterval8 = MathUtils.getConfidenceInterval(list8);
+//        String confidenceInterval1 = MathUtils.getConfidenceInterval(list1);
+//        String confidenceInterval2 = MathUtils.getConfidenceInterval(list2);
+//        String confidenceInterval3 = MathUtils.getConfidenceInterval(list3);
+//        String confidenceInterval8 = MathUtils.getConfidenceInterval(list8);
 
         // B
         Annotation annotationByB = new Annotation();

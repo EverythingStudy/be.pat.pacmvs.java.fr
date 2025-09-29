@@ -98,10 +98,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
         if (isAccessPermission) {
             // 检查用户是否为成员
-            long isMember = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery()
-                    .eq(ProjectMember::getProjectId, req.getProjectId())
-                    .eq(ProjectMember::getUserId, userId)
-                    .eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
+            long isMember = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, req.getProjectId()).eq(ProjectMember::getUserId, userId).eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
 
             // 权限校验
             if (!hasAccessPermission(project, userId, isMember)) {
@@ -130,10 +127,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
      * 判断用户是否有访问权限
      */
     private boolean hasAccessPermission(Project project, Long userId, long isMember) {
-        return project.getOrganizationId() == SecurityUtils.getOrganizationId()
-                || userId == project.getPrincipal()
-                || SecurityUtils.isOrgAdmin()
-                || isMember > 0;
+        return project.getOrganizationId() == SecurityUtils.getOrganizationId() || userId == project.getPrincipal() || SecurityUtils.isOrgAdmin() || isMember > 0;
     }
 
     @Override
@@ -193,9 +187,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         }
         Project project = projectMapper.selectById(projectId);
         Long topicId = project.getTopicId();
-        List<Image> images = imageMapper.selectList(Wrappers.<Image>lambdaQuery().eq(Image::getTopicId, topicId)
-                .eq(Image::getStatus, Constants.IMAGE_STATUS_ENABLE)
-                .eq(Image::getAnalyzeStatus, Constants.IMAGE_NAME_PARSE_SUCC));
+        List<Image> images = imageMapper.selectList(Wrappers.<Image>lambdaQuery().eq(Image::getTopicId, topicId).eq(Image::getStatus, Constants.IMAGE_STATUS_ENABLE).eq(Image::getAnalyzeStatus, Constants.IMAGE_NAME_PARSE_SUCC));
         if (CollectionUtils.isEmpty(images)) {
             return R.fail("没有可关联的新切片");
         }
@@ -215,9 +207,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
     }
 
     private List<Long> imageIdsFilter(List<Long> imageIds, Long projectId) {
-        List<Slide> slides = list(Wrappers.<Slide>lambdaQuery().eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL)
-                .eq(Slide::getProjectId, projectId)
-                .in(Slide::getImageId, imageIds).select(Slide::getImageId));
+        List<Slide> slides = list(Wrappers.<Slide>lambdaQuery().eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).eq(Slide::getProjectId, projectId).in(Slide::getImageId, imageIds).select(Slide::getImageId));
         if (CollectionUtils.isNotEmpty(slides)) {
             List<Long> temp = slides.stream().map(Slide::getImageId).collect(Collectors.toList());
             imageIds.removeAll(temp);
@@ -232,9 +222,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         if (validationResult != null) {
             return validationResult;
         }
-        List<Slide> slideList = list(Wrappers.<Slide>lambdaQuery().eq(ObjectUtil.isNotEmpty(projectId), Slide::getProjectId, projectId)
-                .in(CollectionUtils.isNotEmpty(slideIds), Slide::getSlideId, slideIds)
-                .eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).select(Slide::getSlideId));
+        List<Slide> slideList = list(Wrappers.<Slide>lambdaQuery().eq(ObjectUtil.isNotEmpty(projectId), Slide::getProjectId, projectId).in(CollectionUtils.isNotEmpty(slideIds), Slide::getSlideId, slideIds).eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).select(Slide::getSlideId));
         if (CollectionUtils.isNotEmpty(slideList)) {
             slideList.forEach(slide -> {
                 slide.setDelFlag(cn.staitech.common.core.constant.Constants.DEL_FLAG_DELETED);
@@ -247,9 +235,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
     @Override
     public R checkDeleteSlide(Long projectId, List<Long> slideIds) throws Exception {
-        List<Slide> slideList = list(Wrappers.<Slide>lambdaQuery().eq(ObjectUtil.isNotEmpty(projectId), Slide::getProjectId, projectId)
-                .in(CollectionUtils.isNotEmpty(slideIds), Slide::getSlideId, slideIds)
-                .eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).select(Slide::getSlideId));
+        List<Slide> slideList = list(Wrappers.<Slide>lambdaQuery().eq(ObjectUtil.isNotEmpty(projectId), Slide::getProjectId, projectId).in(CollectionUtils.isNotEmpty(slideIds), Slide::getSlideId, slideIds).eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).select(Slide::getSlideId));
         if (CollectionUtils.isEmpty(slideList)) {
             return R.fail("未找到要删除的切片");
         }
@@ -281,8 +267,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
             return R.fail("项目已完成，不可修改配置");
         }
 
-        if (status == Constants.STATUS_PAUSED
-                && !(SecurityUtils.getUserId() == project.getPrincipal() || SecurityUtils.isOrgAdmin())) {
+        if (status == Constants.STATUS_PAUSED && !(SecurityUtils.getUserId() == project.getPrincipal() || SecurityUtils.isOrgAdmin())) {
 //			return R.fail("项目状态为“暂停”时，机构管理员和项目负责人可以配置项目基础信息");
             return R.fail("您没有该项目的配置权限，请联系该项目负责人或机构管理员");
         }
@@ -668,7 +653,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                 String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
 
                 List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiCast.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup, CommonConstant.NUMBER_0);
-                aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList));
+                Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(singleSlide.getCategoryId(), request.getProjectId(), controlGroup);
+                aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList, count));
 
                 if (null != aiInfoListVO.getNormalDistribution() && null != aiCast.getResults()) {
                     String[] s = aiInfoListVO.getNormalDistribution().split("-");
@@ -690,9 +676,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                 }
 
                 if (CollectionUtils.isNotEmpty(structureIdsSet)) {
-                    LambdaQueryWrapper<StructureTag> in = new LambdaQueryWrapper<StructureTag>()
-                            .in(StructureTag::getStructureId, structureIdsSet)
-                            .eq(StructureTag::getOrganizationId, SecurityUtils.getOrganizationId());
+                    LambdaQueryWrapper<StructureTag> in = new LambdaQueryWrapper<StructureTag>().in(StructureTag::getStructureId, structureIdsSet).eq(StructureTag::getOrganizationId, SecurityUtils.getOrganizationId());
                     List<StructureTag> structureTags = structureTagMapper.selectList(in);
                     if (CollectionUtils.isNotEmpty(structureTags)) {
                         List<Long> structureTagIds = structureTags.stream().map(StructureTag::getStructureTagId).collect(Collectors.toList());
@@ -741,7 +725,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                 String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : "1";
 
                 List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiInfoListVO.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup, CommonConstant.NUMBER_0);
-                String firstAndLastOfMiddle95Percent = MathUtils.getFirstAndLastOfMiddle95Percent(dataList);
+                Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(key.longValue(), request.getProjectId(), controlGroup);
+                String firstAndLastOfMiddle95Percent = MathUtils.getFirstAndLastOfMiddle95Percent(dataList, count);
                 aiInfoListVO.setNormalDistribution(firstAndLastOfMiddle95Percent);
 
                 if (null != aiInfoListVO.getNormalDistribution() && null != aiInfoListVO.getResults()) {

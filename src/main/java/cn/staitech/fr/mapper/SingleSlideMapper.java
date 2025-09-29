@@ -42,6 +42,10 @@ public interface SingleSlideMapper extends BaseMapper<SingleSlide> {
     ExprotAiExcelVO getExportAiVO(Long id);
 
     ExportAiDTO getExportSingleSlideInfoById(Long id);
+
+    Integer getCategoryIdCountByGroupCode(@Param("categoryId") Long categoryId,
+                                          @Param("specialId") Long specialId,
+                                          @Param("groupCode") String groupCode);
 }
 
 

@@ -149,7 +149,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
 
             }
         }
-        String confidenceInterval = MathUtils.getConfidenceInterval(lists);
+        //String confidenceInterval = MathUtils.getConfidenceInterval(lists);
         //L       乳腺腺泡和导管面积（全片）        mm2        12306C        所有轮廓面积之和
         map.put("乳腺腺泡和导管面积（全片）", createNameIndicator(organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "17A06C"));
 //        //O        乳腺腺泡和导管面积（单个）        103 μm2        12306C        单个轮廓分别计算面积        辅助二级指标11的计算，不显示在指标表格里，显示在单个“乳腺腺泡/导管”轮廓详情弹窗中        v2.6.1

@@ -167,10 +167,10 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
     }
 
 
-    protected IndicatorAddIn createComplexIndicator(List<BigDecimal> dataList, String enName, String unit, String type) {
-        String result = MathUtils.getConfidenceInterval(dataList);
-        return new IndicatorAddIn(enName, result, unit, type);
-    }
+//    protected IndicatorAddIn createComplexIndicator(List<BigDecimal> dataList, String enName, String unit, String type) {
+//        String result = MathUtils.getConfidenceInterval(dataList);
+//        return new IndicatorAddIn(enName, result, unit, type);
+//    }
 
     /**
      * 创建指标对象（产品呈现指标）
@@ -188,10 +188,10 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
         return new IndicatorAddIn(enName, String.valueOf(result), unit, CommonConstant.NUMBER_0, structureIds);
     }
 
-    protected IndicatorAddIn createComplexIndicator(List<BigDecimal> dataList, String enName, String unit, String type, String structureIds) {
-        String result = MathUtils.getConfidenceInterval(dataList);
-        return new IndicatorAddIn(enName, result, unit, type, structureIds);
-    }
+//    protected IndicatorAddIn createComplexIndicator(List<BigDecimal> dataList, String enName, String unit, String type, String structureIds) {
+//        String result = MathUtils.getConfidenceInterval(dataList);
+//        return new IndicatorAddIn(enName, result, unit, type, structureIds);
+//    }
 
     /**
      * 占比计算（保留三位小数）

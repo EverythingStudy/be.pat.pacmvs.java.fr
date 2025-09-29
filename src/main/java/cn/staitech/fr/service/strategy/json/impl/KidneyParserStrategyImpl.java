@@ -3,15 +3,19 @@ package cn.staitech.fr.service.strategy.json.impl;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
+import cn.staitech.fr.mapper.ProjectMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -41,7 +45,10 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
     private CommonJsonParser commonJsonParser;
     @Resource
     private CommonJsonCheck commonJsonCheck;
-
+    @Resource
+    private ProjectMapper projectMapper;
+    //默认对照组值
+    private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -79,6 +86,9 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
      */
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
+        Project special = projectMapper.selectById(jsonTask.getSpecialId());
+        String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
+        Integer countCa = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         //皮质
@@ -114,7 +124,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
             BigDecimal temp = annotation.getStructureAreaNum();
             return temp.multiply(BigDecimal.valueOf(1000));
         }).collect(Collectors.toList());
-        indicatorResultsMap.put("肾小球面积（单个）", createComplexIndicator(bsb, "Glomerulus area (per)", SQ_UM_THOUSAND, CommonConstant.NUMBER_0, "11B02D"));
+        indicatorResultsMap.put("肾小球面积（单个）", createNameIndicator("Acinar epithelial area% (per)", MathUtils.getConfidenceInterval(bsb,countCa), SQ_UM_THOUSAND, "11B02D"));
         //4=C/B
         List<BigDecimal> cb = new ArrayList<>();
         for (Annotation annotation : bs) {

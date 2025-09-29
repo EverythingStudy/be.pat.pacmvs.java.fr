@@ -2,7 +2,10 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
+import cn.staitech.fr.mapper.ProjectMapper;
+import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
@@ -10,6 +13,7 @@ import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -39,7 +43,12 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
     private AreaUtils areaUtils;
     @Resource
     private CommonJsonCheck commonJsonCheck;
-
+    @Resource
+    private SingleSlideMapper singleSlideMapper;
+    @Resource
+    private ProjectMapper projectMapper;
+    //默认对照组值
+    private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -82,6 +91,9 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
+        Project special = projectMapper.selectById(jsonTask.getSpecialId());
+        String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
+        Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
         Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
 
         // 获取各种指标
@@ -144,7 +156,7 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
             BigDecimal granularConvolutedTubule = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation1.getCount()), annotation.getStructureAreaNum());
             list.add(granularConvolutedTubule);
         }
-        String granularConvolutedTubules = MathUtils.getConfidenceInterval(list);
+        String granularConvolutedTubules = MathUtils.getConfidenceInterval(list,count);
         // 血管面积占比
         BigDecimal vesselArea = commonJsonParser.getProportion(organAreaD, organAreaH);
         // 红细胞面积占比

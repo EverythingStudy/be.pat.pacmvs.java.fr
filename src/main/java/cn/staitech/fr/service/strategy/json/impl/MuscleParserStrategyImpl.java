@@ -3,7 +3,10 @@ package cn.staitech.fr.service.strategy.json.impl;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
+import cn.staitech.fr.mapper.ProjectMapper;
+import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
@@ -11,6 +14,7 @@ import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -37,6 +41,12 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
     private AreaUtils areaUtils;
     @Resource
     private CommonJsonCheck commonJsonCheck;
+    @Resource
+    private SingleSlideMapper singleSlideMapper;
+    @Resource
+    private ProjectMapper projectMapper;
+    //默认对照组值
+    private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
 
     @PostConstruct
     public void init() {
@@ -72,7 +82,9 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
-
+        Project special = projectMapper.selectById(jsonTask.getSpecialId());
+        String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
+        Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
         // 获取各种指标
         // B间质面积
         BigDecimal organAreaB = commonJsonParser.getOrganArea(jsonTask, "15C027").getStructureAreaNum();
@@ -101,7 +113,7 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
         //肌纤维面积（单个）
         List<Annotation> annotationList = commonJsonParser.getStructureContourList(jsonTask, "15C02A");
         List<BigDecimal> annotationAreaList = annotationList.stream().map(anno -> new BigDecimal(anno.getArea()).setScale(3, RoundingMode.DOWN)).collect(Collectors.toList());
-        String muscleFiberArea = MathUtils.getConfidenceInterval(annotationAreaList);
+        //String muscleFiberArea = MathUtils.getConfidenceInterval(annotationAreaList);
 
         Annotation annotation1 = new Annotation();
         annotation1.setAreaName("肌纤维面积（单个）");
@@ -110,7 +122,8 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
 
 
         // 算法输出指标
-        resultsMap.put("肌纤维面积（单个）", createComplexIndicator(annotationAreaList, "Muscle fiber area (per)", SQ_MM, CommonConstant.NUMBER_0, "15C02A"));// A肌纤维面积（单个）
+        // A肌纤维面积（单个）
+        resultsMap.put("肌纤维面积（单个）", createNameIndicator("Muscle fiber area (per)", MathUtils.getConfidenceInterval(annotationAreaList, count), SQ_MM, "15C02A"));
 //        resultsMap.put("间质面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaB.toString()), SQ_UM_THOUSAND, "15C027"));
 //        resultsMap.put("血管面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaC.toString()), SQ_UM_THOUSAND, "15C003"));
 //        resultsMap.put("红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaD.toString()), SQ_UM, "15C004"));
