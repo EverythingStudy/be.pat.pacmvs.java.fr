@@ -133,6 +133,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             File f = new File(fileUrl);
             String fileName = f.getName().substring(0, f.getName().lastIndexOf("."));
             if (MapConstant.getStructureSize(jsonTask.getOrganizationId() + fileName) == null) {
+            	log.error("SingleSlide id:[{}],tb_structure查询不到结构标签大小:[{}],请确认是否存在这个标签或结构大小,数据处理将会跳过这个结构！！！",singleId, jsonTask.getOrganizationId() + fileName);
                 continue;
             }
             jsonParser(f.getPath(), zoomLevels, fileName, singleSlideSelectBy, geometryIdMap, outputDir,aiAnnotationList);
