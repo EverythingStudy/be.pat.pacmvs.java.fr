@@ -76,9 +76,9 @@ public class SpleenParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal accurateAreaDecimal = new BigDecimal(accurateArea);
         //BigDecimal accurateAreaDecimal = getOrganArea(jsonTask, "145111").getStructureAreaNum();
         //        边缘区面积	G	平方毫米	数据相加输出（算法直接输出）(WORD无数据，JSON有数据！)
-        BigDecimal marginalZoneArea = getOrganArea(jsonTask, "14504A").getStructureAreaNum();
+        BigDecimal G = getOrganArea(jsonTask, "14504A").getStructureAreaNum();
         //        红髓	H	平方毫米	算法直接输出 (WORD无数据，JSON有数据！)
-        BigDecimal redPulpArea = getOrganArea(jsonTask, "145046").getStructureAreaNum();
+        BigDecimal H = getOrganArea(jsonTask, "145046").getStructureAreaNum();
 
         //        产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
         //        白髓面积占比	1	%	White pulp area%	1=A/F
@@ -115,16 +115,16 @@ public class SpleenParserStrategyImpl extends AbstractCustomParserStrategy {
             BigDecimal hemosiderinAreaRate = hemosiderinArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
             map.put("含铁血黄素面积占比", createNameIndicator("Hemosiderin area%", DecimalUtils.percentScale3(hemosiderinAreaRate), PERCENTAGE, "14504D,145111"));
 
-            //红髓面积占比 Red pulp area% 计算公式=3=(F-A)/F
-            BigDecimal redPulpAreaRate = accurateAreaDecimal.subtract(redPulpArea).divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+            //红髓面积占比 Red pulp area% 计算公式=3=H/F
+            BigDecimal redPulpAreaRate = H.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
             map.put("红髓面积占比", createNameIndicator("Red pulp area%", DecimalUtils.percentScale3(redPulpAreaRate), PERCENTAGE, "145047,145111"));
 
             // 红细胞面积占比	4	%	Erythrocyte area%	4=E/F
             BigDecimal erythrocyteAreaRate = erythrocyteArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
             map.put("红细胞面积占比", createNameIndicator("Erythrocyte area%", DecimalUtils.percentScale3(erythrocyteAreaRate), PERCENTAGE, "145004,145111"));
 
-            // 边缘区面积占比	5	%	Marginal zone area%	5=(A-B)/F
-            BigDecimal marginalZoneAreaRate = whitePulpArea.subtract(periarterialLymphaticSheathArea).divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+            // 边缘区面积占比	5	%	Marginal zone area%	5=G/F
+            BigDecimal marginalZoneAreaRate = G.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
             map.put("边缘区面积占比", createNameIndicator("Marginal zone area", DecimalUtils.percentScale3(marginalZoneAreaRate), PERCENTAGE, "145047,145045,145111"));
 
             // 动脉周围淋巴鞘面积占比	6	%	Periarterial lymphatic sheath area%	6=（B-C）/F	包含淋巴滤泡
