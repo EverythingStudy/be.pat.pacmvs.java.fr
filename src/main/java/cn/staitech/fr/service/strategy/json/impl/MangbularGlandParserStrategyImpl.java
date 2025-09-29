@@ -121,7 +121,7 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
 //        resultsMap.put("血管面积", createIndicator(organAreaD, SQ_MM,"10B003"));
 //        resultsMap.put("血管数量", createIndicator(organAreaCountE, PIECE,"10B003"));
 //        resultsMap.put("红细胞面积", createIndicator(organAreaF, SQ_MM,"10B004"));
-        resultsMap.put("颗粒管面积（单个）", createDefaultIndicator("10B125"));// G颗粒管（红色）面积（单个）
+        //resultsMap.put("颗粒管面积（单个）", createDefaultIndicator("10B125"));// G颗粒管（红色）面积（单个）
         resultsMap.put("颗粒管面积（全片）", createIndicator(organAreaI, SQ_MM, "10B125"));// I颗粒管（红色）面积（全片）
         //  resultsMap.put("组织轮廓", createIndicator(organAreaH, SQ_MM,"10B111"));
 
