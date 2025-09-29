@@ -3,15 +3,25 @@ package cn.staitech.fr.controller;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.validation.constraints.NotNull;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+
 import cn.staitech.common.core.domain.R;
+import cn.staitech.fr.domain.JsonFile;
+import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.out.ContourFileVo;
 import cn.staitech.fr.domain.out.JsonFileVo;
+import cn.staitech.fr.mapper.JsonFileMapper;
+import cn.staitech.fr.mapper.JsonTaskMapper;
 import cn.staitech.fr.service.ContourJsonService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,6 +35,10 @@ public class ContourJsonController {
 
 	@Resource
 	private ContourJsonService contourJsonService;
+	@Resource
+	private JsonTaskMapper jsonTaskMapper;
+	@Resource
+	private JsonFileMapper jsonFileMapper;
 
 	/**
 	 * 
@@ -63,4 +77,16 @@ public class ContourJsonController {
 			@RequestParam(value = "organTagIds") @ApiParam(name = "organTagIds", value = "脏器id", required = true) List<Long> organTagIds) {
 		return contourJsonService.getContourJsonSize(slideId, projectId, organTagIds);
 	}
+	
+	
+	@SuppressWarnings("rawtypes")
+    @ApiOperation(value = "瓦块分割",hidden = true)
+    @PostMapping("/test")
+    public R test(@PathVariable @NotNull Long taskId) {
+		//Long taskId = 1706l;
+		JsonTask jsonTask = jsonTaskMapper.selectById(taskId);
+		List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, taskId));
+		contourJsonService.aiJson(fileList, jsonTask);
+        return R.ok();
+    }
 }
