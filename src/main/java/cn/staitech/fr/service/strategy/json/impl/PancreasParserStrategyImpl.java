@@ -122,7 +122,7 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy imp
         //N 血管外红细胞面积
         Annotation annotationOuter = getInsideOrOutside(jsonTask, "105003", "105004", false);
         //O 组织轮廓面积
-        BigDecimal organAreaO = getOrganArea(jsonTask, "105111").getStructureAreaNum();
+        BigDecimal organAreaO = new BigDecimal(singleSlide.getArea());
         //P 胰岛细胞核数量（全片）105077、105078
         Integer countP = getOrganAreaCount(jsonTask, "105078");
         //Q 红细胞面积 105004

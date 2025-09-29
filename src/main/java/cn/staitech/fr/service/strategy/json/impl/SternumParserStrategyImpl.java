@@ -71,17 +71,17 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy impl
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         Map<String, IndicatorAddIn> indicatorResultsMapSecond = new HashMap<>();
 
-        //        红系细胞核数量	B	个	无
-        Integer mucosaCountB = commonJsonParser.getOrganAreaCount(jsonTask, "14E011");
+        //        红系细胞核数量	A	个	无
+        Integer mucosaCountA = commonJsonParser.getOrganAreaCount(jsonTask, "14E011");
+        mucosaCountA = commonJsonParser.getIntegerValue(mucosaCountA);
+        //        粒系细胞数量	B	个	无
+        Integer mucosaCountB = commonJsonParser.getOrganAreaCount(jsonTask, "14E01A");
         mucosaCountB = commonJsonParser.getIntegerValue(mucosaCountB);
-        //        粒系细胞数量	C	个	无
-        Integer mucosaCountC = commonJsonParser.getOrganAreaCount(jsonTask, "14E01A");
+
+
+        //        巨核系细胞数量	C	个	无
+        Integer mucosaCountC = commonJsonParser.getOrganAreaCount(jsonTask, "14E022");
         mucosaCountC = commonJsonParser.getIntegerValue(mucosaCountC);
-
-
-        //        巨核系细胞数量	D	个	无
-        Integer mucosaCountD = commonJsonParser.getOrganAreaCount(jsonTask, "14E022");
-        mucosaCountD = commonJsonParser.getIntegerValue(mucosaCountD);
 
         //        红细胞面积	E	×10³平方微米	若输出结果为多个则相加
 //        BigDecimal bigDecimalE = getOrganArea(jsonTask, "14E004").getStructureAreaNum();
@@ -168,7 +168,7 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy impl
          indicatorResultsMap.put("粒系细胞数量", new IndicatorAddIn("", String.valueOf(mucosaCountC), "个", "1"));
          }
          */
-        indicatorResultsMap.put("巨核系细胞数量", new IndicatorAddIn("", String.valueOf(mucosaCountD), "个", CommonConstant.NUMBER_1, "14E022"));
+        indicatorResultsMap.put("巨核系细胞数量", new IndicatorAddIn("", String.valueOf(mucosaCountC), "个", CommonConstant.NUMBER_1, "14E022"));
 //
 //        indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalE.setScale(3, RoundingMode.HALF_UP)), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "14E004"));
         indicatorResultsMap.put("脂肪细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalE.setScale(3, RoundingMode.HALF_UP)), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "14E012"));
