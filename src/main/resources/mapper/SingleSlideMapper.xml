@@ -241,7 +241,7 @@
           and fs.special_id = #{specialId}
           and tb.group_code = #{groupCode}
           and faf.quantitative_indicators = #{quantitativeIndicators}
-          and faf.struct_type = #{structType}
+--           and faf.struct_type = #{structType}
           group by faf.forecast_id
           order by faf.results desc
     </select>

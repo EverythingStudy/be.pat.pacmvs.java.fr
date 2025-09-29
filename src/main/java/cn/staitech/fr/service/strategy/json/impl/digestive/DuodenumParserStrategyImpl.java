@@ -46,7 +46,7 @@ public class DuodenumParserStrategyImpl extends AbstractCustomParserStrategy {
     private CommonJsonParser commonJsonParser;
     @Resource
     private CommonJsonCheck commonJsonCheck;
-    
+
     @Autowired
     private AreaUtils areaUtils;
 
@@ -76,24 +76,24 @@ public class DuodenumParserStrategyImpl extends AbstractCustomParserStrategy {
         String area = singleSlide.getArea();
 //        BigDecimal areaDecimal = commonJsonParser.getOrganArea(jsonTask, "119111").getStructureAreaNum();
 //        String area = areaDecimal.toString();
-        if(new BigDecimal(area).signum() == 0){
-        	// B/C
-            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscular area%", area, "%",areaUtils.getStructureIds("11900C", "119111")));
+        if (new BigDecimal(area).signum() == 0) {
+            // B/C
+            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscular area%", area, "%", areaUtils.getStructureIds("11900C", "119111")));
             // A/C
-            indicatorResultsMap.put("黏膜上皮和固有层面积占比", new IndicatorAddIn("Mucosal epithelium and lamina propria area%", area, "%",areaUtils.getStructureIds("11901E", "119111")));
-        }else{
-        	// B/C
-            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscular area%", organArea.divide(new BigDecimal(area),5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("11900C", "119111")));
+            indicatorResultsMap.put("黏膜上皮和固有层面积占比", new IndicatorAddIn("Mucosal epithelium and lamina propria area%", area, "%", areaUtils.getStructureIds("11901E", "119111")));
+        } else {
+            // B/C
+            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscular area%", organArea.divide(new BigDecimal(area), 5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%", areaUtils.getStructureIds("11900C", "119111")));
             // A/C
-            indicatorResultsMap.put("黏膜上皮和固有层面积占比", new IndicatorAddIn("Mucosal epithelium and lamina propria area%", organArea1.divide(new BigDecimal(area),5,RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("11901E", "119111")));
+            indicatorResultsMap.put("黏膜上皮和固有层面积占比", new IndicatorAddIn("Mucosal epithelium and lamina propria area%", organArea1.divide(new BigDecimal(area), 5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%", areaUtils.getStructureIds("11901E", "119111")));
 
         }
         //C
-        indicatorResultsMap.put("十二指肠面积", new IndicatorAddIn("Duodenum area", new BigDecimal(singleSlide.getArea()).setScale(3,RoundingMode.HALF_UP).toString(), SQ_MM,"119111"));
+        indicatorResultsMap.put("十二指肠面积", new IndicatorAddIn("Duodenum area", new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "119111"));
         //11900C
-        indicatorResultsMap.put("肌层面积", new IndicatorAddIn("Muscular layer", organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,"11900C"));
+        indicatorResultsMap.put("肌层面积", new IndicatorAddIn("Muscular layer", organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "11900C"));
         //11901E
-        indicatorResultsMap.put("黏膜上皮+固有层", new IndicatorAddIn("Mucosal epithelium+lamina propria", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1,"11901E"));
+        indicatorResultsMap.put("黏膜上皮+固有层", new IndicatorAddIn("Mucosal epithelium+lamina propria", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "11901E"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
         //aiForecastService.addOutIndicators(jsonTask.getSingleId(), indicatorResultsMap);
     }
