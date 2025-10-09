@@ -93,16 +93,16 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12D074",annotation1,3);
         indicatorResultsMap.put("腺上皮面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,"12D074"));
 
-        Annotation annotationBy = new Annotation();
-        annotationBy.setAreaName("腺腔面积（单个）");
-        annotationBy.setAreaUnit(SQ_MM);
-        commonJsonParser.putAnnotationDynamicData(jsonTask,"12D074","12D0E9",annotationBy);
+//        Annotation annotationBy = new Annotation();
+//        annotationBy.setAreaName("腺腔面积（单个）");
+//        annotationBy.setAreaUnit(SQ_MM);
+//        commonJsonParser.putAnnotationDynamicData(jsonTask,"12D074","12D0E9",annotationBy);
       //TODO 算法不支持，暂时先注释，待支持后再次放开
 //        indicatorResultsMap.put("腺腔面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,areaUtils.getStructureIds("12D074","12D0E9")));
 
-        Annotation annotationBy2 = new Annotation();
-        annotationBy2.setCountName("腺上皮细胞核数量（单个）");
-        commonJsonParser.putAnnotationDynamicData(jsonTask,"12D074","12D0ED",annotationBy2);
+//        Annotation annotationBy2 = new Annotation();
+//        annotationBy2.setCountName("腺上皮细胞核数量（单个）");
+//        commonJsonParser.putAnnotationDynamicData(jsonTask,"12D074","12D0ED",annotationBy2);
       //TODO 算法不支持，暂时先注释，待支持后再次放开
 //        indicatorResultsMap.put("腺上皮细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,areaUtils.getStructureIds("12D074","12D0ED")));
 
