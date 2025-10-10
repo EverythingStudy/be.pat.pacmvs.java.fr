@@ -41,6 +41,6 @@ public class AiInfoListVO {
     /**
      * 是否红色底纹高亮整行
      */
-    @ApiModelProperty(value = "是否红色底纹高亮整行")
+    @ApiModelProperty(value = "是否红色底纹高亮整行 true标红 false不标红")
     private Boolean redHighlight;
 }

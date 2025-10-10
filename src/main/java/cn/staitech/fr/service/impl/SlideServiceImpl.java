@@ -600,6 +600,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         return list;
     }
 
+
     @Override
     public AiInfoAnalyzeVo getAiInfoList(AiInfoListRequest request) {
         AiInfoAnalyzeVo aiInfoAnalyzeVo = new AiInfoAnalyzeVo();
@@ -658,7 +659,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
                 if (null != aiInfoListVO.getNormalDistribution() && null != aiCast.getResults()) {
                     String[] s = aiInfoListVO.getNormalDistribution().split("-");
-                    if (!"详情见单个标注轮廓详情弹窗！".equals(aiCast.getResults()) && aiCast.getResults().split(";").length == 0) {
+                    if (!"详情见单个标注轮廓详情弹窗！".equals(aiCast.getResults()) && aiCast.getResults().split(";").length == 1) {
                         boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiCast.getResults()));
                         if (!inRange) {
                             aiInfoListVO.setRedHighlight(true);
@@ -731,7 +732,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
                 if (null != aiInfoListVO.getNormalDistribution() && null != aiInfoListVO.getResults()) {
                     String[] s = aiInfoListVO.getNormalDistribution().split("-");
-                    if (!"详情见单个标注轮廓详情弹窗！".equals(aiInfoListVO.getResults()) && aiInfoListVO.getResults().split(";").length == 0) {
+                    if (!"详情见单个标注轮廓详情弹窗！".equals(aiInfoListVO.getResults()) && aiInfoListVO.getResults().split(";").length == 1) {
                         boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiInfoListVO.getResults()));
                         if (!inRange) {
                             flag = true;
