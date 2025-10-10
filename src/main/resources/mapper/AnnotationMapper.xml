@@ -796,7 +796,7 @@
             AND single_slide_id = #{singleSlideId}
         </if>
         <if test="contour != null">
-            AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = #{insideOrOutside}
+            AND ST_Intersects ( st_geomfromgeojson(#{contour}), ST_SetSRID(contour40000, 4326) ) = #{insideOrOutside}
         </if>
     </select>
 
