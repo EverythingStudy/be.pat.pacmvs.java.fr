@@ -25,6 +25,7 @@ spring:
         namespace: @nacosNamespace@
         # nacos group
         group: @nacosGroup@
+        timeout: 10000
         #register-enabled: false
       config:
         # 配置中心地址
@@ -38,4 +39,5 @@ spring:
         # 共享配置
         shared-configs:
           - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+        timeout: 10000
 
