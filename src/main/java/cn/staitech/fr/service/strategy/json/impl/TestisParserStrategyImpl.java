@@ -64,10 +64,10 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         // todo F生精细胞核数量（单个）
         // todo G支持细胞核数量（单个）
         Annotation annotationBy = new Annotation();
-        annotationBy.setCountName("生精细胞核数量（单个）");
-        commonJsonParser.putAnnotationDynamicData(jsonTask,"12E0FA","12E0FC",annotationBy);
-        annotationBy.setCountName("支持细胞核数量（单个）");
-        commonJsonParser.putAnnotationDynamicData(jsonTask,"12E0FA","12E0FD",annotationBy);
+//        annotationBy.setCountName("生精细胞核数量（单个）");
+//        commonJsonParser.putAnnotationDynamicData(jsonTask,"12E0FA","12E0FC",annotationBy);
+//        annotationBy.setCountName("支持细胞核数量（单个）");
+//        commonJsonParser.putAnnotationDynamicData(jsonTask,"12E0FA","12E0FD",annotationBy);
         annotationBy.setCountName(null);
 //        annotationBy.setAreaName("生精小管内腔面积（单个）");
 //        annotationBy.setAreaUnit(SQ_UM_THOUSAND);

@@ -206,4 +206,18 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
     protected BigDecimal bigDecimalDivideCheck(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
         return commonJsonParser.bigDecimalDivideCheck(bigDecimal1, bigDecimal2);
     }
+    
+    
+    /**
+     * 乘以100，然后保留三位小数
+     *
+     * @param numerator
+     * @param denominator
+     */
+    protected BigDecimal getMultiply100(BigDecimal numerator) {
+    	BigDecimal result = numerator
+    		    .multiply(BigDecimal.valueOf(100))
+    		    .setScale(3, BigDecimal.ROUND_HALF_UP);
+        return result;
+    }
 }

@@ -157,16 +157,19 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 		//灰质面积占比（全片）7=G/(G+H)   Gray matter area（all）
 		if(bigDecimalG.compareTo(BigDecimal.ZERO) != 0 && bigDecimalG_H.compareTo(BigDecimal.ZERO) != 0) {
           BigDecimal mesenchymeAreaRate = bigDecimalG.divide(bigDecimalG_H, 7, BigDecimal.ROUND_HALF_UP);
+          mesenchymeAreaRate = getMultiply100(mesenchymeAreaRate);
 			indicatorResultsMap.put("灰质面积占比（全片）", new IndicatorAddIn("Gray matter area（all）", String.valueOf(mesenchymeAreaRate), "%", "0",areaUtils.getStructureIds("1390B3","1390B2")));
 		}
 		//白质面积占比（全片）White matter area（all）  8=H/(G+H)
 		if(bigDecimalH.compareTo(BigDecimal.ZERO) != 0 && bigDecimalG_H.compareTo(BigDecimal.ZERO) != 0) {
 			BigDecimal mesenchymeAreaRate = bigDecimalH.divide(bigDecimalG_H, 7, BigDecimal.ROUND_HALF_UP);
+			mesenchymeAreaRate = getMultiply100(mesenchymeAreaRate);
 			indicatorResultsMap.put("白质面积占比（全片）", new IndicatorAddIn("White matter area（all）", String.valueOf(mesenchymeAreaRate), "%", "0",areaUtils.getStructureIds("1390B3","1390B2")));
 		}
 		//中央管面积占比（全片）Central canal area（all）9=I/(G+H)
 		if(bigDecimalI.compareTo(BigDecimal.ZERO) != 0 && bigDecimalG_H.compareTo(BigDecimal.ZERO) != 0) {
 			BigDecimal mesenchymeAreaRate = bigDecimalI.divide(bigDecimalG_H, 7, BigDecimal.ROUND_HALF_UP);
+			mesenchymeAreaRate = getMultiply100(mesenchymeAreaRate);
 			indicatorResultsMap.put("中央管面积占比（全片）", new IndicatorAddIn("Central canal area（all）", String.valueOf(mesenchymeAreaRate), "%", "0",areaUtils.getStructureIds("1390B3","1390B2","1390B4")));
 		}
 		

@@ -91,6 +91,9 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy impl
 //        bigDecimalE = new BigDecimal(bigDecimalEStr);
         BigDecimal bigDecimalE = getOrganArea(jsonTask, "14E012").getStructureAreaNum();
         bigDecimalE = commonJsonParser.getBigDecimalValue(bigDecimalE);
+        bigDecimalE = bigDecimalE.setScale(6, RoundingMode.HALF_UP);
+        String bigDecimalEStr = areaUtils.convertToSquareMicrometer(bigDecimalE.toString());
+        bigDecimalE = new BigDecimal(bigDecimalEStr);
         //        脂肪细胞面积	F	×10³平方微米	若输出结果为多个则相加
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         BigDecimal bigDecimalF = new BigDecimal(singleSlide.getArea());
