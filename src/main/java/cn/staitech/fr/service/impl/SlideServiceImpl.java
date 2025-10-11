@@ -730,7 +730,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                 String firstAndLastOfMiddle95Percent = MathUtils.getFirstAndLastOfMiddle95Percent(dataList, count);
                 aiInfoListVO.setNormalDistribution(firstAndLastOfMiddle95Percent);
 
-                if (null != aiInfoListVO.getNormalDistribution() && null != aiInfoListVO.getResults()) {
+                if (null != aiInfoListVO.getNormalDistribution() && null != aiInfoListVO.getResults() && !"数据量过少,无统计学意义".equals(aiInfoListVO.getNormalDistribution())) {
                     String[] s = aiInfoListVO.getNormalDistribution().split("-");
                     if (!"详情见单个标注轮廓详情弹窗！".equals(aiInfoListVO.getResults()) && aiInfoListVO.getResults().split(";").length == 1) {
                         boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiInfoListVO.getResults()));
