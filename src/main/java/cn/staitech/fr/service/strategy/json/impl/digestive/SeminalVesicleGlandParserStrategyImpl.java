@@ -91,7 +91,7 @@ public class SeminalVesicleGlandParserStrategyImpl extends AbstractCustomParserS
         annotation1.setAreaName("腺上皮面积（单个）");
         annotation1.setAreaUnit(SQ_MM);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12D074",annotation1,3);
-        indicatorResultsMap.put("腺上皮面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,"12D074"));
+        //indicatorResultsMap.put("腺上皮面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,"12D074"));
 
 //        Annotation annotationBy = new Annotation();
 //        annotationBy.setAreaName("腺腔面积（单个）");

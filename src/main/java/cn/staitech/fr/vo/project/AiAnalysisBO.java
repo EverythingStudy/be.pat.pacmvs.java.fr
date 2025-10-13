@@ -43,4 +43,8 @@ public class AiAnalysisBO implements Serializable {
      * 种属id
      */
     private String speciesId;
+    /**
+     * 用户ID
+     */
+    private Long userId;
 }

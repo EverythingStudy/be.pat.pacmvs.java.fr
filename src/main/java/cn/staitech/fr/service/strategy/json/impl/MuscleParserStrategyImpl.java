@@ -117,13 +117,13 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
 
         Annotation annotation1 = new Annotation();
         annotation1.setAreaName("肌纤维面积（单个）");
-        annotation1.setAreaUnit(SQ_MM);
+        annotation1.setAreaUnit(SQ_UM);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "15C02A", annotation1, 2);
 
 
         // 算法输出指标
         // A肌纤维面积（单个）
-        resultsMap.put("肌纤维面积（单个）", createNameIndicator("Muscle fiber area (per)", MathUtils.getConfidenceInterval(annotationAreaList, count), SQ_MM, "15C02A"));
+        resultsMap.put("肌纤维面积（单个）", createNameIndicator("Muscle fiber area (per)", MathUtils.getConfidenceInterval(annotationAreaList, count), SQ_UM, "15C02A"));
 //        resultsMap.put("间质面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaB.toString()), SQ_UM_THOUSAND, "15C027"));
 //        resultsMap.put("血管面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaC.toString()), SQ_UM_THOUSAND, "15C003"));
 //        resultsMap.put("红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaD.toString()), SQ_UM, "15C004"));
@@ -135,7 +135,8 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
 //        resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE, "15C003"));
 //        resultsMap.put("血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", vesselInErythrocyteArea.setScale(3, RoundingMode.UP), PERCENTAGE, "15C003,15C004"));
 //        resultsMap.put("血管外红细胞面积占比", createNameIndicator("Extravascular erythrocyte area%", vesselOutErythrocyteArea.setScale(3, RoundingMode.UP), PERCENTAGE, "15C004,15C003"));
-        resultsMap.put("骨骼肌面积", createNameIndicator("Skeletal muscle area", areaUtils.convertToSquareMicrometer(organF.toString()), SQ_UM_THOUSAND, "15C111"));
+        //resultsMap.put("骨骼肌面积", createNameIndicator("Skeletal muscle area", areaUtils.convertToSquareMicrometer(organF.toString()), SQ_UM_THOUSAND, "15C111"));
+        resultsMap.put("骨骼肌面积", createNameIndicator("Skeletal muscle area", organF, SQ_MM, "15C111"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }
 
