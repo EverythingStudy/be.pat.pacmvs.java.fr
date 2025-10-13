@@ -2,7 +2,10 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
+import cn.staitech.fr.mapper.ProjectMapper;
+import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
@@ -10,6 +13,8 @@ import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -41,6 +46,12 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
     private AreaUtils areaUtils;
     @Resource
     private CommonJsonCheck commonJsonCheck;
+    @Resource
+    private ProjectMapper projectMapper;
+    //默认对照组值
+    private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
+    @Resource
+    private SingleSlideMapper singleSlideMapper;
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -50,6 +61,11 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
+    	Project special = projectMapper.selectById(jsonTask.getSpecialId());
+        String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
+        Integer countCa = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
+     
+        
         Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
 
         // 获取各种指标
@@ -135,7 +151,8 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
             String area = areaUtils.micrometerToSquareMicrometer(annotation1.getArea());
             list1.add(BigDecimal.valueOf(Double.parseDouble(area)));
         }
-       // String seminiferousTubulesAreaSingle = MathUtils.getConfidenceInterval(list1);
+        
+        String seminiferousTubulesAreaSingle = MathUtils.getConfidenceInterval(list1,countCa);
         // 生精小管厚度（单个）
         List<BigDecimal> list2 = new ArrayList<>();
         for (Annotation i : annotationList1) {
@@ -220,7 +237,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         //生精小管面积占比	3=B/J
         resultsMap.put("生精小管面积占比", createNameIndicator("Seminiferous tubules area%", seminiferousTubulesArea, PERCENTAGE,areaUtils.getStructureIds("12E0FA","12E111")));
         //生精小管面积（单个）	4=A
-        //resultsMap.put("生精小管面积（单个）", createNameIndicator("Seminiferous tubules area (per)", seminiferousTubulesAreaSingle, SQ_UM_THOUSAND,"12E0FA"));
+        resultsMap.put("生精小管面积（单个）", createNameIndicator("Seminiferous tubules area (per)", seminiferousTubulesAreaSingle, SQ_UM_THOUSAND,"12E0FA"));
         //生精小管密度	5=D/J
         resultsMap.put("生精小管密度", createNameIndicator("Density of seminiferous tubules", densityResult.setScale(3, RoundingMode.HALF_UP), SQ_MM_PIECE,areaUtils.getStructureIds("12E0FA","12E111")));
         //生精小管厚度（单个）	6=\sqrt{\smash[b]{A/\pi}}-\sqrt{\smash[b]{E/\pi}}
