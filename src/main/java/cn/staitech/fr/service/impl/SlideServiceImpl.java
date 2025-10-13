@@ -660,10 +660,15 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                 if (null != aiInfoListVO.getNormalDistribution() && null != aiCast.getResults() && !"数据量过少,无统计学意义".equals(aiInfoListVO.getNormalDistribution())) {
                     String[] s = aiInfoListVO.getNormalDistribution().split("-");
                     if (!"详情见单个标注轮廓详情弹窗！".equals(aiCast.getResults()) && aiCast.getResults().split(";").length == 1) {
-                        boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiCast.getResults()));
-                        if (!inRange) {
-                            aiInfoListVO.setRedHighlight(true);
+                        try {
+                            boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiCast.getResults()));
+                            if (!inRange) {
+                                aiInfoListVO.setRedHighlight(true);
+                            }
+                        } catch (Exception e) {
+                            log.error("数据转换异常{},{},{}", aiInfoListVO.getCategoryId(), aiInfoListVO.getNormalDistribution(), aiInfoListVO.getResults());
                         }
+
                     } else {
                         aiInfoListVO.setRedHighlight(false);
                     }
