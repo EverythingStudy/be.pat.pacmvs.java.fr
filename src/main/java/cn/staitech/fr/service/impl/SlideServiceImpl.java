@@ -849,7 +849,11 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                             Integer aiStatus = this.handleOrganStatus(singleSlide);
                             aiStatusSet.add(aiStatus);
                             statusVo.setAiStatus(aiStatus);
-                            boolean red = this.getAiInfoListCheck(req.getProjectId(), singleSlide.getSingleId());
+                            // 处理指标异常
+                            boolean red = false;
+                            if (req.isHandleRed()) {
+                                red = this.getAiInfoListCheck(req.getProjectId(), singleSlide.getSingleId());
+                            }
                             statusVo.setAbnormalIndicator(red);
                             // 结构化状态
                             statusVo.setForecastStatus(singleSlide.getForecastStatus());
