@@ -82,9 +82,9 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
-        Project special = projectMapper.selectById(jsonTask.getSpecialId());
-        String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
-        Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
+        //Project special = projectMapper.selectById(jsonTask.getSpecialId());
+        //String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
+       // Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
         // 获取各种指标
         // B间质面积
         BigDecimal organAreaB = commonJsonParser.getOrganArea(jsonTask, "15C027").getStructureAreaNum();
@@ -123,7 +123,7 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
 
         // 算法输出指标
         // A肌纤维面积（单个）
-        resultsMap.put("肌纤维面积（单个）", createNameIndicator("Muscle fiber area (per)", MathUtils.getConfidenceInterval(annotationAreaList, count), SQ_UM, "15C02A"));
+        resultsMap.put("肌纤维面积（单个）", createNameIndicator("Muscle fiber area (per)", MathUtils.getConfidenceInterval(annotationAreaList, annotationAreaList.size()), SQ_UM, "15C02A"));
 //        resultsMap.put("间质面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaB.toString()), SQ_UM_THOUSAND, "15C027"));
 //        resultsMap.put("血管面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaC.toString()), SQ_UM_THOUSAND, "15C003"));
 //        resultsMap.put("红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaD.toString()), SQ_UM, "15C004"));

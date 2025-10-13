@@ -2,7 +2,6 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.ProjectMapper;
@@ -15,7 +14,6 @@ import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -66,9 +64,9 @@ public class ProstateGlandParserStrategyImpl extends AbstractCustomParserStrateg
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("前列腺结构指标计算开始");
-        Project special = projectMapper.selectById(jsonTask.getSpecialId());
-        String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
-        Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
+        // Project special = projectMapper.selectById(jsonTask.getSpecialId());
+        // String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
+        //Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         //a 腺泡面积（单个）+ c 腺泡周长（单个）
@@ -92,8 +90,8 @@ public class ProstateGlandParserStrategyImpl extends AbstractCustomParserStrateg
             epithelialList.add(new BigDecimal(1).subtract(x));
             lumenList.add(x);
         }
-        indicatorResultsMap.put("腺上皮面积占比（单个）", createNameIndicator("Acinar epithelial area% (per)", MathUtils.getConfidenceInterval(epithelialList,count), PERCENTAGE, areaUtils.getStructureIds("12D074", "12C0E9")));
-        indicatorResultsMap.put("腺腔面积占比（单个）", createNameIndicator("Acinar lumen area% (per)", MathUtils.getConfidenceInterval(lumenList,count), PERCENTAGE, areaUtils.getStructureIds("12D074", "12C0E9")));
+        indicatorResultsMap.put("腺上皮面积占比（单个）", createNameIndicator("Acinar epithelial area% (per)", MathUtils.getConfidenceInterval(epithelialList, epithelialList.size()), PERCENTAGE, areaUtils.getStructureIds("12D074", "12C0E9")));
+        indicatorResultsMap.put("腺腔面积占比（单个）", createNameIndicator("Acinar lumen area% (per)", MathUtils.getConfidenceInterval(lumenList, lumenList.size()), PERCENTAGE, areaUtils.getStructureIds("12D074", "12C0E9")));
 
         Annotation annotation1 = new Annotation();
         annotation1.setAreaName("腺泡面积（单个）");
