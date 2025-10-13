@@ -96,8 +96,8 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         Project special = projectMapper.selectById(jsonTask.getSpecialId());
-        String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
-        Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
+       // String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
+        //Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
         Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
 
         // 获取各种指标
@@ -187,7 +187,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
             list1.add(one.subtract(commonJsonParser.bigDecimalDivideCheck(annotation2.getStructureAreaNum(), i.getStructureAreaNum())).multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP));
         }
 
-        String mucosalAreaPer = MathUtils.getConfidenceInterval(list1, count);
+        String mucosalAreaPer = MathUtils.getConfidenceInterval(list1, list1.size());
 
         // 精子面积占比（单个）
         List<BigDecimal> list2 = new ArrayList<>();
@@ -229,7 +229,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
             BigDecimal res = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()), i.getStructurePerimeterNum());
             list3.add(res);
         }
-        String mucosalCellDensity = MathUtils.getConfidenceInterval(list3,count);
+        String mucosalCellDensity = MathUtils.getConfidenceInterval(list3, list3.size());
         // 血管相对面积
         BigDecimal vesselArea = commonJsonParser.getProportion(organAreaI, organAreaJ);
         //黏膜上皮厚度（单个）
@@ -244,7 +244,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
                 list4.add(sqrt1.subtract(sqrt2));
             }
         }
-        String mucosalThickness = MathUtils.getConfidenceInterval(list4,count);
+        String mucosalThickness = MathUtils.getConfidenceInterval(list4, list4.size());
         /**
          A	输出小管/附睾管黏膜上皮外轮廓面积（单个）	12F0F5
          B	输出小管/附睾管黏膜上皮外轮廓面积（全片）	12F0F5

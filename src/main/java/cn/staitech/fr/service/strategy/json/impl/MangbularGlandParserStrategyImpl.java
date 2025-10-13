@@ -49,6 +49,7 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
     private ProjectMapper projectMapper;
     //默认对照组值
     private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
+
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -92,8 +93,8 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         Project special = projectMapper.selectById(jsonTask.getSpecialId());
-        String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
-        Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
+        //String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
+        //Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
         Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
 
         // 获取各种指标
@@ -156,7 +157,7 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
             BigDecimal granularConvolutedTubule = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation1.getCount()), annotation.getStructureAreaNum());
             list.add(granularConvolutedTubule);
         }
-        String granularConvolutedTubules = MathUtils.getConfidenceInterval(list,count);
+        String granularConvolutedTubules = MathUtils.getConfidenceInterval(list, list.size());
         // 血管面积占比
         BigDecimal vesselArea = commonJsonParser.getProportion(organAreaD, organAreaH);
         // 红细胞面积占比
