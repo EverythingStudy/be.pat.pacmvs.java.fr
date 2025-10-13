@@ -35,9 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import static cn.staitech.common.security.utils.SecurityUtils.isAdmin;
@@ -821,7 +818,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         if (CollectionUtils.isNotEmpty(page.getRecords())) {
             for (SlidePageVo slidePageVo : page.getRecords()) {
                 // 是否指标异常：矩阵阅片模式下专属：默认false
-                AtomicBoolean abnormalIndicator = new AtomicBoolean(false);
+                boolean abnormalIndicator = false;
                 // 脏器识别完成（算法接口成功并且核对一致），才能查询脏器信息（防止查询到脏器识别异常核对时的数据）
                 if (slidePageVo.getAiStatus() == 3) {
                     // 查询脏器信息
@@ -838,17 +835,13 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                             tagMap = tags.stream().collect(Collectors.toMap(OrganTag::getOrganTagId, tag -> tag));
                         }
                         // 脏器状态集合：4-结构未分析、5-结构分析中、6-结构分析完成、7-结构分析失败-V2.6.1
-                        // 使用线程安全的集合
-                        Set<Integer> aiStatusSet = Collections.newSetFromMap(new ConcurrentHashMap<Integer, Boolean>(16));
-                        ConcurrentLinkedQueue<OrganStatusVo> organStatusVos = new ConcurrentLinkedQueue<>();
-                        Map<Long, OrganTag> finalTagMap = tagMap;
-
-                        // 使用 parallelStream
-                        singleSlides.parallelStream().forEach(singleSlide -> {
+                        Set<Integer> aiStatusSet = new HashSet<>();
+                        List<OrganStatusVo> organStatusVos = new ArrayList<>();
+                        for (SingleSlide singleSlide : singleSlides) {
                             OrganStatusVo statusVo = new OrganStatusVo();
                             statusVo.setSingleId(singleSlide.getSingleId());
                             statusVo.setOrganTagId(singleSlide.getCategoryId());
-                            OrganTag tag = finalTagMap.get(singleSlide.getCategoryId());
+                            OrganTag tag = tagMap.get(singleSlide.getCategoryId());
                             if (tag != null) {
                                 statusVo.setOrganName(tag.getOrganName());
                             }
@@ -856,7 +849,11 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                             Integer aiStatus = this.handleOrganStatus(singleSlide);
                             aiStatusSet.add(aiStatus);
                             statusVo.setAiStatus(aiStatus);
-                            boolean red = this.getAiInfoListCheck(req.getProjectId(), singleSlide.getSingleId());
+                            // 处理指标异常
+                            boolean red = false;
+                            if (req.isHandleRed()) {
+                                red = this.getAiInfoListCheck(req.getProjectId(), singleSlide.getSingleId());
+                            }
                             statusVo.setAbnormalIndicator(red);
                             // 结构化状态
                             statusVo.setForecastStatus(singleSlide.getForecastStatus());
@@ -866,12 +863,11 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                             }
                             // 是否指标异常：矩阵阅片模式下专属
                             if (red) {
-                                abnormalIndicator.set(true);
+                                abnormalIndicator = true;
                             }
-                        });
-
+                        }
                         // 脏器信息状态集合（列表阅片模式下：aiStatus非0、1、2状态使用，目前就是3使用）
-                        slidePageVo.setOrganStatusVos(new ArrayList<>(organStatusVos));
+                        slidePageVo.setOrganStatusVos(organStatusVos);
                         // 矩阵阅片模式下，AI分析状态使用维护：状态一致，直接使用；状态不一致，排除4-结构未分析，其他按照5-结构分析中、6-结构分析完成、7-结构分析失败顺序存在就匹配
                         if (aiStatusSet.size() == 1) {
                             slidePageVo.setAiStatus(aiStatusSet.iterator().next());
@@ -889,7 +885,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                     }
                 }
                 // 是否指标异常：矩阵阅片模式下专属
-                slidePageVo.setAbnormalIndicator(abnormalIndicator.get());
+                slidePageVo.setAbnormalIndicator(abnormalIndicator);
             }
         }
         return R.ok(page);

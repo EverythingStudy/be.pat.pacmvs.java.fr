@@ -69,6 +69,11 @@ public class SlidePageReq extends PageRequest {
      */
     @ApiModelProperty(value = "创建时间-V2.6.1")
     private DateRangeReq createTimeParams;
+    /**
+     * 是否处理指标异常
+     */
+    @ApiModelProperty(value = "是否处理指标异常-V2.6.1")
+    private boolean handleRed = false;
 
 
 
