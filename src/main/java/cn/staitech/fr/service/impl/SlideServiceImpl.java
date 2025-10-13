@@ -401,8 +401,11 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
             if (CollectionUtils.isEmpty(list)) {
                 return R.fail("没有可分析的切片");
             }
+            // 获取当前用户ID
+            Long userId = SecurityUtils.getUserId();
             for (AiAnalysisBO bo : list) {
                 try {
+                    bo.setUserId(userId);
                     log.info("脏器识别请求参数：{}", JSON.toJSONString(bo));
                     String aiResult = HttpUtil.post(this.aiUrl, JSON.toJSONString(bo), this.timeout);
                     log.info("脏器识别返回结果：{}", aiResult);
