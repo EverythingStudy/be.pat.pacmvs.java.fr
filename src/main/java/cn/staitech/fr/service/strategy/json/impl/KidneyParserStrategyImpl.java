@@ -49,6 +49,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
     private ProjectMapper projectMapper;
     //默认对照组值
     private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
+
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -87,8 +88,8 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         Project special = projectMapper.selectById(jsonTask.getSpecialId());
-        String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
-        Integer countCa = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
+        //String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
+        //Integer countCa = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         //皮质
@@ -101,7 +102,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         Integer count = getOrganAreaCount(jsonTask, "11B031");
         //一级指标（算法输出指标）
         //A mm2 11B03D
-       // indicatorResultsMap.put("肾皮质面积", createIndicator(b11B03D.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "11B03D"));
+        // indicatorResultsMap.put("肾皮质面积", createIndicator(b11B03D.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "11B03D"));
         //B、103平方微米 11B02D
         //indicatorResultsMap.put("肾小球面积（单个）", createDefaultIndicator("11B02D"));
         //C、个 11B02D、11B02E
@@ -124,7 +125,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
             BigDecimal temp = annotation.getStructureAreaNum();
             return temp.multiply(BigDecimal.valueOf(1000));
         }).collect(Collectors.toList());
-        indicatorResultsMap.put("肾小球面积（单个）", createNameIndicator("Acinar epithelial area% (per)", MathUtils.getConfidenceInterval(bsb,countCa), SQ_UM_THOUSAND, "11B02D"));
+        indicatorResultsMap.put("肾小球面积（单个）", createNameIndicator("Acinar epithelial area% (per)", MathUtils.getConfidenceInterval(bsb, bsb.size()), SQ_UM_THOUSAND, "11B02D"));
         //4=C/B
         List<BigDecimal> cb = new ArrayList<>();
         for (Annotation annotation : bs) {
@@ -136,7 +137,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
                 cb.add(result);
             }
         }
-       // indicatorResultsMap.put("球内细胞核密度（单个）", createComplexIndicator(cb, "Nucleus density of glomerulus (per)", SQ_MM_PIECE, CommonConstant.NUMBER_0, "11B02D,11B02E"));
+        // indicatorResultsMap.put("球内细胞核密度（单个）", createComplexIndicator(cb, "Nucleus density of glomerulus (per)", SQ_MM_PIECE, CommonConstant.NUMBER_0, "11B02D,11B02E"));
         //5=D/B
         List<BigDecimal> db = bs.stream().map(annotation -> {
             Annotation temp = getContourInsideOrOutside(jsonTask, annotation.getContour(), "11B02F", true);

@@ -28,12 +28,11 @@ import java.util.Map;
 
 
 /**
- * 
-* @ClassName: TestisParserStrategyImpl
-* @Description-d:睾丸
-* @author wanglibei
-* @date 2025年7月22日
-* @version V1.0
+ * @author wanglibei
+ * @version V1.0
+ * @ClassName: TestisParserStrategyImpl
+ * @Description-d:睾丸
+ * @date 2025年7月22日
  */
 @Slf4j
 @Service("Testis")
@@ -52,6 +51,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
     private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
     @Resource
     private SingleSlideMapper singleSlideMapper;
+
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -61,11 +61,11 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-    	Project special = projectMapper.selectById(jsonTask.getSpecialId());
-        String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
-        Integer countCa = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
-     
-        
+        // Project special = projectMapper.selectById(jsonTask.getSpecialId());
+        // String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
+        //Integer countCa = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
+
+
         Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
 
         // 获取各种指标
@@ -90,54 +90,53 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
 //        commonJsonParser.putAnnotationDynamicData(jsonTask,"12E0FA","12E0FB",annotationBy,1);
         annotationBy.setAreaName("生精小管面积（单个）");
         annotationBy.setAreaUnit(SQ_UM_THOUSAND);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12E0FA",annotationBy,1);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12E0FA", annotationBy, 1);
         annotationBy.setAreaName(null);
         annotationBy.setAreaUnit(null);
         annotationBy.setPerimeterName("生精小管周长（单个）");
         annotationBy.setPerimeterUnit(MM);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12E0FA",annotationBy,3);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12E0FA", annotationBy, 3);
         Annotation annotationBy1 = new Annotation();
         annotationBy1.setAreaName("生精小管内腔面积（单个）");
         annotationBy1.setAreaUnit(SQ_UM_THOUSAND);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask,"12E0FB",annotationBy1,1);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12E0FB", annotationBy1, 1);
 
         // 算法输出指标
         /**
-            A	生精小管面积（单个）	12E0FA
-			B	生精小管面积（全片）	12E0FA
-			C	生精小管周长（单个）	12E0FA
-			D	生精小管数量	12E0FA
-			E	生精小管内腔面积（单个）	12E0FA、12E0FB
-			F	生精细胞核数量（单个）	12E0FA、12E0FC
-			G	支持细胞核数量（单个）	12E0FA、12E0FD
-			H	间质细胞核数量	12E0FA、12E0FE
-			I	血管面积	12E003
-			J	组织轮廓面积	12E111
-			
-			睾丸面积	1=J
-			生精小管面积（全片）	2=B
-			生精小管面积占比	3=B/J
-			生精小管面积（单个）	4=A
-			生精小管密度	5=D/J
-			生精小管厚度（单个）	6=\sqrt{\smash[b]{A/\pi}}-\sqrt{\smash[b]{E/\pi}}
-			生精细胞核密度（单个）	7=F/C
-			支持细胞核密度（单个）	8=G/C
-			生精细胞核：支持细胞核（单个）	9=F/G
-			血管面积占比	10=I/J
-			间质细胞核：生精小管	11=H/D
-			间质面积占比	12=(J-B)/J
-			间质细胞核密度	13=H/J
+         A	生精小管面积（单个）	12E0FA
+         B	生精小管面积（全片）	12E0FA
+         C	生精小管周长（单个）	12E0FA
+         D	生精小管数量	12E0FA
+         E	生精小管内腔面积（单个）	12E0FA、12E0FB
+         F	生精细胞核数量（单个）	12E0FA、12E0FC
+         G	支持细胞核数量（单个）	12E0FA、12E0FD
+         H	间质细胞核数量	12E0FA、12E0FE
+         I	血管面积	12E003
+         J	组织轮廓面积	12E111
+
+         睾丸面积	1=J
+         生精小管面积（全片）	2=B
+         生精小管面积占比	3=B/J
+         生精小管面积（单个）	4=A
+         生精小管密度	5=D/J
+         生精小管厚度（单个）	6=\sqrt{\smash[b]{A/\pi}}-\sqrt{\smash[b]{E/\pi}}
+         生精细胞核密度（单个）	7=F/C
+         支持细胞核密度（单个）	8=G/C
+         生精细胞核：支持细胞核（单个）	9=F/G
+         血管面积占比	10=I/J
+         间质细胞核：生精小管	11=H/D
+         间质面积占比	12=(J-B)/J
+         间质细胞核密度	13=H/J
          */
         //resultsMap.put("生精小管面积（单个）", createDefaultIndicator("12E0FA"));// A生精小管面积（单个）
 //        resultsMap.put("生精小管面积（全片）", createIndicator(organAreaB.setScale(3, RoundingMode.HALF_UP), SQ_MM,"12E0FA"));
         //resultsMap.put("生精小管周长（单个）", createDefaultIndicator("12E0FA"));
-        resultsMap.put("生精小管数量", createIndicator(areaCountD, PIECE,"12E0FA"));
+        resultsMap.put("生精小管数量", createIndicator(areaCountD, PIECE, "12E0FA"));
 //        resultsMap.put("生精小管内腔面积（单个）", createDefaultIndicator(areaUtils.getStructureIds("12E0FA","12E0FB")));// E生精小管内腔面积（单个）
 //        resultsMap.put("生精细胞核数量（单个）", createDefaultIndicator(areaUtils.getStructureIds("12E0FA","12E0FC")));
 //        resultsMap.put("支持细胞核数量（单个）", createDefaultIndicator(areaUtils.getStructureIds("12E0FA","12E0FD")));
 //        resultsMap.put("间质细胞核数量", createIndicator(areaCountH, PIECE,areaUtils.getStructureIds("12E0FA","12E0FE")));
 //        resultsMap.put("血管面积", createIndicator(organAreaI.setScale(3, RoundingMode.HALF_UP), SQ_MM,"12E003"));
-
 
 
         // 计算指标
@@ -146,37 +145,37 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal seminiferousTubulesArea = commonJsonParser.getProportion(organAreaB, organAreaJ);
         // 生精小管面积（单个）
         List<BigDecimal> list1 = new ArrayList<>();
-        List<Annotation> annotationList1 = commonJsonParser.getStructureContourList(jsonTask,"12E0FA");
+        List<Annotation> annotationList1 = commonJsonParser.getStructureContourList(jsonTask, "12E0FA");
         for (Annotation annotation1 : annotationList1) {
             String area = areaUtils.micrometerToSquareMicrometer(annotation1.getArea());
             list1.add(BigDecimal.valueOf(Double.parseDouble(area)));
         }
-        
-        String seminiferousTubulesAreaSingle = MathUtils.getConfidenceInterval(list1,countCa);
+
+        String seminiferousTubulesAreaSingle = MathUtils.getConfidenceInterval(list1, list1.size());
         // 生精小管厚度（单个）
         List<BigDecimal> list2 = new ArrayList<>();
         for (Annotation i : annotationList1) {
             Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12E0FB", true);
-            if(i.getArea() != null && annotation2.getArea() != null){
-                BigDecimal sqrt1 = commonJsonParser.sqrt(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(i.getArea())),BigDecimal.valueOf(Double.parseDouble(A))));
-                BigDecimal sqrt2 = commonJsonParser.sqrt(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(annotation2.getArea())),BigDecimal.valueOf(Double.parseDouble(A))));
+            if (i.getArea() != null && annotation2.getArea() != null) {
+                BigDecimal sqrt1 = commonJsonParser.sqrt(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(i.getArea())), BigDecimal.valueOf(Double.parseDouble(A))));
+                BigDecimal sqrt2 = commonJsonParser.sqrt(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(annotation2.getArea())), BigDecimal.valueOf(Double.parseDouble(A))));
                 BigDecimal res = sqrt1.subtract(sqrt2);
                 list2.add(res);
             }
         }
-       // String averageThicknessOfSpermatogenicTubules = MathUtils.getConfidenceInterval(list2);
+        // String averageThicknessOfSpermatogenicTubules = MathUtils.getConfidenceInterval(list2);
         // 生精细胞核密度（单个）
         List<BigDecimal> list3 = new ArrayList<>();
         for (Annotation i : annotationList1) {
             Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12E0FC", true);
-            list3.add(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()),i.getStructurePerimeterNum()));
+            list3.add(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()), i.getStructurePerimeterNum()));
         }
         //String nucleusDensityOfSpermatogenicCells = MathUtils.getConfidenceInterval(list3);
         // 支持细胞核密度（单个）
         List<BigDecimal> list4 = new ArrayList<>();
         for (Annotation i : annotationList1) {
             Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12E0FD", true);
-            list4.add(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()),i.getStructurePerimeterNum()));
+            list4.add(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()), i.getStructurePerimeterNum()));
 
         }
         //String nucleusDensityOfSupportCells = MathUtils.getConfidenceInterval(list4);
@@ -186,7 +185,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         for (Annotation i : annotationList1) {
             Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12E0FC", true);
             Annotation annotation3 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12E0FD", true);
-            list5.add(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()),BigDecimal.valueOf(annotation3.getCount())));
+            list5.add(commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()), BigDecimal.valueOf(annotation3.getCount())));
         }
         //String nucleusDensityOfSpermatogenicCellsSupportCells = MathUtils.getConfidenceInterval(list5);
         // 血管面积占比
@@ -194,7 +193,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         // 间质细胞核：生精小管
 
         BigDecimal interstitialCellNuclei = BigDecimal.ZERO;
-        if(areaCountD != 0 && areaCountH != 0){
+        if (areaCountD != 0 && areaCountH != 0) {
             interstitialCellNuclei = BigDecimal.valueOf(areaCountH).divide(BigDecimal.valueOf(areaCountD), 3, RoundingMode.HALF_UP);
         }
         // 间质面积占比
@@ -205,41 +204,41 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
 
         // 产品呈现指标
         /**
-        A	生精小管面积（单个）	12E0FA
-		B	生精小管面积（全片）	12E0FA
-		C	生精小管周长（单个）	12E0FA
-		D	生精小管数量	12E0FA
-		E	生精小管内腔面积（单个）	12E0FA、12E0FB
-		F	生精细胞核数量（单个）	12E0FA、12E0FC
-		G	支持细胞核数量（单个）	12E0FA、12E0FD
-		H	间质细胞核数量	12E0FA、12E0FE
-		I	血管面积	12E003
-		J	组织轮廓面积	12E111
-		
-		睾丸面积	1=J
-		生精小管面积（全片）	2=B
-		生精小管面积占比	3=B/J
-		生精小管面积（单个）	4=A
-		生精小管密度	5=D/J
-		生精小管厚度（单个）	6=\sqrt{\smash[b]{A/\pi}}-\sqrt{\smash[b]{E/\pi}}
-		生精细胞核密度（单个）	7=F/C
-		支持细胞核密度（单个）	8=G/C
-		生精细胞核：支持细胞核（单个）	9=F/G
-		血管面积占比	10=I/J
-		间质细胞核：生精小管	11=H/D
-		间质面积占比	12=(J-B)/J
-		间质细胞核密度	13=H/J
-     */
+         A	生精小管面积（单个）	12E0FA
+         B	生精小管面积（全片）	12E0FA
+         C	生精小管周长（单个）	12E0FA
+         D	生精小管数量	12E0FA
+         E	生精小管内腔面积（单个）	12E0FA、12E0FB
+         F	生精细胞核数量（单个）	12E0FA、12E0FC
+         G	支持细胞核数量（单个）	12E0FA、12E0FD
+         H	间质细胞核数量	12E0FA、12E0FE
+         I	血管面积	12E003
+         J	组织轮廓面积	12E111
+
+         睾丸面积	1=J
+         生精小管面积（全片）	2=B
+         生精小管面积占比	3=B/J
+         生精小管面积（单个）	4=A
+         生精小管密度	5=D/J
+         生精小管厚度（单个）	6=\sqrt{\smash[b]{A/\pi}}-\sqrt{\smash[b]{E/\pi}}
+         生精细胞核密度（单个）	7=F/C
+         支持细胞核密度（单个）	8=G/C
+         生精细胞核：支持细胞核（单个）	9=F/G
+         血管面积占比	10=I/J
+         间质细胞核：生精小管	11=H/D
+         间质面积占比	12=(J-B)/J
+         间质细胞核密度	13=H/J
+         */
         //睾丸面积	1=J
-        resultsMap.put("睾丸面积", createNameIndicator("Testicular area", organAreaJ.setScale(3, RoundingMode.HALF_UP), SQ_MM,"12E111"));
+        resultsMap.put("睾丸面积", createNameIndicator("Testicular area", organAreaJ.setScale(3, RoundingMode.HALF_UP), SQ_MM, "12E111"));
         //生精小管面积（全片）	2=B
-        resultsMap.put("生精小管面积（全片）", createNameIndicator("Seminiferous tubules area (all)", organAreaB.setScale(3, RoundingMode.HALF_UP), SQ_MM,"12E0FA"));
+        resultsMap.put("生精小管面积（全片）", createNameIndicator("Seminiferous tubules area (all)", organAreaB.setScale(3, RoundingMode.HALF_UP), SQ_MM, "12E0FA"));
         //生精小管面积占比	3=B/J
-        resultsMap.put("生精小管面积占比", createNameIndicator("Seminiferous tubules area%", seminiferousTubulesArea, PERCENTAGE,areaUtils.getStructureIds("12E0FA","12E111")));
+        resultsMap.put("生精小管面积占比", createNameIndicator("Seminiferous tubules area%", seminiferousTubulesArea, PERCENTAGE, areaUtils.getStructureIds("12E0FA", "12E111")));
         //生精小管面积（单个）	4=A
-        resultsMap.put("生精小管面积（单个）", createNameIndicator("Seminiferous tubules area (per)", seminiferousTubulesAreaSingle, SQ_UM_THOUSAND,"12E0FA"));
+        resultsMap.put("生精小管面积（单个）", createNameIndicator("Seminiferous tubules area (per)", seminiferousTubulesAreaSingle, SQ_UM_THOUSAND, "12E0FA"));
         //生精小管密度	5=D/J
-        resultsMap.put("生精小管密度", createNameIndicator("Density of seminiferous tubules", densityResult.setScale(3, RoundingMode.HALF_UP), SQ_MM_PIECE,areaUtils.getStructureIds("12E0FA","12E111")));
+        resultsMap.put("生精小管密度", createNameIndicator("Density of seminiferous tubules", densityResult.setScale(3, RoundingMode.HALF_UP), SQ_MM_PIECE, areaUtils.getStructureIds("12E0FA", "12E111")));
         //生精小管厚度（单个）	6=\sqrt{\smash[b]{A/\pi}}-\sqrt{\smash[b]{E/\pi}}
 //        resultsMap.put("生精小管厚度（单个）", createNameIndicator("Average thickness of spermatogenic tubules (per)", averageThicknessOfSpermatogenicTubules, UM,areaUtils.getStructureIds("12E0FA","12E0FB")));
         //生精细胞核密度（单个）	7=F/C
@@ -250,9 +249,9 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
 //        resultsMap.put("生精细胞核：支持细胞核（单个）", createNameIndicator("Spermatogenic nucleus:  Sertoli nucleus ratio (per)", nucleusDensityOfSpermatogenicCellsSupportCells, NOT,areaUtils.getStructureIds("12E0FA","12E0FC","12E0FD")));
 ////        resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE,areaUtils.getStructureIds("12E003","12E111")));
         //间质细胞核：生精小管	11=H/D
-    //    resultsMap.put("间质细胞核：生精小管", createNameIndicator("Leydig nucleus: seminiferous tubules ratio", interstitialCellNuclei, NOT,areaUtils.getStructureIds("12E0FA","12E0FE")));
+        //    resultsMap.put("间质细胞核：生精小管", createNameIndicator("Leydig nucleus: seminiferous tubules ratio", interstitialCellNuclei, NOT,areaUtils.getStructureIds("12E0FA","12E0FE")));
         //间质面积占比	12=(J-B)/J
-      //  resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area%", interstitialArea, PERCENTAGE,areaUtils.getStructureIds("12E111","12E0FA")));
+        //  resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area%", interstitialArea, PERCENTAGE,areaUtils.getStructureIds("12E111","12E0FA")));
         //间质细胞核密度	13=H/J
         //resultsMap.put("间质细胞核密度", createNameIndicator("Nucleus density of leydig cells", interstitialCellNucleiDensity, SQ_MM_PIECE,areaUtils.getStructureIds("12E0FA","12E0FA","12E111")));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
