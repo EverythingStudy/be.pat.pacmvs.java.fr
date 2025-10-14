@@ -233,7 +233,7 @@
         select CASE
                    WHEN locate('±', faf.results) > 0 THEN
                        CAST(LEFT (faf.results, locate('±', faf.results) - 1) AS DECIMAL (10, 3))
-                   WHEN locate(':', faf.results) = 0 THEN
+                   WHEN locate(':', faf.results) > 0 THEN
                        CAST(LEFT (faf.results, locate(':', faf.results) - 1) AS DECIMAL (10, 3))
                    ELSE
                        CAST(faf.results AS DECIMAL(10, 3))
