@@ -182,7 +182,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         annotation1.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "17A06C", annotation1, 1);
         //g
-        map.put("腺泡和导管面积（单个）", new IndicatorAddIn("17A06C"));
+       // map.put("腺泡和导管面积（单个）", new IndicatorAddIn("17A06C"));
         //e
 //        map.put("细胞核数量（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,areaUtils.getStructureIds("12306C","1230C7")));
 //        Annotation annotationBy = new Annotation();
