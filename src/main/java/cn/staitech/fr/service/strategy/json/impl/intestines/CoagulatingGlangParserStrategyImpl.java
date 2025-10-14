@@ -164,7 +164,7 @@ public class CoagulatingGlangParserStrategyImpl implements ParserStrategy {
 		间质和肌层面积占比	5=(F-B-D)/F
          */
         // 腺上皮面积（单个）A 平方毫米 单个腺上皮面积
-        map.put("腺上皮面积（单个）", new IndicatorAddIn("12B074"));
+        //map.put("腺上皮面积（单个）", new IndicatorAddIn("12B074"));
 
         // 腺腔面积（单个）C 平方毫米 单个腺上皮内所有腺腔面积
 //        map.put("腺腔面积（单个）", new IndicatorAddIn(areaUtils.getStructureIds("12B074","12B0E9")));
