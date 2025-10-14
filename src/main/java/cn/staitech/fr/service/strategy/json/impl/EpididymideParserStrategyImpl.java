@@ -190,17 +190,17 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         String mucosalAreaPer = MathUtils.getConfidenceInterval(list1, list1.size());
 
         // 精子面积占比（单个）
-        List<BigDecimal> list2 = new ArrayList<>();
-        List<String> list3s = new ArrayList<>();
-        List<String> list4s = new ArrayList<>();
-        List<Annotation> annotationList2 = commonJsonParser.getStructureContourList(jsonTask, "12F0F4");
-        for (Annotation i : annotationList2) {
-            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F7", true);
-            BigDecimal res = commonJsonParser.bigDecimalDivideChecks(BigDecimal.valueOf(Double.parseDouble(areaUtils.micrometerToSquareMicrometer(annotation2.getArea()))), BigDecimal.valueOf(Double.parseDouble(areaUtils.micrometerToSquareMicrometer(i.getArea()))));
-            list3s.add(areaUtils.micrometerToSquareMicrometer(annotation2.getArea()));
-            list4s.add(areaUtils.micrometerToSquareMicrometer(i.getArea()));
-            list2.add(res.multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP));
-        }
+//        List<BigDecimal> list2 = new ArrayList<>();
+//        List<String> list3s = new ArrayList<>();
+//        List<String> list4s = new ArrayList<>();
+//        List<Annotation> annotationList2 = commonJsonParser.getStructureContourList(jsonTask, "12F0F4");
+//        for (Annotation i : annotationList2) {
+//            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F7", true);
+//            BigDecimal res = commonJsonParser.bigDecimalDivideChecks(BigDecimal.valueOf(Double.parseDouble(areaUtils.micrometerToSquareMicrometer(annotation2.getArea()))), BigDecimal.valueOf(Double.parseDouble(areaUtils.micrometerToSquareMicrometer(i.getArea()))));
+//            list3s.add(areaUtils.micrometerToSquareMicrometer(annotation2.getArea()));
+//            list4s.add(areaUtils.micrometerToSquareMicrometer(i.getArea()));
+//            list2.add(res.multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP));
+//        }
 //        log.info("====================================================");
 //        for(int i = 0; i < list2.size(); i++){
 //            //log.info("{},{}",i,list2.get(i));
