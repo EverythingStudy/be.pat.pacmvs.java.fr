@@ -97,7 +97,6 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal organAreaE = annotation.getStructureAreaNum();
         // F精细轮廓总面积
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// F精细轮廓总面积
-
         BigDecimal organF = BigDecimal.valueOf(Double.parseDouble(slideArea));
 
         // BigDecimal organF = commonJsonParser.getOrganArea(jsonTask, "15C111").getStructureAreaNum();

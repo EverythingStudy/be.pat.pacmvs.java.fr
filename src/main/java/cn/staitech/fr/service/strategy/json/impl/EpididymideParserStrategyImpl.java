@@ -95,8 +95,8 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
      */
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Project special = projectMapper.selectById(jsonTask.getSpecialId());
-       // String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
+        //Project special = projectMapper.selectById(jsonTask.getSpecialId());
+        // String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
         //Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
         Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
 
@@ -105,11 +105,11 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         Annotation annotation = commonJsonParser.getOrganArea(jsonTask, "12F0F5");// C输出小管/附睾管黏膜上皮周长（单个）
         BigDecimal perimeterC = annotation.getStructurePerimeterNum();
         BigDecimal organAreaE = areaUtils.getOrganArea(jsonTask, "12F0F4");// E输出小管/附睾管管腔面积（全片）
-        BigDecimal organAreaG = areaUtils.getOrganArea(jsonTask, "12F0F7");// G精子面积（全片）
-        Integer organAreaH = areaUtils.getOrganAreaCount(jsonTask, "12F0F7");// G精子面积（全片）
-        BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "12F003");// I血管面积
+//        BigDecimal organAreaG = areaUtils.getOrganArea(jsonTask, "12F0F7");// G精子面积（全片）
+//        Integer organAreaH = areaUtils.getOrganAreaCount(jsonTask, "12F0F7");// G精子面积（全片）
+        //BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "12F003");// I血管面积
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// J组织轮廓面积
-        BigDecimal organAreaJ = BigDecimal.valueOf(Double.parseDouble(slideArea));
+       BigDecimal organAreaJ = BigDecimal.valueOf(Double.parseDouble(slideArea));
         // todo H黏膜上皮细胞核数量（单个）
 
         Annotation annotationBy = new Annotation();
@@ -132,10 +132,10 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12F0F4", annotationBy1, 1);
 
 
-        Annotation annotationBy2 = new Annotation();
-        annotationBy2.setAreaName("精子面积（单个）");
-        annotationBy2.setAreaUnit(SQ_UM_THOUSAND);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12F0F7", annotationBy2, 1);
+//        Annotation annotationBy2 = new Annotation();
+//        annotationBy2.setAreaName("精子面积（单个）");
+//        annotationBy2.setAreaUnit(SQ_UM_THOUSAND);
+//        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12F0F7", annotationBy2, 1);
 
         // 算法输出指标
         /**
@@ -190,17 +190,17 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         String mucosalAreaPer = MathUtils.getConfidenceInterval(list1, list1.size());
 
         // 精子面积占比（单个）
-        List<BigDecimal> list2 = new ArrayList<>();
-        List<String> list3s = new ArrayList<>();
-        List<String> list4s = new ArrayList<>();
-        List<Annotation> annotationList2 = commonJsonParser.getStructureContourList(jsonTask, "12F0F4");
-        for (Annotation i : annotationList2) {
-            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F7", true);
-            BigDecimal res = commonJsonParser.bigDecimalDivideChecks(BigDecimal.valueOf(Double.parseDouble(areaUtils.micrometerToSquareMicrometer(annotation2.getArea()))), BigDecimal.valueOf(Double.parseDouble(areaUtils.micrometerToSquareMicrometer(i.getArea()))));
-            list3s.add(areaUtils.micrometerToSquareMicrometer(annotation2.getArea()));
-            list4s.add(areaUtils.micrometerToSquareMicrometer(i.getArea()));
-            list2.add(res.multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP));
-        }
+//        List<BigDecimal> list2 = new ArrayList<>();
+//        List<String> list3s = new ArrayList<>();
+//        List<String> list4s = new ArrayList<>();
+//        List<Annotation> annotationList2 = commonJsonParser.getStructureContourList(jsonTask, "12F0F4");
+//        for (Annotation i : annotationList2) {
+//            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F7", true);
+//            BigDecimal res = commonJsonParser.bigDecimalDivideChecks(BigDecimal.valueOf(Double.parseDouble(areaUtils.micrometerToSquareMicrometer(annotation2.getArea()))), BigDecimal.valueOf(Double.parseDouble(areaUtils.micrometerToSquareMicrometer(i.getArea()))));
+//            list3s.add(areaUtils.micrometerToSquareMicrometer(annotation2.getArea()));
+//            list4s.add(areaUtils.micrometerToSquareMicrometer(i.getArea()));
+//            list2.add(res.multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP));
+//        }
 //        log.info("====================================================");
 //        for(int i = 0; i < list2.size(); i++){
 //            //log.info("{},{}",i,list2.get(i));
@@ -221,7 +221,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         //String spermAreaPer = MathUtils.getConfidenceInterval(list2);
 
         // 精子面积占比（全片）
-        BigDecimal spermArea = commonJsonParser.getProportion(organAreaG, organAreaE);
+        //BigDecimal spermArea = commonJsonParser.getProportion(organAreaG, organAreaE);
         // 黏膜上皮细胞核密度（单个）
         List<BigDecimal> list3 = new ArrayList<>();
         for (Annotation i : annotationList1) {
@@ -231,7 +231,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         }
         String mucosalCellDensity = MathUtils.getConfidenceInterval(list3, list3.size());
         // 血管相对面积
-        BigDecimal vesselArea = commonJsonParser.getProportion(organAreaI, organAreaJ);
+        //BigDecimal vesselArea = commonJsonParser.getProportion(organAreaI, organAreaJ);
         //黏膜上皮厚度（单个）
         List<BigDecimal> list4 = new ArrayList<>();
         for (Annotation i : annotationList1) {
