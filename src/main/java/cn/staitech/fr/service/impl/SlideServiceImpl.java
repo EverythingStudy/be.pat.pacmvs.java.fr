@@ -665,7 +665,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                     String[] s = aiInfoListVO.getNormalDistribution().split("-");
                     if (!"详情见单个标注轮廓详情弹窗！".equals(aiCast.getResults()) && aiCast.getResults().split(";").length == 1) {
                         try {
-                            boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(aiCast.getResults()));
+                            String result = aiCast.getResults().contains("±") ? aiCast.getResults().split("±")[0] : (aiCast.getResults().contains(":") ? aiCast.getResults().split(":")[0] : aiCast.getResults());
+                            boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(result));
                             if (!inRange) {
                                 aiInfoListVO.setRedHighlight(true);
                             }
@@ -742,7 +743,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                     String[] s = aiInfoListVO.getNormalDistribution().split("-");
                     if (!"详情见单个标注轮廓详情弹窗！".equals(aiInfoListVO.getResults()) && aiInfoListVO.getResults().split(";").length == 1) {
                         try {
-                            boolean inRange = Range.between(new BigDecimal(String.valueOf(s[0])), new BigDecimal(s[1])).contains(new BigDecimal(aiInfoListVO.getResults()));
+                            String result = aiInfoListVO.getResults().contains("±") ? aiInfoListVO.getResults().split("±")[0] : (aiInfoListVO.getResults().contains(":") ? aiInfoListVO.getResults().split(":")[0] : aiInfoListVO.getResults());
+                            boolean inRange = Range.between(new BigDecimal(String.valueOf(s[0])), new BigDecimal(s[1])).contains(new BigDecimal(result));
                             if (!inRange) {
                                 flag = true;
                                 break;
