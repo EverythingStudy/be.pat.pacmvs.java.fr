@@ -168,7 +168,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         //resultsMap.put("精子面积（全片）", createIndicator(organAreaG, SQ_MM,areaUtils.getStructureIds("12F0F5","12F0F7")));
         //resultsMap.put("血管面积", createIndicator(organAreaI.setScale(3, RoundingMode.HALF_UP), SQ_MM,"12F003"));
         //resultsMap.put("黏膜上皮细胞核数量（单个）", createDefaultIndicator(areaUtils.getStructureIds("12F0F5", "12F0F6")));
-        resultsMap.put("输出小管/附睾管管腔面积（单个）", createDefaultIndicator(areaUtils.getStructureIds("12F0F5", "12F0F4")));// D输出小管/附睾管管腔面积（单个）
+        //resultsMap.put("输出小管/附睾管管腔面积（单个）", createDefaultIndicator(areaUtils.getStructureIds("12F0F5", "12F0F4")));// D输出小管/附睾管管腔面积（单个）
 //        resultsMap.put("精子面积（单个）", createDefaultIndicator(areaUtils.getStructureIds("12F0F5","12F0F7")));// F精子面积（单个）
 
         // 产品呈现指标
