@@ -48,9 +48,6 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("大鼠卵巢与输卵管构指标计算开始");
-
-
-
         // 黄体数量 A 个
         Integer mucosaCountA = commonJsonParser.getOrganAreaCount(jsonTask, "17C0CA");
         mucosaCountA = commonJsonParser.getIntegerValue(mucosaCountA);
