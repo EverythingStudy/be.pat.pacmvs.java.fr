@@ -70,9 +70,9 @@ public class ProstateGlandParserStrategyImpl extends AbstractCustomParserStrateg
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         //a 腺泡面积（单个）+ c 腺泡周长（单个）
-        List<Annotation> organAreaA = commonJsonParser.getStructureContourList(jsonTask, "12D074");
+        List<Annotation> organAreaA = commonJsonParser.getStructureContourList(jsonTask, "12C06D");
         //b 腺泡面积（全片）
-        BigDecimal organAreaB = commonJsonParser.getOrganAreaMicron(jsonTask, "12C06D");
+        BigDecimal organAreaB = commonJsonParser.getOrganArea(jsonTask, "12C06D").getStructureAreaNum();
         //F 组织轮廓面积
         BigDecimal organAreF = new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.HALF_UP);
         indicatorResultsMap.put("腺泡面积（全片）", createIndicator(organAreaB.toString(), SQ_MM, "12C06D"));
@@ -84,7 +84,7 @@ public class ProstateGlandParserStrategyImpl extends AbstractCustomParserStrateg
         List<BigDecimal> lumenList = new ArrayList<>();
         for (Annotation annotation : organAreaA) {
             BigDecimal structureAreaNum = annotation.getStructureAreaNum();
-            Annotation contourInsideOrOutside = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "12C0E9", true);
+            Annotation contourInsideOrOutside = commonJsonParser.getInsideOrOutside(jsonTask, "12C06D", "12C0E9", true);
             //D/A
             BigDecimal x = contourInsideOrOutside.getStructureAreaNum().divide(structureAreaNum);
             epithelialList.add(new BigDecimal(1).subtract(x));
