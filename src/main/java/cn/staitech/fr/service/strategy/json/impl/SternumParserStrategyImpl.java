@@ -93,7 +93,7 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy impl
         bigDecimalE = commonJsonParser.getBigDecimalValue(bigDecimalE);
         bigDecimalE = bigDecimalE.setScale(6, RoundingMode.HALF_UP);
         String bigDecimalEStr = areaUtils.convertToSquareMicrometer(bigDecimalE.toString());
-        bigDecimalE = new BigDecimal(bigDecimalEStr);
+        BigDecimal bigDecimalMicrometerE = new BigDecimal(bigDecimalEStr);
         //        脂肪细胞面积	F	×10³平方微米	若输出结果为多个则相加
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         BigDecimal bigDecimalF = new BigDecimal(singleSlide.getArea());
@@ -174,7 +174,7 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy impl
         indicatorResultsMap.put("巨核系细胞数量", new IndicatorAddIn("", String.valueOf(mucosaCountC), "个", CommonConstant.NUMBER_1, "14E022"));
 //
 //        indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalE.setScale(3, RoundingMode.HALF_UP)), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "14E004"));
-        indicatorResultsMap.put("脂肪细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalE.setScale(3, RoundingMode.HALF_UP)), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "14E012"));
+        indicatorResultsMap.put("脂肪细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalMicrometerE.setScale(3, RoundingMode.HALF_UP)), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "14E012"));
 //        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", String.valueOf(bigDecimalF.setScale(3, RoundingMode.HALF_UP)), SQ_MM, CommonConstant.NUMBER_1, "14E111"));
 
         //AI指标保存
