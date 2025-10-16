@@ -7,6 +7,9 @@ import cn.staitech.fr.config.OrganStructureConfig;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.service.strategy.json.impl.EpididymideParserStrategyImpl;
+import cn.staitech.fr.service.strategy.json.impl.ProstateGlandParserStrategyImpl;
+import cn.staitech.fr.service.strategy.json.impl.UrinaryBladderParserStrategyImpl;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -49,11 +52,13 @@ public class Test {
     private AnnotationMapper annotationMapper;
     @Resource
     private ImageMapper imageMapper;
+    @Resource
+    private JsonTaskMapper jsonTaskMapper;
+    @Resource
+    private ProstateGlandParserStrategyImpl parserStrategy;
 
     @PostMapping("pathological")
     public void test() {
-
-
         List<OrganStructureConfig.OrganStructure> structures = organStructureConfig.getStructures().get("0E");
         Map<String, Long> pathologicalMap = getPathologicalMap(1L);
         System.out.println(pathologicalMap);
@@ -149,6 +154,12 @@ public class Test {
 
     }
 
+    @PostMapping("alculationIndicators")
+    public void alculationIndicators() {
+        JsonTask jsonTask = jsonTaskMapper.selectOne(new LambdaQueryWrapper<JsonTask>().eq(JsonTask::getTaskId, 2575));
+        parserStrategy.alculationIndicators(jsonTask);
+    }
+
     private String getResolutionX() {
         Image image = imageMapper.selectById(18790);
         String resolutionX = image.getResolutionX();
@@ -157,6 +168,7 @@ public class Test {
         }
         return resolutionX;
     }
+
 
     private Annotation processAnnotation(String finalResolutionX, Annotation annotation) {
         annotation.setContour(annotation.getContour40000());
