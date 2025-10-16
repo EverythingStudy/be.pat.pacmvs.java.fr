@@ -105,8 +105,9 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 			bigDecimalH = annotationH.getStructureAreaNum();
 			bigDecimalH = bigDecimalH.setScale(3, BigDecimal.ROUND_HALF_UP);
 		}
-		//		中央管面积（全片）	I	10³平方微米	
-		BigDecimal bigDecimalI  = commonJsonParser.getOrganAreaMicron(jsonTask, "1390B4");
+		//		中央管面积（全片）	I	10³平方微米
+		BigDecimal bigDecimalI = commonJsonParser.getOrganArea(jsonTask, "1390B4").getStructureAreaNum();
+		BigDecimal bigDecimalMicrometerI  = commonJsonParser.getOrganAreaMicron(jsonTask, "1390B4");
 		
 		
 		//		中央管面积（全片）	I	平方毫米
@@ -135,7 +136,7 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 
 		indicatorResultsMap.put("灰质面积（全片 ）", new IndicatorAddIn("", bigDecimalG.toString(), SQ_MM, "1","1390B3"));
 		indicatorResultsMap.put("白质面积（全片 ）", new IndicatorAddIn("", bigDecimalH.toString(), SQ_MM, "1","1390B2"));
-		indicatorResultsMap.put("中央管面积（全片 ）", new IndicatorAddIn("", bigDecimalI.toString(), SQ_UM_THOUSAND, "1","1390B4"));
+		indicatorResultsMap.put("中央管面积（全片 ）", new IndicatorAddIn("", bigDecimalMicrometerI.toString(), SQ_UM_THOUSAND, "1","1390B4"));
 		
 		
 //		indicatorResultsMap.put("室管膜细胞核数量（全片 ）", new IndicatorAddIn("", mucosaCountD.toString(), PIECE, "1",areaUtils.getStructureIds("1390B4","1390B5")));
