@@ -41,8 +41,8 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
     private CommonJsonParser commonJsonParser;
     @Resource
     private CommonJsonCheck commonJsonCheck;
-    @Autowired
-    private AreaUtils areaUtils;
+//    @Autowired
+//    private AreaUtils areaUtils;
     @Resource
     private SingleSlideMapper singleSlideMapper;
     @PostConstruct
@@ -107,8 +107,8 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
         BigDecimal organArea1 = getOrganArea(jsonTask, "15F102", BigDecimal.valueOf(1000)).getStructureAreaNum();
         BigDecimal organArea2 = getOrganArea(jsonTask, "15F103").getStructureAreaNum();
         BigDecimal organPerimeter = getOrganArea(jsonTask, "15F103").getStructurePerimeterNum();
-        BigDecimal organArea3 = getOrganArea(jsonTask, "13F0BB").getStructureAreaNum();
-        BigDecimal organArea4 = getOrganArea(jsonTask, "13F0BA").getStructureAreaNum();
+        //BigDecimal organArea3 = getOrganArea(jsonTask, "13F0BB").getStructureAreaNum();
+        //BigDecimal organArea4 = getOrganArea(jsonTask, "13F0BA").getStructureAreaNum();
         //indicatorResultsMap.put("晶状体面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("晶状体面积", new IndicatorAddIn("Crystalline lens area", organArea.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_0,"15F101"));
         //todo 精度丢失

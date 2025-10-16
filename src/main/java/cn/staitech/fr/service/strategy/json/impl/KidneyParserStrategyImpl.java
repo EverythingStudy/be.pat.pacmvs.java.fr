@@ -87,7 +87,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
      */
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Project special = projectMapper.selectById(jsonTask.getSpecialId());
+        //Project special = projectMapper.selectById(jsonTask.getSpecialId());
         //String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
         //Integer countCa = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
@@ -97,7 +97,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal b11B03D = a11B03D.getStructureAreaNum();
         // BigDecimal b11B111 = new BigDecimal(singleSlide.getArea());
         //组织轮廓-肾脏面积
-        BigDecimal b11B111 = getOrganArea(jsonTask, "11B111").getStructureAreaNum();
+        //BigDecimal b11B111 = getOrganArea(jsonTask, "11B111").getStructureAreaNum();
         //肾小管数量
         Integer count = getOrganAreaCount(jsonTask, "11B031");
         //一级指标（算法输出指标）

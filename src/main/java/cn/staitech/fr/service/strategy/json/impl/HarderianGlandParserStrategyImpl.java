@@ -48,8 +48,8 @@ public class HarderianGlandParserStrategyImpl extends AbstractCustomParserStrate
     private CommonJsonParser commonJsonParser;
     @Resource
     private CommonJsonCheck commonJsonCheck;
-    @Autowired
-    private AreaUtils areaUtils;
+//    @Autowired
+//    private AreaUtils areaUtils;
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         commonJsonParser.parseJson(jsonTask, jsonFileS);
