@@ -663,58 +663,200 @@ public class CommonJsonParser {
      * @param annotation
      * @param type         1：面积转10（3）平方微米  2:平方微米
      */
+//    public void putAnnotationDynamicData(JsonTask jsonTask, String structureId, String structureIds, Annotation annotation, Integer type) {
+//        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
+//        List<Annotation> annotationList1 = getStructureContourList(jsonTask, structureId);
+//        for (Annotation i : annotationList1) {
+//            Annotation annotationBy = getContourInsideOrOutside(jsonTask, i.getContour(), structureIds, true);
+//            // 判断每个元素的data
+//            List<String> list = new ArrayList<>();
+//            JSONArray jsonArray = new JSONArray();
+//            if (i.getDynamicDataList() != null) {
+//                JSONObject jsonObject = JSONObject.parseObject(i.getDynamicDataList().toString());
+//                if (jsonObject.getJSONArray("dynamicData") != null) {
+//                    jsonArray = jsonObject.getJSONArray("dynamicData");
+//                    for (int j = 0; j < jsonArray.size(); j++) {
+//                        JSONObject jsonObject1 = jsonArray.getJSONObject(j);
+//                        list.add(jsonObject1.getString("name"));
+//                    }
+//                }
+//            }
+//            if (annotation.getAreaName() != null) {
+//                DynamicData dynamicData = new DynamicData();
+//                dynamicData.setName(annotation.getAreaName());
+//                if (type == 1) {
+//                    dynamicData.setData(convertToSquareMicrometer(String.valueOf(annotationBy.getStructureAreaNum())));
+//                } else if (type == 2) {
+//                    dynamicData.setData(String.valueOf(convertToMicrometer(annotationBy.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString())));
+//                }
+//                dynamicData.setUnit(annotation.getAreaUnit());
+//                jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
+//                list = addList(list, annotation.getAreaName());
+//            }
+//            if (annotation.getPerimeterName() != null) {
+//                DynamicData dynamicData = new DynamicData();
+//                dynamicData.setName(annotation.getPerimeterName());
+//                dynamicData.setData(String.valueOf(annotationBy.getStructurePerimeterNum()));
+//                dynamicData.setUnit(annotation.getPerimeterUnit());
+//                jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
+//                list = addList(list, annotation.getPerimeterName());
+//            }
+//            if (annotation.getCountName() != null) {
+//                DynamicData dynamicData = new DynamicData();
+//                dynamicData.setName(annotation.getCountName());
+//                dynamicData.setData(String.valueOf(annotationBy.getCount()));
+//                dynamicData.setUnit(annotation.getCountUnit());
+//                jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
+//            }
+//            if (jsonArray.size() > 0) {
+//                JSONObject jsonObject = new JSONObject();
+//                jsonObject.put("dynamicData", jsonArray);
+//                i.setSequenceNumber(sequenceNumber);
+//                i.setDynamicData(jsonObject.toString());
+//                i.setSingleSlideId(jsonTask.getSingleId());
+//                annotationMapper.aiUpdateById(i);
+//            }
+//        }
+//    }
+
+
     public void putAnnotationDynamicData(JsonTask jsonTask, String structureId, String structureIds, Annotation annotation, Integer type) {
         Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
-        List<Annotation> annotationList1 = getStructureContourList(jsonTask, structureId);
-        for (Annotation i : annotationList1) {
-            Annotation annotationBy = getContourInsideOrOutside(jsonTask, i.getContour(), structureIds, true);
-            // 判断每个元素的data
-            List<String> list = new ArrayList<>();
-            JSONArray jsonArray = new JSONArray();
-            if (i.getDynamicDataList() != null) {
-                JSONObject jsonObject = JSONObject.parseObject(i.getDynamicDataList().toString());
-                if (jsonObject.getJSONArray("dynamicData") != null) {
-                    jsonArray = jsonObject.getJSONArray("dynamicData");
-                    for (int j = 0; j < jsonArray.size(); j++) {
-                        JSONObject jsonObject1 = jsonArray.getJSONObject(j);
-                        list.add(jsonObject1.getString("name"));
-                    }
-                }
+        List<Annotation> annotationList = getStructureContourList(jsonTask, structureId);
+
+        if (CollectionUtil.isEmpty(annotationList)) {
+            return;
+        }
+
+        // 批量处理数据
+        List<Annotation> batchUpdates = new ArrayList<>(annotationList.size());
+
+        // 预处理通用数据
+        boolean hasAreaName = annotation.getAreaName() != null;
+        boolean hasPerimeterName = annotation.getPerimeterName() != null;
+        boolean hasCountName = annotation.getCountName() != null;
+
+        String areaUnit = annotation.getAreaUnit();
+        String perimeterUnit = annotation.getPerimeterUnit();
+        String countUnit = annotation.getCountUnit();
+
+        for (Annotation item : annotationList) {
+            Annotation annotationBy = getContourInsideOrOutside(jsonTask, item.getContour(), structureIds, true);
+
+            if (annotationBy == null) {
+                continue;
             }
-            if (annotation.getAreaName() != null) {
+
+            // 预处理动态数据
+            JSONObject dynamicDataJson = getOrCreateDynamicDataJson(item);
+            JSONArray jsonArray = dynamicDataJson.getJSONArray("dynamicData");
+            Set<String> existingNames = extractExistingNames(jsonArray);
+
+            // 处理面积数据
+            if (hasAreaName) {
                 DynamicData dynamicData = new DynamicData();
                 dynamicData.setName(annotation.getAreaName());
-                if (type == 1) {
-                    dynamicData.setData(convertToSquareMicrometer(String.valueOf(annotationBy.getStructureAreaNum())));
-                } else if (type == 2) {
-                    dynamicData.setData(String.valueOf(convertToMicrometer(annotationBy.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString())));
+
+                switch (type) {
+                    case 1:
+                        dynamicData.setData(convertToSquareMicrometer(String.valueOf(annotationBy.getStructureAreaNum())));
+                        break;
+                    case 2:
+                        dynamicData.setData(String.valueOf(convertToMicrometer(
+                                annotationBy.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString())));
+                        break;
+                    default:
+                        dynamicData.setData(String.valueOf(annotationBy.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP)));
+                        break;
                 }
-                dynamicData.setUnit(annotation.getAreaUnit());
-                jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
-                list = addList(list, annotation.getAreaName());
+                dynamicData.setUnit(areaUnit);
+                jsonArray = updateDynamicDataList(existingNames, jsonArray, dynamicData);
             }
-            if (annotation.getPerimeterName() != null) {
+
+            // 处理周长数据
+            if (hasPerimeterName) {
                 DynamicData dynamicData = new DynamicData();
                 dynamicData.setName(annotation.getPerimeterName());
                 dynamicData.setData(String.valueOf(annotationBy.getStructurePerimeterNum()));
-                dynamicData.setUnit(annotation.getPerimeterUnit());
-                jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
-                list = addList(list, annotation.getPerimeterName());
+                dynamicData.setUnit(perimeterUnit);
+                jsonArray = updateDynamicDataList(existingNames, jsonArray, dynamicData);
             }
-            if (annotation.getCountName() != null) {
+
+            // 处理计数数据
+            if (hasCountName) {
                 DynamicData dynamicData = new DynamicData();
                 dynamicData.setName(annotation.getCountName());
                 dynamicData.setData(String.valueOf(annotationBy.getCount()));
-                dynamicData.setUnit(annotation.getCountUnit());
-                jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
+                dynamicData.setUnit(countUnit);
+                jsonArray = updateDynamicDataList(existingNames, jsonArray, dynamicData);
             }
+
+            // 更新注解对象
             if (jsonArray.size() > 0) {
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("dynamicData", jsonArray);
-                i.setSequenceNumber(sequenceNumber);
-                i.setDynamicData(jsonObject.toString());
-                i.setSingleSlideId(jsonTask.getSingleId());
-                annotationMapper.aiUpdateById(i);
+                JSONObject resultJson = new JSONObject();
+                resultJson.put("dynamicData", jsonArray);
+                item.setSequenceNumber(sequenceNumber);
+                item.setDynamicData(resultJson.toString());
+                item.setSingleSlideId(jsonTask.getSingleId());
+                batchUpdates.add(item);
+            }
+        }
+
+        // 批量更新数据库
+        if (!batchUpdates.isEmpty()) {
+            batchUpdateAnnotations(batchUpdates);
+        }
+    }
+
+    // 提取现有名称到Set中以提高查找效率
+    private Set<String> extractExistingNames(JSONArray jsonArray) {
+        Set<String> names = new HashSet<>();
+        if (jsonArray != null) {
+            for (int j = 0; j < jsonArray.size(); j++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(j);
+                names.add(jsonObject.getString("name"));
+            }
+        }
+        return names;
+    }
+
+    // 获取或创建动态数据JSON对象
+    private JSONObject getOrCreateDynamicDataJson(Annotation annotation) {
+        if (annotation.getDynamicDataList() != null) {
+            return JSONObject.parseObject(annotation.getDynamicDataList().toString());
+        }
+        return new JSONObject();
+    }
+
+    // 优化的更新方法
+    private JSONArray updateDynamicDataList(Set<String> existingNames, JSONArray jsonArray, DynamicData dynamicData) {
+        if (existingNames.contains(dynamicData.getName())) {
+            // 更新现有数据
+            for (int j = 0; j < jsonArray.size(); j++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(j);
+                if (Objects.equals(jsonObject.getString("name"), dynamicData.getName())) {
+                    jsonObject.put("data", dynamicData.getData());
+                    break;
+                }
+            }
+        } else {
+            // 添加新数据
+            jsonArray.add(dynamicData);
+        }
+        return jsonArray;
+    }
+
+    // 批量更新方法
+    private void batchUpdateAnnotations(List<Annotation> annotations) {
+        // 如果annotationMapper支持批量更新，使用批量操作
+        // 否则可以分批执行，减少数据库连接开销
+        final int batchSize = 100;
+        for (int i = 0; i < annotations.size(); i += batchSize) {
+            int endIndex = Math.min(i + batchSize, annotations.size());
+            List<Annotation> batch = annotations.subList(i, endIndex);
+            // 执行批量更新逻辑
+            for (Annotation annotation : batch) {
+                annotationMapper.aiUpdateById(annotation);
             }
         }
     }
