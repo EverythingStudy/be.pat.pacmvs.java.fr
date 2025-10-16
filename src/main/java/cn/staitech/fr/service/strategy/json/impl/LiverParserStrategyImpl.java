@@ -212,7 +212,7 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         //BigDecimal erythrocyteArea = commonJsonParser.bigDecimalDivideCheck(centralVeinsI, accurateAreaDecimal);
         //这是平方毫米
         Annotation annotationCVI2 = commonJsonParser.getOrganArea(jsonTask, "112004");
-        BigDecimal erythrocyteArea = commonJsonParser.bigDecimalDivideCheck(annotationCVI2.getStructureAreaNum(), accurateAreaDecimal);
+        BigDecimal erythrocyteArea = commonJsonParser.getProportion(annotationCVI2.getStructureAreaNum(), accurateAreaDecimal);
         map.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", DecimalUtils.setScale3(erythrocyteArea), CommonConstant.PERCENTAGE, areaUtils.getStructureIds("112004", "112111")));
 
         // 胆管密度（单个）	4	个/103平方微米	Density of bile duct (per)	4=E/A	单个为单个门管区  以95%置信区间和均数±标准差呈现
