@@ -718,8 +718,6 @@ public class CommonJsonParser {
 //            }
 //        }
 //    }
-
-
     public void putAnnotationDynamicData(JsonTask jsonTask, String structureId, String structureIds, Annotation annotation, Integer type) {
         Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
         List<Annotation> annotationList = getStructureContourList(jsonTask, structureId);
@@ -762,8 +760,7 @@ public class CommonJsonParser {
                         dynamicData.setData(convertToSquareMicrometer(String.valueOf(annotationBy.getStructureAreaNum())));
                         break;
                     case 2:
-                        dynamicData.setData(String.valueOf(convertToMicrometer(
-                                annotationBy.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString())));
+                        dynamicData.setData(String.valueOf(convertToMicrometer(annotationBy.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString())));
                         break;
                     default:
                         dynamicData.setData(String.valueOf(annotationBy.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP)));
@@ -830,6 +827,9 @@ public class CommonJsonParser {
 
     // 优化的更新方法
     private JSONArray updateDynamicDataList(Set<String> existingNames, JSONArray jsonArray, DynamicData dynamicData) {
+        if (jsonArray == null) {
+            jsonArray = new JSONArray();
+        }
         if (existingNames.contains(dynamicData.getName())) {
             // 更新现有数据
             for (int j = 0; j < jsonArray.size(); j++) {
