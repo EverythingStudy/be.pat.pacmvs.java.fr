@@ -1,6 +1,5 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
-import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -130,9 +128,6 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 		
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 		
-//		indicatorResultsMap.put("灰质面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,"1390B3"));
-//		indicatorResultsMap.put("白质面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,"1390B2"));
-//		indicatorResultsMap.put("中央管面积（单个）", new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1,"1390B4"));
 
 		indicatorResultsMap.put("灰质面积（全片 ）", new IndicatorAddIn("", bigDecimalG.toString(), SQ_MM, "1","1390B3"));
 		indicatorResultsMap.put("白质面积（全片 ）", new IndicatorAddIn("", bigDecimalH.toString(), SQ_MM, "1","1390B2"));

@@ -57,30 +57,30 @@ public class LungParserStrategyImpl extends AbstractCustomParserStrategy {
         Double density = count / outlineArea.doubleValue();
 
         // 查询支气管面积
-        BigDecimal bronchiArea = commonJsonParser.getOrganArea(jsonTask, "14C002").getStructureAreaNum();
+        //BigDecimal bronchiArea = commonJsonParser.getOrganArea(jsonTask, "14C002").getStructureAreaNum();
 
         // 查询血管面积
-        BigDecimal vesselArea = commonJsonParser.getOrganArea(jsonTask, "14C003").getStructureAreaNum();
+        //BigDecimal vesselArea = commonJsonParser.getOrganArea(jsonTask, "14C003").getStructureAreaNum();
 
         // 查询血管内红细胞面积
-        BigDecimal intravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, "14C003", "14C004", true).getStructureAreaNum();
+        //BigDecimal intravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, "14C003", "14C004", true).getStructureAreaNum();
 
         // 查询血管外红细胞面积
-        BigDecimal extravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, "14C003", "14C004", false).getStructureAreaNum();
+        //BigDecimal extravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, "14C003", "14C004", false).getStructureAreaNum();
 
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
         // 支气管面积占比
-        BigDecimal bronchiAreas = commonJsonParser.getProportion(bronchiArea, outlineArea);
+        //BigDecimal bronchiAreas = commonJsonParser.getProportion(bronchiArea, outlineArea);
 
         // 血管面积占比
-        BigDecimal vesselAreas = commonJsonParser.getProportion(vesselArea, outlineArea);
+        //BigDecimal vesselAreas = commonJsonParser.getProportion(vesselArea, outlineArea);
 
         // 血管内红细胞面积占比
-        BigDecimal intravascularErythrocyteAreas = commonJsonParser.getProportion(intravascularErythrocyteArea, outlineArea);
+        //BigDecimal intravascularErythrocyteAreas = commonJsonParser.getProportion(intravascularErythrocyteArea, outlineArea);
 
         // 血管外红细胞面积占比
-        BigDecimal extravascularErythrocyteAreas = commonJsonParser.getProportion(extravascularErythrocyteArea, outlineArea);
+        //BigDecimal extravascularErythrocyteAreas = commonJsonParser.getProportion(extravascularErythrocyteArea, outlineArea);
 
         //    indicatorResultsMap.put("支气管面积", new IndicatorAddIn("支气管面积", String.valueOf(bronchiArea.setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM, CommonConstant.NUMBER_1, "14C002"));
 //        indicatorResultsMap.put("血管面积", new IndicatorAddIn("血管面积", String.valueOf(vesselArea.setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM, CommonConstant.NUMBER_1));

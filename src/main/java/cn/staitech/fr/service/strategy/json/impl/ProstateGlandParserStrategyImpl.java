@@ -98,8 +98,8 @@ public class ProstateGlandParserStrategyImpl extends AbstractCustomParserStrateg
         annotation1.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12C06D", annotation1, 3);
         Annotation annotation2 = new Annotation();
-        annotation2.setAreaName("腺泡周长（单个）");
-        annotation2.setAreaUnit(MM);
+        annotation2.setPerimeterName("腺泡周长（单个）");
+        annotation2.setPerimeterUnit(MM);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12C06D", annotation2, 3);
         Annotation annotation3 = new Annotation();
         annotation3.setAreaName("腺腔面积（单个）");

@@ -77,10 +77,10 @@ public class LacrimalGlandParserStrategyImpl implements ParserStrategy {
         //        导管面积	A	平方毫米	数据相加输出
         BigDecimal ductArea = commonJsonParser.getOrganArea(jsonTask, "16906F").getStructureAreaNum();
         //        腺泡细胞核数量	B	个	无
-        Integer nucleusCount = commonJsonParser.getOrganAreaCount(jsonTask, "16906E");
+        //Integer nucleusCount = commonJsonParser.getOrganAreaCount(jsonTask, "16906E");
         //        腺泡细胞核面积（单个）	C	平方微米	单个数值输出
         //        上皮顶部胞质面积	D	平方毫米	数据相加输出
-        BigDecimal epithelialApexCytoplasmArea = commonJsonParser.getOrganArea(jsonTask, "16906A").getStructureAreaNum();
+        //BigDecimal epithelialApexCytoplasmArea = commonJsonParser.getOrganArea(jsonTask, "16906A").getStructureAreaNum();
         //        间质面积	E	平方毫米	数据相加输出
         BigDecimal mesenchymeArea = commonJsonParser.getOrganArea(jsonTask, "169027").getStructureAreaNum();
         //        组织轮廓面积	F	平方毫米	无
