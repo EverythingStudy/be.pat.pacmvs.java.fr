@@ -74,9 +74,11 @@ public class SlidePageReq extends PageRequest {
      */
     @ApiModelProperty(value = "是否处理指标异常-V2.6.1")
     private boolean handleRed = false;
-
-
-
+    /**
+     * 是否归档查询：归档不校验权限和项目状态
+     */
+    @ApiModelProperty(value = "是否归档查询：归档查询不校验权限和项目状态-V2.6.1")
+    private boolean archiveQuery = false;
 
 
 
