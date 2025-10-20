@@ -205,3 +205,6 @@ ADD COLUMN production_save tinyint NOT NULL DEFAULT 0 COMMENT '制片信息是�
 -- viewers默认值
 ALTER TABLE fr_slide MODIFY COLUMN viewers JSON DEFAULT (JSON_ARRAY()) COMMENT '已阅片用户';
 UPDATE fr_slide SET viewers = JSON_ARRAY() WHERE viewers IS NULL;
+
+-- 删除708
+DELETE FROM sys_menu WHERE menu_id = 708;
