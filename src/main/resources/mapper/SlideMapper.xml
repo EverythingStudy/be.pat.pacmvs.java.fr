@@ -482,6 +482,11 @@
                 AND date_format(a.create_time,'%Y%m%d') &lt;= date_format(#{params.createTimeParams.endTime},'%Y%m%d')
             </if>
         </if>
+
+        <if test="params.excludeExceptionStatus != null and params.excludeExceptionStatus == true">
+            AND a.ai_status != 2
+        </if>
+
         GROUP BY a.slide_id) a
         JOIN fr_slide b ON a.slide_id = b.slide_id
         LEFT JOIN tb_image c ON b.image_id = c.image_id
