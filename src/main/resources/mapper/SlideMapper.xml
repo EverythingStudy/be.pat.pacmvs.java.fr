@@ -33,6 +33,9 @@
         <result property="sourceLens" column="source_lens"/>
         <result property="imageId" column="image_id"/>
         <result property="imageName" column="image_name"/>
+
+        <result property="aiStatus" column="aiStatus"/>
+
         <result property="isView" column="is_view"/>
         <result property="viewers" column="viewers"
                 typeHandler="cn.staitech.fr.mapper.handler.ListLongTypeHandler"
@@ -101,7 +104,8 @@
         fs.description,
         fs.slide_id,
         ${params.currentUserId} as is_view,
-        fs.viewers
+        fs.viewers,
+        fs.ai_status AS aiStatus
         from fr_slide fs
         left join tb_image ti on fs.image_id = ti.image_id
         left join sys_user su on fs.create_by = su.user_id

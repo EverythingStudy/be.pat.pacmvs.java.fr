@@ -801,15 +801,19 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         }
         // 显示的脏器
         List<Long> organTagIds = req.getOrganTagIds();
-        // 检查用户是否为成员
-        long isMember = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, req.getProjectId()).eq(ProjectMember::getUserId, userId).eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
-        // 权限校验
-        if (!hasAccessPermission(project, userId, isMember)) {
-            return R.fail("您没有该项目的访问权限，请联系该项目负责人或机构管理员");
-        }
-        // 检查项目状态
-        if (Constants.STATUS_RUNNING != project.getStatus()) {
-            return R.fail("非进行中的项目不可阅片，请联系该项目负责人或机构管理员");
+
+        // 归档不校验权限和项目状态
+        if (!req.isArchiveQuery()) {
+            // 检查用户是否为成员
+            long isMember = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, req.getProjectId()).eq(ProjectMember::getUserId, userId).eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
+            // 权限校验
+            if (!hasAccessPermission(project, userId, isMember)) {
+                return R.fail("您没有该项目的访问权限，请联系该项目负责人或机构管理员");
+            }
+            // 检查项目状态
+            if (Constants.STATUS_RUNNING != project.getStatus()) {
+                return R.fail("非进行中的项目不可阅片，请联系该项目负责人或机构管理员");
+            }
         }
 
         // 分页查询
