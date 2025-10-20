@@ -79,6 +79,11 @@ public class SlidePageReq extends PageRequest {
      */
     @ApiModelProperty(value = "是否归档查询：归档查询不校验权限和项目状态-V2.6.1")
     private boolean archiveQuery = false;
+    /**
+     * 是否过滤掉脏器识别异常的切片
+     */
+    @ApiModelProperty(value = "是否过滤掉脏器识别异常的切片-V2.6.1")
+    private boolean excludeExceptionStatus = false;
 
 
 

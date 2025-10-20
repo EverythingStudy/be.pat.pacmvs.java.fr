@@ -113,6 +113,7 @@ public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, Singl
             int res = singleSlideMapper.updateById(singleSlide);
             if (res > 0) {
                 JsonTask jsonTask = jsonTaskService.getOne(new LambdaQueryWrapper<>(JsonTask.class).eq(JsonTask::getSingleId, singleSlideId));
+                log.info("jsonTask id:{} singleSlide id:{} status:{} 查询指标计算任务是否完成", jsonTask.getTaskId(), jsonTask.getSingleId(), jsonTask.getStatus());
                 if (!Objects.isNull(jsonTask) && JsonTaskStatusEnum.PARSE_NOT_START.getCode().equals(jsonTask.getStatus())) {
                     Date startTime = new Date();
                     log.info("jsonTask id:{} singleSlide id:{} checkJson 精细轮廓进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.formatDateTime(startTime));
