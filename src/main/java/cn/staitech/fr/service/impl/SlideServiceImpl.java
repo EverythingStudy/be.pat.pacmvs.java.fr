@@ -277,6 +277,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
     @Override
     public HashMap<String, SlidePageVo> slideAdjacent(SlidePageReq req) {
         req.setCurrentUserId("JSON_CONTAINS(fs.viewers, '" + SecurityUtils.getUserId() + "', '$')");
+        req.setExcludeExceptionStatus(true);
         List<SlidePageVo> waxList = baseMapper.slideListQuery(req);
 
         // 防止 waxList 为 null

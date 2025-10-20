@@ -152,6 +152,11 @@
                     date_format(#{params.createTimeParams.endTime},'%Y%m%d')
                 </if>
             </if>
+
+            <if test="params.excludeExceptionStatus != null and params.excludeExceptionStatus == true">
+                and fs.ai_status != 2
+            </if>
+
         </where>
         <if test="params.sortField != null and params.sortField!=''">
             order by ${params.sortField} ${params.sortType}
