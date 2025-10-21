@@ -12,6 +12,8 @@ import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
 import cn.staitech.fr.service.strategy.json.OutlineCustom;
 import cn.staitech.fr.service.strategy.json.ParserStrategyFactory;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.ttl.TransmittableThreadLocal;
+import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -36,6 +38,11 @@ import java.util.concurrent.TimeUnit;
 public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, SingleSlide> implements SingleSlideService {
 
     Executor executor = new ThreadPoolExecutor(2, 20, 1000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(1000), new ThreadPoolExecutor.DiscardOldestPolicy());
+    // 声明traceId存储
+    private static final TransmittableThreadLocal<String> traceIdHolder = new TransmittableThreadLocal<>();
+
+    // 包装线程池
+    Executor ttlExecutor = TtlExecutors.getTtlExecutor(executor);
     @Resource
     private AnnotationMapper annotationMapper;
 
