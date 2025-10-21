@@ -79,7 +79,6 @@ public class JsonTaskParserService {
     private ExecutorService executorService;
     // 声明traceId存储
     private static final TransmittableThreadLocal<String> traceIdHolder = new TransmittableThreadLocal<>();
-
     // 包装线程池
     Executor ttlExecutor = TtlExecutors.getTtlExecutor(executorService);
     /**
