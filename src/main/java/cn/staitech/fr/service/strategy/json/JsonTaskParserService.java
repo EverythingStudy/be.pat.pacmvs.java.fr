@@ -234,7 +234,7 @@ public class JsonTaskParserService {
     public void structureFileCalculate(JsonTask jsonTask, List<JsonFile> fileList) {
         updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_ING.getCode());
         //进行指标计算
-        log.info("traceId{},jsonTask id:{} singleSlide id:{} checkJson 进入指标开始 startTime:{}", TraceContext.getTraceId(), jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+        log.info("traceId:{},jsonTask id:{} singleSlide id:{} checkJson 进入指标开始 startTime:{}", TraceContext.getTraceId(), jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
         long start = System.nanoTime();
         JsonTaskAiHandler(jsonTask, fileList);
         // 计算耗时（秒）

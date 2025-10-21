@@ -36,8 +36,7 @@ public class MessageHandler {
 
     @RabbitListener(queues = "${queues.algoMsg:test2}")
     public void handleMessage(Message message, Channel channel) {
-        String messageId = UUID.randomUUID().toString().substring(0, 8);
-        MDC.put("threadId", messageId);
+        TraceContext.generateTraceId();
         String msg = new String(message.getBody(), StandardCharsets.UTF_8);
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         log.info("MessageHandler received: {}", msg);
@@ -65,7 +64,7 @@ public class MessageHandler {
             }
         }
         finally {
-            MDC.clear();
+            TraceContext.clear();
         }
     }
 
