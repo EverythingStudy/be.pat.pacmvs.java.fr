@@ -886,19 +886,18 @@
     </select>
 
     <select id="avgDistance" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
-            WITH
-                poly1_points AS (
-                    SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourOne}))).geom AS geom
-                ),
-                poly2_points AS (
-            SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourTwo}))).geom AS geom
-                    ),
-                point_distances AS (
-            SELECT AVG(ST_Distance(p1.geom, p2.geom)) AS meanDistance
-            FROM poly1_points p1
-                CROSS JOIN poly2_points p2
-                )
-            SELECT * FROM point_distances;
+        WITH poly1_points AS (SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourOne})))
+            .geom AS geom
+            )
+           , poly2_points AS (
+        SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourTwo}))).geom AS geom )
+             , point_distances AS (
+        SELECT AVG (ST_Distance(p1.geom, p2.geom)) AS meanDistance
+        FROM poly1_points p1
+            CROSS JOIN poly2_points p2
+            )
+        SELECT *
+        FROM point_distances;
     </select>
 
 

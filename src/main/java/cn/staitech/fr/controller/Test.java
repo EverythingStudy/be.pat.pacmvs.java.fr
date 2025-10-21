@@ -2,16 +2,22 @@ package cn.staitech.fr.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
-import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.config.OrganStructureConfig;
-import cn.staitech.fr.domain.*;
+import cn.staitech.fr.config.RequestThreadFilter;
+import cn.staitech.fr.config.TraceContext;
+import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.Image;
+import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.StructureTag;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.impl.EpididymideParserStrategyImpl;
 import cn.staitech.fr.service.strategy.json.impl.ProstateGlandParserStrategyImpl;
-import cn.staitech.fr.service.strategy.json.impl.UrinaryBladderParserStrategyImpl;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.ttl.TransmittableThreadLocal;
+import com.alibaba.ttl.TtlRunnable;
+import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,11 +28,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKBWriter;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
@@ -35,6 +41,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -55,7 +63,17 @@ public class Test {
     @Resource
     private JsonTaskMapper jsonTaskMapper;
     @Resource
-    private ProstateGlandParserStrategyImpl parserStrategy;
+    private EpididymideParserStrategyImpl parserStrategy;
+    @Resource
+    private ExecutorService executorService;
+    // 声明traceId存储
+    private static final TransmittableThreadLocal<String> traceIdHolder = new TransmittableThreadLocal<>();
+    private Executor ttlExecutor;
+
+//    @PostConstruct
+//    public void init() {
+//        this.ttlExecutor = TtlExecutors.getTtlExecutor(executorService);
+//    }
 
     @PostMapping("pathological")
     public void test() {
@@ -156,8 +174,16 @@ public class Test {
 
     @PostMapping("alculationIndicators")
     public void alculationIndicators() {
-        JsonTask jsonTask = jsonTaskMapper.selectOne(new LambdaQueryWrapper<JsonTask>().eq(JsonTask::getTaskId, 2575));
+        JsonTask jsonTask = jsonTaskMapper.selectOne(new LambdaQueryWrapper<JsonTask>().eq(JsonTask::getTaskId, 2940));
         parserStrategy.alculationIndicators(jsonTask);
+    }
+
+    @PostMapping("threadPool")
+    public void threadPool() {
+        log.info("开始执行0");
+        executorService.execute(() -> {
+            log.info("开始执行" + TraceContext.getTraceId());
+        });
     }
 
     private String getResolutionX() {
