@@ -17,6 +17,7 @@ import cn.staitech.fr.service.strategy.json.*;
 import cn.staitech.fr.utils.MathUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.shaded.com.google.gson.JsonObject;
+import com.alibaba.ttl.TtlRunnable;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -135,9 +136,9 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
                     Date startTime = new Date();
                     log.info("jsonTask id:{} singleSlide id:{} checkJson 精细轮廓进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.formatDateTime(startTime));
                     List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()).eq(JsonFile::getAiStatus, 0).isNotNull(JsonFile::getFileUrl));
-                    executor.execute(() -> {
+                    executor.execute(TtlRunnable.get(() -> {
                         jsonTaskParserService.structureFileCalculate(jsonTask, fileList);
-                    });
+                    }));
                     log.info("jsonTask id:{} singleSlide id:{} checkJson 精细轮廓进入指标结束 endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime, new Date(), DateUnit.SECOND));
                 }
                 return true;

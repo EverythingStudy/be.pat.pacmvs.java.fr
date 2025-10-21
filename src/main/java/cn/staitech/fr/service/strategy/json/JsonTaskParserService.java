@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.strategy.json;
 
 import cn.staitech.fr.config.OrganStructureConfig;
+import cn.staitech.fr.config.TraceContext;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.enums.ForecastStatusEnum;
 import cn.staitech.fr.enums.JsonTaskStatusEnum;
@@ -26,6 +27,7 @@ import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
@@ -75,12 +77,14 @@ public class JsonTaskParserService {
     private JsonFileMapper jsonFileMapper;
     @Resource
     private OrganStructureConfig organStructureConfig;
-    @Autowired
+    @Resource
     private ExecutorService executorService;
-    // 声明traceId存储
-    private static final TransmittableThreadLocal<String> traceIdHolder = new TransmittableThreadLocal<>();
-    // 包装线程池
-    Executor ttlExecutor = TtlExecutors.getTtlExecutor(executorService);
+    private Executor ttlExecutor;
+
+    @PostConstruct
+    public void init() {
+        this.ttlExecutor = TtlExecutors.getTtlExecutor(executorService);
+    }
     /**
      * 创建计算临时表
      * 此方法用于创建一个临时表，用于数据处理或计算目的
@@ -230,7 +234,7 @@ public class JsonTaskParserService {
     public void structureFileCalculate(JsonTask jsonTask, List<JsonFile> fileList) {
         updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_ING.getCode());
         //进行指标计算
-        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+        log.info("traceId{},jsonTask id:{} singleSlide id:{} checkJson 进入指标开始 startTime:{}", TraceContext.getTraceId(), jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
         long start = System.nanoTime();
         JsonTaskAiHandler(jsonTask, fileList);
         // 计算耗时（秒）
