@@ -200,3 +200,6 @@ organ-structures:
 #queues:
 #  algoMsg: test
 #  algoMsgRetry: algo.message.retry.queue
+dynamic:
+  corePoolSize: 2
+  maxPoolSize: 2
