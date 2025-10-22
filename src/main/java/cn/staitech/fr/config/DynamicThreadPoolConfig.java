@@ -13,7 +13,7 @@ public class DynamicThreadPoolConfig {
 
     @Bean
     public ExecutorService executorService() {
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(CORE_POOL_SIZE, MAX_POOL_SIZE, 1000L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(100), new ThreadFactory() {
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 10, 1000L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(5), new ThreadFactory() {
             private final AtomicInteger threadNumber = new AtomicInteger(1);
 
             @Override
