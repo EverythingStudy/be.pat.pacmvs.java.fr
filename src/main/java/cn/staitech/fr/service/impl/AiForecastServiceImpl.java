@@ -146,11 +146,10 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
                 return false;
             }
         } catch (Exception ex) {
+            ex.printStackTrace();
             log.error("forecastResults异常:{}", ex.getMessage());
             return false;
         }
-
-
     }
 
     /**
