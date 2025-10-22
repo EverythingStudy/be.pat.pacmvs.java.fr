@@ -23,6 +23,9 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.stream.Collectors;
 
 
 /**
@@ -47,6 +50,8 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
     private SingleSlideMapper singleSlideMapper;
     @Resource
     private ProjectMapper projectMapper;
+    @Resource(name = "dynamicDataThreadPool")
+    private ExecutorService dynamicDataThreadPool;
     //默认对照组值
     private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
 
@@ -108,7 +113,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
 //        Integer organAreaH = areaUtils.getOrganAreaCount(jsonTask, "12F0F7");// G精子面积（全片）
         //BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "12F003");// I血管面积
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// J组织轮廓面积
-       BigDecimal organAreaJ = BigDecimal.valueOf(Double.parseDouble(slideArea));
+        BigDecimal organAreaJ = BigDecimal.valueOf(Double.parseDouble(slideArea));
         // todo H黏膜上皮细胞核数量（单个）
 
         Annotation annotationBy = new Annotation();
@@ -185,11 +190,27 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         // 黏膜上皮面积占比（单个）
         List<BigDecimal> list1 = new ArrayList<>();
         List<Annotation> annotationList1 = commonJsonParser.getStructureContourList(jsonTask, "12F0F5");
+        // 使用线程池并行处理
+        List<CompletableFuture<BigDecimal>> futures = new ArrayList<>();
         for (Annotation i : annotationList1) {
-            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
-            list1.add(one.subtract(commonJsonParser.bigDecimalDivideCheck(annotation2.getStructureAreaNum(), i.getStructureAreaNum())).multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP));
+            CompletableFuture<BigDecimal> future = CompletableFuture.supplyAsync(() -> {
+                BigDecimal areaNum = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true).getStructureAreaNum();
+                return one.subtract(commonJsonParser.bigDecimalDivideCheck(areaNum, i.getStructureAreaNum())).multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP);
+            }, dynamicDataThreadPool);
+            futures.add(future);
+            //Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
+            //list1.add(one.subtract(commonJsonParser.bigDecimalDivideCheck(annotation2.getStructureAreaNum(), i.getStructureAreaNum())).multiply(new BigDecimal("100")).setScale(3, RoundingMode.HALF_UP));
         }
-
+        // 等待所有任务完成并收集结果
+        CompletableFuture<Void> allFutures = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        try {
+            allFutures.join();
+        } catch (Exception e) {
+            log.error("并行处理注解数据失败", e);
+        }
+        // 收集处理结果并批量更新
+        list1 = futures.stream().map(CompletableFuture::join).filter(Objects::nonNull).collect(Collectors.toList());
+        futures.clear();
         String mucosalAreaPer = MathUtils.getConfidenceInterval(list1, list1.size());
 
         // 精子面积占比（单个）
@@ -228,25 +249,63 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         // 黏膜上皮细胞核密度（单个）
         List<BigDecimal> list3 = new ArrayList<>();
         for (Annotation i : annotationList1) {
-            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F6", true);
-            BigDecimal res = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()), i.getStructurePerimeterNum());
-            list3.add(res);
+            CompletableFuture<BigDecimal> future = CompletableFuture.supplyAsync(() -> {
+                Integer count = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F6", true).getCount();
+                return commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(count), i.getStructurePerimeterNum());
+            }, dynamicDataThreadPool);
+            futures.add(future);
+            //Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F6", true);
+            //BigDecimal res = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation2.getCount()), i.getStructurePerimeterNum());
+            //list3.add(res);
         }
+        // 等待所有任务完成并收集结果
+        CompletableFuture<Void> allFuture3 = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        try {
+            allFuture3.join();
+        } catch (Exception e) {
+            log.error("并行处理注解数据失败", e);
+        }
+        // 收集处理结果并批量更新
+        list3 = futures.stream().map(CompletableFuture::join).filter(Objects::nonNull).collect(Collectors.toList());
+        futures.clear();
         String mucosalCellDensity = MathUtils.getConfidenceInterval(list3, list3.size());
         // 血管相对面积
         //BigDecimal vesselArea = commonJsonParser.getProportion(organAreaI, organAreaJ);
         //黏膜上皮厚度（单个）
         List<BigDecimal> list4 = new ArrayList<>();
         for (Annotation i : annotationList1) {
-            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
-            if (i.getArea() != null && annotation2.getArea() != null) {
-                BigDecimal sqrtI = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(i.getArea())), BigDecimal.valueOf(Double.parseDouble(A)));
-                BigDecimal sqrt1 = commonJsonParser.sqrt(sqrtI);
-                BigDecimal sqrtAnnotation = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(annotation2.getArea())), BigDecimal.valueOf(Double.parseDouble(A)));
-                BigDecimal sqrt2 = commonJsonParser.sqrt(sqrtAnnotation);
-                list4.add(sqrt1.subtract(sqrt2));
-            }
+            CompletableFuture<BigDecimal> future = CompletableFuture.supplyAsync(() -> {
+                Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
+                if (i.getArea() != null && annotation2.getArea() != null) {
+                    BigDecimal sqrtI = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(i.getArea())), BigDecimal.valueOf(Double.parseDouble(A)));
+                    BigDecimal sqrt1 = commonJsonParser.sqrt(sqrtI);
+                    BigDecimal sqrtAnnotation = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(annotation2.getArea())), BigDecimal.valueOf(Double.parseDouble(A)));
+                    BigDecimal sqrt2 = commonJsonParser.sqrt(sqrtAnnotation);
+                    return sqrt1.subtract(sqrt2);
+                }
+                return null;
+                //return sqrt1.subtract(sqrt2);
+            }, dynamicDataThreadPool);
+            futures.add(future);
+//            Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
+//            if (i.getArea() != null && annotation2.getArea() != null) {
+//                BigDecimal sqrtI = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(i.getArea())), BigDecimal.valueOf(Double.parseDouble(A)));
+//                BigDecimal sqrt1 = commonJsonParser.sqrt(sqrtI);
+//                BigDecimal sqrtAnnotation = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(Double.parseDouble(annotation2.getArea())), BigDecimal.valueOf(Double.parseDouble(A)));
+//                BigDecimal sqrt2 = commonJsonParser.sqrt(sqrtAnnotation);
+//                list4.add(sqrt1.subtract(sqrt2));
+//            }
         }
+        // 等待所有任务完成并收集结果
+        CompletableFuture<Void> allFuture4 = CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]));
+        try {
+            allFuture4.join();
+        } catch (Exception e) {
+            log.error("并行处理注解数据失败", e);
+        }
+        // 收集处理结果并批量更新
+        list4 = futures.stream().map(CompletableFuture::join).filter(Objects::nonNull).collect(Collectors.toList());
+        futures.clear();
         String mucosalThickness = MathUtils.getConfidenceInterval(list4, list4.size());
         /**
          A	输出小管/附睾管黏膜上皮外轮廓面积（单个）	12F0F5
