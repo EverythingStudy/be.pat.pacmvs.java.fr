@@ -243,8 +243,9 @@ public class JsonTaskParserService {
         log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标结束 endTime:{} 耗时:{} 秒", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date(), costSeconds);
         //部分成功-->以脏器为单位 (指标计算)结构分析完成-->forecastStatus结构化状态：1
         updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_SUCCESS.getCode());
+        //删除临时文件
+        commonJsonParser.batchDeleteBySingleSlideId(jsonTask);
     }
-
     private Boolean verifyCategoryStructure(JsonTask jsonTask) {
         OrganTag category = organTagMapper.selectById(jsonTask.getCategoryId());
         //AI识别每个脏器对应的结构JSON文件

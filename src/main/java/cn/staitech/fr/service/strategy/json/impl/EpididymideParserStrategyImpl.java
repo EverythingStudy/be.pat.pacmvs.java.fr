@@ -1,5 +1,7 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.hutool.core.date.DateUnit;
+import cn.hutool.core.date.DateUtil;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.Project;
@@ -20,10 +22,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -115,22 +114,26 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         Annotation annotationBy = new Annotation();
         annotationBy.setAreaName("输出小管/附睾管黏膜上皮面积（单个）");
         annotationBy.setAreaUnit(SQ_UM_THOUSAND);
+        Date startTime = new Date();
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12F0F5", annotationBy, 1);
-
+        log.info("jsonTask id:{} singleSlide id:{} 输出小管/附睾管黏膜上皮面积（单个） endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime, new Date(), DateUnit.SECOND));
         Annotation annotation1 = new Annotation();
         annotation1.setPerimeterName("输出小管/附睾管黏膜上皮周长（单个）");
         annotation1.setPerimeterUnit(MM);
+        Date startTime1 = new Date();
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12F0F5", annotation1, 3);
-
+        log.info("jsonTask id:{} singleSlide id:{} 输出小管/附睾管黏膜上皮周长（单个）endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime1, new Date(), DateUnit.SECOND));
         Annotation annotation2s = new Annotation();
         annotation2s.setCountName("黏膜上皮细胞核数量（单个）");
+        Date startTime2 = new Date();
         commonJsonParser.putAnnotationDynamicData(jsonTask, "12F0F5", "12F0F6", annotation2s);
-
+        log.info("jsonTask id:{} singleSlide id:{} 黏膜上皮细胞核数量（单个）endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime2, new Date(), DateUnit.SECOND));
         Annotation annotationBy1 = new Annotation();
         annotationBy1.setAreaName("输出小管/附睾管管腔面积（单个）");
         annotationBy1.setAreaUnit(SQ_UM_THOUSAND);
+        Date startTime3 = new Date();
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12F0F4", annotationBy1, 1);
-
+        log.info("jsonTask id:{} singleSlide id:{} 输出小管/附睾管管腔面积（单个）endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime3, new Date(), DateUnit.SECOND));
 
 //        Annotation annotationBy2 = new Annotation();
 //        annotationBy2.setAreaName("精子面积（单个）");

@@ -610,6 +610,7 @@ public class CommonJsonParser {
         List<Annotation> annotationList1 = getStructureContourList(jsonTask, structureId);
         for (Annotation i : annotationList1) {
             Annotation annotationBy = getContourInsideOrOutside(jsonTask, i.getContour(), structureIds, true);
+            if (annotationBy == null) continue;
             // 判断每个元素的data
             List<String> list = new ArrayList<>();
             JSONArray jsonArray = new JSONArray();
@@ -623,27 +624,18 @@ public class CommonJsonParser {
                     }
                 }
             }
-            if (annotation.getAreaName() != null) {
-                DynamicData dynamicData = new DynamicData();
-                dynamicData.setName(annotation.getAreaName());
-                dynamicData.setData(annotationBy.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString());
-                dynamicData.setUnit(annotation.getAreaUnit());
+            if (annotation.getAreaName() != null && annotationBy.getStructureAreaNum() != null) {
+                DynamicData dynamicData = buildDynamicData(annotation.getAreaName(), formatDecimal(annotationBy.getStructureAreaNum()), annotation.getAreaUnit());
                 jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
                 list = addList(list, annotation.getAreaName());
             }
-            if (annotation.getPerimeterName() != null) {
-                DynamicData dynamicData = new DynamicData();
-                dynamicData.setName(annotation.getPerimeterName());
-                dynamicData.setData(String.valueOf(annotationBy.getStructurePerimeterNum().setScale(3, RoundingMode.HALF_UP)));
-                dynamicData.setUnit(annotation.getPerimeterUnit());
+            if (annotation.getPerimeterName() != null && annotationBy.getStructurePerimeterNum() != null) {
+                DynamicData dynamicData = buildDynamicData(annotation.getPerimeterName(), formatDecimal(annotationBy.getStructurePerimeterNum()), annotation.getPerimeterUnit());
                 jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
                 list = addList(list, annotation.getPerimeter());
             }
             if (annotation.getCountName() != null) {
-                DynamicData dynamicData = new DynamicData();
-                dynamicData.setName(annotation.getCountName());
-                dynamicData.setData(String.valueOf(annotationBy.getCount()));
-                dynamicData.setUnit(annotation.getCountUnit());
+                DynamicData dynamicData = buildDynamicData(annotation.getCountName(), String.valueOf(annotationBy.getCount()), annotation.getCountUnit());
                 jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
             }
             if (jsonArray.size() > 0) {
@@ -654,6 +646,18 @@ public class CommonJsonParser {
                 annotationMapper.aiUpdateById(i);
             }
         }
+    }
+
+    private DynamicData buildDynamicData(String name, String data, String unit) {
+        DynamicData dynamicData = new DynamicData();
+        dynamicData.setName(name);
+        dynamicData.setData(data);
+        dynamicData.setUnit(unit);
+        return dynamicData;
+    }
+
+    private String formatDecimal(BigDecimal value) {
+        return value.setScale(3, RoundingMode.HALF_UP).toString();
     }
 
     /**
@@ -1243,5 +1247,20 @@ public class CommonJsonParser {
         return intValue;
     }
 
+    public void batchDeleteBySingleSlideId(JsonTask jsonTask) {
+        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
 
+        // 脏器轮廓信息
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(sequenceNumber);
+        //单脏器切片id
+        annotation.setSingleSlideId(jsonTask.getSingleId());
+        int batchSize = 1000;
+        while (true) {
+            int deletedCount = annotationMapper.deleteBySingleSlideIdBatch(annotation, batchSize);
+            if (deletedCount < batchSize) {
+                break;
+            }
+        }
+    }
 }

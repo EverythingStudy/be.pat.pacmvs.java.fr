@@ -178,7 +178,9 @@
         CREATE INDEX "fr_ai_annotation_${sequenceNumber}_contour10000_idx" ON "public"."fr_ai_annotation_${sequenceNumber}" USING gist (
             "contour10000" "public"."gist_geometry_ops_2d"
             );
-
+-- category_id + single_slide_id 复合索引
+        CREATE INDEX idx_fr_ai_annotation_${sequenceNumber}_category_slide
+            ON fr_ai_annotation_${sequenceNumber} (category_id, single_slide_id);
         COMMENT
         ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."annotation_id" IS '主键id';
 
@@ -886,19 +888,18 @@
     </select>
 
     <select id="avgDistance" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
-            WITH
-                poly1_points AS (
-                    SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourOne}))).geom AS geom
-                ),
-                poly2_points AS (
-            SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourTwo}))).geom AS geom
-                    ),
-                point_distances AS (
-            SELECT AVG(ST_Distance(p1.geom, p2.geom)) AS meanDistance
-            FROM poly1_points p1
-                CROSS JOIN poly2_points p2
-                )
-            SELECT * FROM point_distances;
+        WITH poly1_points AS (SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourOne})))
+            .geom AS geom
+            )
+           , poly2_points AS (
+        SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourTwo}))).geom AS geom )
+             , point_distances AS (
+        SELECT AVG (ST_Distance(p1.geom, p2.geom)) AS meanDistance
+        FROM poly1_points p1
+            CROSS JOIN poly2_points p2
+            )
+        SELECT *
+        FROM point_distances;
     </select>
 
 
@@ -1055,6 +1056,15 @@
         <!-- 标注类型：默认 0  1 粗轮廓 2 精细轮廓 -->
          AND contour_type = 1
     </select>
-	
+	<delete id="deleteBySingleSlideIdBatch" >
+        DELETE
+        FROM fr_ai_annotation_${annotation.sequenceNumber}
+        WHERE annotation_id IN (
+            SELECT annotation_id
+            FROM fr_ai_annotation_${annotation.sequenceNumber}
+            WHERE single_slide_id = #{annotation.singleSlideId}
+            LIMIT #{batchSize}
+            );
+    </delete>
 
 </mapper>

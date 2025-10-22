@@ -4,6 +4,7 @@ import cn.staitech.fr.domain.Annotation;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,7 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     Annotation stIsValid(Annotation annotation);
 
     Annotation stIsValidAnnotation(Annotation annotation);
-    
+
     List<Annotation> getDelAnnotation(Annotation annotation);
 
     Integer deleteAiAnnotation(Annotation annotation);
@@ -90,8 +91,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     Annotation getInsideOrOutsideCount(Annotation annotation);
 
     Annotation collectAiGeometry(Annotation annotation);
-    
-    int batchDeleteBySsIds(Map<String,Object> parm);
+
+    int batchDeleteBySsIds(Map<String, Object> parm);
 
     Annotation stEnvelope(Annotation annotation);
 
@@ -106,24 +107,26 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     Annotation avgDistance(Annotation annotation);
 
     int aiUpdateById(Annotation annotation);
-    
+
     List<Annotation> getSpinalCordAnno(Annotation annotation);
 
     Annotation stMakeValid(Annotation annotation);
-    
+
     void dropTable(Annotation annotation);
-    
+
     void transferData(Map params);
-    
+
     List<Annotation> selectIdList(Annotation annotation);
-    
+
     Annotation collectGeometryStIsValid(Long singleSlideId);
-    
+
     List<Annotation> getAIDataList(Annotation annotation);
-    
+
     Annotation getCollectGeometryStIsValid(Annotation annotation);
-    
+
     Annotation getCollectGeometryIsValid(Annotation annotation);
+
+    Integer deleteBySingleSlideIdBatch(@Param("annotation") Annotation annotation, @Param("batchSize")int batchSize);
 }
 
 
