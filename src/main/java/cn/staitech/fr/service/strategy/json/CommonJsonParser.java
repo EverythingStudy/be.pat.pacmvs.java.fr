@@ -610,10 +610,6 @@ public class CommonJsonParser {
 
     public void putAnnotationDynamicData(JsonTask jsonTask, String structureId, String structureIds, Annotation annotation) {
         Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
-
-
-
-
         List<Annotation> annotationList1 = getStructureContourList(jsonTask, structureId);
         // 使用线程池并行处理
         List<CompletableFuture<Annotation>> futures = new ArrayList<>();
