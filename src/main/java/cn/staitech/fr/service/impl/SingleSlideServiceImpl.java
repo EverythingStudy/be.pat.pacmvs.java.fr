@@ -143,6 +143,7 @@ public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, Singl
                 return false;
             }
         } catch (Exception ex) {
+            ex.printStackTrace();
             log.error("forecastResults异常:{}", ex.getMessage());
             return false;
         }
