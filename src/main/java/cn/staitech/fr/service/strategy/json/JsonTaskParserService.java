@@ -14,7 +14,6 @@ import cn.staitech.fr.mapper.OrganTagMapper;
 import cn.staitech.fr.service.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.ttl.TransmittableThreadLocal;
 import com.alibaba.ttl.TtlRunnable;
 import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -35,7 +34,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -176,12 +177,6 @@ public class JsonTaskParserService {
                 return;
             }
             JsonTask jsonTask = parseJasonTask(jsonObject);
-//            if (jsonTask == null || jsonTask.getCode().equals("500")) {
-//                log.info("singleSlide id:[{}],jsonTask :[{}] JSON解析失败!", singleSlideId, jsonTask);
-//                updateSingleSlideStatus(singleSlideId, ForecastStatusEnum.FORECAST_FAIL.getCode());
-//                //return;
-//            }
-
             JsonTask taskOld = jsonTaskMapper.selectOne(Wrappers.<JsonTask>lambdaQuery().eq(JsonTask::getSingleId, singleSlideId));
             log.info("singleSlide id:{} 查询已存在任务 {}", singleSlideId, taskOld);
             if (taskOld != null && (JsonTaskStatusEnum.PARSE_FAIL.getCode().equals(taskOld.getStatus()) || JsonTaskStatusEnum.PARSE_SUCCESS.getCode().equals(taskOld.getStatus()))) {
@@ -190,10 +185,19 @@ public class JsonTaskParserService {
                 log.info("singleSlide id:{} 更新已执行成功或失败任务 {}", singleSlideId, jsonTask);
             } else if (taskOld != null && (JsonTaskStatusEnum.PARSE_ING.getCode().equals(taskOld.getStatus()) || JsonTaskStatusEnum.NO_PARSE.getCode().equals(taskOld.getStatus()))) {
                 log.info("singleSlide id:{} jsonTask 任务执行中,新任务不再执行; {}", singleSlideId, jsonObject);
-                //return;
             } else {
-                jsonTaskService.save(jsonTask);
-                log.info("singleSlide id:[{}] 新增任务 [{}]", singleSlideId, jsonTask);
+                try {
+                    jsonTaskService.save(jsonTask);
+                    log.info("singleSlide id:[{}] 新增任务 [{}]", singleSlideId, jsonTask);
+                } catch (Exception e) {
+                    // 如果是唯一约束冲突，说明任务已存在，查询现有任务
+                    if (e.getMessage().contains("uk_single_id")) {
+                        JsonTask existingTask = jsonTaskMapper.selectOne(Wrappers.<JsonTask>lambdaQuery().eq(JsonTask::getSingleId, singleSlideId));
+                        log.info("singleSlide id:{} 任务已存在，使用现有任务 {}", singleSlideId, existingTask);
+                    } else {
+                        throw e; // 其他异常继续抛出
+                    }
+                }
             }
             //校验脏器下所有结构是否解析完成
             Boolean flag = verifyCategoryStructure(jsonTask);
@@ -246,6 +250,7 @@ public class JsonTaskParserService {
         //删除临时文件
         commonJsonParser.batchDeleteBySingleSlideId(jsonTask);
     }
+
     private Boolean verifyCategoryStructure(JsonTask jsonTask) {
         OrganTag category = organTagMapper.selectById(jsonTask.getCategoryId());
         //AI识别每个脏器对应的结构JSON文件

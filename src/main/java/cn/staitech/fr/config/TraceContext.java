@@ -5,6 +5,9 @@ import org.jboss.logging.MDC;
 
 import java.util.UUID;
 
+/**
+ * traceId上下文
+ */
 public class TraceContext {
     private static final String TRACE_ID = "traceId";
     private static final TransmittableThreadLocal<String> traceIdHolder = new TransmittableThreadLocal<>();
@@ -13,7 +16,7 @@ public class TraceContext {
      * 生成并设置traceId
      */
     public static void generateTraceId() {
-        String traceId =  UUID.randomUUID().toString().substring(0, 8);
+        String traceId = UUID.randomUUID().toString().substring(0, 8);
         setTraceId(traceId);
     }
 

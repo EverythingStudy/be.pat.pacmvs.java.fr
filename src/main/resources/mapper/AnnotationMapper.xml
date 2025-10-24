@@ -178,9 +178,10 @@
         CREATE INDEX "fr_ai_annotation_${sequenceNumber}_contour10000_idx" ON "public"."fr_ai_annotation_${sequenceNumber}" USING gist (
             "contour10000" "public"."gist_geometry_ops_2d"
             );
--- category_id + single_slide_id 复合索引
-        CREATE INDEX idx_fr_ai_annotation_${sequenceNumber}_category_slide
-            ON fr_ai_annotation_${sequenceNumber} (category_id, single_slide_id);
+        CREATE INDEX "idx_fr_ai_annotation_${sequenceNumber}_category_slide" ON "public"."fr_ai_annotation_${sequenceNumber}" USING btree (
+            "category_id" "pg_catalog"."int8_ops" ASC NULLS LAST,
+            "single_slide_id" "pg_catalog"."int8_ops" ASC NULLS LAST
+            );
         COMMENT
         ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."annotation_id" IS '主键id';
 

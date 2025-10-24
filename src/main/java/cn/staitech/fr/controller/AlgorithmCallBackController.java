@@ -23,6 +23,7 @@ import javax.annotation.Resource;
 @Slf4j
 @RestController
 @RequestMapping("/algorithmCallBack")
+@Deprecated
 public class AlgorithmCallBackController {
 
     @Resource
