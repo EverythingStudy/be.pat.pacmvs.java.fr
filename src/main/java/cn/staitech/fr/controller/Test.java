@@ -5,12 +5,10 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.config.OrganStructureConfig;
 import cn.staitech.fr.config.RequestThreadFilter;
 import cn.staitech.fr.config.TraceContext;
-import cn.staitech.fr.domain.Annotation;
-import cn.staitech.fr.domain.Image;
-import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.StructureTag;
+import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
 import cn.staitech.fr.service.strategy.json.impl.EpididymideParserStrategyImpl;
 import cn.staitech.fr.service.strategy.json.impl.ProstateGlandParserStrategyImpl;
 import cn.staitech.fr.vo.geojson.Properties;
@@ -19,6 +17,7 @@ import com.alibaba.ttl.TransmittableThreadLocal;
 import com.alibaba.ttl.TtlRunnable;
 import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
@@ -28,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKBWriter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -66,6 +66,12 @@ public class Test {
     private EpididymideParserStrategyImpl parserStrategy;
     @Resource
     private ExecutorService executorService;
+    @Resource
+    private CommonJsonParser commonJsonParser;
+    @Autowired
+    private JsonFileMapper jsonFileMapper;
+    @Resource
+    private JsonTaskParserService jsonTaskParserService;
     // 声明traceId存储
     private static final TransmittableThreadLocal<String> traceIdHolder = new TransmittableThreadLocal<>();
     private Executor ttlExecutor;
@@ -174,8 +180,17 @@ public class Test {
 
     @PostMapping("alculationIndicators")
     public void alculationIndicators() {
-        JsonTask jsonTask = jsonTaskMapper.selectOne(new LambdaQueryWrapper<JsonTask>().eq(JsonTask::getTaskId, 2940));
-        parserStrategy.alculationIndicators(jsonTask);
+        JsonTask jsonTask = jsonTaskMapper.selectOne(new LambdaQueryWrapper<JsonTask>().eq(JsonTask::getTaskId, 3187));
+        List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()).isNotNull(JsonFile::getFileUrl));
+        //jsonTaskParserService.structureFileCalculate(jsonTask, fileList);
+        //parserStrategy.alculationIndicators(jsonTask);
+        //删除临时文件
+        //commonJsonParser.batchDeleteBySingleSlideId(jsonTask);
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(4L);
+        //1、Sequence
+        annotationMapper.createTableSequence(annotation);
+        annotationMapper.createTable(annotation);
     }
 
     @PostMapping("threadPool")

@@ -193,6 +193,7 @@ public class JsonTaskParserService {
                     // 如果是唯一约束冲突，说明任务已存在，查询现有任务
                     if (e.getMessage().contains("uk_single_id")) {
                         JsonTask existingTask = jsonTaskMapper.selectOne(Wrappers.<JsonTask>lambdaQuery().eq(JsonTask::getSingleId, singleSlideId));
+                        jsonTask.setTaskId(existingTask.getTaskId());
                         log.info("singleSlide id:{} 任务已存在，使用现有任务 {}", singleSlideId, existingTask);
                     } else {
                         throw e; // 其他异常继续抛出
