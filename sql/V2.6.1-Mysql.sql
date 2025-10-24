@@ -208,3 +208,5 @@ UPDATE fr_slide SET viewers = JSON_ARRAY() WHERE viewers IS NULL;
 
 -- 删除708
 DELETE FROM sys_menu WHERE menu_id = 708;
+
+ALTER TABLE `pathmedics`.`fr_json_task` ADD UNIQUE INDEX `uk_single_id` ( `single_id` ) COMMENT '切片id';
