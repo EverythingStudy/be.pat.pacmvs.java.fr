@@ -3,10 +3,11 @@ package cn.staitech.fr.mapper.handler;
 import com.baomidou.mybatisplus.core.toolkit.Assert;
 import com.baomidou.mybatisplus.extension.handlers.AbstractJsonTypeHandler;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.type.JdbcType;
-import com.fasterxml.jackson.core.type.TypeReference;
+
 import java.io.IOException;
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
