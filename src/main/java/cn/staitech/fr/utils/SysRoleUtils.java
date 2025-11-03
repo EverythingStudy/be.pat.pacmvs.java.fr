@@ -39,14 +39,17 @@ public class SysRoleUtils {
      * 匹配给定参数的角色信息
      * @return
      */
-    public static boolean matchAdmin(String roleName) {
+    public static boolean matchAdmin(String ... roleName) {
         //拿到质量保证管理员角色
         List<SysRole> roles = SecurityUtils.getRoles();
         boolean isFind = false;
         for (SysRole role : roles) {
             if(null != role.getRoleName()) {
-                if(roleName.equals(role.getRoleName())) {
-                    isFind = true;
+                for (String s : roleName) {
+                    if(s.equals(role.getRoleName())) {
+                        isFind = true;
+                        break;
+                    }
                 }
             }
         }
