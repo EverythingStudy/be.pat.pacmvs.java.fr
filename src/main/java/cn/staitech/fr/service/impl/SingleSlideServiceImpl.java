@@ -13,6 +13,7 @@ import cn.staitech.fr.service.strategy.json.OutlineCustom;
 import cn.staitech.fr.service.strategy.json.ParserStrategyFactory;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.ttl.TransmittableThreadLocal;
+import com.alibaba.ttl.TtlRunnable;
 import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -38,8 +39,6 @@ import java.util.concurrent.TimeUnit;
 public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, SingleSlide> implements SingleSlideService {
 
     Executor executor = new ThreadPoolExecutor(2, 20, 1000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(1000), new ThreadPoolExecutor.DiscardOldestPolicy());
-    // 声明traceId存储
-    private static final TransmittableThreadLocal<String> traceIdHolder = new TransmittableThreadLocal<>();
 
     // 包装线程池
     Executor ttlExecutor = TtlExecutors.getTtlExecutor(executor);
@@ -63,8 +62,7 @@ public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, Singl
     private JsonFileMapper jsonFileMapper;
     @Resource
     private OrganStructureConfig organStructureConfig;
-//    @Resource
-//    Map<String, OutlineCustom> mapOutline;
+
 
     @Override
     public Boolean forecastResults(Long singleSlideId, Long imageId) {
@@ -124,9 +122,9 @@ public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, Singl
                     Date startTime = new Date();
                     log.info("jsonTask id:{} singleSlide id:{} checkJson 精细轮廓进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.formatDateTime(startTime));
                     List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()).eq(JsonFile::getAiStatus, 0).isNotNull(JsonFile::getFileUrl));
-                    executor.execute(() -> {
+                    ttlExecutor.execute(TtlRunnable.get(() -> {
                         jsonTaskParserService.structureFileCalculate(jsonTask, fileList);
-                    });
+                    }));
                     log.info("jsonTask id:{} singleSlide id:{} checkJson 精细轮廓进入指标结束 endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime, new Date(), DateUnit.SECOND));
                 }
 //                Map<String, List<OrganStructureConfig.OrganStructure>> outline = organStructureConfig.getOutline();

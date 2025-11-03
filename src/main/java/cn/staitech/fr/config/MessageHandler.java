@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -61,8 +62,7 @@ public class MessageHandler {
                     log.error("拒绝消息失败: {}", nackException.getMessage());
                 }
             }
-        }
-        finally {
+        } finally {
             TraceContext.clear();
         }
     }
@@ -76,5 +76,40 @@ public class MessageHandler {
             log.error("业务解析消息异常：[{}]，消息内容：[{}]", e.getMessage(), message);
             throw e; // 重新抛出异常以便上层处理
         }
+    }
+
+    /**
+     * 发送延迟消息
+     *
+     * @param message           消息内容
+     * @param delayMilliseconds 延迟时间（毫秒）
+     */
+    public void sendDelayedMessage(String message, long delayMilliseconds) {
+        // 设置延迟时间
+        rabbitTemplate.convertAndSend("delayed.exchange", "delay.check.routing.key", message, msg -> {
+            msg.getMessageProperties().setHeader("x-delay", delayMilliseconds);
+            return msg;
+        });
+    }
+
+    @RabbitListener(queues = "task.delay.check.queue")
+    public void handleDelayedMessage(String taskId, Channel channel, Message message) {
+        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+        // 处理延迟任务检查逻辑
+
+        log.info("接收到延迟消息，任务ID: {}", taskId);
+        // 手动确认消息
+        try {
+            channel.basicAck(deliveryTag, false);
+        } catch (IOException e) {
+            log.error("延迟消息处理失败: taskId={}, error={}", taskId, e.getMessage());
+            try {
+                // 拒绝消息并重新入队
+                channel.basicNack(deliveryTag, false, true);
+            } catch (Exception nackException) {
+                log.error("拒绝延迟消息失败: {}", nackException.getMessage());
+            }
+        }
+        log.info("延迟消息处理完成并已确认: {}", taskId);
     }
 }
