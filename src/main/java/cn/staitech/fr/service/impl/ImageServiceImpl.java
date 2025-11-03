@@ -86,14 +86,6 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image>
         }
         CustomPage<Image> customPage = new CustomPage<>(req);
         imageMapper.pageImage(customPage, req);
-//        baseMapper.selectPage(customPage, Wrappers.<Image>lambdaQuery()
-//                .like(StringUtils.isNotEmpty(req.getImageName()), Image::getImageName, req.getImageName())
-//                .like(StringUtils.isNotEmpty(req.getTopicName()), Image::getTopicName, req.getTopicName())
-//                .eq(!Objects.isNull(req.getOrganizationId()), Image::getOrganizationId, req.getOrganizationId())
-//                .eq(!Objects.isNull(req.getStatus()), Image::getStatus, req.getStatus())
-//                .ge(!Objects.isNull(req.getCreateTimeParams()), Image::getCreateTime, req.getCreateTimeParams() == null ? null : req.getCreateTimeParams().getBeginTime())
-//                .le(!Objects.isNull(req.getCreateTimeParams()), Image::getCreateTime, req.getCreateTimeParams() == null ? null : req.getCreateTimeParams().getEndTime())
-//                .orderByDesc(Image::getImageId));
         customPage.convert(this::renderImage);
         return customPage;
     }

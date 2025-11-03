@@ -3,15 +3,14 @@ package cn.staitech.fr.config;
 import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import javax.annotation.Resource;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 
 /**
  * @author mugw
