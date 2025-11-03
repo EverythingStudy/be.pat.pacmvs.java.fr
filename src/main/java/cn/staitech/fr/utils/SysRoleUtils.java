@@ -13,7 +13,7 @@ public class SysRoleUtils {
         return roleSort;
     }
 
-    public static String IS_QUALITY_ADMIN = "质量保证管理员";
+    public static String IS_QUALITY_ADMIN = "质量保证人员";
     public static String NUMBER_ADMIN = "数字阅片";
     public static String IS_ORG_ADMIN = "机构管理员";
     public static String INTELL_ADMIN = "智能阅片";
