@@ -11,6 +11,7 @@ import cn.staitech.fr.constant.Constants;
 import cn.staitech.fr.constant.DictData;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.enmu.SpeciesTypeEnum;
+import cn.staitech.fr.utils.SysRoleUtils;
 import cn.staitech.fr.vo.project.ProjectPageVo;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.SlideService;
@@ -23,6 +24,7 @@ import cn.staitech.fr.vo.project.ProjectStatusVo;
 import cn.staitech.fr.vo.project.ProjectVo;
 import cn.staitech.fr.vo.project.slide.ChangeControlGroupReq;
 import cn.staitech.fr.vo.project.slide.GetControlGroupReq;
+import cn.staitech.system.api.domain.SysRole;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -84,7 +86,11 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         CustomPage<ProjectPageVo> page = new CustomPage<>(req);
         // 状态查询条件为空时，默认赋值(0-待启动，1-进行中，2-暂停，3-已完成)
         if (CollectionUtils.isEmpty(req.getStatus())) {
-            req.setStatus(Arrays.asList(Constants.STATUS_PENDING, Constants.STATUS_RUNNING, Constants.STATUS_PAUSED, Constants.STATUS_COMPLETED));
+            if(SysRoleUtils.isQualityAdmin()) {
+                req.setStatus(Arrays.asList(Constants.STATUS_RUNNING));
+            } else {
+                req.setStatus(Arrays.asList(Constants.STATUS_PENDING, Constants.STATUS_RUNNING, Constants.STATUS_PAUSED, Constants.STATUS_COMPLETED));
+            }
         }
         if (!isAdmin(SecurityUtils.getUserId())) {
             req.setOrganizationId(SecurityUtils.getOrganizationId());
@@ -105,13 +111,18 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         e.setExpireTime(DateUtil.offsetDay(e.getUpdateTime(), 30));
         long count = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, e.getProjectId()).eq(ProjectMember::getUserId, SecurityUtils.getUserId()).eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
         List<String> buttons = new ArrayList<>();
+
+        boolean qualityAdmin = SysRoleUtils.isQualityAdmin();
+
         if (SecurityUtils.isOrgAdmin() || SecurityUtils.getUserId() == e.getPrincipal()) {
             buttons = ProjectButtonGenerator.generateButtons(e.getStatus(), Constants.ROLE_OWNER);
-        } else if (count > 0) {
+        //这块可以用或者因为产品想让质量管理员可以看到详情按钮，即便我没有参与这个项目我也可以查看
+        } else if (count > 0 || qualityAdmin) {
             buttons = ProjectButtonGenerator.generateButtons(e.getStatus(), Constants.ROLE_MEMBER);
         } else {
             buttons = ProjectButtonGenerator.generateButtons(e.getStatus(), Constants.ROLE_OTHER);
         }
+        ProjectButtonGenerator.filterButtonsByRole(buttons);
         e.setButtons(buttons);
         return e;
     }
@@ -397,14 +408,15 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public R<Project> getInfoById(Long projectId) {
         log.info("智能阅片项目详情接口开始：");
+        boolean matchAdmin = SysRoleUtils.matchAdmin(SysRoleUtils.INTELL_ADMIN);
         Project project = baseMapper.selectById(projectId);
         project.setTopicName(topicMapper.selectById(project.getTopicId()).getTopicName());
         long count = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, projectId).eq(ProjectMember::getUserId, SecurityUtils.getUserId()).eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
         List<String> buttons = new ArrayList<>();
         Integer status = project.getStatus();
-        if (SecurityUtils.isOrgAdmin() || SecurityUtils.getUserId() == project.getPrincipal()) {
+        if (SecurityUtils.isOrgAdmin() || (SecurityUtils.getUserId() == project.getPrincipal() && matchAdmin)) {
             buttons = ProjectButtonGenerator.generateButtons(status, Constants.ROLE_OWNER);
-        } else if (count > 0) {
+        } else if (count > 0 && matchAdmin) {
             buttons = ProjectButtonGenerator.generateButtons(status, Constants.ROLE_MEMBER);
         } else {
             buttons = ProjectButtonGenerator.generateButtons(status, Constants.ROLE_OTHER);
@@ -417,6 +429,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 ProjectButtonGenerator.filterButtons(buttons);
             }
         }
+        ProjectButtonGenerator.filterButtonsByRole(buttons);
         project.setButtons(buttons);
 
         //增加种属名称
