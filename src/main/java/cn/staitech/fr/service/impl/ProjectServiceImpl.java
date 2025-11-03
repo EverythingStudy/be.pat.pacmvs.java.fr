@@ -112,17 +112,18 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         long count = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, e.getProjectId()).eq(ProjectMember::getUserId, SecurityUtils.getUserId()).eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
         List<String> buttons = new ArrayList<>();
 
+        boolean matchAdmin = SysRoleUtils.matchAdmin(SysRoleUtils.INTELL_ADMIN, SysRoleUtils.NUMBER_ADMIN);
         boolean qualityAdmin = SysRoleUtils.isQualityAdmin();
 
-        if (SecurityUtils.isOrgAdmin() || SecurityUtils.getUserId() == e.getPrincipal()) {
+        if (SecurityUtils.isOrgAdmin() || (SecurityUtils.getUserId().equals(e.getPrincipal()) && matchAdmin)) {
             buttons = ProjectButtonGenerator.generateButtons(e.getStatus(), Constants.ROLE_OWNER);
         //这块可以用或者因为产品想让质量管理员可以看到详情按钮，即便我没有参与这个项目我也可以查看
-        } else if (count > 0 || qualityAdmin) {
+        } else if ((count > 0 && matchAdmin) || qualityAdmin) {
             buttons = ProjectButtonGenerator.generateButtons(e.getStatus(), Constants.ROLE_MEMBER);
         } else {
             buttons = ProjectButtonGenerator.generateButtons(e.getStatus(), Constants.ROLE_OTHER);
         }
-        ProjectButtonGenerator.filterButtonsByRole(buttons);
+        ProjectButtonGenerator.removeButtonsByRole(buttons);
         e.setButtons(buttons);
         return e;
     }
@@ -408,13 +409,13 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     @Override
     public R<Project> getInfoById(Long projectId) {
         log.info("智能阅片项目详情接口开始：");
-        boolean matchAdmin = SysRoleUtils.matchAdmin(SysRoleUtils.INTELL_ADMIN);
+        boolean matchAdmin = SysRoleUtils.matchAdmin(SysRoleUtils.INTELL_ADMIN, SysRoleUtils.NUMBER_ADMIN);
         Project project = baseMapper.selectById(projectId);
         project.setTopicName(topicMapper.selectById(project.getTopicId()).getTopicName());
         long count = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, projectId).eq(ProjectMember::getUserId, SecurityUtils.getUserId()).eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
         List<String> buttons = new ArrayList<>();
         Integer status = project.getStatus();
-        if (SecurityUtils.isOrgAdmin() || (SecurityUtils.getUserId() == project.getPrincipal() && matchAdmin)) {
+        if (SecurityUtils.isOrgAdmin() || (SecurityUtils.getUserId().equals(project.getPrincipal()) && matchAdmin)) {
             buttons = ProjectButtonGenerator.generateButtons(status, Constants.ROLE_OWNER);
         } else if (count > 0 && matchAdmin) {
             buttons = ProjectButtonGenerator.generateButtons(status, Constants.ROLE_MEMBER);
@@ -429,7 +430,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 ProjectButtonGenerator.filterButtons(buttons);
             }
         }
-        ProjectButtonGenerator.filterButtonsByRole(buttons);
+        ProjectButtonGenerator.removeButtonsByRole(buttons);
         project.setButtons(buttons);
 
         //增加种属名称

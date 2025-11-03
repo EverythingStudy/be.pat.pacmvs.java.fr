@@ -49,7 +49,7 @@ public class ProjectButtonGenerator {
      * 质量保证管理员 数字阅片 机构管理员 没有查看ai分析按钮的相关权限
      * @param buttons
      */
-    public static void filterButtonsByRole(List<String> buttons) {
+    public static void removeButtonsByRole(List<String> buttons) {
         //拿到质量保证管理员角色
         List<SysRole> roles = SecurityUtils.getRoles();
         boolean isDelete = false;
