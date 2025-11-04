@@ -1,18 +1,15 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
-import cn.staitech.common.core.utils.StringUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.OutlineCustom;
-import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -38,8 +35,6 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy impl
     private AiForecastService aiForecastService;
     @Resource
     private CommonJsonParser commonJsonParser;
-    @Resource
-    private AreaUtils areaUtils;
     @Resource
     private CommonJsonCheck commonJsonCheck;
     @Resource
