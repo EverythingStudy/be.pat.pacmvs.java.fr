@@ -2,14 +2,12 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.AnnotationMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -48,25 +46,23 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("大鼠卵巢与输卵管构指标计算开始");
-        // 黄体数量 A 个
+        // A 黄体数量 A 个
         Integer mucosaCountA = commonJsonParser.getOrganAreaCount(jsonTask, "17C0CA");
         mucosaCountA = commonJsonParser.getIntegerValue(mucosaCountA);
-        // 黄体面积（全片） C 平方毫米
+        // B 黄体面积（全片） 平方毫米
         BigDecimal bigDecimalC = getOrganArea(jsonTask, "17C0CA").getStructureAreaNum();
         bigDecimalC = bigDecimalC.setScale(3, RoundingMode.HALF_UP);
+        //C 卵巢卵泡数量
+        Integer mucosaCountC = commonJsonParser.getOrganAreaCount(jsonTask, "17C0CB");
+        //D 卵巢卵泡面积（全片） mm2
+        BigDecimal organAreaD = commonJsonParser.getOrganArea(jsonTask, "17C0CB").getStructureAreaNum();
+        //E 卵巢血管面积 μm2
+        BigDecimal organAreaE = commonJsonParser.getOrganArea(jsonTask, "17C003").getStructureAreaNum();
+        //F 卵巢血管外红细胞面积 μm2
+        BigDecimal organAreaF = commonJsonParser.getInsideOrOutside(jsonTask, "17C003", "17C004", false).getStructureAreaNum();
+        // G 卵巢血管内红细胞面积	μm2
+        BigDecimal organAreaG = commonJsonParser.getInsideOrOutside(jsonTask, "17C003", "17C004", true).getStructureAreaNum();
 
-
-        /**
-         黄体数量	17C0CA
-         黄体面积（全片）	17C0CA
-         卵泡数量	17C0CB
-         卵泡面积（全片）	17C0CB
-         血管面积	17C003
-         血管外红细胞面积	17C003、17C004
-         血管内红细胞面积	17C003、17C004
-
-         无
-         */
 
         //算法保存
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
@@ -76,6 +72,11 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
         if (bigDecimalC.compareTo(BigDecimal.ZERO) != 0) {
             indicatorResultsMap.put("黄体面积（全片）", createIndicator(String.valueOf(bigDecimalC.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "17C0CA"));
         }
+        indicatorResultsMap.put("卵巢黄体数量", createIndicator(String.valueOf(mucosaCountC), PIECE, "17C0CB"));
+        indicatorResultsMap.put("卵巢卵泡面积（全片）", createIndicator(String.valueOf(organAreaD), SQ_MM, "17C0CB"));
+        indicatorResultsMap.put("卵巢血管面积", createIndicator(areaUtils.convertToMicrometer(organAreaE.toString()), SQ_MM, "17C003"));
+        indicatorResultsMap.put("卵巢血管外红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaF.toString()), SQ_MM, "17C003,17C004"));
+        indicatorResultsMap.put("卵巢血管外红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaG.toString()), SQ_MM, "17C003,17C004"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 
