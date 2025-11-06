@@ -19,12 +19,11 @@ import java.util.Map;
 
 
 /**
- * 
-* @ClassName: ParotidGlandParserStrategyImpl
-* @Description-d:腮腺
-* @author wanglibei
-* @date 2025年7月21日
-* @version V1.0
+ * @author wanglibei
+ * @version V1.0
+ * @ClassName: ParotidGlandParserStrategyImpl
+ * @Description-d:腮腺
+ * @date 2025年7月21日
  */
 @Slf4j
 @Service("Parotid_gland")
@@ -37,6 +36,7 @@ public class ParotidGlandParserStrategyImpl extends AbstractCustomParserStrategy
     private AreaUtils areaUtils;
     @Resource
     private CommonJsonCheck commonJsonCheck;
+
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -44,68 +44,36 @@ public class ParotidGlandParserStrategyImpl extends AbstractCustomParserStrategy
         log.info("ParotidGlandParserStrategyImpl init");
     }
 
-    /**
-     结构	编码
-     导管	10906F
-     血管	 109003
-     腮腺腺泡细胞核 	10906E
-     组织轮廓	109111
-     算法输出指标	指标代码（仅限本文档）	单位(保留小数点后3位)	备注
-     腺泡细胞核数量	A	个	无
-     导管面积	B	103平方微米	若多个数据则相加输出
-     血管面积	C	103平方微米	若多个数据则相加输出
-     组织轮廓	D	平方毫米	无
-
-     产品呈现指标	指标代码（仅限本文档）	单位(保留小数点后3位)	English	计算方式	备注
-     腺泡细胞核密度	1	个/平方毫米	Nucleus density of acinar cell	1=A/D
-     血管面积占比	2	%	Vessel area%	2=C/D	运算前注意统一单位
-     导管面积占比	3	%	Ducts area%	3=B/D	运算前注意统一单位
-     腮腺面积	4	平方毫米	 Parotid gland area	4=D
-     */
-
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
 
         // 获取各种指标
-        Integer areaCountA = areaUtils.getOrganAreaCount(jsonTask, "10906E");// A腺泡细胞核数量
-        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "10906F");// B导管面积
-        BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask, "109003");// C血管面积
-        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());// D组织轮廓
-        
-        /**
-	        A	腺泡细胞核数量	10906E
-			B	导管面积	10906F
-			C	血管面积	109003
-			D	组织轮廓	109111
-			
-			腺泡细胞核密度	1=A/D
-			血管面积占比	2=C/D
-			导管面积占比	3=B/D
-			腮腺面积	4=D
-         */
+        // A腺泡细胞核数量
+        Integer areaCountA = areaUtils.getOrganAreaCount(jsonTask, "10906E");
+        // B导管面积
+        BigDecimal organAreaB = areaUtils.getOrganArea(jsonTask, "10906F");
+        // C血管面积
+        BigDecimal organAreaC = areaUtils.getOrganArea(jsonTask, "109003");
+        // D组织轮廓
+        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
 
         // 算法输出指标
-//        resultsMap.put("腺泡细胞核数量", createIndicator(areaCountA, PIECE,"10906E"));
-        resultsMap.put("导管面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaB.toString()), SQ_UM_THOUSAND,"10906F"));
-//        resultsMap.put("血管面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaC.toString()), SQ_UM_THOUSAND,"109003"));
+        resultsMap.put("腺泡细胞核数量", createIndicator(areaCountA, PIECE, "10906E"));
+        resultsMap.put("导管面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaB.toString()), SQ_UM_THOUSAND, "10906F"));
+        resultsMap.put("血管面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaC.toString()), SQ_UM_THOUSAND, "109003"));
 
         // 计算指标
-        BigDecimal nucleusResult = getNucleusResult(areaCountA, slideArea);// A/D
-
+        //1 腺泡细胞核密度 个/mm2 1=A/D
+        BigDecimal nucleusResult = getNucleusResult(areaCountA, slideArea);
 
         BigDecimal ares = BigDecimal.valueOf(Double.parseDouble(slideArea));
-        // 血管面积占比
-        BigDecimal vesselArea = commonJsonParser.getProportion(organAreaC, ares);
-        // 导管面积占比
-        BigDecimal ductsArea = commonJsonParser.getProportion(organAreaB, ares);
 
         // 产品呈现指标
-//        resultsMap.put("腺泡细胞核密度", createNameIndicator("Nucleus density of acinar cell", nucleusResult, SQ_MM_PIECE,areaUtils.getStructureIds("10906E","109111")));
-//        resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE,areaUtils.getStructureIds("109003","109111")));
-        resultsMap.put("导管面积占比", createNameIndicator("Ducts area%", ductsArea, PERCENTAGE,areaUtils.getStructureIds("10906F","109111")));
-        resultsMap.put("腮腺面积", createNameIndicator("Parotid gland area",String.valueOf(BigDecimal.valueOf(Double.parseDouble(slideArea)).setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM,"109111"));
-
+        resultsMap.put("腺泡细胞核密度", createNameIndicator("Nucleus density of acinar cell", nucleusResult, SQ_MM_PIECE, areaUtils.getStructureIds("10906E", "109111")));
+        resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", getProportion(organAreaC, ares), PERCENTAGE, areaUtils.getStructureIds("109003", "109111")));
+        resultsMap.put("导管面积占比", createNameIndicator("Ducts area%", getProportion(organAreaB, ares), PERCENTAGE, areaUtils.getStructureIds("10906F", "109111")));
+        resultsMap.put("腮腺面积", createNameIndicator("Parotid gland area", String.valueOf(ares.setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM, "109111"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }
@@ -114,8 +82,7 @@ public class ParotidGlandParserStrategyImpl extends AbstractCustomParserStrategy
      * 计算指标
      */
     private static BigDecimal getNucleusResult(Integer areaCountA, String slideArea) {
-        return (0 == areaCountA) ? BigDecimal.ZERO
-                : new BigDecimal(areaCountA).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP);
+        return (0 == areaCountA) ? BigDecimal.ZERO : new BigDecimal(areaCountA).divide(new BigDecimal(slideArea), 3, RoundingMode.HALF_UP);
     }
 
     @Override
