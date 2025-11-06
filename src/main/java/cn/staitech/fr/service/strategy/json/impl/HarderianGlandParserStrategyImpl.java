@@ -18,7 +18,6 @@ import cn.staitech.fr.utils.DecimalUtils;
 import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
