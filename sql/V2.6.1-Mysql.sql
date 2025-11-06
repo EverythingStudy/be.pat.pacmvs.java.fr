@@ -212,6 +212,7 @@ DELETE FROM sys_menu WHERE menu_id = 708;
 ALTER TABLE `pathmedics`.`fr_json_task` ADD UNIQUE INDEX `uk_single_id` ( `single_id` ) COMMENT '切片id';
 
 
+--2025-11-05 新增sql
 INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (712, '列表', 'list', 7, '', NULL, 5, NULL, 1, 'F', 1, '0', 'system:user:list', '#', 5, '2025-11-03 14:05:32', 5, '2025-11-03 14:05:52', '', NULL, '0', '0', '0', '0');
 INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (713, '列表', 'list', 6, '', NULL, 6, NULL, 1, 'F', 1, '0', 'system:role:list', ' ', 5, '2025-11-03 14:06:50', NULL, NULL, '', NULL, '0', '0', '0', '0');
 INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (714, '列表', 'list', 6, '', NULL, 8, NULL, 1, 'F', 1, '0', 'system:organization:list', ' ', 5, '2025-11-03 14:08:08', NULL, NULL, '', NULL, '0', '0', '0', '0');
@@ -224,3 +225,17 @@ INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `p
 INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (721, '列表', 'list', 3, '', NULL, 663, NULL, 1, 'F', 1, '0', 'readFilmCreate:users:list', ' ', 5, '2025-11-03 14:16:53', NULL, NULL, '', NULL, '0', '0', '0', '0');
 INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (722, '列表', 'list', 3, '', NULL, 709, NULL, 1, 'F', 1, '0', 'readFilmCreate:production:list', ' ', 5, '2025-11-03 14:17:44', NULL, NULL, '', NULL, '0', '0', '0', '0');
 INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (723, '列表', 'list', 3, '', NULL, 670, NULL, 1, 'F', 1, '0', 'topicRecycleBin:list', ' ', 5, '2025-11-03 14:21:02', NULL, NULL, '', NULL, '0', '0', '0', '0');
+
+
+update sys_menu set status='1' where menu_id=59;
+update sys_menu set status='1' where menu_id=61;
+update sys_menu set status='1' where menu_id=62;
+update sys_menu set status='1' where menu_id=656;
+update sys_menu set status='1' where menu_id=684;
+update sys_menu set status='1' where menu_id=685;
+update sys_menu set status='1' where menu_id=694;
+update sys_menu set status='1' where menu_id=667;
+update sys_menu set status='1' where menu_id=668;
+update sys_menu set status='1' where menu_id=706;
+update sys_menu set status='1' where menu_id=669;
+update sys_menu set menu_name='新增项目',menu_name_en='新增项目(en)' where menu_id=655;
