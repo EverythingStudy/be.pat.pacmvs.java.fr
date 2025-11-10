@@ -1,6 +1,10 @@
 package cn.staitech.fr.config;
 
+import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.dto.DelayMessageDTO;
+import cn.staitech.fr.service.JsonTaskService;
 import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
+import com.alibaba.fastjson.JSON;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
@@ -33,6 +37,8 @@ public class MessageHandler {
 
     @Resource
     private JsonTaskParserService jsonTaskParserService;
+    @Resource
+    private JsonTaskService jsonTaskService;
 
     @RabbitListener(queues = "${queues.algoMsg:test2}")
     public void handleMessage(Message message, Channel channel) {
@@ -93,23 +99,29 @@ public class MessageHandler {
     }
 
     @RabbitListener(queues = "task.delay.check.queue")
-    public void handleDelayedMessage(String taskId, Channel channel, Message message) {
+    public void handleDelayedMessage(String data, Channel channel, Message message) {
+        TraceContext.generateTraceId();
+        DelayMessageDTO delayMessageDTO = JSON.parseObject(data, DelayMessageDTO.class);
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         // 处理延迟任务检查逻辑
-
-        log.info("接收到延迟消息，任务ID: {}", taskId);
+        log.info("接收到延迟消息，singleId: {}", delayMessageDTO.getSingleId());
+        JsonTask jsonTask = new JsonTask();
+        jsonTask.setSingleId(Long.parseLong(delayMessageDTO.getSingleId()));
+        jsonTaskService.checkTask(jsonTask);
         // 手动确认消息
         try {
             channel.basicAck(deliveryTag, false);
         } catch (IOException e) {
-            log.error("延迟消息处理失败: taskId={}, error={}", taskId, e.getMessage());
+            log.error("延迟消息处理失败: singleId={}, error={}", delayMessageDTO.getSingleId(), e.getMessage());
             try {
                 // 拒绝消息并重新入队
                 channel.basicNack(deliveryTag, false, true);
             } catch (Exception nackException) {
                 log.error("拒绝延迟消息失败: {}", nackException.getMessage());
             }
+        } finally {
+            TraceContext.clear();
         }
-        log.info("延迟消息处理完成并已确认: {}", taskId);
+        log.info("延迟消息处理完成并已确认: {}", delayMessageDTO.getSingleId());
     }
 }

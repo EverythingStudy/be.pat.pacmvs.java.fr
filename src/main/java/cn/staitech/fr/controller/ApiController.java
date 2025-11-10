@@ -42,4 +42,13 @@ public class ApiController {
         }
         return R.ok("", "成功");
     }
+
+    @ApiOperation(value = "算法脏器识别任务")
+    @PostMapping("/pyTask")
+    public R<String> pyTask() {
+        log.info("开始执行");
+        parkDataProducer.sendDelayedMessage("test", 60 * 60 * 1000);
+        log.info("结束执行");
+        return R.ok("", "成功");
+    }
 }

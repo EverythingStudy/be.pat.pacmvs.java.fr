@@ -49,7 +49,6 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
     @Resource(name = "dynamicDataThreadPool")
     private ExecutorService dynamicDataThreadPool;
 
-
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);

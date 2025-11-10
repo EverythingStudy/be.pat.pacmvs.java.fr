@@ -29,4 +29,14 @@ public class ParkDataProducer {
         rabbitTemplate.convertAndSend(ALGO_MSG_QUEUE, message);
         log.info("生产者发送消息成功: " + message);
     }
+
+    public void sendDelayedMessage(String message,long delayMilliseconds) {
+        // 设置延迟时间
+        rabbitTemplate.convertAndSend("delayed.exchange", "delay.check.routing.key", message, msg -> {
+            msg.getMessageProperties().setHeader("x-delay", delayMilliseconds);
+            return msg;
+        });
+    }
+
+
 }

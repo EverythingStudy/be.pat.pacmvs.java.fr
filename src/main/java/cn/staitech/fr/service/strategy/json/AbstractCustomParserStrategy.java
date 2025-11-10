@@ -5,7 +5,6 @@ import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonFile;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.utils.MathUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,14 +27,6 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
 
     // 指标单位
     protected static final String PIECE = "个";
-//    protected static final String MM = "毫米";
-//    protected static final String UM = "微米";
-//    protected static final String SQ_MM = "平方毫米";
-//    protected static final String SQ_UM = "平方微米";
-//    protected static final String SQ_MM_PIECE = "个/平方毫米";
-//    protected static final String SQ_UM_THOUSAND = "×10³平方微米";
-//    protected static final String MM_PIECE = "个/毫米";
-
     protected static final String MM = "mm";
     protected static final String UM = "μm";
     protected static final String SQ_MM = "mm²";
@@ -120,9 +111,6 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
      *
      * @return 指标对象
      */
-//    protected IndicatorAddIn createDefaultIndicator() {
-//        return new IndicatorAddIn(CommonConstant.SINGLE_RESULT, CommonConstant.NUMBER_1);
-//    }
     protected IndicatorAddIn createDefaultIndicator(String structureId) {
         return createIndicator(CommonConstant.SINGLE_RESULT, "", structureId);
     }
@@ -167,11 +155,6 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
     }
 
 
-//    protected IndicatorAddIn createComplexIndicator(List<BigDecimal> dataList, String enName, String unit, String type) {
-//        String result = MathUtils.getConfidenceInterval(dataList);
-//        return new IndicatorAddIn(enName, result, unit, type);
-//    }
-
     /**
      * 创建指标对象（产品呈现指标）
      *
@@ -188,13 +171,8 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
         return new IndicatorAddIn(enName, String.valueOf(result), unit, CommonConstant.NUMBER_0, structureIds);
     }
 
-//    protected IndicatorAddIn createComplexIndicator(List<BigDecimal> dataList, String enName, String unit, String type, String structureIds) {
-//        String result = MathUtils.getConfidenceInterval(dataList);
-//        return new IndicatorAddIn(enName, result, unit, type, structureIds);
-//    }
-
     /**
-     * 占比计算（保留三位小数）
+     * 百分比计算（保留三位小数）
      *
      * @param numerator
      * @param denominator
@@ -203,11 +181,18 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
         return commonJsonParser.getProportion(numerator, denominator);
     }
 
+    /**
+     * 比值计算（保留三位小数）
+     *
+     * @param bigDecimal1
+     * @param bigDecimal2
+     * @return
+     */
     protected BigDecimal bigDecimalDivideCheck(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
         return commonJsonParser.bigDecimalDivideCheck(bigDecimal1, bigDecimal2);
     }
-    
-    
+
+
     /**
      * 乘以100，然后保留三位小数
      *
@@ -215,9 +200,7 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
      * @param denominator
      */
     protected BigDecimal getMultiply100(BigDecimal numerator) {
-    	BigDecimal result = numerator
-    		    .multiply(BigDecimal.valueOf(100))
-    		    .setScale(3, BigDecimal.ROUND_HALF_UP);
+        BigDecimal result = numerator.multiply(BigDecimal.valueOf(100)).setScale(3, BigDecimal.ROUND_HALF_UP);
         return result;
     }
 }

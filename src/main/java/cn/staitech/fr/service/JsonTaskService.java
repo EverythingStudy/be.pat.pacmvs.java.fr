@@ -10,5 +10,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @since 2024-05-10 14:57:01
  */
 public interface JsonTaskService extends IService<JsonTask> {
+    Boolean checkTask(JsonTask jsonTask);
 }
 
