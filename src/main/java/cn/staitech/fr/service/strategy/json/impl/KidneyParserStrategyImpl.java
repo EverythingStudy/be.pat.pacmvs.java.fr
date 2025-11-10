@@ -1,9 +1,7 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
-import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.ProjectMapper;
@@ -15,7 +13,6 @@ import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -57,34 +54,6 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         log.debug("KidneyParserStrategyImpl init");
     }
 
-    /**
-     * 结构	编码
-     * 髓质	11B03E
-     * 肾小球	11B02D
-     * 球内细胞核	11B02E
-     * 球内红细胞	11B02F
-     * 肾小管	11B031
-     * 组织轮廓	11B111
-     * 算法输出指标	指标代码（仅限本文档）	单位（保留小数点后三位）	备注
-     * 肾皮质面积	A	平方毫米	无
-     * 肾小球面积（单个）	B	103平方微米	无
-     * 球内细胞核数量（单个）	C	个	单个=单个肾小球
-     * 球内红细胞面积（单个）	D	103平方微米	单个=单个肾小球
-     * 肾小管数量	E	个	无
-     * 肾小管面积（单个）	F	103平方微米	无
-     * 组织轮廓面积	G	平方毫米	无
-     * <p>
-     * 产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
-     * 肾脏面积	1	平方毫米	 Renal area	1=G
-     * 髓质面积占比	2	%	Medulla area%	2=(G-A)/G
-     * 肾小球面积（单个）	3	103平方微米	Glomerulus area (per)	3=B	以95%置信区间和均数±标准差呈现
-     * 球内细胞核密度（单个）	4	个/平方毫米	Nucleus density of glomerulus (per)	4=C/B	单个为单个肾小球 以95%置信区间和均数±标准差呈现
-     * 球内红细胞面积占比（单个）	5	个/平方毫米	Erythrocyte of glomerulus area% (per)	5=D/B	单个为单个肾小球 以95%置信区间和均数±标准差呈现
-     * 皮质肾小管密度	6	个/平方毫米	 Density of renal cortical tubules	6=E/A
-     * 肾小管面积(单个)	7	103平方微米	Renal tubule area (per)	7=F	以95%置信区间和均数±标准差呈现
-     *
-     * @param jsonTask
-     */
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         //Project special = projectMapper.selectById(jsonTask.getSpecialId());
@@ -125,7 +94,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
             BigDecimal temp = annotation.getStructureAreaNum();
             return temp.multiply(BigDecimal.valueOf(1000));
         }).collect(Collectors.toList());
-        indicatorResultsMap.put("肾小球面积（单个）", createNameIndicator("Acinar epithelial area% (per)", MathUtils.getConfidenceInterval(bsb, bsb.size()), SQ_UM_THOUSAND, "11B02D"));
+        indicatorResultsMap.put("肾小球面积（单个）", createNameIndicator("Acinar epithelial area% (per)", MathUtils.getConfidenceInterval(bsb), SQ_UM_THOUSAND, "11B02D"));
         //4=C/B
         List<BigDecimal> cb = new ArrayList<>();
         for (Annotation annotation : bs) {
