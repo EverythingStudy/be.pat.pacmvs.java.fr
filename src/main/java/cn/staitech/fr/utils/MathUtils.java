@@ -1,16 +1,12 @@
 package cn.staitech.fr.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
-import cn.staitech.fr.constant.CommonConstant;
-import cn.staitech.fr.domain.JsonTask;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -189,10 +185,9 @@ public class MathUtils {
      * 均值±标准差；中间95%数据分布区间
      *
      * @param dataList
-     * @param count    对应脏器对照组切片数量
      * @return 返回指标结果
      */
-    public static String getConfidenceInterval(List<BigDecimal> dataList, Integer count) {
+    public static String getConfidenceInterval(List<BigDecimal> dataList) {
 
 
         /*List<BigDecimal> objects = new ArrayList<>();
@@ -224,7 +219,7 @@ public class MathUtils {
 //            }
 //            //正态分布(上限)
 //            BigDecimal add2 = bigDecimal.add(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
-            String middle95Percent = getFirstAndLastOfMiddle95Percent(dataList.stream().sorted().map(e -> e.setScale(3, RoundingMode.UP)).collect(Collectors.toList()), count);
+            String middle95Percent = getFirstAndLastOfMiddle95Percent(dataList.stream().sorted().map(e -> e.setScale(3, RoundingMode.UP)).collect(Collectors.toList()), dataList.size());
             return bigDecimal + "±" + sqrt + ";" + middle95Percent;
         } else {
             return 0 + "±" + 0 + ";" + 0 + "-" + 0;
