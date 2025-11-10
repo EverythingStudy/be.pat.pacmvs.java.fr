@@ -46,33 +46,6 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy imple
         log.debug("ThymusParserStrategyImpl init");
     }
 
-
-    /**
-     * 皮质	14403D
-     * 髓质	14403E
-     * 结缔组织	14403F
-     * 红细胞	145004
-     * 组织轮廓	144111
-     * <p>
-     * <p>
-     * 皮质面积	A	平方毫米	数据相加输出
-     * 髓质面积	B	平方毫米	数据相加输出
-     * 髓质内结缔组织面积	C	平方毫米
-     * 髓质外结缔组织面积	D	平方毫米
-     * 红细胞面积	E	平方毫米	数据相加输出
-     * 组织轮廓	F	平方毫米
-     * <p>
-     * 产品呈现指标	指标代码（仅限本文档）	单位(保留3位小数)	English	计算方式	备注
-     * 皮质占比	1	%	Cortex area%	1=（F-B-D）/F
-     * 髓质占比	2	%	Medulla area%	2=B/F
-     * 皮髓比	3	%	Cortex:medulla ratio	3=（F-B-D）/B
-     * 红细胞面积占比	4	%	Erythrocyte area%	4=E/F
-     * 结缔组织面积占比	5	%	Connective tissue area%	5=（C+D）/F
-     * 胸腺面积	6	平方毫米	Thymus area	6=F
-     *
-     * @param jsonTask
-     */
-
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
