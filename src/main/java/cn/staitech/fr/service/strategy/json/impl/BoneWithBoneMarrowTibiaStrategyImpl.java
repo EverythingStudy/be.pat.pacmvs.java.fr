@@ -25,7 +25,7 @@ import java.util.Map;
  * @author admin
  */
 @Slf4j
-@Service("Bone_with_bone_marrow_tibia")
+@Service("Tibia")
 public class BoneWithBoneMarrowTibiaStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
     private AiForecastService aiForecastService;
@@ -81,7 +81,7 @@ public class BoneWithBoneMarrowTibiaStrategyImpl extends AbstractCustomParserStr
 
     @Override
     public String getAlgorithmCode() {
-        return "Bone_with_bone_marrow_femur";
+        return "Tibia";
     }
 
 

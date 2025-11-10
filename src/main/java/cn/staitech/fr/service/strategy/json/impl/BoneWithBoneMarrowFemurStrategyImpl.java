@@ -25,7 +25,7 @@ import java.util.Map;
  * @author admin
  */
 @Slf4j
-@Service("Bone_with_bone_marrow_femur")
+@Service("Femur")
 public class BoneWithBoneMarrowFemurStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
     private AiForecastService aiForecastService;
