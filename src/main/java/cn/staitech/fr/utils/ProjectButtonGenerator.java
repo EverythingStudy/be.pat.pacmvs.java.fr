@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.staitech.common.core.utils.SpringUtils;
+import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.Constants;
+import cn.staitech.system.api.domain.SysRole;
 
 /**
  * @author mugw
@@ -43,6 +45,25 @@ public class ProjectButtonGenerator {
         return buttons;
     }
 
+    /**
+     * 质量保证管理员 数字阅片 机构管理员 没有查看ai分析按钮的相关权限
+     * @param buttons
+     */
+    public static void removeButtonsByRole(List<String> buttons) {
+        //拿到质量保证管理员角色
+        List<SysRole> roles = SecurityUtils.getRoles();
+        boolean isDelete = false;
+        for (SysRole role : roles) {
+            if(null != role.getRoleName()) {
+                if(SysRoleUtils.IS_QUALITY_ADMIN.equals(role.getRoleName()) || SysRoleUtils.NUMBER_ADMIN.equals(role.getRoleName()) || SysRoleUtils.IS_ORG_ADMIN.equals(role.getRoleName())) {
+                    isDelete = true;
+                }
+            }
+        }
+        if(isDelete) {
+            filterButtons(buttons);
+        }
+    }
 
     /**
      * 根据项目状态和成员角色生成操作按钮组合
@@ -138,6 +159,7 @@ public class ProjectButtonGenerator {
     private static boolean isProjectMember(int memberRole) {
         return memberRole == Constants.ROLE_MEMBER;
     }
+
 
 
 }

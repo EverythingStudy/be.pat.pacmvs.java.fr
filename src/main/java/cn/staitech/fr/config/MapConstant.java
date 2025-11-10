@@ -43,9 +43,6 @@ public class MapConstant {
     private OrganizationService organizationService;
     @Resource
     private StructureService structureService;
-
-    //    @Resource
-//    private PathologicalIndicatorCategoryService pathologicalIndicatorCategoryService;
     @Resource
     private StructureTagService structureTagService;
 

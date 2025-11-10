@@ -1,7 +1,6 @@
 package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.R;
-import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.SingleSlideService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,40 +21,11 @@ import javax.annotation.Resource;
 public class AiForecastController {
 
     @Resource
-    private AiForecastService aiForecastService;
-    @Resource
     private SingleSlideService singleSlideService;
-
-//    @ApiOperation(value = "获取ai预测列表")
-//    @GetMapping("/selectList")
-//    public R<List<AiForecast>> list(@RequestParam(value = "singleSlideId") @ApiParam(name = "singleSlideId", value = "单切片ID", required = true) Long singleSlideId) throws Exception {
-//        if (!Optional.ofNullable(singleSlideId).isPresent()) {
-//            return R.fail(MessageSource.M("ARGUMENT_INVALID"));
-//        }
-//        QueryWrapper<AiForecast> aiForecastQueryWrapper = new QueryWrapper<>();
-//        aiForecastQueryWrapper.eq("single_slide_id", singleSlideId);
-//        return R.ok(aiForecastService.selectList(singleSlideId));
-//    }
-
 
     @ApiOperation(value = "预测结果", tags = {"V2.6.1"})
     @GetMapping("/forecastResults")
     public R<Boolean> forecastResults(@RequestParam(value = "singleSlideId") @ApiParam(name = "singleSlideId", value = "单切片ID", required = true) Long singleSlideId, @RequestParam(value = "imageId") @ApiParam(name = "imageId", value = "图片ID", required = true) Long imageId) {
         return R.ok(singleSlideService.forecastResults(singleSlideId, imageId));
     }
-
-//    @ApiOperation(value = "计算指标列表")
-//    @GetMapping("/calculateList")
-//    public R<List<AiForecastListOut>> calculateList(@RequestParam(value = "singleSlideId") @ApiParam(name = "singleSlideId", value = "单切片ID", required = true) Long singleSlideId, @RequestParam(value = "structType") @ApiParam(name = "structType", value = "查询类型：1-预测指标列表；0-计算指标列表", required = true) String structType) throws Exception {
-//        if (!Optional.ofNullable(singleSlideId).isPresent()) {
-//            return R.fail(MessageSource.M("ARGUMENT_INVALID"));
-//        }
-//
-//        if (!Optional.ofNullable(structType).isPresent()) {
-//            return R.fail(MessageSource.M("ARGUMENT_INVALID"));
-//        }
-//        QueryWrapper<AiForecast> aiForecastQueryWrapper = new QueryWrapper<>();
-//        aiForecastQueryWrapper.eq("single_slide_id", singleSlideId);
-//        return R.ok(aiForecastService.calculateList(singleSlideId, structType));
-//    }
 }

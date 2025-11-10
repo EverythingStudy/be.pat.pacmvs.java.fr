@@ -3,15 +3,15 @@ package cn.staitech.fr.config;
 import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
 import com.rabbitmq.client.Channel;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.UUID;
 
 /**
  * @author mugw
@@ -36,8 +36,7 @@ public class MessageHandler {
 
     @RabbitListener(queues = "${queues.algoMsg:test2}")
     public void handleMessage(Message message, Channel channel) {
-        String messageId = UUID.randomUUID().toString().substring(0, 8);
-        MDC.put("threadId", messageId);
+        TraceContext.generateTraceId();
         String msg = new String(message.getBody(), StandardCharsets.UTF_8);
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         log.info("MessageHandler received: {}", msg);
@@ -63,9 +62,8 @@ public class MessageHandler {
                     log.error("拒绝消息失败: {}", nackException.getMessage());
                 }
             }
-        }
-        finally {
-            MDC.clear();
+        } finally {
+            TraceContext.clear();
         }
     }
 
@@ -78,5 +76,40 @@ public class MessageHandler {
             log.error("业务解析消息异常：[{}]，消息内容：[{}]", e.getMessage(), message);
             throw e; // 重新抛出异常以便上层处理
         }
+    }
+
+    /**
+     * 发送延迟消息
+     *
+     * @param message           消息内容
+     * @param delayMilliseconds 延迟时间（毫秒）
+     */
+    public void sendDelayedMessage(String message, long delayMilliseconds) {
+        // 设置延迟时间
+        rabbitTemplate.convertAndSend("delayed.exchange", "delay.check.routing.key", message, msg -> {
+            msg.getMessageProperties().setHeader("x-delay", delayMilliseconds);
+            return msg;
+        });
+    }
+
+    @RabbitListener(queues = "task.delay.check.queue")
+    public void handleDelayedMessage(String taskId, Channel channel, Message message) {
+        long deliveryTag = message.getMessageProperties().getDeliveryTag();
+        // 处理延迟任务检查逻辑
+
+        log.info("接收到延迟消息，任务ID: {}", taskId);
+        // 手动确认消息
+        try {
+            channel.basicAck(deliveryTag, false);
+        } catch (IOException e) {
+            log.error("延迟消息处理失败: taskId={}, error={}", taskId, e.getMessage());
+            try {
+                // 拒绝消息并重新入队
+                channel.basicNack(deliveryTag, false, true);
+            } catch (Exception nackException) {
+                log.error("拒绝延迟消息失败: {}", nackException.getMessage());
+            }
+        }
+        log.info("延迟消息处理完成并已确认: {}", taskId);
     }
 }

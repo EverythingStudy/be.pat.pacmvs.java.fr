@@ -9,7 +9,6 @@ import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.SpeciesWaxCodeTemplate;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.ProductionService;
-import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.vo.project.*;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -36,8 +35,6 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
     private SlideMapper slideMapper;
     @Resource
     private SpeciesWaxCodeTemplateMapper speciesWaxCodeTemplateMapper;
-    @Resource
-    private SlideService slideService;
     @Resource
     private OrganTagMapper organTagMapper;
 

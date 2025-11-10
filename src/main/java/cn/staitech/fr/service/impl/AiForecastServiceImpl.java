@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.staitech.fr.config.OrganStructureConfig;
+import cn.staitech.fr.config.TraceContext;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -17,6 +18,8 @@ import cn.staitech.fr.service.strategy.json.*;
 import cn.staitech.fr.utils.MathUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.shaded.com.google.gson.JsonObject;
+import com.alibaba.ttl.TtlRunnable;
+import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -50,6 +53,8 @@ import java.util.stream.Collectors;
 public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForecast> implements AiForecastService {
 
     Executor executor = new ThreadPoolExecutor(2, 20, 1000, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(1000), new ThreadPoolExecutor.DiscardOldestPolicy());
+    // 包装线程池
+    Executor ttlExecutor = TtlExecutors.getTtlExecutor(executor);
     @Resource
     private AnnotationMapper annotationMapper;
 
@@ -135,9 +140,9 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
                     Date startTime = new Date();
                     log.info("jsonTask id:{} singleSlide id:{} checkJson 精细轮廓进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.formatDateTime(startTime));
                     List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()).eq(JsonFile::getAiStatus, 0).isNotNull(JsonFile::getFileUrl));
-                    executor.execute(() -> {
+                    ttlExecutor.execute(TtlRunnable.get(() -> {
                         jsonTaskParserService.structureFileCalculate(jsonTask, fileList);
-                    });
+                    }));
                     log.info("jsonTask id:{} singleSlide id:{} checkJson 精细轮廓进入指标结束 endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime, new Date(), DateUnit.SECOND));
                 }
                 return true;
@@ -145,11 +150,10 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
                 return false;
             }
         } catch (Exception ex) {
+            ex.printStackTrace();
             log.error("forecastResults异常:{}", ex.getMessage());
             return false;
         }
-
-
     }
 
     /**

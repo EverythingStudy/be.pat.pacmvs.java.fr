@@ -178,7 +178,10 @@
         CREATE INDEX "fr_ai_annotation_${sequenceNumber}_contour10000_idx" ON "public"."fr_ai_annotation_${sequenceNumber}" USING gist (
             "contour10000" "public"."gist_geometry_ops_2d"
             );
-
+        CREATE INDEX "idx_fr_ai_annotation_${sequenceNumber}_category_slide" ON "public"."fr_ai_annotation_${sequenceNumber}" USING btree (
+            "category_id" "pg_catalog"."int8_ops" ASC NULLS LAST,
+            "single_slide_id" "pg_catalog"."int8_ops" ASC NULLS LAST
+            );
         COMMENT
         ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."annotation_id" IS '主键id';
 
@@ -267,11 +270,11 @@
             #{item.area},
             #{item.perimeter},
             #{item.categoryId},
-            ST_GeomFromWKB(#{item.contourB40000}),
-            ST_GeomFromWKB(#{item.contourB625}),
-            ST_GeomFromWKB(#{item.contourB2500}),
-            ST_GeomFromWKB(#{item.contourB10000}),
-            ST_GeomFromWKB(#{item.contourB5000}),
+            st_geomfromgeojson(#{item.contour40000}),
+            st_geomfromgeojson(#{item.contour625}),
+            st_geomfromgeojson(#{item.contour2500}),
+            st_geomfromgeojson(#{item.contour10000}),
+            st_geomfromgeojson(#{item.contour5000}),
             #{item.locationType},
             #{item.annotationType},
             #{item.createBy},
@@ -796,7 +799,7 @@
             AND single_slide_id = #{singleSlideId}
         </if>
         <if test="contour != null">
-            AND ST_Intersects ( st_geomfromgeojson(#{contour}), ST_SetSRID(contour40000, 4326) ) = #{insideOrOutside}
+            AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000) = #{insideOrOutside}
         </if>
     </select>
 
@@ -886,19 +889,18 @@
     </select>
 
     <select id="avgDistance" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
-            WITH
-                poly1_points AS (
-                    SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourOne}))).geom AS geom
-                ),
-                poly2_points AS (
-            SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourTwo}))).geom AS geom
-                    ),
-                point_distances AS (
-            SELECT AVG(ST_Distance(p1.geom, p2.geom)) AS meanDistance
-            FROM poly1_points p1
-                CROSS JOIN poly2_points p2
-                )
-            SELECT * FROM point_distances;
+        WITH poly1_points AS (SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourOne})))
+            .geom AS geom
+            )
+           , poly2_points AS (
+        SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourTwo}))).geom AS geom )
+             , point_distances AS (
+        SELECT AVG (ST_Distance(p1.geom, p2.geom)) AS meanDistance
+        FROM poly1_points p1
+            CROSS JOIN poly2_points p2
+            )
+        SELECT *
+        FROM point_distances;
     </select>
 
 
@@ -1055,6 +1057,15 @@
         <!-- 标注类型：默认 0  1 粗轮廓 2 精细轮廓 -->
          AND contour_type = 1
     </select>
-	
+	<delete id="deleteBySingleSlideIdBatch" >
+        DELETE
+        FROM fr_ai_annotation_${annotation.sequenceNumber}
+        WHERE annotation_id IN (
+            SELECT annotation_id
+            FROM fr_ai_annotation_${annotation.sequenceNumber}
+            WHERE single_slide_id = #{annotation.singleSlideId}
+            LIMIT #{batchSize}
+            );
+    </delete>
 
 </mapper>

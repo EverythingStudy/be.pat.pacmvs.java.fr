@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.strategy.json;
 
 import cn.staitech.fr.config.OrganStructureConfig;
+import cn.staitech.fr.config.TraceContext;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.enums.ForecastStatusEnum;
 import cn.staitech.fr.enums.JsonTaskStatusEnum;
@@ -13,6 +14,8 @@ import cn.staitech.fr.mapper.OrganTagMapper;
 import cn.staitech.fr.service.*;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.alibaba.ttl.TtlRunnable;
+import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.extern.slf4j.Slf4j;
@@ -20,9 +23,11 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +35,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -72,9 +79,14 @@ public class JsonTaskParserService {
     private JsonFileMapper jsonFileMapper;
     @Resource
     private OrganStructureConfig organStructureConfig;
-    @Autowired
+    @Resource
     private ExecutorService executorService;
+    private Executor ttlExecutor;
 
+    @PostConstruct
+    public void init() {
+        this.ttlExecutor = TtlExecutors.getTtlExecutor(executorService);
+    }
     /**
      * 创建计算临时表
      * 此方法用于创建一个临时表，用于数据处理或计算目的
@@ -166,12 +178,6 @@ public class JsonTaskParserService {
                 return;
             }
             JsonTask jsonTask = parseJasonTask(jsonObject);
-//            if (jsonTask == null || jsonTask.getCode().equals("500")) {
-//                log.info("singleSlide id:[{}],jsonTask :[{}] JSON解析失败!", singleSlideId, jsonTask);
-//                updateSingleSlideStatus(singleSlideId, ForecastStatusEnum.FORECAST_FAIL.getCode());
-//                //return;
-//            }
-
             JsonTask taskOld = jsonTaskMapper.selectOne(Wrappers.<JsonTask>lambdaQuery().eq(JsonTask::getSingleId, singleSlideId));
             log.info("singleSlide id:{} 查询已存在任务 {}", singleSlideId, taskOld);
             if (taskOld != null && (JsonTaskStatusEnum.PARSE_FAIL.getCode().equals(taskOld.getStatus()) || JsonTaskStatusEnum.PARSE_SUCCESS.getCode().equals(taskOld.getStatus()))) {
@@ -180,10 +186,20 @@ public class JsonTaskParserService {
                 log.info("singleSlide id:{} 更新已执行成功或失败任务 {}", singleSlideId, jsonTask);
             } else if (taskOld != null && (JsonTaskStatusEnum.PARSE_ING.getCode().equals(taskOld.getStatus()) || JsonTaskStatusEnum.NO_PARSE.getCode().equals(taskOld.getStatus()))) {
                 log.info("singleSlide id:{} jsonTask 任务执行中,新任务不再执行; {}", singleSlideId, jsonObject);
-                //return;
             } else {
-                jsonTaskService.save(jsonTask);
-                log.info("singleSlide id:[{}] 新增任务 [{}]", singleSlideId, jsonTask);
+                try {
+                    jsonTaskService.save(jsonTask);
+                    log.info("singleSlide id:[{}] 新增任务 [{}]", singleSlideId, jsonTask);
+                } catch (Exception e) {
+                    // 如果是唯一约束冲突，说明任务已存在，查询现有任务
+                    if (e.getMessage().contains("uk_single_id")) {
+                        JsonTask existingTask = jsonTaskMapper.selectOne(Wrappers.<JsonTask>lambdaQuery().eq(JsonTask::getSingleId, singleSlideId));
+                        jsonTask.setTaskId(existingTask.getTaskId());
+                        log.info("singleSlide id:{} 任务已存在，使用现有任务 {}", singleSlideId, existingTask);
+                    } else {
+                        throw e; // 其他异常继续抛出
+                    }
+                }
             }
             //校验脏器下所有结构是否解析完成
             Boolean flag = verifyCategoryStructure(jsonTask);
@@ -206,9 +222,9 @@ public class JsonTaskParserService {
                             log.info("singleSlide id:{} 待开始结构化任务 {}", singleSlideId, jsonTask);
                             return;
                         }
-                        executorService.execute(() -> {
+                        ttlExecutor.execute(Objects.requireNonNull(TtlRunnable.get(() -> {
                             structureFileCalculate(jsonTask, fileList);
-                        });
+                        })));
                     }
                 }
             } else {
@@ -224,7 +240,7 @@ public class JsonTaskParserService {
     public void structureFileCalculate(JsonTask jsonTask, List<JsonFile> fileList) {
         updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_ING.getCode());
         //进行指标计算
-        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标开始 startTime:{}",jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
         long start = System.nanoTime();
         JsonTaskAiHandler(jsonTask, fileList);
         // 计算耗时（秒）
@@ -233,6 +249,8 @@ public class JsonTaskParserService {
         log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标结束 endTime:{} 耗时:{} 秒", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date(), costSeconds);
         //部分成功-->以脏器为单位 (指标计算)结构分析完成-->forecastStatus结构化状态：1
         updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_SUCCESS.getCode());
+        //删除临时文件
+        commonJsonParser.batchDeleteBySingleSlideId(jsonTask);
     }
 
     private Boolean verifyCategoryStructure(JsonTask jsonTask) {
