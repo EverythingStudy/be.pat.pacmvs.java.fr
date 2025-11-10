@@ -63,7 +63,7 @@ public class MuscleParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal organF = BigDecimal.valueOf(Double.parseDouble(slideArea));
         //1 肌纤维面积（单个） mm2 1=A
         List<BigDecimal> annotationAreaList = annotationList.stream().map(anno -> new BigDecimal(anno.getArea()).setScale(3, RoundingMode.DOWN)).collect(Collectors.toList());
-        String muscleFiberArea = MathUtils.getConfidenceInterval(annotationAreaList, annotationAreaList.size());
+        String muscleFiberArea = MathUtils.getConfidenceInterval(annotationAreaList);
 
         //2 间质面积占比 % 2=B/F
         BigDecimal mesenchymeArea = commonJsonParser.getProportion(organAreaB, organF);
