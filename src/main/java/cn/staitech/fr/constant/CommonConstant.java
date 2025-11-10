@@ -37,5 +37,6 @@ public class CommonConstant {
     public static final String SQ_MM_PIECE_EN = "个/mm²";
     public static final String SQ_SQUARE_MICROMETER_PIECE_EN = "个/10³ μm²";
     public static final String PERCENTAGE = "%";
+    public static final String PIECE = "个";
 
 }
