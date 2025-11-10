@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author: wangfeng
- * @create: 2024-05-10 14:18:48
+ * @author: chenly
+ * @create: 2025-11-04 09:07
  * @Description: Json Parser 大鼠-免疫系统-腹股沟淋巴结 Inguinal lymph node
  */
 @Slf4j
