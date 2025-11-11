@@ -121,9 +121,7 @@ organ-structures:
     0D: # 舌
       - structure-id: 10D12E,10D12F,10D01C
     0E: # 喉
-      - structure-id:
-          - "10E035"
-          - "10E133"
+      - structure-id: "10E035,10E133"
     10: #  胃（腺胃和非腺胃）
       - structure-id: 11013F,110140,110023,110024,11012E,11012F,110035
     12: #  肝脏
