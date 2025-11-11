@@ -45,7 +45,10 @@ INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_e
 INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'13','眼睛与视神经','Eyes with optic nerve',2,'N','7B','EY_OE',1,1);
 INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'13','哈德氏腺','Harderian glands',2,'N','02','HG',1,1);
 INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'14','骨和骨髓，胸骨','Bone with bone marrow, sternum',1,'N','4E','SN',1,1);
-INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'15','骨和骨髓，股骨','Bone with bone marrow, femur',1,'N','7E','FE_TI',1,1);
+INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'15','骨和骨髓，股骨','Bone with bone marrow, femur',1,'N','50','FE',1,1);
+
+INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'15','骨和骨髓，胫骨','Bone with bone marrow, tibia',1,'N','51','TI',1,1);
+
 INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'16','注射局部','Injection site',1,'N','78','IS',1,1);
 INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'17','膀胱','Urinary bladder',1,'M','1E','UB',1,1);
 INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'17','前列腺','Prostate',1,'M','2C','PR',1,1);
