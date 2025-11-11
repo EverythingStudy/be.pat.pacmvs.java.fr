@@ -23,6 +23,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -221,9 +222,9 @@ public class JsonTaskParserService {
                             log.info("singleSlide id:{} 待开始结构化任务 {}", singleSlideId, jsonTask);
                             return;
                         }
-                        ttlExecutor.execute(TtlRunnable.get(() -> {
+                        ttlExecutor.execute(Objects.requireNonNull(TtlRunnable.get(() -> {
                             structureFileCalculate(jsonTask, fileList);
-                        }));
+                        })));
                     }
                 }
             } else {
@@ -239,7 +240,7 @@ public class JsonTaskParserService {
     public void structureFileCalculate(JsonTask jsonTask, List<JsonFile> fileList) {
         updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_ING.getCode());
         //进行指标计算
-        log.info("traceId:{},jsonTask id:{} singleSlide id:{} checkJson 进入指标开始 startTime:{}", TraceContext.getTraceId(), jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标开始 startTime:{}",jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
         long start = System.nanoTime();
         JsonTaskAiHandler(jsonTask, fileList);
         // 计算耗时（秒）

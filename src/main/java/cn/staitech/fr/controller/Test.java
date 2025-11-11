@@ -2,26 +2,26 @@ package cn.staitech.fr.controller;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.util.ObjectUtil;
+import cn.staitech.fr.config.MessageHandler;
 import cn.staitech.fr.config.OrganStructureConfig;
-import cn.staitech.fr.config.RequestThreadFilter;
 import cn.staitech.fr.config.TraceContext;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.JsonTaskParserService;
 import cn.staitech.fr.service.strategy.json.impl.EpididymideParserStrategyImpl;
-import cn.staitech.fr.service.strategy.json.impl.ProstateGlandParserStrategyImpl;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.ttl.TransmittableThreadLocal;
-import com.alibaba.ttl.TtlRunnable;
-import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.fasterxml.jackson.core.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MappingJsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.netty.util.HashedWheelTimer;
+import io.netty.util.Timeout;
+import io.netty.util.TimerTask;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.geotools.geojson.geom.GeometryJSON;
@@ -32,7 +32,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,6 +42,7 @@ import java.math.RoundingMode;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -72,6 +72,8 @@ public class Test {
     private JsonFileMapper jsonFileMapper;
     @Resource
     private JsonTaskParserService jsonTaskParserService;
+    @Resource
+    private MessageHandler messageHandler;
     // 声明traceId存储
     private static final TransmittableThreadLocal<String> traceIdHolder = new TransmittableThreadLocal<>();
     private Executor ttlExecutor;
@@ -355,5 +357,37 @@ public class Test {
         // 转换为WKB格式
         WKBWriter wkbWriter = new WKBWriter();
         return wkbWriter.write(geometry);
+    }
+
+    @PostMapping(value = "delay")
+    public void testDelay() throws Exception {
+        log.info("开始执行");
+        messageHandler.sendDelayedMessage("test", 5000);
+        log.info("结束执行");
+    }
+
+    private void timer() {
+        // 创建时间轮
+        HashedWheelTimer timer = new HashedWheelTimer(
+                Executors.defaultThreadFactory(),
+                100, TimeUnit.MILLISECONDS, // 每格时间间隔
+                512 // 轮子大小
+        );
+        // 添加一小时后的任务
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run(Timeout timeout) throws Exception {
+
+            }
+
+//            @Override
+//            public void run(Timeout timeout) throws Exception {
+//                // 处理延迟数据的业务逻辑
+//                //processDelayedData(data);
+//            }
+        };
+
+// 设置60分钟延迟
+        timer.newTimeout(task, 60, TimeUnit.MINUTES);
     }
 }

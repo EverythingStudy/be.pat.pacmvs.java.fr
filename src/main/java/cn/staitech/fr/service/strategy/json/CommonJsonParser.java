@@ -138,23 +138,18 @@ public class CommonJsonParser {
             annotation.setProjectId(0L);
             if (null != geometry) {
                 annotation.setContour40000(geometry.toString());
-                //annotation.setContourB40000(geoJsonToWkb(geometry.toString()));
             }
             if (null != geometry10000) {
                 annotation.setContour10000(geometry10000.toString());
-                //annotation.setContourB10000(geoJsonToWkb(geometry10000.toString()));
             }
             if (null != geometry2500) {
                 annotation.setContour2500(geometry2500.toString());
-                //annotation.setContourB2500(geoJsonToWkb(geometry2500.toString()));
             }
             if (null != geometry625) {
                 annotation.setContour625(geometry625.toString());
-                //annotation.setContourB625(geoJsonToWkb(geometry625.toString()));
             }
             if (null != geometry0) {
                 annotation.setContour5000(geometry0.toString());
-                //annotation.setContourB5000(geoJsonToWkb(geometry0.toString()));
             }
             annotation.setId(annotationId);
             // 拿到categoryId
@@ -677,7 +672,6 @@ public class CommonJsonParser {
             DynamicData dynamicData = buildDynamicData(inputAnnotation.getCountName(), String.valueOf(annotationBy.getCount()), inputAnnotation.getCountUnit());
             jsonArray = updateDynamicDataList(list, jsonArray, dynamicData);
         }
-
         if (jsonArray.size() > 0) {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("dynamicData", jsonArray);
@@ -930,7 +924,7 @@ public class CommonJsonParser {
     }
 
     // 批量更新方法
-    private void batchUpdateAnnotations(List<Annotation> annotations) {
+    public void batchUpdateAnnotations(List<Annotation> annotations) {
         // 如果annotationMapper支持批量更新，使用批量操作
         // 否则可以分批执行，减少数据库连接开销
         final int batchSize = 100;
@@ -1122,7 +1116,12 @@ public class CommonJsonParser {
         return new BigDecimal(sqrtValue, mc);
     }
 
-
+    /**
+     * 比值计算（保留三位小数）
+     *
+     * @param bigDecimal1
+     * @param bigDecimal2
+     */
     public BigDecimal getProportionMultiply(BigDecimal bigDecimal1, BigDecimal bigDecimal2) {
         BigDecimal proportion;
         if (null == bigDecimal1 || null == bigDecimal2 || bigDecimal1.compareTo(BigDecimal.ZERO) == 0 || bigDecimal2.compareTo(BigDecimal.ZERO) == 0) {

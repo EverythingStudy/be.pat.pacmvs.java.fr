@@ -80,7 +80,7 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         //        中央静脉面积	B	103平方微米	若多个数据则相加输出
         //BigDecimal centralVeinsArea = commonJsonParser.getOrganAreaMicron(jsonTask, "112147");
         //        大静脉面积	C	103平方微米	若多个数据则相加输出
-       // BigDecimal venaCavaArea = commonJsonParser.getOrganAreaMicron(jsonTask, "112146");
+        // BigDecimal venaCavaArea = commonJsonParser.getOrganAreaMicron(jsonTask, "112146");
         //        肝细胞核数量	D	个(肝细胞核数量 D 个 肝细胞核	112149)
         //Integer nucleusCount = commonJsonParser.getOrganAreaCount(jsonTask, "112149");
         //        窦内细胞核数量	G	个
@@ -172,7 +172,7 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         // 产品呈现指标 -------------------------------------------------------------
         // H 肝脏面积	1	平方毫米	Liver area	1=H
         map.put("肝脏面积", new IndicatorAddIn("Liver area", DecimalUtils.setScale3(accurateAreaDecimal), CommonConstant.SQUARE_MILLIMETRE, "112111"));
-        map.put("红细胞面积", new IndicatorAddIn("", DecimalUtils.setScale3(centralVeinsI), CommonConstant.SQUARE_MICROMETER, CommonConstant.NUMBER_1,"112004"));
+        map.put("红细胞面积", new IndicatorAddIn("", DecimalUtils.setScale3(centralVeinsI), CommonConstant.SQUARE_MICROMETER, CommonConstant.NUMBER_1, "112004"));
         /**
          A	门管区面积（单个）	112145
          B	中央静脉面积	112146

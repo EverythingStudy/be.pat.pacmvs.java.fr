@@ -90,8 +90,8 @@ public class ProstateGlandParserStrategyImpl extends AbstractCustomParserStrateg
             epithelialList.add(new BigDecimal(1).subtract(x));
             lumenList.add(x);
         }
-        indicatorResultsMap.put("腺上皮面积占比（单个）", createNameIndicator("Acinar epithelial area% (per)", MathUtils.getConfidenceInterval(epithelialList, epithelialList.size()), PERCENTAGE, areaUtils.getStructureIds("12D074", "12C0E9")));
-        indicatorResultsMap.put("腺腔面积占比（单个）", createNameIndicator("Acinar lumen area% (per)", MathUtils.getConfidenceInterval(lumenList, lumenList.size()), PERCENTAGE, areaUtils.getStructureIds("12D074", "12C0E9")));
+        indicatorResultsMap.put("腺上皮面积占比（单个）", createNameIndicator("Acinar epithelial area% (per)", MathUtils.getConfidenceInterval(epithelialList), PERCENTAGE, areaUtils.getStructureIds("12D074", "12C0E9")));
+        indicatorResultsMap.put("腺腔面积占比（单个）", createNameIndicator("Acinar lumen area% (per)", MathUtils.getConfidenceInterval(lumenList), PERCENTAGE, areaUtils.getStructureIds("12D074", "12C0E9")));
 
         Annotation annotation1 = new Annotation();
         annotation1.setAreaName("腺泡面积（单个）");

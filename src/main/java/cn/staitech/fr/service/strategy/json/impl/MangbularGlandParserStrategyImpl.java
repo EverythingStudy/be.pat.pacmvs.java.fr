@@ -2,9 +2,7 @@ package cn.staitech.fr.service.strategy.json.impl;
 
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
-import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.ProjectMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
@@ -13,7 +11,6 @@ import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -45,10 +42,7 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
     private CommonJsonCheck commonJsonCheck;
     @Resource
     private SingleSlideMapper singleSlideMapper;
-    @Resource
-    private ProjectMapper projectMapper;
-    //默认对照组值
-    private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
+
 
     @PostConstruct
     public void init() {
@@ -57,99 +51,50 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
         log.info("MangbularGlandParserStrategyImpl init");
     }
 
-    /**
-     * 结构	编码
-     * 颗粒管（红色）	10B125
-     * 黏液腺细胞核	10B128
-     * 颗粒管细胞核	10B126
-     * 有血管壁的血管	10B003
-     * 红细胞	10B004
-     * 间质	10B027
-     * 小叶间导管	10B115
-     * 组织轮廓	10B111
-     * 算法输出指标	指标代码（仅限本文档）	单位（保留小数点后三位）	备注
-     * 颗粒管（红色）数量	A	个	无
-     * 黏液腺细胞核数量	B	个	无
-     * 颗粒管细胞核数量（单个）	C	个	无
-     * 有血管壁的血管面积	D	平方毫米	数据相加输出
-     * 有血管壁的血管数量	E	个	无
-     * 红细胞面积	F	平方毫米	数据相加输出
-     * 颗粒管（红色）面积（单个）	G	103平方微米	无
-     * 组织轮廓	H	平方毫米	无
-     * 颗粒管（红色）面积（全片）	I	平方毫米	数据相加输出
-     * <p>
-     * 产品呈现指标	指标代码（仅限本文档）	单位（保留小数点后三位）	English	计算方式	备注
-     * 颗粒管（红色）密度	1	个/平方毫米	Density of granular convoluted tubules (eosinophilic) 	1=A/H
-     * 黏液腺细胞核密度	2	个/平方毫米	Nucleus density of mucous gland	2=B/H
-     * 颗粒管细胞核密度(单个颗粒管)	3	个/平方毫米	Nucleus density of granular convoluted tubule (per)	3=C/G	以95%置信区间和均数±标准差呈现
-     * 血管面积占比	4	%	Vessel area%	4=D/H	运算前注意统一单位；
-     * 即有血管壁的血管面积
-     * 红细胞面积占比	5	%	Erythrocyte area%	5=F/H	运算前注意统一单位
-     * 颌下腺面积	6	平方毫米	Submadibular gland
-     * area	6=H
-     * 颗粒管面积占比（全片）	7	%	Granular convoluted tubules area% (all)	7=I/H
-     */
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Project special = projectMapper.selectById(jsonTask.getSpecialId());
-        //String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
-        //Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(jsonTask.getCategoryId(), jsonTask.getSingleId(), controlGroup);
-        Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
-
         // 获取各种指标
-        Integer organAreaCountA = areaUtils.getOrganAreaCount(jsonTask, "10B125");// A颗粒管（红色）数量
-        Integer organAreaCountB = areaUtils.getOrganAreaCount(jsonTask, "10B128");// B黏液腺细胞核数量
-        BigDecimal organAreaD = areaUtils.getOrganArea(jsonTask, "10B003");// D有血管壁的血管面积
-        //Integer organAreaCountE = areaUtils.getOrganAreaCount(jsonTask, "10B003");// E有血管壁的血管数量
-        BigDecimal organAreaF = areaUtils.getOrganArea(jsonTask, "10B004");// F红细胞面积
-        String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId()); // H组织轮廓
+        // A 颗粒管（红色）数量
+        Integer organAreaCountA = commonJsonParser.getOrganAreaCount(jsonTask, "10B125");
+        // B 黏液腺细胞核数量
+        Integer organAreaCountB = commonJsonParser.getOrganAreaCount(jsonTask, "10B128");
+        // D 有血管壁的血管面积
+        BigDecimal organAreaD = commonJsonParser.getOrganArea(jsonTask, "10B003").getStructureAreaNum();
+        // E有血管壁的血管数量
+        Integer organAreaCountE = commonJsonParser.getOrganAreaCount(jsonTask, "10B003");
+        // F红细胞面积
+        BigDecimal organAreaF = commonJsonParser.getOrganArea(jsonTask, "10B004").getStructureAreaNum();
+        // H组织轮廓
+        String slideArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
         BigDecimal organAreaH = BigDecimal.valueOf(Double.parseDouble(slideArea));
-        BigDecimal organAreaI = areaUtils.getOrganArea(jsonTask, "10B125");// I颗粒管（红色）面积（全片）
+        // I颗粒管（红色）面积（全片）
+        BigDecimal organAreaI = commonJsonParser.getOrganArea(jsonTask, "10B125").getStructureAreaNum();
+        // C 颗粒管内细胞核数量（单个）
         Annotation annotationBy = new Annotation();
         annotationBy.setCountName("颗粒管内细胞核数量（单个）");
         commonJsonParser.putAnnotationDynamicData(jsonTask, "10B125", "10B126", annotationBy);
         // G颗粒管（红色）面积（单个）
-
         Annotation annotation2 = new Annotation();
         annotation2.setAreaName("颗粒管（红色）面积（单个）");
         annotation2.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "10B125", annotation2, 1);
+        Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
         // 算法输出指标
         resultsMap.put("颗粒管数量", createIndicator(organAreaCountA, PIECE, "10B125"));
         resultsMap.put("黏液腺细胞核数量", createIndicator(organAreaCountB, PIECE, "10B128"));
-        //resultsMap.put("颗粒管内细胞核数量（单个）", createDefaultIndicator(areaUtils.getStructureIds("10B125","10B126")));
-//        resultsMap.put("血管面积", createIndicator(organAreaD, SQ_MM,"10B003"));
-//        resultsMap.put("血管数量", createIndicator(organAreaCountE, PIECE,"10B003"));
-//        resultsMap.put("红细胞面积", createIndicator(organAreaF, SQ_MM,"10B004"));
-        //resultsMap.put("颗粒管面积（单个）", createDefaultIndicator("10B125"));// G颗粒管（红色）面积（单个）
-        resultsMap.put("颗粒管面积（全片）", createIndicator(organAreaI, SQ_MM, "10B125"));// I颗粒管（红色）面积（全片）
-        //  resultsMap.put("组织轮廓", createIndicator(organAreaH, SQ_MM,"10B111"));
+        resultsMap.put("血管面积", createIndicator(organAreaD, SQ_MM, "10B003"));
+        resultsMap.put("血管数量", createIndicator(organAreaCountE, PIECE, "10B003"));
+        resultsMap.put("红细胞面积", createIndicator(organAreaF, SQ_MM, "10B004"));
+        resultsMap.put("颗粒管面积（全片）", createIndicator(organAreaI, SQ_MM, "10B125"));
 
-        /**
-         A	颗粒管数量	10B125
-         B	黏液腺细胞核数量	10B128
-         C	颗粒管内细胞核数量（单个）	10B125、10B128
-         D	血管面积	10B003
-         E	血管数量	10B003
-         F	红细胞面积	10B004
-         G	颗粒管面积（单个）	10B125
-         H	组织轮廓	10B111
-         I	颗粒管面积（全片）	10B125
 
-         颗粒管密度	1=A/H
-         黏液腺细胞核密度	2=B/H
-         颗粒管细胞核密度（单个）	3=C/G
-         血管面积占比	4=D/H
-         红细胞面积占比	5=F/H
-         颌下腺面积	6=H
-         颗粒管面积占比（全片）	7=I/H
-         */
         // 计算指标
-        BigDecimal densityResult = getDensityResult(organAreaCountA, slideArea);// A/H
-        BigDecimal nucleusResult = getDensityResult(organAreaCountB, slideArea);// B/H
-        // 颗粒管细胞核密度(单个颗粒管)
-
+        //1 颗粒管密度 个/mm2 1=A/H
+        BigDecimal densityResult = getDensityResult(organAreaCountA, slideArea);
+        //2 黏液腺细胞核密度 个/mm2 2=B/H
+        BigDecimal nucleusResult = getDensityResult(organAreaCountB, slideArea);
+        //3 颗粒管细胞核密度(单个颗粒管) 个/mm2  3=C/G
         List<Annotation> annotationList = commonJsonParser.getStructureContourList(jsonTask, "10B125");
         List<BigDecimal> list = new ArrayList<>();
         for (Annotation annotation : annotationList) {
@@ -157,21 +102,21 @@ public class MangbularGlandParserStrategyImpl extends AbstractCustomParserStrate
             BigDecimal granularConvolutedTubule = commonJsonParser.bigDecimalDivideCheck(BigDecimal.valueOf(annotation1.getCount()), annotation.getStructureAreaNum());
             list.add(granularConvolutedTubule);
         }
-        String granularConvolutedTubules = MathUtils.getConfidenceInterval(list, list.size());
-        // 血管面积占比
+        String granularConvolutedTubules = MathUtils.getConfidenceInterval(list);
+        //4 血管面积占比 % 4=D/H
         BigDecimal vesselArea = commonJsonParser.getProportion(organAreaD, organAreaH);
-        // 红细胞面积占比
+        //5 红细胞面积占比 %  5=F/H
         BigDecimal erythrocyteArea = commonJsonParser.getProportion(organAreaF, organAreaH);
-        // 颗粒管面积占比（全片）
+        // 7 颗粒管面积占比（全片） 7=I/H
         BigDecimal granularConvolutedTubulesArea = commonJsonParser.getProportion(organAreaI, organAreaH);
 
         // 产品呈现指标
         resultsMap.put("颗粒管密度", createNameIndicator("Density of granular convoluted tubules (eosinophilic)", densityResult, SQ_MM_PIECE, areaUtils.getStructureIds("10B125", "10B111")));
         resultsMap.put("黏液腺细胞核密度", createNameIndicator("Nucleus density of mucous gland", nucleusResult, SQ_MM_PIECE, areaUtils.getStructureIds("10B128", "10B111")));
         resultsMap.put("颗粒管细胞核密度(单个)", createNameIndicator("Nucleus density of granular convoluted tubule (per)", granularConvolutedTubules, SQ_MM_PIECE, areaUtils.getStructureIds("10B125", "10B126")));
-//        resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE,areaUtils.getStructureIds("10B003","10B111")));
-//        resultsMap.put("红细胞面积占比", createNameIndicator("Erythrocyte area%", erythrocyteArea, PERCENTAGE,areaUtils.getStructureIds("10B004","10B111")));
-        resultsMap.put("颌下腺面积", createNameIndicator("Submadibular gland area", String.valueOf(BigDecimal.valueOf(Double.parseDouble(slideArea)).setScale(3, BigDecimal.ROUND_HALF_UP)), SQ_MM, "10B111"));
+        resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", vesselArea, PERCENTAGE, areaUtils.getStructureIds("10B003", "10B111")));
+        resultsMap.put("红细胞面积占比", createNameIndicator("Erythrocyte area%", erythrocyteArea, PERCENTAGE, areaUtils.getStructureIds("10B004", "10B111")));
+        resultsMap.put("颌下腺面积", createNameIndicator("Submadibular gland area", organAreaH.setScale(3, BigDecimal.ROUND_HALF_UP).toString(), SQ_MM, "10B111"));
         resultsMap.put("颗粒管面积占比（全片）", createNameIndicator("Granular convoluted tubules area% (all)", granularConvolutedTubulesArea, PERCENTAGE, areaUtils.getStructureIds("10B125", "10B111")));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }

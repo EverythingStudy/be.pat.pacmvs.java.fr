@@ -41,10 +41,8 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
     private SingleSlideMapper singleSlideMapper;
     @Resource
     private AiForecastService aiForecastService;
-
     @Autowired
     private AreaUtils areaUtils;
-
     @Resource
     private CommonJsonParser commonJsonParser;
     @Resource
@@ -68,32 +66,29 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
 
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        //a
+        //A 黏膜上皮面积 mm2
         BigDecimal organArea = commonJsonParser.getOrganArea(jsonTask, "10E035").getStructureAreaNum();
-        //b
+        //B 腺体面积 mm2
         BigDecimal organArea1 = commonJsonParser.getOrganArea(jsonTask, "10E133").getStructureAreaNum();
-        //c 10E111
+        //C 组织轮廓面积 mm2
         BigDecimal bigDecimal = new BigDecimal(singleSlide.getArea());
-        //c 10E111
-        indicatorResultsMap.put("喉面积", new IndicatorAddIn("Larynx area", new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "10E111"));
-        //TODO 算法不支持，暂时先注释，待支持后再次放开
-        //a 10E035
-//        indicatorResultsMap.put("黏膜上皮面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), "平方毫米", CommonConstant.NUMBER_1,"10E035"));
-        //b
+        //A
+        indicatorResultsMap.put("黏膜上皮面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), MM, CommonConstant.NUMBER_1, "10E035"));
+        //B
         indicatorResultsMap.put("腺体面积", new IndicatorAddIn("", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "10E133"));
         if (bigDecimal.signum() == 0) {
-            ////TODO 算法不支持，暂时先注释，待支持后再次放开
-            //A/C
-//            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", "0", "%",areaUtils.getStructureIds("10E035","10E111")));
-            //B/C
-            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", "0", "%", areaUtils.getStructureIds("10E133", "10E111")));
+            //1 黏膜上皮面积占比  % A/C
+            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", "0", PERCENTAGE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("10E035", "10E111")));
+            //2 腺体面积占比 %  B/C
+            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", "0", PERCENTAGE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("10E133", "10E111")));
         } else {
-            //TODO 算法不支持，暂时先注释，待支持后再次放开
-//            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", organArea.divide(bigDecimal,5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), "%",areaUtils.getStructureIds("10E035","10E111")));
-            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", organArea1.divide(bigDecimal, 5, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(3).toString(), PERCENTAGE, areaUtils.getStructureIds("10E133", "10E111")));
-
+            //1 黏膜上皮面积占比  % A/C
+            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", getProportion(organArea, bigDecimal).toString(), PERCENTAGE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("10E035", "10E111")));
+            //2 腺体面积占比 %  B/C
+            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", getProportion(organArea1, bigDecimal).toString(), PERCENTAGE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("10E133", "10E111")));
         }
+        //3 喉面积 mm2
+        indicatorResultsMap.put("喉面积", new IndicatorAddIn("Larynx area", new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_0, "10E111"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
-        //aiForecastService.addOutIndicators(jsonTask.getSingleId(), indicatorResultsMap);
     }
 }
