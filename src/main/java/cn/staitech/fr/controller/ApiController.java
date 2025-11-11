@@ -3,6 +3,8 @@ package cn.staitech.fr.controller;
 import cn.hutool.json.JSONUtil;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.config.ParkDataProducer;
+import cn.staitech.fr.domain.dto.DelayMessageDTO;
+import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -45,9 +47,9 @@ public class ApiController {
 
     @ApiOperation(value = "算法脏器识别任务")
     @PostMapping("/pyTask")
-    public R<String> pyTask() {
+    public R<String> pyTask(@RequestBody Map params) {
         log.info("开始执行");
-        parkDataProducer.sendDelayedMessage("test", 60 * 60 * 1000);
+        parkDataProducer.sendDelayedMessage(JSON.toJSONString(params), 60 * 60 * 1000);
         log.info("结束执行");
         return R.ok("", "成功");
     }
