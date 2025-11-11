@@ -20,6 +20,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -51,6 +52,13 @@ public class CoagulatingGlangParserStrategyImpl extends AbstractCustomParserStra
     private CommonJsonCheck commonJsonCheck;
     @Autowired
     private AreaUtils areaUtils;
+
+    @PostConstruct
+    public void init() {
+        setCommonJsonParser(commonJsonParser);
+        setCommonJsonCheck(commonJsonCheck);
+        log.debug("AdrenalGlandParserStrategyImpl init");
+    }
 
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {

@@ -39,11 +39,12 @@ public class AreaUtils {
 
     /**
      * 获取组织轮廓面积
+     *
      * @return 面积单位-平方毫米
      */
     public String getFineContourArea(Long singleSlideId) {
         SingleSlide singleSlide = singleSlideMapper.selectById(singleSlideId);
-        if(null == singleSlide || StringUtils.isEmpty(singleSlide.getArea())){
+        if (null == singleSlide || StringUtils.isEmpty(singleSlide.getArea())) {
             return "0";
         }
         return singleSlide.getArea();
@@ -51,10 +52,11 @@ public class AreaUtils {
 
     /**
      * 平方毫米换算为10³平方微米
+     *
      * @param str 输入值
      * @return 转换后结果
      */
-    public String convertToSquareMicrometer(String str){
+    public String convertToSquareMicrometer(String str) {
         BigDecimal result = BigDecimal.ZERO;
         if (!StringUtils.isEmpty(str)) {
             BigDecimal areaNum = new BigDecimal(str).multiply(BigDecimal.valueOf(1000));
@@ -65,19 +67,21 @@ public class AreaUtils {
 
     /**
      * 微末转10³平方微米
+     *
      * @param str 输入值
      * @return 转换后结果
      */
-    public String micrometerToSquareMicrometer(String str){
+    public String micrometerToSquareMicrometer(String str) {
         BigDecimal result = BigDecimal.ZERO;
         if (!StringUtils.isEmpty(str)) {
-            result = new BigDecimal(str).divide(BigDecimal.valueOf(1000),3, BigDecimal.ROUND_HALF_UP);
+            result = new BigDecimal(str).divide(BigDecimal.valueOf(1000), 3, BigDecimal.ROUND_HALF_UP);
         }
         return result.toString();
     }
 
     /**
      * 平方毫米换算为平方微米
+     *
      * @param str 输入值
      * @return 转换后结果
      */
@@ -111,18 +115,20 @@ public class AreaUtils {
 
     /**
      * 获取脏器轮廓面积
-     * @param jsonTask jsonTask
+     *
+     * @param jsonTask    jsonTask
      * @param structureId 结构ID
      * @return 脏器面积-平方毫米
      */
-    public BigDecimal getOrganArea(JsonTask jsonTask,String structureId) {
+    public BigDecimal getOrganArea(JsonTask jsonTask, String structureId) {
         Annotation annotation = commonJsonParser.getOrganArea(jsonTask, structureId);
         return annotation.getStructureAreaNum();
     }
 
     /**
      * 取脏器轮廓数量
-     * @param jsonTask jsonTask
+     *
+     * @param jsonTask    jsonTask
      * @param structureId 结构ID
      * @return 脏器轮廓数量
      */
@@ -136,8 +142,10 @@ public class AreaUtils {
         // 脏器轮廓信息
         Annotation annotation = new Annotation();
         annotation.setSequenceNumber(sequenceNumber);
-        annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
-        annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
+        //单脏器切片id
+        annotation.setSingleSlideId(jsonTask.getSingleId());
+        // 标注类别ID
+        annotation.setCategoryId(pathologicalMap.get(structureId));
         return annotationMapper.countDucts(annotation);
 
     }
@@ -151,6 +159,7 @@ public class AreaUtils {
 
     /**
      * 定位表
+     *
      * @param specialId 专题ID
      * @return 表后缀
      */
@@ -163,10 +172,12 @@ public class AreaUtils {
 
     /**
      * 查询所有未被删除且登录机构相同的数据
+     *
      * @param organizationId 机构id
      * @return 指标的结构ID和类别ID
      */
     Map<Long, Map<String, Long>> pathologicalHasMap = new HashMap<>();
+
     public Map<String, Long> getPathologicalMap(Long organizationId) {
         Map<String, Long> pathlogicalMap = pathologicalHasMap.get(organizationId);
         if (pathlogicalMap == null) {
@@ -179,19 +190,18 @@ public class AreaUtils {
         }
         return pathlogicalMap;
     }
-    
-    
+
+
     /**
-     * 
-    * @Title: getStructureIds
-    * @Description: 获取结构
-    * @param @param structureIdList
-    * @param @return
-    * @return String
-    * @throws
+     * @param @param  structureIdList
+     * @param @return
+     * @return String
+     * @throws
+     * @Title: getStructureIds
+     * @Description: 获取结构
      */
-    public String getStructureIds(String ... structureId) {
-    	return structureId == null || structureId.length == 0 ? "" : String.join(",", structureId);
+    public String getStructureIds(String... structureId) {
+        return structureId == null || structureId.length == 0 ? "" : String.join(",", structureId);
     }
 
 }
