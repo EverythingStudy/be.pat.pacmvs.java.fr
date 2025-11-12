@@ -40,7 +40,7 @@ public class MessageHandler {
     @Resource
     private JsonTaskService jsonTaskService;
 
-    @RabbitListener(queues = "${queues.algoMsg:test2}")
+    @RabbitListener(queues = "${queues.algoMsg:algo.message.queue}")
     public void handleMessage(Message message, Channel channel) {
         TraceContext.generateTraceId();
         String msg = new String(message.getBody(), StandardCharsets.UTF_8);
@@ -52,7 +52,8 @@ public class MessageHandler {
             channel.basicAck(deliveryTag, false);
             log.info("消息处理完成并已确认: {}", msg);
         } catch (Exception e) {
-            log.error("消息处理失败：[{}]，消息内容：[{}]", e.getMessage(), msg);
+            e.printStackTrace();
+            log.info("消息处理失败：[{}]，消息内容：[{}]", e.getMessage(), msg);
             try {
                 // 发送到重试队列
                 rabbitTemplate.convertAndSend(ALGO_MSG_RETRY_QUEUE, msg);
@@ -60,7 +61,7 @@ public class MessageHandler {
                 // 确认原消息
                 channel.basicAck(deliveryTag, false);
             } catch (Exception sendException) {
-                log.error("发送重试队列失败: {}", sendException.getMessage());
+                log.info("发送重试队列失败: {}", sendException.getMessage());
                 // 拒绝消息并重新入队
                 try {
                     channel.basicNack(deliveryTag, false, true);

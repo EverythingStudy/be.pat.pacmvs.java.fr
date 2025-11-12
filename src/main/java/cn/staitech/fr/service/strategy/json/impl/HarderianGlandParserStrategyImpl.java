@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -51,7 +52,12 @@ public class HarderianGlandParserStrategyImpl extends AbstractCustomParserStrate
     private CommonJsonCheck commonJsonCheck;
     @Resource
     private AreaUtils areaUtils;
-
+    @PostConstruct
+    public void init() {
+        setCommonJsonParser(commonJsonParser);
+        setCommonJsonCheck(commonJsonCheck);
+        log.debug("D65EyeAndOpticNerveParserStrategyImpl init");
+    }
     @Override
     public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
         commonJsonParser.parseJson(jsonTask, jsonFileS);

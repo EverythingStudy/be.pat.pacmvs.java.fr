@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -54,7 +55,12 @@ public class BrainParserStrategyImpl extends AbstractCustomParserStrategy {
     public boolean checkJson(JsonTask jsonTask, List<JsonFile> jsonFileList) {
         return commonJsonCheck.checkJson(jsonTask, jsonFileList);
     }
-
+    @PostConstruct
+    public void init() {
+        setCommonJsonParser(commonJsonParser);
+        setCommonJsonCheck(commonJsonCheck);
+        log.info("BrainParserStrategyImpl init");
+    }
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("大鼠大脑 BR1_BR2 指标计算开始……{}", jsonTask);
