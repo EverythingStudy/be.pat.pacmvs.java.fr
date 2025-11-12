@@ -83,10 +83,6 @@ public class MandibularLymphNodeParserStrategyImpl extends AbstractCustomParserS
             // 4 皮质和副皮质占比		%	Cortex and paracortex area%	4=（D-C）/D
             BigDecimal cortexAndParacortexAreaRateDecimal = organAreaD.subtract(organAreaC).divide(organAreaD, 6, RoundingMode.HALF_UP);
             map.put("皮质和副皮质占比", createNameIndicator("Cortex and paracortex area%", DecimalUtils.percentScale3(cortexAndParacortexAreaRateDecimal), PERCENTAGE, "14803E,148111"));
-        } else {
-            map.put("生发中心占比", new IndicatorAddIn("Germinal center area%", "0.000", PERCENTAGE, "148051,148111"));
-            map.put("髓质占比", new IndicatorAddIn("Medulla area%", "0.000", PERCENTAGE, "14803E,148111"));
-            map.put("皮质和副皮质占比", new IndicatorAddIn("Cortex and paracortex area%", "0.000", PERCENTAGE, "14803E,148111"));
         }
 
         // 5 淋巴结面积 mm2  5=D

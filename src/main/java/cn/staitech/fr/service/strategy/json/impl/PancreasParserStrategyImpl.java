@@ -118,8 +118,10 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy imp
         //indicatorResultsMap.put("胰腺面积", createNameIndicator("Pancreas area%", organAreaO.setScale(3, RoundingMode.DOWN).toString(), SQ_MM, "105111"));
         BigDecimal O = new BigDecimal(singleSlide.getArea());
         //1 上皮细胞核密度 个/mm2 1=A/(O-E-G)
-        BigDecimal result = bigDecimalDivideCheck(BigDecimal.valueOf(Long.valueOf(countA)), O.subtract(organArea1).subtract(organArea2));
-        indicatorResultsMap.put("上皮细胞核密度", createNameIndicator("Nucleus density of  epithelial cell", result.toString(), SQ_MM_PIECE, "105075,105111,105077,105027"));
+        if (O.subtract(organArea1).subtract(organArea2) != BigDecimal.ZERO) {
+            BigDecimal result = bigDecimalDivideCheck(BigDecimal.valueOf(Long.valueOf(countA)), O.subtract(organArea1).subtract(organArea2));
+            indicatorResultsMap.put("上皮细胞核密度", createNameIndicator("Nucleus density of  epithelial cell", result.toString(), SQ_MM_PIECE, "105075,105111,105077,105027"));
+        }
         //2 酶原颗粒面积占比 % 2=B/O
         indicatorResultsMap.put("酶原颗粒面积占比", createNameIndicator("Zymogen granule area%", getProportion(organArea, O).toString(), PERCENTAGE, "105076,105111"));
         // 3 胰岛面积占比 % 3=E/O
