@@ -197,7 +197,8 @@ public class JsonTaskParserService {
                         jsonTask.setTaskId(existingTask.getTaskId());
                         log.info("singleSlide id:{} 任务已存在，使用现有任务 {}", singleSlideId, existingTask);
                     } else {
-                        throw e; // 其他异常继续抛出
+                        // 其他异常继续抛出
+                        throw e;
                     }
                 }
             }
@@ -209,23 +210,17 @@ public class JsonTaskParserService {
                 Boolean flag1 = verifyCategoryStructure(jsonTask);
                 if (flag1) {
                     List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()).isNotNull(JsonFile::getFileUrl));
-                    List<JsonFile> list = fileList.stream().filter(e -> e.getAiStatus() == 0).collect(Collectors.toList());
-                    if (CollectionUtils.isEmpty(list)) {
-                        //结构识别全部失败-->以脏器为单位 (指标计算)结构分析失败-->forecastStatus结构化状态：2
-                        updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_FAIL.getCode());
-                    } else {
-                        //验证精细轮廓是否存在
-                        SingleSlide singleSlide = singleSlideService.getById(singleSlideId);
-                        if (singleSlide != null && !singleSlide.getAiStatusFine().equals(1)) {
-                            jsonTask.setStatus(JsonTaskStatusEnum.PARSE_NOT_START.getCode());
-                            jsonTaskService.updateById(jsonTask);
-                            log.info("singleSlide id:{} 待开始结构化任务 {}", singleSlideId, jsonTask);
-                            return;
-                        }
-                        ttlExecutor.execute(Objects.requireNonNull(TtlRunnable.get(() -> {
-                            structureFileCalculate(jsonTask, fileList);
-                        })));
+                    //验证精细轮廓是否存在
+                    SingleSlide singleSlide = singleSlideService.getById(singleSlideId);
+                    if (singleSlide != null && !singleSlide.getAiStatusFine().equals(1)) {
+                        jsonTask.setStatus(JsonTaskStatusEnum.PARSE_NOT_START.getCode());
+                        jsonTaskService.updateById(jsonTask);
+                        log.info("singleSlide id:{} 待开始结构化任务 {}", singleSlideId, jsonTask);
+                        return;
                     }
+                    ttlExecutor.execute(Objects.requireNonNull(TtlRunnable.get(() -> {
+                        structureFileCalculate(jsonTask, fileList);
+                    })));
                 }
             } else {
                 //解析脏器结构文件路径，并存入MySQL
@@ -238,9 +233,16 @@ public class JsonTaskParserService {
     }
 
     public void structureFileCalculate(JsonTask jsonTask, List<JsonFile> fileList) {
+        List<JsonFile> list = fileList.stream().filter(e -> e.getAiStatus() == 0).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(list)) {
+            //结构识别全部失败-->以脏器为单位 (指标计算)结构分析失败-->forecastStatus结构化状态：2
+            updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_FAIL.getCode());
+            jsonTask.setStatus(JsonTaskStatusEnum.PARSE_FAIL.getCode());
+            jsonTaskService.updateById(jsonTask);
+        }
         updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_ING.getCode());
         //进行指标计算
-        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标开始 startTime:{}",jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
+        log.info("jsonTask id:{} singleSlide id:{} checkJson 进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), new Date());
         long start = System.nanoTime();
         JsonTaskAiHandler(jsonTask, fileList);
         // 计算耗时（秒）

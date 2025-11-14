@@ -121,14 +121,6 @@ public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, Singl
                     })));
                     log.info("jsonTask id:{} singleSlide id:{} checkJson 精细轮廓进入指标结束 endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime, new Date(), DateUnit.SECOND));
                 }
-//                Map<String, List<OrganStructureConfig.OrganStructure>> outline = organStructureConfig.getOutline();
-//                List<OrganStructureConfig.OrganStructure> organStructureList = outline.get(category.getOrganTagCode());
-//                if (!CollectionUtils.isEmpty(organStructureList)) {
-//                    JsonTask task = new JsonTask();
-//                    task.setSingleId(singleSlideId);
-//                    OutlineCustom parser = mapOutline.get(jsonTask.getAlgorithmCode());
-//                    parser.getCustomOutLine(task);
-//                }
                 return true;
             } else {
                 return false;

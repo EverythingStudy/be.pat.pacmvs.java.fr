@@ -140,9 +140,9 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
                     Date startTime = new Date();
                     log.info("jsonTask id:{} singleSlide id:{} checkJson 精细轮廓进入指标开始 startTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.formatDateTime(startTime));
                     List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()).eq(JsonFile::getAiStatus, 0).isNotNull(JsonFile::getFileUrl));
-                    ttlExecutor.execute(TtlRunnable.get(() -> {
+                    ttlExecutor.execute(Objects.requireNonNull(TtlRunnable.get(() -> {
                         jsonTaskParserService.structureFileCalculate(jsonTask, fileList);
-                    }));
+                    })));
                     log.info("jsonTask id:{} singleSlide id:{} checkJson 精细轮廓进入指标结束 endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime, new Date(), DateUnit.SECOND));
                 }
                 return true;
