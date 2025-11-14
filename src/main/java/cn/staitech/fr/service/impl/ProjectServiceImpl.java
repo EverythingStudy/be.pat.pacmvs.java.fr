@@ -25,6 +25,7 @@ import cn.staitech.fr.vo.project.ProjectVo;
 import cn.staitech.fr.vo.project.slide.ChangeControlGroupReq;
 import cn.staitech.fr.vo.project.slide.GetControlGroupReq;
 import cn.staitech.system.api.domain.SysRole;
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
@@ -415,6 +416,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         long count = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, projectId).eq(ProjectMember::getUserId, SecurityUtils.getUserId()).eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
         List<String> buttons = new ArrayList<>();
         Integer status = project.getStatus();
+        log.info("当前用户角色：{}", JSON.toJSONString(SecurityUtils.getRoles()));
         if (SecurityUtils.isOrgAdmin() || (SecurityUtils.getUserId().equals(project.getPrincipal()) && matchAdmin)) {
             buttons = ProjectButtonGenerator.generateButtons(status, Constants.ROLE_OWNER);
         } else if (count > 0 && matchAdmin) {
