@@ -118,6 +118,8 @@ public class Test {
         int bathSize = 5000;
         Annotation anno = new Annotation();
         anno.setSequenceNumber(1L);
+
+
         String finalResolutionX = getResolutionX();
         try (FileInputStream fis = new FileInputStream(jsonFile); JsonParser jsonParser = jsonFactory.createParser(fis)) {
 
