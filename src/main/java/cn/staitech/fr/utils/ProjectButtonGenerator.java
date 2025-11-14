@@ -55,7 +55,7 @@ public class ProjectButtonGenerator {
         boolean isDelete = false;
         for (SysRole role : roles) {
             if(null != role.getRoleName()) {
-                if(SysRoleUtils.IS_QUALITY_ADMIN.equals(role.getRoleName()) || SysRoleUtils.NUMBER_ADMIN.equals(role.getRoleName()) || SysRoleUtils.IS_ORG_ADMIN.equals(role.getRoleName())) {
+                if(SysRoleUtils.IS_QUALITY_ADMIN.equals(role.getRoleName()) || SysRoleUtils.NUMBER_ADMIN.equals(role.getRoleName()) || (null != role.getRoleLevel() && role.getRoleLevel().equals(1))) {
                     isDelete = true;
                 }
             }
