@@ -74,7 +74,7 @@ public class MandibularLymphNodeParserStrategyImpl extends AbstractCustomParserS
         if (organAreaD.compareTo(BigDecimal.ZERO) != 0) {
             // 2 生发中心占比		%	Germinal center area%	2=B/D
             BigDecimal germinalCenterAreaRateDecimal = organAreaB.divide(organAreaD, 6, RoundingMode.HALF_UP);
-            map.put("生发中心占比", createNameIndicator("Germinal center area%", DecimalUtils.percentScale3(germinalCenterAreaRateDecimal), PERCENTAGE, "148051,148111"));
+            map.put("生发中心面积占比", createNameIndicator("Germinal center area%", DecimalUtils.percentScale3(germinalCenterAreaRateDecimal), PERCENTAGE, "148051,148111"));
 
             // 3 髓质占比		%	Medulla area%	3=C/D
             BigDecimal medullaAreaRateDecimal = organAreaC.divide(organAreaD, 6, RoundingMode.HALF_UP);
