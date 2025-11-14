@@ -116,17 +116,10 @@ public class LacrimalGlandParserStrategyImpl extends AbstractCustomParserStrateg
             map.put("间质面积占比", new IndicatorAddIn("Mesenchyme area %", getProportion(mesenchymeArea, singleSlideBigDecimal).toString(), CommonConstant.PERCENTAGE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("169027", "169111")));
             //5 腺泡面积占比 %   Acinus area% 5=(F-E)/F
             map.put("腺泡面积占比", new IndicatorAddIn("Acinus area %", getProportion(singleSlideBigDecimal.subtract(mesenchymeArea), singleSlideBigDecimal).toString(), CommonConstant.PERCENTAGE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("169027", "169111")));
-        } else {
-            map.put("导管面积占比", new IndicatorAddIn("Duct area%", "0.000", CommonConstant.PERCENTAGE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("16906F", "169111")));
-            map.put("上皮顶部胞质占比", new IndicatorAddIn("Epithelial apex cytoplasm area %", "0.000", CommonConstant.PERCENTAGE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("16906A", "169111")));
-            map.put("间质占比", new IndicatorAddIn("Mesenchyme area %", "0.000", CommonConstant.PERCENTAGE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("169027", "169111")));
-            map.put("腺泡占比", new IndicatorAddIn("Acinus area %", "0.000", CommonConstant.PERCENTAGE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("169027", "169111")));
         }
         // 2 腺泡细胞核密度 个/mm2 Nucleus density of acinus 2 = B / (F - E)
         if (singleSlideBigDecimal.subtract(mesenchymeArea).compareTo(BigDecimal.ZERO) != 0) {
             map.put("腺泡细胞核密度", new IndicatorAddIn("Nucleus density of acinus", bigDecimalDivideCheck(new BigDecimal(nucleusCount), singleSlideBigDecimal.subtract(mesenchymeArea)).toString(), CommonConstant.SQ_MM_PIECE_EN, CommonConstant.NUMBER_0, areaUtils.getStructureIds("16906E", "169027", "169111")));
-        } else {
-            map.put("腺泡细胞核密度", new IndicatorAddIn("Nucleus density of acinus", "0.000", CommonConstant.SQ_MM_PIECE_EN, CommonConstant.NUMBER_0, areaUtils.getStructureIds("16906E", "169027", "169111")));
         }
 
         //6 腺泡细胞核面积（单个）μm2  Acinar nucleus area (per) 6=C 以95 % 置信区间和均数±标准差呈现

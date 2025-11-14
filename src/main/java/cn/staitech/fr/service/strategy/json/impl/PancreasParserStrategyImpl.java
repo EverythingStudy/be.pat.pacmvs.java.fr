@@ -118,19 +118,21 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy imp
         //indicatorResultsMap.put("胰腺面积", createNameIndicator("Pancreas area%", organAreaO.setScale(3, RoundingMode.DOWN).toString(), SQ_MM, "105111"));
         BigDecimal O = new BigDecimal(singleSlide.getArea());
         //1 上皮细胞核密度 个/mm2 1=A/(O-E-G)
-        BigDecimal result = bigDecimalDivideCheck(BigDecimal.valueOf(Long.valueOf(countA)), O.subtract(organArea1).subtract(organArea2));
-        indicatorResultsMap.put("上皮细胞核密度", createNameIndicator("Nucleus density of  epithelial cell", result.toString(), SQ_MM_PIECE, "105075,105111,105077,105027"));
+        if (O.subtract(organArea1).subtract(organArea2) != BigDecimal.ZERO) {
+            BigDecimal result = bigDecimalDivideCheck(BigDecimal.valueOf(Long.valueOf(countA)), O.subtract(organArea1).subtract(organArea2));
+            indicatorResultsMap.put("上皮细胞核密度", createNameIndicator("Nucleus density of  epithelial cell", result.toString(), SQ_MM_PIECE, "105075,105111,105077,105027"));
+        }
         //2 酶原颗粒面积占比 % 2=B/O
         indicatorResultsMap.put("酶原颗粒面积占比", createNameIndicator("Zymogen granule area%", getProportion(organArea, O).toString(), PERCENTAGE, "105076,105111"));
         // 3 胰岛面积占比 % 3=E/O
         indicatorResultsMap.put("胰岛面积占比", createNameIndicator("Pancreatic islet area%", getProportion(organArea1, O).toString(), PERCENTAGE, "105077,105111"));
         //4 胰岛细胞核密度（单个） 个/103 μm2 4=F/D
-        indicatorResultsMap.put("胰岛细胞核密度（单个）", createNameIndicator(MathUtils.getConfidenceInterval(dataList), "Nucleus density of pancreatic islet（per）", SQ_UM_PICE, "105077,105078"));
+        indicatorResultsMap.put("胰岛细胞核密度（单个）", createNameIndicator("Nucleus density of pancreatic islet（per）", MathUtils.getConfidenceInterval(dataList), SQ_UM_PICE, "105077,105078"));
         //5 间质面积占比 % 5=G/O
         indicatorResultsMap.put("间质面积占比", createNameIndicator("Interstitial area%", getProportion(organArea2, O).toString(), PERCENTAGE, "105027,105111"));
         //6 导管面积占比 % 6=J/O
         indicatorResultsMap.put("导管面积占比", createNameIndicator("Vascular area%", getProportion(organArea3, O).toString(), PERCENTAGE, "10506F,105111"));
-
+        //7 导管细胞核密度（单个） 个/103 μm2 7=K/I
         annotationList = getStructureContourList(jsonTask, "10506F");
         if (CollectionUtils.isNotEmpty(annotationList)) {
             dataList.clear();
@@ -144,7 +146,7 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy imp
                 }
             }
         }
-        indicatorResultsMap.put("导管细胞核密度（单个）", new IndicatorAddIn(MathUtils.getConfidenceInterval(dataList), "Nucleus density of duct（per）", SQ_UM_PICE, CommonConstant.NUMBER_0, "10506F,10507B"));
+        indicatorResultsMap.put("导管细胞核密度（单个）", new IndicatorAddIn("Nucleus density of duct（per）", MathUtils.getConfidenceInterval(dataList), SQ_UM_PICE, CommonConstant.NUMBER_0, "10506F,10507B"));
         //8 血管内红细胞面积占比 % 8=M/O
         indicatorResultsMap.put("血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", getProportion(annotationInner.getStructureAreaNum(), O).toString(), PERCENTAGE, "105003,105004,105111"));
         //9 血管外红细胞面积占比 % 9=N/O

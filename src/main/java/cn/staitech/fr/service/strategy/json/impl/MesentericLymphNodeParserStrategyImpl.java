@@ -64,7 +64,7 @@ public class MesentericLymphNodeParserStrategyImpl extends AbstractCustomParserS
         resultsMap.put("生发中心数量", createNameIndicator("Number of germinal center", areaCountA, PIECE, "146051"));
         //2 生发中心占比 % Germinal center area% 2=B/D
         BigDecimal germinalCenterArea = getProportion(organAreaB, organAreaD);
-        resultsMap.put("生发中心占比", createNameIndicator("Germinal center area%", germinalCenterArea, PERCENTAGE, "146051,146111"));
+        resultsMap.put("生发中心面积占比", createNameIndicator("Germinal center area%", germinalCenterArea, PERCENTAGE, "146051,146111"));
         //3 髓质占比 % Medulla area% 3=C/D
         BigDecimal medullaArea = getProportion(organAreaC, organAreaD);
         resultsMap.put("髓质占比", createNameIndicator("Medulla area%", medullaArea, PERCENTAGE, "14603E,146111"));
