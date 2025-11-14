@@ -1,3 +1,4 @@
+DELETE FROM tb_species_wax_code_template;
 -- 模板数据初始化-大鼠（52条数据）
 INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'1','大脑','Brain',1,'N','32','BR1_BR2',1,1);
 INSERT INTO tb_species_wax_code_template (species_id,wax_code,organ_name,organ_en,block_count,sex_flag,organ_code,abbreviation,create_by,update_by) VALUES ("1",'1','小脑与脑干','Cerebellum with brain stem',1,'N','7D','CM_BS',1,1);
