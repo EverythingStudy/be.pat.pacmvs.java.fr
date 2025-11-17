@@ -142,7 +142,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         List<String> list3s = new ArrayList<>();
         List<String> list4s = new ArrayList<>();
         //D 输出小管/附睾管管腔面积（单个）103 μm2
-        List<Annotation> annotationList2 = commonJsonParser.getStructureContourList(jsonTask, "12F0F4");
+        List<Annotation> annotationList2 = commonJsonParser.getStructureContourList(jsonTask, "12F0F5");
         for (Annotation i : annotationList2) {
             //F 精子面积（单个）103 μm2
             Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F7", true);
