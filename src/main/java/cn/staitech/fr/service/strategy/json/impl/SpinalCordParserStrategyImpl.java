@@ -71,11 +71,11 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-        indicatorResultsMap.put("灰质面积（全片 ）", new IndicatorAddIn("", bigDecimalG.toString(), SQ_MM, CommonConstant.NUMBER_1, "1390B3"));
-        indicatorResultsMap.put("白质面积（全片 ）", new IndicatorAddIn("", bigDecimalH.toString(), SQ_MM, "1", "1390B2"));
+        indicatorResultsMap.put("灰质面积（全片 ）", new IndicatorAddIn("", bigDecimalG.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "1390B3"));
+        indicatorResultsMap.put("白质面积（全片 ）", new IndicatorAddIn("", bigDecimalH.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "1", "1390B2"));
         indicatorResultsMap.put("中央管面积（全片 ）", new IndicatorAddIn("", areaUtils.convertToSquareMicrometer(bigDecimalI.toString()), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "1390B4"));
 //		indicatorResultsMap.put("室管膜细胞核数量（全片 ）", new IndicatorAddIn("", mucosaCountD.toString(), PIECE, "1",areaUtils.getStructureIds("1390B4","1390B5")));
-        indicatorResultsMap.put("红细胞面积（全片 ）", new IndicatorAddIn("", bigDecimalE.toString(), SQ_MM, CommonConstant.NUMBER_1, "139004"));
+        indicatorResultsMap.put("红细胞面积（全片 ）", new IndicatorAddIn("", bigDecimalE.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "139004"));
 
         Annotation annotationC = new Annotation();
         annotationC.setAreaName("灰质面积（单个）");
@@ -144,7 +144,7 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 
         //	脊髓面积	6	平方毫米	Spinal cord area（all）	12=G+H
         if (bigDecimalG_H.compareTo(BigDecimal.ZERO) != 0) {
-            indicatorResultsMap.put("脊髓面积（全片）", new IndicatorAddIn("Spinal cord area（all）", String.valueOf(bigDecimalG_H), SQ_MM, CommonConstant.NUMBER_0, areaUtils.getStructureIds("1390B3", "1390B2")));
+            indicatorResultsMap.put("脊髓面积（全片）", new IndicatorAddIn("Spinal cord area（all）", String.valueOf(bigDecimalG_H.setScale(3, RoundingMode.HALF_UP)), SQ_MM, CommonConstant.NUMBER_0, areaUtils.getStructureIds("1390B3", "1390B2")));
         }
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 

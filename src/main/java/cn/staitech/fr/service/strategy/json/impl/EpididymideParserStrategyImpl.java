@@ -142,7 +142,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         List<String> list3s = new ArrayList<>();
         List<String> list4s = new ArrayList<>();
         //D 输出小管/附睾管管腔面积（单个）103 μm2
-        List<Annotation> annotationList2 = commonJsonParser.getStructureContourList(jsonTask, "12F0F4");
+        List<Annotation> annotationList2 = commonJsonParser.getStructureContourList(jsonTask, "12F0F5");
         for (Annotation i : annotationList2) {
             //F 精子面积（单个）103 μm2
             Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F7", true);
@@ -208,7 +208,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         //2 输出小管和附睾管面积占比（全片） % 2=B/J
         resultsMap.put("输出小管和附睾管面积占比（全片）", createNameIndicator("Efferent ducts and epididymal ducts area%（all）", getProportion(organAreaB, organAreaJ), PERCENTAGE, areaUtils.getStructureIds("12F0F5", "12F111")));
         //3 间质面积占比 % 1-B/J
-        resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area%", one.subtract(getProportion(organAreaB, organAreaJ)), PERCENTAGE, areaUtils.getStructureIds("12F0F5", "12F111")));
+        resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area%", one.subtract(bigDecimalDivideCheck(organAreaB, organAreaJ)), PERCENTAGE, areaUtils.getStructureIds("12F0F5", "12F111")));
         //4 黏膜上皮面积占比 % 4=1-D/A
         resultsMap.put("黏膜上皮面积占比（单个）", createNameIndicator("Mucosal epithelium area% (per)", mucosalAreaPer, PERCENTAGE, areaUtils.getStructureIds("12F0F5", "12F0F4")));
         //5 精子面积占比 % 5=F/D

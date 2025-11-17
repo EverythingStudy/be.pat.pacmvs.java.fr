@@ -55,9 +55,12 @@ public class MesentericLymphNodeParserStrategyImpl extends AbstractCustomParserS
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
         BigDecimal organAreaD = BigDecimal.valueOf(Double.parseDouble(slideArea));
         // BigDecimal organAreaD = areaUtils.getOrganArea(jsonTask, "146111");
+        // E 次级淋巴滤泡数量
+        Integer areaCountE = areaUtils.getOrganAreaCount(jsonTask, "146050");
         // 算法输出指标
         resultsMap.put("生发中心面积（全片）", createIndicator(organAreaB.setScale(3, RoundingMode.HALF_UP), SQ_MM, "146051"));
         resultsMap.put("髓质面积", createIndicator(organAreaC.setScale(3, RoundingMode.HALF_UP), SQ_MM, "14603E"));
+        resultsMap.put("次级淋巴滤泡数量", createIndicator(areaCountE, PIECE, "146050"));
 
         // 产品呈现指标
         //1 生发中心数量 个 Number of germinal center 1=A

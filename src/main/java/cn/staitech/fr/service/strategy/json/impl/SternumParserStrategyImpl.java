@@ -10,7 +10,9 @@ import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.service.strategy.json.OutlineCustom;
+import cn.staitech.fr.utils.AreaUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -39,6 +41,8 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy impl
     private CommonJsonCheck commonJsonCheck;
     @Resource
     private SingleSlideMapper singleSlideMapper;
+    @Autowired
+    private AreaUtils areaUtils;
 
     @PostConstruct
     public void init() {
@@ -68,9 +72,9 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy impl
         mucosaCountC = commonJsonParser.getIntegerValue(mucosaCountC);
 
         // D 所有红细胞轮廓面积之和 单位：103 μm2
-        BigDecimal bigDecimalD = getOrganArea(jsonTask, "14E004").getStructureAreaNum().multiply(BigDecimal.valueOf(1000)).setScale(3, BigDecimal.ROUND_HALF_UP);
+        BigDecimal bigDecimalD = getOrganArea(jsonTask, "14E004").getStructureAreaNum().setScale(3, BigDecimal.ROUND_HALF_UP);
         // E 所有脂肪细胞轮廓面积之和 单位：103 μm2
-        BigDecimal bigDecimalMicrometerE = getOrganArea(jsonTask, "14E012").getStructureAreaNum().multiply(BigDecimal.valueOf(1000)).setScale(3, BigDecimal.ROUND_HALF_UP);
+        BigDecimal bigDecimalMicrometerE = getOrganArea(jsonTask, "14E012").getStructureAreaNum().setScale(3, BigDecimal.ROUND_HALF_UP);
         // F  组织轮廓面积 mm2
         SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
         BigDecimal bigDecimalF = new BigDecimal(singleSlide.getArea());
@@ -92,8 +96,8 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy impl
             densityOfMegakaryocyte = commonJsonParser.getProportion(new BigDecimal(mucosaCountC), bigDecimalF);
         }
         indicatorResultsMap.put("巨核系细胞数量", new IndicatorAddIn("", String.valueOf(mucosaCountC), "个", CommonConstant.NUMBER_1, "14E022"));
-        indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalD.setScale(3, RoundingMode.HALF_UP)), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "14E004"));
-        indicatorResultsMap.put("脂肪细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalMicrometerE.setScale(3, RoundingMode.HALF_UP)), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "14E012"));
+        indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", String.valueOf(areaUtils.convertToSquareMicrometer(bigDecimalD.toString())), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "14E004"));
+        indicatorResultsMap.put("脂肪细胞面积", new IndicatorAddIn("", String.valueOf(areaUtils.convertToSquareMicrometer(bigDecimalMicrometerE.toString())), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "14E012"));
 
 
         //AI指标保存
