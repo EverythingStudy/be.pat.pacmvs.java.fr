@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * @author: chenly
  * @create: 2025-11-04 09:07
- * @Description: Json Parser 大鼠-免疫系统-腹股沟淋巴结 Inguinal lymph node
+ * @Description: 大鼠-免疫系统-腹股沟淋巴结
  */
 @Slf4j
 @Component("Inguinal_lymph_node")
@@ -59,16 +59,19 @@ public class InguinalLymphNodeParserStrategyImpl extends AbstractCustomParserStr
         String accurateArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
         BigDecimal organAreaD = new BigDecimal(accurateArea);
         // BigDecimal organAreaD = commonJsonParser.getOrganArea(jsonTask, "147111").getStructureAreaNum();
-
+        // E 次级淋巴滤泡数量
+        Integer areaCountE = commonJsonParser.getOrganAreaCount(jsonTask, "147050");
         // 算法输出指标 -------------------------------------------------------------
         // B 生发中心面积（全片）
         map.put("生发中心面积（全片）", createIndicator(DecimalUtils.setScale3(organAreaB), SQ_MM, "147051"));
         // C 髓质面积
         map.put("髓质面积", createIndicator(DecimalUtils.setScale3(organAreaC), SQ_MM, "14703E"));
+        // C 髓质面积
+        map.put("次级淋巴滤泡数量", createIndicator(areaCountE, PIECE, "147050"));
 
         // 产品呈现指标 -------------------------------------------------------------
         // 1 生发中心数量		个	 Number of germinal center	1=A
-        map.put("生发中心数量", createNameIndicator("Number of germinal center", areaCountA.toString(), "个", "147051"));
+        map.put("生发中心数量", createNameIndicator("Number of germinal center", areaCountA.toString(), PIECE, "147051"));
 
         if (organAreaD.compareTo(BigDecimal.ZERO) != 0) {
             // 2 生发中心占比		%	Germinal center area%	2=B/D

@@ -61,12 +61,15 @@ public class MandibularLymphNodeParserStrategyImpl extends AbstractCustomParserS
         String accurateArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
         BigDecimal organAreaD = new BigDecimal(accurateArea);
         //BigDecimal organAreaD = commonJsonParser.getOrganArea(jsonTask, "148111").getStructureAreaNum();
-
+        // E 次级淋巴滤泡数量
+        Integer areaCountE = commonJsonParser.getOrganAreaCount(jsonTask, "148050");
         // 算法输出指标 -------------------------------------------------------------
         // B 生发中心面积（全片）
         map.put("生发中心面积（全片）", createIndicator(DecimalUtils.setScale3(organAreaB), SQ_UM, "148051"));
         // C 髓质面积
         map.put("髓质面积", createIndicator(DecimalUtils.setScale3(organAreaC), SQ_UM, "14803E"));
+        //E 次级淋巴滤泡数量
+        map.put("次级淋巴滤泡数量", createIndicator(areaCountE, PIECE, "148050"));
         // 产品呈现指标 -------------------------------------------------------------
         // 1 生发中心数量
         map.put("生发中心数量", createNameIndicator("Number of germinal center", areaCountA.toString(), PIECE, "148051"));
