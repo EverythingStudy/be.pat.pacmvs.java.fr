@@ -88,7 +88,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         Annotation annotationBy2 = new Annotation();
         annotationBy2.setAreaName("精子面积（单个）");
         annotationBy2.setAreaUnit(SQ_UM_THOUSAND);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12F0F7", annotationBy2, 1);
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "12F0F5", "12F0F7", annotationBy2, 1);
         // H 黏膜上皮细胞核数量（单个) 个
         Annotation annotation2s = new Annotation();
         annotation2s.setCountName("黏膜上皮细胞核数量（单个）");
