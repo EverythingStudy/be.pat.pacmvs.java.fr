@@ -55,12 +55,14 @@ public class BrainParserStrategyImpl extends AbstractCustomParserStrategy {
     public boolean checkJson(JsonTask jsonTask, List<JsonFile> jsonFileList) {
         return commonJsonCheck.checkJson(jsonTask, jsonFileList);
     }
+
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
         setCommonJsonCheck(commonJsonCheck);
         log.info("BrainParserStrategyImpl init");
     }
+
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("大鼠大脑 BR1_BR2 指标计算开始……{}", jsonTask);
@@ -92,10 +94,6 @@ public class BrainParserStrategyImpl extends AbstractCustomParserStrategy {
             map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular Erythrocyte area%", getProportion(extravascularErythrocyteArea, accurateAreaBigDecimal).toString(), PERCENTAGE, "132003,132004,132111"));
             // 3 血管内红细胞面积占比%	Intravascular Erythrocyte area%	3=C/D	无
             map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", getProportion(intravascularErythrocyteArea, accurateAreaBigDecimal).toString(), PERCENTAGE, "132003,132004,132111"));
-        } else {
-            map.put("脉络丛面积占比", new IndicatorAddIn("Choroid Plexus area %", "0.000", "%", areaUtils.getStructureIds("13209C", "132111")));
-            map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular Erythrocyte area%", "0.000", "%"));
-            map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", "0.000", "%"));
         }
 
         // D 大脑面积	4	平方毫米	Brain area	4=D	无
