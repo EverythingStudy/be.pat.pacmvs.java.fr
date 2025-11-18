@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -50,14 +51,11 @@ public class LacrimalGlandParserStrategyImpl extends AbstractCustomParserStrateg
     @Autowired
     private AreaUtils areaUtils;
 
-    @Override
-    public void parseJson(JsonTask jsonTask, JsonFile jsonFileS) {
-        commonJsonParser.parseJson(jsonTask, jsonFileS);
-    }
-
-    @Override
-    public boolean checkJson(JsonTask jsonTask, List<JsonFile> jsonFileList) {
-        return commonJsonCheck.checkJson(jsonTask, jsonFileList);
+    @PostConstruct
+    public void init() {
+        setCommonJsonParser(commonJsonParser);
+        setCommonJsonCheck(commonJsonCheck);
+        log.info("MammaryGlandParserStrategyImpl init");
     }
 
     @Override

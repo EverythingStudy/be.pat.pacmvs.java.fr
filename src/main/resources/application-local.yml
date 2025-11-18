@@ -117,7 +117,7 @@ organ-structures:
     0A: # 唾液腺，舌下腺
       - structure-id: 10A06F,10A121,10A06D
     0B: #  唾液腺，颌下腺
-      - structure-id: 10B125,10B128,10B126,10B003,10B004,10B027
+      - structure-id: 10B125,10B128,10B126,10B003,10B004
     0D: # 舌
       - structure-id: 10D12E,10D12F,10D01C
     0E: # 喉
