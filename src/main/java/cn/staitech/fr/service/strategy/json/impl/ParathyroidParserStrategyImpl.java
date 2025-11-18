@@ -31,9 +31,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component("Parathyroid")
-public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy{
-    @Resource
-    private AnnotationMapper annotationMapper;
+public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
     private AiForecastService aiForecastService;
     @Resource
@@ -42,8 +40,7 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy{
     private AreaUtils areaUtils;
     @Resource
     private CommonJsonCheck commonJsonCheck;
-    @Resource
-    private SingleSlideMapper singleSlideMapper;
+
     @PostConstruct
     public void init() {
         setCommonJsonParser(commonJsonParser);
@@ -71,11 +68,11 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy{
         Integer mucosaCountA = commonJsonParser.getOrganAreaCount(jsonTask, "108091");
         mucosaCountA = commonJsonParser.getIntegerValue(mucosaCountA);
         //组织轮廓面积==>甲状旁腺面积 B 10³平方微米
-		BigDecimal areaDecimalB = BigDecimal.ZERO;
-		if (StringUtils.isNotEmpty(slideArea)) {
-			String area = areaUtils.convertToSquareMicrometer(slideArea);
-			areaDecimalB  = new BigDecimal(area);
-		}
+        BigDecimal areaDecimalB = BigDecimal.ZERO;
+        if (StringUtils.isNotEmpty(slideArea)) {
+            String area = areaUtils.convertToSquareMicrometer(slideArea);
+            areaDecimalB = new BigDecimal(area);
+        }
         areaDecimalB = areaDecimalB.setScale(3, RoundingMode.HALF_UP);
         areaDecimalB = commonJsonParser.getBigDecimalValue(areaDecimalB);
 
@@ -84,7 +81,7 @@ public class ParathyroidParserStrategyImpl extends AbstractCustomParserStrategy{
 
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 
-        indicatorResultsMap.put("主细胞核数", createIndicator(String.valueOf(mucosaCountA), PIECE, "108091"));
+        indicatorResultsMap.put("主细胞核数量", createIndicator(String.valueOf(mucosaCountA), PIECE, "108091"));
 
         indicatorResultsMap.put("甲状旁腺面积", createNameIndicator("Parathyroid gland area", String.valueOf(areaDecimalB.setScale(3, RoundingMode.HALF_UP)), SQ_UM_THOUSAND, "108111"));
 
