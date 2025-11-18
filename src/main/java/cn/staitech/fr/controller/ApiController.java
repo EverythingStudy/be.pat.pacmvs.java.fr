@@ -48,7 +48,8 @@ public class ApiController {
     @ApiOperation(value = "算法脏器识别任务")
     @PostMapping("/pyTask")
     public R<String> pyTask(@RequestBody Map params) {
-        log.info("开始执行");
+        String retData = JSONUtil.toJsonStr(params);
+        log.info("开始执行:{} ", retData);
         parkDataProducer.sendDelayedMessage(JSON.toJSONString(params), 60 * 60 * 1000);
         log.info("结束执行");
         return R.ok("", "成功");
