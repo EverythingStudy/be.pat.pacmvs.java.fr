@@ -72,15 +72,15 @@ public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy im
         }
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
         //A 食管腔面积 mm2
-        BigDecimal area = areaUtils.getOrganArea(jsonTask, "10F12E");
+        BigDecimal area = areaUtils.getOrganArea(jsonTask, "10F120");
         //B 角质层面积 103 μm2
-        BigDecimal organArea = commonJsonParser.getOrganAreaMicron(jsonTask, "10F12F");
+        BigDecimal organArea = commonJsonParser.getOrganAreaMicron(jsonTask, "12F12E");
         //C 颗粒层+棘层+基底层面积
-        BigDecimal organArea1 = commonJsonParser.getOrganAreaMicron(jsonTask, "10F00C");
+        BigDecimal organArea1 = commonJsonParser.getOrganAreaMicron(jsonTask, "10F12F");
         //D 黏膜固有层+黏膜肌层+黏膜下层面积
-        BigDecimal organArea2 = commonJsonParser.getOrganAreaMicron(jsonTask, "10F120");
+        BigDecimal organArea2 = commonJsonParser.getOrganAreaMicron(jsonTask, "10F13B");
         //E 肌层面积
-        BigDecimal organArea3 = commonJsonParser.getOrganArea(jsonTask, "10F13B").getStructureAreaNum();
+        BigDecimal organArea3 = commonJsonParser.getOrganArea(jsonTask, "10F00C").getStructureAreaNum();
 
         indicatorResultsMap.put("食管腔面积", new IndicatorAddIn("Esophageal cavity area", area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "10F12E"));
         indicatorResultsMap.put("角质层面积", new IndicatorAddIn("Area of stratum corneum", organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "10F12F"));
@@ -90,20 +90,14 @@ public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy im
         indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("Organizational contour area", bigDecimal.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "10F111"));
         // F-A
         BigDecimal subtract = bigDecimal.subtract(area);
-        if (subtract.signum() == 0) {
+        if (subtract.signum() != 0) {
             //B/(F-A)
-            indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum Corneum area%", "0", "%", areaUtils.getStructureIds("10F12E", "10F111", "10F120")));
-            //C/(F-A)
-            indicatorResultsMap.put("颗粒层+棘层+基底层面积占比", new IndicatorAddIn("Nucleated cell layer area%", "0", "%", areaUtils.getStructureIds("10F12F", "10F111", "10F120")));
-            //D/(F-A)
-            indicatorResultsMap.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", new IndicatorAddIn("Subepithelium area %", "0", "%", areaUtils.getStructureIds("10F13B", "10F111", "10F120")));
-            //E/(F-A)
-            indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscularis area%", "0", "%", areaUtils.getStructureIds("10F00C", "10F111", "10F120")));
-
-        } else {
             indicatorResultsMap.put("角质层面积占比", new IndicatorAddIn("Stratum Corneum area%", getProportion(organArea, new BigDecimal(areaUtils.convertToSquareMicrometer(subtract.toString()))).toString(), PERCENTAGE, areaUtils.getStructureIds("10F12E", "10F111", "10F120")));
+            //C/(F-A)
             indicatorResultsMap.put("颗粒层+棘层+基底层面积占比", new IndicatorAddIn("Nucleated cell layer area%", getProportion(organArea1, new BigDecimal(areaUtils.convertToSquareMicrometer(subtract.toString()))).toString(), PERCENTAGE, areaUtils.getStructureIds("10F12F", "10F111", "10F120")));
+            //D/(F-A)
             indicatorResultsMap.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", new IndicatorAddIn("Subepithelium area %", getProportion(organArea2, new BigDecimal(areaUtils.convertToSquareMicrometer(subtract.toString()))).toString(), PERCENTAGE, areaUtils.getStructureIds("10F13B", "10F111", "10F120")));
+            //E/(F-A)
             indicatorResultsMap.put("肌层面积占比", new IndicatorAddIn("Muscularis area%", getProportion(organArea3, new BigDecimal(areaUtils.convertToSquareMicrometer(subtract.toString()))).toString(), PERCENTAGE, areaUtils.getStructureIds("10F00C", "10F111", "10F120")));
         }
         //F-A
