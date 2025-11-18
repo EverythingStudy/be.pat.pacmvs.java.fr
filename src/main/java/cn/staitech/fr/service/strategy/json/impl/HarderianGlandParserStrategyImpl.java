@@ -33,7 +33,7 @@ import java.util.Map;
  * @author wanglibei
  * @version V1.0
  * @ClassName: HarderianGlandParserStrategyImpl
- * @Description-d:哈氏腺
+ * @Description-d:哈德氏腺
  * @date 2025年7月21日
  */
 @Slf4j
@@ -144,7 +144,7 @@ public class HarderianGlandParserStrategyImpl extends AbstractCustomParserStrate
         map.put("腺泡细胞核密度（全片）", new IndicatorAddIn("Nucleus density of acinus (all)", bigDecimalDivideCheck(new BigDecimal(nucleusCount), acinusArea).toString(), CommonConstant.SQ_MM_PIECE_EN, CommonConstant.NUMBER_0, areaUtils.getStructureIds("10206E", "10206D")));
 
         // 5 哈氏腺面积 mm2
-        map.put("哈氏腺面积", new IndicatorAddIn("Acinus area", DecimalUtils.setScale3(accurateAreaBigDecimal), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_0, "102111"));
+        map.put("哈德氏腺面积", new IndicatorAddIn("Acinus area", DecimalUtils.setScale3(accurateAreaBigDecimal), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_0, "102111"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
         log.info("指标计算结束-哈氏腺");
     }

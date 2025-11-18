@@ -82,7 +82,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         // H皮肤-毛囊面积（全片） mm2
         BigDecimal organAreaH = commonJsonParser.getOrganArea(jsonTask, "17A098").getStructureAreaNum();
         //I 淋巴结面积 mm2
-        BigDecimal organAreaA = commonJsonParser.getOrganArea(jsonTask, "17A005").getStructureAreaNum();
+        BigDecimal organAreaI = commonJsonParser.getOrganArea(jsonTask, "17A005").getStructureAreaNum();
         //J 皮肤面积	mm2
         BigDecimal organAreaJ = commonJsonParser.getOrganArea(jsonTask, "17A0C3").getStructureAreaNum();
         //K 乳腺腺泡和导管数量 个
@@ -121,7 +121,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         Annotation annotationO = new Annotation();
         annotationO.setCountName("乳腺腺泡和导管面积（单个）");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "17A06C", annotationO, 1);
-        map.put("乳腺细胞核数量（全片）", createIndicator(areaPCount.toString(), PIECE, "17A06C,17A0C7"));
+        //map.put("乳腺细胞核数量（全片）", createIndicator(areaPCount.toString(), PIECE, "17A06C,17A0C7"));
 
         if (organAreaJ.compareTo(new BigDecimal(0)) != 0) {
             // 1 表皮角质层面积占比	 %	Stratum corneum area%	1=A/J
@@ -153,7 +153,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         // 9 乳腺腺泡和导管数量	 个	9=K
         map.put("乳腺腺泡和导管数量", createNameIndicator("Number of acinus and ducts", organAreaCount.toString(), PIECE, "17A06C"));
         //(Q-I-J)
-        BigDecimal subtract = h.subtract(h).subtract(organAreaJ);
+        BigDecimal subtract = h.subtract(organAreaI).subtract(organAreaJ);
         if (subtract.compareTo(new BigDecimal(0)) != 0) {
             //10 乳腺腺泡和导管面积占比 %  10=L/(Q-I-J)
             map.put("乳腺腺泡和导管面积占比", createNameIndicator("Acinus and ducts area%", getProportion(organArea1, subtract), PERCENTAGE, areaUtils.getStructureIds("17A111", "17A06C", "17A005", "17A0C3")));

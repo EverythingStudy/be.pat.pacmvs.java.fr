@@ -82,7 +82,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         annotationBy1.setAreaName("输出小管/附睾管管腔面积（单个）");
         annotationBy1.setAreaUnit(SQ_UM_THOUSAND);
         Date startTime3 = new Date();
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12F0F4", annotationBy1, 1);
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "12F0F5", "12F0F4", annotationBy1);
         log.info("jsonTask id:{} singleSlide id:{} 输出小管/附睾管黏膜上皮周长（单个）endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime1, new Date(), DateUnit.SECOND));
         //F 精子面积（单个）103 μm2
         Annotation annotationBy2 = new Annotation();
@@ -140,15 +140,16 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         // 5 精子面积占比（单个）5=F/D
         List<BigDecimal> list2 = new ArrayList<>();
         List<String> list3s = new ArrayList<>();
-        List<String> list4s = new ArrayList<>();
+//        List<String> list4s = new ArrayList<>();
         //D 输出小管/附睾管管腔面积（单个）103 μm2
         List<Annotation> annotationList2 = commonJsonParser.getStructureContourList(jsonTask, "12F0F5");
         for (Annotation i : annotationList2) {
             //F 精子面积（单个）103 μm2
             Annotation annotation2 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F7", true);
-            BigDecimal res = getProportion(new BigDecimal(areaUtils.micrometerToSquareMicrometer(annotation2.getArea())), new BigDecimal(areaUtils.micrometerToSquareMicrometer(i.getArea())));
+            Annotation annotation3 = commonJsonParser.getContourInsideOrOutside(jsonTask, i.getContour(), "12F0F4", true);
+            BigDecimal res = getProportion(new BigDecimal(areaUtils.micrometerToSquareMicrometer(annotation2.getArea())), new BigDecimal(areaUtils.micrometerToSquareMicrometer(annotation3.getArea())));
             list3s.add(areaUtils.micrometerToSquareMicrometer(annotation2.getArea()));
-            list4s.add(areaUtils.micrometerToSquareMicrometer(i.getArea()));
+            //list4s.add(areaUtils.micrometerToSquareMicrometer(i.getArea()));
             list2.add(res);
         }
 

@@ -80,10 +80,10 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
         Annotation annotationC = new Annotation();
         annotationC.setAreaName("灰质面积（单个）");
         annotationC.setAreaUnit(CommonConstant.SQUARE_MILLIMETRE);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "1390B3", annotationC, 1);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "1390B3", annotationC,3);
         annotationC.setAreaName("白质面积（单个）");
         annotationC.setAreaUnit(CommonConstant.SQUARE_MILLIMETRE);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "1390B2", annotationC, 1);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "1390B2", annotationC, 3);
         annotationC.setAreaName("中央管面积（单个）");
         annotationC.setAreaUnit(CommonConstant.SQUARE_MICROMETER);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "1390B4", annotationC, 1);
@@ -92,7 +92,7 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 //        commonJsonParser.putAnnotationDynamicData(jsonTask, "1390B4", "1390B5", annotationC, 1);
         annotationC.setAreaName("红细胞面积（单个）");
         annotationC.setAreaUnit(CommonConstant.SQUARE_MILLIMETRE);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "139004", annotationC, 1);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "139004", annotationC, 3);
 
         BigDecimal bigDecimalG_H = BigDecimal.ZERO;
         bigDecimalG_H = bigDecimalG.add(bigDecimalH);
