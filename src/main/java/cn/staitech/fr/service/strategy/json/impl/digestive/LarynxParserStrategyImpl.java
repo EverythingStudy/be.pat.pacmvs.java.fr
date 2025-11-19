@@ -73,15 +73,10 @@ public class LarynxParserStrategyImpl extends AbstractCustomParserStrategy {
         //C 组织轮廓面积 mm2
         BigDecimal bigDecimal = new BigDecimal(singleSlide.getArea());
         //A
-        indicatorResultsMap.put("黏膜上皮面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), MM, CommonConstant.NUMBER_1, "10E035"));
+        indicatorResultsMap.put("黏膜上皮面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "10E035"));
         //B
         indicatorResultsMap.put("腺体面积", new IndicatorAddIn("", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "10E133"));
-        if (bigDecimal.signum() == 0) {
-            //1 黏膜上皮面积占比  % A/C
-            indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", "0", PERCENTAGE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("10E035", "10E111")));
-            //2 腺体面积占比 %  B/C
-            indicatorResultsMap.put("腺体面积占比", new IndicatorAddIn("Gland area%", "0", PERCENTAGE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("10E133", "10E111")));
-        } else {
+        if (bigDecimal.signum() != 0) {
             //1 黏膜上皮面积占比  % A/C
             indicatorResultsMap.put("黏膜上皮面积占比", new IndicatorAddIn("Mucous epithelium area%", getProportion(organArea, bigDecimal).toString(), PERCENTAGE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("10E035", "10E111")));
             //2 腺体面积占比 %  B/C

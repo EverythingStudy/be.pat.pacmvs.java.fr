@@ -44,20 +44,11 @@ public class ThyroidGlandParserStrategyImpl extends AbstractCustomParserStrategy
     @Resource
     private AiForecastService aiForecastService;
     @Resource
-    private ImageService imageService;
-    @Resource
-    private SlideService slideService;
-    @Resource
     private CommonJsonParser commonJsonParser;
     @Resource
     private CommonJsonCheck commonJsonCheck;
     @Resource
     private AreaUtils areaUtils;
-    @Resource
-    private AnnotationMapper annotationMapper;
-
-    @Resource
-    private OrganTagMapper organTagMapper;
 
     @PostConstruct
     public void init() {
@@ -135,12 +126,12 @@ public class ThyroidGlandParserStrategyImpl extends AbstractCustomParserStrategy
 
         // A 滤泡面积（单个）
         Annotation annotationA = new Annotation();
-        annotationA.setAreaName("甲状腺滤泡面积（单个）");
+        annotationA.setAreaName("滤泡面积（单个）");
         annotationA.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "107088", annotationA, 1);
         // B 滤泡腔面积（单个）
         Annotation annotationByB = new Annotation();
-        annotationByB.setAreaName("甲状腺滤泡腔面积（单个）");
+        annotationByB.setAreaName("滤泡腔面积（单个）");
         annotationByB.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putAnnotationDynamicData(jsonTask, "107088", "10708A", annotationByB, 1);
         Annotation annotationC = new Annotation();
@@ -164,16 +155,16 @@ public class ThyroidGlandParserStrategyImpl extends AbstractCustomParserStrategy
 
         // 产品呈现指标 -------------------------------------------------------------
         // 1 甲状腺滤泡面积（单个）		103平方微米	Thyroid follicle area (per)	1=A	以95%置信区间和均数±标准差呈现
-        map.put("甲状腺滤泡面积（单个）", createNameIndicator("Thyroid follicle area (per)", MathUtils.getConfidenceInterval(list1), SQ_UM_THOUSAND, "107088"));
+        map.put("滤泡面积（单个）", createNameIndicator("Thyroid follicle area (per)", MathUtils.getConfidenceInterval(list1), SQ_UM_THOUSAND, "107088"));
         // 2 甲状腺滤泡腔面积（单个）	103平方微米	Thyroid follicular lumen area (per)	2=B	以95%置信区间和均数±标准差呈现
-        map.put("甲状腺滤泡腔面积（单个）", createNameIndicator("Thyroid follicular lumen area (per)", MathUtils.getConfidenceInterval(list2), SQ_UM_THOUSAND, "107088,10708A"));
+        map.put("滤泡腔面积（单个）", createNameIndicator("Thyroid follicular lumen area (per)", MathUtils.getConfidenceInterval(list2), SQ_UM_THOUSAND, "107088,10708A"));
         // 3 甲状腺滤泡上皮面积占比（单个）	%	Thyroid follicular epithelium area%(per)	3=(A-B)/A	以95%置信区间和均数±标准差呈现
-        map.put("甲状腺滤泡上皮面积占比（单个）", createNameIndicator("Thyroid follicular epithelium area%(per)", MathUtils.getConfidenceInterval(list3), PERCENTAGE, "107088,10708A"));
+        map.put("滤泡上皮面积占比（单个）", createNameIndicator("Thyroid follicular epithelium area%(per)", MathUtils.getConfidenceInterval(list3), PERCENTAGE, "107088,10708A"));
 
         if (accurateAreaDecimal.compareTo(BigDecimal.ZERO) != 0) {
             // 4 血管面积占比	%	Vessel area%	4=D/I 	运算前注意统一单位  D 103平方微米 I平方微米
             BigDecimal vesselAreaRate = getProportion(vesselAreaD, accurateAreaDecimal);
-            map.put("血管面积占比", createNameIndicator("Vessel area", DecimalUtils.percentScale3(vesselAreaRate), PERCENTAGE, "107003,107111"));
+            map.put("血管面积占比", createNameIndicator("Vessel area", vesselAreaRate, PERCENTAGE, "107003,107111"));
 
             //5 血管内红细胞面积占比	%	Intravascular erythrocyte area%	5=E/I 	运算前注意统一单位
             map.put("血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", getProportion(intravascularErythrocyteArea, accurateAreaDecimal), PERCENTAGE, "107003,107004,107111"));
