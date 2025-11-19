@@ -70,7 +70,7 @@ public class BoneWithBoneMarrowTibiaStrategyImpl extends AbstractCustomParserStr
         indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("红细胞面积", areaUtils.convertToSquareMicrometer(organAreaE.toString()), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "151004"));
         indicatorResultsMap.put("脂肪细胞面积", new IndicatorAddIn("脂肪细胞面积", areaUtils.convertToSquareMicrometer(organAreaF.toString()), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "151012"));
 
-        indicatorResultsMap.put("生长骨骺板面积", new IndicatorAddIn("Physis area", areaUtils.convertToSquareMicrometer(organArea.toString()), SQ_MM_PIECE, CommonConstant.NUMBER_1, "151022"));
+        indicatorResultsMap.put("生长骨骺板面积", new IndicatorAddIn("Physis area", areaUtils.convertToSquareMicrometer(organArea.toString()), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "151010"));
         indicatorResultsMap.put("巨核系细胞密度", new IndicatorAddIn("Density of megakaryocyte", densityOfMegakaryocyte.toString(), SQ_MM_PIECE, CommonConstant.NUMBER_0, "151022"));
         indicatorResultsMap.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area", erythrocyteArea.toString(), PERCENTAGE, CommonConstant.NUMBER_0, "151004"));
         indicatorResultsMap.put("脂肪细胞面积占比", new IndicatorAddIn("Adipocyte area", adipocyteArea.toString(), PERCENTAGE, CommonConstant.NUMBER_0, "151012"));

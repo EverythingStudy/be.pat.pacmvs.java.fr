@@ -170,7 +170,7 @@ public class TestisParserStrategyImpl extends AbstractCustomParserStrategy {
         //12 间质面积占比	% 12=(J-B)/J
         resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area%", getProportion(organAreaJ.subtract(organAreaB), organAreaJ), PERCENTAGE, areaUtils.getStructureIds("12E111", "12E0FA")));
         //13 间质细胞核密度 个/mm2	13=H/J
-        resultsMap.put("间质细胞核密度", createNameIndicator("Nucleus density of leydig cells", bigDecimalDivideCheck(BigDecimal.valueOf(areaCountH), organAreaJ), SQ_MM_PIECE, areaUtils.getStructureIds("12E0FA", "12E0FA", "12E111")));
+        resultsMap.put("间质细胞核密度", createNameIndicator("Nucleus density of leydig cells", bigDecimalDivideCheck(BigDecimal.valueOf(areaCountH), organAreaJ), SQ_MM_PIECE, areaUtils.getStructureIds("12E0FE", "12E111")));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }
 
