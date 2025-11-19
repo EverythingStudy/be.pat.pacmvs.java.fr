@@ -163,11 +163,11 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy imp
         indicatorResultsMap.put("红细胞面积", createNameIndicator("Erythrocyte area", organAreaQ, SQ_MM, "105004"));
         Annotation annotationBy = new Annotation();
         //F
-        annotationBy.setCountName("胰岛细胞核数量（单个）");
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "105077", "105078", annotationBy);
+//        annotationBy.setCountName("胰岛细胞核数量（单个）");
+//        commonJsonParser.putAnnotationDynamicData(jsonTask, "105077", "105078", annotationBy);
         //K
-        annotationBy.setCountName("导管细胞核数量（单个）");
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "10506F", "10507B", annotationBy);
+//        annotationBy.setCountName("导管细胞核数量（单个）");
+//        commonJsonParser.putAnnotationDynamicData(jsonTask, "10506F", "10507B", annotationBy);
         //D
         annotationBy.setCountName(null);
         annotationBy.setAreaName("胰岛面积（单个）");
