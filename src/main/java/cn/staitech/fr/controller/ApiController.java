@@ -8,6 +8,7 @@ import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +31,8 @@ public class ApiController {
 
     @Resource
     private ParkDataProducer parkDataProducer;
+    @Value("${queues.delayTime:60*60*1000}")
+    private Long delayTime;
 
     @ApiOperation(value = "py任务结果")
     @PostMapping("/pyResult")
@@ -48,8 +51,9 @@ public class ApiController {
     @ApiOperation(value = "算法脏器识别任务")
     @PostMapping("/pyTask")
     public R<String> pyTask(@RequestBody Map params) {
-        log.info("开始执行");
-        parkDataProducer.sendDelayedMessage(JSON.toJSONString(params), 60 * 60 * 1000);
+        String retData = JSONUtil.toJsonStr(params);
+        log.info("开始执行:{} ", retData);
+        parkDataProducer.sendDelayedMessage(JSON.toJSONString(params), delayTime);
         log.info("结束执行");
         return R.ok("", "成功");
     }

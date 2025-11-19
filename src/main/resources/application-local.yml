@@ -215,9 +215,10 @@ organ-structures:
       - structure-id: 15E111
 
 
-#queues:
-#  algoMsg: test
-#  algoMsgRetry: algo.message.retry.queue
+queues:
+  algoMsg: test
+  algoMsgRetry: algo.message.retry.queue
+  delayTime: 60*60*1000
 dynamic:
   corePoolSize: 2
   maxPoolSize: 2
