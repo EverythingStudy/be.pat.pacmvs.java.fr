@@ -76,7 +76,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         // D皮肤-毛囊数量 个
         Integer areaCount = commonJsonParser.getOrganAreaCount(jsonTask, "17A098");
         // E皮肤-皮脂腺面积 103 μm2
-        BigDecimal organAreaE = commonJsonParser.getOrganAreaMicron(jsonTask, "17A099");
+        BigDecimal organAreaE = commonJsonParser.getOrganArea(jsonTask, "17A099").getStructureAreaNum();
         // F皮肤-皮脂腺数量 个
         Integer organAreaCount1 = commonJsonParser.getOrganAreaCount(jsonTask, "17A099");
         // H皮肤-毛囊面积（全片） mm2
@@ -105,7 +105,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         annotationC.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "17A098", annotationC, 1);
         map.put("毛囊数量", createIndicator(areaCount.toString(), PIECE, "17A098"));
-        map.put("皮脂腺面积", createIndicator(DecimalUtils.setScale3(organAreaE), SQ_UM_THOUSAND, "17A099"));
+        map.put("皮脂腺面积", createIndicator(areaUtils.micrometerToSquareMicrometer(organAreaE.toString()), SQ_UM_THOUSAND, "17A099"));
         // F 皮脂腺数量	F	个	无
         map.put("皮脂腺数量", createIndicator(organAreaCount1.toString(), PIECE, "17A099"));
         // H 毛囊面积（全片）	H	平方毫米	无
@@ -113,9 +113,9 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         // L 乳腺腺泡和导管面积（全片）        mm2        12306C        所有轮廓面积之和
         map.put("乳腺腺泡和导管面积（全片）", createIndicator(organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "17A06C"));
         //M 乳腺细胞核数量（单个）个
-        Annotation annotationM = new Annotation();
-        annotationM.setCountName("乳腺细胞核数量（单个）");
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "17A06C", "17A0C7", annotationM);
+//        Annotation annotationM = new Annotation();
+//        annotationM.setCountName("乳腺细胞核数量（单个）");
+//        commonJsonParser.putAnnotationDynamicData(jsonTask, "17A06C", "17A0C7", annotationM);
         map.put("乳腺结缔组织面积", createIndicator(organNArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "17A03F"));
         //O 乳腺腺泡和导管面积（单个）
         Annotation annotationO = new Annotation();
@@ -133,7 +133,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
             // 5 皮脂腺密度	个/mm2	Density of Sebaceous glands 	5=F/J
             map.put("皮脂腺密度", createNameIndicator("Sebaceous gland density", bigDecimalDivideCheck(new BigDecimal(organAreaCount1), organAreaJ), SQ_MM_PIECE, "17A099,17A0C3"));
             // 6 皮脂腺面积占比 %	Sebaceous glands area%	6=E/J	运算前注意统一单位
-            map.put("皮脂腺面积占比", createNameIndicator("Sebaceous glands area%", getProportion(organAreaE, new BigDecimal(areaUtils.convertToSquareMicrometer(organAreaJ.toString()))), PERCENTAGE, "121099,17A0C3"));
+            map.put("皮脂腺面积占比", createNameIndicator("Sebaceous glands area%", getProportion(organAreaE, organAreaJ), PERCENTAGE, "17A099,17A0C3"));
             // 7 毛囊面积占比	%	Hair follicles area%	7=H/J
             map.put("毛囊面积占比", createNameIndicator("Hair follicles area%", getProportion(organAreaH, organAreaJ), PERCENTAGE, "17A098,17A0C3"));
         }
