@@ -61,9 +61,9 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
             // F 血管面积
             BigDecimal organAreaF = getOrganArea(jsonTask, "11E003").getStructureAreaNum();
             // G 血管外红细胞
-            BigDecimal organAreaG = getInsideOrOutside(jsonTask, "11E003", "00E004", false).getStructureAreaNum();
+            BigDecimal organAreaG = getInsideOrOutside(jsonTask, "11E003", "11E004", false).getStructureAreaNum();
             // H 血管内红细胞
-            BigDecimal organAreaH = getInsideOrOutside(jsonTask, "11E003", "00E004", true).getStructureAreaNum();
+            BigDecimal organAreaH = getInsideOrOutside(jsonTask, "11E003", "11E004", true).getStructureAreaNum();
 
             // 算法输出指标
             resultsMap.put("膀胱腔面积", createIndicator(organAreaA.setScale(3, RoundingMode.UP), SQ_MM, "11E034"));
@@ -72,8 +72,8 @@ public class UrinaryBladderParserStrategyImpl extends AbstractCustomParserStrate
             resultsMap.put("黏膜固有层+黏膜下层面积", createIndicator(organAreaD.setScale(3, RoundingMode.UP), SQ_MM, "11E037"));
             resultsMap.put("黏膜上皮细胞核数量", createIndicator(areaCountE, PIECE, "11E036"));
             resultsMap.put("血管面积", createIndicator(organAreaF.setScale(3, RoundingMode.UP), SQ_MM, "11E003"));
-            resultsMap.put("血管外红细胞面积", createIndicator(organAreaG.setScale(3, RoundingMode.UP), SQ_MM, "11E003,00E004"));
-            resultsMap.put("血管内红细胞面积", createIndicator(organAreaH.setScale(3, RoundingMode.UP), SQ_MM, "11E003,00E004"));
+            resultsMap.put("血管外红细胞面积", createIndicator(organAreaG.setScale(3, RoundingMode.UP), SQ_MM, "11E003,11E004"));
+            resultsMap.put("血管内红细胞面积", createIndicator(organAreaH.setScale(3, RoundingMode.UP), SQ_MM, "11E003,11E004"));
 
             // 计算指标
 
