@@ -74,7 +74,7 @@ public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy im
         //A 食管腔面积 mm2
         BigDecimal area = areaUtils.getOrganArea(jsonTask, "10F120");
         //B 角质层面积 103 μm2
-        BigDecimal organArea = commonJsonParser.getOrganAreaMicron(jsonTask, "12F12E");
+        BigDecimal organArea = commonJsonParser.getOrganAreaMicron(jsonTask, "10F12E");
         //C 颗粒层+棘层+基底层面积
         BigDecimal organArea1 = commonJsonParser.getOrganAreaMicron(jsonTask, "10F12F");
         //D 黏膜固有层+黏膜肌层+黏膜下层面积
@@ -83,7 +83,7 @@ public class EsophagusParserStrategyImpl extends AbstractCustomParserStrategy im
         BigDecimal organArea3 = commonJsonParser.getOrganArea(jsonTask, "10F00C").getStructureAreaNum();
 
         indicatorResultsMap.put("食管腔面积", new IndicatorAddIn("Esophageal cavity area", area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "10F120"));
-        indicatorResultsMap.put("角质层面积", new IndicatorAddIn("Area of stratum corneum", organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "10F13B"));
+        indicatorResultsMap.put("角质层面积", new IndicatorAddIn("Area of stratum corneum", organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "10F12E"));
         indicatorResultsMap.put("颗粒层+棘层+基底层面积", new IndicatorAddIn("Granular layer+spinous layer+basal layer", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "10F12F"));
         indicatorResultsMap.put("黏膜固有层+黏膜肌层+黏膜下层面积", new IndicatorAddIn("Mucosal lamina propria+mucosal muscle layer+submucosal submucosal area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "10F13B"));
         indicatorResultsMap.put("肌层面积", new IndicatorAddIn("Muscle layer area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "10F00C"));
