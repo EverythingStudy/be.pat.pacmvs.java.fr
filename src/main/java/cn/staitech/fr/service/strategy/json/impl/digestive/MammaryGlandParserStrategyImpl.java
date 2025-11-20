@@ -105,7 +105,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         annotationC.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "17A098", annotationC, 1);
         map.put("毛囊数量", createIndicator(areaCount.toString(), PIECE, "17A098"));
-        map.put("皮脂腺面积", createIndicator(areaUtils.micrometerToSquareMicrometer(organAreaE.toString()), SQ_UM_THOUSAND, "17A099"));
+        map.put("皮脂腺面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaE.toString()), SQ_UM_THOUSAND, "17A099"));
         // F 皮脂腺数量	F	个	无
         map.put("皮脂腺数量", createIndicator(organAreaCount1.toString(), PIECE, "17A099"));
         // H 毛囊面积（全片）	H	平方毫米	无
@@ -119,7 +119,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("乳腺结缔组织面积", createIndicator(organNArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "17A03F"));
         //O 乳腺腺泡和导管面积（单个）
         Annotation annotationO = new Annotation();
-        annotationO.setCountName("乳腺腺泡和导管面积（单个）");
+        annotationO.setAreaName("乳腺腺泡和导管面积（单个）");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "17A06C", annotationO, 1);
         //map.put("乳腺细胞核数量（全片）", createIndicator(areaPCount.toString(), PIECE, "17A06C,17A0C7"));
 
