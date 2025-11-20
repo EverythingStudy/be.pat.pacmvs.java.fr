@@ -1001,7 +1001,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         Integer aiStatusFine = singleSlide.getAiStatusFine();
         if (Constants.FORECAST_STATUS_PROCESS.equals(forecastStatus) || aiStatusFine == Constants.AI_STATUS_FINE_PROCESS) {
             return 5;
-        } else if (Constants.FORECAST_STATUS_SUCCESS.equals(forecastStatus) || aiStatusFine == Constants.AI_STATUS_FINE_SUCCESS) {
+        } else if (Constants.FORECAST_STATUS_SUCCESS.equals(forecastStatus)) {
             return 6;
         } else if (Constants.FORECAST_STATUS_FAIL.equals(forecastStatus) || aiStatusFine == Constants.AI_STATUS_FINE_FAIL) {
             return 7;
