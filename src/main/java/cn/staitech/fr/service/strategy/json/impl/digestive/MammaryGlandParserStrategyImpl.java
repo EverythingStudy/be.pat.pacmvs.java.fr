@@ -105,7 +105,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         annotationC.setAreaUnit(SQ_UM_THOUSAND);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "17A098", annotationC, 1);
         map.put("毛囊数量", createIndicator(areaCount.toString(), PIECE, "17A098"));
-        map.put("皮脂腺面积", createIndicator(areaUtils.micrometerToSquareMicrometer(organAreaE.toString()), SQ_UM_THOUSAND, "17A099"));
+        map.put("皮脂腺面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaE.toString()), SQ_UM_THOUSAND, "17A099"));
         // F 皮脂腺数量	F	个	无
         map.put("皮脂腺数量", createIndicator(organAreaCount1.toString(), PIECE, "17A099"));
         // H 毛囊面积（全片）	H	平方毫米	无
