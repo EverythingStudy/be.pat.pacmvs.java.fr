@@ -141,7 +141,7 @@ organ-structures:
     1B: #  肾脏
       - structure-id: 11B02D
     1E: #  膀胱
-      - structure-id: 11E034,11E035,11E037,11E036,11E003,10E004
+      - structure-id: 11E034,11E035,11E037,11E036,11E003,11E004
     2B: #  凝固腺
       - structure-id: 12B074,12B0E9,12B0ED
     2C: #  前列腺
@@ -181,7 +181,7 @@ organ-structures:
     7D: #  小脑与脑干
       - structure-id: 17D003,17D004,17D0A5
     44: # 胸腺
-      - structure-id: 14403F,145004
+      - structure-id: 14403F,144004
     "05": # 胰腺
       - structure-id: 105075,105076,105077,105027,10506F,105003,105004
     "06": #垂体

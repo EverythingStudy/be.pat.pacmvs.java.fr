@@ -260,7 +260,7 @@ public class JsonTaskParserService {
         //AI识别每个脏器对应的结构JSON文件
         List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
         if (CollectionUtils.isNotEmpty(fileList)) {
-            List<String> structureIdSet1 = fileList.stream().map(e -> e.getStructureId()).collect(Collectors.toList());
+            List<String> structureIdSet1 = fileList.stream().map(JsonFile::getStructureId).collect(Collectors.toList());
             return isOrganRecognitionComplete(category.getOrganTagCode(), structureIdSet1);
         }
         return Boolean.FALSE;
