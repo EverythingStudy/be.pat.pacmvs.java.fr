@@ -119,7 +119,7 @@ public class MammaryGlandParserStrategyImpl extends AbstractCustomParserStrategy
         map.put("乳腺结缔组织面积", createIndicator(organNArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "17A03F"));
         //O 乳腺腺泡和导管面积（单个）
         Annotation annotationO = new Annotation();
-        annotationO.setCountName("乳腺腺泡和导管面积（单个）");
+        annotationO.setAreaName("乳腺腺泡和导管面积（单个）");
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "17A06C", annotationO, 1);
         //map.put("乳腺细胞核数量（全片）", createIndicator(areaPCount.toString(), PIECE, "17A06C,17A0C7"));
 
