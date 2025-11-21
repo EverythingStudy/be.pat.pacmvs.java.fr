@@ -72,11 +72,11 @@ public class OvariesOviductParserStrategyImpl extends AbstractCustomParserStrate
         if (bigDecimalC.compareTo(BigDecimal.ZERO) != 0) {
             indicatorResultsMap.put("黄体面积（全片）", createIndicator(String.valueOf(bigDecimalC.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "17C0CA"));
         }
-        indicatorResultsMap.put("卵巢黄体数量", createIndicator(String.valueOf(mucosaCountC), PIECE, "17C0CB"));
+        indicatorResultsMap.put("卵巢黄体数量", createIndicator(String.valueOf(mucosaCountC), PIECE, "17C0CA"));
         indicatorResultsMap.put("卵巢卵泡面积（全片）", createIndicator(String.valueOf(organAreaD.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "17C0CB"));
-        indicatorResultsMap.put("卵巢血管面积", createIndicator(areaUtils.convertToMicrometer(organAreaE.toString()), SQ_MM, "17C003"));
-        indicatorResultsMap.put("卵巢血管外红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaF.toString()), SQ_MM, "17C003,17C004"));
-        indicatorResultsMap.put("卵巢血管内红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaG.toString()), SQ_MM, "17C003,17C004"));
+        indicatorResultsMap.put("卵巢血管面积", createIndicator(areaUtils.convertToMicrometer(organAreaE.toString()), SQ_UM, "17C003"));
+        indicatorResultsMap.put("卵巢血管外红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaF.toString()), SQ_UM, "17C003,17C004"));
+        indicatorResultsMap.put("卵巢血管内红细胞面积", createIndicator(areaUtils.convertToMicrometer(organAreaG.toString()), SQ_UM, "17C003,17C004"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 
