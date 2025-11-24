@@ -467,7 +467,7 @@
             </foreach>
             OR
             CASE WHEN c.forecast_status = '3' OR c.ai_status_fine = 3 THEN 5
-            WHEN c.forecast_status = '1' OR c.ai_status_fine = 1 THEN 6
+            WHEN  c.ai_status_fine = 1 THEN 6
             WHEN c.forecast_status = '2' OR c.ai_status_fine = 2 THEN 7
             WHEN c.single_id IS NOT NULL THEN 4
             ELSE NULL END IN
@@ -574,7 +574,7 @@
             </foreach>
             OR
             CASE WHEN c.forecast_status = '3' OR c.ai_status_fine = 3 THEN 5
-            WHEN c.forecast_status = '1' OR c.ai_status_fine = 1 THEN 6
+            WHEN c.forecast_status = '1'  THEN 6
             WHEN c.forecast_status = '2' OR c.ai_status_fine = 2 THEN 7
             WHEN c.single_id IS NOT NULL THEN 4
             ELSE NULL END IN
