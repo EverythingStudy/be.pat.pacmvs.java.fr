@@ -133,20 +133,20 @@ public class PancreasParserStrategyImpl extends AbstractCustomParserStrategy imp
         //6 导管面积占比 % 6=J/O
         indicatorResultsMap.put("导管面积占比", createNameIndicator("Vascular area%", getProportion(organArea3, O).toString(), PERCENTAGE, "10506F,105111"));
         //7 导管细胞核密度（单个） 个/103 μm2 7=K/I
-        annotationList = getStructureContourList(jsonTask, "10506F");
-        if (CollectionUtils.isNotEmpty(annotationList)) {
-            dataList.clear();
-            for (Annotation annotation : annotationList) {
-                String contour = annotation.getContour();
-                //K 导管细胞核数量（单个）个
-                Annotation temp = getContourInsideOrOutside(jsonTask, contour, "10507B", true);
-                if (annotation.getStructureAreaNum().compareTo(BigDecimal.ZERO) > 0 && temp.getCount() != 0) {
-                    //7 导管细胞核密度（单个） 个/103 μm2 7=K/I
-                    dataList.add(BigDecimal.valueOf(temp.getCount()).divide(annotation.getStructureAreaNum().multiply(BigDecimal.valueOf(1000)), 3, RoundingMode.HALF_UP));
-                }
-            }
-        }
-        indicatorResultsMap.put("导管细胞核密度（单个）", new IndicatorAddIn("Nucleus density of duct（per）", MathUtils.getConfidenceInterval(dataList), SQ_UM_PICE, CommonConstant.NUMBER_0, "10506F,10507B"));
+//        annotationList = getStructureContourList(jsonTask, "10506F");
+//        if (CollectionUtils.isNotEmpty(annotationList)) {
+//            dataList.clear();
+//            for (Annotation annotation : annotationList) {
+//                String contour = annotation.getContour();
+//                //K 导管细胞核数量（单个）个
+//                Annotation temp = getContourInsideOrOutside(jsonTask, contour, "10507B", true);
+//                if (annotation.getStructureAreaNum().compareTo(BigDecimal.ZERO) > 0 && temp.getCount() != 0) {
+//                    //7 导管细胞核密度（单个） 个/103 μm2 7=K/I
+//                    dataList.add(BigDecimal.valueOf(temp.getCount()).divide(annotation.getStructureAreaNum().multiply(BigDecimal.valueOf(1000)), 3, RoundingMode.HALF_UP));
+//                }
+//            }
+//        }
+        //indicatorResultsMap.put("导管细胞核密度（单个）", new IndicatorAddIn("Nucleus density of duct（per）", MathUtils.getConfidenceInterval(dataList), SQ_UM_PICE, CommonConstant.NUMBER_0, "10506F,10507B"));
         //8 血管内红细胞面积占比 % 8=M/O
         indicatorResultsMap.put("血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", getProportion(annotationInner.getStructureAreaNum(), O).toString(), PERCENTAGE, "105003,105004,105111"));
         //9 血管外红细胞面积占比 % 9=N/O

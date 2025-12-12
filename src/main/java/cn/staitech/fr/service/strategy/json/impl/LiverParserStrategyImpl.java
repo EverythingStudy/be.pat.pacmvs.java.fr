@@ -161,7 +161,7 @@ public class LiverParserStrategyImpl implements ParserStrategy {
         annotationBy.setAreaUnit(CommonConstant.SQUARE_MICROMETER);
         annotationBy.setCountName("胆管数量（单个门管区）");
         annotationBy.setCountUnit("个");
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "112145", "11214A", annotationBy, 1);
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "112145", "11214A", annotationBy, 1,true);
         // E
 //        map.put("胆管数量（单个）", new IndicatorAddIn(areaUtils.getStructureIds("112145", "11214A")));
         // F

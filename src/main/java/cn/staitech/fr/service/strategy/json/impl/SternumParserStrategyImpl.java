@@ -93,7 +93,7 @@ public class SternumParserStrategyImpl extends AbstractCustomParserStrategy impl
         //4 巨核系细胞密度  个/mm2	4=C/F
         BigDecimal densityOfMegakaryocyte = BigDecimal.ZERO;
         if (bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
-            densityOfMegakaryocyte = commonJsonParser.getProportion(new BigDecimal(mucosaCountC), bigDecimalF);
+            densityOfMegakaryocyte = bigDecimalDivideCheck(new BigDecimal(mucosaCountC), bigDecimalF);
         }
         indicatorResultsMap.put("巨核系细胞数量", new IndicatorAddIn("", String.valueOf(mucosaCountC), "个", CommonConstant.NUMBER_1, "14E022"));
         indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", String.valueOf(areaUtils.convertToSquareMicrometer(bigDecimalD.toString())), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "14E004"));

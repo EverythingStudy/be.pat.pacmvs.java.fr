@@ -87,8 +87,8 @@ public class ProstateGlandParserStrategyImpl extends AbstractCustomParserStrateg
             Annotation contourInsideOrOutside = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "12C0E9", true);
             //D/A
             BigDecimal x = contourInsideOrOutside.getStructureAreaNum().divide(structureAreaNum, 3, RoundingMode.HALF_UP);
-            epithelialList.add(new BigDecimal(1).subtract(x));
-            lumenList.add(x);
+            epithelialList.add(new BigDecimal(1).subtract(x).multiply(new BigDecimal(100)));
+            lumenList.add(x.multiply(new BigDecimal(100)));
         }
         indicatorResultsMap.put("腺上皮面积占比（单个）", createNameIndicator("Acinar epithelial area% (per)", MathUtils.getConfidenceInterval(epithelialList), PERCENTAGE, areaUtils.getStructureIds("12D074", "12C0E9")));
         indicatorResultsMap.put("腺腔面积占比（单个）", createNameIndicator("Acinar lumen area% (per)", MathUtils.getConfidenceInterval(lumenList), PERCENTAGE, areaUtils.getStructureIds("12D074", "12C0E9")));
@@ -96,7 +96,7 @@ public class ProstateGlandParserStrategyImpl extends AbstractCustomParserStrateg
         Annotation annotation1 = new Annotation();
         annotation1.setAreaName("腺泡面积（单个）");
         annotation1.setAreaUnit(SQ_UM_THOUSAND);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12C06D", annotation1, 3);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12C06D", annotation1, 1);
         Annotation annotation2 = new Annotation();
         annotation2.setPerimeterName("腺泡周长（单个）");
         annotation2.setPerimeterUnit(MM);
@@ -104,7 +104,7 @@ public class ProstateGlandParserStrategyImpl extends AbstractCustomParserStrateg
         Annotation annotation3 = new Annotation();
         annotation3.setAreaName("腺腔面积（单个）");
         annotation3.setAreaUnit(SQ_UM_THOUSAND);
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "12C0E9", "12C06D", annotation3, 3);
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "12C0E9","12C06D", annotation3, 1, true);
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }

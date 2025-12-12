@@ -64,7 +64,7 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
         //J 室管膜细胞核数量（全片）	D	个	单个脊髓内数据相加输出
         //Integer mucosaCountD = commonJsonParser.getOrganAreaCount(jsonTask, "1390B5");
         //K	红细胞面积（全片）	mm2
-        BigDecimal bigDecimalE = commonJsonParser.getOrganArea(jsonTask, "139004").getStructureAreaNum();
+        BigDecimal bigDecimalK = commonJsonParser.getOrganArea(jsonTask, "139004").getStructureAreaNum();
         //L	组织轮廓面积（全片）	mm2
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
         BigDecimal bigDSlideArea = new BigDecimal(slideArea);
@@ -75,12 +75,12 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("白质面积（全片 ）", new IndicatorAddIn("", bigDecimalH.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "1", "1390B2"));
         indicatorResultsMap.put("中央管面积（全片 ）", new IndicatorAddIn("", areaUtils.convertToSquareMicrometer(bigDecimalI.toString()), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "1390B4"));
 //		indicatorResultsMap.put("室管膜细胞核数量（全片 ）", new IndicatorAddIn("", mucosaCountD.toString(), PIECE, "1",areaUtils.getStructureIds("1390B4","1390B5")));
-        indicatorResultsMap.put("红细胞面积（全片 ）", new IndicatorAddIn("", bigDecimalE.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "139004"));
+        indicatorResultsMap.put("红细胞面积（全片 ）", new IndicatorAddIn("", bigDecimalK.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "139004"));
 
         Annotation annotationC = new Annotation();
         annotationC.setAreaName("灰质面积（单个）");
         annotationC.setAreaUnit(CommonConstant.SQUARE_MILLIMETRE);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "1390B3", annotationC,3);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "1390B3", annotationC, 3);
         annotationC.setAreaName("白质面积（单个）");
         annotationC.setAreaUnit(CommonConstant.SQUARE_MILLIMETRE);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "1390B2", annotationC, 3);
@@ -141,7 +141,11 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
             mesenchymeAreaRate = getMultiply100(mesenchymeAreaRate);
             indicatorResultsMap.put("中央管面积占比（全片）", new IndicatorAddIn("Central canal area（all）", String.valueOf(mesenchymeAreaRate), PERCENTAGE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("1390B3", "1390B2", "1390B4")));
         }
-
+        if (bigDecimalK.compareTo(BigDecimal.ZERO) != 0 && bigDecimalG_H.compareTo(BigDecimal.ZERO) != 0) {
+            BigDecimal mesenchymeAreaRate = bigDecimalK.divide(bigDecimalG_H, 7, BigDecimal.ROUND_HALF_UP);
+            mesenchymeAreaRate = getMultiply100(mesenchymeAreaRate);
+            indicatorResultsMap.put("红细胞面积占比（全片）", new IndicatorAddIn("White matter area（all）", String.valueOf(mesenchymeAreaRate), PERCENTAGE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("139004", "1390B3", "1390B2")));
+        }
         //	脊髓面积	6	平方毫米	Spinal cord area（all）	12=G+H
         if (bigDecimalG_H.compareTo(BigDecimal.ZERO) != 0) {
             indicatorResultsMap.put("脊髓面积（全片）", new IndicatorAddIn("Spinal cord area（all）", String.valueOf(bigDecimalG_H.setScale(3, RoundingMode.HALF_UP)), SQ_MM, CommonConstant.NUMBER_0, areaUtils.getStructureIds("1390B3", "1390B2")));
