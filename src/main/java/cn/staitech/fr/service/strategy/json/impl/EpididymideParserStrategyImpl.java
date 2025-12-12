@@ -82,7 +82,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         annotationBy1.setAreaName("输出小管/附睾管管腔面积（单个）");
         annotationBy1.setAreaUnit(SQ_UM_THOUSAND);
         Date startTime3 = new Date();
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "12F0F5", "12F0F4", annotationBy1);
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "12F0F5", "12F0F4", annotationBy1, 1,true);
         log.info("jsonTask id:{} singleSlide id:{} 输出小管/附睾管黏膜上皮周长（单个）endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime1, new Date(), DateUnit.SECOND));
         //F 精子面积（单个）103 μm2
         Annotation annotationBy2 = new Annotation();
@@ -100,7 +100,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         annotationBy.setAreaName("输出小管/附睾管黏膜上皮面积（单个）");
         annotationBy.setAreaUnit(SQ_UM_THOUSAND);
         Date startTime = new Date();
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12F0F5", annotationBy, 1);
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "12F0F4","12F0F5", annotationBy, 1,false);
         log.info("jsonTask id:{} singleSlide id:{} 输出小管/附睾管黏膜上皮面积（单个） endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime, new Date(), DateUnit.SECOND));
         Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
         // 算法输出指标
@@ -209,7 +209,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         //2 输出小管和附睾管面积占比（全片） % 2=B/J
         resultsMap.put("输出小管和附睾管面积占比（全片）", createNameIndicator("Efferent ducts and epididymal ducts area%（all）", getProportion(organAreaB, organAreaJ), PERCENTAGE, areaUtils.getStructureIds("12F0F5", "12F111")));
         //3 间质面积占比 % 1-B/J
-        resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area%", one.subtract(bigDecimalDivideCheck(organAreaB, organAreaJ)), PERCENTAGE, areaUtils.getStructureIds("12F0F5", "12F111")));
+        resultsMap.put("间质面积占比", createNameIndicator("Mesenchyme area%", one.subtract(getProportion(organAreaB, organAreaJ)), PERCENTAGE, areaUtils.getStructureIds("12F0F5", "12F111")));
         //4 黏膜上皮面积占比 % 4=1-D/A
         resultsMap.put("黏膜上皮面积占比（单个）", createNameIndicator("Mucosal epithelium area% (per)", mucosalAreaPer, PERCENTAGE, areaUtils.getStructureIds("12F0F5", "12F0F4")));
         //5 精子面积占比 % 5=F/D

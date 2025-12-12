@@ -241,8 +241,8 @@ public class MathUtils {
             return "0-0";
         }
         if (count < 40) {
-            BigDecimal firstNumber = (BigDecimal) dataList.get(0);
-            BigDecimal lastNumber = (BigDecimal) dataList.get(dataList.size() - 1);
+            BigDecimal firstNumber = (BigDecimal) dataList.get(1);
+            BigDecimal lastNumber = (BigDecimal) dataList.get(dataList.size() - 2);
             if (getCompTO(firstNumber, lastNumber) <= 0) {
                 return firstNumber + "-" + lastNumber;
             } else {

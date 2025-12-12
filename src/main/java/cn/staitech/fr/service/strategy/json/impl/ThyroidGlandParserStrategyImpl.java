@@ -133,11 +133,11 @@ public class ThyroidGlandParserStrategyImpl extends AbstractCustomParserStrategy
         Annotation annotationByB = new Annotation();
         annotationByB.setAreaName("滤泡腔面积（单个）");
         annotationByB.setAreaUnit(SQ_UM_THOUSAND);
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "107088", "10708A", annotationByB, 1);
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "107088", "10708A", annotationByB, 1,true);
         Annotation annotationC = new Annotation();
         annotationC.setAreaName("滤泡上皮面积占比（单个）");
         annotationC.setAreaUnit(SQ_UM_THOUSAND);
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "107088", "10708A", annotationC, 1);
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "107088", "10708A", annotationC, 1,true);
         // H 滤泡上皮细胞核数量（单个）
         Annotation annotationByH = new Annotation();
         annotationByH.setCountName("滤泡上皮细胞核数量（单个）");
