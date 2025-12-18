@@ -77,22 +77,6 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
 //		indicatorResultsMap.put("室管膜细胞核数量（全片 ）", new IndicatorAddIn("", mucosaCountD.toString(), PIECE, "1",areaUtils.getStructureIds("1390B4","1390B5")));
         indicatorResultsMap.put("红细胞面积（全片 ）", new IndicatorAddIn("", bigDecimalK.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "139004"));
 
-        Annotation annotationC = new Annotation();
-        annotationC.setAreaName("灰质面积（单个）");
-        annotationC.setAreaUnit(CommonConstant.SQUARE_MILLIMETRE);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "1390B3", annotationC, 3);
-        annotationC.setAreaName("白质面积（单个）");
-        annotationC.setAreaUnit(CommonConstant.SQUARE_MILLIMETRE);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "1390B2", annotationC, 3);
-        annotationC.setAreaName("中央管面积（单个）");
-        annotationC.setAreaUnit(CommonConstant.SQUARE_MICROMETER);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "1390B4", annotationC, 1);
-//        annotationC.setAreaName("室管膜细胞核数量（单个）");
-//        annotationC.setAreaUnit(CommonConstant.PIECE);
-//        commonJsonParser.putAnnotationDynamicData(jsonTask, "1390B4", "1390B5", annotationC, 1);
-        annotationC.setAreaName("红细胞面积（单个）");
-        annotationC.setAreaUnit(CommonConstant.SQUARE_MILLIMETRE);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "139004", annotationC, 3);
 
         BigDecimal bigDecimalG_H = BigDecimal.ZERO;
         bigDecimalG_H = bigDecimalG.add(bigDecimalH);
@@ -111,9 +95,9 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationBy.setAreaUnit(PERCENTAGE);
         putAnnotationDynamicData(jsonTask, "1390B4", "1390B2", "1390B3", annotationBy);
         //4 室管膜细胞核数量占比（单个） 		%  4=D/C
-        annotationBy.setAreaName("室管膜细胞核密度（单个）");
-        annotationBy.setAreaUnit(SQ_UM_PICE);
-        putAnnotationDynamicData(jsonTask, "1390B4", "1390B5", annotationBy);
+//        annotationBy.setAreaName("室管膜细胞核密度（单个）");
+//        annotationBy.setAreaUnit(SQ_UM_PICE);
+//        putAnnotationDynamicData(jsonTask, "1390B4", "1390B5", annotationBy);
         //5 红细胞面积占比（单个） 	%	5=E/(A+B)
         annotationBy.setAreaName("红细胞面积占比（单个）");
         annotationBy.setAreaUnit(PERCENTAGE);
@@ -122,6 +106,23 @@ public class SpinalCordParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationBy.setAreaName("脊髓面积（单个）");
         annotationBy.setAreaUnit(SQ_MM);
         putAnnotationDynamicData(jsonTask, "1390B2", "1390B3", annotationBy);
+
+        Annotation annotationC = new Annotation();
+        annotationC.setAreaName("灰质面积（单个）");
+        annotationC.setAreaUnit(CommonConstant.SQUARE_MILLIMETRE);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "1390B3", annotationC, 3);
+        annotationC.setAreaName("白质面积（单个）");
+        annotationC.setAreaUnit(CommonConstant.SQUARE_MILLIMETRE);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "1390B2", annotationC, 3);
+        annotationC.setAreaName("中央管面积（单个）");
+        annotationC.setAreaUnit(CommonConstant.SQUARE_MICROMETER);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "1390B4", annotationC, 1);
+//        annotationC.setAreaName("室管膜细胞核数量（单个）");
+//        annotationC.setAreaUnit(CommonConstant.PIECE);
+//        commonJsonParser.putAnnotationDynamicData(jsonTask, "1390B4", "1390B5", annotationC, 1);
+        annotationC.setAreaName("红细胞面积（单个）");
+        annotationC.setAreaUnit(CommonConstant.SQUARE_MILLIMETRE);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "139004", annotationC, 3);
 
         //灰质面积占比（全片）7=G/(G+H)   Gray matter area（all）
         if (bigDecimalG.compareTo(BigDecimal.ZERO) != 0 && bigDecimalG_H.compareTo(BigDecimal.ZERO) != 0) {
