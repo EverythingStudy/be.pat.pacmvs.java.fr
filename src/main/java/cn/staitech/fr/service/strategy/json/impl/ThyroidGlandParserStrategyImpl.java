@@ -5,13 +5,9 @@ import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.DynamicData;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
-import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.OrganTagMapper;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SpecialAnnotationRelMapper;
 import cn.staitech.fr.service.AiForecastService;
-import cn.staitech.fr.service.ImageService;
-import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
 import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
@@ -138,7 +134,7 @@ public class ThyroidGlandParserStrategyImpl extends AbstractCustomParserStrategy
         Annotation annotationC = new Annotation();
         annotationC.setAreaName("滤泡上皮面积占比（单个）");
         annotationC.setAreaUnit(PERCENTAGE);
-        putAnnotationDynamicData(jsonTask, "107088", "10708A", annotationC, true);
+        putAnnotationDynamicData(jsonTask, annotationC);
         // H 滤泡上皮细胞核数量（单个）
         Annotation annotationByH = new Annotation();
         annotationByH.setCountName("滤泡上皮细胞核数量（单个）");
@@ -193,9 +189,9 @@ public class ThyroidGlandParserStrategyImpl extends AbstractCustomParserStrategy
         return "Thyroid_gland";
     }
 
-    private void putAnnotationDynamicData(JsonTask jsonTask, String structureId, String structureIds, Annotation annotation, Boolean isInside) {
+    private void putAnnotationDynamicData(JsonTask jsonTask, Annotation annotation) {
         Long sequenceNumber = commonJsonParser.getSequenceNumber(jsonTask.getSpecialId());
-        List<Annotation> annotationList = getStructureContourList(jsonTask, structureId);
+        List<Annotation> annotationList = getStructureContourList(jsonTask, "107088");
 
         if (CollectionUtil.isEmpty(annotationList)) {
             return;
@@ -210,7 +206,7 @@ public class ThyroidGlandParserStrategyImpl extends AbstractCustomParserStrategy
         String areaUnit = annotation.getAreaUnit();
 
         for (Annotation item : annotationList) {
-            Annotation annotationBy = getContourInsideOrOutside(jsonTask, item.getContour(), structureIds, isInside);
+            Annotation annotationBy = getContourInsideOrOutside(jsonTask, item.getContour(), "10708A", true);
 
             if (annotationBy == null) {
                 continue;
@@ -219,7 +215,7 @@ public class ThyroidGlandParserStrategyImpl extends AbstractCustomParserStrategy
             // 预处理动态数据
             JSONObject dynamicDataJson = new JSONObject();
             if (item.getDynamicDataList() != null) {
-                dynamicDataJson = JSONObject.parseObject(annotation.getDynamicDataList().toString());
+                dynamicDataJson = JSONObject.parseObject(item.getDynamicDataList().toString());
             }
 
             JSONArray jsonArray = dynamicDataJson.getJSONArray("dynamicData");
@@ -229,6 +225,8 @@ public class ThyroidGlandParserStrategyImpl extends AbstractCustomParserStrategy
                     JSONObject jsonObject = jsonArray.getJSONObject(j);
                     existingNames.add(jsonObject.getString("name"));
                 }
+            } else {
+                jsonArray = new JSONArray();
             }
             // 处理面积数据
             if (hasAreaName) {
@@ -236,9 +234,6 @@ public class ThyroidGlandParserStrategyImpl extends AbstractCustomParserStrategy
                 dynamicData.setName(annotation.getAreaName());
                 dynamicData.setData(String.valueOf(getProportion(item.getStructureAreaNum().subtract(annotationBy.getStructureAreaNum()), item.getStructureAreaNum())));
                 dynamicData.setUnit(areaUnit);
-                if (jsonArray == null) {
-                    jsonArray = new JSONArray();
-                }
                 if (existingNames.contains(dynamicData.getName())) {
                     // 更新现有数据
                     for (int j = 0; j < jsonArray.size(); j++) {
@@ -256,7 +251,7 @@ public class ThyroidGlandParserStrategyImpl extends AbstractCustomParserStrategy
 
 
             // 更新注解对象
-            if (jsonArray.size() > 0) {
+            if (!jsonArray.isEmpty()) {
                 JSONObject resultJson = new JSONObject();
                 resultJson.put("dynamicData", jsonArray);
                 item.setSequenceNumber(sequenceNumber);
