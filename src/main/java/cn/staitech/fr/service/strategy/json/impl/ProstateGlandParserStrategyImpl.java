@@ -87,9 +87,8 @@ public class ProstateGlandParserStrategyImpl extends AbstractCustomParserStrateg
             BigDecimal structureAreaNum = annotation.getStructureAreaNum();
             Annotation contourInsideOrOutside = commonJsonParser.getContourInsideOrOutside(jsonTask, annotation.getContour(), "12C0E9", true);
             //D/A
-            BigDecimal x = contourInsideOrOutside.getStructureAreaNum().divide(structureAreaNum, 3, RoundingMode.HALF_UP);
-            epithelialList.add(new BigDecimal(1).subtract(x).multiply(new BigDecimal(100)));
-            lumenList.add(x.multiply(new BigDecimal(100)));
+            epithelialList.add(new BigDecimal(100).subtract(getProportion(contourInsideOrOutside.getStructureAreaNum(), structureAreaNum)));
+            lumenList.add(getProportion(contourInsideOrOutside.getStructureAreaNum(), structureAreaNum));
         }
         indicatorResultsMap.put("腺上皮面积占比（单个）", createNameIndicator("Acinar epithelial area% (per)", MathUtils.getConfidenceInterval(epithelialList), PERCENTAGE, areaUtils.getStructureIds("12D074", "12C0E9")));
         indicatorResultsMap.put("腺腔面积占比（单个）", createNameIndicator("Acinar lumen area% (per)", MathUtils.getConfidenceInterval(lumenList), PERCENTAGE, areaUtils.getStructureIds("12D074", "12C0E9")));
