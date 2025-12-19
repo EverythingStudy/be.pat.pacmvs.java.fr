@@ -109,7 +109,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         resultsMap.put("血管面积", createIndicator(organAreaI.setScale(3, RoundingMode.HALF_UP), SQ_MM, "12F003"));
 
         // 产品呈现指标
-        BigDecimal one = new BigDecimal("1");
+        BigDecimal one = new BigDecimal("100");
 
         // 4 黏膜上皮面积占比（单个）4=1-D/A
         List<BigDecimal> list1 = new ArrayList<>();
