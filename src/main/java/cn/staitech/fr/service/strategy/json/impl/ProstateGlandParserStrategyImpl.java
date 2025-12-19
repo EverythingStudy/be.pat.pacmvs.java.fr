@@ -105,7 +105,7 @@ public class ProstateGlandParserStrategyImpl extends AbstractCustomParserStrateg
         Annotation annotation3 = new Annotation();
         annotation3.setAreaName("腺腔面积（单个）");
         annotation3.setAreaUnit(SQ_UM_THOUSAND);
-        putAnnotationDynamicData(jsonTask, annotation3);
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "12C06D", "12C0E9", annotation3, 1, true);
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
@@ -127,7 +127,7 @@ public class ProstateGlandParserStrategyImpl extends AbstractCustomParserStrateg
         String areaUnit = annotation.getAreaUnit();
 
         for (Annotation item : annotationList) {
-            Annotation annotationBy = getContourInsideOrOutside(jsonTask, item.getContour(), "12C06D", false);
+            Annotation annotationBy = getContourInsideOrOutside(jsonTask, item.getContour(), "12C06D", true);
 
             if (annotationBy == null) {
                 continue;
@@ -154,7 +154,7 @@ public class ProstateGlandParserStrategyImpl extends AbstractCustomParserStrateg
             if (hasAreaName) {
                 DynamicData dynamicData = new DynamicData();
                 dynamicData.setName(annotation.getAreaName());
-                dynamicData.setData(commonJsonParser.convertToSquareMicrometer(String.valueOf(item.getStructureAreaNum().subtract(annotationBy.getStructureAreaNum()))));
+                dynamicData.setData(commonJsonParser.convertToSquareMicrometer(String.valueOf(annotationBy.getStructureAreaNum().subtract(item.getStructureAreaNum()))));
                 dynamicData.setUnit(areaUnit);
                 if (existingNames.contains(dynamicData.getName())) {
                     // 更新现有数据
