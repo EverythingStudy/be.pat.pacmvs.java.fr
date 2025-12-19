@@ -1,8 +1,10 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.staitech.fr.domain.Annotation;
+import cn.staitech.fr.domain.DynamicData;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -13,6 +15,8 @@ import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.AreaUtils;
 import cn.staitech.fr.utils.MathUtils;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -228,5 +232,83 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
     @Override
     public String getAlgorithmCode() {
         return "Epididymide";
+    }
+
+    public void putAnnotationDynamicData(JsonTask jsonTask, Annotation annotation) {
+        Long sequenceNumber = commonJsonParser.getSequenceNumber(jsonTask.getSpecialId());
+        List<Annotation> annotationList = getStructureContourList(jsonTask, "12F0F5");
+
+        if (CollectionUtil.isEmpty(annotationList)) {
+            return;
+        }
+
+        // 批量处理数据
+        List<Annotation> batchUpdates = new ArrayList<>(annotationList.size());
+
+        // 预处理通用数据
+        boolean hasAreaName = annotation.getAreaName() != null;
+
+        String areaUnit = annotation.getAreaUnit();
+
+        for (Annotation item : annotationList) {
+            Annotation annotationBy = getContourInsideOrOutside(jsonTask, item.getContour(), "12F0F4", true);
+
+            if (annotationBy == null) {
+                continue;
+            }
+
+            // 预处理动态数据
+            JSONObject dynamicDataJson = new JSONObject();
+            if (item.getDynamicDataList() != null) {
+                dynamicDataJson = JSONObject.parseObject(item.getDynamicDataList().toString());
+            }
+
+            JSONArray jsonArray = dynamicDataJson.getJSONArray("dynamicData");
+            Set<String> existingNames = new HashSet<>();
+            if (jsonArray != null) {
+                for (int j = 0; j < jsonArray.size(); j++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(j);
+                    existingNames.add(jsonObject.getString("name"));
+                }
+            } else {
+                jsonArray = new JSONArray();
+            }
+
+            // 处理面积数据
+            if (hasAreaName) {
+                DynamicData dynamicData = new DynamicData();
+                dynamicData.setName(annotation.getAreaName());
+                dynamicData.setData(commonJsonParser.convertToSquareMicrometer(String.valueOf(item.getStructureAreaNum().subtract(annotationBy.getStructureAreaNum()))));
+                dynamicData.setUnit(areaUnit);
+                if (existingNames.contains(dynamicData.getName())) {
+                    // 更新现有数据
+                    for (int j = 0; j < jsonArray.size(); j++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(j);
+                        if (Objects.equals(jsonObject.getString("name"), dynamicData.getName())) {
+                            jsonObject.put("data", dynamicData.getData());
+                            break;
+                        }
+                    }
+                } else {
+                    // 添加新数据
+                    jsonArray.add(dynamicData);
+                }
+            }
+
+            // 更新注解对象
+            if (jsonArray.size() > 0) {
+                JSONObject resultJson = new JSONObject();
+                resultJson.put("dynamicData", jsonArray);
+                item.setSequenceNumber(sequenceNumber);
+                item.setDynamicData(resultJson.toString());
+                item.setSingleSlideId(jsonTask.getSingleId());
+                batchUpdates.add(item);
+            }
+        }
+
+        // 批量更新数据库
+        if (!batchUpdates.isEmpty()) {
+            commonJsonParser.batchUpdateAnnotations(batchUpdates);
+        }
     }
 }
