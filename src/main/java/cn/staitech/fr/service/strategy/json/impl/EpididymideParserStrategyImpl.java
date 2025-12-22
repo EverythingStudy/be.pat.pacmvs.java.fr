@@ -86,7 +86,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         annotationBy1.setAreaName("输出小管/附睾管管腔面积（单个）");
         annotationBy1.setAreaUnit(SQ_UM_THOUSAND);
         Date startTime3 = new Date();
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "12F0F5", "12F0F4", annotationBy1, 1,true);
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "12F0F5", "12F0F4", annotationBy1, 1, true);
         log.info("jsonTask id:{} singleSlide id:{} 输出小管/附睾管黏膜上皮周长（单个）endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime1, new Date(), DateUnit.SECOND));
         //F 精子面积（单个）103 μm2
         Annotation annotationBy2 = new Annotation();
@@ -104,7 +104,7 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         annotationBy.setAreaName("输出小管/附睾管黏膜上皮面积（单个）");
         annotationBy.setAreaUnit(SQ_UM_THOUSAND);
         Date startTime = new Date();
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "12F0F5","12F0F4", annotationBy, 1,false);
+        putAnnotationDynamicData(jsonTask, annotationBy);
         log.info("jsonTask id:{} singleSlide id:{} 输出小管/附睾管黏膜上皮面积（单个） endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime, new Date(), DateUnit.SECOND));
         Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
         // 算法输出指标
