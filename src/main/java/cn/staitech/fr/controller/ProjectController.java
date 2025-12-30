@@ -8,10 +8,13 @@ import cn.staitech.common.core.enums.UserStatus;
 import cn.staitech.common.core.web.controller.BaseController;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.Constants;
-import cn.staitech.fr.constant.DictData;
 import cn.staitech.fr.domain.AccessProjectRecords;
 import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.ProjectLockLog;
+import cn.staitech.fr.enums.ColorTypeEnum;
+import cn.staitech.fr.enums.ProjectStatusArchivedEnum;
+import cn.staitech.fr.enums.ProjectStatusEnum;
+import cn.staitech.fr.enums.TrialTypeEnum;
 import cn.staitech.fr.service.AccessProjectRecordsService;
 import cn.staitech.fr.service.AccessViewRecordsService;
 import cn.staitech.fr.service.ProjectService;
@@ -148,44 +151,35 @@ public class ProjectController extends BaseController {
     @ApiOperation(value = "染色类型列表", notes = "染色类型列表")
     @GetMapping("/colorType")
     public R<Map<Integer, String>> colorType() {
-        Map<Integer, String> map;
-        if (LanguageUtils.isEn()) {
-            map = DictData.COLOR_TYPE_EN;
-        } else {
-            map = DictData.COLOR_TYPE;
-        }
+        Map<Integer, String> map = ColorTypeEnum.getMap() ;
         return R.ok(map);
     }
 
     @ApiOperation(value = "试验类型列表", notes = "试验类型列表")
     @GetMapping("/trialType")
     public R<Map<Integer, String>> trialType() {
-        Map<Integer, String> map;
-        if (LanguageUtils.isEn()) {
-            map = DictData.TRIAL_TYPE_EN;
-        } else {
-            map = DictData.TRIAL_TYPE;
-        }
+        Map<Integer, String> map = TrialTypeEnum.getMap();
         return R.ok(map);
     }
 
     @ApiOperation(value = "项目状态列表", notes = "项目状态列表")
     @GetMapping("/projectStatus")
     public R<Map<Integer, String>> specialStatus(@Validated @RequestParam Boolean flag) {
+        if (flag == null) {
+            throw new IllegalArgumentException("参数不能为空");
+        }
+
         Map<Integer, String> map;
-        if (LanguageUtils.isEn()) {
-            map = DictData.SPECIAL_STATUS_EN;
-            if (flag) {
-                map = DictData.SPECIAL_STATUS_ARCHIVED_EN;
-            }
+        if (flag) {
+            // 包含归档状态
+            map = ProjectStatusArchivedEnum.getMap();
         } else {
-            map = DictData.SPECIAL_STATUS;
-            if (flag) {
-                map = DictData.SPECIAL_STATUS_ARCHIVED;
-            }
+            // 标准状态（不包含归档）
+            map = ProjectStatusEnum.getMap();
         }
         return R.ok(map);
     }
+
 
     @ApiOperation(value = "项目锁定日志")
     @GetMapping("/getLockLog")

@@ -3,8 +3,8 @@ package cn.staitech.fr.service.impl;
 import cn.hutool.core.date.DateUtil;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
-import cn.staitech.fr.constant.DictData;
 import cn.staitech.fr.domain.AccessProjectRecords;
+import cn.staitech.fr.enums.TrialTypeEnum;
 import cn.staitech.fr.mapper.AccessProjectRecordsMapper;
 import cn.staitech.fr.service.AccessProjectRecordsService;
 import cn.staitech.fr.vo.AccessProjectRecordsVo;
@@ -60,7 +60,7 @@ public class AccessProjectRecordsServiceImpl extends ServiceImpl<AccessProjectRe
         List<AccessProjectRecordsVo> accessProjectRecordsVos = this.getBaseMapper().accessProjectStatistics(req);
         for (AccessProjectRecordsVo accessProjectRecordsVo : accessProjectRecordsVos) {
             if(rmap.containsKey(accessProjectRecordsVo.getSpecialId())) {
-                Map<Integer, String> trialType = DictData.TRIAL_TYPE;
+                Map<Integer, String> trialType = TrialTypeEnum.getMap();
                 accessProjectRecordsVo.setTrialType(trialType.get(accessProjectRecordsVo.getTrialId()));
                 accessProjectRecordsVo.setAccessTime(DateUtil.formatDateTime(rmap.get(accessProjectRecordsVo.getSpecialId())));
                 accessProjectRecordsVo.setAnalysisCount(accessProjectRecordsVo.getAnalysisCount() == null ? "0" : accessProjectRecordsVo.getAnalysisCount());

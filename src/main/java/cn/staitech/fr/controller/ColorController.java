@@ -1,10 +1,9 @@
 package cn.staitech.fr.controller;
 
 import cn.staitech.common.core.domain.R;
-import cn.staitech.fr.constant.DictData;
 import cn.staitech.fr.domain.Color;
+import cn.staitech.fr.enums.ColorTypeEnum;
 import cn.staitech.fr.service.ColorService;
-import cn.staitech.fr.utils.LanguageUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -37,12 +36,7 @@ public class ColorController {
     @ApiOperation(value = "颜色类型列表")
     @GetMapping("/colorType")
     public R<Map<Integer, String>> colorType() {
-        Map<Integer, String> map;
-        if (LanguageUtils.isEn()) {
-            map = DictData.COLOR_TYPE_EN;
-        } else {
-            map = DictData.COLOR_TYPE;
-        }
+        Map<Integer, String> map = ColorTypeEnum.getMap() ;
         return R.ok(map);
     }
 

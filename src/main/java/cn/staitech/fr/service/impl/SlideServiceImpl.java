@@ -12,6 +12,7 @@ import cn.staitech.fr.enums.AiStatusEnum;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.MathUtils;
+import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.system.api.RemoteAnnotationService;
@@ -91,7 +92,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
         if (project == null) {
             log.warn("项目不存在，projectId: {}", req.getProjectId());
-            return R.fail("您没有该项目的访问权限，请联系该项目负责人或机构管理员");
+            return R.fail(MessageSource.M("slide.no.access.permission"));
         }
 
         if (isAccessPermission) {
@@ -101,7 +102,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
             // 权限校验
             if (!hasAccessPermission(project, userId, isMember)) {
                 log.warn("用户无访问权限，userId: {}, projectId: {}", userId, req.getProjectId());
-                return R.fail("您没有该项目的访问权限，请联系该项目负责人或机构管理员");
+                return R.fail(MessageSource.M("slide.no.access.permission"));
             }
         }
 
@@ -110,7 +111,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         if (!isPageConfigSlide) {
             if (status != Constants.STATUS_RUNNING) {
                 log.warn("项目状态不可访问，projectId: {}, status: {}", req.getProjectId(), status);
-                return R.fail("非进行中的项目不可阅片，请联系该项目负责人或机构管理员");
+                return R.fail(MessageSource.M("slide.project.not.active"));
             }
         }
         // 分页查询
@@ -130,7 +131,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
     @Override
     public R<CustomPage<ImageVO>> choiceImageList(ChoiceImagePageReq image) {
-        Objects.requireNonNull(image, "请求参数不能为空");
+        Objects.requireNonNull(image, MessageSource.M("slide.request.param.empty"));
 
         R validationResult = validateProjectStatus(image.getProjectId());
         if (validationResult != null) {
@@ -149,9 +150,9 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
     @Override
     @Transactional(rollbackFor = Exception.class)
     public R choiceSave(ProjectImageVo req) {
-        Objects.requireNonNull(req, "请求参数不能为空");
+        Objects.requireNonNull(req, MessageSource.M("slide.request.param.empty"));
         List<ImageVO> images = req.getImages();
-        Objects.requireNonNull(images, "图片列表不能为空");
+        Objects.requireNonNull(images, MessageSource.M("slide.image.list.empty"));
 
         log.info("切片选择保存接口开始，用户ID：{}，ProjectId：{}", SecurityUtils.getUserId(), req.getProjectId());
 
@@ -187,7 +188,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         Long topicId = project.getTopicId();
         List<Image> images = imageMapper.selectList(Wrappers.<Image>lambdaQuery().eq(Image::getTopicId, topicId).eq(Image::getStatus, Constants.IMAGE_STATUS_ENABLE).eq(Image::getAnalyzeStatus, Constants.IMAGE_NAME_PARSE_SUCC));
         if (CollectionUtils.isEmpty(images)) {
-            return R.fail("没有可关联的新切片");
+            return R.fail(MessageSource.M("slide.no.new.images"));
         }
         List<Slide> slidesToSave = new ArrayList<>();
         Long userId = SecurityUtils.getUserId();
@@ -235,7 +236,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
     public R checkDeleteSlide(Long projectId, List<Long> slideIds) throws Exception {
         List<Slide> slideList = list(Wrappers.<Slide>lambdaQuery().eq(ObjectUtil.isNotEmpty(projectId), Slide::getProjectId, projectId).in(CollectionUtils.isNotEmpty(slideIds), Slide::getSlideId, slideIds).eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).select(Slide::getSlideId));
         if (CollectionUtils.isEmpty(slideList)) {
-            return R.fail("未找到要删除的切片");
+            return R.fail(MessageSource.M("slide.image.not.found"));
         }
         R<Long> resp = remoteAnnotationService.countAnnoBySlides(slideList.stream().map(Slide::getSlideId).collect(Collectors.toList()));
         if (resp.getCode() == 500) {
@@ -256,19 +257,15 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         Integer status = project.getStatus();
 
         if (status == Constants.STATUS_RUNNING) {
-//			return R.fail("项目状态为“进行中”时，不能配置项目基础信息和切片");
-            return R.fail("项目进行中，除配置用户外不可修改其他配置");
+            return R.fail(MessageSource.M("slide.project.ongoing.config"));
         }
 
         if (status == Constants.STATUS_COMPLETED) {
-//			return R.fail("项目状态为“完成”时，任何用户不能再配置项目任何信息");
-            return R.fail("项目已完成，不可修改配置");
+            return R.fail(MessageSource.M("slide.project.completed.config"));
         }
 
         if (status == Constants.STATUS_PAUSED && !(SecurityUtils.getUserId() == project.getPrincipal() || SecurityUtils.isOrgAdmin())) {
-//			return R.fail("项目状态为“暂停”时，机构管理员和项目负责人可以配置项目基础信息");
-            return R.fail("您没有该项目的配置权限，请联系该项目负责人或机构管理员");
-        }
+            return R.fail(MessageSource.M("slide.project.no.config.permission"));        }
 
         return null; // 表示通过校验
     }
@@ -367,7 +364,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         String key = "ai_analysis_projectId_" + req.getProjectId();
         Boolean result = this.redisTemplate.opsForValue().setIfAbsent(key, req.getProjectId());
         if (Boolean.FALSE.equals(result)) {
-            return R.fail("处理中，请稍后");
+            return R.fail(MessageSource.M("slide.processing.wait"));
         }
         try {
             // 查询项目信息
@@ -798,7 +795,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         Long userId = SecurityUtils.getUserId();
         Project project = projectMapper.selectById(req.getProjectId());
         if (project == null) {
-            return R.fail("您没有该项目的访问权限，请联系该项目负责人或机构管理员");
+            return R.fail(MessageSource.M("slide.no.access.permission"));
         }
         // 显示的脏器
         List<Long> organTagIds = req.getOrganTagIds();
@@ -809,11 +806,11 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
             long isMember = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, req.getProjectId()).eq(ProjectMember::getUserId, userId).eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
             // 权限校验
             if (!hasAccessPermission(project, userId, isMember)) {
-                return R.fail("您没有该项目的访问权限，请联系该项目负责人或机构管理员");
+                return R.fail(MessageSource.M("slide.no.access.permission"));
             }
             // 检查项目状态
             if (Constants.STATUS_RUNNING != project.getStatus()) {
-                return R.fail("非进行中的项目不可阅片，请联系该项目负责人或机构管理员");
+                return R.fail(MessageSource.M("slide.no.access.permission"));
             }
         }
 

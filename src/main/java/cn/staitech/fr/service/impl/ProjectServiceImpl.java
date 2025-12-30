@@ -8,9 +8,10 @@ import cn.staitech.common.redis.service.RedisService;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.constant.Constants;
-import cn.staitech.fr.constant.DictData;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.enmu.SpeciesTypeEnum;
+import cn.staitech.fr.enums.ColorTypeEnum;
+import cn.staitech.fr.enums.TrialTypeEnum;
 import cn.staitech.fr.utils.SysRoleUtils;
 import cn.staitech.fr.vo.project.ProjectPageVo;
 import cn.staitech.fr.mapper.*;
@@ -24,7 +25,6 @@ import cn.staitech.fr.vo.project.ProjectStatusVo;
 import cn.staitech.fr.vo.project.ProjectVo;
 import cn.staitech.fr.vo.project.slide.ChangeControlGroupReq;
 import cn.staitech.fr.vo.project.slide.GetControlGroupReq;
-import cn.staitech.system.api.domain.SysRole;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -105,10 +105,12 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     }
 
     private ProjectPageVo renderProject(ProjectPageVo e) {
-        e.setColorName(DictData.COLOR_TYPE.get(Integer.valueOf(e.getColorType())));
-        e.setColorNameEn(DictData.COLOR_TYPE_EN.get(Integer.valueOf(e.getColorType())));
-        e.setTrialType(DictData.TRIAL_TYPE.get(e.getTrialId()));
-        e.setTrialTypeEn(DictData.TRIAL_TYPE_EN.get(e.getTrialId()));
+        ColorTypeEnum colorTypeEnum = ColorTypeEnum.getByCode(Integer.valueOf(e.getColorType()));
+        e.setColorName(colorTypeEnum.getValue());
+        e.setColorNameEn(colorTypeEnum.getValueEn());
+        TrialTypeEnum trialTypeEnum = TrialTypeEnum.getByCode(Integer.valueOf(e.getTrialId()));
+        e.setTrialType(trialTypeEnum.getValue());
+        e.setTrialTypeEn(trialTypeEnum.getValueEn());
         e.setExpireTime(DateUtil.offsetDay(e.getUpdateTime(), 30));
         long count = projectMemberMapper.selectCount(Wrappers.<ProjectMember>lambdaQuery().eq(ProjectMember::getProjectId, e.getProjectId()).eq(ProjectMember::getUserId, SecurityUtils.getUserId()).eq(ProjectMember::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL));
         List<String> buttons = new ArrayList<>();
@@ -142,17 +144,17 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         log.info("添加项目接口开始：");
         long archivedCount = count(Wrappers.<Project>lambdaQuery().eq(Project::getOrganizationId, SecurityUtils.getOrganizationId()).eq(Project::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).and(wrapper -> wrapper.eq(Project::getProjectName, req.getProjectName()).or().eq(Project::getTopicId, req.getTopicId())).eq(Project::getStatus, Constants.STATUS_ARCHIVED));
         if (archivedCount > 0) {
-            return R.fail("该项目已归档，不能重复创建项目，请选择其他项目");
+            return R.fail(MessageSource.M("project.archived.cannot.create"));
         }
 
         long normalCount = count(Wrappers.<Project>lambdaQuery().eq(Project::getOrganizationId, SecurityUtils.getOrganizationId()).eq(Project::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).eq(Project::getTopicId, req.getTopicId()));
         if (normalCount > 0) {
-            return R.fail("专题编号已存在，请重新输入！");
+            return R.fail(MessageSource.M("topic.id.exists"));
         }
 
         normalCount = count(Wrappers.<Project>lambdaQuery().eq(Project::getOrganizationId, SecurityUtils.getOrganizationId()).eq(Project::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).eq(Project::getProjectName, req.getProjectName()));
         if (normalCount > 0) {
-            return R.fail("项目名称已存在，请重新输入！");
+            return R.fail(MessageSource.M("project.name.exists"));
         }
 
         Project project = new Project();
@@ -293,19 +295,17 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         Project entity = baseMapper.selectById(req.getProjectId());
         Integer status = entity.getStatus();
         if (entity.getOrganizationId() != SecurityUtils.getOrganizationId()) {
-            return R.fail("非机构内用户不可以对该项目进行配置");
+            return R.fail(MessageSource.M("project.non.org.user"));
         }
         if (status == Constants.STATUS_COMPLETED) {
-//            return R.fail("项目状态为“完成”时，任何用户不能再配置项目任何信息");
-            return R.fail("项目已完成，不可修改配置");
+            return R.fail(MessageSource.M("project.completed.cannot.modify"));
+
         }
         if (status == Constants.STATUS_RUNNING) {
-//            return R.fail("项目状态为“进行中”时，不能配置项目基础信息");
-            return R.fail("项目进行中，除配置用户外不可修改其他配置");
+            return R.fail(MessageSource.M("project.running.cannot.modify"));
         }
         if (status == Constants.STATUS_PAUSED && !(SecurityUtils.getUserId() == entity.getPrincipal() || SecurityUtils.isOrgAdmin())) {
-//            return R.fail("项目状态为“暂停”时，机构管理员和项目负责人可以配置项目基础信息");
-            return R.fail("您没有该项目的配置权限，请联系该项目负责人或机构管理员");
+            return R.fail(MessageSource.M("project.no.permission"));
         }
 
         long count = count(Wrappers.<Project>lambdaQuery().eq(Project::getOrganizationId, req.getOrganizationId()).eq(Project::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).eq(Project::getProjectName, req.getProjectName()).ne(Project::getProjectId, req.getProjectId()));
@@ -361,7 +361,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             return R.fail(MessageSource.M("DATA_DOES_NOT_EXIST"));
         }
         if (!project.getStatus().equals(Constants.STATUS_PENDING)) {
-            return R.fail("只有当状态为待启动时，可以删除");
+            return R.fail(MessageSource.M("project.delete.pending.only"));
         }
         project.setDelFlag(cn.staitech.common.core.constant.Constants.DEL_FLAG_DELETED);
         project.setUpdateBy(SecurityUtils.getUserId());
@@ -385,7 +385,8 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             //校验用户名、密码
             /*boolean res = userLoginVerify(req.getUserName(), req.getPwd(), req);
             if (!res) {
-                return R.fail("校验失败");
+                //return R.fail("校验失败");
+                return R.fail(MessageSource.M("project.validation.failed"));
             }*/
             int status = project.getStatus();
             if (status == Constants.STATUS_PENDING) {
@@ -398,7 +399,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         }
 
         if (req.getStatus().equals(Constants.STATUS_ARCHIVED) && project.getStatus() != Constants.STATUS_COMPLETED) {
-            return R.fail("只有已完成才允许归档");
+            return R.fail(MessageSource.M("project.archived.only.completed"));
         }
         project.setUpdateTime(new Date());
         project.setUpdateBy(SecurityUtils.getUserId());
@@ -459,7 +460,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     public R recycleProjectDel(Long projectId) {
         int success = baseMapper.updateById(Project.builder().projectId(projectId).isPermanentDel(true).build());
         //删除切片、标注数据 todo
-        return R.ok("删除成功");
+        return R.ok(MessageSource.M("project.delete.success"));
     }
 
     /**
@@ -474,16 +475,16 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         //校验项目编号
         long count = count(Wrappers.<Project>lambdaQuery().eq(Project::getTopicId, project.getTopicId()).eq(Project::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).eq(Project::getOrganizationId, SecurityUtils.getOrganizationId()));
         if (count > 0) {
-            return R.fail("专题编号已存在，禁止恢复");
+            return R.fail(MessageSource.M("topic.id.exists.restore"));
         }
         //校验项目名称
         count = count(Wrappers.<Project>lambdaQuery().eq(Project::getProjectName, project.getProjectName()).eq(Project::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).eq(Project::getOrganizationId, SecurityUtils.getOrganizationId()));
         if (count > 0) {
-            return R.fail("专题名称已存在，禁止恢复");
+            return R.fail(MessageSource.M("project.name.exists.restore"));
         }
         project.setDelFlag(cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL);
         int success = baseMapper.updateById(project);
-        return R.ok("恢复成功");
+        return R.ok(MessageSource.M("project.restore.success"));
     }
 
     @Override
