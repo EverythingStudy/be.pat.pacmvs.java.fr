@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.User">
+            <id property="userId" column="user_id" />
+            <result property="userCode" column="user_code" />
+            <result property="roleId" column="role_id" />
+            <result property="organizationId" column="organization_id" />
+            <result property="userName" column="user_name" />
+            <result property="nickName" column="nick_name" />
+            <result property="userType" column="user_type" />
+            <result property="dept" column="dept" />
+            <result property="email" column="email" />
+            <result property="phonenumber" column="phonenumber" />
+            <result property="sex" column="sex" />
+            <result property="password" column="password" />
+            <result property="status" column="status" />
+            <result property="delFlag" column="del_flag" />
+            <result property="loginStatus" column="login_status" />
+            <result property="loginIp" column="login_ip" />
+            <result property="loginDate" column="login_date" />
+            <result property="createBy" column="create_by" />
+            <result property="createTime" column="create_time" />
+            <result property="updateBy" column="update_by" />
+            <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        user_id,user_code,role_id,organization_id,user_name,nick_name,
+        user_type,dept,email,phonenumber,sex,
+        password,status,del_flag,login_status,login_ip,
+        login_date,create_by,create_time,update_by,update_time
+    </sql>
+</mapper>

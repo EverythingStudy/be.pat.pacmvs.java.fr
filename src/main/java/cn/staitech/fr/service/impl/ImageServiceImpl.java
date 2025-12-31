@@ -3,9 +3,10 @@ package cn.staitech.fr.service.impl;
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.Constants;
-import cn.staitech.fr.constant.DictData;
 import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.enums.ImageAnalyzeStatusEnum;
+import cn.staitech.fr.enums.ImageStatusEnum;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.service.ImageService;
@@ -59,14 +60,8 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image>
     @Override
     public List<ImageStatusVo> status() {
         List<ImageStatusVo> list = new ArrayList<>();
-        if (LanguageUtils.isEn()) {
-            for (Map.Entry<Integer, String> entry : DictData.IMAGE_STATUS_MAP_EN.entrySet()) {
-                list.add(new ImageStatusVo(entry.getKey(), entry.getValue()));
-            }
-        } else {
-            for (Map.Entry<Integer, String> entry : DictData.IMAGE_STATUS_MAP.entrySet()) {
-                list.add(new ImageStatusVo(entry.getKey(), entry.getValue()));
-            }
+        for (ImageStatusEnum status : ImageStatusEnum.values()) {
+            list.add(new ImageStatusVo(status.getCode(), status.getName()));
         }
         return list;
     }
@@ -98,18 +93,18 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image>
      */
     private Image renderImage(Image image) {
         // 根据语言设置文件状态的显示名称
-        String fileStatus = LanguageUtils.isEn()
-                ? DictData.IMAGE_STATUS_MAP_EN.get(image.getStatus())
-                : DictData.IMAGE_STATUS_MAP.get(image.getStatus());
+        String fileStatus = "未知状态";
+        ImageStatusEnum statusEnum = ImageStatusEnum.getByCode(image.getStatus());
+        if (statusEnum != null) {
+            fileStatus = statusEnum.getName();
+        }
         image.setFileStatus(fileStatus);
 
         if (null != image.getAnalyzeStatus()) {
-            String analyzeStatus = Objects.equals(Constants.IMAGE_NAME_PARSE_FAIL, image.getAnalyzeStatus()) ? "失败" : "成功";
-            image.setAnalyzeStatusName(analyzeStatus);
+            ImageAnalyzeStatusEnum analyzeStatusEnum = ImageAnalyzeStatusEnum.getByCode(image.getAnalyzeStatus());
+            assert analyzeStatusEnum != null;
+            image.setAnalyzeStatusName(analyzeStatusEnum.getName());
         }
-
-        // 设置删除状态
-        //out.setDeleState(imageMapper.selectFrSlideCountByImageId(out.getImageId()) > 0 ? DataConstants.NUMBER_1 : DataConstants.NUMBER_0);
         return image;
     }
 
@@ -133,11 +128,11 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image>
                     .eq(Slide::getDelFlag, DEL_FLAG_NORMAL)
                     .select(Slide::getImageId));
             forbidIds = slideList.stream().map(Slide::getImageId).collect(Collectors.toList());
-            if (CollectionUtils.isNotEmpty(forbidIds)){
+            if (CollectionUtils.isNotEmpty(forbidIds)) {
                 throw new RuntimeException("已关联项目的图像不可删除，请重新选择");
             }
             imageIdList.removeAll(forbidIds);
-            if (CollectionUtils.isNotEmpty(imageIdList)){
+            if (CollectionUtils.isNotEmpty(imageIdList)) {
                 imageMapper.deleteBatchIds(imageIdList);
                 NumberFormat formatter = NumberFormat.getNumberInstance();
                 formatter.setMinimumIntegerDigits(3);
@@ -185,6 +180,7 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image>
         image.setUpdateBy(loginUser);
         return imageMapper.updateById(image);
     }
+
     /**
      * 查询单个图像信息
      *

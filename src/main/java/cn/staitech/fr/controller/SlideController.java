@@ -50,10 +50,8 @@ public class SlideController  extends BaseController {
     private SlideService slideService;
     @Resource
     private SlideMapper slideMapper;
-    @Autowired
+    @Resource
     private AccessViewRecordsService accessViewRecordsService;
-    @Autowired
-    private ProjectMapper projectMapper;
 
     @ApiOperation(value = "获取动物编号下拉列表")
     @PostMapping("/getAnimalCode")
@@ -119,16 +117,16 @@ public class SlideController  extends BaseController {
         return slideService.choiceImageList(image);
     }
 
-    @ApiOperation(value = "项目配置-选片保存")
+    @ApiOperation(value = "项目配置-选片保存", tags = {"I18n"})
     @PostMapping(value = "/choiceSave")
     public R choiceSave(@RequestBody @Validated ProjectImageVo choiceSaveInVo) {
         return slideService.choiceSave(choiceSaveInVo);
     }
 
-    @ApiOperation(value = "项目配置-选片当前专题下原始切片保存")
+    @ApiOperation(value = "项目配置-选片当前专题下原始切片保存", tags = {"I18n"})
     @PostMapping(value = "/choiceAll")
-    public R choiceAll(@RequestParam(value = "projectId") @ApiParam(name = "projectId", value = "项目id") Long projectId) throws Exception {
-        return slideService.choiceAll(projectId);
+    public R choiceAll(@RequestBody @Validated ProjectImageVo choiceSaveInVo) throws Exception {
+        return slideService.choiceAll(choiceSaveInVo);
     }
 
     @ApiOperation(value = "项目配置-删除切片")

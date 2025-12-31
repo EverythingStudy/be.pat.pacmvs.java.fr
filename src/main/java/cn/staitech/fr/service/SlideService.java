@@ -29,7 +29,7 @@ public interface SlideService extends IService<Slide> {
 
     R choiceSave(ProjectImageVo choiceSaveInVo);
 
-    R choiceAll(Long projectId) throws Exception;
+    R choiceAll(ProjectImageVo req) throws Exception;
 
     HashMap<String, SlidePageVo> slideAdjacent(SlidePageReq req);
 
