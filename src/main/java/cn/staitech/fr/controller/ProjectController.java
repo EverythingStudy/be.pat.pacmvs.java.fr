@@ -129,11 +129,11 @@ public class ProjectController extends BaseController {
     @EncryptResponse
     @ApiOperation(value = "日志获取项目详情", tags = {"V2.6.0","I18n"})
     @GetMapping("/detail/{projectId}")
-    public R<ProjectEditVo> detail(@PathVariable("projectId") Long projectId) {
+    public R<ProjectDetailVo> detail(@PathVariable("projectId") Long projectId) {
         Project project = projectService.getInfoById(projectId).getData();
-        ProjectEditVo projectEditVo = new ProjectEditVo();
-        BeanUtil.copyProperties(project, projectEditVo);
-        return R.ok(projectEditVo);
+        ProjectDetailVo detailVo = new ProjectDetailVo();
+        BeanUtil.copyProperties(project, detailVo);
+        return R.ok(detailVo);
     }
 
     @LogAudit
