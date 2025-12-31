@@ -3,7 +3,7 @@
     <!-- 日志存放路径 -->
     <property name="log.path" value="logs/staitech-fr"/>
     <!-- 日志输出格式 -->
-    <property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] [%X{traceId}] %-5level %logger{20} - [%method,%line] - %msg%n"/>
+    <property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] [%X{traceId}] [%X{trace_id}] %-5level %logger{20} - [%method,%line] - %msg%n"/>
 
     <!-- 控制台输出 -->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
@@ -92,6 +92,8 @@
     <logger name="org.springframework" level="info"/>
     <!--项目启动时，打印加载nacos的配置文件日志-->
     <logger name="com.alibaba.cloud.nacos.client" level="debug"/>
+    <!-- 数据源名称 -->
+    <logger name="com.baomidou.dynamic.datasource" level="debug" />
     <!--系统操作日志-->
     <root level="info">
         <appender-ref ref="console"/>

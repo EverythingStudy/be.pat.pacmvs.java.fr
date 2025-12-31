@@ -3,6 +3,10 @@ server:
   port: 9701
 knife4j:
   enable: true
+management:
+  health:
+    elasticsearch:
+      enabled: false
 # Spring
 spring:
   messages:
