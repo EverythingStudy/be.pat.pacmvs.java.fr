@@ -10,13 +10,20 @@ import cn.staitech.sft.logaudit.annotation.EncryptResponse;
 import cn.staitech.sft.logaudit.annotation.LogAudit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.MDC;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+
+import static org.elasticsearch.tasks.Task.TRACE_ID;
+import static org.springframework.amqp.support.AmqpHeaders.USER_ID;
 
 
 @Api(value = "切片管理", tags = "切片管理")
@@ -31,6 +38,14 @@ public class ImageController {
     @ApiOperation(value = "日志" ,tags = {"I18n"})
     @PostMapping("/addLog")
     public R addLog(@RequestBody ImageLogDetailReq req) {
+        MDC.put("trace_id", UUID.randomUUID().toString());
+        MDC.put("user_id", "0");
+        MDC.put("organization_id", req.getOrganizationId().toString());
+        try {
+            MDC.put("ip", InetAddress.getLocalHost().getHostAddress());
+        } catch (UnknownHostException e) {
+            throw new RuntimeException(e);
+        }
         return R.ok();
     }
 
