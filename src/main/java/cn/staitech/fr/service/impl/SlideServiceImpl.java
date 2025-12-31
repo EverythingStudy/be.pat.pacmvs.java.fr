@@ -151,7 +151,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
     @Transactional(rollbackFor = Exception.class)
     public R choiceSave(ProjectImageVo req) {
         Objects.requireNonNull(req, MessageSource.M("slide.request.param.empty"));
-        List<ImageVO> images = req.getImages();
+        List<SlideInfo> images = req.getSlideInfos();
         Objects.requireNonNull(images, MessageSource.M("slide.image.list.empty"));
 
         log.info("切片选择保存接口开始，用户ID：{}，ProjectId：{}", SecurityUtils.getUserId(), req.getProjectId());
@@ -163,7 +163,10 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
         List<Slide> slidesToSave = new ArrayList<>();
         Long userId = SecurityUtils.getUserId();
-        List<Long> imageIds = imageIdsFilter(images.stream().map(ImageVO::getImageId).collect(Collectors.toList()), req.getProjectId());
+        List<Long> imageIds = imageIdsFilter(images.stream().map(SlideInfo::getImageId).collect(Collectors.toList()), req.getProjectId());
+        List<Image> imageList = imageMapper.selectList(Wrappers.<Image>lambdaQuery().in(Image::getImageId,imageIds));
+        Map<Long,Image> imageMap = imageList.stream().collect(Collectors.toMap(Image::getImageId, v -> v));
+        List<SlideInfo> slideInfos = new ArrayList<>();
         for (Long imageId : imageIds) {
             Slide slide = new Slide();
             slide.setCreateBy(userId);
@@ -171,20 +174,30 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
             slide.setImageId(imageId);
             slide.setProjectId(req.getProjectId());
             slidesToSave.add(slide);
+            Image image = imageMap.get(imageId);
+            slideInfos.add(SlideInfo.builder()
+                    .imageCode(image.getImageCode())
+                    .animalCode(image.getAnimalCode())
+                    .sexFlag(image.getSexFlag())
+                    .createBy(SecurityUtils.getUserId())
+                    .groupCode(image.getGroupCode())
+                    .waxCode(image.getWaxCode())
+                    .createTime(slide.getCreateTime()).build());
         }
         saveBatch(slidesToSave);
+        req.setSlideInfos(slideInfos);
         return R.ok();
     }
 
     @Override
-    public R choiceAll(Long projectId) throws Exception {
+    public R choiceAll(ProjectImageVo req) throws Exception {
 
-        R validationResult = validateProjectStatus(projectId);
+        R validationResult = validateProjectStatus(req.getProjectId());
 
         if (validationResult != null) {
             return validationResult;
         }
-        Project project = projectMapper.selectById(projectId);
+        Project project = projectMapper.selectById(req.getProjectId());
         Long topicId = project.getTopicId();
         List<Image> images = imageMapper.selectList(Wrappers.<Image>lambdaQuery().eq(Image::getTopicId, topicId).eq(Image::getStatus, Constants.IMAGE_STATUS_ENABLE).eq(Image::getAnalyzeStatus, Constants.IMAGE_NAME_PARSE_SUCC));
         if (CollectionUtils.isEmpty(images)) {
@@ -192,16 +205,30 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         }
         List<Slide> slidesToSave = new ArrayList<>();
         Long userId = SecurityUtils.getUserId();
-        List<Long> imageIds = imageIdsFilter(images.stream().map(Image::getImageId).collect(Collectors.toList()), projectId);
+        List<Long> imageIds = imageIdsFilter(images.stream().map(Image::getImageId).collect(Collectors.toList()), req.getProjectId());
+        List<Image> imageList = imageMapper.selectList(Wrappers.<Image>lambdaQuery().in(Image::getImageId,imageIds));
+        Map<Long,Image> imageMap = imageList.stream().collect(Collectors.toMap(Image::getImageId, v -> v));
+        List<SlideInfo> slideInfos = new ArrayList<>();
         for (Long imageId : imageIds) {
             Slide slide = new Slide();
             slide.setCreateBy(userId);
             slide.setCreateTime(new Date());
             slide.setImageId(imageId);
-            slide.setProjectId(projectId);
+            slide.setProjectId(req.getProjectId());
             slidesToSave.add(slide);
+            Image image = imageMap.get(imageId);
+            slideInfos.add(SlideInfo.builder()
+                    .imageCode(image.getImageCode())
+                    .animalCode(image.getAnimalCode())
+                    .sexFlag(image.getSexFlag())
+                    .createBy(SecurityUtils.getUserId())
+                    .groupCode(image.getGroupCode())
+                    .waxCode(image.getWaxCode())
+                    .createTime(slide.getCreateTime()).build());
         }
         saveBatch(slidesToSave);
+        req.setSlideInfos(slideInfos);
+
         return R.ok();
     }
 

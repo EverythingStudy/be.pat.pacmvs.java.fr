@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.impl;
 
 import cn.hutool.core.date.DateUtil;
+import cn.staitech.common.core.constant.SecurityConstants;
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.utils.bean.BeanUtils;
@@ -13,18 +14,18 @@ import cn.staitech.fr.enmu.SpeciesTypeEnum;
 import cn.staitech.fr.enums.ColorTypeEnum;
 import cn.staitech.fr.enums.TrialTypeEnum;
 import cn.staitech.fr.utils.SysRoleUtils;
-import cn.staitech.fr.vo.project.ProjectPageVo;
+import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.service.ProjectService;
 import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.fr.utils.ProjectButtonGenerator;
-import cn.staitech.fr.vo.project.ProjectEditVo;
-import cn.staitech.fr.vo.project.ProjectPageReq;
-import cn.staitech.fr.vo.project.ProjectStatusVo;
-import cn.staitech.fr.vo.project.ProjectVo;
 import cn.staitech.fr.vo.project.slide.ChangeControlGroupReq;
 import cn.staitech.fr.vo.project.slide.GetControlGroupReq;
+import cn.staitech.fr.vo.project.slide.SlideInfo;
+import cn.staitech.system.api.RemoteUserService;
+import cn.staitech.system.api.domain.SysRole;
+import cn.staitech.system.api.model.LoginUser;
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -38,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static cn.staitech.common.security.utils.SecurityUtils.isAdmin;
 
@@ -74,6 +76,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
     private SpecialAnnotationRelMapper specialAnnotationRelMapper;
     @Resource
     private AnnotationMapper annotationMapper;
+    @Resource
+    private RemoteUserService remoteUserService;
+    @Resource
+    private UserMapper userMapper;
 
     /**
      * 分页查询项目列表
@@ -167,6 +173,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         List<Image> images = imageMapper.selectList(Wrappers.<Image>lambdaQuery().eq(Image::getTopicId, req.getTopicId()).eq(Image::getStatus, Constants.IMAGE_STATUS_ENABLE).eq(Image::getOrganizationId, SecurityUtils.getOrganizationId()).eq(Image::getAnalyzeStatus, Constants.IMAGE_NAME_PARSE_SUCC));
         //初始化切片
         List<Slide> slides = new ArrayList<>();
+        List<SlideInfo> slideInfos = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(images)) {
             for (Image image : images) {
                 Slide slide = new Slide();
@@ -175,14 +182,34 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 slide.setImageId(image.getImageId());
                 slide.setProjectId(project.getProjectId());
                 slides.add(slide);
+                slideInfos.add(SlideInfo.builder()
+                        .imageCode(image.getImageCode())
+                        .animalCode(image.getAnimalCode())
+                        .sexFlag(image.getSexFlag())
+                        .createBy(SecurityUtils.getUserId())
+                        .groupCode(image.getGroupCode())
+                        .waxCode(image.getWaxCode())
+                        .createTime(slide.getCreateTime()).build());
             }
         }
         slideService.saveBatch(slides);
-
+        req.setSlideInfos(slideInfos);
         //添加项目成员
         addProjectMember(project.getProjectId(), req.getPrincipal());
-
+        User user = userMapper.selectById(req.getPrincipal());
+        R<LoginUser> loginUserResp = remoteUserService.getUserInfo(user.getUserName(), SecurityConstants.INNER);
+        if (loginUserResp.getCode() == R.SUCCESS) {
+            LoginUser loginUser = loginUserResp.getData();
+            String roleNames = loginUser.getRoleObjs().stream()
+                    .map(SysRole::getRoleName)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining(","));
+            req.setProjectMemberInfo(ProjectMemberInfo.builder().sex(user.getSex())
+                    .userName(user.getUserName()).nickName(user.getNickName())
+                    .roleName(roleNames).phonenumber(user.getPhonenumber()).build());
+        }
         getSpecialAnnotationRel(project.getProjectId(), req.getPrincipal());
+        req.setCreateTime(project.getCreateTime());
         return R.ok(project);
     }
 

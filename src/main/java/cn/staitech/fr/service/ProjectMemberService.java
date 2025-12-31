@@ -3,9 +3,7 @@ package cn.staitech.fr.service;
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.ProjectMember;
-import cn.staitech.fr.vo.project.ProjectMemberVo;
-import cn.staitech.fr.vo.project.ProjectMemberPageReq;
-import cn.staitech.fr.vo.project.ProjectMemberPageVo;
+import cn.staitech.fr.vo.project.*;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 /**
@@ -18,7 +16,9 @@ public interface ProjectMemberService extends IService<ProjectMember> {
 
     CustomPage<ProjectMemberPageVo> getSpecialMemberList(ProjectMemberPageReq req);
 
-    R removeMember(Long memberId);
+    R removeMember(ProjectMemberRemoveVo req);
 
     R addMember(ProjectMemberVo req);
+
+    R<ProjectMemberInfo> detail(Long memberId);
 }

@@ -5,6 +5,7 @@ import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.Constants;
 import cn.staitech.fr.domain.Image;
 import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.enums.ImageAnalyzeStatusEnum;
 import cn.staitech.fr.enums.ImageStatusEnum;
 import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.SlideMapper;
@@ -100,13 +101,9 @@ public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image>
         image.setFileStatus(fileStatus);
 
         if (null != image.getAnalyzeStatus()) {
-            String analyzeStatus;
-            if (LanguageUtils.isEn()) {
-                analyzeStatus = Objects.equals(Constants.IMAGE_NAME_PARSE_FAIL, image.getAnalyzeStatus()) ? "Failed" : "Success";
-            } else {
-                analyzeStatus = Objects.equals(Constants.IMAGE_NAME_PARSE_FAIL, image.getAnalyzeStatus()) ? "失败" : "成功";
-            }
-            image.setAnalyzeStatusName(analyzeStatus);
+            ImageAnalyzeStatusEnum analyzeStatusEnum = ImageAnalyzeStatusEnum.getByCode(image.getAnalyzeStatus());
+            assert analyzeStatusEnum != null;
+            image.setAnalyzeStatusName(analyzeStatusEnum.getName());
         }
         return image;
     }

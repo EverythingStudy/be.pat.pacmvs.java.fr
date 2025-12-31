@@ -1,5 +1,6 @@
 package cn.staitech.fr.controller;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.date.DateUtil;
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.DateRangeReq;
@@ -19,11 +20,12 @@ import cn.staitech.fr.service.AccessProjectRecordsService;
 import cn.staitech.fr.service.AccessViewRecordsService;
 import cn.staitech.fr.service.ProjectService;
 import cn.staitech.fr.service.SpecialLockLogService;
-import cn.staitech.fr.utils.LanguageUtils;
 import cn.staitech.fr.vo.AccessProjectRecordsVo;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.ChangeControlGroupReq;
 import cn.staitech.fr.vo.project.slide.GetControlGroupReq;
+import cn.staitech.sft.logaudit.annotation.EncryptResponse;
+import cn.staitech.sft.logaudit.annotation.LogAudit;
 import cn.staitech.system.api.RemoteUserService;
 import cn.staitech.system.api.domain.SysUser;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -33,7 +35,6 @@ import io.swagger.annotations.ApiParam;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Date;
@@ -67,13 +68,14 @@ public class ProjectController extends BaseController {
     @Resource
     private AccessViewRecordsService accessViewRecordsService;
 
-    @ApiOperation(value = "获取项目详情，添加项目访问记录", tags = {"V2.6.0"})
-    @GetMapping("/info")
-    public R<Project> info(@RequestParam("projectId") @ApiParam(name = "projectId", value = "项目id") Long projectId) {
+    @LogAudit
+    @ApiOperation(value = "获取项目详情，添加项目访问记录", tags = {"V2.6.0","I18n"})
+    @PostMapping("/info")
+    public R<Project> info(@RequestBody VisitProjectVO  req) {
         Long userId = SecurityUtils.getUserId();
-        AccessProjectRecords record = AccessProjectRecords.builder().projectId(projectId).userId(userId).accessTime(new Date()).build();
+        AccessProjectRecords record = AccessProjectRecords.builder().projectId(req.getProjectId()).userId(userId).accessTime(new Date()).build();
         accessProjectRecordsService.saveAccessProjectRecords(record);
-        return projectService.getInfoById(projectId);
+        return projectService.getInfoById(req.getProjectId());
     }
 
     @ApiOperation(value = "获取项目详情", tags = {"V2.6.0"})
@@ -124,28 +126,42 @@ public class ProjectController extends BaseController {
         return R.ok(projectService.pageProject(req, true));
     }
 
-    @ApiOperation(value = "项目新增", tags = {"V2.6.0"})
+    @EncryptResponse
+    @ApiOperation(value = "日志获取项目详情", tags = {"V2.6.0","I18n"})
+    @GetMapping("/detail/{projectId}")
+    public R<ProjectEditVo> detail(@PathVariable("projectId") Long projectId) {
+        Project project = projectService.getInfoById(projectId).getData();
+        ProjectEditVo projectEditVo = new ProjectEditVo();
+        BeanUtil.copyProperties(project, projectEditVo);
+        return R.ok(projectEditVo);
+    }
+
+    @LogAudit
+    @ApiOperation(value = "项目新增", tags = {"V2.6.0","I18n"})
     @PostMapping("/add")
     public R add(@RequestBody @Validated ProjectVo req) {
         return projectService.addProject(req);
     }
 
-    @ApiOperation(value = "项目修改", tags = {"V2.6.0"})
+    @LogAudit
+    @ApiOperation(value = "项目修改", tags = {"V2.6.0","I18n"})
     @PostMapping("/edit")
     public R edit(@RequestBody @Validated ProjectEditVo req) {
         return projectService.editProject(req);
     }
 
-    @ApiOperation(value = "编辑项目状态", tags = {"V2.6.0"})
+    @LogAudit
+    @ApiOperation(value = "编辑项目状态", tags = {"V2.6.0","I18n"})
     @PostMapping("/editStatus")
     public R editStatus(@Validated @RequestBody ProjectStatusVo req) {
         return projectService.editProjectStatus(req);
     }
 
-    @ApiOperation(value = "项目删除", tags = {"V2.6.0"})
-    @PostMapping("/remove/{projectId}")
-    public R remove(@PathVariable("projectId") Long projectId) {
-        return projectService.removeProject(projectId);
+    @LogAudit
+    @ApiOperation(value = "项目删除", tags = {"V2.6.0","I18n"})
+    @PostMapping("/remove")
+    public R remove(@RequestBody @Validated ProjectEditVo req) {
+        return projectService.removeProject(req.getProjectId());
     }
 
     @ApiOperation(value = "染色类型列表", notes = "染色类型列表")

@@ -1,18 +1,20 @@
 package cn.staitech.fr.service.impl;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.annotation.Resource;
 
+import cn.staitech.common.core.constant.SecurityConstants;
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.utils.MessageSource;
+import cn.staitech.fr.vo.project.*;
 import cn.staitech.system.api.RemoteAnnotationService;
+import cn.staitech.system.api.RemoteUserService;
+import cn.staitech.system.api.domain.SysRole;
 import cn.staitech.system.api.domain.biz.CheckUserOperation;
+import cn.staitech.system.api.model.LoginUser;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -21,9 +23,6 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.Constants;
-import cn.staitech.fr.vo.project.ProjectMemberVo;
-import cn.staitech.fr.vo.project.ProjectMemberPageReq;
-import cn.staitech.fr.vo.project.ProjectMemberPageVo;
 import cn.staitech.fr.service.ProjectMemberService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,6 +42,10 @@ public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, P
     private ProjectMapper projectMapper;
     @Resource
     private RemoteAnnotationService remoteAnnotationService;
+    @Resource
+    private RemoteUserService remoteUserService;
+    @Resource
+    private UserMapper userMapper;
 
     @Override
     public CustomPage<ProjectMemberPageVo> getSpecialMemberList(ProjectMemberPageReq req) {
@@ -54,10 +57,10 @@ public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, P
     }
 
     @Override
-    public R removeMember(Long memberId) {
+    public R removeMember(ProjectMemberRemoveVo req) {
         log.info("项目成员删除接口开始：");
         //校验用户操作信息
-        ProjectMember member = baseMapper.selectById(memberId);
+        ProjectMember member = baseMapper.selectById(req.getMemberId());
         R validationResult = validateProjectStatus(member.getProjectId());
         if (validationResult != null) {
             return validationResult;
@@ -84,11 +87,11 @@ public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, P
             }
         }
         Project project = projectMapper.selectById(member.getProjectId());
-        if (project.getPrincipal() == memberUserId){
+        if (Objects.equals(project.getPrincipal(), memberUserId)){
             return R.fail(MessageSource.M("project.member.principal.cannot.delete"));
         }
         ProjectMember specialMember = new ProjectMember();
-        specialMember.setMemberId(memberId);
+        specialMember.setMemberId(req.getMemberId());
         specialMember.setDelFlag(cn.staitech.common.core.constant.Constants.DEL_FLAG_DELETED);
         this.updateById(specialMember);
         return R.ok();
@@ -122,7 +125,46 @@ public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, P
             collect.add(specialMember);
         }
         saveBatch(collect);
+        List<ProjectMemberInfo> projectMemberInfos = new ArrayList<>();
+
+        for (Long userId : req.getUserId()){
+            User user = userMapper.selectById(userId);
+            R<LoginUser> loginUserResp = remoteUserService.getUserInfo(user.getUserName(), SecurityConstants.INNER);
+            if (loginUserResp.getCode() == R.SUCCESS) {
+                LoginUser loginUser = loginUserResp.getData();
+                String roleNames = loginUser.getRoleObjs().stream()
+                        .map(SysRole::getRoleName)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.joining(","));
+                projectMemberInfos.add(ProjectMemberInfo.builder().sex(user.getSex())
+                        .userName(user.getUserName()).nickName(user.getNickName())
+                        .roleName(roleNames).phonenumber(user.getPhonenumber()).build());
+            }
+        }
+        req.setProjectMemberInfos( projectMemberInfos);
         return R.ok();
+    }
+
+    @Override
+    public R<ProjectMemberInfo> detail(Long memberId) {
+        ProjectMember member = baseMapper.selectById(memberId);
+        User user = userMapper.selectById(member.getUserId());
+        R<LoginUser> loginUserResp = remoteUserService.getUserInfo(user.getUserName(), SecurityConstants.INNER);
+        if (loginUserResp.getCode() == R.SUCCESS) {
+            LoginUser loginUser = loginUserResp.getData();
+            String roleNames = loginUser.getRoleObjs().stream()
+                    .map(SysRole::getRoleName)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.joining(","));
+            return R.ok(ProjectMemberInfo.builder()
+                            .memberId( memberId)
+                            .sex(user.getSex())
+                            .userName(user.getUserName())
+                            .nickName(user.getNickName())
+                            .roleName(roleNames)
+                            .phonenumber(user.getPhonenumber()).build());
+        }
+        return  R.fail();
     }
 
     /**

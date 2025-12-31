@@ -3,20 +3,15 @@ package cn.staitech.fr.controller;
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.common.core.web.controller.BaseController;
-import cn.staitech.fr.vo.project.ProjectMemberVo;
-import cn.staitech.fr.vo.project.ProjectMemberPageReq;
-import cn.staitech.fr.vo.project.ProjectMemberPageVo;
+import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.service.ProjectMemberService;
+import cn.staitech.sft.logaudit.annotation.EncryptResponse;
+import cn.staitech.sft.logaudit.annotation.LogAudit;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
@@ -41,15 +36,23 @@ public class ProjectMemberController extends BaseController {
         return R.ok(resp);
     }
 
-    @ApiOperation(value = "项目配置-项目成员删除", notes = "项目成员删除")
-    @GetMapping("/remove")
-    public R remove(@RequestParam("memberId")@ApiParam(value = "memberId",name = "项目成员id") Long memberId) {
-       return projectMemberService.removeMember(memberId);
+    @LogAudit
+    @ApiOperation(value = "项目配置-项目成员删除", notes = "项目成员删除" ,tags = {"I18n"})
+    @PostMapping("/remove")
+    public R remove(@RequestBody ProjectMemberRemoveVo req) {
+       return projectMemberService.removeMember(req);
+    }
 
+    @EncryptResponse
+    @ApiOperation(value = "项目配置-项目成员详情", notes = "项目成员详情" ,tags = {"I18n"})
+    @GetMapping("/detail/{memberId}")
+    public R<ProjectMemberInfo> remove(@PathVariable("memberId") Long memberId) {
+        return projectMemberService.detail(memberId);
     }
 
 
-    @ApiOperation(value = "项目配置-项目成员表增加")
+    @LogAudit
+    @ApiOperation(value = "项目配置-项目成员表增加",tags = {"I18n"})
     @PostMapping("/addMember")
     public R addMember(@RequestBody @Validated ProjectMemberVo req) {
         return projectMemberService.addMember(req);
