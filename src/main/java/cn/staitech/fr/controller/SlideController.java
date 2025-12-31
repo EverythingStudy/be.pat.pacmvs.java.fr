@@ -19,6 +19,7 @@ import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.MessageSource;
+import cn.staitech.sft.logaudit.annotation.LogAudit;
 import cn.staitech.system.api.domain.biz.AddSingleSlide;
 import cn.staitech.system.api.domain.biz.DelSingleSlide;
 import io.swagger.annotations.Api;
@@ -117,12 +118,14 @@ public class SlideController  extends BaseController {
         return slideService.choiceImageList(image);
     }
 
+    @LogAudit
     @ApiOperation(value = "项目配置-选片保存", tags = {"I18n"})
     @PostMapping(value = "/choiceSave")
     public R choiceSave(@RequestBody @Validated ProjectImageVo choiceSaveInVo) {
         return slideService.choiceSave(choiceSaveInVo);
     }
 
+    @LogAudit
     @ApiOperation(value = "项目配置-选片当前专题下原始切片保存", tags = {"I18n"})
     @PostMapping(value = "/choiceAll")
     public R choiceAll(@RequestBody @Validated ProjectImageVo choiceSaveInVo) throws Exception {

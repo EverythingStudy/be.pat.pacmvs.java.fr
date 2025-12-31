@@ -27,6 +27,13 @@ public class ImageController {
     @Resource
     private ImageService imageService;
 
+    @LogAudit
+    @ApiOperation(value = "日志" ,tags = {"I18n"})
+    @PostMapping("/addLog")
+    public R addLog(ImageLogDetailReq req) {
+        return R.ok();
+    }
+
     /**
      * 切片状态列表 .
      */
