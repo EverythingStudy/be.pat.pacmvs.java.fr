@@ -30,7 +30,7 @@ public class ImageController {
     @LogAudit
     @ApiOperation(value = "日志" ,tags = {"I18n"})
     @PostMapping("/addLog")
-    public R addLog(ImageLogDetailReq req) {
+    public R addLog(@RequestBody ImageLogDetailReq req) {
         return R.ok();
     }
 
