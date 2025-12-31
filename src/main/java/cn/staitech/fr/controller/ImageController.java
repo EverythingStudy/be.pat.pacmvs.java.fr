@@ -110,6 +110,7 @@ public class ImageController {
 
         for (Image image : images) {
             ImageLogDetail detail = ImageLogDetail.builder()
+                    .imageId(image.getImageId())
                     .imageName(image.getImageName())
                     .topicName(image.getTopicName())
                     .size(image.getSize())
