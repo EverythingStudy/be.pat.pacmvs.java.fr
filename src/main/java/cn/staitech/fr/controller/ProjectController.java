@@ -26,6 +26,7 @@ import cn.staitech.fr.vo.project.slide.ChangeControlGroupReq;
 import cn.staitech.fr.vo.project.slide.GetControlGroupReq;
 import cn.staitech.sft.logaudit.annotation.EncryptResponse;
 import cn.staitech.sft.logaudit.annotation.LogAudit;
+import cn.staitech.sft.logaudit.req.FieldMapperReq;
 import cn.staitech.system.api.RemoteUserService;
 import cn.staitech.system.api.domain.SysUser;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
@@ -36,10 +37,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 /**
@@ -140,7 +138,40 @@ public class ProjectController extends BaseController {
     @ApiOperation(value = "项目新增", tags = {"V2.6.0","I18n"})
     @PostMapping("/add")
     public R add(@RequestBody @Validated ProjectVo req) {
+        List<FieldMapperReq> fieldMappers = createFieldMappers();
+        req.getLogAuditParams().getFieldMappers().addAll(fieldMappers);
         return projectService.addProject(req);
+    }
+
+    private List<FieldMapperReq> createFieldMappers() {
+        List<FieldMapperReq> fieldMappers = new ArrayList<>();
+
+        String[][] fieldMappings = {
+                {"topicName", "专题号","Study ID"},
+                {"imageName", "切片编号","Image Name"},
+                {"size", "图像大小","File Size"},
+                {"organizationId", "机构","Institution"},
+                {"createTime", "上传时间","Upload Time"},
+                {"status", "状态","Status"},
+                {"analyzeStatus", "信息解析状态","Information parsing status"},
+                {"phonenumber", "手机","Phone Number"},
+                {"userName", "系统姓名","Sign In Name"},
+                {"nickName", "注册姓名","User Name"},
+                {"sex", "性别","Gender"},
+                {"roleName", "系统角色","Role"},
+                {"slideInfos", "图像列表","Image list"},
+                {"projectMemberInfo", "用户信息","User info"}
+        };
+
+        for (String[] mapping : fieldMappings) {
+            FieldMapperReq fieldMapper = new FieldMapperReq();
+            fieldMapper.setField(mapping[0]);
+            fieldMapper.setFieldName(mapping[1]);
+            fieldMapper.setFieldNameEn(mapping[2]);
+            fieldMappers.add(fieldMapper);
+        }
+
+        return fieldMappers;
     }
 
     @LogAudit

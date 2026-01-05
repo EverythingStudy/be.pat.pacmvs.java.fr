@@ -4,6 +4,7 @@ import cn.staitech.fr.mapper.SysOrganizationMapper;
 import cn.staitech.fr.mapper.UserMapper;
 import cn.staitech.sft.logaudit.annotation.IgnoreLogField;
 import cn.staitech.sft.logaudit.annotation.LogFieldDBConvert;
+import cn.staitech.sft.logaudit.req.LogAuditBaseReq;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -26,10 +27,14 @@ import static cn.staitech.fr.constant.LogFieldConvertConstants.USER_NAME;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SlideInfo {
+public class SlideInfo extends LogAuditBaseReq {
     @IgnoreLogField
     @ApiModelProperty(value = "原始切片id")
     private Long imageId;
+
+    @IgnoreLogField
+    @ApiModelProperty(value = "切片id")
+    private Long slideId;
 
     @ApiModelProperty(value = "切片编号")
     private String imageCode;

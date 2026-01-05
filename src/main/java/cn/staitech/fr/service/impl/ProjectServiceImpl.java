@@ -23,6 +23,7 @@ import cn.staitech.fr.utils.ProjectButtonGenerator;
 import cn.staitech.fr.vo.project.slide.ChangeControlGroupReq;
 import cn.staitech.fr.vo.project.slide.GetControlGroupReq;
 import cn.staitech.fr.vo.project.slide.SlideInfo;
+import cn.staitech.sft.logaudit.req.OperationObjectReq;
 import cn.staitech.system.api.RemoteUserService;
 import cn.staitech.system.api.domain.SysRole;
 import cn.staitech.system.api.model.LoginUser;
@@ -168,7 +169,14 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         project.setCreateBy(SecurityUtils.getUserId());
         project.setCreateTime(new Date());
         baseMapper.insert(project);
-
+        List<OperationObjectReq> operationObjects = new ArrayList<>();
+        OperationObjectReq operationObject = new OperationObjectReq();
+        operationObject.setName("项目编号");
+        operationObject.setNameEn("项目编号");
+        operationObject.setValue(project.getProjectId()+"("+project.getTopicName()+")");
+        operationObject.setValueEn(project.getProjectId()+"("+project.getTopicName()+")");
+        operationObjects.add(operationObject);
+        req.getLogAuditParams().setOperationObjects(operationObjects);
         //查询图像切片
         List<Image> images = imageMapper.selectList(Wrappers.<Image>lambdaQuery().eq(Image::getTopicId, req.getTopicId()).eq(Image::getStatus, Constants.IMAGE_STATUS_ENABLE).eq(Image::getOrganizationId, SecurityUtils.getOrganizationId()).eq(Image::getAnalyzeStatus, Constants.IMAGE_NAME_PARSE_SUCC));
         //初始化切片
@@ -193,6 +201,25 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             }
         }
         slideService.saveBatch(slides);
+        for (Slide slide : slides) {
+             for (SlideInfo slideInfo : slideInfos){
+                 if (slide.getImageId().equals(slideInfo.getImageId())){
+                     List<OperationObjectReq> slideInfoOperationObjects = new ArrayList<>();
+                     OperationObjectReq slideInfoOperationObject = new OperationObjectReq();
+                     slideInfoOperationObject.setName("图像系统编号");
+                     slideInfoOperationObject.setNameEn("图像系统编号");
+                     slideInfoOperationObject.setValue(slide.getImageId().toString());
+                     slideInfoOperationObject.setValueEn(slide.getImageId().toString());
+                     OperationObjectReq slideInfoOperationObject1 = new OperationObjectReq();
+                     slideInfoOperationObject1.setName("图像项目编号");
+                     slideInfoOperationObject1.setNameEn("图像项目编号");
+                     slideInfoOperationObject1.setValue(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
+                     slideInfoOperationObject1.setValueEn(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
+                     slideInfoOperationObjects.add(slideInfoOperationObject);
+                     slideInfo.getLogAuditParams().setOperationObjects(slideInfoOperationObjects);
+                 }
+             }
+        }
         req.setSlideInfos(slideInfos);
         //添加项目成员
         addProjectMember(project.getProjectId(), req.getPrincipal());

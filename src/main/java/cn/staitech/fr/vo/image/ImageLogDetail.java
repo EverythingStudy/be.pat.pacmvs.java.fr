@@ -7,6 +7,7 @@ import cn.staitech.sft.logaudit.annotation.IgnoreLogField;
 import cn.staitech.sft.logaudit.annotation.LogFieldDBConvert;
 import cn.staitech.sft.logaudit.annotation.LogFieldEnumConvert;
 import cn.staitech.sft.logaudit.pojo.LogAuditObj;
+import cn.staitech.sft.logaudit.req.LogAuditBaseReq;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,7 +31,7 @@ import static cn.staitech.fr.constant.LogFieldConvertConstants.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ImageLogDetail {
+public class ImageLogDetail  extends LogAuditBaseReq {
 
     @IgnoreLogField
     @ApiModelProperty(value = "图像id", hidden = true)

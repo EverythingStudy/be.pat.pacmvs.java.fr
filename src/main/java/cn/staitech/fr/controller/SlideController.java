@@ -34,6 +34,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author mugw
@@ -132,16 +133,18 @@ public class SlideController  extends BaseController {
         return slideService.choiceAll(choiceSaveInVo);
     }
 
-    @ApiOperation(value = "项目配置-删除切片")
+    @LogAudit
+    @ApiOperation(value = "项目配置-删除切片", tags = {"I18n"})
     @PostMapping("/deleteSlide")
-    public R deleteSlide(@RequestParam(value = "projectId") @ApiParam(name = "projectId", value = "项目id") Long projectId)throws  Exception {
-        return slideService.deleteSlide(projectId,null);
+    public R deleteSlide(@RequestBody @Validated ProjectImageVo req)throws  Exception {
+        return slideService.deleteSlide(req);
     }
 
-    @ApiOperation(value = "项目配置-删除切片")
+    @LogAudit
+    @ApiOperation(value = "项目配置-删除切片", tags = {"I18n"})
     @PostMapping("/deleteSlideByIds")
-    public R deleteSlideByIds(@RequestBody @Validated SlideDelVo slideDelIn)throws  Exception {
-        return slideService.deleteSlide(slideDelIn.getProjectId(),slideDelIn.getSlideIds());
+    public R deleteSlideByIds(@RequestBody @Validated ProjectImageVo req)throws  Exception {
+        return slideService.deleteSlide(req);
     }
 
     @ApiOperation(value = "项目配置-检查删除切片")

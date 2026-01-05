@@ -23,7 +23,7 @@ public interface SlideService extends IService<Slide> {
 
     R<CustomPage<ImageVO>> choiceImageList(ChoiceImagePageReq image);
 
-    R deleteSlide(Long projectId, List<Long> slideIds) throws  Exception;
+    R deleteSlide(ProjectImageVo req) throws  Exception;
 
     R checkDeleteSlide(Long projectId, List<Long> slideIds) throws  Exception;
 

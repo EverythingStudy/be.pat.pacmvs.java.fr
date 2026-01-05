@@ -15,6 +15,7 @@ import cn.staitech.fr.utils.MathUtils;
 import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
+import cn.staitech.sft.logaudit.req.OperationObjectReq;
 import cn.staitech.system.api.RemoteAnnotationService;
 import cn.staitech.system.api.domain.biz.AddSingleSlide;
 import cn.staitech.system.api.domain.biz.DelSingleSlide;
@@ -185,6 +186,25 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                     .createTime(slide.getCreateTime()).build());
         }
         saveBatch(slidesToSave);
+        for (Slide slide : slidesToSave) {
+            for (SlideInfo slideInfo : slideInfos){
+                if (slide.getImageId().equals(slideInfo.getImageId())){
+                    List<OperationObjectReq> slideInfoOperationObjects = new ArrayList<>();
+                    OperationObjectReq slideInfoOperationObject = new OperationObjectReq();
+                    slideInfoOperationObject.setName("图像系统编号");
+                    slideInfoOperationObject.setNameEn("图像系统编号");
+                    slideInfoOperationObject.setValue(slide.getImageId().toString());
+                    slideInfoOperationObject.setValueEn(slide.getImageId().toString());
+                    OperationObjectReq slideInfoOperationObject1 = new OperationObjectReq();
+                    slideInfoOperationObject1.setName("图像项目编号");
+                    slideInfoOperationObject1.setNameEn("图像项目编号");
+                    slideInfoOperationObject1.setValue(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
+                    slideInfoOperationObject1.setValueEn(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
+                    slideInfoOperationObjects.add(slideInfoOperationObject);
+                    slideInfo.getLogAuditParams().setOperationObjects(slideInfoOperationObjects);
+                }
+            }
+        }
         req.setSlideInfos(slideInfos);
         return R.ok();
     }
@@ -227,6 +247,26 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                     .createTime(slide.getCreateTime()).build());
         }
         saveBatch(slidesToSave);
+        for (Slide slide : slidesToSave) {
+            for (SlideInfo slideInfo : slideInfos){
+                if (slide.getImageId().equals(slideInfo.getImageId())){
+                    List<OperationObjectReq> slideInfoOperationObjects = new ArrayList<>();
+                    OperationObjectReq slideInfoOperationObject = new OperationObjectReq();
+                    slideInfoOperationObject.setName("图像系统编号");
+                    slideInfoOperationObject.setNameEn("图像系统编号");
+                    slideInfoOperationObject.setValue(slide.getImageId().toString());
+                    slideInfoOperationObject.setValueEn(slide.getImageId().toString());
+                    OperationObjectReq slideInfoOperationObject1 = new OperationObjectReq();
+                    slideInfoOperationObject1.setName("图像项目编号");
+                    slideInfoOperationObject1.setNameEn("图像项目编号");
+                    slideInfoOperationObject1.setValue(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
+                    slideInfoOperationObject1.setValueEn(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
+                    slideInfoOperationObjects.add(slideInfoOperationObject);
+                    slideInfoOperationObjects.add(slideInfoOperationObject1);
+                    slideInfo.getLogAuditParams().setOperationObjects(slideInfoOperationObjects);
+                }
+            }
+        }
         req.setSlideInfos(slideInfos);
 
         return R.ok();
@@ -242,21 +282,58 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
     }
 
     @Override
-    public R deleteSlide(Long projectId, List<Long> slideIds) throws Exception {
+    public R deleteSlide(ProjectImageVo req) throws Exception {
         log.info("删除全部切片接口开始：");
-        R validationResult = validateProjectStatus(projectId);
+        R validationResult = validateProjectStatus(req.getProjectId());
         if (validationResult != null) {
             return validationResult;
         }
-        List<Slide> slideList = list(Wrappers.<Slide>lambdaQuery().eq(ObjectUtil.isNotEmpty(projectId), Slide::getProjectId, projectId).in(CollectionUtils.isNotEmpty(slideIds), Slide::getSlideId, slideIds).eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).select(Slide::getSlideId));
+        List<Long> slideIds = req.getSlideInfos().stream().map(SlideInfo::getSlideId).collect(Collectors.toList());
+        List<Slide> slideList = list(Wrappers.<Slide>lambdaQuery().eq(ObjectUtil.isNotEmpty(req.getProjectId()), Slide::getProjectId, req.getProjectId())
+                .in(CollectionUtils.isNotEmpty(slideIds), Slide::getSlideId, slideIds)
+                .eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).select(Slide::getSlideId));
+        R<Boolean> deleteResult = R.ok(Boolean.TRUE);
         if (CollectionUtils.isNotEmpty(slideList)) {
             slideList.forEach(slide -> {
                 slide.setDelFlag(cn.staitech.common.core.constant.Constants.DEL_FLAG_DELETED);
             });
             updateBatchById(slideList);
-            R<Boolean> deleteResult = remoteAnnotationService.deleteBySlide(slideList.stream().map(Slide::getSlideId).collect(Collectors.toList()));
+            deleteResult = remoteAnnotationService.deleteBySlide(slideList.stream().map(Slide::getSlideId).collect(Collectors.toList()));
+            List<Long> imageIds = slideList.stream().map(Slide::getImageId).collect(Collectors.toList());
+            List<Image> imageList = imageMapper.selectList(Wrappers.<Image>lambdaQuery().in(Image::getImageId,imageIds));
+            List<SlideInfo> slideInfos = new ArrayList<>();
+            for (Image image : imageList){
+                for (Slide slide : slideList){
+                    if (slide.getImageId().equals(image.getImageId())){
+                        SlideInfo slideInfo = SlideInfo.builder()
+                                .imageCode(image.getImageCode())
+                                .animalCode(image.getAnimalCode())
+                                .sexFlag(image.getSexFlag())
+                                .createBy(SecurityUtils.getUserId())
+                                .groupCode(image.getGroupCode())
+                                .waxCode(image.getWaxCode())
+                                .createTime(slide.getCreateTime()).build();
+                        List<OperationObjectReq> slideInfoOperationObjects = new ArrayList<>();
+                        OperationObjectReq slideInfoOperationObject = new OperationObjectReq();
+                        slideInfoOperationObject.setName("图像系统编号");
+                        slideInfoOperationObject.setNameEn("图像系统编号");
+                        slideInfoOperationObject.setValue(slide.getImageId().toString());
+                        slideInfoOperationObject.setValueEn(slide.getImageId().toString());
+                        OperationObjectReq slideInfoOperationObject1 = new OperationObjectReq();
+                        slideInfoOperationObject1.setName("图像项目编号");
+                        slideInfoOperationObject1.setNameEn("图像项目编号");
+                        slideInfoOperationObject1.setValue(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
+                        slideInfoOperationObject1.setValueEn(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
+                        slideInfoOperationObjects.add(slideInfoOperationObject);
+                        slideInfoOperationObjects.add(slideInfoOperationObject1);
+                        slideInfo.getLogAuditParams().setOperationObjects(slideInfoOperationObjects);
+                        slideInfos.add(slideInfo);
+                    }
+                }
+            }
+            req.setSlideInfos(slideInfos);
         }
-        return R.ok();
+        return deleteResult;
     }
 
     @Override

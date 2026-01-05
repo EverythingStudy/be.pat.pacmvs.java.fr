@@ -1,6 +1,7 @@
 package cn.staitech.fr.vo.project;
 
 import cn.staitech.sft.logaudit.annotation.IgnoreLogField;
+import cn.staitech.sft.logaudit.req.LogAuditBaseReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +14,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectMemberInfo {
+public class ProjectMemberInfo extends LogAuditBaseReq {
     @IgnoreLogField
     @ApiModelProperty(value = "项目成员id", required = true)
     private Long memberId;
