@@ -1,6 +1,8 @@
 package cn.staitech.fr.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.crypto.SecureUtil;
+import cn.hutool.crypto.symmetric.AES;
 import cn.hutool.http.HttpUtil;
 import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
@@ -16,6 +18,7 @@ import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.sft.logaudit.req.OperationObjectReq;
+import cn.staitech.sft.logaudit.utils.JSONUtils;
 import cn.staitech.system.api.RemoteAnnotationService;
 import cn.staitech.system.api.domain.biz.AddSingleSlide;
 import cn.staitech.system.api.domain.biz.DelSingleSlide;
@@ -36,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -327,6 +331,10 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                         slideInfoOperationObjects.add(slideInfoOperationObject);
                         slideInfoOperationObjects.add(slideInfoOperationObject1);
                         slideInfo.getLogAuditParams().setOperationObjects(slideInfoOperationObjects);
+                        String encrypt = JSONUtils.toJsonString(slideInfo);
+                        AES aes = SecureUtil.aes("1234567890123456".getBytes(StandardCharsets.UTF_8));
+                        String encryptBase64 = aes.encryptBase64(encrypt);
+                        slideInfo.getLogAuditParams().setEncrypt(encryptBase64);
                         slideInfos.add(slideInfo);
                     }
                 }
