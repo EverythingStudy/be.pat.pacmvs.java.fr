@@ -159,8 +159,8 @@ public class ProjectController extends BaseController {
                 {"nickName", "注册姓名","User Name"},
                 {"sex", "性别","Gender"},
                 {"roleName", "系统角色","Role"},
-                {"slideInfos", "图像列表","Image list"},
-                {"projectMemberInfo", "用户信息","User info"}
+                {"slideInfos", "图像列表","Image List"},
+                {"projectMemberInfos", "用户列表","User List"}
         };
 
         for (String[] mapping : fieldMappings) {

@@ -7,9 +7,13 @@ import cn.staitech.fr.mapper.SysOrganizationMapper;
 import cn.staitech.fr.mapper.TopicMapper;
 import cn.staitech.fr.mapper.UserMapper;
 import cn.staitech.fr.vo.project.slide.SlideInfo;
+import cn.staitech.sft.logaudit.annotation.IdField;
+import cn.staitech.sft.logaudit.annotation.IgnoreLogField;
 import cn.staitech.sft.logaudit.annotation.LogFieldDBConvert;
 import cn.staitech.sft.logaudit.annotation.LogFieldEnumConvert;
 import cn.staitech.sft.logaudit.req.LogAuditBaseReq;
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 import io.swagger.annotations.ApiModelProperty;
 import javax.validation.constraints.NotBlank;
@@ -23,6 +27,12 @@ import static cn.staitech.fr.constant.LogFieldConvertConstants.*;
 
 @Data
 public class ProjectVo extends LogAuditBaseReq<ProjectEditVo> {
+
+//    @IgnoreLogField
+//    @ApiModelProperty(value = "项目ID")
+//    @IdField(index = 1,name = "项目编号",nameEn = "Project ID")
+//    private Long projectId;
+
     @LogFieldDBConvert(mapper = TopicMapper.class, convertField = TOPIC_NAME)
     @ApiModelProperty(value = "项目id")
     @NotNull(message = "{StartPredictionIn.specialId.isnull}")
@@ -65,6 +75,6 @@ public class ProjectVo extends LogAuditBaseReq<ProjectEditVo> {
     private List<SlideInfo> slideInfos;
 
     @ApiModelProperty(value = "将项目负责人账号添加到项目")
-    private ProjectMemberInfo projectMemberInfo;
+    private List<ProjectMemberInfo> projectMemberInfos;
 
 }

@@ -17,7 +17,6 @@ import cn.staitech.fr.utils.MathUtils;
 import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
-import cn.staitech.sft.logaudit.req.OperationObjectReq;
 import cn.staitech.sft.logaudit.utils.JSONUtils;
 import cn.staitech.system.api.RemoteAnnotationService;
 import cn.staitech.system.api.domain.biz.AddSingleSlide;
@@ -193,19 +192,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         for (Slide slide : slidesToSave) {
             for (SlideInfo slideInfo : slideInfos){
                 if (slide.getImageId().equals(slideInfo.getImageId())){
-                    List<OperationObjectReq> slideInfoOperationObjects = new ArrayList<>();
-                    OperationObjectReq slideInfoOperationObject = new OperationObjectReq();
-                    slideInfoOperationObject.setName("图像系统编号");
-                    slideInfoOperationObject.setNameEn("图像系统编号");
-                    slideInfoOperationObject.setValue(slide.getImageId().toString());
-                    slideInfoOperationObject.setValueEn(slide.getImageId().toString());
-                    OperationObjectReq slideInfoOperationObject1 = new OperationObjectReq();
-                    slideInfoOperationObject1.setName("图像项目编号");
-                    slideInfoOperationObject1.setNameEn("图像项目编号");
-                    slideInfoOperationObject1.setValue(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
-                    slideInfoOperationObject1.setValueEn(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
-                    slideInfoOperationObjects.add(slideInfoOperationObject);
-                    slideInfo.getLogAuditParams().setOperationObjects(slideInfoOperationObjects);
+                    slideInfo.setSlideId(slide.getSlideId());
                 }
             }
         }
@@ -254,20 +241,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         for (Slide slide : slidesToSave) {
             for (SlideInfo slideInfo : slideInfos){
                 if (slide.getImageId().equals(slideInfo.getImageId())){
-                    List<OperationObjectReq> slideInfoOperationObjects = new ArrayList<>();
-                    OperationObjectReq slideInfoOperationObject = new OperationObjectReq();
-                    slideInfoOperationObject.setName("图像系统编号");
-                    slideInfoOperationObject.setNameEn("图像系统编号");
-                    slideInfoOperationObject.setValue(slide.getImageId().toString());
-                    slideInfoOperationObject.setValueEn(slide.getImageId().toString());
-                    OperationObjectReq slideInfoOperationObject1 = new OperationObjectReq();
-                    slideInfoOperationObject1.setName("图像项目编号");
-                    slideInfoOperationObject1.setNameEn("图像项目编号");
-                    slideInfoOperationObject1.setValue(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
-                    slideInfoOperationObject1.setValueEn(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
-                    slideInfoOperationObjects.add(slideInfoOperationObject);
-                    slideInfoOperationObjects.add(slideInfoOperationObject1);
-                    slideInfo.getLogAuditParams().setOperationObjects(slideInfoOperationObjects);
+                    slideInfo.setSlideId(slide.getSlideId());
                 }
             }
         }
@@ -310,6 +284,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                 for (Slide slide : slideList){
                     if (slide.getImageId().equals(image.getImageId())){
                         SlideInfo slideInfo = SlideInfo.builder()
+                                .slideId(slide.getSlideId())
                                 .imageCode(image.getImageCode())
                                 .animalCode(image.getAnimalCode())
                                 .sexFlag(image.getSexFlag())
@@ -317,20 +292,6 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                                 .groupCode(image.getGroupCode())
                                 .waxCode(image.getWaxCode())
                                 .createTime(slide.getCreateTime()).build();
-                        List<OperationObjectReq> slideInfoOperationObjects = new ArrayList<>();
-                        OperationObjectReq slideInfoOperationObject = new OperationObjectReq();
-                        slideInfoOperationObject.setName("图像系统编号");
-                        slideInfoOperationObject.setNameEn("图像系统编号");
-                        slideInfoOperationObject.setValue(slide.getImageId().toString());
-                        slideInfoOperationObject.setValueEn(slide.getImageId().toString());
-                        OperationObjectReq slideInfoOperationObject1 = new OperationObjectReq();
-                        slideInfoOperationObject1.setName("图像项目编号");
-                        slideInfoOperationObject1.setNameEn("图像项目编号");
-                        slideInfoOperationObject1.setValue(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
-                        slideInfoOperationObject1.setValueEn(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
-                        slideInfoOperationObjects.add(slideInfoOperationObject);
-                        slideInfoOperationObjects.add(slideInfoOperationObject1);
-                        slideInfo.getLogAuditParams().setOperationObjects(slideInfoOperationObjects);
                         String encrypt = JSONUtils.toJsonString(slideInfo);
                         AES aes = SecureUtil.aes("1234567890123456".getBytes(StandardCharsets.UTF_8));
                         String encryptBase64 = aes.encryptBase64(encrypt);

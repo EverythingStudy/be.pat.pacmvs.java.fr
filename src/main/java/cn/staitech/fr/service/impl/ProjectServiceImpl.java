@@ -94,7 +94,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         CustomPage<ProjectPageVo> page = new CustomPage<>(req);
         // 状态查询条件为空时，默认赋值(0-待启动，1-进行中，2-暂停，3-已完成)
         if (CollectionUtils.isEmpty(req.getStatus())) {
-            if(SysRoleUtils.isQualityAdmin()) {
+            if (SysRoleUtils.isQualityAdmin()) {
                 req.setStatus(Arrays.asList(Constants.STATUS_RUNNING));
             } else {
                 req.setStatus(Arrays.asList(Constants.STATUS_PENDING, Constants.STATUS_RUNNING, Constants.STATUS_PAUSED, Constants.STATUS_COMPLETED));
@@ -127,7 +127,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
         if (SecurityUtils.isOrgAdmin() || (SecurityUtils.getUserId().equals(e.getPrincipal()) && matchAdmin)) {
             buttons = ProjectButtonGenerator.generateButtons(e.getStatus(), Constants.ROLE_OWNER);
-        //这块可以用或者因为产品想让质量管理员可以看到详情按钮，即便我没有参与这个项目我也可以查看
+            //这块可以用或者因为产品想让质量管理员可以看到详情按钮，即便我没有参与这个项目我也可以查看
         } else if ((count > 0 && matchAdmin) || qualityAdmin) {
             buttons = ProjectButtonGenerator.generateButtons(e.getStatus(), Constants.ROLE_MEMBER);
         } else {
@@ -172,10 +172,16 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         List<OperationObjectReq> operationObjects = new ArrayList<>();
         OperationObjectReq operationObject = new OperationObjectReq();
         operationObject.setName("项目编号");
-        operationObject.setNameEn("项目编号");
-        operationObject.setValue(project.getProjectId()+"("+project.getTopicName()+")");
-        operationObject.setValueEn(project.getProjectId()+"("+project.getTopicName()+")");
+        operationObject.setNameEn("Project ID");
+        operationObject.setValue(project.getProjectId() + project.getTopicName());
+        operationObject.setValueEn(project.getProjectId() + project.getTopicName());
         operationObjects.add(operationObject);
+        OperationObjectReq operationObject1 = new OperationObjectReq();
+        operationObject1.setName("专题编号");
+        operationObject1.setNameEn("Study ID");
+        operationObject1.setValue(project.getProjectId() + project.getTopicName());
+        operationObject1.setValueEn(project.getProjectId() + project.getTopicName());
+        operationObjects.add(operationObject1);
         req.getLogAuditParams().setOperationObjects(operationObjects);
         //查询图像切片
         List<Image> images = imageMapper.selectList(Wrappers.<Image>lambdaQuery().eq(Image::getTopicId, req.getTopicId()).eq(Image::getStatus, Constants.IMAGE_STATUS_ENABLE).eq(Image::getOrganizationId, SecurityUtils.getOrganizationId()).eq(Image::getAnalyzeStatus, Constants.IMAGE_NAME_PARSE_SUCC));
@@ -202,23 +208,11 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         }
         slideService.saveBatch(slides);
         for (Slide slide : slides) {
-             for (SlideInfo slideInfo : slideInfos){
-                 if (slide.getImageId().equals(slideInfo.getImageId())){
-                     List<OperationObjectReq> slideInfoOperationObjects = new ArrayList<>();
-                     OperationObjectReq slideInfoOperationObject = new OperationObjectReq();
-                     slideInfoOperationObject.setName("图像系统编号");
-                     slideInfoOperationObject.setNameEn("图像系统编号");
-                     slideInfoOperationObject.setValue(slide.getImageId().toString());
-                     slideInfoOperationObject.setValueEn(slide.getImageId().toString());
-                     OperationObjectReq slideInfoOperationObject1 = new OperationObjectReq();
-                     slideInfoOperationObject1.setName("图像项目编号");
-                     slideInfoOperationObject1.setNameEn("图像项目编号");
-                     slideInfoOperationObject1.setValue(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
-                     slideInfoOperationObject1.setValueEn(slide.getSlideId()+"("+slideInfo.getImageCode()+")");
-                     slideInfoOperationObjects.add(slideInfoOperationObject);
-                     slideInfo.getLogAuditParams().setOperationObjects(slideInfoOperationObjects);
-                 }
-             }
+            for (SlideInfo slideInfo : slideInfos) {
+                if (slide.getImageId().equals(slideInfo.getImageId())) {
+                    slideInfo.setSlideId(slide.getSlideId());
+                }
+            }
         }
         req.setSlideInfos(slideInfos);
         //添加项目成员
@@ -231,9 +225,11 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                     .map(SysRole::getRoleName)
                     .filter(Objects::nonNull)
                     .collect(Collectors.joining(","));
-            req.setProjectMemberInfo(ProjectMemberInfo.builder().sex(user.getSex())
+            req.setProjectMemberInfos(Collections.singletonList(ProjectMemberInfo.builder()
+                    .userId(user.getUserId())
+                    .sex(user.getSex())
                     .userName(user.getUserName()).nickName(user.getNickName())
-                    .roleName(roleNames).phonenumber(user.getPhonenumber()).build());
+                    .roleName(roleNames).phonenumber(user.getPhonenumber()).build()));
         }
         getSpecialAnnotationRel(project.getProjectId(), req.getPrincipal());
         req.setCreateTime(project.getCreateTime());
@@ -369,7 +365,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
         // 项目启动后，仅在暂停时可以修改基础信息部分的项目名称和负责人外，其他信息不允许修改
         Project project = new Project();
-        if(status == Constants.STATUS_PAUSED){
+        if (status == Constants.STATUS_PAUSED) {
             project.setProjectId(req.getProjectId());
             // 项目名称
             project.setProjectName(req.getProjectName());
@@ -378,7 +374,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
             project.setUpdateBy(SecurityUtils.getUserId());
             project.setUpdateTime(new Date());
             baseMapper.updateById(project);
-        }else {
+        } else {
             BeanUtils.copyProperties(req, project);
             project.setUpdateBy(SecurityUtils.getUserId());
             project.setUpdateTime(new Date());
