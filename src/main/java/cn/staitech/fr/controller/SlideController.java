@@ -9,6 +9,7 @@ import cn.staitech.common.core.web.controller.BaseController;
 import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.Slide;
+import cn.staitech.fr.domain.in.SlideInfoReq;
 import cn.staitech.fr.domain.out.AiInfoListRequest;
 import cn.staitech.fr.domain.out.ExportAiListVO;
 import cn.staitech.fr.mapper.ProjectMapper;
@@ -171,10 +172,10 @@ public class SlideController  extends BaseController {
         return R.ok(resp);
     }
 
-    @ApiOperation(value = "查询切片、图片详情接口。调用后更新阅片状态")
-    @GetMapping("/slideInfo")
-    public R<SlideDetailVo> slideInfo(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "标注id", required = true) Long slideId) {
-        SlideDetailVo slideInfo = slideMapper.getSlideInfo(slideId);
+    @ApiOperation(value = "查询切片、图片详情接口。调用后更新阅片状态",tags = {"I18n"})
+    @PostMapping("/slideInfo")
+    public R<SlideDetailVo> slideInfo(@RequestBody SlideInfoReq req) {
+        SlideDetailVo slideInfo = slideMapper.getSlideInfo(req.getSlideId());
         return R.ok(slideInfo);
     }
 
