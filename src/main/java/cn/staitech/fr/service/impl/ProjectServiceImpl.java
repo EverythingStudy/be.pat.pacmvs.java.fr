@@ -168,6 +168,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         BeanUtils.copyProperties(req, project);
         project.setCreateBy(SecurityUtils.getUserId());
         project.setCreateTime(new Date());
+        project.setTopicName(topicMapper.selectById(project.getTopicId()).getTopicName());
         baseMapper.insert(project);
         List<OperationObjectReq> operationObjects = new ArrayList<>();
         OperationObjectReq operationObject = new OperationObjectReq();
