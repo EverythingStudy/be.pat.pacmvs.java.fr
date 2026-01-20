@@ -300,7 +300,14 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                     }
                 }
             }
-            req.setSlideInfos(slideInfos);
+            List<SlideInfoDel> slideInfoDels = new ArrayList<>();
+            for (SlideInfo slideInfo : slideInfos){
+                SlideInfoDel slideInfoDel = new SlideInfoDel(slideInfo.getSlideId(), slideInfo.getImageId(), slideInfo.getImageCode());
+                slideInfoDel.setEncrypt(slideInfo.getLogAuditParams().getEncrypt());
+                slideInfoDels.add(slideInfoDel);
+            }
+            req.setObjList(slideInfoDels);
+//            req.setSlideInfos(slideInfos);
         }
         return deleteResult;
     }

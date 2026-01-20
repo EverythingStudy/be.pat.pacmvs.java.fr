@@ -1,6 +1,7 @@
 package cn.staitech.fr.vo.project;
 
 import cn.staitech.fr.vo.project.slide.SlideInfo;
+import cn.staitech.fr.vo.project.slide.SlideInfoDel;
 import cn.staitech.sft.logaudit.annotation.IgnoreLogField;
 import cn.staitech.sft.logaudit.req.LogAuditBaseReq;
 import io.swagger.annotations.ApiModelProperty;
@@ -20,6 +21,7 @@ public class ProjectImageVo extends LogAuditBaseReq {
     @ApiModelProperty(value = "图像ID", required = true)
 //    @NotEmpty(message = "{PICTURE_NON_CHOOSE}")
     private List<SlideInfo> slideInfos;
+    private List<SlideInfoDel> objList;
 
 
 
