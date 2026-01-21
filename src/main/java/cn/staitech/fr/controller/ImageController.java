@@ -78,7 +78,7 @@ public class ImageController {
      * @return 包含已删除切片ID列表的响应
      * @throws Exception 如果删除过程中发生错误
      */
-    @LogAudit
+    @LogAudit(deleteBusiness= true,batch= true)
     @ApiOperation(value = "批量删除切片-物理删除",tags = {"I18n"})
     @PostMapping("/deleteBatchIds")
     public R<List<Long>> deleteBatchIds(@Validated @RequestBody ImageBatchIdsVO request) {

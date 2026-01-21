@@ -134,14 +134,14 @@ public class SlideController  extends BaseController {
         return slideService.choiceAll(choiceSaveInVo);
     }
 
-    @LogAudit
+    @LogAudit(deleteBusiness= true,batch= true)
     @ApiOperation(value = "项目配置-删除切片", tags = {"I18n"})
     @PostMapping("/deleteSlide")
     public R deleteSlide(@RequestBody @Validated ProjectImageVo req)throws  Exception {
         return slideService.deleteSlide(req);
     }
 
-    @LogAudit
+    @LogAudit(deleteBusiness= true,batch= true)
     @ApiOperation(value = "项目配置-删除切片", tags = {"I18n"})
     @PostMapping("/deleteSlideByIds")
     public R deleteSlideByIds(@RequestBody @Validated ProjectImageVo req)throws  Exception {
