@@ -20,5 +20,5 @@ public class ImageBatchIdsVO extends LogAuditBaseReq<ImageBatchIdsVO> {
     private List<Long> imageIdList;
 
     @ApiModelProperty(value = "日志记录", required = true)
-    private List<ImageLogDel> imageLogDetails;
+    private List<ImageLogDel> objList;
 }
