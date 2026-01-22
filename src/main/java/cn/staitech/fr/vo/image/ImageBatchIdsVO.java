@@ -11,7 +11,7 @@ import java.util.List;
  * @author wangf
  */
 @Data
-public class ImageBatchIdsVO extends LogAuditBaseReq<ImageBatchIdsVO> {
+public class ImageBatchIdsVO extends LogAuditBaseReq<ImageLogDetail> {
     /**
      * 图像id
      */
