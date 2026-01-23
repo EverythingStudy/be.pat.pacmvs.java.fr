@@ -198,6 +198,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 slide.setProjectId(project.getProjectId());
                 slides.add(slide);
                 slideInfos.add(SlideInfo.builder()
+                        .imageId(image.getImageId())
                         .imageCode(image.getImageCode())
                         .animalCode(image.getAnimalCode())
                         .sexFlag(image.getSexFlag())

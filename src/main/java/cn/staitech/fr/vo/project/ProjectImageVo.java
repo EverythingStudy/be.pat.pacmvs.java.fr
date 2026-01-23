@@ -12,7 +12,7 @@ import java.util.List;
 
 
 @Data
-public class ProjectImageVo extends LogAuditBaseReq {
+public class ProjectImageVo extends LogAuditBaseReq<SlideInfo> {
     @IgnoreLogField
     @ApiModelProperty("项目id")
     @NotNull(message = "{StartPredictionIn.specialId.isnull}")
