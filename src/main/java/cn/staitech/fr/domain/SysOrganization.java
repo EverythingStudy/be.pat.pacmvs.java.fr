@@ -1,5 +1,7 @@
 package cn.staitech.fr.domain;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import io.swagger.annotations.ApiModelProperty;
 import org.hibernate.validator.constraints.Length;
 
@@ -20,6 +22,7 @@ public class SysOrganization implements Serializable {
     */
     @NotNull(message="[机构ID、序号]不能为空")
     @ApiModelProperty("机构ID、序号")
+    @TableId(type = IdType.AUTO)
     private Long organizationId;
     /**
     * 机构名称
