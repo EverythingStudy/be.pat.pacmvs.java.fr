@@ -1,7 +1,9 @@
 package cn.staitech.fr.vo.project;
 
+import cn.staitech.fr.enums.GenderEnum;
 import cn.staitech.sft.logaudit.annotation.IdField;
 import cn.staitech.sft.logaudit.annotation.IgnoreLogField;
+import cn.staitech.sft.logaudit.annotation.LogFieldEnumConvert;
 import cn.staitech.sft.logaudit.req.LogAuditBaseReq;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -32,6 +34,7 @@ public class ProjectMemberInfo extends LogAuditBaseReq {
     @ApiModelProperty(value = "注册姓名")
     private String userName;
 
+    @LogFieldEnumConvert(enumClass = GenderEnum.class,valueField = "code",convertField = "info")
     @ApiModelProperty(value = "性别")
     private String sex;
 
