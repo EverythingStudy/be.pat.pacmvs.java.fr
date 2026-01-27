@@ -227,12 +227,13 @@ public class MathUtils {
     }
 
     /**
-     * @param dataList
-     * @param count    对应脏器对照组切片数量
-     * @param <T>
+     * @param decimalList
+     * @param count       对应脏器对照组切片数量
+     * @param
      * @return
      */
-    public static <T> String getFirstAndLastOfMiddle95Percent(List<T> dataList, Integer count) {
+    public static String getFirstAndLastOfMiddle95Percent(List<BigDecimal> decimalList, Integer count) {
+        List<BigDecimal> dataList = decimalList.stream().sorted().map(e -> e.setScale(3, RoundingMode.UP)).collect(Collectors.toList());
         //数量[1,5)
         if (count == null || count < 5) {
             return "数据量过少,无统计学意义";
@@ -241,8 +242,8 @@ public class MathUtils {
             return "0-0";
         }
         if (count < 40) {
-            BigDecimal firstNumber = (BigDecimal) dataList.get(1);
-            BigDecimal lastNumber = (BigDecimal) dataList.get(dataList.size() - 2);
+            BigDecimal firstNumber = dataList.get(1);
+            BigDecimal lastNumber = dataList.get(dataList.size() - 2);
             if (getCompTO(firstNumber, lastNumber) <= 0) {
                 return firstNumber + "-" + lastNumber;
             } else {
@@ -259,8 +260,8 @@ public class MathUtils {
         // 确保剩余数据量至少为 1
         if (totalSize - 2 * removeCount < 1) {
             //log.error("剩余数量小于1");
-            BigDecimal firstNumber = (BigDecimal) dataList.get(startIndex - 1);
-            BigDecimal lastNumber = (BigDecimal) dataList.get(endIndex - 1);
+            BigDecimal firstNumber = dataList.get(startIndex - 1);
+            BigDecimal lastNumber = dataList.get(endIndex - 1);
             if (getCompTO(firstNumber, lastNumber) <= 0) {
                 return firstNumber + "-" + lastNumber;
             } else {
@@ -272,8 +273,8 @@ public class MathUtils {
         //List<T> middleSubList = dataList.subList(startIndex, endIndex);
 
         // 获取第一个数和最后一个数
-        BigDecimal firstNumber = (BigDecimal) dataList.get(startIndex - 1);
-        BigDecimal lastNumber = (BigDecimal) dataList.get(endIndex - 1);
+        BigDecimal firstNumber = dataList.get(startIndex - 1);
+        BigDecimal lastNumber = dataList.get(endIndex - 1);
         if (getCompTO(firstNumber, lastNumber) <= 0) {
             return firstNumber + "-" + lastNumber;
         } else {
