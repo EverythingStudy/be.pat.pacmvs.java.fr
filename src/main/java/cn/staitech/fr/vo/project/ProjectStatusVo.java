@@ -1,6 +1,5 @@
 package cn.staitech.fr.vo.project;
 
-import cn.staitech.fr.enums.ColorTypeEnum;
 import cn.staitech.fr.enums.ProjectStatusEnum;
 import cn.staitech.sft.logaudit.annotation.IgnoreLogField;
 import cn.staitech.sft.logaudit.annotation.LogFieldEnumConvert;
@@ -17,7 +16,7 @@ import static cn.staitech.fr.constant.LogFieldConvertConstants.VALUE;
  * @desc
  */
 @Data
-public class ProjectStatusVo extends LogAuditBaseReq {
+public class ProjectStatusVo extends LogAuditBaseReq<ProjectDetailVo> {
     @IgnoreLogField
     @ApiModelProperty(required = true, value = "项目id")
     private Long projectId;

@@ -21,7 +21,7 @@ import java.util.Date;
 import static cn.staitech.fr.constant.LogFieldConvertConstants.*;
 
 @Data
-public class ProjectEditVo extends LogAuditBaseReq<ProjectEditVo> {
+public class ProjectEditVo extends LogAuditBaseReq<ProjectDetailVo> {
     @IgnoreLogField
     @ApiModelProperty("项目id")
     @NotNull(message = "项目id不能为空")
