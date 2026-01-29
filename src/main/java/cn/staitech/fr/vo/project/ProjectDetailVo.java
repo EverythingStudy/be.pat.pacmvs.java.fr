@@ -54,7 +54,6 @@ public class ProjectDetailVo {
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
 
-    @IgnoreLogField
     @ApiModelProperty(value = "状态(0-待启动，1-进行中，2-暂停，3-已完成，6-归档)")
     private Integer status;
 
