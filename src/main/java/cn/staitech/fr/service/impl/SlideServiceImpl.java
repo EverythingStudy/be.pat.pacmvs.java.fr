@@ -17,6 +17,8 @@ import cn.staitech.fr.utils.MathUtils;
 import cn.staitech.fr.utils.MessageSource;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
+import cn.staitech.sft.logaudit.req.LogAuditParams;
+import cn.staitech.sft.logaudit.req.OperationObjectReq;
 import cn.staitech.sft.logaudit.utils.JSONUtils;
 import cn.staitech.system.api.RemoteAnnotationService;
 import cn.staitech.system.api.domain.biz.AddSingleSlide;
@@ -266,10 +268,11 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         if (validationResult != null) {
             return validationResult;
         }
+        Map<String, List<OperationObjectReq>> operationObjectsMap = new HashMap<>();
         List<Long> slideIds = req.getSlideInfos().stream().map(SlideInfo::getSlideId).collect(Collectors.toList());
         List<Slide> slideList = list(Wrappers.<Slide>lambdaQuery().eq(ObjectUtil.isNotEmpty(req.getProjectId()), Slide::getProjectId, req.getProjectId())
                 .in(CollectionUtils.isNotEmpty(slideIds), Slide::getSlideId, slideIds)
-                .eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).select(Slide::getSlideId));
+                .eq(Slide::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).select(Slide::getSlideId, Slide::getImageId));
         R<Boolean> deleteResult = R.ok(Boolean.TRUE);
         if (CollectionUtils.isNotEmpty(slideList)) {
             slideList.forEach(slide -> {
@@ -285,6 +288,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                     if (slide.getImageId().equals(image.getImageId())){
                         SlideInfo slideInfo = SlideInfo.builder()
                                 .slideId(slide.getSlideId())
+                                .imageId(slide.getImageId())
                                 .imageCode(image.getImageCode())
                                 .animalCode(image.getAnimalCode())
                                 .sexFlag(image.getSexFlag())
@@ -295,17 +299,42 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                         String encrypt = JSONUtils.toJsonString(slideInfo);
                         AES aes = SecureUtil.aes("1234567890123456".getBytes(StandardCharsets.UTF_8));
                         String encryptBase64 = aes.encryptBase64(encrypt);
-                        slideInfo.getLogAuditParams().setEncrypt(encryptBase64);
+                        LogAuditParams logAuditParams = new LogAuditParams();
+                        logAuditParams.setEncrypt(encryptBase64);
+                        slideInfo.setLogAuditParams(logAuditParams);
                         slideInfos.add(slideInfo);
                     }
                 }
             }
             List<SlideInfoDel> slideInfoDels = new ArrayList<>();
             for (SlideInfo slideInfo : slideInfos){
-                SlideInfoDel slideInfoDel = new SlideInfoDel(slideInfo.getSlideId(), slideInfo.getImageId(), slideInfo.getImageCode());
+                SlideInfoDel slideInfoDel = new SlideInfoDel(slideInfo.getImageId(), slideInfo.getSlideId(), slideInfo.getImageCode());
                 slideInfoDel.setEncrypt(slideInfo.getLogAuditParams().getEncrypt());
                 slideInfoDels.add(slideInfoDel);
+                List<OperationObjectReq> operationObjectReqs = new ArrayList<>();
+//                图像系统编号：5214，图像项目编号：1379，图像名称：R25-S001-RD 7284677-6 4F.svs
+                OperationObjectReq operationObjectReq = new OperationObjectReq();
+                operationObjectReq.setValue(String.valueOf(slideInfo.getImageId()));
+                operationObjectReq.setValueEn(String.valueOf(slideInfo.getImageId()));
+                operationObjectReq.setName("图像系统编号");
+                operationObjectReq.setNameEn("Image System ID");
+                operationObjectReqs.add(operationObjectReq);
+                OperationObjectReq operationObjectReq1 = new OperationObjectReq();
+                operationObjectReq1.setValue(String.valueOf(slideInfo.getSlideId()));
+                operationObjectReq1.setValueEn(String.valueOf(slideInfo.getSlideId()));
+                operationObjectReq1.setName("图像项目编号");
+                operationObjectReq1.setNameEn("Image Project ID");
+                operationObjectReqs.add(operationObjectReq1);
+                OperationObjectReq operationObjectReq2 = new OperationObjectReq();
+                operationObjectReq2.setValue(slideInfo.getImageCode());
+                operationObjectReq2.setValueEn(slideInfo.getImageCode());
+                operationObjectReq2.setName("图像名称");
+                operationObjectReq2.setNameEn("Image Name");
+                operationObjectReqs.add(operationObjectReq2);
+                operationObjectsMap.put(String.valueOf(slideInfoDel.getSlideId()), operationObjectReqs);
             }
+            req.getLogAuditParams().setOperationObjectsMap(operationObjectsMap);
+            req.getLogAuditParams().setProjectId(req.getProjectId());
             req.setObjList(slideInfoDels);
 //            req.setSlideInfos(slideInfos);
         }
