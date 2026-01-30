@@ -231,6 +231,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
             slidesToSave.add(slide);
             Image image = imageMap.get(imageId);
             slideInfos.add(SlideInfo.builder()
+                    .imageId(imageId)
                     .imageCode(image.getImageCode())
                     .animalCode(image.getAnimalCode())
                     .sexFlag(image.getSexFlag())
