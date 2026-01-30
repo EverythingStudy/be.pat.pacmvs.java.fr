@@ -232,7 +232,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
             Image image = imageMap.get(imageId);
             slideInfos.add(SlideInfo.builder()
                     .imageId(imageId)
-                    .imageCode(image.getImageCode())
+                    .imageCode(image.getImageName())
                     .animalCode(image.getAnimalCode())
                     .sexFlag(image.getSexFlag())
                     .createBy(SecurityUtils.getUserId())
@@ -290,7 +290,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                         SlideInfo slideInfo = SlideInfo.builder()
                                 .slideId(slide.getSlideId())
                                 .imageId(slide.getImageId())
-                                .imageCode(image.getImageCode())
+                                .imageCode(image.getImageName())
                                 .animalCode(image.getAnimalCode())
                                 .sexFlag(image.getSexFlag())
                                 .createBy(SecurityUtils.getUserId())
