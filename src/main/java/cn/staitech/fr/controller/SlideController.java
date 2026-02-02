@@ -10,6 +10,7 @@ import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.in.SlideInfoReq;
+import cn.staitech.fr.domain.in.VisitReq;
 import cn.staitech.fr.domain.out.AiInfoListRequest;
 import cn.staitech.fr.domain.out.ExportAiListVO;
 import cn.staitech.fr.mapper.ProjectMapper;
@@ -188,10 +189,10 @@ public class SlideController  extends BaseController {
 
 
     @ApiOperation(value = "阅片记录")
-    @GetMapping("/visit")
-    public R visit(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "标注id", required = true) Long slideId) {
-        accessViewRecordsService.saveAccessViewRecords(slideId);
-        return R.ok(slideService.getSlideInfo(slideId));
+    @PostMapping("/visit")
+    public R visit(@RequestBody VisitReq visitReq) {
+        accessViewRecordsService.saveAccessViewRecords(visitReq.getSlideId());
+        return R.ok(slideService.getSlideInfo(visitReq.getSlideId()));
     }
 
 
