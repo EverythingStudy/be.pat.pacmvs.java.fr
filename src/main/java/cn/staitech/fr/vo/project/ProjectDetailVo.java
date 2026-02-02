@@ -26,6 +26,10 @@ public class ProjectDetailVo {
     @NotNull(message = "项目id不能为空")
     private Long projectId;
 
+    @IgnoreLogField
+    @ApiModelProperty(value = "项目编号")
+    private String topicName;
+
     @ApiModelProperty("项目名称")
     @NotBlank(message = "{SpecialInsertVo.specialName.isnull}")
     @Size(max = 100,message = "{SpecialInsertVo.specialNumber.length}")
