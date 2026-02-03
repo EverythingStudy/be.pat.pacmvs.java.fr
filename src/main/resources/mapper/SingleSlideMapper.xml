@@ -248,7 +248,7 @@
           and tb.group_code = #{groupCode}
           and faf.quantitative_indicators = #{quantitativeIndicators}
         group by faf.forecast_id
-        order by faf.results desc
+        order by CAST(faf.results AS DECIMAL(10, 3)) desc
     </select>
     <select id="getCategoryIdCountByGroupCode" resultType="java.lang.Integer">
         select count(1)
