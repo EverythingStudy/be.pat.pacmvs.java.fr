@@ -170,18 +170,19 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         project.setCreateTime(new Date());
         project.setTopicName(topicMapper.selectById(project.getTopicId()).getTopicName());
         baseMapper.insert(project);
+        req.getLogAuditParams().setProjectId(project.getProjectId());
         List<OperationObjectReq> operationObjects = new ArrayList<>();
         OperationObjectReq operationObject = new OperationObjectReq();
         operationObject.setName("项目编号");
         operationObject.setNameEn("Project ID");
-        operationObject.setValue(project.getProjectId() + project.getTopicName());
-        operationObject.setValueEn(project.getProjectId() + project.getTopicName());
+        operationObject.setValue(String.valueOf(project.getProjectId()));
+        operationObject.setValueEn(String.valueOf(project.getProjectId()));
         operationObjects.add(operationObject);
         OperationObjectReq operationObject1 = new OperationObjectReq();
         operationObject1.setName("专题编号");
         operationObject1.setNameEn("Study ID");
-        operationObject1.setValue(project.getProjectId() + project.getTopicName());
-        operationObject1.setValueEn(project.getProjectId() + project.getTopicName());
+        operationObject1.setValue(project.getTopicName());
+        operationObject1.setValueEn(project.getTopicName());
         operationObjects.add(operationObject1);
         req.getLogAuditParams().setOperationObjects(operationObjects);
         //查询图像切片
@@ -199,7 +200,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                 slides.add(slide);
                 slideInfos.add(SlideInfo.builder()
                         .imageId(image.getImageId())
-                        .imageCode(image.getImageCode())
+                        .imageCode(image.getImageName())
                         .animalCode(image.getAnimalCode())
                         .sexFlag(image.getSexFlag())
                         .createBy(SecurityUtils.getUserId())
