@@ -190,6 +190,7 @@ public class SlideController  extends BaseController {
 
     @ApiOperation(value = "阅片记录")
     @PostMapping("/visit")
+    @LogAudit
     public R visit(@RequestBody VisitReq visitReq) {
         accessViewRecordsService.saveAccessViewRecords(visitReq.getSlideId());
         return R.ok(slideService.getSlideInfo(visitReq.getSlideId()));
