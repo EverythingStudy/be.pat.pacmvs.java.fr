@@ -3,6 +3,7 @@ package cn.staitech.fr.service.impl;
 import cn.hutool.core.date.DateUnit;
 import cn.hutool.core.date.DateUtil;
 import cn.staitech.fr.domain.*;
+import cn.staitech.fr.enums.ForecastStatusEnum;
 import cn.staitech.fr.enums.JsonTaskStatusEnum;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.JsonTaskService;
@@ -123,12 +124,21 @@ public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, Singl
                 }
                 return true;
             } else {
+                updateSingleSlideStatus(singleSlideId, ForecastStatusEnum.FORECAST_FAIL.getCode());
                 return false;
             }
         } catch (Exception ex) {
+            updateSingleSlideStatus(singleSlideId, ForecastStatusEnum.FORECAST_FAIL.getCode());
             ex.printStackTrace();
             log.error("forecastResults异常:{}", ex.getMessage());
             return false;
         }
+    }
+    private boolean updateSingleSlideStatus(Long singleSlideId, String forecastStatus) {
+        SingleSlide singleSlide = new SingleSlide();
+        singleSlide.setSingleId(singleSlideId);
+        //0未预测、1预测成功、2预测失败、3预测中
+        singleSlide.setForecastStatus(forecastStatus);
+        return this.updateById(singleSlide);
     }
 }
