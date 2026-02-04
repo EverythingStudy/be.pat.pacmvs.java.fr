@@ -127,19 +127,19 @@ organ-structures:
     12: #  肝脏
       - structure-id: 11214D,112004
     14: #  肠，盲肠
-      - structure-id: 114008,114009,11400C,114049
+      - structure-id: 114008,114009,11400C,114049,114156
     15: #  肠，结肠
-      - structure-id: 115008,115009,11500C
+      - structure-id: 115008,115009,11500C,115156
     16: #  肠，直肠
-      - structure-id: 116008,116009,11600C
+      - structure-id: 116008,116009,11600C,116156
     17: #  肠，回肠（含派氏结）
-      - structure-id: 117008,117009,11700C,117049
+      - structure-id: 117008,117009,11700C,117049,117156
     18: #  肠，空肠
-      - structure-id: 118008,118009,11800C
+      - structure-id: 118008,118009,11800C,118156
     19: #  肠，十二指肠
       - structure-id: 11900C,11901E
     1B: #  肾脏
-      - structure-id: 11B02D
+      - structure-id: 11B02D,11B03D
     1E: #  膀胱
       - structure-id: 11E034,11E035,11E037,11E036,11E003,11E004
     2B: #  凝固腺
@@ -210,7 +210,7 @@ organ-structures:
     40: # 神经，坐骨
       - structure-id: 1400BA
     5D: # 主动脉
-      - structure-id: 15D111
+      - structure-id: 15D111,15D113
     5E: # 心脏
       - structure-id: 15E111
 
