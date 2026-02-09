@@ -200,6 +200,10 @@ organ-structures:
       - structure-id: 15E003
     "0F": # 食管
       - structure-id: 10F12E,10F12F,10F00C,10F120,10F13B
+    "7B": # 眼球
+      - structure-id: 17B101,17B102,17B103
+    "5D": # 主动脉
+      - structure-id: 15D113
   outline: # 脏器结构轮廓
     "02": #哈德氏腺
       - structure-id: 102111
@@ -210,7 +214,7 @@ organ-structures:
     40: # 神经，坐骨
       - structure-id: 1400BA
     5D: # 主动脉
-      - structure-id: 15D111,15D113
+      - structure-id: 15D111
     5E: # 心脏
       - structure-id: 15E111
 

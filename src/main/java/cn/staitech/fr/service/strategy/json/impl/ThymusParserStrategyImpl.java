@@ -64,9 +64,9 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy imple
         //G 组织轮廓（144111）
         BigDecimal outLine = new BigDecimal(singleSlide.getArea());
         //A
-        indicatorResultsMap.put("皮质外轮廓面积", createIndicator(organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "14403D"));
+//        indicatorResultsMap.put("皮质外轮廓面积", createIndicator(organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "14403D"));
         //B
-        indicatorResultsMap.put("髓质外轮廓面积", createIndicator(organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "14403E"));
+//        indicatorResultsMap.put("髓质外轮廓面积", createIndicator(organArea2.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "14403E"));
         //C
         indicatorResultsMap.put("结缔组织面积", createIndicator(organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "14403F"));
         //D
