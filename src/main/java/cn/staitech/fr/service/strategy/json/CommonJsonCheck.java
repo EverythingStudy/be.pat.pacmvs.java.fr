@@ -181,7 +181,7 @@ public class CommonJsonCheck {
 
             JsonToken current;
 
-            try (FileInputStream fis = new FileInputStream("C:\\Users\\Administrator\\Desktop\\a.json"); JsonParser jsonParser = jsonFactory.createParser(fis)) {
+            try (FileInputStream fis = new FileInputStream(jsonFile); JsonParser jsonParser = jsonFactory.createParser(fis)) {
                 current = jsonParser.nextToken();
                 if (current != JsonToken.START_OBJECT) {
                     log.error("json type error！ : {},{}", current, jsonFileS.getFileUrl());

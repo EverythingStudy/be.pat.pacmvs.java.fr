@@ -208,7 +208,7 @@ public class JsonTaskParserService {
                 //解析脏器结构文件路径，并存入MySQL
                 parseSingleJsonFile(jsonTask, jsonObject);
                 Boolean flag1 = verifyCategoryStructure(jsonTask);
-                if (!flag1) {
+                if (flag1) {
                     List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()).isNotNull(JsonFile::getFileUrl));
                     //验证精细轮廓是否存在
                     SingleSlide singleSlide = singleSlideService.getById(singleSlideId);
