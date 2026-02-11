@@ -4,7 +4,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
-import cn.staitech.fr.service.strategy.json.impl.TestisParserStrategyImpl;
+import cn.staitech.fr.service.strategy.json.impl.rat.TestisParserStrategyImpl;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
