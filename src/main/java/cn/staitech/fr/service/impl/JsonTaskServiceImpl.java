@@ -31,7 +31,10 @@ public class JsonTaskServiceImpl extends ServiceImpl<JsonTaskMapper, JsonTask> i
     @Override
     public Boolean checkTask(JsonTask jsonTask) {
         jsonTask = this.getOne(new LambdaQueryWrapper<JsonTask>().eq(JsonTask::getSingleId, jsonTask.getSingleId()));
-        if (Objects.nonNull(jsonTask) && JsonTaskStatusEnum.PARSE_SUCCESS.getCode().equals(jsonTask.getStatus())) {
+        if (jsonTask == null) {
+            return Boolean.FALSE;
+        }
+        if (JsonTaskStatusEnum.PARSE_SUCCESS.getCode().equals(jsonTask.getStatus())) {
             return Boolean.TRUE;
         }
         jsonTask.setStatus(JsonTaskStatusEnum.PARSE_FAIL.getCode());
