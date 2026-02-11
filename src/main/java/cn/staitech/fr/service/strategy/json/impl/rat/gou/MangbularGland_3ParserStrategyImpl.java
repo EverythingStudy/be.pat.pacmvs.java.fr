@@ -1,0 +1,95 @@
+package cn.staitech.fr.service.strategy.json.impl.rat.gou;
+
+import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.in.IndicatorAddIn;
+import cn.staitech.fr.mapper.SingleSlideMapper;
+import cn.staitech.fr.service.AiForecastService;
+import cn.staitech.fr.service.strategy.json.AbstractCustomParserStrategy;
+import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
+import cn.staitech.fr.service.strategy.json.CommonJsonParser;
+import cn.staitech.fr.utils.AreaUtils;
+import cn.staitech.fr.utils.DecimalUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * 狗 颌下腺
+ */
+@Slf4j
+@Service
+public class MangbularGland_3ParserStrategyImpl extends AbstractCustomParserStrategy {
+    @Resource
+    private AiForecastService aiForecastService;
+    @Resource
+    private CommonJsonParser commonJsonParser;
+    @Resource
+    private AreaUtils areaUtils;
+    @Resource
+    private CommonJsonCheck commonJsonCheck;
+    @Resource
+    private SingleSlideMapper singleSlideMapper;
+
+
+    @PostConstruct
+    public void init() {
+        setCommonJsonParser(commonJsonParser);
+        setCommonJsonCheck(commonJsonCheck);
+        log.info("MangbularGlandParserStrategyImpl init");
+    }
+
+
+    @Override
+    public void alculationIndicators(JsonTask jsonTask) {
+        log.info("狗颌下腺结构指标计算开始：");
+
+        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
+        String slideAreaStr = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
+        BigDecimal slideArea = new BigDecimal(slideAreaStr);
+
+        // 获取各项指标
+        BigDecimal ductAreaPer = commonJsonParser.getOrganAreaMicron(jsonTask, "30B06F"); // A: 导管面积（单个）
+        BigDecimal ductAreaTotal = commonJsonParser.getOrganAreaMicron(jsonTask, "30B06F"); // B: 导管面积（全片）
+        BigDecimal acinusArea = commonJsonParser.getOrganArea(jsonTask, "30B06D").getStructureAreaNum(); // C: 腺泡面积
+        Integer acinusNucleusCount = commonJsonParser.getOrganAreaCount(jsonTask, "30B06E"); // D: 腺泡细胞核数量
+
+        // 算法输出指标
+        indicatorResultsMap.put("导管面积（单个）", new IndicatorAddIn("", DecimalUtils.setScale3(ductAreaPer), "10³平方微米", CommonConstant.NUMBER_1, "30B06F"));
+        indicatorResultsMap.put("导管面积（全片）", new IndicatorAddIn("", DecimalUtils.setScale3(ductAreaTotal), "10³平方微米", CommonConstant.NUMBER_1, "30B06F"));
+        indicatorResultsMap.put("腺泡面积", new IndicatorAddIn("", DecimalUtils.setScale3(acinusArea), "平方毫米", CommonConstant.NUMBER_1, "30B06D"));
+        indicatorResultsMap.put("腺泡细胞核数量", new IndicatorAddIn("", acinusNucleusCount.toString(), "个", CommonConstant.NUMBER_1, "30B06E"));
+        indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", DecimalUtils.setScale3(slideArea), "平方毫米", CommonConstant.NUMBER_1, "30B111"));
+
+        // 产品呈现指标
+        indicatorResultsMap.put("颌下腺面积", new IndicatorAddIn("Submandibular gland area", DecimalUtils.setScale3(slideArea), "平方毫米", "30B111"));
+
+        if (slideArea.compareTo(BigDecimal.ZERO) != 0) {
+            // 导管面积占比（全片）= B / E
+            BigDecimal ductAreaRatioAll = commonJsonParser.getProportion(ductAreaTotal, slideArea.multiply(new BigDecimal(1000)));
+            indicatorResultsMap.put("导管面积占比（全片）", new IndicatorAddIn("Ducts area% (all)", DecimalUtils.percentScale3(ductAreaRatioAll), "%", areaUtils.getStructureIds("30B06F", "30B111")));
+
+            // 腺泡面积占比 = C / E
+            BigDecimal acinusAreaRatio = commonJsonParser.getProportion(acinusArea, slideArea);
+            indicatorResultsMap.put("腺泡面积占比", new IndicatorAddIn("Acinus area%", DecimalUtils.percentScale3(acinusAreaRatio), "%", areaUtils.getStructureIds("30B06D", "30B111")));
+        }
+
+        if (acinusArea.compareTo(BigDecimal.ZERO) != 0) {
+            // 腺泡细胞核密度 = D / C
+            BigDecimal acinusNucleusDensity = commonJsonParser.bigDecimalDivideCheck(new BigDecimal(acinusNucleusCount), acinusArea);
+            indicatorResultsMap.put("腺泡细胞核密度", new IndicatorAddIn("Nucleus density of acinar cell", DecimalUtils.setScale3(acinusNucleusDensity), "个/平方毫米", areaUtils.getStructureIds("30B06E", "30B06D")));
+        }
+
+        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
+        log.info("狗颌下腺结构指标计算结束");
+    }
+
+    @Override
+    public String getAlgorithmCode() {
+        return "Mangbular_Gland_3";
+    }
+}
