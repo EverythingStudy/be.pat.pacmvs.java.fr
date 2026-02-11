@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.FrAnnotationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.FrAnnotation">
+        <id column="annotation_id" property="annotationId" />
+        <result column="area" property="area" />
+        <result column="perimeter" property="perimeter" />
+        <result column="description" property="description" />
+        <result column="tag_id" property="tagId" />
+        <result column="contour" property="contour" />
+        <result column="location_type" property="locationType" />
+        <result column="annotation_type" property="annotationType" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+        <result column="slide_id" property="slideId" />
+        <result column="json_id" property="jsonId" />
+        <result column="contour_type" property="contourType" />
+        <result column="single_slide_id" property="singleSlideId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        annotation_id, area, perimeter, description, tag_id, contour, location_type, annotation_type,
+         create_by, create_time, update_by, update_time, slide_id, json_id, contour_type, single_slide_id
+    </sql>
+    
+    <insert id="batchSave" parameterType="cn.staitech.fr.domain.FrAnnotation">
+        insert into fr_annotation (
+        contour,
+        annotation_type,
+        create_by ,
+        create_time,
+        slide_id,
+        single_slide_id
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            st_geomfromgeojson(#{item.contour}),
+            #{item.annotationType},
+            #{item.createBy},
+            NOW(),
+            #{item.slideId},
+            #{item.singleSlideId}
+            )
+        </foreach>
+    </insert>
+
+</mapper>
