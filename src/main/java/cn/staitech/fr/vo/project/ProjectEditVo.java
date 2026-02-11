@@ -21,15 +21,15 @@ import java.util.Date;
 import static cn.staitech.fr.constant.LogFieldConvertConstants.*;
 
 @Data
-public class ProjectEditVo extends LogAuditBaseReq<ProjectEditVo> {
+public class ProjectEditVo extends LogAuditBaseReq<ProjectDetailVo> {
     @IgnoreLogField
     @ApiModelProperty("项目id")
     @NotNull(message = "项目id不能为空")
     private Long projectId;
 
     @ApiModelProperty("项目名称")
-    @NotBlank(message = "{SpecialInsertVo.specialName.isnull}")
-    @Size(max = 100,message = "{SpecialInsertVo.specialNumber.length}")
+    /*@NotBlank(message = "{SpecialInsertVo.specialName.isnull}")
+    @Size(max = 100,message = "{SpecialInsertVo.specialNumber.length}")*/
     private String projectName;
 
     @LogFieldDBConvert(mapper = SpeciesMapper.class, convertField = NAME)

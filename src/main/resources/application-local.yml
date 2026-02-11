@@ -127,19 +127,19 @@ organ-structures:
     12: #  肝脏
       - structure-id: 11214D,112004
     14: #  肠，盲肠
-      - structure-id: 114008,114009,11400C,114049
+      - structure-id: 114008,114009,11400C,114049,114156
     15: #  肠，结肠
-      - structure-id: 115008,115009,11500C
+      - structure-id: 115008,115009,11500C,115156
     16: #  肠，直肠
-      - structure-id: 116008,116009,11600C
+      - structure-id: 116008,116009,11600C,116156
     17: #  肠，回肠（含派氏结）
-      - structure-id: 117008,117009,11700C,117049
+      - structure-id: 117008,117009,11700C,117049,117156
     18: #  肠，空肠
-      - structure-id: 118008,118009,11800C
+      - structure-id: 118008,118009,11800C,118156
     19: #  肠，十二指肠
       - structure-id: 11900C,11901E
     1B: #  肾脏
-      - structure-id: 11B02D
+      - structure-id: 11B02D,11B03D
     1E: #  膀胱
       - structure-id: 11E034,11E035,11E037,11E036,11E003,11E004
     2B: #  凝固腺
@@ -181,7 +181,7 @@ organ-structures:
     7D: #  小脑与脑干
       - structure-id: 17D003,17D004,17D0A5
     44: # 胸腺
-      - structure-id: 14403F,144004
+      - structure-id: 14403F,144004,14403D,14403E
     "05": # 胰腺
       - structure-id: 105075,105076,105077,105027,10506F,105003,105004
     "06": #垂体
@@ -200,6 +200,10 @@ organ-structures:
       - structure-id: 15E003
     "0F": # 食管
       - structure-id: 10F12E,10F12F,10F00C,10F120,10F13B
+    "7B": # 眼球
+      - structure-id: 17B101,17B102,17B103
+    "5D": # 主动脉
+      - structure-id: 15D113
   outline: # 脏器结构轮廓
     "02": #哈德氏腺
       - structure-id: 102111

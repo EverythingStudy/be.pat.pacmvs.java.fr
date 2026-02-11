@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProjectMemberRemoveVo extends LogAuditBaseReq {
+public class ProjectMemberRemoveVo extends LogAuditBaseReq<ProjectMemberInfo> {
     @IgnoreLogField
     @NotNull(message = "{StartPredictionIn.specialId.isnull}")
     @ApiModelProperty(value = "项目成员id", required = true)

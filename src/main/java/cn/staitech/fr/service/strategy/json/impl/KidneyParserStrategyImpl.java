@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
@@ -13,6 +14,7 @@ import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.MathUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -64,14 +66,18 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         //皮质
         Annotation a11B03D = getOrganArea(jsonTask, "11B03D");
         BigDecimal b11B03D = a11B03D.getStructureAreaNum();
-        // BigDecimal b11B111 = new BigDecimal(singleSlide.getArea());
+        BigDecimal b11B111 = new BigDecimal(0);
+        if (ObjectUtil.isNotEmpty(singleSlide) && StringUtils.isNotEmpty(singleSlide.getArea())) {
+        	b11B111 = b11B111.add(new BigDecimal(singleSlide.getArea()));
+        }
+//         BigDecimal b11B111 = new BigDecimal(singleSlide.getArea());
         //组织轮廓-肾脏面积
-        //BigDecimal b11B111 = getOrganArea(jsonTask, "11B111").getStructureAreaNum();
+//        BigDecimal b11B111 = getOrganArea(jsonTask, "11B111").getStructureAreaNum();
         //肾小管数量
         Integer count = getOrganAreaCount(jsonTask, "11B031");
         //一级指标（算法输出指标）
         //A mm2 11B03D
-        // indicatorResultsMap.put("肾皮质面积", createIndicator(b11B03D.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "11B03D"));
+         indicatorResultsMap.put("肾皮质面积", createIndicator(b11B03D.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "11B03D"));
         //B、103平方微米 11B02D
         //indicatorResultsMap.put("肾小球面积（单个）", createDefaultIndicator("11B02D"));
         //C、个 11B02D、11B02E
@@ -87,7 +93,7 @@ public class KidneyParserStrategyImpl extends AbstractCustomParserStrategy {
         //1=G
         indicatorResultsMap.put("肾脏面积", createNameIndicator("", new BigDecimal(singleSlide.getArea()).setScale(3, RoundingMode.DOWN).toString(), SQ_MM, "11B111"));
         //2=(G-A)/G
-        //indicatorResultsMap.put("髓质面积占比", createNameIndicator("Medulla area%", String.valueOf(getProportion(b11B111.subtract(b11B03D), b11B111)), PERCENTAGE, "11B111,11B03D"));
+        indicatorResultsMap.put("髓质面积占比", createNameIndicator("Medulla area%", String.valueOf(getProportion(b11B111.subtract(b11B03D), b11B111)), PERCENTAGE, "11B111,11B03D"));
         //肾小球面积（单个）3=B
         List<Annotation> bs = getStructureContourList(jsonTask, "11B02D");
         List<BigDecimal> bsb = bs.stream().map(annotation -> {

@@ -137,6 +137,7 @@ public class ProjectMemberServiceImpl extends ServiceImpl<ProjectMemberMapper, P
                         .filter(Objects::nonNull)
                         .collect(Collectors.joining(","));
                 projectMemberInfos.add(ProjectMemberInfo.builder().sex(user.getSex())
+                        .userId(userId)
                         .userName(user.getUserName()).nickName(user.getNickName())
                         .roleName(roleNames).phonenumber(user.getPhonenumber()).build());
             }

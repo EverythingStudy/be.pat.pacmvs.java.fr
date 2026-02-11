@@ -29,7 +29,7 @@ import static cn.staitech.fr.constant.LogFieldConvertConstants.USER_NAME;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SlideInfoDel extends BatchLogAuditBaseReq {
-    @IdField(index = 1,name = "图像系统编号",nameEn = "Image System ID")
+//    @IdField(index = 1,name = "图像系统编号",nameEn = "Image System ID")
     @IgnoreLogField
     @ApiModelProperty(value = "原始切片id")
     private Long imageId;
@@ -39,7 +39,7 @@ public class SlideInfoDel extends BatchLogAuditBaseReq {
     @ApiModelProperty(value = "切片id")
     private Long slideId;
 
-    @IdField(index = 3,name = "图像名称",nameEn = "Image Name")
+//    @IdField(index = 3,name = "图像名称",nameEn = "Image Name")
     @ApiModelProperty(value = "切片编号")
     private String imageCode;
 }

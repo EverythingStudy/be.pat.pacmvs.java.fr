@@ -56,10 +56,10 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
     /**
      * 眼球
      * 结构	编码
-     * 晶状体	15F101
-     * 睫状体-虹膜	15F102
-     * 视网膜	15F103
-     * 组织轮廓	15F111
+     * 晶状体	17B101
+     * 睫状体-虹膜	17B102
+     * 视网膜	17B103
+     * 组织轮廓	17B111
      * 算法输出指标	指标代码（仅限本文档）	单位（保留小数点后三位）	备注
      * 晶状体面积	A	平方毫米	若多个数据则相加输出
      * 睫状体-虹膜面积	B	103平方微米	若多个数据则相加输出
@@ -92,10 +92,10 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
     	/**
-    	A	晶状体面积	15F101
-		B	睫状体-虹膜面积	15F102
-		C	视网膜面积	15F103
-		D	视网膜周长	15F103
+    	A	晶状体面积	17B101
+		B	睫状体-虹膜面积	17B102
+		C	视网膜面积	17B103
+		D	视网膜周长	17B103
 		
 		晶状体面积	1=A
 		睫状体-虹膜面积	2=B
@@ -103,19 +103,19 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
 		视网膜平均厚度	4=2C/D
     	 */
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        BigDecimal organArea = getOrganArea(jsonTask, "15F101").getStructureAreaNum();
-        BigDecimal organArea1 = getOrganArea(jsonTask, "15F102", BigDecimal.valueOf(1000)).getStructureAreaNum();
-        BigDecimal organArea2 = getOrganArea(jsonTask, "15F103").getStructureAreaNum();
-        BigDecimal organPerimeter = getOrganArea(jsonTask, "15F103").getStructurePerimeterNum();
+        BigDecimal organArea = getOrganArea(jsonTask, "17B101").getStructureAreaNum();
+        BigDecimal organArea1 = getOrganArea(jsonTask, "17B102", BigDecimal.valueOf(1000)).getStructureAreaNum();
+        BigDecimal organArea2 = getOrganArea(jsonTask, "17B103").getStructureAreaNum();
+        BigDecimal organPerimeter = getOrganArea(jsonTask, "17B103").getStructurePerimeterNum();
         //BigDecimal organArea3 = getOrganArea(jsonTask, "13F0BB").getStructureAreaNum();
         //BigDecimal organArea4 = getOrganArea(jsonTask, "13F0BA").getStructureAreaNum();
         //indicatorResultsMap.put("晶状体面积", new IndicatorAddIn("", organArea.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("晶状体面积", new IndicatorAddIn("Crystalline lens area", organArea.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_0,"15F101"));
+        indicatorResultsMap.put("晶状体面积", new IndicatorAddIn("Crystalline lens area", organArea.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_0,"17B101"));
         //todo 精度丢失
-        indicatorResultsMap.put("睫状体-虹膜面积", new IndicatorAddIn("Ciliary body-Iris area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1,"15F102"));
+        indicatorResultsMap.put("睫状体-虹膜面积", new IndicatorAddIn("Ciliary body-Iris area", organArea1.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1,"17B102"));
         //indicatorResultsMap.put("视网膜面积", new IndicatorAddIn("", organArea2.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_1));
-        indicatorResultsMap.put("视网膜面积", new IndicatorAddIn("Retina area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_0,"15F103"));
-        indicatorResultsMap.put("视网膜周长", new IndicatorAddIn("", organPerimeter.setScale(3, RoundingMode.HALF_UP).toString(), MM, CommonConstant.NUMBER_1,"15F103"));
+        indicatorResultsMap.put("视网膜面积", new IndicatorAddIn("Retina area", organArea2.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_0,"17B103"));
+        indicatorResultsMap.put("视网膜周长", new IndicatorAddIn("", organPerimeter.setScale(3, RoundingMode.HALF_UP).toString(), MM, CommonConstant.NUMBER_1,"17B103"));
         //indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), SQUARE_MICROMETER, CommonConstant.NUMBER_1));
 //        indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("Nerve fiber bundles area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_0));
 //        indicatorResultsMap.put("神经外膜结缔组织面积", new IndicatorAddIn("", organArea4.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_1));
@@ -131,7 +131,7 @@ public class D65EyeAndOpticNerveParserStrategyImpl extends AbstractCustomParserS
         if (D.compareTo(BigDecimal.ZERO) != 0 && C.compareTo(BigDecimal.ZERO) != 0){
             b = C.multiply(BigDecimal.valueOf(2)).divide(D, 3, RoundingMode.HALF_UP);
         }
-        indicatorResultsMap.put("视网膜平均厚度", new IndicatorAddIn("Average thickness of retina", b.toString(), MM, CommonConstant.NUMBER_0,"15F103"));
+        indicatorResultsMap.put("视网膜平均厚度", new IndicatorAddIn("Average thickness of retina", b.toString(), MM, CommonConstant.NUMBER_0,"17B103"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
     }
 

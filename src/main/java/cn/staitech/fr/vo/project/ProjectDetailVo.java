@@ -26,6 +26,10 @@ public class ProjectDetailVo {
     @NotNull(message = "项目id不能为空")
     private Long projectId;
 
+    @IgnoreLogField
+    @ApiModelProperty(value = "项目编号")
+    private String topicName;
+
     @ApiModelProperty("项目名称")
     @NotBlank(message = "{SpecialInsertVo.specialName.isnull}")
     @Size(max = 100,message = "{SpecialInsertVo.specialNumber.length}")
@@ -53,5 +57,12 @@ public class ProjectDetailVo {
 
     @ApiModelProperty(value = "创建时间")
     private Date createTime;
+
+    @ApiModelProperty(value = "状态(0-待启动，1-进行中，2-暂停，3-已完成，6-归档)")
+    private Integer status;
+
+    @IgnoreLogField
+    @ApiModelProperty(value = "删除标志(0:正常，1:删除)")
+    private String delFlag;
 
 }
