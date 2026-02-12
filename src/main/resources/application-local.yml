@@ -204,6 +204,20 @@ organ-structures:
       - structure-id: 17B101,17B102,17B103
     "5D": # 主动脉
       - structure-id: 15D113
+    30E:
+      - structure-id: 30E111,30E035,30E133
+    311:
+      - structure-id: 311111,311035,311036
+    312:
+      - structure-id: 312111,312145,312146,312147,312149,31214A,31214D
+    309:
+      - structure-id: 309111,30906F,30906E,30906D,30904F,30903F
+    30D:
+      - structure-id: 30D111,30D114,30D01C
+    30A:
+      - structure-id: 30A111,30A06F,30A06E,30A06D
+    30B:
+      - structure-id: 30B06F,30B111,30B06E,30B06D
   outline: # 脏器结构轮廓
     "02": #哈德氏腺
       - structure-id: 102111
