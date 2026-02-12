@@ -261,7 +261,8 @@ public class JsonTaskParserService {
         List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
         if (CollectionUtils.isNotEmpty(fileList)) {
             List<String> structureIdSet1 = fileList.stream().map(JsonFile::getStructureId).collect(Collectors.toList());
-            return isOrganRecognitionComplete(category.getOrganTagCode(), structureIdSet1);
+            String speciesOrganCode = String.format("%d%s", category.getSpeciesId(), category.getOrganTagCode());
+            return isOrganRecognitionComplete(speciesOrganCode, structureIdSet1);
         }
         return Boolean.FALSE;
     }
