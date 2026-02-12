@@ -1,14 +1,12 @@
 package cn.staitech.fr.service;
 
-import cn.staitech.fr.domain.SingleSlide;
-import cn.staitech.fr.domain.in.OrganDisassemblyQueryIn;
-import cn.staitech.fr.domain.out.OrganDisassemblyOut;
-import cn.staitech.fr.domain.out.SingleSlideSelectBy;
 import com.baomidou.mybatisplus.extension.service.IService;
 
-import java.util.List;
+import cn.staitech.fr.domain.SingleSlide;
 
 public interface SingleSlideService extends IService<SingleSlide> {
 
     Boolean forecastResults(Long singleSlideId, Long imageId);
+    
+    Boolean updateRatTcAreaPerimeter(Long singleSlideId, Long imageId);
 }

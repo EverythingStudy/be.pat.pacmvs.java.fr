@@ -1,13 +1,14 @@
 package cn.staitech.fr.service.strategy.json;
 
 import cn.staitech.fr.config.OrganStructureConfig;
-import cn.staitech.fr.config.TraceContext;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.enums.ForecastStatusEnum;
 import cn.staitech.fr.enums.JsonTaskStatusEnum;
 import cn.staitech.fr.enums.StructureAiStatusEnum;
 import cn.staitech.fr.enums.StructureJsonStatusEnum;
 import cn.staitech.fr.mapper.AiForecastMapper;
+import cn.staitech.fr.mapper.AnnotationMapper;
+import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.JsonFileMapper;
 import cn.staitech.fr.mapper.JsonTaskMapper;
 import cn.staitech.fr.mapper.OrganTagMapper;
@@ -23,7 +24,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -333,14 +333,23 @@ public class JsonTaskParserService {
 //                return;
 //            }
             long starts = System.nanoTime();
+            Long singleId = jsonTask.getSingleId();
+            Long imageId = jsonTask.getImageId();
             for (JsonFile jsonFile : jsonFileList) {
                 long start = System.nanoTime();
                 log.info("jsonTask id:[{}] singleSlide id:[{}],Json文件解析开始:{} {} {}", jsonTask.getTaskId(), jsonTask.getSingleId(), System.currentTimeMillis(), jsonFile.getFileUrl(), parser.getClass().getName());
                 jsonFile.setStartTime(new Date());
                 jsonFile.setStatus(StructureJsonStatusEnum.PARSE_ING.getCode());
                 jsonFileService.updateById(jsonFile);
-                // 解析json文件
-                parser.parseJson(jsonTask, jsonFile);
+                if(!jsonFile.getStructureId().endsWith("111")) {
+                	// 解析json文件
+                	parser.parseJson(jsonTask, jsonFile);
+                }else {
+                	//如果是组织轮廓（XXX111）保存到fr_annotation表内
+                	commonJsonParser.parseTissueContourJson(jsonTask, jsonFile);
+                    //计算面积和周长，并更新到fr_single_slide表里
+                	singleSlideService.updateRatTcAreaPerimeter(singleId, imageId);
+                }
                 // 计算耗时（秒）
                 long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);
                 long costSeconds = TimeUnit.MILLISECONDS.toSeconds(costMillis);

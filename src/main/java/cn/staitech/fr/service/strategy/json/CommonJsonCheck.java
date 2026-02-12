@@ -175,6 +175,11 @@ public class CommonJsonCheck {
 
         Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
         for (JsonFile jsonFileS : jsonFileList) {
+        	String structureId = jsonFileS.getStructureId();
+        	if(StringUtils.isNotEmpty(structureId) && structureId.endsWith("111")) {
+        		//组织轮廓,不用校验
+        		continue;
+        	}
             File jsonFile = new File(jsonFileS.getFileUrl());
             ObjectMapper mapper = new ObjectMapper();
             JsonFactory jsonFactory = new MappingJsonFactory();

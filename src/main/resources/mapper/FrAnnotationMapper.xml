@@ -35,7 +35,8 @@
         create_by ,
         create_time,
         slide_id,
-        single_slide_id
+        single_slide_id,
+        contour_type
         )
         values
         <foreach collection="list" item="item" separator=",">
@@ -45,7 +46,8 @@
             #{item.createBy},
             NOW(),
             #{item.slideId},
-            #{item.singleSlideId}
+            #{item.singleSlideId},
+            #{item.contourType}
             )
         </foreach>
     </insert>

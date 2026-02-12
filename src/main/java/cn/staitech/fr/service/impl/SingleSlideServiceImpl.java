@@ -141,4 +141,68 @@ public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, Singl
         singleSlide.setForecastStatus(forecastStatus);
         return this.updateById(singleSlide);
     }
+    
+    @Override
+    public Boolean updateRatTcAreaPerimeter(Long singleSlideId, Long imageId) {
+    	try {
+    		if (!Optional.ofNullable(singleSlideId).isPresent()) {
+    			return false;
+    		}
+    		SingleSlide singleSlideBy = singleSlideMapper.selectById(singleSlideId);
+    		if (singleSlideBy == null) {
+    			return false;
+    		}
+    		Annotation annotation = new Annotation();
+    		annotation.setSingleSlideId(singleSlideId);
+    		annotation.setFiligreeContour(true);
+    		//根据singleSlideId 查询面积和轮廓
+    		Annotation annotationBy = annotationMapper.getOrganArea(annotation);
+
+    		if (annotationBy == null || annotationBy.getArea() == null) {
+    			return false;
+    		}
+    		// 查询图像分辨率
+    		Image image = imageMapper.selectById(imageId);
+    		if (image == null) {
+    			return false;
+    		}
+    		if (!Optional.ofNullable(image.getResolutionX()).isPresent()) {
+    			return false;
+    		}
+
+    		double resolutions = Double.parseDouble(image.getResolutionX());
+    		//面积
+    		String area = getArea(annotationBy, resolutions);
+    		//周长
+    		String perimeter = getPerimeter(annotationBy, resolutions);
+    		
+    		SingleSlide singleSlide = new SingleSlide();
+    		singleSlide.setSingleId(singleSlideId);
+    		singleSlide.setArea(area);
+    		singleSlide.setPerimeter(perimeter);
+    		singleSlideMapper.updateById(singleSlide);
+    		return true;
+    	} catch (Exception ex) {
+    		updateSingleSlideStatus(singleSlideId, ForecastStatusEnum.FORECAST_FAIL.getCode());
+    		ex.printStackTrace();
+    		log.error("forecastResults异常:{}", ex.getMessage());
+    		return false;
+    	}
+    }
+    
+    private String getArea(Annotation annotationBy,double resolutions) {
+    	double areas = (Double.parseDouble(annotationBy.getArea()) * resolutions * resolutions) * 0.000001;
+		BigDecimal bd1 = new BigDecimal(Double.toString(areas));
+		bd1 = bd1.setScale(9, RoundingMode.HALF_UP);
+		String area = bd1.toPlainString();
+		return area;
+    }
+    
+    private String getPerimeter(Annotation annotationBy,double resolutions) {
+    	double perimeters = (Double.parseDouble(annotationBy.getPerimeter()) * resolutions) * 0.001;
+		BigDecimal bd = new BigDecimal(Double.toString(perimeters));
+		bd = bd.setScale(9, RoundingMode.HALF_UP);
+		String perimeter = bd.toPlainString();
+		return perimeter;
+    }
 }

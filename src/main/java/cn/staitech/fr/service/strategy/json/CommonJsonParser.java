@@ -6,6 +6,7 @@ import cn.staitech.fr.config.MapConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.AnnotationService;
+import cn.staitech.fr.service.FrAnnotationService;
 import cn.staitech.fr.vo.geojson.Properties;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -55,6 +56,10 @@ public class CommonJsonParser {
     private ImageMapper imageMapper;
     @Resource
     private AnnotationService annotationService;
+    
+    @Resource
+    private FrAnnotationService frAnnotationService;
+    
     @Resource
     private OrganTagMapper organTagMapper;
     @Resource(name = "dynamicDataThreadPool")
@@ -475,6 +480,28 @@ public class CommonJsonParser {
             return pathlogicalMap;
         }
         return pathlogicalMap;
+    }
+    
+    
+    /**
+     * 查询所有未被删除且登录机构相同的数据
+     *
+     * @param organizationId 机构id
+     * @return 指标的结构ID和类别ID
+     */
+    Map<Long, Map<String, Long>> organTagHasMap = new HashMap<>();
+
+    public Map<String, Long> getOrganTagMap(Long organizationId) {
+        Map<String, Long> organTagMap = organTagHasMap.get(organizationId);
+        if (organTagMap == null) {
+            LambdaQueryWrapper<OrganTag> categoryQueryWrapper = new LambdaQueryWrapper<>();
+            categoryQueryWrapper.eq(OrganTag::getDelFlag, 0).eq(OrganTag::getOrganizationId, organizationId);
+            List<OrganTag> list = organTagMapper.selectList(categoryQueryWrapper);
+            organTagMap = list.stream().collect(Collectors.toMap(OrganTag::getOrganTagCode, OrganTag::getOrganTagId, (entity1, entity2) -> entity1));
+            organTagHasMap.put(organizationId, organTagMap);
+            return organTagMap;
+        }
+        return organTagMap;
     }
 
 
@@ -1150,6 +1177,147 @@ public class CommonJsonParser {
             if (deletedCount < batchSize) {
                 break;
             }
+        }
+    }
+    
+    /**
+     * 
+    * @Title: parseTissueContourJson
+    * @Description: 解析组织轮廓数据
+    * @param @param jsonTask
+    * @param @param jsonFileS
+    * @return void
+    * @throws
+     */
+    public void parseTissueContourJson(JsonTask jsonTask, JsonFile jsonFileS) {
+        log.info("parseJson --------------> 组织轮廓数据文件解析开始: {} {} {}", 
+            System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
+
+        if (checkCategory(jsonTask)) {
+            return;
+        }
+
+        Map<String, Long> organTagMap = getOrganTagMap(jsonTask.getOrganizationId());
+        Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
+
+        File jsonFile = new File(jsonFileS.getFileUrl());
+        JsonFactory jsonFactory = new MappingJsonFactory();
+
+        List<FrAnnotation> processedAnnotations = new ArrayList<>();
+
+        try (FileInputStream fis = new FileInputStream(jsonFile);
+             JsonParser jsonParser = jsonFactory.createParser(fis)) {
+
+            log.info("parseJson --------------> 开始解析 JSON 文件流: {} {} {}", 
+                System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
+
+            // 检查根节点是否为对象
+            if (jsonParser.nextToken() != JsonToken.START_OBJECT) {
+                log.error("JSON 根节点不是对象！当前 token: {}", jsonParser.getCurrentToken());
+                return;
+            }
+
+            // 遍历顶层字段
+            while (jsonParser.nextToken() != JsonToken.END_OBJECT) {
+                String fieldName = jsonParser.getCurrentName();
+                jsonParser.nextToken(); // 移动到值
+                if ("features".equals(fieldName)) {
+                    if (jsonParser.getCurrentToken() == JsonToken.START_ARRAY) {
+                        // 遍历 features 数组
+                        while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
+                            JsonNode element = jsonParser.readValueAsTree(); // 直接获取节点，无多余序列化
+                            FrAnnotation annotation = handleTissueContourJsonElement(element, pathologicalMap, jsonTask, organTagMap);
+                            if (annotation != null) {
+                                processedAnnotations.add(annotation);
+                            }
+                        }
+                    }
+                } else {
+                    // 跳过其他字段
+                    jsonParser.skipChildren();
+                }
+            }
+
+            // 一次性批量保存
+            if (!processedAnnotations.isEmpty()) {
+                log.info("共解析出 {} 条组织轮廓标注，开始批量保存...", processedAnnotations.size());
+//                frAnnotationService.saveBatch(processedAnnotations);
+                frAnnotationService.batchProcessAndSave(processedAnnotations);
+                
+            } else {
+                log.warn("未解析出任何有效的组织轮廓标注数据");
+            }
+
+            log.info("parseJson --------------> JSON 文件解析与保存完成: {} {} {}", 
+                System.currentTimeMillis(), jsonFileS.getFileUrl(), jsonTask);
+
+        } catch (Exception e) {
+            log.error("解析组织轮廓 JSON 文件时发生异常: file={}, task={}", 
+                jsonFileS.getFileUrl(), jsonTask, e);
+        }
+    }
+    
+    
+    private static FrAnnotation handleTissueContourJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask,Map<String, Long> organTagMap ) {
+        if (element.isObject()) {
+            JsonNode node = element.get("id");
+            // node 转换成String
+            String annotationId = node.asText();
+            if (StringUtils.isEmpty(annotationId)) {
+                log.info("annotationId解析失败");
+                return null;
+            }
+            JsonNode node1 = element.get("properties");
+            // 将node1转换成Properties实体类
+            ObjectMapper mapper = new ObjectMapper();
+            Properties properties = null;
+            try {
+                properties = mapper.treeToValue(node1, Properties.class);
+            } catch (JsonProcessingException e) {
+                log.error("Unexpected error occurred: " + e.getMessage(), e);
+            }
+            if (null == properties) {
+                log.info("properties解析失败");
+                return null;
+            }
+            JsonNode geometry = element.get("geometry");
+            // geometry转换成JSONObject
+            JSONObject jsonObject = JSONObject.parseObject(JSONObject.toJSONString(geometry));
+            if (null == jsonObject) {
+                log.info("geometry解析失败");
+                return null;
+            }
+            String labelCode = properties.getLabel_code();
+            if (StringUtils.isEmpty(labelCode)) {
+                log.info("labelCode为空");
+                return null;
+            }
+            String annotationType = properties.getAnnotation_type();
+            if (StringUtils.isEmpty(annotationType)) {
+                log.info("annotationType为空");
+                return null;
+            }
+            FrAnnotation annotation = new FrAnnotation();
+
+            annotation.setCreateBy(0L);
+            annotation.setCreateTime(new Date());
+            annotation.setUpdateBy(0l);
+            annotation.setUpdateTime(new Date());
+            annotation.setContourType(2);
+            if (null != geometry) {
+                annotation.setContour(geometry.toString());
+            }
+            // 拿到categoryId
+            if (null != jsonTask && null != jsonTask.getCategoryId()) {
+            	annotation.setTagId(jsonTask.getCategoryId());
+            }
+            annotation.setSlideId(jsonTask.getSlideId());
+            annotation.setSingleSlideId(jsonTask.getSingleId());
+            annotation.setAnnotationType(annotationType.toUpperCase());
+            return annotation;
+        } else {
+            log.error("Expected an object, but got a non-object node: " + element);
+            return null;
         }
     }
 }
