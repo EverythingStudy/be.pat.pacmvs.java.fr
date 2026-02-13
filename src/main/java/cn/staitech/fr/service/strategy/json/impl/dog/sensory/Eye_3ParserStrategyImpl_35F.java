@@ -24,11 +24,11 @@ import java.util.Map;
  */
 @Component
 @Slf4j
-public class EyeOpticNerveParserStrategyImpl_35F extends AbstractCustomParserStrategy {
+public class Eye_3ParserStrategyImpl_35F extends AbstractCustomParserStrategy {
     private final SingleSlideMapper singleSlideMapper;
     private final AiForecastService aiForecastService;
 
-    public EyeOpticNerveParserStrategyImpl_35F(
+    public Eye_3ParserStrategyImpl_35F(
             CommonJsonParser commonJsonParser,
             CommonJsonCheck commonJsonCheck,
             SingleSlideMapper singleSlideMapper,
@@ -42,7 +42,7 @@ public class EyeOpticNerveParserStrategyImpl_35F extends AbstractCustomParserStr
 
     @Override
     public String getAlgorithmCode() {
-        return "EyeOpticNerve_3";
+        return "Eye_3";
     }
 
     @Override

@@ -24,11 +24,11 @@ import java.util.Map;
  */
 @Component
 @Slf4j
-public class SpleenParserStrategyImpl_345 extends AbstractCustomParserStrategy {
+public class Spleen_3ParserStrategyImpl_345 extends AbstractCustomParserStrategy {
     private final SingleSlideMapper singleSlideMapper;
     private final AiForecastService aiForecastService;
 
-    public SpleenParserStrategyImpl_345(
+    public Spleen_3ParserStrategyImpl_345(
             CommonJsonParser commonJsonParser,
             CommonJsonCheck commonJsonCheck,
             SingleSlideMapper singleSlideMapper,

@@ -10,7 +10,6 @@ import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.DecimalUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -24,11 +23,11 @@ import java.util.Map;
  */
 @Deprecated
 @Slf4j
-public class InguinalLymphNodeParserStrategyImpl_347 extends AbstractCustomParserStrategy {
+public class InguinalLymphNode_3ParserStrategyImpl_347 extends AbstractCustomParserStrategy {
     private final SingleSlideMapper singleSlideMapper;
     private final AiForecastService aiForecastService;
 
-    public InguinalLymphNodeParserStrategyImpl_347(
+    public InguinalLymphNode_3ParserStrategyImpl_347(
             CommonJsonParser commonJsonParser,
             CommonJsonCheck commonJsonCheck,
             SingleSlideMapper singleSlideMapper,

@@ -24,11 +24,11 @@ import java.util.Map;
  */
 @Component
 @Slf4j
-public class ThymusParserStrategyImpl_344 extends AbstractCustomParserStrategy {
+public class Thymus_3ParserStrategyImpl_344 extends AbstractCustomParserStrategy {
     private final SingleSlideMapper singleSlideMapper;
     private final AiForecastService aiForecastService;
 
-    public ThymusParserStrategyImpl_344(
+    public Thymus_3ParserStrategyImpl_344(
             CommonJsonParser commonJsonParser,
             CommonJsonCheck commonJsonCheck,
             SingleSlideMapper singleSlideMapper,

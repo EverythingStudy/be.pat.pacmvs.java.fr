@@ -24,11 +24,11 @@ import java.util.Map;
  */
 @Component
 @Slf4j
-public class LymphNodeParserStrategyImpl_34B extends AbstractCustomParserStrategy {
+public class LymphNode_3ParserStrategyImpl_34B extends AbstractCustomParserStrategy {
     private final SingleSlideMapper singleSlideMapper;
     private final AiForecastService aiForecastService;
 
-    public LymphNodeParserStrategyImpl_34B(
+    public LymphNode_3ParserStrategyImpl_34B(
             CommonJsonParser commonJsonParser,
             CommonJsonCheck commonJsonCheck,
             SingleSlideMapper singleSlideMapper,
