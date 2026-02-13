@@ -454,6 +454,6 @@ public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 
 	@Override
 	public String getAlgorithmCode() {
-		return "Kidney";
+		return "Kidney_3";
 	}
 }
