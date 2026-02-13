@@ -137,6 +137,6 @@ public class UrinaryBladder_3ParserStrategyImpl extends AbstractCustomParserStra
 
 	@Override
 	public String getAlgorithmCode() {
-		return "Urinary_bladder";
+		return "Urinary_bladder_3";
 	}
 }
