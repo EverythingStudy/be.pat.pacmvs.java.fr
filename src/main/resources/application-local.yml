@@ -218,6 +218,8 @@ organ-structures:
       - structure-id: 30A111,30A06F,30A06E,30A06D
     30B:
       - structure-id: 30B06F,30B111,30B06E,30B06D
+    30F:
+      - structure-id: 30F035,30F00C,30F120,30F13B,30F111
     33F: # 视神经 https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1VLPq2F4Xv5p6Ad9nL1
       - structure-id: 33F0BB,33F0BA,33F111
     340: #  坐骨神经    https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1LMDpOH4Xv5p6Ad9nL1
