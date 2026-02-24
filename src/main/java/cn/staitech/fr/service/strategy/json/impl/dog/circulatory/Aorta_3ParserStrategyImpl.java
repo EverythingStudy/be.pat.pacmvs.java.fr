@@ -29,7 +29,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component("Aorta_3")
-public class AortaParserStrategyImpl extends AbstractCustomParserStrategy implements OutlineCustom {
+public class Aorta_3ParserStrategyImpl extends AbstractCustomParserStrategy implements OutlineCustom {
 
     /** 犬主动脉 - 空腔结构ID */
     private static final String STRUCTURE_CAVITY = "35D113";

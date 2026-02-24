@@ -29,7 +29,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component("Heart_3")
-public class HeartParserStrategyImpl extends AbstractCustomParserStrategy implements OutlineCustom {
+public class Heart_3ParserStrategyImpl extends AbstractCustomParserStrategy implements OutlineCustom {
 
     /** 犬心脏 - 血管结构ID */
     private static final String STRUCTURE_VESSEL = "35E003";
