@@ -230,6 +230,10 @@ organ-structures:
       - structure-id: 3390B3,3390B2,3390B4,3390B5,339004,339111
     33D: #   脑干-33D-BS   https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1dnP0rc4Xv5p6Ad9nL1
       - structure-id: 33D003,33D004,33D111
+    35E: #   血液循环系统-心脏
+      - structure-id: 35E003,35E111
+    35D: #   血液循环系统-主动脉
+      - structure-id: 35D113,35D111
   outline: # 脏器结构轮廓
     "02": #哈德氏腺
       - structure-id: 102111
