@@ -218,6 +218,18 @@ organ-structures:
       - structure-id: 30A111,30A06F,30A06E,30A06D
     30B:
       - structure-id: 30B06F,30B111,30B06E,30B06D
+    344: # 胸腺
+      - structure-id: 34403D,34403E,344004,344111
+    345: # 脾脏
+      - structure-id: 345046,345047,345004,345051,345048,34504A,34505B,345111
+    34B: # 淋巴结
+      - structure-id: 34B054,34B051,34B052,34B03E,34B111
+    369: # 泪腺
+      - structure-id: 36906D,36906E,369111
+    35F: # 眼球
+      - structure-id: 35F101,35F103,35F111
+    30F:
+      - structure-id: 30F035,30F00C,30F120,30F13B,30F111
     33F: # 视神经 https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1VLPq2F4Xv5p6Ad9nL1
       - structure-id: 33F0BB,33F0BA,33F111
     340: #  坐骨神经    https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1LMDpOH4Xv5p6Ad9nL1
@@ -230,6 +242,10 @@ organ-structures:
       - structure-id: 3390B3,3390B2,3390B4,3390B5,339004,339111
     33D: #   脑干-33D-BS   https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1dnP0rc4Xv5p6Ad9nL1
       - structure-id: 33D003,33D004,33D111
+    35E: #   血液循环系统-心脏
+      - structure-id: 35E003,35E111
+    35D: #   血液循环系统-主动脉
+      - structure-id: 35D113,35D111
   outline: # 脏器结构轮廓
     "02": #哈德氏腺
       - structure-id: 102111
