@@ -100,6 +100,6 @@ public class CanidaeBrainStrategyImpl  extends AbstractCustomParserStrategy {
 
     @Override
     public String getAlgorithmCode() {
-        return "CanidaeBrainStrategy";
+        return "Brain_3";
     }
 }
