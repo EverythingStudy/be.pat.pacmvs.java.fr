@@ -20,12 +20,13 @@
         <result column="json_id" property="jsonId" />
         <result column="contour_type" property="contourType" />
         <result column="single_slide_id" property="singleSlideId" />
+        <result column="structure_id" property="structureId" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
         annotation_id, area, perimeter, description, tag_id, contour, location_type, annotation_type,
-         create_by, create_time, update_by, update_time, slide_id, json_id, contour_type, single_slide_id
+         create_by, create_time, update_by, update_time, slide_id, json_id, contour_type, single_slide_id,structure_id
     </sql>
     
     <insert id="batchSave" parameterType="cn.staitech.fr.domain.FrAnnotation">
@@ -36,7 +37,8 @@
         create_time,
         slide_id,
         single_slide_id,
-        contour_type
+        contour_type,
+        structure_id
         )
         values
         <foreach collection="list" item="item" separator=",">
@@ -47,7 +49,8 @@
             NOW(),
             #{item.slideId},
             #{item.singleSlideId},
-            #{item.contourType}
+            #{item.contourType},
+            #{item.structureId}
             )
         </foreach>
     </insert>

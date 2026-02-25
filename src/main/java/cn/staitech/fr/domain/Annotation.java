@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonFormat;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -264,6 +266,9 @@ public class Annotation implements Serializable {
     
     @TableField(exist = false)
     private Long tagId;
+    
+    @TableField(exist = false)
+    private String structureId;
 
     @Override
     public boolean equals(Object that) {

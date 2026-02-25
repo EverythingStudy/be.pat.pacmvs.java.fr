@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.strategy.json;
 
 import cn.staitech.fr.config.OrganStructureConfig;
+import cn.staitech.fr.config.SpecialStructureConfig;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.enums.ForecastStatusEnum;
 import cn.staitech.fr.enums.JsonTaskStatusEnum;
@@ -79,6 +80,8 @@ public class JsonTaskParserService {
     private JsonFileMapper jsonFileMapper;
     @Resource
     private OrganStructureConfig organStructureConfig;
+    @Resource
+    private SpecialStructureConfig specialStructureConfig;
     @Resource
     private ExecutorService executorService;
     private Executor ttlExecutor;
@@ -261,7 +264,7 @@ public class JsonTaskParserService {
         List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()));
         if (CollectionUtils.isNotEmpty(fileList)) {
             List<String> structureIdSet1 = fileList.stream().map(JsonFile::getStructureId).collect(Collectors.toList());
-            String speciesOrganCode = String.format("%d%s", category.getSpeciesId(), category.getOrganTagCode());
+            String speciesOrganCode = String.format("%s%s", category.getSpeciesId(), category.getOrganTagCode());
             return isOrganRecognitionComplete(speciesOrganCode, structureIdSet1);
         }
         return Boolean.FALSE;
@@ -342,14 +345,17 @@ public class JsonTaskParserService {
                 jsonFile.setStartTime(new Date());
                 jsonFile.setStatus(StructureJsonStatusEnum.PARSE_ING.getCode());
                 jsonFileService.updateById(jsonFile);
-                if(!jsonFile.getStructureId().endsWith("111")) {
+                if(!jsonFile.getStructureId().endsWith("111")&& !specialStructureConfig.containsStructureId(jsonFile.getStructureId())) {
                 	// 解析json文件
                 	parser.parseJson(jsonTask, jsonFile);
                 }else {
-                	//如果是组织轮廓（XXX111）保存到fr_annotation表内
+                	//如果是组织轮廓（XXX111或者specialStructureConfig.containsStructureId(jsonFile.getStructureId()得到的结构id）保存到fr_annotation表内
                 	commonJsonParser.parseTissueContourJson(jsonTask, jsonFile);
-                    //计算面积和周长，并更新到fr_single_slide表里
-                	singleSlideService.updateRatTcAreaPerimeter(singleId, imageId);
+                	//计算面积和周长，并更新到fr_single_slide表里
+                	//两种情况，一种是（XXX111）的结构id，走原逻辑，另外一种特殊的不处理（具体脏器，查询出来自己计算面积和周长）
+                	if(jsonFile.getStructureId().endsWith("111")) {
+                		singleSlideService.updateRatTcAreaPerimeter(singleId, imageId,jsonFile.getStructureId());
+                	}
                 }
                 // 计算耗时（秒）
                 long costMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - start);

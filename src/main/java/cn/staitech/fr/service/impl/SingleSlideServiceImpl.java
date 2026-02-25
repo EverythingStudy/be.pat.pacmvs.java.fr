@@ -15,6 +15,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -143,51 +145,64 @@ public class SingleSlideServiceImpl extends ServiceImpl<SingleSlideMapper, Singl
     }
     
     @Override
-    public Boolean updateRatTcAreaPerimeter(Long singleSlideId, Long imageId) {
+    public Boolean updateRatTcAreaPerimeter(Long singleSlideId, Long imageId,String structureId) {
     	try {
-    		if (!Optional.ofNullable(singleSlideId).isPresent()) {
+    		SingleSlide singleSlide = getSingleSlide(singleSlideId, imageId,structureId);
+    		if(null != singleSlide) {
+    			singleSlideMapper.updateById(singleSlide);
+    			return true;
+    		}else {
     			return false;
     		}
-    		SingleSlide singleSlideBy = singleSlideMapper.selectById(singleSlideId);
-    		if (singleSlideBy == null) {
-    			return false;
-    		}
-    		Annotation annotation = new Annotation();
-    		annotation.setSingleSlideId(singleSlideId);
-    		annotation.setFiligreeContour(true);
-    		//根据singleSlideId 查询面积和轮廓
-    		Annotation annotationBy = annotationMapper.getOrganArea(annotation);
-
-    		if (annotationBy == null || annotationBy.getArea() == null) {
-    			return false;
-    		}
-    		// 查询图像分辨率
-    		Image image = imageMapper.selectById(imageId);
-    		if (image == null) {
-    			return false;
-    		}
-    		if (!Optional.ofNullable(image.getResolutionX()).isPresent()) {
-    			return false;
-    		}
-
-    		double resolutions = Double.parseDouble(image.getResolutionX());
-    		//面积
-    		String area = getArea(annotationBy, resolutions);
-    		//周长
-    		String perimeter = getPerimeter(annotationBy, resolutions);
-    		
-    		SingleSlide singleSlide = new SingleSlide();
-    		singleSlide.setSingleId(singleSlideId);
-    		singleSlide.setArea(area);
-    		singleSlide.setPerimeter(perimeter);
-    		singleSlideMapper.updateById(singleSlide);
-    		return true;
     	} catch (Exception ex) {
     		updateSingleSlideStatus(singleSlideId, ForecastStatusEnum.FORECAST_FAIL.getCode());
     		ex.printStackTrace();
     		log.error("forecastResults异常:{}", ex.getMessage());
     		return false;
     	}
+    }
+    
+    @Override
+    public SingleSlide getSingleSlide(Long singleSlideId, Long imageId,String structureId) {
+    	if (!Optional.ofNullable(singleSlideId).isPresent()) {
+			return null;
+		}
+		SingleSlide singleSlideBy = singleSlideMapper.selectById(singleSlideId);
+		if (singleSlideBy == null) {
+			return null;
+		}
+		Annotation annotation = new Annotation();
+		annotation.setSingleSlideId(singleSlideId);
+		annotation.setFiligreeContour(true);
+		if(StringUtils.isNotEmpty(structureId)) {
+			annotation.setStructureId(structureId);
+		}
+		//根据singleSlideId 查询面积和轮廓
+		Annotation annotationBy = annotationMapper.getOrganArea(annotation);
+
+		if (annotationBy == null || annotationBy.getArea() == null) {
+			return null;
+		}
+		// 查询图像分辨率
+		Image image = imageMapper.selectById(imageId);
+		if (image == null) {
+			return null;
+		}
+		if (!Optional.ofNullable(image.getResolutionX()).isPresent()) {
+			return null;
+		}
+
+		double resolutions = Double.parseDouble(image.getResolutionX());
+		//面积
+		String area = getArea(annotationBy, resolutions);
+		//周长
+		String perimeter = getPerimeter(annotationBy, resolutions);
+		
+		SingleSlide singleSlide = new SingleSlide();
+		singleSlide.setSingleId(singleSlideId);
+		singleSlide.setArea(area);
+		singleSlide.setPerimeter(perimeter);
+		return singleSlide;
     }
     
     private String getArea(Annotation annotationBy,double resolutions) {
