@@ -1,5 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl.dog.immune;
 
+import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
@@ -73,7 +74,7 @@ public class Spleen_3ParserStrategyImpl_345 extends AbstractCustomParserStrategy
         BigDecimal areaH = getOrganArea(jsonTask, "34504A").getStructureAreaNum();
         map.put("边缘区面积", new IndicatorAddIn("", DecimalUtils.setScale3(areaH), SQ_MM, CommonConstant.NUMBER_0, "34504A"));
         // 红髓面积占比 1=(A-G)/F
-        BigDecimal proportion1 = getProportion(areaA.subtract(areaG), areaF);
+        BigDecimal proportion1 = getProportion(safetySubtract(areaA, areaG), areaF);
         map.put("红髓面积占比", new IndicatorAddIn("Red pulp area%", DecimalUtils.setScale3(proportion1), PERCENTAGE, CommonConstant.NUMBER_1, "345046,34505B,345111"));
         // 白髓面积占比 2=B/F
         BigDecimal proportion2 = getProportion(areaB, areaF);
@@ -82,11 +83,18 @@ public class Spleen_3ParserStrategyImpl_345 extends AbstractCustomParserStrategy
         BigDecimal proportion3 = getProportion(areaE, areaF);
         map.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", DecimalUtils.setScale3(proportion3), PERCENTAGE, CommonConstant.NUMBER_1, "345004,345111"));
         // 脾脏面积 4=F
-        map.put("脾脏面积", new IndicatorAddIn("Spleen area", DecimalUtils.setScale3(areaF), SQ_MM, CommonConstant.NUMBER_0, "345111"));
+        map.put("脾脏面积", new IndicatorAddIn("Spleen area", DecimalUtils.setScale3(areaF), SQ_MM, CommonConstant.NUMBER_1, "345111"));
         // 边缘区面积占比 5=H/F
         BigDecimal proportion5 = getProportion(areaH, areaF);
         map.put("边缘区面积占比", new IndicatorAddIn("Marginal area %", DecimalUtils.setScale3(proportion5), PERCENTAGE, CommonConstant.NUMBER_1, "34504A,345111"));
         // 保存结果
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
+    }
+
+    private BigDecimal safetySubtract(BigDecimal value1, BigDecimal value2) {
+        value1 = ObjectUtil.defaultIfNull(value1, BigDecimal.ZERO);
+        value2 = ObjectUtil.defaultIfNull(value2, BigDecimal.ZERO);
+        BigDecimal subtract = value1.subtract(value2);
+        return BigDecimal.ZERO.compareTo(subtract) >= 0 ? BigDecimal.ZERO : subtract;
     }
 }

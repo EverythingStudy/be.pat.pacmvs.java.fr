@@ -78,6 +78,8 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                         waxCodes.add(template.getWaxCode());
                         ProductionVO vo = new ProductionVO();
                         BeanUtils.copyProperties(template, vo);
+                        // 种属蜡块模板表ID
+                        vo.setWaxCodeId(template.getId());
                         // 查询脏器标签ID
                         LambdaQueryWrapper<OrganTag> organTagWrapper = new LambdaQueryWrapper<>();
                         organTagWrapper.eq(OrganTag::getOrganTagCode, template.getOrganCode());
@@ -91,7 +93,6 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                         } else {
                             log.error("种属蜡块模板表的脏器编码：" + template.getOrganCode() + "，不在脏器标签中，机构ID=" + project.getOrganizationId());
                         }
-                        vo.setId(null);
                         list.add(vo);
                     }
                 }
