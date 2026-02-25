@@ -228,7 +228,6 @@ organ-structures:
       - structure-id: 36906D,36906E,369111
     35F: # 眼球
       - structure-id: 35F101,35F103,35F111
-
     33F: # 视神经 https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1VLPq2F4Xv5p6Ad9nL1
       - structure-id: 33F0BB,33F0BA,33F111
     340: #  坐骨神经    https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1LMDpOH4Xv5p6Ad9nL1
