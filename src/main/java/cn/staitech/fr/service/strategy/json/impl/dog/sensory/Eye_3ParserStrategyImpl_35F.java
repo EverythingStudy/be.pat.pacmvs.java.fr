@@ -65,7 +65,7 @@ public class Eye_3ParserStrategyImpl_35F extends AbstractCustomParserStrategy {
         // 视网膜面积 2=B
         map.put("视网膜面积", new IndicatorAddIn("Retina area", DecimalUtils.setScale3(areaB), SQ_MM, CommonConstant.NUMBER_1, "35F103"));
         // 视网膜平均厚度 3=2B/C
-        BigDecimal thickness3 = bigDecimalDivideCheck(BigDecimal.valueOf(2).multiply(areaB), perimeterC);
+        BigDecimal thickness3 = bigDecimalDivideCheck(BigDecimal.valueOf(2).multiply(areaB == null ? BigDecimal.ZERO : areaB), perimeterC);
         map.put("视网膜平均厚度", new IndicatorAddIn("Average thickness of retina", DecimalUtils.setScale3(thickness3), MM, CommonConstant.NUMBER_1, "35F103"));
         // 眼球面积 4=D
         map.put("眼球面积", new IndicatorAddIn("Eye area", DecimalUtils.setScale3(areaD), SQ_MM, CommonConstant.NUMBER_1, "35F111"));

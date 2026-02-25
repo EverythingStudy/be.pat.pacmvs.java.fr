@@ -11,10 +11,16 @@ import java.math.RoundingMode;
 
 public class DecimalUtils {
     public static String setScale3(BigDecimal bigDecimal) {
+        if (bigDecimal == null) {
+            bigDecimal = BigDecimal.ZERO;
+        }
         return bigDecimal.setScale(3, RoundingMode.HALF_UP).toString();
     }
 
     public static String percentScale3(BigDecimal bigDecimal) {
+        if (bigDecimal == null) {
+            bigDecimal = BigDecimal.ZERO;
+        }
         return bigDecimal.multiply(new BigDecimal(100)).setScale(3, RoundingMode.HALF_UP).toString();
     }
 
