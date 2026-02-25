@@ -113,6 +113,10 @@ public class FrAnnotation implements Serializable {
     @TableField("single_slide_id")
     private Long singleSlideId;
     
+    @Schema(description = "组织轮廓id")
+    @TableField("structure_id")
+    private String structureId;
+    
     @TableField(exist = false)
     private List<FrAnnotation> list;
 

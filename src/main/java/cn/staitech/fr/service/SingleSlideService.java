@@ -8,5 +8,7 @@ public interface SingleSlideService extends IService<SingleSlide> {
 
     Boolean forecastResults(Long singleSlideId, Long imageId);
     
-    Boolean updateRatTcAreaPerimeter(Long singleSlideId, Long imageId);
+    Boolean updateRatTcAreaPerimeter(Long singleSlideId, Long imageId,String structureId);
+
+	SingleSlide getSingleSlide(Long singleSlideId, Long imageId,String structureId);
 }

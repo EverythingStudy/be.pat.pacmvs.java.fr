@@ -2,6 +2,8 @@ package cn.staitech.fr.service.strategy.json;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.staitech.fr.config.MapConstant;
+import cn.staitech.fr.config.OrganStructureConfig;
+import cn.staitech.fr.config.SpecialStructureConfig;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.strategy.json.impl.rat.TestisParserStrategyImpl;
@@ -47,7 +49,8 @@ public class CommonJsonCheck {
     private OrganTagMapper organTagMapper;
     @Resource
     private StructureTagMapper structureTagMapper;
-
+    @Resource
+    private SpecialStructureConfig specialStructureConfig;
 
     private static boolean handleSingleJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask) {
         if (element.isObject()) {
@@ -176,7 +179,10 @@ public class CommonJsonCheck {
         Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
         for (JsonFile jsonFileS : jsonFileList) {
         	String structureId = jsonFileS.getStructureId();
-        	if(StringUtils.isNotEmpty(structureId) && structureId.endsWith("111")) {
+        	if(StringUtils.isEmpty(structureId)) {
+        			continue;
+        	}
+        	if(structureId.endsWith("111") || specialStructureConfig.containsStructureId(structureId)) {
         		//组织轮廓,不用校验
         		continue;
         	}

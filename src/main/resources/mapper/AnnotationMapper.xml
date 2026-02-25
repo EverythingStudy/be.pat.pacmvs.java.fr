@@ -769,6 +769,9 @@
         <if test="categoryId != null">
           and category_id = #{categoryId}
         </if>
+        <if test="structureId != null">
+          and structure_id = #{structureId}
+        </if>
           and contour_type = 2
     </select>
 
