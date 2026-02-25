@@ -11,10 +11,10 @@ import lombok.Data;
 @Data
 public class ProductionVO {
     /**
-     * 主键
+     * 种属蜡块模板表ID
      */
-    @ApiModelProperty(value = "主键", hidden = true)
-    private Long id;
+    @ApiModelProperty(value = "种属蜡块模板表ID：不为空表示初始化的数据")
+    private Long waxCodeId;
     /**
      * 种属ID
      */
@@ -33,12 +33,12 @@ public class ProductionVO {
     /**
      * 脏器名称
      */
-    @ApiModelProperty(value = "脏器名称：辅助使用")
+    @ApiModelProperty(value = "脏器名称：初始化的数据使用")
     private String organName;
     /**
      * 英文名称
      */
-    @ApiModelProperty(value = "英文名称：辅助使用")
+    @ApiModelProperty(value = "英文名称：初始化的数据使用")
     private String organEn;
     /**
      * 取材块数
