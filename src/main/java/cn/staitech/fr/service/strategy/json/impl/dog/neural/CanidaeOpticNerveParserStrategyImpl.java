@@ -28,7 +28,7 @@ import java.util.Map;
 * @version V1.0
  */
 @Slf4j
-@Service("CanidaeOpticNerve")
+@Service("Optic_nerve_3")
 public class CanidaeOpticNerveParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Resource
@@ -78,9 +78,10 @@ public class CanidaeOpticNerveParserStrategyImpl extends AbstractCustomParserStr
 	     * 神经纤维束面积	1	平方毫米	Nerve fiber bundles area	1=A	无
 	     * 神经外膜面积	2	103平方微米	Epineurium area	2=B-A	即神经外膜结缔组织面积
     	 */
+        String specialId = "3";
         Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        BigDecimal organArea3 = getOrganArea(jsonTask, "13F0BB").getStructureAreaNum();
-        BigDecimal organArea4 = getOrganArea(jsonTask, "13F0BA").getStructureAreaNum();
+        BigDecimal organArea3 = getOrganArea(jsonTask, specialId+"3F0BB").getStructureAreaNum();
+        BigDecimal organArea4 = getOrganArea(jsonTask, specialId+"3F0BA").getStructureAreaNum();
         indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("", organArea3.setScale(3, RoundingMode.HALF_UP).toString(), CommonConstant.SQUARE_MICROMETER, CommonConstant.NUMBER_1));
         indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("Nerve fiber bundles area", organArea3.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_0));
        // indicatorResultsMap.put("神经外膜结缔组织面积", new IndicatorAddIn("", organArea4.setScale(3, RoundingMode.HALF_UP).toString(),SQ_MM, CommonConstant.NUMBER_1));
@@ -95,6 +96,6 @@ public class CanidaeOpticNerveParserStrategyImpl extends AbstractCustomParserStr
 
     @Override
     public String getAlgorithmCode() {
-        return "Optic_nerve";
+        return "Optic_nerve_3";
     }
 }
