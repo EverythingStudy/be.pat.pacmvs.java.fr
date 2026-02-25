@@ -64,7 +64,7 @@ public class SublingualGland_3ParserStrategyImpl extends AbstractCustomParserStr
         indicatorResultsMap.put("导管面积（全片）", new IndicatorAddIn("", DecimalUtils.setScale3(ductAreaTotal), "10³平方微米", CommonConstant.NUMBER_1, "30A06F"));
         indicatorResultsMap.put("腺泡面积", new IndicatorAddIn("", DecimalUtils.setScale3(acinusArea), "平方毫米", CommonConstant.NUMBER_1, "30A06D"));
         indicatorResultsMap.put("腺泡细胞核数量", new IndicatorAddIn("", acinusNucleusCount.toString(), CommonConstant.PIECE, CommonConstant.NUMBER_1, "30A06E"));
-        indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", DecimalUtils.setScale3(slideArea),"平方毫米", CommonConstant.NUMBER_1, "30A111"));
+        //indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", DecimalUtils.setScale3(slideArea),"平方毫米", CommonConstant.NUMBER_1, "30A111"));
 
         // 产品呈现指标
         indicatorResultsMap.put("舌下腺面积", new IndicatorAddIn("Sublingual gland area", DecimalUtils.setScale3(slideArea), CommonConstant.SQUARE_MILLIMETRE, "30A111"));
@@ -91,6 +91,6 @@ public class SublingualGland_3ParserStrategyImpl extends AbstractCustomParserStr
 
     @Override
     public String getAlgorithmCode() {
-        return "Sublingual_gland_3";
+        return "Salivary_Glands_Sublingual_3";
     }
 }

@@ -68,7 +68,7 @@ public class Tongue_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         // 算法输出指标
         indicatorResultsMap.put("复层扁平上皮面积", new IndicatorAddIn("", DecimalUtils.setScale3(stratifiedSquamousEpitheliumArea), "平方毫米", CommonConstant.NUMBER_1, "30D114"));
         indicatorResultsMap.put("固有层+肌层面积", new IndicatorAddIn("", DecimalUtils.setScale3(laminaPropriaAndMuscularisArea), "平方毫米", CommonConstant.NUMBER_1, "30D01C"));
-        indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", DecimalUtils.setScale3(tissueContourArea), "平方毫米", CommonConstant.NUMBER_1, "30D111"));
+        //indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", DecimalUtils.setScale3(tissueContourArea), "平方毫米", CommonConstant.NUMBER_1, "30D111"));
 
         // 产品呈现指标
         indicatorResultsMap.put("舌面积", new IndicatorAddIn("Tongue area", DecimalUtils.setScale3(tissueContourArea), "平方毫米", "30D111"));

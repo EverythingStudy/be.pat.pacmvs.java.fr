@@ -63,7 +63,7 @@ public class MangbularGland_3ParserStrategyImpl extends AbstractCustomParserStra
         indicatorResultsMap.put("导管面积（全片）", new IndicatorAddIn("", DecimalUtils.setScale3(ductAreaTotal), "10³平方微米", CommonConstant.NUMBER_1, "30B06F"));
         indicatorResultsMap.put("腺泡面积", new IndicatorAddIn("", DecimalUtils.setScale3(acinusArea), "平方毫米", CommonConstant.NUMBER_1, "30B06D"));
         indicatorResultsMap.put("腺泡细胞核数量", new IndicatorAddIn("", acinusNucleusCount.toString(), "个", CommonConstant.NUMBER_1, "30B06E"));
-        indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", DecimalUtils.setScale3(slideArea), "平方毫米", CommonConstant.NUMBER_1, "30B111"));
+        //indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", DecimalUtils.setScale3(slideArea), "平方毫米", CommonConstant.NUMBER_1, "30B111"));
 
         // 产品呈现指标
         indicatorResultsMap.put("颌下腺面积", new IndicatorAddIn("Submandibular gland area", DecimalUtils.setScale3(slideArea), "平方毫米", "30B111"));
@@ -90,6 +90,6 @@ public class MangbularGland_3ParserStrategyImpl extends AbstractCustomParserStra
 
     @Override
     public String getAlgorithmCode() {
-        return "Mangbular_Gland_3";
+        return "Salivary_Glands_Mandibular_3";
     }
 }

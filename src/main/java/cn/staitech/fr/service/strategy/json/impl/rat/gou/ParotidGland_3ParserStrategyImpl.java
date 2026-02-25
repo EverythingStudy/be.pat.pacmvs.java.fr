@@ -63,7 +63,7 @@ public class ParotidGland_3ParserStrategyImpl extends AbstractCustomParserStrate
         indicatorResultsMap.put("导管面积（全片）", new IndicatorAddIn("", DecimalUtils.setScale3(ductAreaTotal), "10³平方微米", CommonConstant.NUMBER_1, "30906F"));
         indicatorResultsMap.put("腺泡面积", new IndicatorAddIn("", DecimalUtils.setScale3(acinusArea), "平方毫米", CommonConstant.NUMBER_1, "30906D"));
         indicatorResultsMap.put("腺泡细胞核数量", new IndicatorAddIn("", acinusNucleusCount.toString(), "个", CommonConstant.NUMBER_1, "30906E"));
-        indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", DecimalUtils.setScale3(slideArea), "平方毫米", CommonConstant.NUMBER_1, "309111"));
+        //indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", DecimalUtils.setScale3(slideArea), "平方毫米", CommonConstant.NUMBER_1, "309111"));
 
         // 产品呈现指标
         indicatorResultsMap.put("腮腺面积", new IndicatorAddIn("Parotid gland area", DecimalUtils.setScale3(slideArea), "平方毫米", "309111"));
@@ -90,6 +90,6 @@ public class ParotidGland_3ParserStrategyImpl extends AbstractCustomParserStrate
 
     @Override
     public String getAlgorithmCode() {
-        return "Parotid_gland_3";
+        return "Salivary_Glands_Parotid_3";
     }
 }

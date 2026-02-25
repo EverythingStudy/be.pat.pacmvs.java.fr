@@ -81,11 +81,6 @@ public class Larynx_3ParserStrategyImpl extends AbstractCustomParserStrategy {
                 new IndicatorAddIn("", glandArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "30E133")
         );
 
-        indicatorResultsMap.put(
-                "腺体面积",
-                new IndicatorAddIn("", contourArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, "30E111")
-        );
-
         if (contourArea.signum() != 0) {
             // 1: 黏膜上皮面积占比 (%) = A / C
             indicatorResultsMap.put(

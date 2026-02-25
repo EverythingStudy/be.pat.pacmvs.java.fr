@@ -77,7 +77,7 @@ public class Gallbladder_3ParserStrategyImpl extends AbstractCustomParserStrateg
         // B: 黏膜上皮细胞核数量
         indicatorResultsMap.put(
                 "黏膜上皮细胞核数量",
-                new IndicatorAddIn("", nucleusCount.toString(), String.valueOf(nucleusCount), CommonConstant.NUMBER_1, "311036")
+                new IndicatorAddIn("", nucleusCount.toString(), PIECE, CommonConstant.NUMBER_1, "311036")
         );
 
         // C: 组织轮廓面积
