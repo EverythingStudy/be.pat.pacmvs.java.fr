@@ -228,7 +228,6 @@ organ-structures:
       - structure-id: 36906D,36906E,369111
     35F: # 眼球
       - structure-id: 35F101,35F103,35F111
-
     33F: # 视神经 https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1VLPq2F4Xv5p6Ad9nL1
       - structure-id: 33F0BB,33F0BA,33F111
     340: #  坐骨神经    https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1LMDpOH4Xv5p6Ad9nL1
@@ -249,6 +248,10 @@ organ-structures:
       - structure-id: 30F035,30F00C,30F120,30F13B,30F111
     383: # 消化系统-消化道-大肠
       - structure-id: 38301E,38301F,38300C,383049,383111
+    382: # 消化系统-消化道-小肠
+      - structure-id: 38201E,38201F,38200C,382064,382049,382111
+    310: # 消化系统-消化道-胃
+      - structure-id: 31001E,31001F,31000C,310111
   outline: # 脏器结构轮廓
     "02": #哈德氏腺
       - structure-id: 102111

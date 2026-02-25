@@ -200,7 +200,9 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
      * @param denominator
      */
     protected BigDecimal getMultiply100(BigDecimal numerator) {
-        BigDecimal result = numerator.multiply(BigDecimal.valueOf(100)).setScale(3, BigDecimal.ROUND_HALF_UP);
-        return result;
+        if (numerator == null) {
+            numerator = BigDecimal.ZERO;
+        }
+        return numerator.multiply(BigDecimal.valueOf(100)).setScale(3, RoundingMode.HALF_UP);
     }
 }
