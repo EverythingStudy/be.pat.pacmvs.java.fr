@@ -16,6 +16,11 @@ import java.io.Serializable;
 @Data
 public class ProductionInfoReq implements Serializable {
     /**
+     * 种属蜡块模板表ID
+     */
+    @ApiModelProperty(value = "种属蜡块模板表ID")
+    private Long waxCodeId;
+    /**
      * 蜡块编号
      */
     @ApiModelProperty(value = "蜡块编号", required = true)

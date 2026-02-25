@@ -49,7 +49,7 @@ public class Gallbladder_3ParserStrategyImpl extends AbstractCustomParserStrateg
 
     @Override
     public String getAlgorithmCode() {
-        return "Gallbladder_3";
+        return "Gall_bladder_3";
     }
 
     @Override
@@ -81,10 +81,10 @@ public class Gallbladder_3ParserStrategyImpl extends AbstractCustomParserStrateg
         );
 
         // C: 组织轮廓面积
-        indicatorResultsMap.put(
+        /*indicatorResultsMap.put(
                 "组织轮廓面积",
                 new IndicatorAddIn("", contourArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "311111")
-        );
+        );*/
 
         if (contourArea.signum() != 0) {
             // 1: 黏膜上皮面积占比 (%) = A / C

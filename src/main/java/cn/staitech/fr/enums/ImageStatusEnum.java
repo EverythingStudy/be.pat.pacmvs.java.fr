@@ -7,10 +7,10 @@ import lombok.Getter;
 public enum ImageStatusEnum {
     UPLOADING(0, "上传中", "Uploading"),
     UPLOAD_FAILED(1, "上传失败", "Upload Failed"),
-    PARSING(2, "解析中", "Parsing"),
-    PARSE_FAILED(3, "解析失败", "Parse Failed"),
-    INFO_PARSING(5, "信息解析中", "Info Parsing"),
-    INFO_PARSE_FAILED(6, "信息解析失败", "Info Parse Failed"),
+    PARSING(2, "解析中", "Checking"),
+    PARSE_FAILED(3, "解析失败", "Check Failed"),
+    INFO_PARSING(5, "信息解析中", "Parsing"),
+    INFO_PARSE_FAILED(6, "信息解析失败", "Parse Failed"),
     PROCESSING(7, "处理中", "Processing"),
     PROCESSING_FAILED(8, "处理失败", "Processing Failed"),
     AVAILABLE(4, "可用", "Available");
