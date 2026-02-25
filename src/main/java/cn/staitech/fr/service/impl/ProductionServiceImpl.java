@@ -78,6 +78,8 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                         waxCodes.add(template.getWaxCode());
                         ProductionVO vo = new ProductionVO();
                         BeanUtils.copyProperties(template, vo);
+                        // 种属蜡块模板表ID
+                        vo.setWaxCodeId(template.getId());
                         // 查询脏器标签ID
                         LambdaQueryWrapper<OrganTag> organTagWrapper = new LambdaQueryWrapper<>();
                         organTagWrapper.eq(OrganTag::getOrganTagCode, template.getOrganCode());
@@ -91,7 +93,6 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                         } else {
                             log.error("种属蜡块模板表的脏器编码：" + template.getOrganCode() + "，不在脏器标签中，机构ID=" + project.getOrganizationId());
                         }
-                        vo.setId(null);
                         list.add(vo);
                     }
                 }
@@ -201,19 +202,40 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                 Production production = new Production();
                 // 专题ID
                 production.setSpecialId(req.getProjectId());
+                // 种属蜡块模板表ID
+                production.setWaxCodeId(r.getWaxCodeId());
                 // 脏器标签ID
                 production.setOrganTagId(r.getTemplateId());
-                if (organTag != null) {
-                    // 种属ID
-                    production.setSpeciesId(organTag.getSpeciesId());
-                    // 脏器名称
-                    production.setOrganName(organTag.getOrganName());
-                    // 英文名称
-                    production.setOrganEn(organTag.getOrganEn());
-                    // 脏器编码
-                    production.setOrganCode(organTag.getOrganTagCode());
-                    // 脏器缩写
-                    production.setAbbreviation(organTag.getAbbreviation());
+                // 种属蜡块模板表ID不为空：初始化数据，使用初始化数据的信息
+                if (r.getWaxCodeId() != null) {
+                    SpeciesWaxCodeTemplate waxCodeTemplate = this.speciesWaxCodeTemplateMapper.selectById(r.getWaxCodeId());
+                    if (waxCodeTemplate != null) {
+                        // 种属ID
+                        production.setSpeciesId(waxCodeTemplate.getSpeciesId());
+                        // 脏器名称
+                        production.setOrganName(waxCodeTemplate.getOrganName());
+                        // 英文名称
+                        production.setOrganEn(waxCodeTemplate.getOrganEn());
+                        // 脏器编码
+                        production.setOrganCode(waxCodeTemplate.getOrganCode());
+                        // 脏器缩写
+                        production.setAbbreviation(waxCodeTemplate.getAbbreviation());
+                    }
+                }
+                // 用户创建的数据，使用脏器标签的信息
+                else {
+                    if (organTag != null) {
+                        // 种属ID
+                        production.setSpeciesId(organTag.getSpeciesId());
+                        // 脏器名称
+                        production.setOrganName(organTag.getOrganName());
+                        // 英文名称
+                        production.setOrganEn(organTag.getOrganEn());
+                        // 脏器编码
+                        production.setOrganCode(organTag.getOrganTagCode());
+                        // 脏器缩写
+                        production.setAbbreviation(organTag.getAbbreviation());
+                    }
                 }
                 // 蜡块编号
                 production.setWaxCode(r.getWaxCode());
