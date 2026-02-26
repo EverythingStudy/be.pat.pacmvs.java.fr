@@ -74,8 +74,8 @@ public class CanidaeSciaticNerveParserStrategyImpl extends AbstractCustomParserS
 		if(null != pituitaryA){
 			String accurateArea = areaUtils.convertToSquareMicrometer(pituitaryA.toString());
 			//神经纤维束面积	1	10³平方微米	Nerve fiber bundles area	1=A
-			indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("Nerve fiber bundles area", accurateArea, SQ_UM_THOUSAND, "0",specialId+"400BB"));
-			indicatorResultsMap.put("神经纤维束面积", new IndicatorAddIn("", String.valueOf(pituitaryA.setScale(3, RoundingMode.HALF_UP)), SQ_UM_THOUSAND, "1",specialId+"400BB"));
+			//indicatorResultsMap.put("神经束膜内缘内面积", new IndicatorAddIn("Nerve fiber bundles area", accurateArea, SQ_UM_THOUSAND, "0",specialId+"400BB"));
+			indicatorResultsMap.put("神经纤维束面积",     new IndicatorAddIn("Nerve fiber bundles area", String.valueOf(pituitaryA.setScale(3, RoundingMode.HALF_UP)), SQ_UM_THOUSAND, "1",specialId+"400BB"));
 		}
 
 
@@ -89,7 +89,7 @@ public class CanidaeSciaticNerveParserStrategyImpl extends AbstractCustomParserS
 		//神经外膜结缔组织面积	2	平方毫米	Connective tissue area	2=B-A
 		if(bigDecimalB.compareTo(BigDecimal.ZERO) != 0 && pituitaryA.compareTo(BigDecimal.ZERO) != 0){
 			BigDecimal BigDecimalB_A = bigDecimalB.subtract(pituitaryA);
-			indicatorResultsMap.put("神经外膜结缔组织面积", new IndicatorAddIn("Connective tissue area", String.valueOf(BigDecimalB_A.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "0",areaUtils.getStructureIds(specialId+"400BB",specialId+"400BA")));
+			indicatorResultsMap.put("结缔组织面积", new IndicatorAddIn("Connective tissue area", String.valueOf(BigDecimalB_A.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "0",areaUtils.getStructureIds(specialId+"400BB",specialId+"400BA")));
 		}
 
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);

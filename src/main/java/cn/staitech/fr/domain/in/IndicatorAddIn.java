@@ -18,7 +18,7 @@ public class IndicatorAddIn {
 
     // 单位
     private String unit;
-
+    //结构指标类别0：产品呈现指标1：算法输出指标
     private String structType;
     //指标关联结构编码
     private String structureIds;
