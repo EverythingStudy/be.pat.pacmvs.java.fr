@@ -41,7 +41,10 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Qualifier;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 /**
  * @author: wangfeng
  * @create: 2024-05-10 15:52:39
@@ -49,7 +52,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class JsonTaskParserService {
+public class JsonTaskParserService implements DisposableBean{
     @Resource
     JsonTaskService jsonTaskService;
     @Resource
@@ -83,13 +86,25 @@ public class JsonTaskParserService {
     private OrganStructureConfig organStructureConfig;
     @Resource
     private SpecialStructureConfig specialStructureConfig;
+    
     @Resource
+    @Qualifier("taskExecutor") 
     private ExecutorService executorService;
     private Executor ttlExecutor;
 
     @PostConstruct
     public void init() {
+        if (executorService == null) {
+            log.error("未找到名为 'taskExecutor' 的线程池 Bean，请检查配置类！");
+            throw new IllegalStateException("Missing ExecutorService Bean: taskExecutor");
+        }
+        
         this.ttlExecutor = TtlExecutors.getTtlExecutor(executorService);
+        
+        if (executorService instanceof ThreadPoolExecutor) {
+            ThreadPoolExecutor pool = (ThreadPoolExecutor) executorService;
+            log.info(">>> 任务线程池初始化完成 -> Core: {}, Max: {}, Queue: {}",pool.getCorePoolSize(), pool.getMaximumPoolSize(), pool.getQueue().size());
+        }
     }
     /**
      * 创建计算临时表
@@ -719,5 +734,24 @@ public class JsonTaskParserService {
         }
         return list;
     }
+
+	@Override
+	public void destroy() throws Exception {
+		if (executorService != null) {
+            log.info("开始关闭任务线程池，等待正在执行的任务完成...");
+            executorService.shutdown();
+            try {
+                // 最多等待 60 秒
+                if (!executorService.awaitTermination(60, TimeUnit.SECONDS)) {
+                    log.warn("线程池未能在 60 秒内正常关闭，强制关闭中...");
+                    executorService.shutdownNow();
+                }
+            } catch (InterruptedException e) {
+                executorService.shutdownNow();
+                Thread.currentThread().interrupt();
+            }
+            log.info("Python 任务线程池已关闭");
+        }
+	}
 
 }
