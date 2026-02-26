@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.strategy.json.impl.rat.gou;
 
 import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
@@ -58,8 +59,11 @@ public class MangbularGland_3ParserStrategyImpl extends AbstractCustomParserStra
         BigDecimal acinusArea = commonJsonParser.getOrganArea(jsonTask, "30B06D").getStructureAreaNum(); // C: 腺泡面积
         Integer acinusNucleusCount = commonJsonParser.getOrganAreaCount(jsonTask, "30B06E"); // D: 腺泡细胞核数量
 
-        // 算法输出指标
-        indicatorResultsMap.put("导管面积（单个）", new IndicatorAddIn("", DecimalUtils.setScale3(ductAreaPer), MULTIPLIED_SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "30B06F"));
+        Annotation annotationC = new Annotation();
+        annotationC.setAreaName("导管面积（单个）");
+        annotationC.setAreaUnit(MULTIPLIED_SQ_UM_THOUSAND);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "30B06F", annotationC, 1);
+        //indicatorResultsMap.put("导管面积（单个）", new IndicatorAddIn("", DecimalUtils.setScale3(ductAreaPer), MULTIPLIED_SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "30B06F"));
         indicatorResultsMap.put("导管面积（全片）", new IndicatorAddIn("", DecimalUtils.setScale3(ductAreaTotal), MULTIPLIED_SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "30B06F"));
         indicatorResultsMap.put("腺泡面积", new IndicatorAddIn("", DecimalUtils.setScale3(acinusArea), SQ_MM, CommonConstant.NUMBER_1, "30B06D"));
         indicatorResultsMap.put("腺泡细胞核数量", new IndicatorAddIn("", acinusNucleusCount.toString(), PIECE, CommonConstant.NUMBER_1, "30B06E"));
