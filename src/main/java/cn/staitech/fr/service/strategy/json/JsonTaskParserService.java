@@ -3,6 +3,7 @@ package cn.staitech.fr.service.strategy.json;
 import cn.staitech.fr.config.OrganStructureConfig;
 import cn.staitech.fr.config.SpecialStructureConfig;
 import cn.staitech.fr.domain.*;
+import cn.staitech.fr.enmu.SpeciesTypeEnum;
 import cn.staitech.fr.enums.ForecastStatusEnum;
 import cn.staitech.fr.enums.JsonTaskStatusEnum;
 import cn.staitech.fr.enums.StructureAiStatusEnum;
@@ -213,13 +214,25 @@ public class JsonTaskParserService {
                 Boolean flag1 = verifyCategoryStructure(jsonTask);
                 if (flag1) {
                     List<JsonFile> fileList = jsonFileMapper.selectList(Wrappers.<JsonFile>lambdaQuery().eq(JsonFile::getTaskId, jsonTask.getTaskId()).isNotNull(JsonFile::getFileUrl));
-                    //验证精细轮廓是否存在
-                    SingleSlide singleSlide = singleSlideService.getById(singleSlideId);
-                    if (singleSlide != null && !singleSlide.getAiStatusFine().equals(1)) {
-                        jsonTask.setStatus(JsonTaskStatusEnum.PARSE_NOT_START.getCode());
-                        jsonTaskService.updateById(jsonTask);
-                        log.info("singleSlide id:{} 待开始结构化任务 {}", singleSlideId, jsonTask);
-                        return;
+                    OrganTag organTag = organTagMapper.selectById(jsonTask.getCategoryId());
+                    String speciesId = organTag.getSpeciesId();
+                    if (speciesId != null && !speciesId.isEmpty()) {
+                    	try {
+                    		//大鼠的需要校验、犬的不需要校验
+                    		if (SpeciesTypeEnum.RAT.getCode() == Integer.parseInt(speciesId)) {
+                    				//验证精细轮廓是否存在
+                    				SingleSlide singleSlide = singleSlideService.getById(singleSlideId);
+                    				if (singleSlide != null && !singleSlide.getAiStatusFine().equals(1)) {
+                    					jsonTask.setStatus(JsonTaskStatusEnum.PARSE_NOT_START.getCode());
+                    					jsonTaskService.updateById(jsonTask);
+                    					log.info("singleSlide id:{} 待开始结构化任务 {}", singleSlideId, jsonTask);
+                    					return;
+                    				}
+                    		}
+                    	} catch (NumberFormatException e) {
+                    		// 记录日志
+                    		log.warn("taskId:{},Invalid speciesId format: {}",jsonTask.getTaskId(), speciesId);
+                    	}
                     }
                     ttlExecutor.execute(Objects.requireNonNull(TtlRunnable.get(() -> {
                         structureFileCalculate(jsonTask, fileList);
