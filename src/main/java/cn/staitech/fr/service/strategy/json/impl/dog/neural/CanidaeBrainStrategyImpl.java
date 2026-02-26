@@ -20,6 +20,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -63,7 +64,7 @@ public class CanidaeBrainStrategyImpl  extends AbstractCustomParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("大鼠大脑 332-BR 指标计算开始……{}", jsonTask);
-        Map<String, IndicatorAddIn> map = new HashMap<>();
+        Map<String, IndicatorAddIn> map = new LinkedHashMap<>();
         String specialId = "3";
         // A 脉络丛面积	mm2	无
         BigDecimal choroidOPlexusAreaAnnotation = commonJsonParser.getOrganArea(jsonTask, specialId+"3209C").getStructureAreaNum();
