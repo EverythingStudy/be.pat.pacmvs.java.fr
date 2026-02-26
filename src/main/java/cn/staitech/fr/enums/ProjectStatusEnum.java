@@ -9,10 +9,10 @@ import java.util.stream.Collectors;
 
 @Getter
 public enum ProjectStatusEnum {
-    PENDING_STARTED(0, "待启动", "Pending Started"),
-    IN_PROCESS(1, "进行中", "In process"),
+    PENDING_STARTED(0, "待启动", "Initiation"),
+    IN_PROCESS(1, "进行中", "Ongoing"),
     PAUSE(2, "暂停", "Pause"),
-    COMPLETED(3, "已完成", "Done");
+    COMPLETED(3, "已完成", "Complete");
 
     private final Integer code;
     private final String value;    // 中文名称

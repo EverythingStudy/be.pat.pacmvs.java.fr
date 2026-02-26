@@ -12,7 +12,7 @@ public enum TrialTypeEnum {
 //    RESERVE(1, "储备", "Reserve"),
     SINGLE_DOSING_TOXICITY(2, "单次给药毒性试验", "Single Dose Toxicity Study"),
     REPEATED_DOSING_TOXICITY(3, "重复给药毒性试验", "Repeated Dose Toxicity Study"),
-    DOSE_FINDING_TOXICITY(4, "剂量探索毒性试验", "Dose Range Finding Study"),
+    DOSE_FINDING_TOXICITY(4, "剂量探索毒性试验", "Dose Rang Finding Study"),
     IRRITATION_TEST(5, "刺激试验", "Irritation Test"),
     ALLERGY_TEST(6, "过敏试验", "Allergy Test"),
     CARCINOGENICITY_STUDY(7, "致癌试验", "Carcinogenicity Study"),
