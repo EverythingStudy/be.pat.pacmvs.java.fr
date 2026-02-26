@@ -20,11 +20,12 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * 大脑
+ * 小脑
  */
 
 @Slf4j
@@ -63,7 +64,7 @@ public class CanidaeCerebellumStrategyImpl extends AbstractCustomParserStrategy 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         log.info("犬小脑-33E-CM 指标计算开始……{}", jsonTask);
-        Map<String, IndicatorAddIn> map = new HashMap<>();
+        Map<String, IndicatorAddIn> map = new LinkedHashMap<>();
         String specialId = "3";
         // A 颗粒细胞层＋浦肯野细胞层	mm2	无
         BigDecimal choroidOPlexusAreaAnnotation = commonJsonParser.getOrganArea(jsonTask, specialId+"3E0A5").getStructureAreaNum();
