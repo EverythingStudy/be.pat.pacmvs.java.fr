@@ -60,29 +60,29 @@ public class SublingualGland_3ParserStrategyImpl extends AbstractCustomParserStr
         Integer acinusNucleusCount = commonJsonParser.getOrganAreaCount(jsonTask, "30A06E"); // D: 腺泡细胞核数量
 
         // 算法输出指标
-        indicatorResultsMap.put("导管面积（单个）", new IndicatorAddIn("", DecimalUtils.setScale3(ductAreaPer), "10³平方微米", CommonConstant.NUMBER_1, "30A06F"));
-        indicatorResultsMap.put("导管面积（全片）", new IndicatorAddIn("", DecimalUtils.setScale3(ductAreaTotal), "10³平方微米", CommonConstant.NUMBER_1, "30A06F"));
-        indicatorResultsMap.put("腺泡面积", new IndicatorAddIn("", DecimalUtils.setScale3(acinusArea), "平方毫米", CommonConstant.NUMBER_1, "30A06D"));
-        indicatorResultsMap.put("腺泡细胞核数量", new IndicatorAddIn("", acinusNucleusCount.toString(), CommonConstant.PIECE, CommonConstant.NUMBER_1, "30A06E"));
+        indicatorResultsMap.put("导管面积（单个）", new IndicatorAddIn("", DecimalUtils.setScale3(ductAreaPer), MULTIPLIED_SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "30A06F"));
+        indicatorResultsMap.put("导管面积（全片）", new IndicatorAddIn("", DecimalUtils.setScale3(ductAreaTotal), MULTIPLIED_SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "30A06F"));
+        indicatorResultsMap.put("腺泡面积", new IndicatorAddIn("", DecimalUtils.setScale3(acinusArea), SQ_MM, CommonConstant.NUMBER_1, "30A06D"));
+        indicatorResultsMap.put("腺泡细胞核数量", new IndicatorAddIn("", acinusNucleusCount.toString(), PIECE, CommonConstant.NUMBER_1, "30A06E"));
         //indicatorResultsMap.put("组织轮廓", new IndicatorAddIn("", DecimalUtils.setScale3(slideArea),"平方毫米", CommonConstant.NUMBER_1, "30A111"));
 
         // 产品呈现指标
-        indicatorResultsMap.put("舌下腺面积", new IndicatorAddIn("Sublingual gland area", DecimalUtils.setScale3(slideArea), CommonConstant.SQUARE_MILLIMETRE, "30A111"));
+        indicatorResultsMap.put("舌下腺面积", new IndicatorAddIn("Sublingual gland area", DecimalUtils.setScale3(slideArea), SQ_MM, "30A111"));
 
         if (slideArea.compareTo(BigDecimal.ZERO) != 0) {
             // 导管面积占比（全片）= B / E
             BigDecimal ductAreaRatioAll = commonJsonParser.getProportion(ductAreaTotal, slideArea.multiply(new BigDecimal(1000)));
-            indicatorResultsMap.put("导管面积占比（全片）", new IndicatorAddIn("Ducts area% (all)", DecimalUtils.percentScale3(ductAreaRatioAll), CommonConstant.PERCENTAGE, areaUtils.getStructureIds("30A06F", "30A111")));
+            indicatorResultsMap.put("导管面积占比（全片）", new IndicatorAddIn("Ducts area% (all)", DecimalUtils.setScale3(ductAreaRatioAll), PERCENTAGE, areaUtils.getStructureIds("30A06F", "30A111")));
 
             // 腺泡面积占比 = C / E
             BigDecimal acinusAreaRatio = commonJsonParser.getProportion(acinusArea, slideArea);
-            indicatorResultsMap.put("腺泡面积占比", new IndicatorAddIn("Acinus area%", DecimalUtils.percentScale3(acinusAreaRatio), CommonConstant.PERCENTAGE, areaUtils.getStructureIds("30A06D", "30A111")));
+            indicatorResultsMap.put("腺泡面积占比", new IndicatorAddIn("Acinus area%", DecimalUtils.setScale3(acinusAreaRatio), PERCENTAGE, areaUtils.getStructureIds("30A06D", "30A111")));
         }
 
         if (acinusArea.compareTo(BigDecimal.ZERO) != 0) {
             // 腺泡细胞核密度 = D / C
             BigDecimal acinusNucleusDensity = commonJsonParser.bigDecimalDivideCheck(new BigDecimal(acinusNucleusCount), acinusArea);
-            indicatorResultsMap.put("腺泡细胞核密度", new IndicatorAddIn("Nucleus density of acinar cell", DecimalUtils.setScale3(acinusNucleusDensity), "个/平方毫米", areaUtils.getStructureIds("30A06E", "30A06D")));
+            indicatorResultsMap.put("腺泡细胞核密度", new IndicatorAddIn("Nucleus density of acinar cell", DecimalUtils.setScale3(acinusNucleusDensity), SQ_MM_PIECE, areaUtils.getStructureIds("30A06E", "30A06D")));
         }
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);

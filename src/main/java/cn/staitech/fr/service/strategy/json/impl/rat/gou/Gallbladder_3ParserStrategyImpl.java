@@ -101,14 +101,14 @@ public class Gallbladder_3ParserStrategyImpl extends AbstractCustomParserStrateg
                     .setScale(3, RoundingMode.HALF_UP);
             indicatorResultsMap.put(
                     "黏膜上皮细胞核密度",
-                    new IndicatorAddIn("Nucleus density of mucosal epithelium", nucleusDensity.toString(), "个/10³平方微米", CommonConstant.NUMBER_0, areaUtils.getStructureIds("311036", "311035"))
+                    new IndicatorAddIn("Nucleus density of mucosal epithelium", nucleusDensity.toString(), SQ_UM_PICE, CommonConstant.NUMBER_0, areaUtils.getStructureIds("311036", "311035"))
             );
         }
 
         // 3: 胆囊面积 (10^3 平方微米) = C
         indicatorResultsMap.put(
                 "胆囊面积",
-                new IndicatorAddIn("Gallbladder area", contourArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_UM_THOUSAND, CommonConstant.NUMBER_0, "311111")
+                new IndicatorAddIn("Gallbladder area", contourArea.setScale(3, RoundingMode.HALF_UP).toString(), MULTIPLIED_SQ_UM_THOUSAND, CommonConstant.NUMBER_0, "311111")
         );
 
         // 调用AI预测服务保存结果
