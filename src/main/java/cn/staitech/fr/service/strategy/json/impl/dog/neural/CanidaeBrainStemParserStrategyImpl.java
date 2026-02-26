@@ -22,6 +22,7 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -62,8 +63,8 @@ public class CanidaeBrainStemParserStrategyImpl extends AbstractCustomParserStra
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        log.info("指标计算开始-大鼠脑干");
-        Map<String, IndicatorAddIn> map = new HashMap<>();
+        log.info("指标计算开始-犬脑干");
+        Map<String, IndicatorAddIn> map = new LinkedHashMap<>();
         
         /**
         A	血管内红细胞面积	13D003、13D004
