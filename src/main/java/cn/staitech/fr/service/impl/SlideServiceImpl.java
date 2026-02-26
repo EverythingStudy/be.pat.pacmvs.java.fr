@@ -642,12 +642,11 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                 aiVos.add(aiVo);
             }
             for (Production production : productionMap.values()) {
-                OrganTag organTag = tagMap.get(production.getOrganTagId());
                 OrganCheckProductionVo productionVo = new OrganCheckProductionVo();
                 productionVo.setId(production.getId());
                 productionVo.setOrganTagId(production.getOrganTagId());
-                productionVo.setOrganName(organTag.getOrganName());
-                productionVo.setOrganEn(organTag.getOrganEn());
+                productionVo.setOrganName(production.getOrganName());
+                productionVo.setOrganEn(production.getOrganEn());
                 productionVo.setWaxCode(production.getWaxCode());
                 productionVo.setRedHighlight(!singleSlideMap.containsKey(production.getOrganTagId()));
                 productionVos.add(productionVo);

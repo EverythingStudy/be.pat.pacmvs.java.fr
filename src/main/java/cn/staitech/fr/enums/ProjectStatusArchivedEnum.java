@@ -9,6 +9,14 @@ import java.util.stream.Collectors;
 
 @Getter
 public enum ProjectStatusArchivedEnum {
+    /*待启动
+    Initiation
+            进行中
+    Ongoing
+            暂停
+    Pause
+            已完成
+    Complete*/
     PENDING_STARTED(0, "待启动", "Pending Started"),
     IN_PROCESS(1, "进行中", "In process"),
     PAUSE(2, "暂停", "Pause"),

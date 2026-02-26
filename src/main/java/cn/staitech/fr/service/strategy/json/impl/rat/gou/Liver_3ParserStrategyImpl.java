@@ -75,7 +75,7 @@ public class Liver_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("肝细胞核数量", new IndicatorAddIn("", hepatocyteNucleusCount.toString(), "个", CommonConstant.NUMBER_1, "312149"));
         //indicatorResultsMap.put("肝细胞核面积（单个）", new IndicatorAddIn("", DecimalUtils.setScale3(hepatocyteNucleusAreaPer), "平方微米", CommonConstant.NUMBER_1, "312149"));
         indicatorResultsMap.put("窦内细胞核数量", new IndicatorAddIn("", sinusNucleusCount.toString(), "个", CommonConstant.NUMBER_1, "31214D"));
-        indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", DecimalUtils.setScale3(accurateArea), "平方毫米", CommonConstant.NUMBER_1, "312111"));
+        //indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", DecimalUtils.setScale3(accurateArea), "平方毫米", CommonConstant.NUMBER_1, "312111"));
         indicatorResultsMap.put("胆管数量（全片）", new IndicatorAddIn("", totalBileDuctCount.toString(), "个", CommonConstant.NUMBER_1, "31214A"));
         indicatorResultsMap.put("胆管面积（全片）", new IndicatorAddIn("", DecimalUtils.setScale3(totalBileDuctArea), "10³平方微米", CommonConstant.NUMBER_1, "31214A"));
         indicatorResultsMap.put("门管区面积（全片）", new IndicatorAddIn("", DecimalUtils.setScale3(totalPortalArea), "10³平方微米", CommonConstant.NUMBER_1, "312145"));

@@ -1226,7 +1226,7 @@ public class CommonJsonParser {
                         // 遍历 features 数组
                         while (jsonParser.nextToken() != JsonToken.END_ARRAY) {
                             JsonNode element = jsonParser.readValueAsTree(); // 直接获取节点，无多余序列化
-                            FrAnnotation annotation = handleTissueContourJsonElement(element, pathologicalMap, jsonTask, organTagMap);
+                            FrAnnotation annotation = handleTissueContourJsonElement(element, pathologicalMap, jsonTask, organTagMap,jsonFileS);
                             if (annotation != null) {
                                 processedAnnotations.add(annotation);
                             }
@@ -1258,7 +1258,7 @@ public class CommonJsonParser {
     }
     
     
-    private static FrAnnotation handleTissueContourJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask,Map<String, Long> organTagMap ) {
+    private static FrAnnotation handleTissueContourJsonElement(JsonNode element, Map<String, Long> pathologicalMap, JsonTask jsonTask,Map<String, Long> organTagMap, JsonFile jsonFileS ) {
         if (element.isObject()) {
             JsonNode node = element.get("id");
             // node 转换成String
@@ -1314,6 +1314,8 @@ public class CommonJsonParser {
             annotation.setSlideId(jsonTask.getSlideId());
             annotation.setSingleSlideId(jsonTask.getSingleId());
             annotation.setAnnotationType(annotationType.toUpperCase());
+            //保存组织轮廓的结构id 
+            annotation.setStructureId(jsonFileS.getStructureId());
             return annotation;
         } else {
             log.error("Expected an object, but got a non-object node: " + element);
