@@ -17,6 +17,8 @@ public class DynamicDataPool {
     @Value("${dynamic.maxPoolSize}")
     private Integer dynamicMaxPoolSize;
     private ExecutorService dynamicDataThreadPool;
+    
+    private ThreadPoolExecutor recognitionExecutor; 
 
     @Bean("dynamicDataThreadPool")
     public ExecutorService dynamicDataThreadPool() {
@@ -37,11 +39,12 @@ public class DynamicDataPool {
     }
 
     /**
-     * 优雅关闭所有线程池
+     * 关闭所有线程池
      */
     @PreDestroy
     public void shutdown() {
-        shutdownExecutor(dynamicDataThreadPool, "动态数据线程池");
+    	shutdownExecutor(dynamicDataThreadPool, "动态数据线程池");
+        shutdownExecutor(recognitionExecutor, "识别任务线程池");
     }
 
     private void shutdownExecutor(ExecutorService executor, String name) {
@@ -66,6 +69,26 @@ public class DynamicDataPool {
     }
     
     /**
+     * 【新增】自定义拒绝策略：用于识别任务
+     * 记录详细日志并抛出异常，让调用者感知任务提交失败（以便处理 CountDownLatch）
+     */
+    static class CustomRejectedExecutionHandler implements RejectedExecutionHandler {
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+            String msg = String.format("识别任务被拒绝！[活跃:%d/最大:%d] [队列:%d/%d] 任务:%s",
+                    executor.getActiveCount(), 
+                    executor.getMaximumPoolSize(),
+                    executor.getQueue().size(), 
+                    executor.getQueue().remainingCapacity(),
+                    r.toString());
+            
+            log.error(msg);
+            // 抛出异常，业务代码 catch 后需执行 countDownLatch.countDown()
+            throw new RejectedExecutionException(msg);
+        }
+    }
+    
+    /**
      * 新增：任务线程池
      * 策略：低并发、有界队列、快速失败（防止 OOM 和主线程阻塞）
      */
@@ -79,7 +102,7 @@ public class DynamicDataPool {
         
         int queueCapacity = 10000; 
 
-        log.info(">>> 初始化 任务线程池 <<<");
+        log.info(">>> 初始化 [任务线程池]<<<");
         log.info("CPU 核心数: {}, 核心线程: {}, 最大线程: {}, 队列容量: {}", 
                 processors, corePoolSize, maxPoolSize, queueCapacity);
 
@@ -117,5 +140,39 @@ public class DynamicDataPool {
             }
             return thread;
         }
+    }
+    
+    
+    /**
+     * 【新增】文件识别任务线程池
+     * 用途：用于 submitPathList 中的大量文件 IO 和几何计算任务
+     * 策略：IO 密集型 (CPU * 2 ~ CPU * 4)，有界队列，失败快速抛出异常
+     */
+    @Bean("recognitionExecutor")
+    public ThreadPoolExecutor recognitionExecutor() {
+        int processors = Runtime.getRuntime().availableProcessors();
+
+        // 优先使用配置文件，如果没有配置或为0，则使用默认 IO 密集型策略
+        int corePoolSize = (dynamicCorePoolSize != null && dynamicCorePoolSize > 0)? dynamicCorePoolSize : Math.max(1, processors * 2);
+        
+        int maxPoolSize = (dynamicMaxPoolSize != null && dynamicMaxPoolSize > 0) ? dynamicMaxPoolSize : Math.max(corePoolSize, processors * 4);
+        
+        int queueCapacity = 10000;
+
+        log.info(">>> 初始化 [识别任务线程池] <<<");
+        log.info("CPU 核心数: {}, 核心线程: {}, 最大线程: {}, 队列容量: {}", 
+                processors, corePoolSize, maxPoolSize, queueCapacity);
+
+        this.recognitionExecutor = new ThreadPoolExecutor(
+                corePoolSize,
+                maxPoolSize,
+                60L,
+                TimeUnit.SECONDS,
+                new LinkedBlockingQueue<>(queueCapacity),
+                new NamedThreadFactory("Recognition-Thread"),
+                new CustomRejectedExecutionHandler() // 使用自定义拒绝策略
+        );
+        
+        return this.recognitionExecutor;
     }
 }

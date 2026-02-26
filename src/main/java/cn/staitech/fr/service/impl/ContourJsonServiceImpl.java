@@ -31,6 +31,8 @@ import org.geotools.geojson.geom.GeometryJSON;
 import org.json.JSONException;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.index.strtree.STRtree;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -61,6 +63,10 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
 
     @Resource
     private SingleSlideMapper singleSlideMapper;
+    
+    @Autowired
+    @Qualifier("recognitionExecutor")
+    private ThreadPoolExecutor recognitionExecutor;
 
     // json文件存储路径
     private final static String OUTPUT_FILTERED_FILE_PATH = File.separator + "home" + File.separator + "data" + File.separator + "aiJson";
@@ -75,7 +81,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
     private CommonJsonParser commonJsonParser;
 
 
-    ExecutorService EXECUTOR = new ThreadPoolExecutor((int) (Runtime.getRuntime().availableProcessors() * 3), Runtime.getRuntime().availableProcessors() * 8, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new CustomRejectedExecutionHandler());
+    //ExecutorService EXECUTOR = new ThreadPoolExecutor((int) (Runtime.getRuntime().availableProcessors() * 3), Runtime.getRuntime().availableProcessors() * 8, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new CustomRejectedExecutionHandler());
 
     static class CustomRejectedExecutionHandler implements RejectedExecutionHandler {
         @Override
@@ -347,7 +353,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             for (String fileName : filteredFilePathList) {
                 try {
                     // 提交识别线程到线程池执行
-                    EXECUTOR.submit(new RecognitionThread(fileName, jsonName, tree, geometryMap, single, tileGeometryMap, outputDir, zoom, dynamicDataMap, countDownLatch));
+                	recognitionExecutor.submit(new RecognitionThread(fileName, jsonName, tree, geometryMap, single, tileGeometryMap, outputDir, zoom, dynamicDataMap, countDownLatch));
                 } catch (RejectedExecutionException e) {
                     // 日志记录任务提交错误
                     log.error("Error submitting task: [{}]", e.getMessage());
