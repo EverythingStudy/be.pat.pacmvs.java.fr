@@ -143,7 +143,6 @@ public class Esophagus_3ParserStrategyImpl extends AbstractCustomParserStrategy 
     }
 
     private BigDecimal getAreaOrZero(Annotation annotation) {
-        return ObjectUtil.isNotEmpty(annotation) && annotation.getStructureAreaNum() != null
-                ? annotation.getStructureAreaNum() : BigDecimal.ZERO;
+        return ObjectUtil.isNotEmpty(annotation) && annotation.getStructureAreaNum() != null ? annotation.getStructureAreaNum() : BigDecimal.ZERO;
     }
 }

@@ -128,7 +128,6 @@ public class LargeIntestine_3ParserStrategyImpl extends AbstractCustomParserStra
     }
 
     private BigDecimal getAreaOrZero(Annotation annotation) {
-        return ObjectUtil.isNotEmpty(annotation) && annotation.getStructureAreaNum() != null
-                ? annotation.getStructureAreaNum() : BigDecimal.ZERO;
+        return ObjectUtil.isNotEmpty(annotation) && annotation.getStructureAreaNum() != null ? annotation.getStructureAreaNum() : BigDecimal.ZERO;
     }
 }
