@@ -1,6 +1,7 @@
 package cn.staitech.fr.vo.project;
 
 import cn.staitech.fr.enums.ProjectStatusEnum;
+import cn.staitech.fr.enums.ProjectStatusLogEnum;
 import cn.staitech.sft.logaudit.annotation.IgnoreLogField;
 import cn.staitech.sft.logaudit.annotation.LogFieldEnumConvert;
 import cn.staitech.sft.logaudit.req.LogAuditBaseReq;
@@ -23,7 +24,7 @@ public class ProjectStatusVo extends LogAuditBaseReq<ProjectDetailVo> {
     /**
      * 以下属性暂未使用
      */
-    @LogFieldEnumConvert(enumClass = ProjectStatusEnum.class, valueField = CODE, convertField = VALUE)
+    @LogFieldEnumConvert(enumClass = ProjectStatusLogEnum.class, valueField = CODE, convertField = VALUE)
     @ApiModelProperty( value = "状态:1-启动，2-暂停，3-完成，6-归档")
     private Integer status;
 
