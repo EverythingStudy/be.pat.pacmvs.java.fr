@@ -88,11 +88,13 @@ public class EpididymideParserStrategyImpl extends AbstractCustomParserStrategy 
         Date startTime3 = new Date();
         commonJsonParser.putAnnotationDynamicData(jsonTask, "12F0F5", "12F0F4", annotationBy1, 1, true);
         log.info("jsonTask id:{} singleSlide id:{} 输出小管/附睾管黏膜上皮周长（单个）endTime:{}", jsonTask.getTaskId(), jsonTask.getSingleId(), DateUtil.between(startTime1, new Date(), DateUnit.SECOND));
+
         //F 精子面积（单个）103 μm2
         Annotation annotationBy2 = new Annotation();
         annotationBy2.setAreaName("精子面积（单个）");
         annotationBy2.setAreaUnit(SQ_UM_THOUSAND);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "12F0F7", annotationBy2, 1);
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "12F0F5", "12F0F7", annotationBy2, 1, true);
+
         // H 黏膜上皮细胞核数量（单个) 个
         Annotation annotation2s = new Annotation();
         annotation2s.setCountName("黏膜上皮细胞核数量（单个）");
