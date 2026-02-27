@@ -79,7 +79,7 @@ public class CanidaeSpinalCordParserStrategyImpl extends AbstractCustomParserStr
 
 
         BigDecimal bigDecimalG_H = bigDSlideArea;//BigDecimal.ZERO;
-        //bigDecimalG_H = bigDecimalG.add(bigDecimalH);
+        BigDecimal bigDecimalG_H1 = bigDecimalG.add(bigDecimalH);
 
         //1	灰质面积占比（单个）		%	Gray matter area（per）	1=A/(A+B)
         Annotation annotationBy = new Annotation();
