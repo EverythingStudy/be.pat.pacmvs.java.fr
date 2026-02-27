@@ -151,11 +151,37 @@ public class DynamicDataPool {
     @Bean("recognitionExecutor")
     public ThreadPoolExecutor recognitionExecutor() {
         int processors = Runtime.getRuntime().availableProcessors();
-
-        // 优先使用配置文件，如果没有配置或为0，则使用默认 IO 密集型策略
-        int corePoolSize = (dynamicCorePoolSize != null && dynamicCorePoolSize > 0)? dynamicCorePoolSize : Math.max(1, processors * 2);
         
-        int maxPoolSize = (dynamicMaxPoolSize != null && dynamicMaxPoolSize > 0) ? dynamicMaxPoolSize : Math.max(corePoolSize, processors * 4);
+        int defaultCore = Math.max(1, processors * 2);
+        int defaultMax = Math.max(defaultCore, processors * 4);
+        
+        int corePoolSize;
+        if (dynamicCorePoolSize != null && dynamicCorePoolSize > 0) {
+            // 【兜底策略】如果配置值小于 CPU 核心数 (或者小于默认值的 50%)，视为配置不合理，强制使用默认值
+            if (dynamicCorePoolSize < processors) {
+                log.warn("检测到 [核心线程数] 配置过小 (配置:{}, CPU:{}), 存在性能风险！已自动修正为默认值: {}", 
+                        dynamicCorePoolSize, processors, defaultCore);
+                corePoolSize = defaultCore;
+            } else {
+                corePoolSize = dynamicCorePoolSize;
+            }
+        } else {
+            corePoolSize = defaultCore;
+        }
+        
+        // --- 修改最大线程数逻辑 ---
+        int maxPoolSize;
+        if (dynamicMaxPoolSize != null && dynamicMaxPoolSize > 0) {
+            if (dynamicMaxPoolSize < processors || dynamicMaxPoolSize < corePoolSize) {
+                log.warn("检测到 [最大线程数] 配置过小 (配置:{}, CPU:{}, 核心线程:{}), 存在性能风险！已自动修正为默认值: {}", 
+                        dynamicMaxPoolSize, processors, corePoolSize, defaultMax);
+                maxPoolSize = defaultMax;
+            } else {
+                maxPoolSize = dynamicMaxPoolSize;
+            }
+        } else {
+            maxPoolSize = defaultMax;
+        }
         
         int queueCapacity = 10000;
 

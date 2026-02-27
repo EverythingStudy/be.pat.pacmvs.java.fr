@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
  * @version V1.0
  */
 @Slf4j
-@Service("Kidney_3")
+@Service("Kidneys_3")
 public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 	@Resource
 	private SingleSlideMapper singleSlideMapper;
@@ -107,29 +107,29 @@ public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		BigDecimal C_31B02D_area = commonJsonParser.getOrganArea(jsonTask, "31B02D").getStructureAreaNum();
 
 		//D 球内细胞核数量（单个）(31B02E)                    单个肾小球(31B02D) 内数据相加输出
-		Annotation annotationD = new Annotation();
-		annotationD.setCountName("球内细胞核数量（单个）");
-		annotationD.setAreaUnit(PIECE);
-		commonJsonParser.putAnnotationDynamicData(jsonTask, "31B02D", "31B02E", annotationD);
+//		Annotation annotationD = new Annotation();
+//		annotationD.setCountName("球内细胞核数量（单个）");
+//		annotationD.setAreaUnit(PIECE);
+//		commonJsonParser.putAnnotationDynamicData(jsonTask, "31B02D", "31B02E", annotationD);
 
 		//E 球内细胞核数量（全片）个		数据相加输出
-		Integer E_31B02E_count = commonJsonParser.getOrganAreaCount(jsonTask, "31B02E");
-		BigDecimal E_31B02E_area = commonJsonParser.getOrganArea(jsonTask, "31B02E").getStructureAreaNum();    
+//		Integer E_31B02E_count = commonJsonParser.getOrganAreaCount(jsonTask, "31B02E");
+//		BigDecimal E_31B02E_area = commonJsonParser.getOrganArea(jsonTask, "31B02E").getStructureAreaNum();    
 
 		//F 球内红细胞面积（单个） 10³平方微米		 单个肾小球内数据相加输出
-		Annotation annotationF = new Annotation();
-		annotationF.setAreaName("球内红细胞面积（单个）");
-		annotationF.setAreaUnit(CommonConstant.SQUARE_MICROMETER);
-		commonJsonParser.putAnnotationDynamicData(jsonTask, "31B02D", "31B02F", annotationF, 1, true);
+//		Annotation annotationF = new Annotation();
+//		annotationF.setAreaName("球内红细胞面积（单个）");
+//		annotationF.setAreaUnit(CommonConstant.SQUARE_MICROMETER);
+//		commonJsonParser.putAnnotationDynamicData(jsonTask, "31B02D", "31B02F", annotationF, 1, true);
 
 		//G 球内红细胞面积（全片）平方毫米 数据相加输出
-		BigDecimal G_31B02F_area = commonJsonParser.getOrganArea(jsonTask, "31B02F").getStructureAreaNum();
+//		BigDecimal G_31B02F_area = commonJsonParser.getOrganArea(jsonTask, "31B02F").getStructureAreaNum();
 
 		
 		//H 肾小管面积(单个)  10³平方微米
 		Annotation annotationByH = new Annotation();
 		annotationByH.setAreaName("肾小管面积(单个)");
-		annotationByH.setAreaUnit(SQ_UM_THOUSAND);
+		annotationByH.setAreaUnit(MULTIPLIED_SQ_UM_THOUSAND);
 		//		commonJsonParser.putAnnotationDynamicData(jsonTask, "107088", "31B031", annotationByH, 1, true);
 		commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "31B031", annotationByH, 1);
 
@@ -143,7 +143,7 @@ public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "31B026", annotationByJ, 1);
 
 		//K 血管球面积（全片） 平方毫米  数据相加输出
-		BigDecimal K_31B026_area = commonJsonParser.getOrganArea(jsonTask, "31B026").getStructureAreaNum();
+		//BigDecimal K_31B026_area = commonJsonParser.getOrganArea(jsonTask, "31B026").getStructureAreaNum();
 
 		//L 组织轮廓-肾脏面积 平方毫米
 		SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
@@ -178,11 +178,11 @@ public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		indicatorResultsMap.put("皮质面积", createIndicator(A_31B03D.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B03D"));
 		indicatorResultsMap.put("髓质面积", createIndicator(M_31B03E_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B03E"));
 		indicatorResultsMap.put("肾小球面积（全片）", createIndicator(C_31B02D_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B02D"));
-		indicatorResultsMap.put("球内细胞核数量（全片）", createIndicator(C_31B02D_area.setScale(3, RoundingMode.HALF_UP).toString(), PIECE, "31B02D,31B02E"));
-		indicatorResultsMap.put("球内红细胞面积（全片）", createIndicator(G_31B02F_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B02D,31B02F"));
+//		indicatorResultsMap.put("球内细胞核数量（全片）", createIndicator(C_31B02D_area.setScale(3, RoundingMode.HALF_UP).toString(), PIECE, "31B02D,31B02E"));
+//		indicatorResultsMap.put("球内红细胞面积（全片）", createIndicator(G_31B02F_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B02D,31B02F"));
 		indicatorResultsMap.put("肾小管面积（全片）", createIndicator(I_31B031_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B031"));
-		indicatorResultsMap.put("血管球面积（全片）", createIndicator(K_31B026_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B026"));
-		indicatorResultsMap.put("组织轮廓面积", createIndicator(L_31B111.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B111"));
+//		indicatorResultsMap.put("血管球面积（全片）", createIndicator(K_31B026_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B026"));
+//		indicatorResultsMap.put("组织轮廓面积", createIndicator(L_31B111.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B111"));
 
 		//二级指标（产品呈现指标）
 		/**
@@ -214,21 +214,21 @@ public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		indicatorResultsMap.put("髓质面积占比", createNameIndicator("Medulla area%", String.valueOf(getProportion(M_31B03E_area, L_31B111)), PERCENTAGE, "31B03E,31B111"));
 		
 		//血管球
-		List<Annotation> annotationList = commonJsonParser.getStructureContourList(jsonTask, "31B026");
+//		List<Annotation> annotationList = commonJsonParser.getStructureContourList(jsonTask, "31B026");
 
 		//球内细胞核密度（单个）4 个/10³平方微米 Nucleus density of glomerulus (per) 4=D/J 单个为单个肾小球以95%置信区间和均数±标准差呈现
-		String mucosalCellDensity = getResult1(jsonTask, "31B026", "31B02E",annotationList);
-		indicatorResultsMap.put("球内细胞核密度（单个）", createNameIndicator("Nucleus density of glomerulus (per)", mucosalCellDensity, SQ_UM_PICE, "31B02D,31B02E,31B026"));
+//		String mucosalCellDensity = getResult1(jsonTask, "31B026", "31B02E",annotationList);
+//		indicatorResultsMap.put("球内细胞核密度（单个）", createNameIndicator("Nucleus density of glomerulus (per)", mucosalCellDensity, SQ_UM_PICE, "31B02D,31B02E,31B026"));
 
 		//球内细胞核密度（全片）5 个/平方毫米 Nucleus density of glomerulus (all) 5=E/K
-		indicatorResultsMap.put("球内细胞核密度（全片）", createNameIndicator("Nucleus density of glomerulus (all)", String.valueOf(getProportion(new BigDecimal(E_31B02E_count), K_31B026_area)), SQ_MM_PIECE, "31B03D,31B111"));
+//		indicatorResultsMap.put("球内细胞核密度（全片）", createNameIndicator("Nucleus density of glomerulus (all)", String.valueOf(getProportion(new BigDecimal(E_31B02E_count), K_31B026_area)), SQ_MM_PIECE, "31B03D,31B111"));
 
 		//球内红细胞面积占比（单个）6 % Erythrocyte of glomerulus area% (per) 6=F/J 单个为单个肾小球以95%置信区间和均数±标准差呈现
-		String ieaf = getResult2(jsonTask, "31B02F", "31B026",annotationList);
-		indicatorResultsMap.put("球内红细胞面积占比（单个）", createNameIndicator("Erythrocyte of glomerulus area% (per)", ieaf, PERCENTAGE, "31B02F,31B026"));
+//		String ieaf = getResult2(jsonTask, "31B02F", "31B026",annotationList);
+//		indicatorResultsMap.put("球内红细胞面积占比（单个）", createNameIndicator("Erythrocyte of glomerulus area% (per)", ieaf, PERCENTAGE, "31B02F,31B026"));
 
 		//球内红细胞面积占比（全片）7 % Erythrocyte of glomerulus area% (all) 7=G/K
-		indicatorResultsMap.put("球内红细胞面积占比（全片）", createNameIndicator("Erythrocyte of glomerulus area%", String.valueOf(getProportion(G_31B02F_area, K_31B026_area)), PERCENTAGE, "31B02F,31B026"));
+//		indicatorResultsMap.put("球内红细胞面积占比（全片）", createNameIndicator("Erythrocyte of glomerulus area%", String.valueOf(getProportion(G_31B02F_area, K_31B026_area)), PERCENTAGE, "31B02F,31B026"));
 
 		//皮质肾小球面积占比（全片）8 % Glomerulus of renal cortical area%（all） 8=C/A
 		indicatorResultsMap.put("皮质肾小球面积占比（全片）", createNameIndicator("Glomerulus of renal cortical area%（all）", String.valueOf(getProportion(C_31B02D_area, A_31B03D)), PERCENTAGE, "31B02D,31B03D"));
@@ -242,25 +242,25 @@ public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		
 		
 		//血管球面积占比（单个）11 % Glomerulus area%（per）11=J/B 配对肾小球和血管球以95%置信区间和均数±标准差呈现
-		String gcafs = getResult2(jsonTask, "31B026", "31B02D",annotationList);
-		indicatorResultsMap.put("血管球面积占比（单个）", createNameIndicator("Glomerulus area%（per）", gcafs, PERCENTAGE, "31B026,31B02D"));
+//		String gcafs = getResult2(jsonTask, "31B026", "31B02D",annotationList);
+//		indicatorResultsMap.put("血管球面积占比（单个）", createNameIndicator("Glomerulus area%（per）", gcafs, PERCENTAGE, "31B026,31B02D"));
 
 		//血管球面积占比(全片)12 % Glomerulus area%（all）12=K/C
-		indicatorResultsMap.put("血管球面积占比(全片)", createNameIndicator("Glomerulus area%", String.valueOf(getProportion(K_31B026_area, C_31B02D_area)), PERCENTAGE, "31B026,31B02D"));
+//		indicatorResultsMap.put("血管球面积占比(全片)", createNameIndicator("Glomerulus area%", String.valueOf(getProportion(K_31B026_area, C_31B02D_area)), PERCENTAGE, "31B026,31B02D"));
 		
 		//肾小囊面积占比（单个）13 % Renal capsule area%（per）13=(B-J)/B 配对肾小球和血管球以95%置信区间和均数±标准差呈现
-		String bcafs = getResult3(jsonTask, "31B026", "31B02D",annotationList);
-		indicatorResultsMap.put("肾小囊面积占比（单个）", createNameIndicator("Renal capsule area%（per）", gcafs, PERCENTAGE, "31B026,31B02D"));
+//		String bcafs = getResult3(jsonTask, "31B026", "31B02D",annotationList);
+//		indicatorResultsMap.put("肾小囊面积占比（单个）", createNameIndicator("Renal capsule area%（per）", gcafs, PERCENTAGE, "31B026,31B02D"));
 
 		//肾小囊面积占比（全片）14 % Renal capsule area%（all）14=(C-K)/C
-		indicatorResultsMap.put("肾小囊面积占比（全片）", createNameIndicator("Renal capsule area%（all）", String.valueOf(getProportion(C_31B02D_area.subtract(K_31B026_area), A_31B03D)), PERCENTAGE, "31B02D,31B026,31B03D"));
+//		indicatorResultsMap.put("肾小囊面积占比（全片）", createNameIndicator("Renal capsule area%（all）", String.valueOf(getProportion(C_31B02D_area.subtract(K_31B026_area), A_31B03D)), PERCENTAGE, "31B02D,31B026,31B03D"));
 		
 		//球内基质面积占比（单个）15 % Mesangial matrix area%（per）15=(J-D-F)/J 以95%置信区间和均数±标准差呈现
-		String sbcaf = getResult4(jsonTask, "31B026", "31B02F", "31B02E",annotationList);
-		indicatorResultsMap.put("球内基质面积占比（单个）", createNameIndicator("Glomerulus area%（per）", sbcaf, PERCENTAGE, "31B026,31B02F,31B02E"));
+//		String sbcaf = getResult4(jsonTask, "31B026", "31B02F", "31B02E",annotationList);
+//		indicatorResultsMap.put("球内基质面积占比（单个）", createNameIndicator("Glomerulus area%（per）", sbcaf, PERCENTAGE, "31B026,31B02F,31B02E"));
 		
 		//球内基质面积占比（全片）16 % Mesangial matrix area%（all）16=(K-E-G)/K
-		indicatorResultsMap.put("球内基质面积占比（全片）", createNameIndicator("Mesangial matrix area%（all）", String.valueOf(getProportion(K_31B026_area.subtract(E_31B02E_area).subtract(G_31B02F_area), K_31B026_area)), PERCENTAGE, "31B026,31B02E,31B02F"));
+//		indicatorResultsMap.put("球内基质面积占比（全片）", createNameIndicator("Mesangial matrix area%（all）", String.valueOf(getProportion(K_31B026_area.subtract(E_31B02E_area).subtract(G_31B02F_area), K_31B026_area)), PERCENTAGE, "31B026,31B02E,31B02F"));
 		
 		//A_31B03D C_31B02D_area E_31B02E_count G_31B02F_area I_31B031_area K_31B026_area L_31B111 M_31B03E_area
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
@@ -454,6 +454,6 @@ public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 
 	@Override
 	public String getAlgorithmCode() {
-		return "Kidney_3";
+		return "Kidneys_3";
 	}
 }

@@ -36,8 +36,8 @@ import java.util.Map;
  * @date 2025年7月22日
  */
 @Slf4j
-@Component("IntegumentMammaryGland_3")
-public class InMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
+@Component("Skin_with_mammary_gland_3")
+public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 
 	@Resource
 	public SpecialAnnotationRelMapper specialAnnotationRelMapper;
@@ -58,7 +58,7 @@ public class InMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 	public void init() {
 		setCommonJsonParser(commonJsonParser);
 		setCommonJsonCheck(commonJsonCheck);
-		log.info("InMg_3ParserStrategyImpl init");
+		log.info("SwMg_3ParserStrategyImpl init");
 	}
 
 	/**
@@ -193,15 +193,15 @@ public class InMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		 * 
 		 */
 		//A 皮肤与乳腺总面积  mm² 仅辅助指标6、7、9、10、11、12、13计算，数值不显示在页面指标表格里 37A111
-		map.put("皮肤与乳腺总面积皮肤与乳腺总面积", createIndicator(DecimalUtils.setScale3(A_37A111_area).toString(), SQ_MM, "37A111"));
+		//map.put("皮肤与乳腺总面积", createIndicator(DecimalUtils.setScale3(A_37A111_area).toString(), SQ_MM, "37A111"));
 		//乳腺腺泡/导管数量  个 无 37A06C
 		map.put("乳腺腺泡/导管数量", createNameIndicator(B_37A06C_count.toString(), PIECE, "37A06C"));
 		//乳腺腺泡/导管面积（全片） mm² 数据相加输出 37A06C
 		map.put("乳腺腺泡/导管面积（全片）", createIndicator(C_37A06C_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "37A06C"));
 		// 乳腺面积 mm² 仅辅助指标5计算，数值不显示在页面指标表格里 37A07A
-		map.put("乳腺面积", createIndicator(F_37A07A_area, SQ_MM, "37A07A"));
+		//map.put("乳腺面积", createIndicator(F_37A07A_area, SQ_MM, "37A07A"));
 		//G 乳腺细胞核数量（全片）个 37A061
-		map.put("乳腺细胞核数量（全片）", createNameIndicator(G_37A061_count.toString(), PIECE, "37A061"));
+		//map.put("乳腺细胞核数量（全片）", createNameIndicator(G_37A061_count.toString(), PIECE, "37A061"));
 
 		/**
 		 * 算法输出指标 指标代码（仅限本文档） 单位（保留小数点后三位） 备注 相关指标
@@ -254,6 +254,9 @@ public class InMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		//3 腺泡或导管细胞核密度（单个）个/10³ μm2 Nucleus density of acinus or ducts （per）3=D/E以95%置信区间和均数±标准差呈现
 		//D 乳腺细胞核数量（单个）个 单个腺泡/导管内细胞核数量输出显示在单个腺泡/导管轮廓弹窗中，不显示在指标表格里 37A06C、37A061
 		//E 乳腺腺泡/导管面积（单个）×10³ μm2 单个腺泡/导管面积输出显示在单个腺泡/导管轮廓弹窗中，不显示在指标表格里 37A06C
+		/**
+		 * 
+		 
 		List<Annotation> structureContourList = commonJsonParser.getStructureContourList(jsonTask, "37A06C");
 		List<BigDecimal> lists = new ArrayList<>();
 		if (CollectionUtil.isNotEmpty(structureContourList)) {
@@ -269,10 +272,10 @@ public class InMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 				}
 			}
 		}
-      map.put("腺泡或导管细胞核密度（单个）", createNameIndicator(MathUtils.getConfidenceInterval(lists), SQ_UM_PICE, "37A06C,37A061"));
-
+      	map.put("腺泡或导管细胞核密度（单个）", createNameIndicator(MathUtils.getConfidenceInterval(lists), SQ_UM_PICE, "37A06C,37A061"));
+		 */
 		//4 乳腺细胞核密度（全片）个/mm² Nucleus density of mammary gland（all）4=G/C
-		map.put("乳腺细胞核密度（全片）", createNameIndicator("Nucleus density of mammary gland（all）", getProportion(new BigDecimal(G_37A061_count), C_37A06C_area), SQ_MM_PIECE, "37A061,37A06C"));
+		//map.put("乳腺细胞核密度（全片）", createNameIndicator("Nucleus density of mammary gland（all）", getProportion(new BigDecimal(G_37A061_count), C_37A06C_area), SQ_MM_PIECE, "37A061,37A06C"));
 		//5 乳腺面积 mm² Mammary gland area 5=F
 		map.put("乳腺面积", createNameIndicator("Mammary gland area", F_37A07A_area, SQ_MM, "37A07A"));
 
@@ -329,6 +332,6 @@ public class InMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 
 	@Override
 	public String getAlgorithmCode() {
-		return "IntegumentMammaryGland_3";
+		return "Skin_with_mammary_gland_3";
 	}
 }
