@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -48,7 +49,7 @@ public class Eye_3ParserStrategyImpl_35F extends AbstractCustomParserStrategy {
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Map<String, IndicatorAddIn> map = new HashMap<>();
+        Map<String, IndicatorAddIn> map = new LinkedHashMap<>();
         // 晶状体面积 A
         BigDecimal areaA = getOrganArea(jsonTask, "35F101").getStructureAreaNum();
         map.put("晶状体面积", new IndicatorAddIn("", DecimalUtils.setScale3(areaA), SQ_MM, CommonConstant.NUMBER_0, "35F101"));

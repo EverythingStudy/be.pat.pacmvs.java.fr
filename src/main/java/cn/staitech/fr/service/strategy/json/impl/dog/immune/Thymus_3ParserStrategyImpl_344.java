@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -47,7 +48,7 @@ public class Thymus_3ParserStrategyImpl_344 extends AbstractCustomParserStrategy
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Map<String, IndicatorAddIn> map = new HashMap<>();
+        Map<String, IndicatorAddIn> map = new LinkedHashMap<>();
         // 皮质面积 A
         BigDecimal areaA = getOrganArea(jsonTask, "34403D").getStructureAreaNum();
         map.put("皮质面积", new IndicatorAddIn("", DecimalUtils.setScale3(areaA), SQ_MM, CommonConstant.NUMBER_0, "34403D"));

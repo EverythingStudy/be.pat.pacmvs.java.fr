@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -47,7 +48,7 @@ public class LymphNode_3ParserStrategyImpl_34B extends AbstractCustomParserStrat
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Map<String, IndicatorAddIn> map = new HashMap<>();
+        Map<String, IndicatorAddIn> map = new LinkedHashMap<>();
         // 生发中心数量 A
         Integer countA = getOrganAreaCount(jsonTask, "34B051");
         map.put("生发中心数量", new IndicatorAddIn("", countA.toString(), PIECE, CommonConstant.NUMBER_0, "34B054,34B051"));

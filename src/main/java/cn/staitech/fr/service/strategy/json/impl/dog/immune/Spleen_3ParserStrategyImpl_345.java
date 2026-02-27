@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -48,7 +49,7 @@ public class Spleen_3ParserStrategyImpl_345 extends AbstractCustomParserStrategy
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        Map<String, IndicatorAddIn> map = new HashMap<>();
+        Map<String, IndicatorAddIn> map = new LinkedHashMap<>(32);
         // 红髓面积 A
         BigDecimal areaA = getOrganArea(jsonTask, "345046").getStructureAreaNum();
         map.put("红髓面积", new IndicatorAddIn("", DecimalUtils.setScale3(areaA), SQ_MM, CommonConstant.NUMBER_0, "345046"));
