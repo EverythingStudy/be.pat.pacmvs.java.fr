@@ -102,11 +102,11 @@ public class CanidaeBrainStemParserStrategyImpl extends AbstractCustomParserStra
          */
         // 脑干
         // A
-         map.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area%", DecimalUtils.setScale3(intravascularErythrocyteArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,areaUtils.getStructureIds(speciesId+"3D003",speciesId+"3D004")));
+        //-- map.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area%", DecimalUtils.setScale3(intravascularErythrocyteArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,areaUtils.getStructureIds(speciesId+"3D003",speciesId+"3D004")));
         // B
-         map.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area%", DecimalUtils.setScale3(extravascularErythrocyteArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,areaUtils.getStructureIds(speciesId+"3D003",speciesId+"3D004")));
+        //-- map.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area%", DecimalUtils.setScale3(extravascularErythrocyteArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,areaUtils.getStructureIds(speciesId+"3D003",speciesId+"3D004")));
         // 小脑
-        // map.put("分子层红细胞面积", new IndicatorAddIn("erythrocyte area", DecimalUtils.setScale3(molecularLevelerythrocyteArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1));
+        //-- map.put("分子层红细胞面积", new IndicatorAddIn("erythrocyte area", DecimalUtils.setScale3(molecularLevelerythrocyteArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1));
 
         // 产品呈现指标 -------------------------------------------------------------
         if (accurateAreaDecimal.compareTo(BigDecimal.ZERO) != 0) {
