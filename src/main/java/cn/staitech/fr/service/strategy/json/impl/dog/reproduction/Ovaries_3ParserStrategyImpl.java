@@ -52,7 +52,7 @@ public class Ovaries_3ParserStrategyImpl extends AbstractCustomParserStrategy {
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
         Map<String, IndicatorAddIn> resultsMap = new HashMap<>();
-        // A：卵泡数量
+       /* // A：卵泡数量
         Integer countA = this.commonJsonParser.getOrganAreaCount(jsonTask, "3240CB");
         // B：卵泡面积（全片）mm2
         BigDecimal organAreaB = this.commonJsonParser.getOrganArea(jsonTask, "3240CB").getStructureAreaNum();
@@ -60,7 +60,7 @@ public class Ovaries_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         Annotation annotationC = new Annotation();
         annotationC.setAreaName("卵泡面积（单个）");
         annotationC.setAreaUnit(MULTIPLIED_SQ_UM_THOUSAND);
-        this.commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "3240CB", annotationC, 1);
+        this.commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "3240CB", annotationC, 1);*/
         // D：血管面积μm2
         BigDecimal organAreaD = this.commonJsonParser.getOrganArea(jsonTask, "324003").getStructureAreaNum();
         organAreaD = organAreaD.multiply(new BigDecimal(1000000)).setScale(3, RoundingMode.HALF_UP);
@@ -75,12 +75,12 @@ public class Ovaries_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         String organAreaG = singleSlide.getArea();
 
         // 指标存放
-        resultsMap.put("卵泡数量", createIndicator(countA, PIECE, "3240CB"));
-        resultsMap.put("卵泡面积（全片）", createIndicator(organAreaB, SQ_MM, "3240CB"));
+       /* resultsMap.put("卵泡数量", createIndicator(countA, PIECE, "3240CB"));
+        resultsMap.put("卵泡面积（全片）", createIndicator(organAreaB, SQ_MM, "3240CB"));*/
         resultsMap.put("血管面积", createIndicator(organAreaD, SQ_UM, "324003"));
         resultsMap.put("血管外红细胞面积", createIndicator(organAreaE, SQ_UM, this.areaUtils.getStructureIds("324003", "324004")));
         resultsMap.put("血管内红细胞面积", createIndicator(organAreaF, SQ_UM, this.areaUtils.getStructureIds("324003", "324004")));
-        // 1=A：卵泡数量
+       /* // 1=A：卵泡数量
         resultsMap.put("卵泡数量", createNameIndicator("Follicle numbers", countA, PIECE, "3240CB"));
 
         // 2=C：卵泡面积（单个）×103 μm2
@@ -98,7 +98,7 @@ public class Ovaries_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         resultsMap.put("卵泡密度", createNameIndicator("Follicle density", ag3, SQ_MM_PIECE, this.areaUtils.getStructureIds("3240CB", "324111")));
         // 4=B/G：卵泡面积占比
         BigDecimal bg4 = this.commonJsonParser.bigDecimalDivideCheck(organAreaB, new BigDecimal(organAreaG));
-        resultsMap.put("卵泡面积占比", createNameIndicator("Follicle area%", bg4, PERCENTAGE, this.areaUtils.getStructureIds("3240CB", "324111")));
+        resultsMap.put("卵泡面积占比", createNameIndicator("Follicle area%", bg4, PERCENTAGE, this.areaUtils.getStructureIds("3240CB", "324111")));*/
         // 5=D/G：血管面积占比
         BigDecimal dg5 = this.commonJsonParser.bigDecimalDivideCheck(organAreaD, new BigDecimal(organAreaG).multiply(new BigDecimal(1000000)));
         resultsMap.put("血管面积占比", createNameIndicator("Vessel area%", dg5, PERCENTAGE, this.areaUtils.getStructureIds("324003", "324111")));
