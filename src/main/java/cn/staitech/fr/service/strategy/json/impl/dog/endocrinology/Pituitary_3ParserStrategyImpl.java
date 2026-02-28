@@ -44,7 +44,7 @@ public class Pituitary_3ParserStrategyImpl extends AbstractCustomParserStrategy{
     public void init() {
         setCommonJsonParser(commonJsonParser);
         setCommonJsonCheck(commonJsonCheck);
-        log.info("PituitaryParserStrategyImpl init");
+        log.info("Pituitary_3ParserStrategyImpl init");
     }
 
     @Override
@@ -85,10 +85,10 @@ public class Pituitary_3ParserStrategyImpl extends AbstractCustomParserStrategy{
         D_306004_area = commonJsonParser.getBigDecimalValue(D_306004_area.setScale(3, RoundingMode.HALF_UP));
         
         // E 中间部细胞核数量  个 无
-        Integer E_306082_Count = getOrganAreaCount(jsonTask, "306082");
+//        Integer E_306082_Count = getOrganAreaCount(jsonTask, "306082");
         
         // F 远侧部细胞核数量  个 无
-        Integer F_306084_Count = getOrganAreaCount(jsonTask, "306084");
+//        Integer F_306084_Count = getOrganAreaCount(jsonTask, "306084");
         
         //G 组织轮廓面积
         String slideArea = areaUtils.getFineContourArea(jsonTask.getSingleId());
@@ -123,9 +123,9 @@ public class Pituitary_3ParserStrategyImpl extends AbstractCustomParserStrategy{
         indicatorResultsMap.put("中间部面积", createIndicator(String.valueOf(B_306081_area.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "306081"));
         indicatorResultsMap.put("远侧部面积", createIndicator(String.valueOf(C_306083_area.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "306083"));
         indicatorResultsMap.put("红细胞面积", createIndicator(String.valueOf(D_306004_area.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "306004"));
-        indicatorResultsMap.put("中间部细胞核数量", createIndicator(String.valueOf(E_306082_Count), PIECE, "306081,306082"));
-        indicatorResultsMap.put("远侧部细胞核数量", createIndicator(String.valueOf(F_306084_Count), PIECE, "306083,306084"));
-        indicatorResultsMap.put("组织轮廓面积", createIndicator(String.valueOf(G_306111_area), PIECE, "306111"));
+//        indicatorResultsMap.put("中间部细胞核数量", createIndicator(String.valueOf(E_306082_Count), PIECE, "306081,306082"));
+//        indicatorResultsMap.put("远侧部细胞核数量", createIndicator(String.valueOf(F_306084_Count), PIECE, "306083,306084"));
+//        indicatorResultsMap.put("组织轮廓面积", createIndicator(String.valueOf(G_306111_area), PIECE, "306111"));
 
        //产品呈现指标
         /**
@@ -156,12 +156,12 @@ public class Pituitary_3ParserStrategyImpl extends AbstractCustomParserStrategy{
         indicatorResultsMap.put("红细胞面积占比", createNameIndicator("Erythrocyte area%", String.valueOf(ea.setScale(3, RoundingMode.HALF_UP)), PERCENTAGE, "306004,306111"));
 
         //5 中间部细胞核密度 个/平方毫米	Nucleus density of pars intermedia	5=E/B
-        BigDecimal ndpi = commonJsonParser.getProportionMultiply(new BigDecimal(E_306082_Count), B_306081_area);
-        indicatorResultsMap.put("中间部细胞核密度", createNameIndicator("Nucleus density of pars intermedi", String.valueOf(ndpi.setScale(3, RoundingMode.HALF_UP)), SQ_MM_PIECE, "306082,306081"));
+//        BigDecimal ndpi = commonJsonParser.getProportionMultiply(new BigDecimal(E_306082_Count), B_306081_area);
+//        indicatorResultsMap.put("中间部细胞核密度", createNameIndicator("Nucleus density of pars intermedi", String.valueOf(ndpi.setScale(3, RoundingMode.HALF_UP)), SQ_MM_PIECE, "306082,306081"));
 
         //6 远侧部细胞核密度个/平方毫米	Nucleus density of 7=G/C
-        BigDecimal ndo = commonJsonParser.getProportionMultiply(G_306111_area, C_306083_area);
-        indicatorResultsMap.put("远侧部细胞核密度", createNameIndicator("Nucleus density of pars distalis", String.valueOf(ndo.setScale(3, RoundingMode.HALF_UP)), SQ_MM_PIECE, "306111,306083"));
+//        BigDecimal ndo = commonJsonParser.getProportionMultiply(G_306111_area, C_306083_area);
+//        indicatorResultsMap.put("远侧部细胞核密度", createNameIndicator("Nucleus density of pars distalis", String.valueOf(ndo.setScale(3, RoundingMode.HALF_UP)), SQ_MM_PIECE, "306111,306083"));
         //7 垂体面积	 8=H
         indicatorResultsMap.put("垂体面积", createNameIndicator("Pituitary gland area", String.valueOf(G_306111_area.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "106111"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);

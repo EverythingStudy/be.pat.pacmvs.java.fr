@@ -44,7 +44,7 @@ public class Pancreas_3ParserStrategyImpl extends AbstractCustomParserStrategy{
 	public void init() {
 		setCommonJsonParser(commonJsonParser);
 		setCommonJsonCheck(commonJsonCheck);
-		log.debug("PancreasParserStrategyImpl init");
+		log.debug("Pancreas_3ParserStrategyImpl init");
 	}
 
 
@@ -84,12 +84,10 @@ public class Pancreas_3ParserStrategyImpl extends AbstractCustomParserStrategy{
 		BigDecimal B_305076_organArea = getOrganArea(jsonTask, "305076").getStructureAreaNum();
 		//C 胰岛数量
 		Integer C_305077_count = getOrganAreaCount(jsonTask, "305077");
-		//D 胰岛面积（单个）
-		List<Annotation> annotationList = getStructureContourList(jsonTask, "305077");
 		//E 胰岛面积（全片）mm²
 		BigDecimal E_305077_organArea = getOrganArea(jsonTask, "305077").getStructureAreaNum();
 		//F 胰岛细胞核数量（单个）305077、305078
-		Integer F_305078_count = getOrganAreaCount(jsonTask, "305078");
+//		Integer F_305078_count = getOrganAreaCount(jsonTask, "305078");
 		//G 间质面积 305027
 		BigDecimal G_305027_organArea = getOrganArea(jsonTask, "305027").getStructureAreaNum();
 		//H 导管面积  30506F
@@ -100,7 +98,7 @@ public class Pancreas_3ParserStrategyImpl extends AbstractCustomParserStrategy{
 		SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
 		BigDecimal J_organArea = new BigDecimal(singleSlide.getArea());
 		// K 胰岛细胞核数量（全片）305077、305078
-		Integer  K_305078_count = getOrganAreaCount(jsonTask, "305078");
+//		Integer  K_305078_count = getOrganAreaCount(jsonTask, "305078");
 
 		//4 胰岛细胞核密度（单个）个/10³ μm2 4=F/D
 		//        List<BigDecimal> dataList = new ArrayList<>();
@@ -155,14 +153,14 @@ public class Pancreas_3ParserStrategyImpl extends AbstractCustomParserStrategy{
 		indicatorResultsMap.put("胰岛面积（全片）", createIndicator(E_305077_organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "305077"));
 
 		//F  胰岛细胞核数量（单个）   个 单个胰岛内胰岛细胞核数量输出显示在单个胰岛轮廓弹窗中，不显示在指标表格里 305077、305078
-		annotationBy.setCountName("胰岛细胞核数量（单个）");
-		commonJsonParser.putAnnotationDynamicData(jsonTask, "305077", "305078", annotationBy);
+//		annotationBy.setCountName("胰岛细胞核数量（单个）");
+//		commonJsonParser.putAnnotationDynamicData(jsonTask, "305077", "305078", annotationBy);
 
 		indicatorResultsMap.put("间质面积", createIndicator(G_305027_organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "305027"));
 		indicatorResultsMap.put("导管面积（全片）", createIndicator(H_30506F_organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "30506F"));
 		indicatorResultsMap.put("血管面积", createIndicator(I_305003_organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "305003"));
-		indicatorResultsMap.put("组织轮廓面积", createIndicator(J_organArea, SQ_MM, "301111"));
-		indicatorResultsMap.put("胰岛细胞核数量（全片）", createIndicator(String.valueOf(K_305078_count), PIECE, "305077,305078"));
+//		indicatorResultsMap.put("组织轮廓面积", createIndicator(J_organArea, SQ_MM, "301111"));
+//		indicatorResultsMap.put("胰岛细胞核数量（全片）", createIndicator(String.valueOf(K_305078_count), PIECE, "305077,305078"));
 		//        indicatorResultsMap.put("导管数量", createIndicator(String.valueOf(count2), PIECE, "30506F"));
 		//indicatorResultsMap.put("导管细胞核数量（单个）", createDefaultIndicator("30506F,30507B"));
 		//        indicatorResultsMap.put("血管内红细胞面积", createIndicator(annotationInner.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "305003,305004"));
@@ -204,7 +202,7 @@ public class Pancreas_3ParserStrategyImpl extends AbstractCustomParserStrategy{
 		//8 腺泡面积占比 8 % Pancreatic acinus area% 8=（J-E-G）/J
 		indicatorResultsMap.put("腺泡面积占比", createNameIndicator("Pancreatic acinus area%", getProportion(J.subtract(E_305077_organArea).subtract(G_305027_organArea), J).toString(), PERCENTAGE, "305077,305027,305111"));
 		//9 胰岛细胞核密度（全片）9  个/mm² Nucleus density of pancreatic islet（all） 9=K/E
-		indicatorResultsMap.put("胰岛细胞核密度（全片）", createNameIndicator("Nucleus density of pancreatic islet（all）", bigDecimalDivideCheck(new BigDecimal(K_305078_count), E_305077_organArea).toString(), SQ_MM_PIECE, "305077,305078"));
+//		indicatorResultsMap.put("胰岛细胞核密度（全片）", createNameIndicator("Nucleus density of pancreatic islet（all）", bigDecimalDivideCheck(new BigDecimal(K_305078_count), E_305077_organArea).toString(), SQ_MM_PIECE, "305077,305078"));
 		//10 胰腺面积 mm²  Pancreas area 10=J
 		indicatorResultsMap.put("胰腺面积", createNameIndicator("Pancreas area", J_organArea, SQ_MM, "305111"));
 

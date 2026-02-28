@@ -27,7 +27,7 @@ import java.util.Map;
  * @version V1.0
  */
 @Slf4j
-@Service("AdrenalGland_3")
+@Service("Adrenal_glands_3")
 public class AdrenalGland_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 	@Resource
 	private SingleSlideMapper singleSlideMapper;
@@ -42,7 +42,7 @@ public class AdrenalGland_3ParserStrategyImpl extends AbstractCustomParserStrate
 	public void init() {
 		setCommonJsonParser(commonJsonParser);
 		setCommonJsonCheck(commonJsonCheck);
-		log.debug("AdrenalGlandParserStrategyImpl init");
+		log.debug("AdrenalGland_3ParserStrategyImpl init");
 	}
 
 	@Override
@@ -83,11 +83,11 @@ public class AdrenalGland_3ParserStrategyImpl extends AbstractCustomParserStrate
 		//D 束状带+网状带面积 D mm² 扣减后输出 301057
 		BigDecimal D_301057_area = getOrganArea(jsonTask, "301057").getStructureAreaNum();
 		//E 球状带细胞核数量  个 包含在球状带轮廓内的所有实质细胞核轮廓数量 301056、301068
-		Integer E_301056_301068_count = getInsideOrOutside(jsonTask, "301056", "301068", true).getCount();
+//		Integer E_301056_301068_count = getInsideOrOutside(jsonTask, "301056", "301068", true).getCount();
 		//F 束状带+网状带细胞核数量  个 包含在束状带+网状带轮廓内的所有实质细胞核轮廓数量 301057、301068
-		Integer F_301057_301068_count = getInsideOrOutside(jsonTask, "301057", "301068", true).getCount();
+//		Integer F_301057_301068_count = getInsideOrOutside(jsonTask, "301057", "301068", true).getCount();
 		//G 髓质细胞核数量 包含在髓质轮廓内的所有实质细胞核轮廓数量 30103E、301068
-		Integer G_30103E_301068_count = getInsideOrOutside(jsonTask, "30103E", "301068", true).getCount();
+//		Integer G_30103E_301068_count = getInsideOrOutside(jsonTask, "30103E", "301068", true).getCount();
 		//参考肺脏 所有血管轮廓内的红细胞轮廓面积之和
 		//      BigDecimal intravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, "14C003", "14C004", true).getStructureAreaNum();
 		//参考肺脏 所有血管轮廓外的红细胞轮廓面积之和
@@ -121,12 +121,12 @@ public class AdrenalGland_3ParserStrategyImpl extends AbstractCustomParserStrate
 		indicatorResultsMap.put("髓质面积", createIndicator(B_30103E_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "30103E"));
 		indicatorResultsMap.put("球状带面积", createIndicator(C_301056_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "301056"));
 		indicatorResultsMap.put("束状带+网状带面积", createIndicator(D_301057_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "301057"));
-		indicatorResultsMap.put("球状带细胞核数量", createIndicator(E_301056_301068_count, PIECE, "301057"));
-		indicatorResultsMap.put("束状带+网状带细胞核数量", createIndicator(F_301057_301068_count, PIECE, "301057"));
-		indicatorResultsMap.put("髓质细胞核数量", createIndicator(G_30103E_301068_count, PIECE, "30103E,301068"));
+//		indicatorResultsMap.put("球状带细胞核数量", createIndicator(E_301056_301068_count, PIECE, "301057"));
+//		indicatorResultsMap.put("束状带+网状带细胞核数量", createIndicator(F_301057_301068_count, PIECE, "301057"));
+//		indicatorResultsMap.put("髓质细胞核数量", createIndicator(G_30103E_301068_count, PIECE, "30103E,301068"));
 		indicatorResultsMap.put("皮质红细胞面积", createIndicator(H_30103D_301004_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "30103D,301004"));
 		indicatorResultsMap.put("髓质红细胞面积", createIndicator(I_30103E_301004_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "30103E,301004"));
-		indicatorResultsMap.put("组织轮廓面积", createIndicator(J_301111_area, SQ_MM, "301111"));
+//		indicatorResultsMap.put("组织轮廓面积", createIndicator(J_301111_area, SQ_MM, "301111"));
 		/**
 		 * 
         产品呈现指标指标代码（仅限本文档）单位(保留小数点后三位)English计算方式备注
@@ -159,17 +159,17 @@ public class AdrenalGland_3ParserStrategyImpl extends AbstractCustomParserStrate
 		BigDecimal b5 = bigDecimalDivideCheck(D_301057_area, J_301111_area);
 		indicatorResultsMap.put("束状带+网状带面积占比", createNameIndicator("Zona fasciculate and zona reticularis%", String.valueOf(b5), PERCENTAGE, "301057,301111"));
 		//球状带细胞核密度 6 个/mm² Nucleus density of zona glomerulosa 6=E/C
-        BigDecimal b6 = bigDecimalDivideCheck(new BigDecimal(E_301056_301068_count), C_301056_area);
-		indicatorResultsMap.put("球状带细胞核密度", createNameIndicator("Nucleus density of zona glomerulosa", String.valueOf(b6), SQ_MM_PIECE, "301056,301068"));
+//        BigDecimal b6 = bigDecimalDivideCheck(new BigDecimal(E_301056_301068_count), C_301056_area);
+//		indicatorResultsMap.put("球状带细胞核密度", createNameIndicator("Nucleus density of zona glomerulosa", String.valueOf(b6), SQ_MM_PIECE, "301056,301068"));
 		// 束状带+网状带细胞核密度 7 个/mm² Nucleus density of zona fasciculate and zona reticularis 7=F/D
-        BigDecimal b7 = bigDecimalDivideCheck(new BigDecimal(F_301057_301068_count), D_301057_area);
-		indicatorResultsMap.put("束状带+网状带细胞核密度", createNameIndicator("Nucleus density of zona fasciculate and zona reticularis", String.valueOf(b7), SQ_MM_PIECE, "301057,301068"));
+//        BigDecimal b7 = bigDecimalDivideCheck(new BigDecimal(F_301057_301068_count), D_301057_area);
+//		indicatorResultsMap.put("束状带+网状带细胞核密度", createNameIndicator("Nucleus density of zona fasciculate and zona reticularis", String.valueOf(b7), SQ_MM_PIECE, "301057,301068"));
 		//髓质细胞核密度 8 个/mm² Nucleus density of adrenal medulla 8=G/B
-		BigDecimal b8 = bigDecimalDivideCheck(new BigDecimal(G_30103E_301068_count), B_30103E_area);
-		indicatorResultsMap.put("髓质细胞核密度", createNameIndicator("Nucleus density of zona fasciculate and zona reticularis", String.valueOf(b8), SQ_MM_PIECE, "30103E,30103E,301068"));
+//		BigDecimal b8 = bigDecimalDivideCheck(new BigDecimal(G_30103E_301068_count), B_30103E_area);
+//		indicatorResultsMap.put("髓质细胞核密度", createNameIndicator("Nucleus density of zona fasciculate and zona reticularis", String.valueOf(b8), SQ_MM_PIECE, "30103E,30103E,301068"));
 		//皮质红细胞面积占比 9 % Cortial erythrocyte area% 9=H/J
-		BigDecimal b9 = bigDecimalDivideCheck(D_301057_area, J_301111_area);
-		indicatorResultsMap.put("束状带+网状带面积占比", createNameIndicator("Zona fasciculate and zona reticularis%", String.valueOf(b5), PERCENTAGE, "301057,301111"));
+		BigDecimal b9 = bigDecimalDivideCheck(H_30103D_301004_area, J_301111_area);
+		indicatorResultsMap.put("束状带+网状带面积占比", createNameIndicator("Zona fasciculate and zona reticularis%", String.valueOf(b9), PERCENTAGE, "301057,301111"));
 		
 		//髓质红细胞面积占比 10 % Medullary erythrocyte area% 10=I/J
 		BigDecimal b10 = bigDecimalDivideCheck(I_30103E_301004_area, J_301111_area);
@@ -183,6 +183,6 @@ public class AdrenalGland_3ParserStrategyImpl extends AbstractCustomParserStrate
 
 	@Override
 	public String getAlgorithmCode() {
-		return "Adrenal_gland_3";
+		return "Adrenal_glands_3";
 	}
 }

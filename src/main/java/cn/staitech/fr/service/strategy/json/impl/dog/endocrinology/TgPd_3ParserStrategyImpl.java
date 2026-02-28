@@ -162,6 +162,7 @@ public class TgPd_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         //K 甲状旁腺细胞核数量  个 数据相加输出 37F092
         Integer K_37F092_count = commonJsonParser.getOrganAreaCount(jsonTask, "37F092");
         K_37F092_count = commonJsonParser.getIntegerValue(K_37F092_count);
+        
 		//L 甲状旁腺组织轮廓面积  ×10³ μm² 若多个数据则相加输出仅辅助指标13计算，数值不显示在页面指标表格里 37F07D
         SingleSlide singleSlideL = singleSlideService.getSingleSlide(jsonTask.getSingleId(), jsonTask.getImageId(), "37F07D");
         BigDecimal L_37F07D_area = BigDecimal.ZERO;
@@ -251,7 +252,7 @@ public class TgPd_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         // F  血管外红细胞面积 ×10³ μm² 数据相加输出 37F003、37F004
         map.put("血管外红细胞面积", createIndicator(F_37F003_37F004_areaStr, MULTIPLIED_SQ_UM_THOUSAND, "37F003,37F004"));
         //H 甲状腺组织轮廓面积  mm² 数据相加输出仅辅助指标9计算，数值不显示在页面指标表格里 37F07C
-        map.put("甲状腺组织轮廓面积", createIndicator(H_37F07C_area, SQ_MM, "37F07C"));
+//        map.put("甲状腺组织轮廓面积", createIndicator(H_37F07C_area, SQ_MM, "37F07C"));
         //I  C细胞核数量  个 数据相加输出 37F08F
         map.put("C细胞核数量", createIndicator(I_37F08F_count, PIECE, "37F08F"));
         //J  C细胞团面积  mm² 数据相加输出 37F08B
@@ -261,7 +262,7 @@ public class TgPd_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         //甲状旁腺细胞核数量 K 个 数据相加输出 37F092
         map.put("甲状旁腺细胞核数量", createIndicator(K_37F092_count, PIECE, "37F092"));
         //甲状旁腺组织轮廓面积 L ×10³ μm² 若多个数据则相加输出仅辅助指标13计算，数值不显示在页面指标表格里 37F07D
-        map.put("甲状旁腺组织轮廓面积", createIndicator(L_37F07D_area.toString(), MULTIPLIED_SQ_UM_THOUSAND, "37F07D"));
+//        map.put("甲状旁腺组织轮廓面积", createIndicator(L_37F07D_area.toString(), MULTIPLIED_SQ_UM_THOUSAND, "37F07D"));
         
         // 产品呈现指标 -------------------------------------------------------------
         /**
@@ -321,6 +322,7 @@ public class TgPd_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         //甲状旁腺
         //12 甲状旁腺细胞核密度 个/10³ μm² Nucleus density of chief cell 12=K/L运算前注意统一单位
         map.put("甲状旁腺细胞核密度", createNameIndicator("Nucleus density of chief cell", getProportion(new BigDecimal(K_37F092_count) , L_37F07D_area), SQ_UM_PICE, "37F092,37F07D"));
+        
         //13 甲状旁腺面积 ×10³ μm² Parathyroid gland area 13=L
         map.put("甲状旁腺面积", createNameIndicator("Parathyroid gland area", DecimalUtils.setScale3(L_37F07D_area), MULTIPLIED_SQ_UM_THOUSAND, "37F07D"));
         
