@@ -8,17 +8,18 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Getter
-public enum ProjectStatusEnum {
+public enum ProjectStatusLogEnum{
     PENDING_STARTED(0, "待启动", "Initiation"),
     IN_PROCESS(1, "进行中", "Ongoing"),
     PAUSE(2, "暂停", "Pause"),
-    COMPLETED(3, "已完成", "Complete");
+    COMPLETED(3, "已完成", "Complete"),
+    ARCHIVED(6, "已归档", "Archived");
 
     private final Integer code;
     private final String value;    // 中文名称
     private final String valueEn;  // 英文名称
 
-    ProjectStatusEnum(Integer code, String value, String valueEn) {
+    ProjectStatusLogEnum(Integer code, String value, String valueEn) {
         this.code = code;
         this.value = value;
         this.valueEn = valueEn;
@@ -30,8 +31,8 @@ public enum ProjectStatusEnum {
     }
 
     // 根据code获取枚举
-    public static ProjectStatusEnum getByCode(Integer code) {
-        for (ProjectStatusEnum status : values()) {
+    public static ProjectStatusLogEnum getByCode(Integer code) {
+        for (ProjectStatusLogEnum status : values()) {
             if (status.getCode().equals(code)) {
                 return status;
             }
@@ -43,7 +44,7 @@ public enum ProjectStatusEnum {
     public static Map<Integer, String> getMap() {
         return Arrays.stream(values())
                 .collect(Collectors.toMap(
-                        ProjectStatusEnum::getCode,
+                        ProjectStatusLogEnum::getCode,
                         status -> LanguageUtils.isEn() ? status.getValueEn() : status.getValue()
                 ));
     }
