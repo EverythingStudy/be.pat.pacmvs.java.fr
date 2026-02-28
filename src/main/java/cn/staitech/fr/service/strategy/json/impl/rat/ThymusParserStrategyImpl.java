@@ -92,7 +92,8 @@ public class ThymusParserStrategyImpl extends AbstractCustomParserStrategy imple
         BigDecimal b4 = getProportion(organArea2.subtract(organArea4), organArea);
         indicatorResultsMap.put("髓质占比", createNameIndicator("Medulla area%", String.valueOf(b4), "%", "14403D,14403E,14403F"));
         //5=(A-B-E)/(B-D)
-        BigDecimal b5 = getProportion(organArea.subtract(organArea2).subtract(organArea4), organArea2.subtract(organArea4));
+        //BigDecimal b5 = getProportion(organArea.subtract(organArea2).subtract(organArea4), organArea2.subtract(organArea4));
+        BigDecimal b5 = bigDecimalDivideCheck(organArea.subtract(organArea2).subtract(organArea4), organArea2.subtract(organArea4));
         indicatorResultsMap.put("皮髓比", createNameIndicator("Cortex:medulla ratio", String.valueOf(b5), "%", "14403D,14403E,14403F"));
         //6=F/G
         BigDecimal G = outLine;
