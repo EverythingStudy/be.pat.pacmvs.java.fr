@@ -115,9 +115,9 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		BigDecimal C_37A06C_area = commonJsonParser.getOrganArea(jsonTask, "37A06C").getStructureAreaNum();
 
 		//D 乳腺细胞核数量（单个）个 单个腺泡/导管内细胞核数量输出显示在单个腺泡/导管轮廓弹窗中，不显示在指标表格里 37A06C、37A061
-		Annotation annotationD = new Annotation();
-		annotationD.setCountName("乳腺细胞核数量（单个）");
-		commonJsonParser.putAnnotationDynamicData(jsonTask, "37A06C", "37A061", annotationD);
+//		Annotation annotationD = new Annotation();
+//		annotationD.setCountName("乳腺细胞核数量（单个）");
+//		commonJsonParser.putAnnotationDynamicData(jsonTask, "37A06C", "37A061", annotationD);
 
 		//E 乳腺腺泡/导管面积（单个）×10³ μm2 单个腺泡/导管面积输出显示在单个腺泡/导管轮廓弹窗中，不显示在指标表格里 37A06C
 		Annotation annotationE = new Annotation();
@@ -133,7 +133,7 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		}
 
 		//G 乳腺细胞核数量（全片）个 37A061
-		Integer G_37A061_count = commonJsonParser.getOrganAreaCount(jsonTask, "37A061");
+//		Integer G_37A061_count = commonJsonParser.getOrganAreaCount(jsonTask, "37A061");
 
 		//-------------------皮肤--------------------------------------
 		/**
@@ -194,11 +194,11 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		 */
 		//A 皮肤与乳腺总面积  mm² 仅辅助指标6、7、9、10、11、12、13计算，数值不显示在页面指标表格里 37A111
 		//map.put("皮肤与乳腺总面积", createIndicator(DecimalUtils.setScale3(A_37A111_area).toString(), SQ_MM, "37A111"));
-		//乳腺腺泡/导管数量  个 无 37A06C
+		//B 乳腺腺泡/导管数量  个 无 37A06C
 		map.put("乳腺腺泡/导管数量", createNameIndicator(B_37A06C_count.toString(), PIECE, "37A06C"));
-		//乳腺腺泡/导管面积（全片） mm² 数据相加输出 37A06C
+		//C 乳腺腺泡/导管面积（全片） mm² 数据相加输出 37A06C
 		map.put("乳腺腺泡/导管面积（全片）", createIndicator(C_37A06C_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "37A06C"));
-		// 乳腺面积 mm² 仅辅助指标5计算，数值不显示在页面指标表格里 37A07A
+		//F 乳腺面积 mm² 仅辅助指标5计算，数值不显示在页面指标表格里 37A07A
 		//map.put("乳腺面积", createIndicator(F_37A07A_area, SQ_MM, "37A07A"));
 		//G 乳腺细胞核数量（全片）个 37A061
 		//map.put("乳腺细胞核数量（全片）", createNameIndicator(G_37A061_count.toString(), PIECE, "37A061"));
@@ -251,9 +251,9 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		map.put("乳腺腺泡和导管数量", createNameIndicator("Number of acinus and ducts", B_37A06C_count.toString(), PIECE, "37A06C"));
 		//2 乳腺腺泡和导管面积占比 % Acinus and ducts area% 2=C/F
 		map.put("乳腺腺泡和导管面积占比", createNameIndicator("Acinus and ducts area%", getProportion(C_37A06C_area, F_37A07A_area), PERCENTAGE, areaUtils.getStructureIds("37A06C", "37A07A")));
-		//3 腺泡或导管细胞核密度（单个）个/10³ μm2 Nucleus density of acinus or ducts （per）3=D/E以95%置信区间和均数±标准差呈现
-		//D 乳腺细胞核数量（单个）个 单个腺泡/导管内细胞核数量输出显示在单个腺泡/导管轮廓弹窗中，不显示在指标表格里 37A06C、37A061
-		//E 乳腺腺泡/导管面积（单个）×10³ μm2 单个腺泡/导管面积输出显示在单个腺泡/导管轮廓弹窗中，不显示在指标表格里 37A06C
+		//3 腺泡或导管细胞核密度（单个）个/10³ μm2 Nucleus density of acinus or ducts （per）3=D/E以95%置信区间和均数±标准差呈现  (下面的是用于计算的)
+			//D 乳腺细胞核数量（单个）个 单个腺泡/导管内细胞核数量输出显示在单个腺泡/导管轮廓弹窗中，不显示在指标表格里 37A06C、37A061
+			//E 乳腺腺泡/导管面积（单个）×10³ μm2 单个腺泡/导管面积输出显示在单个腺泡/导管轮廓弹窗中，不显示在指标表格里 37A06C
 		/**
 		 * 
 		 
