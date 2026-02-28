@@ -2,6 +2,7 @@ package cn.staitech.fr.service.strategy.json.impl.dog.reproduction;
 
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
+import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.service.AiForecastService;
@@ -73,7 +74,8 @@ public class Prostate_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationE.setCountUnit(PIECE);
         this.commonJsonParser.putAnnotationDynamicData(jsonTask, "32C06C", "32C061", annotationD, 1, true);
         // F：组织轮廓面积mm2
-        BigDecimal organAreaF = this.commonJsonParser.getOrganArea(jsonTask, "32C111").getStructureAreaNum();
+        SingleSlide singleSlide = this.singleSlideMapper.selectById(jsonTask.getSingleId());
+        BigDecimal organAreaF = new BigDecimal(singleSlide.getArea());
         // G：尿道及尿道周围面积mm2
         BigDecimal organAreaG = this.commonJsonParser.getOrganArea(jsonTask, "32C060").getStructureAreaNum();
 
@@ -109,7 +111,7 @@ public class Prostate_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 
         resultsMap.put("腺泡/导管面积占比（单个）", createNameIndicator("Acinar epithelial area% (per)", spermAreaPer3, PERCENTAGE, this.areaUtils.getStructureIds("32C06C", "32C0F4")));
         resultsMap.put("管腔占比（单个）", createNameIndicator("Acinar lumen area% (per)", spermAreaPer4, PERCENTAGE, this.areaUtils.getStructureIds("32C06C", "32C0F4")));
-        resultsMap.put("腺泡/导管细胞核密度（单个）", createNameIndicator("Nucleus density of acinar epithelium (per)", spermAreaPer5, PERCENTAGE, this.areaUtils.getStructureIds("32C06C", "32C061")));
+        resultsMap.put("腺泡/导管细胞核密度（单个）", createNameIndicator("Nucleus density of acinar epithelium (per)", spermAreaPer5, PIECE_UM, this.areaUtils.getStructureIds("32C06C", "32C061")));
 
         this.aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }
