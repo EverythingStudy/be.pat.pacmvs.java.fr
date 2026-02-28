@@ -96,6 +96,9 @@ public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		//A 皮质面积
 		Annotation a_31B03D_anno = getOrganArea(jsonTask, "31B03D");
 		BigDecimal A_31B03D = a_31B03D_anno.getStructureAreaNum();
+		
+		//M 髓质面积		M		平方毫米
+		BigDecimal M_31B03E_area = commonJsonParser.getOrganArea(jsonTask, "31B03E").getStructureAreaNum();
 
 		//B 肾小球面积（单个）10³平方微米
 		Annotation annotationB = new Annotation();
@@ -137,10 +140,10 @@ public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		BigDecimal I_31B031_area = commonJsonParser.getOrganArea(jsonTask, "31B031").getStructureAreaNum();    
 
 		//J  血管球面积（单个）10³平方微米
-		Annotation annotationByJ = new Annotation();
-		annotationByJ.setAreaName("血管球面积（单个）");
-		annotationByJ.setAreaUnit(SQ_UM_THOUSAND);
-		commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "31B026", annotationByJ, 1);
+//		Annotation annotationByJ = new Annotation();
+//		annotationByJ.setAreaName("血管球面积（单个）");
+//		annotationByJ.setAreaUnit(SQ_UM_THOUSAND);
+//		commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "31B026", annotationByJ, 1);
 
 		//K 血管球面积（全片） 平方毫米  数据相加输出
 		//BigDecimal K_31B026_area = commonJsonParser.getOrganArea(jsonTask, "31B026").getStructureAreaNum();
@@ -152,8 +155,7 @@ public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 			L_31B111 = L_31B111.add(new BigDecimal(singleSlide.getArea()));
 		}
 
-		//M 髓质面积		M		平方毫米
-		BigDecimal M_31B03E_area = commonJsonParser.getOrganArea(jsonTask, "31B03E").getStructureAreaNum();
+		
 		
 		Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
 		/**
@@ -175,13 +177,22 @@ public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		 */
 		//		A_31B03D C_31B02D_area E_31B02E_count G_31B02F_area I_31B031_area K_31B026_area L_31B111 M_31B03E_area
 		//一级指标（算法输出指标）
+		
+		//A 皮质面积 平方毫米 31B03D
 		indicatorResultsMap.put("皮质面积", createIndicator(A_31B03D.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B03D"));
+	    //M 髓质面积 平方毫米 31B03E
 		indicatorResultsMap.put("髓质面积", createIndicator(M_31B03E_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B03E"));
+		//C 肾小球面积（全片）平方毫米 数据相加输出 31B02D
 		indicatorResultsMap.put("肾小球面积（全片）", createIndicator(C_31B02D_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B02D"));
+		//E 球内细胞核数量（全片）个 数据相加输出 31B02D、31B02E
 //		indicatorResultsMap.put("球内细胞核数量（全片）", createIndicator(C_31B02D_area.setScale(3, RoundingMode.HALF_UP).toString(), PIECE, "31B02D,31B02E"));
+		//G 球内红细胞面积（全片）平方毫米 数据相加输出31B02D、31B02F
 //		indicatorResultsMap.put("球内红细胞面积（全片）", createIndicator(G_31B02F_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B02D,31B02F"));
+		//I 肾小管面积（全片）平方毫米 数据相加输出 31B031
 		indicatorResultsMap.put("肾小管面积（全片）", createIndicator(I_31B031_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B031"));
+		//K 血管球面积（全片）平方毫米 数据相加输出 31B026
 //		indicatorResultsMap.put("血管球面积（全片）", createIndicator(K_31B026_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B026"));
+		//L 组织轮廓面积 平方毫米 仅辅助指标1计算，数值不显示在页面指标表格里 31B111
 //		indicatorResultsMap.put("组织轮廓面积", createIndicator(L_31B111.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "31B111"));
 
 		//二级指标（产品呈现指标）

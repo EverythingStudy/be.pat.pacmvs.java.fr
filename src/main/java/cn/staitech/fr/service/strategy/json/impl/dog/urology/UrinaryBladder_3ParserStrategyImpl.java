@@ -102,30 +102,21 @@ public class UrinaryBladder_3ParserStrategyImpl extends AbstractCustomParserStra
 			resultsMap.put("血管面积", createIndicator(C_31E003_area.setScale(3, RoundingMode.UP), SQ_MM, "31E003"));
 //			resultsMap.put("组织轮廓面积", createIndicator(F_31E111.setScale(3, RoundingMode.UP), SQ_MM, "31E111"));
 
+
 			/**
 			 * 
     		产品呈现指标指标代码（仅限本文档）单位（保留小数点后三位）English计算方式备注
-
-    		黏膜上皮面积占比 1 % Mucosa epithelium area % 1=A/F
-    		黏膜上皮细胞核密度 2 个/mm2 Nucleus density of mucosal epithelial nucleus 2=B/A
-    		血管面积占比3 % Vessel area % 3=C/F
-    		膀胱面积 6 mm2 Urinary bladder area 6=F
 			 */
-
-			// 计算指标
-			//黏膜上皮面积占比
+			//1 黏膜上皮面积占比  % Mucosa epithelium area % 1=A/F
 			BigDecimal mucosaEpitheliumArea = getProportion(A_31E035_area, F_31E111);
-			// 黏膜上皮细胞核密度
+			//2 黏膜上皮细胞核密度  个/mm2 Nucleus density of mucosal epithelial nucleus 2=B/A
 //			BigDecimal nucleusDensityOfMucosalEpithelialNucleus = getProportion(new BigDecimal(B_31E036_count), A_31E035_area);
-			// 血管面积占比
-			BigDecimal vesselArea = getProportion(C_31E003_area, F_31E111);
-			// 膀胱面积 F
-
-
-			// 产品呈现指标
 			resultsMap.put("黏膜上皮面积占比", createNameIndicator("Mucosa epithelium area %", mucosaEpitheliumArea, PERCENTAGE, "31E035,31E111"));
 //			resultsMap.put("黏膜上皮细胞核密度", createNameIndicator("Nucleus density of mucosal epithelial nucleus", nucleusDensityOfMucosalEpithelialNucleus, SQ_MM_PIECE, "31E036,31E035"));
+			//3 血管面积占比 % Vessel area % 3=C/F
+			BigDecimal vesselArea = getProportion(C_31E003_area, F_31E111);
 			resultsMap.put("血管面积占比", createNameIndicator("Vessel area %", vesselArea, PERCENTAGE, "31E003,31E111"));
+			//6 膀胱面积  mm2 Urinary bladder area 6=F
 			resultsMap.put("膀胱面积", createNameIndicator("Urinary bladder area", F_31E111, SQ_MM, "31E111"));
 			aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
 		} catch (Exception e) {
