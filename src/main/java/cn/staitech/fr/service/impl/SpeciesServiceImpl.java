@@ -20,7 +20,7 @@ public class SpeciesServiceImpl extends ServiceImpl<SpeciesMapper, Species> impl
     public List<Species> getSpeciesList() {
         log.info("种属下拉框接口查询开始：");
         LambdaQueryWrapper<Species> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(Species::getOrganizationId, SecurityUtils.getOrganizationId());
+        //wrapper.eq(Species::getOrganizationId, SecurityUtils.getOrganizationId());
         List<Species> species = baseMapper.selectList(wrapper);
         return species;
     }
