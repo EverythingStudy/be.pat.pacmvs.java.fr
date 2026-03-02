@@ -124,7 +124,7 @@ public class CanidaeBrainStemParserStrategyImpl extends AbstractCustomParserStra
         } else {
              map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", "0.000", "%",areaUtils.getStructureIds(speciesId+"3D003",speciesId+"3D004",speciesId+"3D111")));
             map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", "0.000", "%",areaUtils.getStructureIds(speciesId+"3D003",speciesId+"3D004",speciesId+"3D111")));
-            map.put("颗粒细胞层和浦肯野细胞层面积占比", new IndicatorAddIn("Granulocyte and Purkinje cell layer area %", "0.000", "%",areaUtils.getStructureIds(speciesId+"3D111",speciesId+"3D0A5")));
+           // map.put("颗粒细胞层和浦肯野细胞层面积占比", new IndicatorAddIn("Granulocyte and Purkinje cell layer area %", "0.000", "%",areaUtils.getStructureIds(speciesId+"3D111",speciesId+"3D0A5")));
             // map.put("分子层红细胞面积占比", new IndicatorAddIn("Molecular level erythrocyte area%", "0.000", "%"));
         }
 
