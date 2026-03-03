@@ -97,7 +97,7 @@ public class Testis_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         // 2=B：生精小管面积（全片）
         resultsMap.put("生精小管面积（全片）", createNameIndicator("Seminiferous tubules area (all)", organAreaB, SQ_MM, "32E0FA"));
         // 3=B/I：生精小管面积占比
-        resultsMap.put("生精小管面积占比）", createNameIndicator("Seminiferous tubules area%", getProportion(organAreaB, organAreaI), PERCENTAGE, this.areaUtils.getStructureIds("32E0FA", "32E111")));
+        resultsMap.put("生精小管面积占比", createNameIndicator("Seminiferous tubules area%", getProportion(organAreaB, organAreaI), PERCENTAGE, this.areaUtils.getStructureIds("32E0FA", "32E111")));
         // 5=D/I：生精小管密度
         resultsMap.put("生精小管密度", createNameIndicator("Density of seminiferous tubules", this.commonJsonParser.bigDecimalDivideCheck(new BigDecimal(countD), organAreaI), SQ_MM_PIECE, this.areaUtils.getStructureIds("32E0FA", "32E111")));
 
