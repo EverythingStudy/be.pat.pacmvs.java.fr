@@ -34,6 +34,7 @@ public abstract class AbstractCustomParserStrategy implements CustomParserStrate
     protected static final String SQ_MM_PIECE = "个/mm²";
     protected static final String SQ_UM_THOUSAND = " 10³ μm²";
     protected static final String MULTIPLIED_SQ_UM_THOUSAND = "×10³ μm²";
+    protected static final String MULTIPLIED_SQ_UM = "×10³ mm²";
     protected static final String MM_PIECE = "个/mm";
     protected static final String SQ_UM_PICE = "个/10³μm²";
     protected static final String PERCENTAGE = "%";

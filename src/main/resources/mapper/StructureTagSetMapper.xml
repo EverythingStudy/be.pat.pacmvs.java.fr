@@ -53,6 +53,9 @@
 <!--            <if test="params.speciesName != null and params.speciesName != ''">-->
 <!--                and s.name like concat('%',#{params.speciesName},'%')-->
 <!--            </if>-->
+            <if test="params.speciesName != null and params.speciesName != ''">
+               and t.species_id = #{params.speciesName}
+            </if>
             <if test="params.createTimeParams != null">
                 <if test="params.createTimeParams.beginTime != null ">
                     <!-- 开始时间检索 -->
