@@ -27,8 +27,12 @@ public class ProjectDetailVo {
     private Long projectId;
 
     @IgnoreLogField
-    @ApiModelProperty(value = "项目编号")
+    @ApiModelProperty(value = "专题编号")
     private String topicName;
+
+    @IgnoreLogField
+    @ApiModelProperty(value = "专题id")
+    private Long topicId;
 
     @ApiModelProperty("项目名称")
     @NotBlank(message = "{SpecialInsertVo.specialName.isnull}")
