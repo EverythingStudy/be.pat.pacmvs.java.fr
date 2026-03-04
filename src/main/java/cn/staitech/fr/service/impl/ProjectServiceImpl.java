@@ -363,7 +363,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
 
         long count = count(Wrappers.<Project>lambdaQuery().eq(Project::getOrganizationId, req.getOrganizationId()).eq(Project::getDelFlag, cn.staitech.common.core.constant.Constants.DEL_FLAG_NORMAL).eq(Project::getProjectName, req.getProjectName()).ne(Project::getProjectId, req.getProjectId()));
         if (count > 0) {
-            return R.fail(MessageSource.M("EXISTS_SPECIAL_DATA"));
+            return R.fail(MessageSource.M("project.name.exists"));
         }
 
         // 项目启动后，仅在暂停时可以修改基础信息部分的项目名称和负责人外，其他信息不允许修改
