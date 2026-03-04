@@ -37,10 +37,10 @@ public class Project implements Serializable {
     @TableId(value = "special_id", type = IdType.AUTO)
     private Long projectId;
 
-    @ApiModelProperty(value = "项目id")
+    @ApiModelProperty(value = "专题id")
     private Long topicId;
 
-    @ApiModelProperty(value = "项目编号")
+    @ApiModelProperty(value = "专题编号")
     private String topicName;
 
     @TableField(value = "special_name")
