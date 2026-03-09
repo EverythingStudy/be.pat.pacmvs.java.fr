@@ -217,9 +217,12 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
         if (CollectionUtils.isEmpty(images)) {
             return R.fail(MessageSource.M("slide.no.new.images"));
         }
+        List<Long> imageIds = imageIdsFilter(images.stream().map(Image::getImageId).collect(Collectors.toList()), req.getProjectId());
+        if (CollectionUtils.isEmpty(imageIds)) {
+            return R.fail(MessageSource.M("slide.no.new.images"));
+        }
         List<Slide> slidesToSave = new ArrayList<>();
         Long userId = SecurityUtils.getUserId();
-        List<Long> imageIds = imageIdsFilter(images.stream().map(Image::getImageId).collect(Collectors.toList()), req.getProjectId());
         List<Image> imageList = imageMapper.selectList(Wrappers.<Image>lambdaQuery().in(Image::getImageId,imageIds));
         Map<Long,Image> imageMap = imageList.stream().collect(Collectors.toMap(Image::getImageId, v -> v));
         List<SlideInfo> slideInfos = new ArrayList<>();
