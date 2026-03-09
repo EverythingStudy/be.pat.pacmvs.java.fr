@@ -7,6 +7,7 @@ import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.SingleSlide;
 import cn.staitech.fr.domain.dto.ExportAiDTO;
 import cn.staitech.fr.domain.out.ExportAiListVO;
+import cn.staitech.fr.domain.out.ExprotAiExcelEnVO;
 import cn.staitech.fr.domain.out.ExprotAiExcelVO;
 import cn.staitech.fr.mapper.AiForecastMapper;
 import cn.staitech.fr.mapper.ProjectMapper;
@@ -14,6 +15,7 @@ import cn.staitech.fr.mapper.SingleSlideMapper;
 import cn.staitech.fr.mapper.SlideMapper;
 import cn.staitech.fr.service.MatrixReviewService;
 import cn.staitech.fr.utils.ExportPdfUtils;
+import cn.staitech.fr.utils.LanguageUtils;
 import cn.staitech.fr.utils.MathUtils;
 import cn.staitech.fr.vo.project.SlideDownLoadReq;
 import cn.staitech.fr.vo.project.slide.SlidePageVo;
@@ -21,6 +23,7 @@ import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.Range;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,6 +118,29 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
                     exportAiExcelVO.setTopicName(exportVO.getTopicName());
                     exportAiExcelVO.setImageName(exportVO.getImageName());
                     exportAiExcelVO.setOrganName(exportVO.getOrganName());
+                    if (null != exportAiListVO.getNormalDistribution() && null != exportAiListVO.getResults() && !"数据量过少,无统计学意义".equals(exportAiListVO.getNormalDistribution())) {
+                        String[] s = exportAiListVO.getNormalDistribution().split("-");
+                        if (!"详情见单个标注轮廓详情弹窗！".equals(exportAiListVO.getResults()) && exportAiListVO.getResults().split(";").length == 1) {
+                            try {
+                                String result = exportAiListVO.getResults().contains("±")
+                                        ? exportAiListVO.getResults().split("±")[0]
+                                        : (exportAiListVO.getResults().contains(":") ? exportAiListVO.getResults().split(":")[0] : exportAiListVO.getResults());
+                                boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(result));
+                                exportAiExcelVO.setLowerBound(s[0]);
+                                exportAiExcelVO.setUpperBound(s[1]);
+                                if (!inRange) {
+                                    exportAiExcelVO.setAbnormalValue("T");
+                                }
+                            } catch (Exception e) {
+                                log.error("数据转换异常{},{}",  exportAiListVO.getNormalDistribution(), exportAiListVO.getResults());
+                            }
+                        } else {
+                            exportAiExcelVO.setAbnormalValue("");
+                        }
+                    } else {
+                        exportAiExcelVO.setLowerBound(exportAiListVO.getNormalDistribution());
+                        exportAiExcelVO.setUpperBound(exportAiListVO.getNormalDistribution());
+                    }
                     collect.add(exportAiExcelVO);
                 }
             }
@@ -125,8 +151,19 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
         if (!file.exists() && !file.isDirectory()) {
             file.mkdirs();
         }
-        //生成Excel文件
-        EasyExcel.write(s, ExprotAiExcelVO.class).sheet("AI量化指标数据").doWrite(collect);
+        if(LanguageUtils.isEn()){
+            List<ExprotAiExcelEnVO> excelModels = collect.stream()
+                    .map(m -> {
+                        ExprotAiExcelEnVO model = new ExprotAiExcelEnVO();
+                        BeanUtils.copyProperties(m, model);
+                        return model;
+                    })
+                    .collect(Collectors.toList());
+            EasyExcel.write(s,ExprotAiExcelEnVO.class).sheet("AI量化指标数据").doWrite(excelModels);
+        } else {
+            EasyExcel.write(s, ExprotAiExcelVO.class).sheet("AI量化指标数据").doWrite(collect);
+        }
+
         ExportPdfUtils.downloadLocal(s, response);
         log.info("结束");
     }
