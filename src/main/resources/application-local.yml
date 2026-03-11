@@ -252,6 +252,24 @@ organ-structures:
       - structure-id: 38201E,38201F,38200C,382064,382049,382111
     310: # 消化系统-消化道-胃
       - structure-id: 31001E,31001F,31000C,310111
+    324: # 卵巢
+      - structure-id: 324004,324003,324111
+    32C: # 前列腺
+      - structure-id: 32C06C,32C0F4,32C061,32C060,32C111
+    32E: # 睾丸
+      - structure-id: 32E0FA,32E0FB,32E0FC,32E0FD,32E0FE,32E111
+    32F: # 附睾
+      - structure-id: 32F0F5,32F0F4,32F0F7,32F0F6,32F111
+    34C: #肺脏
+      - structure-id: 34C002,34C003,34C004,34C006,34C027,34C111
+    34D: # 气管
+      - structure-id: 34D036,34D035,34D111
+    350: # 股骨
+      - structure-id: 35000B,350111
+    34E: # 胸骨
+      - structure-id: 34E011,34E022,34E004,34E012,34E111
+    35C: # 骨骼肌
+      - structure-id: 35C027,35C02A,35C05A,35C111
   outline: # 脏器结构轮廓
     "02": #哈德氏腺
       - structure-id: 102111
