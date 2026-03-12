@@ -597,7 +597,6 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                 singleSlideMap = singleSlides.stream().collect(Collectors.toMap(SingleSlide::getCategoryId, singleSlide -> singleSlide, (existing, replacement) -> existing));
             }
 
-            Map<Long, Production> productionMap = new HashMap<>(16);
             // 查询图片信息
             Image image = this.imageMapper.selectById(slide.getImageId());
             // 查询项目信息
@@ -613,18 +612,14 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
             wrapper.eq(Production::getWaxCode, image.getWaxCode());
             wrapper.in(Production::getSexFlag, sexFlags);
             List<Production> productions = this.productionMapper.selectList(wrapper);
-            if (!CollectionUtils.isEmpty(productions)) {
-                productionMap = productions.stream().collect(Collectors.toMap(Production::getOrganTagId, production -> production, (existing, replacement) -> existing));
-            }
+            // 脏器标签ID集合
+            List<Long> organTagIds = productions.stream().map(Production::getOrganTagId).collect(Collectors.toList());
 
             // 查询标签信息
             Map<Long, OrganTag> tagMap = new HashMap<>(16);
-            Set<Long> tagIds = new HashSet<>(16);
-            tagIds.addAll(singleSlideMap.keySet());
-            tagIds.addAll(productionMap.keySet());
-            if (!CollectionUtils.isEmpty(tagIds)) {
+            if (!singleSlideMap.isEmpty()) {
                 LambdaQueryWrapper<OrganTag> tagWrapper = new LambdaQueryWrapper<>();
-                tagWrapper.in(OrganTag::getOrganTagId, tagIds);
+                tagWrapper.in(OrganTag::getOrganTagId, singleSlideMap.keySet());
                 List<OrganTag> tags = organTagMapper.selectList(tagWrapper);
                 if (!CollectionUtils.isEmpty(tags)) {
                     tagMap = tags.stream().collect(Collectors.toMap(OrganTag::getOrganTagId, tag -> tag));
@@ -641,10 +636,10 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                 aiVo.setOrganEn(organTag.getOrganEn());
                 aiVo.setRgb(organTag.getRgb());
                 aiVo.setChromaticValue(organTag.getChromaticValue());
-                aiVo.setRedHighlight(!productionMap.containsKey(singleSlide.getCategoryId()));
+                aiVo.setRedHighlight(!organTagIds.contains(singleSlide.getCategoryId()));
                 aiVos.add(aiVo);
             }
-            for (Production production : productionMap.values()) {
+            for (Production production : productions) {
                 OrganCheckProductionVo productionVo = new OrganCheckProductionVo();
                 productionVo.setId(production.getId());
                 productionVo.setOrganTagId(production.getOrganTagId());
