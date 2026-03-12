@@ -60,8 +60,6 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                     for (Production p : productions) {
                         ProductionVO vo = new ProductionVO();
                         BeanUtils.copyProperties(p, vo);
-                        // 脏器标签ID
-                        vo.setTemplateId(p.getOrganTagId());
                         list.add(vo);
                     }
                 }
@@ -80,19 +78,6 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                         BeanUtils.copyProperties(template, vo);
                         // 种属蜡块模板表ID
                         vo.setWaxCodeId(template.getId());
-                        // 查询脏器标签ID
-                        LambdaQueryWrapper<OrganTag> organTagWrapper = new LambdaQueryWrapper<>();
-                        organTagWrapper.eq(OrganTag::getOrganTagCode, template.getOrganCode());
-                        organTagWrapper.eq(OrganTag::getOrganizationId, project.getOrganizationId());
-                        organTagWrapper.eq(OrganTag::getSpeciesId, project.getSpeciesId());
-                        organTagWrapper.eq(OrganTag::getDelFlag, false);
-                        OrganTag tag = organTagMapper.selectOne(organTagWrapper);
-                        if (tag != null) {
-                            // 脏器标签ID
-                            vo.setTemplateId(tag.getOrganTagId());
-                        } else {
-                            log.error("种属蜡块模板表的脏器编码：" + template.getOrganCode() + "，不在脏器标签中，机构ID=" + project.getOrganizationId());
-                        }
                         list.add(vo);
                     }
                 }
@@ -278,17 +263,15 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
         // 查询项目信息
         Project project = this.projectMapper.selectById(req.getProjectId());
         if (project != null && StringUtils.isNotBlank(project.getSpeciesId())) {
-            LambdaQueryWrapper<OrganTag> wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(OrganTag::getSpeciesId, project.getSpeciesId());
-            wrapper.eq(OrganTag::getOrganizationId, project.getOrganizationId());
-            wrapper.eq(OrganTag::getDelFlag, false);
-            List<OrganTag> tags = organTagMapper.selectList(wrapper);
-            if (!CollectionUtils.isEmpty(tags)) {
-                for (OrganTag tag : tags) {
+            LambdaQueryWrapper<SpeciesWaxCodeTemplate> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(SpeciesWaxCodeTemplate::getSpeciesId, project.getSpeciesId());
+            List<SpeciesWaxCodeTemplate> templates = this.speciesWaxCodeTemplateMapper.selectList(wrapper);
+            if (!CollectionUtils.isEmpty(templates)) {
+                for (SpeciesWaxCodeTemplate template : templates) {
                     OrganVO vo = new OrganVO();
-                    vo.setTemplateId(tag.getOrganTagId());
-                    vo.setOrganName(tag.getOrganName());
-                    vo.setOrganEn(tag.getOrganEn());
+                    vo.setWaxCodeId(template.getId());
+                    vo.setOrganName(template.getOrganName());
+                    vo.setOrganEn(template.getOrganEn());
                     list.add(vo);
                 }
             }

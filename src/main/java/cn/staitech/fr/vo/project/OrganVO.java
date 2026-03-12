@@ -11,10 +11,10 @@ import lombok.Data;
 @Data
 public class OrganVO {
     /**
-     * 脏器标签ID
+     * 种属蜡块模板表ID
      */
-    @ApiModelProperty(value = "脏器标签ID")
-    private Long templateId;
+    @ApiModelProperty(value = "种属蜡块模板表ID")
+    private Long waxCodeId;
     /**
      * 脏器名称
      */
