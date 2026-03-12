@@ -155,17 +155,17 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
                 return R.fail("您没有该项目的配置权限，请联系该项目负责人或机构管理员");
             }
         }
-        Set<Long> organTagIds = new HashSet<>(16);
+        Set<Long> waxCodeIds = new HashSet<>(16);
         // 校验
         if (!CollectionUtils.isEmpty(req.getProductions())) {
             List<String> list = new ArrayList<>();
             for (ProductionInfoReq r : req.getProductions()) {
-                String key = r.getWaxCode() + "-" + r.getTemplateId() + "-" + r.getSexFlag();
+                String key = r.getWaxCode() + "-" + r.getWaxCodeId() + "-" + r.getSexFlag();
                 if (list.contains(key)) {
                     return R.fail("表中有重复信息，请删除重复信息后再保存");
                 }
                 list.add(key);
-                organTagIds.add(r.getTemplateId());
+                waxCodeIds.add(r.getWaxCodeId());
             }
         }
         // 先删除后插入
@@ -174,54 +174,51 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
         this.baseMapper.delete(wrapper);
 
         if (!CollectionUtils.isEmpty(req.getProductions())) {
+            // 查询模板表
+            List<SpeciesWaxCodeTemplate> templates = speciesWaxCodeTemplateMapper.selectBatchIds(waxCodeIds);
+            // 模板id为key，脏器编码为value的map
+            Map<Long, String> templateMap = templates.stream().collect(Collectors.toMap(SpeciesWaxCodeTemplate::getId, SpeciesWaxCodeTemplate::getOrganCode));
+            Map<Long, SpeciesWaxCodeTemplate> speciesWaxCodeTemplateMap = templates.stream().collect(Collectors.toMap(SpeciesWaxCodeTemplate::getId, item -> item));
             // 查询脏器标签信息
             LambdaQueryWrapper<OrganTag> tagWrapper = new LambdaQueryWrapper<>();
-            tagWrapper.in(OrganTag::getOrganTagId, organTagIds);
+            tagWrapper.eq(OrganTag::getOrganizationId, project.getOrganizationId());
+            // 种属ID取模板表里面的：防止此时项目种属变更导致脏器标签id漂移
+            tagWrapper.eq(OrganTag::getSpeciesId, templates.get(0).getSpeciesId());
+            tagWrapper.in(OrganTag::getOrganTagCode, templateMap.values());
             List<OrganTag> tags = organTagMapper.selectList(tagWrapper);
-            Map<Long, OrganTag> map = tags.stream().collect(Collectors.toMap(OrganTag::getOrganTagId, item -> item));
+            Map<String, Long> organTagMap = tags.stream().collect(Collectors.toMap(OrganTag::getOrganTagCode, OrganTag::getOrganTagId));
 
             List<Production> productions = new ArrayList<>();
             Date now = new Date();
             for (ProductionInfoReq r : req.getProductions()) {
-                OrganTag organTag = map.get(r.getTemplateId());
+                Long organTagId = null;
+                SpeciesWaxCodeTemplate speciesWaxCodeTemplate = speciesWaxCodeTemplateMap.get(r.getWaxCodeId());
+                if (speciesWaxCodeTemplate != null) {
+                    organTagId = organTagMap.get(speciesWaxCodeTemplate.getOrganCode());
+                }
+                if (organTagId == null) {
+                    continue;
+                }
                 Production production = new Production();
                 // 专题ID
                 production.setSpecialId(req.getProjectId());
                 // 种属蜡块模板表ID
                 production.setWaxCodeId(r.getWaxCodeId());
                 // 脏器标签ID
-                production.setOrganTagId(r.getTemplateId());
-                // 种属蜡块模板表ID不为空：初始化数据，使用初始化数据的信息
-                if (r.getWaxCodeId() != null) {
-                    SpeciesWaxCodeTemplate waxCodeTemplate = this.speciesWaxCodeTemplateMapper.selectById(r.getWaxCodeId());
-                    if (waxCodeTemplate != null) {
-                        // 种属ID
-                        production.setSpeciesId(waxCodeTemplate.getSpeciesId());
-                        // 脏器名称
-                        production.setOrganName(waxCodeTemplate.getOrganName());
-                        // 英文名称
-                        production.setOrganEn(waxCodeTemplate.getOrganEn());
-                        // 脏器编码
-                        production.setOrganCode(waxCodeTemplate.getOrganCode());
-                        // 脏器缩写
-                        production.setAbbreviation(waxCodeTemplate.getAbbreviation());
-                    }
-                }
-                // 用户创建的数据，使用脏器标签的信息
-                else {
-                    if (organTag != null) {
-                        // 种属ID
-                        production.setSpeciesId(organTag.getSpeciesId());
-                        // 脏器名称
-                        production.setOrganName(organTag.getOrganName());
-                        // 英文名称
-                        production.setOrganEn(organTag.getOrganEn());
-                        // 脏器编码
-                        production.setOrganCode(organTag.getOrganTagCode());
-                        // 脏器缩写
-                        production.setAbbreviation(organTag.getAbbreviation());
-                    }
-                }
+                production.setOrganTagId(organTagId);
+                // 种属ID
+                production.setSpeciesId(speciesWaxCodeTemplate.getSpeciesId());
+                // 脏器名称
+                production.setOrganName(speciesWaxCodeTemplate.getOrganName());
+                // 英文名称
+                production.setOrganEn(speciesWaxCodeTemplate.getOrganEn());
+                // 脏器编码
+                production.setOrganCode(speciesWaxCodeTemplate.getOrganCode());
+                // 脏器缩写
+                production.setAbbreviation(speciesWaxCodeTemplate.getAbbreviation());
+                // 对应算法接口脏器编码：只记录不同的
+                production.setAlgorithmMethod(speciesWaxCodeTemplate.getAlgorithmMethod());
+
                 // 蜡块编号
                 production.setWaxCode(r.getWaxCode());
                 // 取材块数

@@ -27,12 +27,6 @@ public class ProductionInfoReq implements Serializable {
     @NotBlank(message = "蜡块编号不能为空")
     private String waxCode;
     /**
-     * 脏器标签ID
-     */
-    @ApiModelProperty(value = "脏器标签ID：种属脏器下拉列表（取自脏器标签数据）接口中返回", required = true)
-    @NotNull(message = "脏器标签ID不能为空")
-    private Long templateId;
-    /**
      * 取材块数
      */
     @ApiModelProperty(value = "取材块数", required = true)
