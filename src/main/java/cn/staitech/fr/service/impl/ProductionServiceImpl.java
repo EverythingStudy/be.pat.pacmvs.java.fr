@@ -160,7 +160,7 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
         if (!CollectionUtils.isEmpty(req.getProductions())) {
             List<String> list = new ArrayList<>();
             for (ProductionInfoReq r : req.getProductions()) {
-                String key = r.getWaxCode() + "-" + r.getWaxCodeId() + "-" + r.getSexFlag();
+                String key = r.getWaxCode() + "-" + r.getWaxCodeId();
                 if (list.contains(key)) {
                     return R.fail("表中有重复信息，请删除重复信息后再保存");
                 }
