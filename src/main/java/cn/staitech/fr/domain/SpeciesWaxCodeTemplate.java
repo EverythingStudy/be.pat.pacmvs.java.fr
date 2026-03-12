@@ -54,6 +54,10 @@ public class SpeciesWaxCodeTemplate implements Serializable {
      */
     private String abbreviation;
     /**
+     * 对应算法接口脏器编码：只记录不同的
+     */
+    private String algorithmMethod;
+    /**
      * 创建人id
      */
     private Long createBy;

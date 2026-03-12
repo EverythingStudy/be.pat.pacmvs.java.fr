@@ -66,6 +66,10 @@ public class Production implements Serializable {
      */
     private String abbreviation;
     /**
+     * 对应算法接口脏器编码：只记录不同的
+     */
+    private String algorithmMethod;
+    /**
      * 机构ID
      */
     private Long organizationId;
