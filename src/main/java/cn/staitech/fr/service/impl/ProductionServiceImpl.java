@@ -176,15 +176,15 @@ public class ProductionServiceImpl extends ServiceImpl<ProductionMapper, Product
         if (!CollectionUtils.isEmpty(req.getProductions())) {
             // 查询模板表
             List<SpeciesWaxCodeTemplate> templates = speciesWaxCodeTemplateMapper.selectBatchIds(waxCodeIds);
-            // 模板id为key，脏器编码为value的map
-            Map<Long, String> templateMap = templates.stream().collect(Collectors.toMap(SpeciesWaxCodeTemplate::getId, SpeciesWaxCodeTemplate::getOrganCode));
+            // 脏器编码集合
+            List<String> organCodes = templates.stream().map(SpeciesWaxCodeTemplate::getOrganCode).collect(Collectors.toList());
             Map<Long, SpeciesWaxCodeTemplate> speciesWaxCodeTemplateMap = templates.stream().collect(Collectors.toMap(SpeciesWaxCodeTemplate::getId, item -> item));
             // 查询脏器标签信息
             LambdaQueryWrapper<OrganTag> tagWrapper = new LambdaQueryWrapper<>();
             tagWrapper.eq(OrganTag::getOrganizationId, project.getOrganizationId());
             // 种属ID取模板表里面的：防止此时项目种属变更导致脏器标签id漂移
             tagWrapper.eq(OrganTag::getSpeciesId, templates.get(0).getSpeciesId());
-            tagWrapper.in(OrganTag::getOrganTagCode, templateMap.values());
+            tagWrapper.in(OrganTag::getOrganTagCode, organCodes);
             List<OrganTag> tags = organTagMapper.selectList(tagWrapper);
             Map<String, Long> organTagMap = tags.stream().collect(Collectors.toMap(OrganTag::getOrganTagCode, OrganTag::getOrganTagId));
 
