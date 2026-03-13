@@ -18,7 +18,7 @@ import java.util.Map;
 
 /**
  * <p>犬类-免疫系统-颌下淋巴结</p>
- * <a href="https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1dd0x5i4Xv5p6Ad9nL1">文档</a>
+ * <a href="https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1vJk10f4Xv5p6Ad9nL1">文档</a>
  *
  * @author wangtc
  */

@@ -18,7 +18,7 @@ import java.util.Map;
 
 /**
  * <p>犬类-免疫系统-肠系膜淋巴结</p>
- * <a href="https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1dnW00H4Xv5p6Ad9nL1">文档</a>
+ * <a href="https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1eROy0u4Xv5p6Ad9nL1">文档</a>
  *
  * @author wangtc
  */
