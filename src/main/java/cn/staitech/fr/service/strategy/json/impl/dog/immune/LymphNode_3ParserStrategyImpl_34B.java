@@ -10,10 +10,8 @@ import cn.staitech.fr.service.strategy.json.CommonJsonCheck;
 import cn.staitech.fr.service.strategy.json.CommonJsonParser;
 import cn.staitech.fr.utils.DecimalUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -23,7 +21,7 @@ import java.util.Map;
  *
  * @author wangtc
  */
-@Component
+@Deprecated
 @Slf4j
 public class LymphNode_3ParserStrategyImpl_34B extends AbstractCustomParserStrategy {
     private final SingleSlideMapper singleSlideMapper;
