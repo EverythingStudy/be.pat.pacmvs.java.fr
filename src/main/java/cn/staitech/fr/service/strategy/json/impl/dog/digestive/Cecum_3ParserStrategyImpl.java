@@ -23,23 +23,23 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 犬 消化系统-消化道 - 大肠指标计算
+ * 犬 消化系统-消化道 - 盲肠指标计算
  * @author zhangy
  */
 @Slf4j
-//@Component("Large_intestine_3")
-public class LargeIntestine_3ParserStrategyImpl extends AbstractCustomParserStrategy {
+@Component("Cecum_3")
+public class Cecum_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 
     /** 黏膜上皮+固有层 */
-    private static final String STRUCTURE_EPITHELIUM_LAMINA = "38301E";
+    private static final String STRUCTURE_EPITHELIUM_LAMINA = "31401E";
     /** 黏膜上皮+黏膜下层 */
-    private static final String STRUCTURE_EPITHELIUM_SUBMUCOSA = "38301F";
+    private static final String STRUCTURE_EPITHELIUM_SUBMUCOSA = "31401F";
     /** 肌层 */
-    private static final String STRUCTURE_MUSCULAR = "38300C";
+    private static final String STRUCTURE_MUSCULAR = "31400C";
     /** 淋巴组织 */
-    private static final String STRUCTURE_LYMPHATIC = "383049";
+    private static final String STRUCTURE_LYMPHATIC = "314049";
     /** 组织轮廓 */
-    private static final String STRUCTURE_OUTLINE = "383111";
+    private static final String STRUCTURE_OUTLINE = "314111";
 
     @Resource
     private SingleSlideMapper singleSlideMapper;
@@ -59,35 +59,35 @@ public class LargeIntestine_3ParserStrategyImpl extends AbstractCustomParserStra
     public void init() {
         setCommonJsonParser(commonJsonParser);
         setCommonJsonCheck(commonJsonCheck);
-        log.info("Dog LargeIntestineParserStrategyImpl init");
+        log.info("Dog Cecum_3ParserStrategyImpl init");
     }
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        log.info("犬大肠指标计算开始 singleId={}", jsonTask.getSingleId());
-        Map<String, IndicatorAddIn> indicatorResultsMap = buildLargeIntestineIndicators(jsonTask);
+        log.info("犬盲肠指标计算开始 singleId={}", jsonTask.getSingleId());
+        Map<String, IndicatorAddIn> indicatorResultsMap = buildCecumIndicators(jsonTask);
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
-        log.info("犬大肠指标计算完成");
+        log.info("犬盲肠指标计算完成");
     }
 
     @Override
     public String getAlgorithmCode() {
-        return "Large_intestine_3";
+        return "Cecum_3";
     }
 
     /**
-     * A 黏膜上皮+固有层面积 mm² - 38301E
-     * B 黏膜上皮+黏膜下层面积 mm² - 38301F
-     * C 肌层面积 mm² - 38300C
-     * D 淋巴组织面积 mm² - 383049（若多个数据则相加输出）
-     * E 组织轮廓面积 mm² - 383111（辅助指标5，不单独展示）
+     * A 黏膜上皮+固有层面积 mm² - 31401E
+     * B 黏膜上皮+黏膜下层面积 mm² - 31401F
+     * C 肌层面积 mm² - 31400C
+     * D 淋巴组织面积 mm² - 314049（若多个数据则相加输出）
+     * E 组织轮廓面积 mm² - 314111（辅助指标5，不单独展示）
      * 1 黏膜上皮+固有层面积占比 % = A/E
      * 2 黏膜上皮+黏膜下层面积占比 % = B/E
      * 3 肌层面积占比 % = C/E
      * 4 淋巴组织面积占比 % = D/E
-     * 5 组织面积 mm² = E
+     * 5 盲肠面积 mm² = E
      */
-    private Map<String, IndicatorAddIn> buildLargeIntestineIndicators(JsonTask jsonTask) {
+    private Map<String, IndicatorAddIn> buildCecumIndicators(JsonTask jsonTask) {
         BigDecimal areaA = getAreaOrZero(commonJsonParser.getOrganArea(jsonTask, STRUCTURE_EPITHELIUM_LAMINA));
         BigDecimal areaB = getAreaOrZero(commonJsonParser.getOrganArea(jsonTask, STRUCTURE_EPITHELIUM_SUBMUCOSA));
         BigDecimal areaC = getAreaOrZero(commonJsonParser.getOrganArea(jsonTask, STRUCTURE_MUSCULAR));
@@ -105,7 +105,7 @@ public class LargeIntestine_3ParserStrategyImpl extends AbstractCustomParserStra
         result.put("肌层面积", createIndicator(areaC.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_MUSCULAR));
         result.put("淋巴组织面积", createIndicator(areaD.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_LYMPHATIC));
 
-        // 产品呈现指标：1~4 占比，5 组织面积
+        // 产品呈现指标：1~4 占比，5 盲肠面积
         if (areaE.compareTo(BigDecimal.ZERO) > 0) {
             result.put("黏膜上皮+固有层面积占比", createNameIndicator("Mucosa epithelium+lamina propria mucosa area%",
                     getProportion(areaA, areaE).toString(), PERCENTAGE, STRUCTURE_EPITHELIUM_LAMINA + "," + STRUCTURE_OUTLINE));
@@ -122,8 +122,8 @@ public class LargeIntestine_3ParserStrategyImpl extends AbstractCustomParserStra
             result.put("淋巴组织面积占比", createNameIndicator("Lymphatic nodule area%", "0.000", PERCENTAGE, STRUCTURE_LYMPHATIC + "," + STRUCTURE_OUTLINE));
         }
 
-        // 5 组织面积 mm² = E（文档英文名 Cecum area，此处为大肠组织面积）
-        result.put("组织面积", createNameIndicator("Cecum area", areaE.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_OUTLINE));
+        // 5 盲肠面积 mm² = E
+        result.put("盲肠面积", createNameIndicator("Cecum area", areaE.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_OUTLINE));
         return result;
     }
 
@@ -131,3 +131,4 @@ public class LargeIntestine_3ParserStrategyImpl extends AbstractCustomParserStra
         return ObjectUtil.isNotEmpty(annotation) && annotation.getStructureAreaNum() != null ? annotation.getStructureAreaNum() : BigDecimal.ZERO;
     }
 }
+

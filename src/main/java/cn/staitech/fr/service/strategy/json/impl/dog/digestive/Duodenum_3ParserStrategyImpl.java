@@ -23,25 +23,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 犬 消化系统-消化道 - 小肠指标计算
+ * 犬 消化系统-消化道 - 十二指肠指标计算
  * @author zhangy
  */
 @Slf4j
-//@Component("Small_intestine_3")
-public class SmallIntestine_3ParserStrategyImpl extends AbstractCustomParserStrategy {
+@Component("Duodenum_3")
+public class Duodenum_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 
     /** 黏膜上皮+固有层 */
-    private static final String STRUCTURE_EPITHELIUM_LAMINA = "38201E";
+    private static final String STRUCTURE_EPITHELIUM_LAMINA = "31901E";
     /** 黏膜肌层+黏膜下层 */
-    private static final String STRUCTURE_MUSCULAR_SUBMUCOSA = "38201F";
+    private static final String STRUCTURE_MUSCULAR_SUBMUCOSA = "31901F";
     /** 肌层 */
-    private static final String STRUCTURE_MUSCULAR = "38200C";
+    private static final String STRUCTURE_MUSCULAR = "31900C";
     /** 淋巴小结 */
-    private static final String STRUCTURE_LYMPH_NODULE = "382064";
+    private static final String STRUCTURE_LYMPH_NODULE = "319064";
     /** 淋巴组织 */
-    private static final String STRUCTURE_LYMPHATIC = "382049";
+    private static final String STRUCTURE_LYMPHATIC = "319049";
     /** 组织轮廓 */
-    private static final String STRUCTURE_OUTLINE = "382111";
+    private static final String STRUCTURE_OUTLINE = "319111";
 
     @Resource
     private SingleSlideMapper singleSlideMapper;
@@ -61,36 +61,36 @@ public class SmallIntestine_3ParserStrategyImpl extends AbstractCustomParserStra
     public void init() {
         setCommonJsonParser(commonJsonParser);
         setCommonJsonCheck(commonJsonCheck);
-        log.info("Dog SmallIntestineParserStrategyImpl init");
+        log.info("Dog Duodenum_3ParserStrategyImpl init");
     }
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        log.info("犬小肠指标计算开始 singleId={}", jsonTask.getSingleId());
-        Map<String, IndicatorAddIn> indicatorResultsMap = buildSmallIntestineIndicators(jsonTask);
+        log.info("犬十二指肠指标计算开始 singleId={}", jsonTask.getSingleId());
+        Map<String, IndicatorAddIn> indicatorResultsMap = buildDuodenumIndicators(jsonTask);
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
-        log.info("犬小肠指标计算完成");
+        log.info("犬十二指肠指标计算完成");
     }
 
     @Override
     public String getAlgorithmCode() {
-        return "Small_intestine_3";
+        return "Duodenum_3";
     }
 
     /**
-     * B 黏膜上皮+固有层面积 mm² - 38201E
-     * C 黏膜肌层+黏膜下层面积 mm² - 38201F
-     * D 肌层面积 mm² - 38200C
-     * E 淋巴组织面积 mm² - 382049（若多个数据则相加输出）
-     * F 组织轮廓面积 mm² - 382111（辅助指标5，不单独展示）
-     * G 淋巴小结数量 个 - 382064
+     * B 黏膜上皮+固有层面积 mm² - 31901E
+     * C 黏膜肌层+黏膜下层面积 mm² - 31901F
+     * D 肌层面积 mm² - 31900C
+     * E 淋巴组织面积 mm² - 319049（若多个数据则相加输出）
+     * F 组织轮廓面积 mm² - 319111（辅助指标5，不单独展示）
+     * G 淋巴小结数量 个 - 319064
      * 1 黏膜上皮+固有层面积占比 % = B/F
      * 2 黏膜肌层+黏膜下层面积占比 % = C/F
      * 3 肌层面积占比 % = D/F
      * 4 淋巴组织面积占比 % = E/F
-     * 5 组织面积 mm² = F
+     * 5 十二指肠面积 mm² = F
      */
-    private Map<String, IndicatorAddIn> buildSmallIntestineIndicators(JsonTask jsonTask) {
+    private Map<String, IndicatorAddIn> buildDuodenumIndicators(JsonTask jsonTask) {
         BigDecimal areaB = getAreaOrZero(commonJsonParser.getOrganArea(jsonTask, STRUCTURE_EPITHELIUM_LAMINA));
         BigDecimal areaC = getAreaOrZero(commonJsonParser.getOrganArea(jsonTask, STRUCTURE_MUSCULAR_SUBMUCOSA));
         BigDecimal areaD = getAreaOrZero(commonJsonParser.getOrganArea(jsonTask, STRUCTURE_MUSCULAR));
@@ -111,7 +111,7 @@ public class SmallIntestine_3ParserStrategyImpl extends AbstractCustomParserStra
         result.put("淋巴组织面积", createIndicator(areaE.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_LYMPHATIC));
         result.put("淋巴小结数量", createIndicator(String.valueOf(countG != null ? countG : 0), PIECE, STRUCTURE_LYMPH_NODULE));
 
-        // 产品呈现指标：1~4 占比，5 组织面积
+        // 产品呈现指标：1~4 占比，5 十二指肠面积
         if (areaF.compareTo(BigDecimal.ZERO) > 0) {
             result.put("黏膜上皮+固有层面积占比", createNameIndicator("Mucosa epithelium+lamina propria mucosa area%",
                     getProportion(areaB, areaF).toString(), PERCENTAGE, STRUCTURE_EPITHELIUM_LAMINA + "," + STRUCTURE_OUTLINE));
@@ -128,8 +128,8 @@ public class SmallIntestine_3ParserStrategyImpl extends AbstractCustomParserStra
             result.put("淋巴组织面积占比", createNameIndicator("Lymphatic nodule area%", "0.000", PERCENTAGE, STRUCTURE_LYMPHATIC + "," + STRUCTURE_OUTLINE));
         }
 
-        // 5 组织面积 mm² = F（文档英文名 Ileum area）
-        result.put("组织面积", createNameIndicator("Ileum area", areaF.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_OUTLINE));
+        // 5 十二指肠面积 mm² = F
+        result.put("十二指肠面积", createNameIndicator("Duodenum area", areaF.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_OUTLINE));
 
         return result;
     }
@@ -138,3 +138,4 @@ public class SmallIntestine_3ParserStrategyImpl extends AbstractCustomParserStra
         return ObjectUtil.isNotEmpty(annotation) && annotation.getStructureAreaNum() != null ? annotation.getStructureAreaNum() : BigDecimal.ZERO;
     }
 }
+
