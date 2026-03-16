@@ -31,6 +31,8 @@ public class AccessProjectRecordsVo {
     @ApiModelProperty(value = "种属名称")
     private String speciesName;
 
+    private String speciesNameEn;
+
     @ApiModelProperty(value = "试验类型")
     private String trialType;
 
