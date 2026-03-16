@@ -7,6 +7,7 @@ import cn.staitech.fr.domain.AccessProjectRecords;
 import cn.staitech.fr.enums.TrialTypeEnum;
 import cn.staitech.fr.mapper.AccessProjectRecordsMapper;
 import cn.staitech.fr.service.AccessProjectRecordsService;
+import cn.staitech.fr.utils.LanguageUtils;
 import cn.staitech.fr.vo.AccessProjectRecordsVo;
 import cn.staitech.fr.vo.project.AccessProjectRecordReq;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -56,12 +57,17 @@ public class AccessProjectRecordsServiceImpl extends ServiceImpl<AccessProjectRe
         AccessProjectRecordReq req = new AccessProjectRecordReq();
         req.setProjectIds(projectIds);
         req.setOrganizationId(SecurityUtils.getOrganizationId());
-
+        boolean en = LanguageUtils.isEn();
         List<AccessProjectRecordsVo> accessProjectRecordsVos = this.getBaseMapper().accessProjectStatistics(req);
         for (AccessProjectRecordsVo accessProjectRecordsVo : accessProjectRecordsVos) {
             if(rmap.containsKey(accessProjectRecordsVo.getSpecialId())) {
                 Map<Integer, String> trialType = TrialTypeEnum.getMap();
                 accessProjectRecordsVo.setTrialType(trialType.get(accessProjectRecordsVo.getTrialId()));
+                if(en) {
+                    accessProjectRecordsVo.setSpeciesName(accessProjectRecordsVo.getSpeciesNameEn());
+                } else {
+                    accessProjectRecordsVo.setSpeciesName(accessProjectRecordsVo.getSpeciesName());
+                }
                 accessProjectRecordsVo.setAccessTime(DateUtil.formatDateTime(rmap.get(accessProjectRecordsVo.getSpecialId())));
                 accessProjectRecordsVo.setAnalysisCount(accessProjectRecordsVo.getAnalysisCount() == null ? "0" : accessProjectRecordsVo.getAnalysisCount());
                 accessProjectRecordsVo.setAnalysisSum(accessProjectRecordsVo.getAnalysisSum() == null ? "0" : accessProjectRecordsVo.getAnalysisSum());

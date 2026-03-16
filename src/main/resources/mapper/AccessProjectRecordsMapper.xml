@@ -15,7 +15,7 @@
         records_id, user_id, project_id, access_time
     </sql>
     <select id="accessProjectStatistics" resultType="cn.staitech.fr.vo.AccessProjectRecordsVo">
-        select fs.special_id,ts.name as speciesName,tt.topic_name,fs.special_name,fs.trial_id,s.analysis_sum,m.analysis_count,fs.status
+        select fs.special_id,ts.name as speciesName,ts.name_en as speciesNameEn,tt.topic_name,fs.special_name,fs.trial_id,s.analysis_sum,m.analysis_count,fs.status
         from fr_special fs
                  left join tb_species ts on fs.species_id=ts.species_id
                  left join tb_topic tt on tt.topic_id=fs.topic_id
