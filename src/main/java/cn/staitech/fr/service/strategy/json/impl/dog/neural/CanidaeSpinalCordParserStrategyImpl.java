@@ -95,9 +95,9 @@ public class CanidaeSpinalCordParserStrategyImpl extends AbstractCustomParserStr
         annotationBy.setAreaUnit(PERCENTAGE);
         putAnnotationDynamicData(jsonTask, specialId+"390B4", specialId+"390B2", specialId+"390B3", annotationBy);
         //4 室管膜细胞核数量占比（单个） 		%  4=D/C
-        annotationBy.setAreaName("室管膜细胞核密度（单个）");
+       /* annotationBy.setAreaName("室管膜细胞核密度（单个）");
         annotationBy.setAreaUnit(PIECE);
-        putAnnotationDynamicData(jsonTask, specialId+"390B4", specialId+"3390B5", annotationBy);
+        putAnnotationDynamicData(jsonTask, specialId+"390B4", specialId+"3390B5", annotationBy);*/
         //5 红细胞面积占比（单个） 	%	5=E/(A+B)
         annotationBy.setAreaName("红细胞面积占比（单个）");
         annotationBy.setAreaUnit(PERCENTAGE);
