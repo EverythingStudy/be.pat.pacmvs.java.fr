@@ -194,7 +194,7 @@ public class DynamicDataPool {
                 maxPoolSize,
                 60L,
                 TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(queueCapacity),
+                new LinkedBlockingQueue<>(),
                 new NamedThreadFactory("Recognition-Thread"),
                 new CustomRejectedExecutionHandler() // 使用自定义拒绝策略
         );
