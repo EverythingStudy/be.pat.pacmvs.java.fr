@@ -1,6 +1,7 @@
 package cn.staitech.fr.service.strategy.json.impl.rat.gou;
 
 import cn.staitech.fr.constant.CommonConstant;
+import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.in.IndicatorAddIn;
 import cn.staitech.fr.mapper.SingleSlideMapper;
@@ -67,13 +68,31 @@ public class Liver_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal totalBileDuctArea = commonJsonParser.getOrganAreaMicron(jsonTask, "31214A"); // K: 胆管面积（全片）
 
         // 算法输出指标
-        indicatorResultsMap.put("门管区面积（单个）", new IndicatorAddIn("", DecimalUtils.setScale3(portalAreaPer), MULTIPLIED_SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "312145"));
-        indicatorResultsMap.put("胆管数量（单个门管区）", new IndicatorAddIn("", bileDuctCountPer.toString(), PIECE, CommonConstant.NUMBER_1, "31214A"));
-        indicatorResultsMap.put("胆管面积（单个门管区）", new IndicatorAddIn("", DecimalUtils.setScale3(bileDuctAreaPer), SQ_MM, CommonConstant.NUMBER_1, "31214A"));
+        //indicatorResultsMap.put("门管区面积（单个）", new IndicatorAddIn("", DecimalUtils.setScale3(portalAreaPer), MULTIPLIED_SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "312145"));
+        Annotation annotationC = new Annotation();
+        annotationC.setAreaName("门管区面积（单个）");
+        annotationC.setAreaUnit(MULTIPLIED_SQ_UM_THOUSAND);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "312145", annotationC, 1);
+
+        /*indicatorResultsMap.put("胆管数量（单个门管区）", new IndicatorAddIn("", bileDuctCountPer.toString(), PIECE, CommonConstant.NUMBER_1, "31214A"));
+        indicatorResultsMap.put("胆管面积（单个门管区）", new IndicatorAddIn("", DecimalUtils.setScale3(bileDuctAreaPer), SQ_MM, CommonConstant.NUMBER_1, "31214A"));*/
+
+        Annotation annotationA = new Annotation();
+        annotationA.setCountName("胆管数量（单个门管区）");
+        annotationA.setCountUnit(PIECE);
+        annotationA.setAreaName("胆管面积（单个门管区）");
+        annotationA.setAreaUnit(SQ_MM);
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "312145", "31214A", annotationA, 1,true);
+
         indicatorResultsMap.put("中央静脉面积", new IndicatorAddIn("", DecimalUtils.setScale3(centralVeinArea), MULTIPLIED_SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "312146"));
         indicatorResultsMap.put("大静脉面积", new IndicatorAddIn("", DecimalUtils.setScale3(venaCavaArea), MULTIPLIED_SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "312147"));
         indicatorResultsMap.put("肝细胞核数量", new IndicatorAddIn("", hepatocyteNucleusCount.toString(), PIECE, CommonConstant.NUMBER_1, "312149"));
         //indicatorResultsMap.put("肝细胞核面积（单个）", new IndicatorAddIn("", DecimalUtils.setScale3(hepatocyteNucleusAreaPer), SQ_MM, CommonConstant.NUMBER_1, "312149"));
+        Annotation annotationB = new Annotation();
+        annotationB.setAreaName("肝细胞核面积（单个）");
+        annotationB.setAreaUnit(SQ_MM);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "312149", annotationB, 1);
+
         indicatorResultsMap.put("窦内细胞核数量", new IndicatorAddIn("", sinusNucleusCount.toString(), PIECE, CommonConstant.NUMBER_1, "31214D"));
         //indicatorResultsMap.put("组织轮廓面积", new IndicatorAddIn("", DecimalUtils.setScale3(accurateArea), "平方毫米", CommonConstant.NUMBER_1, "312111"));
         indicatorResultsMap.put("胆管数量（全片）", new IndicatorAddIn("", totalBileDuctCount.toString(), PIECE, CommonConstant.NUMBER_1, "31214A"));
@@ -103,7 +122,6 @@ public class Liver_3ParserStrategyImpl extends AbstractCustomParserStrategy {
             indicatorResultsMap.put("肝细胞核密度", new IndicatorAddIn("Nucleus density of hepatocyte", DecimalUtils.setScale3(hepatocyteNucleusDensity), SQ_MM_PIECE, areaUtils.getStructureIds("312149", "312111")));
 
             indicatorResultsMap.put("肝细胞核面积（单个）", new IndicatorAddIn("Hepatocyte nucleus area (per)", DecimalUtils.setScale3(hepatocyteNucleusAreaPer), SQ_UM, CommonConstant.NUMBER_0, "312149"));
-
 
             // 窦内细胞核密度 = H / (I - L - D - E)
             BigDecimal sinusNucleusDensityDenominator = accurateArea.subtract(totalPortalArea.divide(new BigDecimal(1000)))
