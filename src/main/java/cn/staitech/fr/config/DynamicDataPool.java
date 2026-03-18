@@ -183,7 +183,7 @@ public class DynamicDataPool {
             maxPoolSize = defaultMax;
         }
         
-        int queueCapacity = 10000;
+        int queueCapacity = 15000;
 
         log.info(">>> 初始化 [识别任务线程池] <<<");
         log.info("CPU 核心数: {}, 核心线程: {}, 最大线程: {}, 队列容量: {}", 
