@@ -26,7 +26,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component
-@Service("Lung_3")
+@Service("Lung_with_bronchi_3")
 public class Lung_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Resource
@@ -43,7 +43,7 @@ public class Lung_3ParserStrategyImpl extends AbstractCustomParserStrategy {
     public void init() {
         setCommonJsonParser(commonJsonParser);
         setCommonJsonCheck(commonJsonCheck);
-        log.info("Lung_3ParserStrategyImpl init");
+        log.info("Lung_with_bronchi_3ParserStrategyImpl init");
     }
 
     @Override
@@ -110,6 +110,6 @@ public class Lung_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Override
     public String getAlgorithmCode() {
-        return "Lung_3";
+        return "Lung_with_bronchi_3";
     }
 }
