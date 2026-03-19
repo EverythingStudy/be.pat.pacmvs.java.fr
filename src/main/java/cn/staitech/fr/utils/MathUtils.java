@@ -219,8 +219,11 @@ public class MathUtils {
 //            }
 //            //正态分布(上限)
 //            BigDecimal add2 = bigDecimal.add(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
-            String middle95Percent = getFirstAndLastOfMiddle95Percent(dataList.stream().sorted().map(e -> e.setScale(3, RoundingMode.UP)).collect(Collectors.toList()), dataList.size());
-            return bigDecimal + "±" + sqrt + ";" + middle95Percent;
+
+            return bigDecimal + "±" + sqrt;
+
+          /*  String middle95Percent = getFirstAndLastOfMiddle95Percent(dataList.stream().sorted().map(e -> e.setScale(3, RoundingMode.UP)).collect(Collectors.toList()), dataList.size());
+            return bigDecimal + "±" + sqrt + ";" + middle95Percent;*/
         } else {
             return 0 + "±" + 0 + ";" + 0 + "-" + 0;
         }
