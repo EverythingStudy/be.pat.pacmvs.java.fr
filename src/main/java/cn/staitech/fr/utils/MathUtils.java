@@ -225,7 +225,7 @@ public class MathUtils {
           /*  String middle95Percent = getFirstAndLastOfMiddle95Percent(dataList.stream().sorted().map(e -> e.setScale(3, RoundingMode.UP)).collect(Collectors.toList()), dataList.size());
             return bigDecimal + "±" + sqrt + ";" + middle95Percent;*/
         } else {
-            return 0 + "±" + 0 + ";" + 0 + "-" + 0;
+            return 0 + "±" + 0;
         }
     }
 
