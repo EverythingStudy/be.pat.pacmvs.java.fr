@@ -26,7 +26,7 @@ import java.util.Map;
  * 狗  胸骨
  */
 @Slf4j
-@Component("Sternum_3")
+@Component("Bone_with_bone_marrow_sternum_3")
 public class Sternum_3ParserStrategyImpl extends AbstractCustomParserStrategy implements OutlineCustom {
 
     @Resource
@@ -44,7 +44,7 @@ public class Sternum_3ParserStrategyImpl extends AbstractCustomParserStrategy im
     public void init() {
         setCommonJsonParser(commonJsonParser);
         setCommonJsonCheck(commonJsonCheck);
-        log.info("Sternum_3ParserStrategyImpl init");
+        log.info("Bone_with_bone_marrow_sternum_3ParserStrategyImpl init");
     }
 
 
@@ -130,7 +130,7 @@ public class Sternum_3ParserStrategyImpl extends AbstractCustomParserStrategy im
 
     @Override
     public String getAlgorithmCode() {
-        return "Sternum_3";
+        return "Bone_with_bone_marrow_sternum_3";
     }
 
     @Override

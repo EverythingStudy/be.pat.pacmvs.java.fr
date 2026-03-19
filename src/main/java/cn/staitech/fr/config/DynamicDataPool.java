@@ -75,7 +75,7 @@ public class DynamicDataPool {
     static class CustomRejectedExecutionHandler implements RejectedExecutionHandler {
         @Override
         public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
-            String msg = String.format("识别任务被拒绝！[活跃:%d/最大:%d] [队列:%d/%d] 任务:%s",
+            String msg = String.format("识别任务被拒绝！[当前活跃线程数:%d/最大允许线程数:%d] [队列中任务数:%d/队列剩余容量:%d] 任务:%s",
                     executor.getActiveCount(), 
                     executor.getMaximumPoolSize(),
                     executor.getQueue().size(), 
@@ -183,7 +183,7 @@ public class DynamicDataPool {
             maxPoolSize = defaultMax;
         }
         
-        int queueCapacity = 10000;
+        int queueCapacity = 15000;
 
         log.info(">>> 初始化 [识别任务线程池] <<<");
         log.info("CPU 核心数: {}, 核心线程: {}, 最大线程: {}, 队列容量: {}", 
@@ -194,7 +194,7 @@ public class DynamicDataPool {
                 maxPoolSize,
                 60L,
                 TimeUnit.SECONDS,
-                new LinkedBlockingQueue<>(queueCapacity),
+                new LinkedBlockingQueue<>(),
                 new NamedThreadFactory("Recognition-Thread"),
                 new CustomRejectedExecutionHandler() // 使用自定义拒绝策略
         );

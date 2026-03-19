@@ -378,7 +378,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
             return R.fail(MessageSource.M("slide.project.completed.config"));
         }
 
-        if (status == Constants.STATUS_PAUSED && !(SecurityUtils.getUserId() == project.getPrincipal() || SecurityUtils.isOrgAdmin())) {
+        if (status == Constants.STATUS_PAUSED && !(SecurityUtils.getUserId() .equals( project.getPrincipal()) || SecurityUtils.isOrgAdmin())) {
             return R.fail(MessageSource.M("slide.project.no.config.permission"));        }
 
         return null; // 表示通过校验

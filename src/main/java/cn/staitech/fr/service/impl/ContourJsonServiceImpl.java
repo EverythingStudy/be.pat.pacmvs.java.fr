@@ -43,6 +43,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -99,6 +100,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
 //        FileUtils.deleteFilesInDirectory(directoryPath);
         Long specialId = jsonTask.getSpecialId();
         Long singleId = jsonTask.getSingleId();
+
         //切片id
         Long slideId = jsonTask.getSlideId();
         //图片id
@@ -132,7 +134,8 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
         annotation.setSequenceNumber(seqId);
         annotation.setSingleSlideId(singleId);
         List<Annotation> aiAnnotationList = annotationMapper.getAIDataList(annotation);
-
+        // 统计线程池任务总数
+        AtomicInteger totalThreadCount = new AtomicInteger(0);
         for (JsonFile jsonFile : jsonFileList) {
             String fileUrl = jsonFile.getFileUrl();
             File f = new File(fileUrl);
@@ -141,8 +144,9 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                 log.error("SingleSlide id:[{}],tb_structure查询不到结构标签大小:[{}],请确认是否存在这个标签或结构大小,数据处理将会跳过这个结构！！！", singleId, jsonTask.getOrganizationId() + fileName);
                 continue;
             }
-            jsonParser(f.getPath(), zoomLevels, fileName, singleSlideSelectBy, geometryIdMap, outputDir, aiAnnotationList);
+            jsonParser(f.getPath(), zoomLevels, fileName, singleSlideSelectBy, geometryIdMap, outputDir, aiAnnotationList, totalThreadCount);
         }
+        log.info("任务id:[{}]，singleSlideId:[{}],算法脏器code：[{}]，所创建的线程数量是:[{}]", jsonTask.getTaskId(), singleId,jsonTask.getAlgorithmCode(), totalThreadCount.get());
     }
 
     /**
@@ -155,7 +159,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
      * @param tileGeometryMap      瓦片几何图形映射表
      * @param outputDir            输出目录路径
      */
-    public void jsonParser(String inputGeoJsonFilePath, List<String> zoomLevels, String jsonName, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir, List<Annotation> aiAnnotationList) {
+    public void jsonParser(String inputGeoJsonFilePath, List<String> zoomLevels, String jsonName, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir, List<Annotation> aiAnnotationList, AtomicInteger totalThreadCount) {
         JSONArray featuresJson = new JSONArray();
         JsonFactory jsonFactory = new MappingJsonFactory();
         JsonToken current = null;
@@ -178,7 +182,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                                 JSONObject featureObject = JSONObject.parseObject(node);
                                 featuresJson.add(featureObject);
                                 if (featuresJson.size() > BATCH_SIZE) {
-                                    parseJson(featuresJson, zoomLevels, jsonName, single, tileGeometryMap, outputDir, aiAnnotationList);
+                                    parseJson(featuresJson, zoomLevels, jsonName, single, tileGeometryMap, outputDir, aiAnnotationList,totalThreadCount);
                                     featuresJson = new JSONArray();
                                 }
                             } catch (Exception e) {
@@ -192,7 +196,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                 }
             }
             if (featuresJson.size() > 0) {
-                parseJson(featuresJson, zoomLevels, jsonName, single, tileGeometryMap, outputDir, aiAnnotationList);
+                parseJson(featuresJson, zoomLevels, jsonName, single, tileGeometryMap, outputDir, aiAnnotationList,totalThreadCount);
             }
         } catch (Exception e) {
             log.error("inputGeoJsonFilePath:[{}] ,Unexpected error occurred: [{}]，[{}]", inputGeoJsonFilePath, e.getMessage(), e);
@@ -268,7 +272,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
      * @param tileGeometryMap 瓦片几何图形映射表
      * @param outputDir       输出目录路径
      */
-    public void parseJson(JSONArray featuresJson, List<String> zoomLevels, String jsonName, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir, List<Annotation> aiAnnotationList) {
+    public void parseJson(JSONArray featuresJson, List<String> zoomLevels, String jsonName, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir, List<Annotation> aiAnnotationList, AtomicInteger totalThreadCount) {
         List<Features> features = featuresJson.toJavaList(Features.class);
         Map<String, String> dynamicDataMap = preDynamicDataMap(features, single.getSpecialId(), aiAnnotationList);
         List<String> filteredFilePathList;
@@ -295,7 +299,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                     }
                 }
             }
-            log.info("进入切分single{}filePath:[{}],list:[{}]", single.getSingleId(), outputPath, list.size());
+            log.info("进入切分single{},filePath:[{}],list:[{}]", single.getSingleId(), outputPath, list.size());
             // 写入文件
             writeFilteredGeoJson(list, outputPath);
         } else if (size == 2) {
@@ -304,14 +308,16 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             int zoom = (int) computeZoomForImageZoom(2.5, single.getSourceLens(), single.getMaxZ());
             // filePathList,获取文件名称,使用-将z-x-y进行分割，并筛选出z等于zoom的切片
             filteredFilePathList = zoomLevels.stream().filter(filePath -> isFirstDigit(filePath, zoom)).collect(Collectors.toList());
-            submitPathList(filteredFilePathList, jsonName, tree, geometryMap, single, tileGeometryMap, outputDir, 40, dynamicDataMap);
+            log.info("进入切分，singleSlideId:{},结构structureSize是2，jsonName:{},filteredFilePathList个数是:[{}]",single.getSingleId(), jsonName, filteredFilePathList != null ? filteredFilePathList.size() : 0); 
+            submitPathList(filteredFilePathList, jsonName, tree, geometryMap, single, tileGeometryMap, outputDir, 40, dynamicDataMap, totalThreadCount);
         } else {
             preFeature(features, dynamicDataMap, tree, geometryMap);
             // 过滤出符合条件的切片
             int zoom = (int) computeZoomForImageZoom(40, single.getSourceLens(), single.getMaxZ());
             // filePathList,获取文件名称,使用-将z-x-y进行分割，并筛选出z等于zoom的切片
             filteredFilePathList = zoomLevels.stream().filter(filePath -> isFirstDigit(filePath, zoom)).collect(Collectors.toList());
-            submitPathList(filteredFilePathList, jsonName, tree, geometryMap, single, tileGeometryMap, outputDir, 40, dynamicDataMap);
+            log.info("进入切分，singleSlideId:{},结构structureSize是空，jsonName:{},filteredFilePathList个数是:[{}]",single.getSingleId(), jsonName, filteredFilePathList != null ? filteredFilePathList.size() : 0);
+            submitPathList(filteredFilePathList, jsonName, tree, geometryMap, single, tileGeometryMap, outputDir, 40, dynamicDataMap, totalThreadCount);
         }
 
         if (size == 2 || size == 3) {
@@ -322,7 +328,8 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             int zoom = (int) computeZoomForImageZoom(10, single.getSourceLens(), single.getMaxZ());
             // filePathList,获取文件名称,使用-将z-x-y进行分割，并筛选出z等于zoom的切片
             filteredFilePathList = zoomLevels.stream().filter(filePath -> isFirstDigit(filePath, zoom)).collect(Collectors.toList());
-            submitPathList(filteredFilePathList, jsonName, tree, geometryMap, single, tileGeometryMap, outputDir, 10, dynamicDataMap);
+            log.info("进入切分，singleSlideId:{},结构structureSize是2或者3，jsonName:{},filteredFilePathList个数是:[{}]",single.getSingleId(), jsonName, filteredFilePathList != null ? filteredFilePathList.size() : 0);
+            submitPathList(filteredFilePathList, jsonName, tree, geometryMap, single, tileGeometryMap, outputDir, 10, dynamicDataMap, totalThreadCount);
         }
         // log.info("singleSlide id:[{}] 轮廓标签:[{}] 轮廓数量:[{}] 结束解析轮廓数据", single.getSingleId(), jsonName, features.size());
     }
@@ -343,7 +350,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
      * @param zoom                 缩放级别，用于指定处理的缩放级别
      * @param dynamicDataMap       动态数据映射，用于存储和处理动态数据
      */
-    public void submitPathList(List<String> filteredFilePathList, String jsonName, STRtree tree, Map<Geometry, Features> geometryMap, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir, int zoom, Map<String, String> dynamicDataMap) {
+    public void submitPathList(List<String> filteredFilePathList, String jsonName, STRtree tree, Map<Geometry, Features> geometryMap, SingleSlideSelectBy single, ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir, int zoom, Map<String, String> dynamicDataMap, AtomicInteger totalThreadCount) {
         // 检查文件路径列表是否非空
         if (CollectionUtils.isNotEmpty(filteredFilePathList)) {
             //long start = System.nanoTime();
@@ -354,6 +361,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                 try {
                     // 提交识别线程到线程池执行
                 	recognitionExecutor.submit(new RecognitionThread(fileName, jsonName, tree, geometryMap, single, tileGeometryMap, outputDir, zoom, dynamicDataMap, countDownLatch));
+                	totalThreadCount.incrementAndGet(); // 统计线程池任务数量
                 } catch (RejectedExecutionException e) {
                     // 日志记录任务提交错误
                     log.error("Error submitting task: [{}]", e.getMessage());
@@ -369,7 +377,71 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             }
         }
     }
+    
+    /**
+     * 提交路径列表以进行处理（分批 + 重试 + 确保 countDown）
+     
+	public void submitPathList2(List<String> filteredFilePathList, String jsonName, STRtree tree,
+			Map<Geometry, Features> geometryMap, SingleSlideSelectBy single,
+			ConcurrentMap<String, Geometry> tileGeometryMap, String outputDir, int zoom,
+			Map<String, String> dynamicDataMap, AtomicInteger totalThreadCount) {
+		if (CollectionUtils.isEmpty(filteredFilePathList)) {
+			return;
+		}
 
+		int totalTasks = filteredFilePathList.size();
+		CountDownLatch countDownLatch = new CountDownLatch(totalTasks);
+		int batchSize = 1000; // 每批提交 1000 个任务
+
+		for (int i = 0; i < totalTasks; i += batchSize) {
+			int end = Math.min(i + batchSize, totalTasks);
+			List<String> batch = filteredFilePathList.subList(i, end);
+
+			for (String fileName : batch) {
+				boolean submitted = false;
+				int retryCount = 0;
+				while (!submitted && retryCount < 3) {
+					try {
+						recognitionExecutor.submit(new RecognitionThread(fileName, jsonName, tree, geometryMap, single,
+								tileGeometryMap, outputDir, zoom, dynamicDataMap, countDownLatch));
+						 totalThreadCount.incrementAndGet(); // 统计线程池任务数量
+						submitted = true;
+					} catch (RejectedExecutionException e) {
+						retryCount++;
+						log.warn("任务提交被拒（第 {} 次重试）: {}, 原因: {}", retryCount, fileName, e.getMessage());
+						if (retryCount >= 3) {
+							log.error("任务最终失败，手动 countDown: {}", fileName);
+							countDownLatch.countDown(); // ⚠️ 关键：确保 countDown 被调用！
+						} else {
+							try {
+								Thread.sleep(50); // 简单退避
+							} catch (InterruptedException ie) {
+								Thread.currentThread().interrupt();
+								log.error("重试等待被中断", ie);
+								countDownLatch.countDown();
+								break;
+							}
+						}
+					}
+				}
+			}
+
+			// 可选：每批之间稍作等待，让线程池消化（非必须）
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException ignored) {
+			}
+		}
+
+		try {
+			countDownLatch.await();
+		} catch (InterruptedException e) {
+			log.error("等待任务完成时被中断", e);
+			Thread.currentThread().interrupt();
+		}
+	}
+     */
+    
     /**
      * 读取geojson文件,将文件转化为JSONObject
      *

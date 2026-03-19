@@ -26,7 +26,7 @@ import java.util.Map;
  * @author jiazx
  */
 @Slf4j
-@Service("Femur_3")
+@Service("Bone_with_bone_marrow_femur_3")
 public class Bone_3WithBoneMarrowFemurStrategyImpl extends AbstractCustomParserStrategy {
     @Resource
     private AiForecastService aiForecastService;
@@ -43,7 +43,7 @@ public class Bone_3WithBoneMarrowFemurStrategyImpl extends AbstractCustomParserS
     public void init() {
         setCommonJsonParser(commonJsonParser);
         setCommonJsonCheck(commonJsonCheck);
-        log.info("Bone_3WithBoneMarrowFemurStrategyImpl init");
+        log.info("Bone_with_bone_marrow_femur_3WithBoneMarrowFemurStrategyImpl init");
     }
 
     @Override
@@ -82,7 +82,7 @@ public class Bone_3WithBoneMarrowFemurStrategyImpl extends AbstractCustomParserS
 
     @Override
     public String getAlgorithmCode() {
-        return "Femur_3";
+        return "Bone_with_bone_marrow_femur_3";
     }
 
 
