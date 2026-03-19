@@ -16,6 +16,12 @@ public class DynamicDataPool {
     private Integer dynamicCorePoolSize;
     @Value("${dynamic.maxPoolSize}")
     private Integer dynamicMaxPoolSize;
+    //ai json文件分割线程池调整  核心倍数和最大倍数的调整
+    @Value("${dynamic.coreMultiple}")
+    private Integer dynamicCoreMultiple;
+    @Value("${dynamic.maxMultiple}")
+    private Integer dynamicMaxMultiple;
+    
     private ExecutorService dynamicDataThreadPool;
     
     private ThreadPoolExecutor recognitionExecutor; 
@@ -152,8 +158,8 @@ public class DynamicDataPool {
     public ThreadPoolExecutor recognitionExecutor() {
         int processors = Runtime.getRuntime().availableProcessors();
         
-        int defaultCore = Math.max(1, processors * 2);
-        int defaultMax = Math.max(defaultCore, processors * 4);
+        int defaultCore = Math.max(1, processors * dynamicCoreMultiple);
+        int defaultMax = Math.max(defaultCore, processors * dynamicMaxMultiple);
         
         int corePoolSize;
         if (dynamicCorePoolSize != null && dynamicCorePoolSize > 0) {
