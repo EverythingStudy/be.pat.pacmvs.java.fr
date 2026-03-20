@@ -183,10 +183,10 @@ public class Liver_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 
         /*
          * 遍历肝细胞核列表，提取每个肝细胞核的面积值
-         * 面积单位：10³平方微米
+         * 面积单位：平方微米
          */
         for (Annotation annotation : hepatocyteNucleusList) {
-            hepatocyteNucleusAreaList.add(annotation.getStructureAreaNum().multiply(BigDecimal.valueOf(1000)));
+            hepatocyteNucleusAreaList.add(annotation.getStructureAreaNum().multiply(BigDecimal.valueOf(1000000)));
         }
         log.info("肝细胞核面积数据收集完成：jsonTask id:[{}] singleSlide id:[{}], 有效数据量：{}", jsonTask.getTaskId(), jsonTask.getSingleId(), hepatocyteNucleusAreaList.size());
 
@@ -235,8 +235,8 @@ public class Liver_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationA.setCountName("胆管数量（单个门管区）");
         annotationA.setCountUnit(PIECE);
         annotationA.setAreaName("胆管面积（单个门管区）");
-        annotationA.setAreaUnit(SQ_MM);
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "312145", "31214A", annotationA, 1,true);
+        annotationA.setAreaUnit(SQ_UM);
+        commonJsonParser.putAnnotationDynamicData(jsonTask, "312145", "31214A", annotationA, 2,true);
         log.info("保存胆管数量/面积（单个门管区）动态数据：jsonTask id:[{}] singleSlide id:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId());
 
         indicatorResultsMap.put("中央静脉面积", new IndicatorAddIn("", DecimalUtils.setScale3(centralVeinArea), MULTIPLIED_SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "312146"));
@@ -251,8 +251,8 @@ public class Liver_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         //indicatorResultsMap.put("肝细胞核面积（单个）", new IndicatorAddIn("", DecimalUtils.setScale3(hepatocyteNucleusAreaPer), SQ_MM, CommonConstant.NUMBER_1, "312149"));
         Annotation annotationB = new Annotation();
         annotationB.setAreaName("肝细胞核面积（单个）");
-        annotationB.setAreaUnit(SQ_MM);
-        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "312149", annotationB, 1);
+        annotationB.setAreaUnit(SQ_UM);
+        commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "312149", annotationB, 2);
         log.info("保存肝细胞核面积（单个）动态数据：jsonTask id:[{}] singleSlide id:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId());
 
         indicatorResultsMap.put("窦内细胞核数量", new IndicatorAddIn("", sinusNucleusCount.toString(), PIECE, CommonConstant.NUMBER_1, "31214D"));
