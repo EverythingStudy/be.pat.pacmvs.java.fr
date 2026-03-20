@@ -98,7 +98,7 @@ public class Liver_3ParserStrategyImpl extends AbstractCustomParserStrategy {
             int processedCount = 0;
             for (Annotation annotation : portalList) {
                 // 获取单个门管区的面积（单位：10³平方微米）
-                BigDecimal singlePortalAreaNum = annotation.getStructureAreaNum();
+                BigDecimal singlePortalAreaNum = annotation.getStructureAreaNum().multiply(BigDecimal.valueOf(1000));
 
                 /*
                  * 根据门管区轮廓查询其内部的胆管标注数据
@@ -114,7 +114,7 @@ public class Liver_3ParserStrategyImpl extends AbstractCustomParserStrategy {
                 Integer bileDuctCount = bileDuctData.getCount();
 
                 // 获取胆管总面积（单个门管区内所有胆管面积之和，单位：10³平方微米）
-                BigDecimal bileDuctArea = bileDuctData.getStructureAreaNum();
+                BigDecimal bileDuctArea = bileDuctData.getStructureAreaNum().multiply(BigDecimal.valueOf(1000));
 
                 /*
                  * 有效性校验与指标计算
@@ -186,7 +186,7 @@ public class Liver_3ParserStrategyImpl extends AbstractCustomParserStrategy {
          * 面积单位：10³平方微米
          */
         for (Annotation annotation : hepatocyteNucleusList) {
-            hepatocyteNucleusAreaList.add(annotation.getStructureAreaNum());
+            hepatocyteNucleusAreaList.add(annotation.getStructureAreaNum().multiply(BigDecimal.valueOf(1000)));
         }
         log.info("肝细胞核面积数据收集完成：jsonTask id:[{}] singleSlide id:[{}], 有效数据量：{}", jsonTask.getTaskId(), jsonTask.getSingleId(), hepatocyteNucleusAreaList.size());
 
@@ -274,16 +274,16 @@ public class Liver_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 
         if (portalAreaPer.compareTo(BigDecimal.ZERO) != 0) {
             // 胆管密度（单个）= B / A
-            BigDecimal bileDuctDensityPer = commonJsonParser.bigDecimalDivideCheck(new BigDecimal(bileDuctCountPer), portalAreaPer.multiply(new BigDecimal(1000)));
+            /*BigDecimal bileDuctDensityPer = commonJsonParser.bigDecimalDivideCheck(new BigDecimal(bileDuctCountPer), portalAreaPer);
             log.info("计算胆管密度（单个）：jsonTask id:[{}] singleSlide id:[{}], 胆管数量：{}, 门管区面积：{}, 密度：{} 个/10³平方微米",
-                    jsonTask.getTaskId(), jsonTask.getSingleId(), bileDuctCountPer, portalAreaPer, bileDuctDensityPer);
+                    jsonTask.getTaskId(), jsonTask.getSingleId(), bileDuctCountPer, portalAreaPer, bileDuctDensityPer);*/
             indicatorResultsMap.put("胆管密度（单个）", new IndicatorAddIn("Density of bile duct (per)", portalDensityPerConfidenceInterval, SQ_UM_PICE, areaUtils.getStructureIds("312145", "31214A")));
             log.info("添加胆管密度（单个）指标：jsonTask id:[{}] singleSlide id:[{}], 置信区间：{}", jsonTask.getTaskId(), jsonTask.getSingleId(), portalDensityPerConfidenceInterval);
 
             // 胆管面积占比（单个）= C / A
-            BigDecimal bileDuctAreaRatioPer = commonJsonParser.getProportion(bileDuctAreaPer, portalAreaPer);
+            /*BigDecimal bileDuctAreaRatioPer = commonJsonParser.getProportion(bileDuctAreaPer, portalAreaPer);
             log.info("计算胆管面积占比（单个）：jsonTask id:[{}] singleSlide id:[{}], 胆管面积：{}, 门管区面积：{}, 占比：{}%",
-                    jsonTask.getTaskId(), jsonTask.getSingleId(), bileDuctAreaPer, portalAreaPer, bileDuctAreaRatioPer);
+                    jsonTask.getTaskId(), jsonTask.getSingleId(), bileDuctAreaPer, portalAreaPer, bileDuctAreaRatioPer);*/
             indicatorResultsMap.put("胆管面积占比（单个）", new IndicatorAddIn("Bile duct area% (per)", portalDensityAreaPerConfidenceInterval, PERCENTAGE, areaUtils.getStructureIds("312145", "31214A")));
             log.info("添加胆管面积占比（单个）指标：jsonTask id:[{}] singleSlide id:[{}], 置信区间：{}", jsonTask.getTaskId(), jsonTask.getSingleId(), portalDensityAreaPerConfidenceInterval);
         } else {
