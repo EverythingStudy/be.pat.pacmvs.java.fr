@@ -496,6 +496,7 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
                     .eq(Species::getOrganizationId, SecurityUtils.getOrganizationId());
             Species species = speciesMapper.selectOne(lambdaQueryWrapper);
             project.setSpeciesName(species.getName());
+            project.setSpeciesNameEn(species.getNameEn());
         }
         //ai是否执行
         boolean isAiTrained = slideService.checkAiExecuted(projectId);

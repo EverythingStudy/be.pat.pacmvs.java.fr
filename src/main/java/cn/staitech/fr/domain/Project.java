@@ -97,6 +97,9 @@ public class Project implements Serializable {
     @TableField(exist = false)
     @ApiModelProperty(value = "种属名称:制片信息使用")
     private String speciesName;
+    @TableField(exist = false)
+    @ApiModelProperty(value = "种属名称英文:制片信息使用")
+    private String speciesNameEn;
 
     @TableField(exist = false)
     @ApiModelProperty(value = "是否启动过AI分析:制片信息使用")
