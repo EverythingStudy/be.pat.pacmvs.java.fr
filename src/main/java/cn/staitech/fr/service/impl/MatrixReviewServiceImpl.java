@@ -193,7 +193,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
             if (CollectionUtil.isNotEmpty(dataList)) {
                 BigDecimal bigDecimal = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
                 log.info("平均值" + bigDecimal);
-                BigDecimal variance = MathUtils.variance(dataList.toArray(new BigDecimal[dataList.size()]), 3);
+                BigDecimal variance = MathUtils.variance(bigDecimal,dataList.toArray(new BigDecimal[dataList.size()]), 3);
                 log.info("总体方差" + variance);
                 BigDecimal sqrt = MathUtils.sqrt(variance, 3);
                 log.info("总体标准差" + sqrt);

@@ -62,11 +62,14 @@ public class MathUtils {
     }
 
     /**
-     * @param data  原数据集
-     * @param scale 保留小数位
+     * 总体方差
+     *
+     * @param average 平均值
+     * @param data    原数据集
+     * @param scale   保留小数位
      * @return 总体方差
      */
-    public static BigDecimal variance(BigDecimal[] data, int scale) {
+    public static BigDecimal variance(BigDecimal average, BigDecimal[] data, int scale) {
         if (data.length == 1) {
             return BigDecimal.ZERO;
         }
@@ -74,37 +77,20 @@ public class MathUtils {
             throw new RuntimeException("数据集的总数应大于0");
         }
 
-        BigDecimal sum = sum(data, scale);
+        BigDecimal sum = sum(average, data, scale);
         return sum.divide(new BigDecimal(data.length), scale, RoundingMode.HALF_UP);
-        // return  sum .divide(new BigDecimal( data.length),scale,BigDecimal.ROUND_HALF_UP);
     }
 
     /**
-     * @param data  原数据集
-     * @param scale 保留小数位
-     * @return 样本方差
-     */
-    public static BigDecimal sampleVariance(BigDecimal[] data, int scale) {
-        if (data.length == 1) {
-            return BigDecimal.ZERO;
-        }
-        if (data.length < 1) {
-            throw new RuntimeException("数据集的总数应大于0");
-        }
-        BigDecimal sum = sum(data, scale);
-        return sum.divide(new BigDecimal(data.length - 1), new MathContext(scale, RoundingMode.HALF_UP));
-        //return sum .divide(new BigDecimal( data.length-1),scale,BigDecimal.ROUND_HALF_UP);
-    }
-
-    /**
-     * @param data  数据集
-     * @param scale 保留小数
+     * @param average 平均值
+     * @param data    数据集
+     * @param scale   保留小数
      * @return 总数 Σ(x-x̄)2
      */
-    public static BigDecimal sum(BigDecimal[] data, int scale) {
+    public static BigDecimal sum(BigDecimal average, BigDecimal[] data, int scale) {
         BigDecimal sum = BigDecimal.ZERO;
         for (BigDecimal num : data) {
-            BigDecimal diff = num.subtract(calculateAve(data, scale));
+            BigDecimal diff = num.subtract(average);
             BigDecimal square = diff.multiply(diff);
             sum = sum.add(square);
 
@@ -196,7 +182,7 @@ public class MathUtils {
         }
         if (CollectionUtil.isNotEmpty(dataList)) {
             BigDecimal average = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
-            BigDecimal variance = MathUtils.variance(dataList.toArray(new BigDecimal[dataList.size()]), 3);
+            BigDecimal variance = MathUtils.variance(average, dataList.toArray(new BigDecimal[dataList.size()]), 3);
             BigDecimal sqrt = MathUtils.sqrt(variance, 3);
             return average + "±" + sqrt;
             // V3.6.4去掉95区间
