@@ -110,7 +110,6 @@ public class MathUtils {
 
         }
         BigDecimal round = sum.round(new MathContext(scale, RoundingMode.HALF_UP));
-        //BigDecimal bigDecimal = sum.setScale(scale,BigDecimal.ROUND_HALF_UP);
         return round;
     }
 
@@ -124,7 +123,6 @@ public class MathUtils {
         for (BigDecimal num : data) {
             sum = sum.add(num);
         }
-        //return sum.divide(new BigDecimal(data.length),scale,BigDecimal.ROUND_HALF_UP);
         return sum.divide(new BigDecimal(data.length), scale, RoundingMode.HALF_UP);
     }
 
@@ -197,10 +195,10 @@ public class MathUtils {
             });
         }
         if (CollectionUtil.isNotEmpty(dataList)) {
-            BigDecimal bigDecimal = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
+            BigDecimal average = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
             BigDecimal variance = MathUtils.variance(dataList.toArray(new BigDecimal[dataList.size()]), 3);
             BigDecimal sqrt = MathUtils.sqrt(variance, 3);
-            return bigDecimal + "±" + sqrt;
+            return average + "±" + sqrt;
             // V3.6.4去掉95区间
           /*  String middle95Percent = getFirstAndLastOfMiddle95Percent(dataList.stream().sorted().map(e -> e.setScale(3, RoundingMode.UP)).collect(Collectors.toList()), dataList.size());
             return bigDecimal + "±" + sqrt + ";" + middle95Percent;*/
