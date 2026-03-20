@@ -188,14 +188,6 @@ public class MathUtils {
      * @return 返回指标结果
      */
     public static String getConfidenceInterval(List<BigDecimal> dataList) {
-
-
-        /*List<BigDecimal> objects = new ArrayList<>();
-        objects.add(BigDecimal.ZERO);
-        //筛掉为零的
-        if(CollectionUtil.isNotEmpty(dataList)){
-            dataList.removeAll(objects);
-        }*/
         if (CollectionUtil.isNotEmpty(dataList)) {
             List<BigDecimal> objects = new ArrayList<>(dataList);
             objects.forEach(e -> {
@@ -206,22 +198,10 @@ public class MathUtils {
         }
         if (CollectionUtil.isNotEmpty(dataList)) {
             BigDecimal bigDecimal = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
-            //log.info("平均值" + bigDecimal);
             BigDecimal variance = MathUtils.variance(dataList.toArray(new BigDecimal[dataList.size()]), 3);
-            //log.info("总体方差" + variance);
             BigDecimal sqrt = MathUtils.sqrt(variance, 3);
-            // log.info("总体标准差" + sqrt);
-
-            //正态分布(下限)
-//            BigDecimal subtract2 = bigDecimal.subtract(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
-//            if (subtract2.compareTo(BigDecimal.ZERO) < 0) {
-//                return bigDecimal + "±" + sqrt;
-//            }
-//            //正态分布(上限)
-//            BigDecimal add2 = bigDecimal.add(new BigDecimal(1.96).multiply(sqrt)).setScale(3, RoundingMode.UP);
-
             return bigDecimal + "±" + sqrt;
-
+            // V3.6.4去掉95区间
           /*  String middle95Percent = getFirstAndLastOfMiddle95Percent(dataList.stream().sorted().map(e -> e.setScale(3, RoundingMode.UP)).collect(Collectors.toList()), dataList.size());
             return bigDecimal + "±" + sqrt + ";" + middle95Percent;*/
         } else {
