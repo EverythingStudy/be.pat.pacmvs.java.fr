@@ -172,7 +172,7 @@ public class MathUtils {
      * @return 返回指标结果
      */
     public static String getConfidenceInterval(List<BigDecimal> dataList) {
-        log.info("开始计算均值±标准差");
+        log.info("开始计算均值±标准差,元素数量：{}", dataList.size());
         if (CollectionUtil.isNotEmpty(dataList)) {
             List<BigDecimal> objects = new ArrayList<>(dataList);
             objects.forEach(e -> {
