@@ -963,8 +963,13 @@
         DROP TABLE IF EXISTS fr_ai_annotation_${sequenceNumber};
         DROP SEQUENCE IF EXISTS fr_ai_annotation_${sequenceNumber}_annotation_id_seq;
     </update>
-    
-    
+    <update id="batchUpdate">
+        <foreach collection="list" item="item" separator=";">
+            update fr_ai_annotation_${sequenceNumber} set dynamic_data = #{item.dynamicData}  where annotation_id = #{item.annotationId}
+        </foreach>
+    </update>
+
+
     <insert id="transferData" parameterType="Map">
         insert into fr_ai_annotation_${specialSequenceNumber} (area,
                                                                perimeter,

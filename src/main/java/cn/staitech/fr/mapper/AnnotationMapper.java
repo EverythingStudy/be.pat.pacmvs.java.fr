@@ -127,6 +127,8 @@ public interface AnnotationMapper extends BaseMapper<Annotation> {
     Annotation getCollectGeometryIsValid(Annotation annotation);
 
     Integer deleteBySingleSlideIdBatch(@Param("annotation") Annotation annotation, @Param("batchSize")int batchSize);
+
+    void batchUpdate(Annotation annotation);
 }
 
 

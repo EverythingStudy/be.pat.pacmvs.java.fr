@@ -859,16 +859,27 @@ public class CommonJsonParser {
 
     // 批量更新方法
     public void batchUpdateAnnotations(List<Annotation> annotations) {
+        log.info("开始批量更新,数量={}", annotations.size());
         // 如果annotationMapper支持批量更新，使用批量操作
         // 否则可以分批执行，减少数据库连接开销
         final int batchSize = 100;
         for (int i = 0; i < annotations.size(); i += batchSize) {
             int endIndex = Math.min(i + batchSize, annotations.size());
             List<Annotation> batch = annotations.subList(i, endIndex);
-            // 执行批量更新逻辑
+
+            Annotation annotation = new Annotation();
+            annotation.setSequenceNumber(annotations.get(0).getSequenceNumber());
+            annotation.setList(batch);
+            try {
+                log.info("分批更新");
+                annotationMapper.batchUpdate(annotation);
+            } catch (Exception e) {
+                log.info("分批更新异常：", e);
+            }
+          /*  // 执行批量更新逻辑
             for (Annotation annotation : batch) {
                 annotationMapper.aiUpdateById(annotation);
-            }
+            }*/
         }
     }
 
