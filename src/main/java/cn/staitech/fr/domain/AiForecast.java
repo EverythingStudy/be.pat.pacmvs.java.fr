@@ -73,6 +73,10 @@ public class AiForecast implements Serializable {
 
     @ApiModelProperty("指标计算机构编码")
     private String structureIds;
+    /**
+     * 计算均值±方差的原始数据，存放到文件
+     */
+    private String fileUrl;
 
 
     @TableField(exist = false)
