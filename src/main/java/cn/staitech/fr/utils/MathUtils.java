@@ -1,13 +1,19 @@
 package cn.staitech.fr.utils;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.staitech.fr.constant.CommonConstant;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -169,7 +175,7 @@ public class MathUtils {
      * 均值±标准差；中间95%数据分布区间
      *
      * @param dataList
-     * @return 返回指标结果
+     * @return 返回指标结果：@分隔追加元数据文件地址
      */
     public static String getConfidenceInterval(List<BigDecimal> dataList) {
         log.info("开始计算均值±标准差,元素数量：{}", dataList.size());
@@ -182,6 +188,9 @@ public class MathUtils {
             });
         }
         if (CollectionUtil.isNotEmpty(dataList)) {
+            // 元数据存放到文件
+            String url = MDC.get(CommonConstant.FORECAST_FILE_URL_MDC) + UUID.randomUUID() + "-" + dataList.size() + ".txt";
+            saveForecastFile(url, dataList);
             log.info("开始计算均值");
             BigDecimal average = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
             log.info("均值为:{}", average);
@@ -193,13 +202,58 @@ public class MathUtils {
             log.info("开始计算标准差");
             BigDecimal sqrt = MathUtils.sqrt(variance, 3);
             log.info("标准差为:{}", sqrt);
-            return average + "±" + sqrt;
+            return average + "±" + sqrt + "@" + url;
             // V3.6.4去掉95区间
           /*  String middle95Percent = getFirstAndLastOfMiddle95Percent(dataList.stream().sorted().map(e -> e.setScale(3, RoundingMode.UP)).collect(Collectors.toList()), dataList.size());
             return bigDecimal + "±" + sqrt + ";" + middle95Percent;*/
         } else {
             return 0 + "±" + 0;
         }
+    }
+
+    /**
+     * 保存指标元数据到文件
+     *
+     * @param url      文件地址
+     * @param dataList 元数据
+     */
+    private static void saveForecastFile(String url, List<BigDecimal> dataList) {
+        log.info("保存指标元数据到文件开始，文件地址：{}", url);
+        File file = new File(url);
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            boolean created = parentDir.mkdirs();
+            if (!created) {
+                log.error("无法创建目录: {}", parentDir.getAbsolutePath());
+                return;
+            }
+        }
+        // 使用 try-with-resources 自动关闭流，防止资源泄露
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(url))) {
+            int count = 0;
+            StringBuilder lineBuilder = new StringBuilder();
+            for (int i = 0; i < dataList.size(); i++) {
+                BigDecimal value = dataList.get(i);
+                // 处理空值情况，避免空指针，视业务需求也可选择跳过或写 "null"
+                String valStr = (value != null) ? value.toPlainString() : "";
+                lineBuilder.append(valStr);
+                count++;
+                // 每满 100 个，或者到达列表末尾时，进行换行写入
+                if (count % 100 == 0 || i == dataList.size() - 1) {
+                    writer.write(lineBuilder.toString());
+                    // 写入平台相关的换行符
+                    writer.newLine();
+                    // 清空 StringBuilder 以复用
+                    lineBuilder.setLength(0);
+                } else {
+                    // 如果不是该行最后一个，添加逗号
+                    lineBuilder.append(",");
+                }
+            }
+        } catch (Exception e) {
+            log.error("保存指标元数据到文件异常：", e);
+        }
+        log.info("保存指标元数据到文件结束，文件地址：{}", url);
     }
 
     /**

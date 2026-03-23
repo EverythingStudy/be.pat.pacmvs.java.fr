@@ -2,6 +2,7 @@ package cn.staitech.fr.service.strategy.json;
 
 import cn.staitech.fr.config.OrganStructureConfig;
 import cn.staitech.fr.config.SpecialStructureConfig;
+import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.enmu.SpeciesTypeEnum;
 import cn.staitech.fr.enums.ForecastStatusEnum;
@@ -9,8 +10,6 @@ import cn.staitech.fr.enums.JsonTaskStatusEnum;
 import cn.staitech.fr.enums.StructureAiStatusEnum;
 import cn.staitech.fr.enums.StructureJsonStatusEnum;
 import cn.staitech.fr.mapper.AiForecastMapper;
-import cn.staitech.fr.mapper.AnnotationMapper;
-import cn.staitech.fr.mapper.ImageMapper;
 import cn.staitech.fr.mapper.JsonFileMapper;
 import cn.staitech.fr.mapper.JsonTaskMapper;
 import cn.staitech.fr.mapper.OrganTagMapper;
@@ -26,7 +25,10 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.slf4j.MDC;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -39,12 +41,9 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.annotation.Qualifier;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
 /**
  * @author: wangfeng
  * @create: 2024-05-10 15:52:39
@@ -405,7 +404,11 @@ public class JsonTaskParserService implements DisposableBean{
             log.info("jsonTask id:[{}] singleSlide id:[{}] 开始计算指标。", jsonTask.getTaskId(), jsonTask.getSingleId());
             // 指标计算
             long alculationTime = System.nanoTime();
+
+            MDC.put(CommonConstant.FORECAST_FILE_URL_MDC, String.format(CommonConstant.FORECAST_FILE_URL, jsonTask.getSpecialId(), jsonTask.getSlideId(), jsonTask.getSingleId()));
             parser.alculationIndicators(jsonTask);
+            MDC.remove(CommonConstant.FORECAST_FILE_URL_MDC);
+
             long alculationMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - alculationTime);
             long alculationSeconds = TimeUnit.MILLISECONDS.toSeconds(alculationMillis);
             log.info("jsonTask id:[{}] singleSlide id:[{}] 结束计算指标。耗时:{} 秒", jsonTask.getTaskId(), jsonTask.getSingleId(), alculationSeconds);

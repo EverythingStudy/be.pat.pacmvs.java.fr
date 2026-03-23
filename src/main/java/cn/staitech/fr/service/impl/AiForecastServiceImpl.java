@@ -171,7 +171,21 @@ public class AiForecastServiceImpl extends ServiceImpl<AiForecastMapper, AiForec
             forecast.setSingleSlideId(singleSlideId);
             forecast.setQuantitativeIndicators(indicatorCode);
             forecast.setQuantitativeIndicatorsEn(indicator.getEnglishName());
+            // 默认indicator.getResult()
             forecast.setResults(indicator.getResult());
+            // 如果是：均值±标准差@分隔追加元数据文件地址
+            if (indicator.getResult() != null) {
+                int atIndex = indicator.getResult().indexOf('@');
+                if (atIndex != -1) {
+                    // 截取 @ 之前
+                    String before = indicator.getResult().substring(0, atIndex);
+                    // 截取 @ 之后
+                    String after = indicator.getResult().substring(atIndex + 1);
+                    forecast.setResults(before);
+                    forecast.setFileUrl(after);
+                }
+            }
+
             forecast.setUnit(indicator.getUnit());
             forecast.setCreateTime(DateUtil.now());
             if (StringUtils.isNotEmpty(indicator.getStructType())) {

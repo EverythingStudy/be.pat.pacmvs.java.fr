@@ -38,5 +38,6 @@ public class CommonConstant {
     public static final String SQ_SQUARE_MICROMETER_PIECE_EN = "个/10³ μm²";
     public static final String PERCENTAGE = "%";
     public static final String PIECE = "个";
-
+    public static final String FORECAST_FILE_URL_MDC = "FORECAST_FILE_URL";
+    public static final String FORECAST_FILE_URL = "/home/data/forecast/%s/%s/%s/";
 }
