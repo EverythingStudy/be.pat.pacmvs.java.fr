@@ -212,6 +212,43 @@ public class MathUtils {
     }
 
     /**
+     * 均值±标准差；中间95%数据分布区间
+     *
+     * @param dataList
+     * @return 返回指标结果：@分隔追加元数据文件地址
+     */
+    public static String getConfidenceIntervalCopy(List<BigDecimal> dataList) {
+        log.info("开始计算均值±标准差,元素数量：{}", dataList.size());
+        if (CollectionUtil.isNotEmpty(dataList)) {
+            List<BigDecimal> objects = new ArrayList<>(dataList);
+            objects.forEach(e -> {
+                if (e.compareTo(BigDecimal.ZERO) < 0) {
+                    dataList.remove(e);
+                }
+            });
+        }
+        if (CollectionUtil.isNotEmpty(dataList)) {
+            log.info("开始计算均值");
+            BigDecimal average = MathUtils.calculateAve(dataList.toArray(new BigDecimal[dataList.size()]), 3);
+            log.info("均值为:{}", average);
+
+            log.info("开始计算方差");
+            BigDecimal variance = MathUtils.variance(average, dataList.toArray(new BigDecimal[dataList.size()]), 3);
+            log.info("方差为:{}", variance);
+
+            log.info("开始计算标准差");
+            BigDecimal sqrt = MathUtils.sqrt(variance, 3);
+            log.info("标准差为:{}", sqrt);
+            return average + "±" + sqrt;
+            // V3.6.4去掉95区间
+          /*  String middle95Percent = getFirstAndLastOfMiddle95Percent(dataList.stream().sorted().map(e -> e.setScale(3, RoundingMode.UP)).collect(Collectors.toList()), dataList.size());
+            return bigDecimal + "±" + sqrt + ";" + middle95Percent;*/
+        } else {
+            return 0 + "±" + 0;
+        }
+    }
+
+    /**
      * 保存指标元数据到文件
      *
      * @param url      文件地址
