@@ -61,10 +61,10 @@ public class Ovaries_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal organAreaD = this.commonJsonParser.getOrganArea(jsonTask, "324003").getStructureAreaNum();
         organAreaD = organAreaD.multiply(new BigDecimal(1000000)).setScale(3, RoundingMode.HALF_UP);
         // E：血管外红细胞面积μm2
-        BigDecimal organAreaE = commonJsonParser.getInsideOrOutside(jsonTask, "324003", "14C004", false).getStructureAreaNum();
+        BigDecimal organAreaE = commonJsonParser.getInsideOrOutside(jsonTask, "324003", "324004", false).getStructureAreaNum();
         organAreaE = organAreaE.multiply(new BigDecimal(1000000)).setScale(3, RoundingMode.HALF_UP);
         // F：血管内红细胞面积μm2
-        BigDecimal organAreaF = commonJsonParser.getInsideOrOutside(jsonTask, "324003", "14C004", true).getStructureAreaNum();
+        BigDecimal organAreaF = commonJsonParser.getInsideOrOutside(jsonTask, "324003", "324004", true).getStructureAreaNum();
         organAreaF = organAreaF.multiply(new BigDecimal(1000000)).setScale(3, RoundingMode.HALF_UP);
         // G：组织轮廓面积mm2
         SingleSlide singleSlide = this.singleSlideMapper.selectById(jsonTask.getSingleId());
