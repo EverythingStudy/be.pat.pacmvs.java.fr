@@ -72,7 +72,7 @@ public class Thymus_3ParserStrategyImpl_344 extends AbstractCustomParserStrategy
         map.put("皮髓比", new IndicatorAddIn("Corticomedullary ratio", divide3.toPlainString() + ":1", NOT, CommonConstant.NUMBER_1, "34403D,34403E"));
         // 红细胞面积占比 4=C/D
         BigDecimal proportion4 = getProportion(areaC, areaD);
-        map.put("红细胞占比", new IndicatorAddIn("Erythrocyte area%", DecimalUtils.setScale3(proportion4), PERCENTAGE, CommonConstant.NUMBER_1, "344004,344111"));
+        map.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", DecimalUtils.setScale3(proportion4), PERCENTAGE, CommonConstant.NUMBER_1, "344004,344111"));
         // 胸腺面积 5=D
         map.put("胸腺面积", new IndicatorAddIn("Thymus area", DecimalUtils.setScale3(areaD), SQ_MM, CommonConstant.NUMBER_1, "344111"));
         // 保存结果

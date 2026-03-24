@@ -59,10 +59,10 @@ public class LymphNodeMesenteric_3ParserStrategyImpl_346 extends AbstractCustomP
         map.put("皮质+副皮质区面积", new IndicatorAddIn("", DecimalUtils.setScale3(areaC), SQ_MM, CommonConstant.NUMBER_0, "346052"));
         // 髓质面积 D
         BigDecimal areaD = getOrganArea(jsonTask, "34603E").getStructureAreaNum();
-//        map.put("髓质面积", new IndicatorAddIn("", DecimalUtils.setScale3(areaD), SQ_MM, CommonConstant.NUMBER_0, "34603E"));
+        map.put("髓质面积", new IndicatorAddIn("", DecimalUtils.setScale3(areaD), SQ_MM, CommonConstant.NUMBER_0, "34603E"));
         // 组织轮廓面积 E
         BigDecimal areaE = new BigDecimal(singleSlideMapper.selectById(jsonTask.getSingleId()).getArea());
-        map.put("组织轮廓面积", new IndicatorAddIn("", DecimalUtils.setScale3(areaE), SQ_MM, CommonConstant.NUMBER_0, "346111"));
+//        map.put("组织轮廓面积", new IndicatorAddIn("", DecimalUtils.setScale3(areaE), SQ_MM, CommonConstant.NUMBER_0, "346111"));
         // 生发中心数量 1=A
         map.put("生发中心数量", new IndicatorAddIn("Number of germinal center", countA.toString(), PIECE, CommonConstant.NUMBER_1, "346054,346051"));
         // 生发中心面积占比 2=B/E
