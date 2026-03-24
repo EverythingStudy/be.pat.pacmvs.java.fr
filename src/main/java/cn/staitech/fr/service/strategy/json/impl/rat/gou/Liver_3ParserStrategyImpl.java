@@ -316,7 +316,7 @@ public class Liver_3ParserStrategyImpl extends AbstractCustomParserStrategy {
             BigDecimal sinusNucleusDensity = commonJsonParser.bigDecimalDivideCheck(new BigDecimal(sinusNucleusCount), sinusNucleusDensityDenominator);
             log.info("计算窦内细胞核密度：jsonTask id:[{}] singleSlide id:[{}], 窦内细胞核数量：{}, 分母面积：{}, 密度：{} 个/平方毫米",
                     jsonTask.getTaskId(), jsonTask.getSingleId(), sinusNucleusCount, sinusNucleusDensityDenominator, sinusNucleusDensity);
-            indicatorResultsMap.put("窦内细胞核密度", new IndicatorAddIn("Nucleus density of Sinus cell", DecimalUtils.setScale3(sinusNucleusDensity), SQ_MM_PIECE, areaUtils.getStructureIds("31214D", "312111")));
+            indicatorResultsMap.put("窦内细胞核密度", new IndicatorAddIn("Nucleus density of Sinus cell", DecimalUtils.setScale3(sinusNucleusDensity), SQ_MM_PIECE, areaUtils.getStructureIds("31214D", "312111", "312145", "312146", "312147")));
             log.info("添加窦内细胞核密度指标：jsonTask id:[{}] singleSlide id:[{}], 值：{} 个/平方毫米", jsonTask.getTaskId(), jsonTask.getSingleId(), DecimalUtils.setScale3(sinusNucleusDensity));
 
             // 胆管密度（全片）= J / I

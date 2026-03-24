@@ -85,14 +85,14 @@ public class CanidaeBrainStrategyImpl  extends AbstractCustomParserStrategy {
         //--map.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", areaUtils.convertToSquareMicrometer(intravascularErythrocyteArea.toString()), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, specialId+"32003,"+specialId+"32004"));
 
         // 产品呈现指标 -------------------------------------------------------------
-        if (accurateAreaBigDecimal.compareTo(BigDecimal.ZERO) != 0) {
+        //if (accurateAreaBigDecimal.compareTo(BigDecimal.ZERO) != 0) {
             // 1 脉络丛面积占比	%	Choroid Plexus area %	1=A/D	无
-            map.put("脉络丛面积占比", new IndicatorAddIn("Choroid Plexus area %", getProportion(choroidOPlexusAreaAnnotation, accurateAreaBigDecimal).toString(), PERCENTAGE, areaUtils.getStructureIds(specialId+"3209C", specialId+"32111")));
+        map.put("脉络丛面积占比", new IndicatorAddIn("Choroid Plexus area %", getProportion(choroidOPlexusAreaAnnotation, accurateAreaBigDecimal).toString(), PERCENTAGE, areaUtils.getStructureIds(specialId+"3209C", specialId+"32111")));
             // 2 血管外红细胞面积占比	%	Extravascular Erythrocyte area%	2=B/D	无
-            map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular Erythrocyte area%", getProportion(extravascularErythrocyteArea, accurateAreaBigDecimal).toString(), PERCENTAGE, specialId+"32003,"+specialId+"32004,"+specialId+"32111"));
+        map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular Erythrocyte area%", getProportion(extravascularErythrocyteArea, accurateAreaBigDecimal).toString(), PERCENTAGE, specialId+"32003,"+specialId+"32004,"+specialId+"32111"));
             // 3 血管内红细胞面积占比%	Intravascular Erythrocyte area%	3=C/D	无
-            map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", getProportion(intravascularErythrocyteArea, accurateAreaBigDecimal).toString(), PERCENTAGE, specialId+"32003,"+specialId+"32004,"+specialId+"32111"));
-        }
+        map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", getProportion(intravascularErythrocyteArea, accurateAreaBigDecimal).toString(), PERCENTAGE, specialId+"32003,"+specialId+"32004,"+specialId+"32111"));
+       // }
 
         // D 大脑面积	4	平方毫米	Brain area	4=D	无
         map.put("大脑面积", new IndicatorAddIn("Brain area", DecimalUtils.setScale3(accurateAreaBigDecimal), CommonConstant.SQUARE_MILLIMETRE, specialId+"32111"));

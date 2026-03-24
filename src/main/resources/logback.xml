@@ -93,7 +93,7 @@
     <!--项目启动时，打印加载nacos的配置文件日志-->
     <logger name="com.alibaba.cloud.nacos.client" level="debug"/>
     <!-- 数据源名称 -->
-    <logger name="com.baomidou.dynamic.datasource" level="debug" />
+    <logger name="com.baomidou.dynamic.datasource" level="info" />
     <!--系统操作日志-->
     <root level="info">
         <appender-ref ref="console"/>

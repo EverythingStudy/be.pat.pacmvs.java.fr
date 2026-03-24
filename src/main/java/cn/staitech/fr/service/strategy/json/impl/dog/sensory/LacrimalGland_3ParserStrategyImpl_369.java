@@ -43,7 +43,7 @@ public class LacrimalGland_3ParserStrategyImpl_369 extends AbstractCustomParserS
 
     @Override
     public String getAlgorithmCode() {
-        return "Lacrimal_gland_3";
+        return "Lacrimal_glands_3";
     }
 
     @Override

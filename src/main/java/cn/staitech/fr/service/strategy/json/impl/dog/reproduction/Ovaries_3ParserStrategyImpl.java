@@ -61,10 +61,10 @@ public class Ovaries_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal organAreaD = this.commonJsonParser.getOrganArea(jsonTask, "324003").getStructureAreaNum();
         organAreaD = organAreaD.multiply(new BigDecimal(1000000)).setScale(3, RoundingMode.HALF_UP);
         // E：血管外红细胞面积μm2
-        BigDecimal organAreaE = commonJsonParser.getInsideOrOutside(jsonTask, "324003", "14C004", false).getStructureAreaNum();
+        BigDecimal organAreaE = commonJsonParser.getInsideOrOutside(jsonTask, "324003", "324004", false).getStructureAreaNum();
         organAreaE = organAreaE.multiply(new BigDecimal(1000000)).setScale(3, RoundingMode.HALF_UP);
         // F：血管内红细胞面积μm2
-        BigDecimal organAreaF = commonJsonParser.getInsideOrOutside(jsonTask, "324003", "14C004", true).getStructureAreaNum();
+        BigDecimal organAreaF = commonJsonParser.getInsideOrOutside(jsonTask, "324003", "324004", true).getStructureAreaNum();
         organAreaF = organAreaF.multiply(new BigDecimal(1000000)).setScale(3, RoundingMode.HALF_UP);
         // G：组织轮廓面积mm2
         SingleSlide singleSlide = this.singleSlideMapper.selectById(jsonTask.getSingleId());
@@ -103,7 +103,7 @@ public class Ovaries_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         resultsMap.put("血管外红细胞面积占比", createNameIndicator("Extravascular Erythrocyte area%", eg6, PERCENTAGE, this.areaUtils.getStructureIds("324003", "324004", "324111")));
         // 7=F/G：血管内红细胞面积占比
         BigDecimal fg7 = getProportion(organAreaF, organAreaG.multiply(new BigDecimal(1000000)));
-        resultsMap.put("血管外红细胞面积占比", createNameIndicator("Intravascular Erythrocyte area%", fg7, PERCENTAGE, this.areaUtils.getStructureIds("324003", "324004", "324111")));
+        resultsMap.put("血管内红细胞面积占比", createNameIndicator("Intravascular Erythrocyte area%", fg7, PERCENTAGE, this.areaUtils.getStructureIds("324003", "324004", "324111")));
         // 8=G：卵巢面积
         resultsMap.put("卵巢面积", createNameIndicator("Ovary area", organAreaG, SQ_MM, "324111"));
 
