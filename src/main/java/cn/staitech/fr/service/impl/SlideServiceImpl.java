@@ -10,11 +10,13 @@ import cn.staitech.common.security.utils.SecurityUtils;
 import cn.staitech.fr.constant.Constants;
 import cn.staitech.fr.domain.*;
 import cn.staitech.fr.domain.out.AiInfoListRequest;
+import cn.staitech.fr.enmu.SpeciesTypeEnum;
 import cn.staitech.fr.enums.AiStatusEnum;
 import cn.staitech.fr.mapper.*;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.MathUtils;
 import cn.staitech.fr.utils.MessageSource;
+import cn.staitech.fr.vo.AiForecastVo;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.sft.logaudit.req.LogAuditParams;
@@ -39,9 +41,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static cn.staitech.common.security.utils.SecurityUtils.isAdmin;
@@ -82,7 +91,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
     private StructureTagMapper structureTagMapper;
     @Autowired
     private SlideMapper slideMapper;
-
+    @Resource
+    private ExecutorService executorService;
     //默认对照组值
     private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
     @Autowired
@@ -762,26 +772,129 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                 AiInfoListVO aiInfoListVO = new AiInfoListVO();
                 BeanUtils.copyProperties(aiCast, aiInfoListVO);
                 String controlGroup = StringUtils.isNotEmpty(special.getControlGroup()) ? special.getControlGroup() : DEFAULT_CONTROL_GROUP_VALUE;
+                // 20260323:大鼠的对照组数据保持原样
+                if(special.getSpeciesId().equals(String.valueOf(SpeciesTypeEnum.RAT.getCode()))){
+                    List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiCast.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup);
+                    Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(singleSlide.getCategoryId(), request.getProjectId(), controlGroup);
+                    aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList, count));
 
-                List<BigDecimal> dataList = singleSlideMapper.getReferenceScopeCopy(aiCast.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup);
-                Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(singleSlide.getCategoryId(), request.getProjectId(), controlGroup);
-                aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList, count));
-
-                if (null != aiInfoListVO.getNormalDistribution() && null != aiCast.getResults() && !"数据量过少,无统计学意义".equals(aiInfoListVO.getNormalDistribution())) {
-                    String[] s = aiInfoListVO.getNormalDistribution().split("-");
-                    if (!"详情见单个标注轮廓详情弹窗！".equals(aiCast.getResults()) && aiCast.getResults().split(";").length == 1) {
-                        try {
-                            String result = aiCast.getResults().contains("±") ? aiCast.getResults().split("±")[0] : (aiCast.getResults().contains(":") ? aiCast.getResults().split(":")[0] : aiCast.getResults());
-                            boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(result));
-                            if (!inRange) {
-                                aiInfoListVO.setRedHighlight(true);
+                    if (null != aiInfoListVO.getNormalDistribution() && null != aiCast.getResults() && !"数据量过少,无统计学意义".equals(aiInfoListVO.getNormalDistribution())) {
+                        String[] s = aiInfoListVO.getNormalDistribution().split("-");
+                        if (!"详情见单个标注轮廓详情弹窗！".equals(aiCast.getResults()) && aiCast.getResults().split(";").length == 1) {
+                            try {
+                                String result = aiCast.getResults().contains("±") ? aiCast.getResults().split("±")[0] : (aiCast.getResults().contains(":") ? aiCast.getResults().split(":")[0] : aiCast.getResults());
+                                boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(result));
+                                if (!inRange) {
+                                    aiInfoListVO.setRedHighlight(true);
+                                }
+                            } catch (Exception e) {
+                                log.error("数据转换异常{},{},{}", aiInfoListVO.getCategoryId(), aiInfoListVO.getNormalDistribution(), aiInfoListVO.getResults());
                             }
-                        } catch (Exception e) {
-                            log.error("数据转换异常{},{},{}", aiInfoListVO.getCategoryId(), aiInfoListVO.getNormalDistribution(), aiInfoListVO.getResults());
-                        }
 
+                        } else {
+                            aiInfoListVO.setRedHighlight(false);
+                        }
+                    }
+                }
+                // 20260323:V263新逻辑
+                else {
+                    if (aiCast.getResults().contains("±")) {
+                        List<AiForecastVo> forecastVo = singleSlideMapper.getReferenceScopeCopyV2(aiCast.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup);
+                        for (AiForecastVo aiForecastVo : forecastVo) {
+                            //首先去掉所有数值为“0±0” 0±0;0-0 的切片
+                            if (aiForecastVo.getResults().contains("0±0")) {
+                                aiForecastVo.setIsDelete("1");
+                            } else {
+                                //计算每条指标的加减标准差
+                                String[] result = aiForecastVo.getResults().split("±");
+                                BigDecimal meanAddStandardDeviation = new BigDecimal(String.valueOf(result[0])).add(new BigDecimal(result[1]));
+                                BigDecimal meanSubStandardDeviation = new BigDecimal(String.valueOf(result[0])).subtract(new BigDecimal(result[1]));
+                                aiForecastVo.setMeanAddStandardDeviation(meanAddStandardDeviation);
+                                aiForecastVo.setMeanSubStandardDeviation(meanSubStandardDeviation);
+                            }
+                        }
+                        //找出最大 最小的标准差 如果存在多个相同的话只剔除第一个
+                        markMinMax(forecastVo);
+                        List<AiForecastVo> aiForecastVos = forecastVo.stream().filter(e -> !"1".equals(e.getIsDelete())).collect(Collectors.toList());
+
+                        if (aiForecastVos.size() < 5) {
+                            aiInfoListVO.setNormalDistribution("数据量过少,无统计学意义");
+                        } else {
+
+                            List<String> fileUrls = aiForecastVos.stream().map(AiForecastVo::getFileUrl).filter(StringUtils::isNotBlank).collect(Collectors.toList());
+                            if (CollectionUtils.isNotEmpty(fileUrls)) {
+                                // 累加文件数量
+                                int totalCount = fileUrls.stream()
+                                        .filter(url -> url.endsWith(".txt")) // 基础过滤
+                                        .map(url -> {
+                                            int index1 = url.lastIndexOf("-");
+                                            int index2 = url.indexOf(".txt");
+                                            return Integer.parseInt(url.substring(index1 + 1, index2));
+                                        })
+                                        .mapToInt(Integer::intValue)
+                                        .sum();
+
+                                log.info("读取文件时间开始");
+                                long currentTimeMillis = System.currentTimeMillis();
+                                List<BigDecimal> bigDecimalList_ = new ArrayList<>(totalCount);
+                                // 2. 并行处理每个文件
+                                List<CompletableFuture<List<BigDecimal>>> futures = fileUrls.stream().map(path -> CompletableFuture.supplyAsync(() -> {
+                                    try {
+                                        return readFileSingle(path);
+                                    } catch (Exception e) {
+                                        log.error("读取文件失败: {}", path, e);
+                                        return Collections.<BigDecimal>emptyList(); // 空集合
+                                    }
+                                }, executorService)).collect(Collectors.toList());
+
+                                // 3. 等待所有任务完成并合并结果
+                                for (CompletableFuture<List<BigDecimal>> future : futures) {
+                                    bigDecimalList_.addAll(future.join());
+                                }
+                                long endTime = System.currentTimeMillis();
+                                log.info("读取文件时间结束:{} 秒", (endTime - currentTimeMillis)/1000.0);
+                                String confidenceInterval = MathUtils.getConfidenceIntervalCopy(bigDecimalList_);
+                                aiInfoListVO.setNormalDistribution(confidenceInterval);
+
+                                String s = confidenceInterval.split("±")[0];
+                                String v = confidenceInterval.split("±")[1];
+                                BigDecimal up = new BigDecimal(String.valueOf(s)).add(new BigDecimal(v)); //上界
+                                BigDecimal down = new BigDecimal(String.valueOf(s)).subtract(new BigDecimal(v));//下界
+
+                                //计算每条指标的加减标准差
+                                String[] result = aiInfoListVO.getResults().split("±");
+                                BigDecimal meanAdd = new BigDecimal(String.valueOf(result[0])).add(new BigDecimal(result[1]));
+                                BigDecimal meanSub = new BigDecimal(String.valueOf(result[0])).subtract(new BigDecimal(result[1]));
+
+                                //如果该切片的“均值-标准差”小于对照组数值分布区间的“均值-标准差”数值，或该切片的“均值+标准差”大于对照组数值分布区间的“均值+标准差”数值，即判定该切片此指标数值异常，标红提示
+                                if (meanSub.compareTo(down) < 0 || meanAdd.compareTo(up) > 0) {
+                                    aiInfoListVO.setRedHighlight(true);
+                                } else {
+                                    aiInfoListVO.setRedHighlight(false);
+                                }
+                            }
+                        }
                     } else {
-                        aiInfoListVO.setRedHighlight(false);
+                        List<BigDecimal> dataList_ = singleSlideMapper.getReferenceScopeCopy(aiCast.getQuantitativeIndicators(), key.longValue(), request.getProjectId(), controlGroup);
+                        Integer count = singleSlideMapper.getCategoryIdCountByGroupCode(singleSlide.getCategoryId(), request.getProjectId(), controlGroup);
+                        aiInfoListVO.setNormalDistribution(MathUtils.getFirstAndLastOfMiddle95Percent(dataList_, count));
+
+                        if (null != aiInfoListVO.getNormalDistribution() && null != aiCast.getResults() && !"数据量过少,无统计学意义".equals(aiInfoListVO.getNormalDistribution())) {
+                            String[] s = aiInfoListVO.getNormalDistribution().split("-");
+                            if (!"详情见单个标注轮廓详情弹窗！".equals(aiCast.getResults())) {
+                                try {
+                                    String result = aiCast.getResults();
+                                    boolean inRange = Range.between(new BigDecimal(s[0]), new BigDecimal(s[1])).contains(new BigDecimal(result));
+                                    if (!inRange) {
+                                        aiInfoListVO.setRedHighlight(true);
+                                    }
+                                } catch (Exception e) {
+                                    log.error("数据转换异常{},{},{}", aiInfoListVO.getCategoryId(), aiInfoListVO.getNormalDistribution(), aiInfoListVO.getResults());
+                                }
+                            } else {
+                                aiInfoListVO.setRedHighlight(false);
+                            }
+                        }
                     }
                 }
 
@@ -819,6 +932,88 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
         aiInfoAnalyzeVo.setAiInfoList(aiInfoListResps);
         return aiInfoAnalyzeVo;
+    }
+
+    /**
+     * 单文件极速读取核心逻辑
+     * 不使用 split，不使用 Scanner，手动解析字符
+     */
+    private static List<BigDecimal> readFileSingle(String filePath) throws IOException {
+        int index1 = filePath.lastIndexOf("-");
+        int index2 = filePath.indexOf(".txt");
+        int size= Integer.parseInt(filePath.substring(index1 + 1, index2));
+        // 预分配容量
+        List<BigDecimal> numbers = new ArrayList<>(size);
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // 优化点：如果一行只有一个数字，直接解析
+                // 如果一行有多个逗号分隔的数字，手动遍历字符
+                int len = line.length();
+                int start = 0;
+
+                for (int i = 0; i <= len; i++) {
+                    // 遇到逗号或行尾，截取数字
+                    if (i == len || line.charAt(i) == ',') {
+                        if (i > start) {
+                            // 手动解析 substring 可能会产生临时字符串，极致优化可自定义 parseLong(char[], start, end)
+                            // 但 JDK 的 Long.parseLong 已经足够快，substring 在短字符串下开销可控
+                            // 为了代码可读性与性能的平衡，这里使用 substring
+                            // 极致优化版见下方的 "进阶：零字符串分配" 提示
+                            String numStr = line.substring(start, i);
+                            // 跳过空值（如果有连续逗号）
+                            if (!numStr.isEmpty()) {
+                                numbers.add(new BigDecimal(numStr.trim()));
+                            }
+                        }
+                        start = i + 1;
+                    }
+                }
+            }
+        }
+        return numbers;
+    }
+
+
+    /**
+     * 找出最大 最小的标准差 如果存在多个相同的话只剔除第一个
+     * @param list
+     */
+    public static void markMinMax(List<AiForecastVo> list) {
+        if (list == null || list.isEmpty()) return;
+
+        List<AiForecastVo> aiForecastVos = list.stream().filter(obj -> obj.getIsDelete().equals("0")).collect(Collectors.toList());
+        // 找出最大值和最小值
+        Optional<BigDecimal> maxOpt = aiForecastVos.stream()
+                .map(AiForecastVo::getMeanAddStandardDeviation)
+                .max(BigDecimal::compareTo);
+        Optional<BigDecimal> minOpt = aiForecastVos.stream()
+                .map(AiForecastVo::getMeanSubStandardDeviation)
+                .min(BigDecimal::compareTo);
+
+
+        if (maxOpt.isPresent() && minOpt.isPresent()) {
+            BigDecimal maxValue = maxOpt.get();
+            BigDecimal minValue = minOpt.get();
+
+            boolean max_first = true;
+            boolean min_first = true;
+            for (AiForecastVo obj : aiForecastVos) {
+                if(maxValue.compareTo(obj.getMeanAddStandardDeviation()) == 0) {
+                    if(max_first) {
+                        obj.setIsDelete("1");
+                        max_first = false;
+                    }
+                }
+                if(minValue.compareTo(obj.getMeanSubStandardDeviation()) == 0) {
+                    if(min_first) {
+                        obj.setIsDelete("1");
+                        min_first = false;
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -1132,6 +1327,8 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
 
 
 }
+
+
 
 
 
