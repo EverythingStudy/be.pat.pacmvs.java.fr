@@ -817,7 +817,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                         markMinMax(forecastVo);
                         List<AiForecastVo> aiForecastVos = forecastVo.stream().filter(e -> !"1".equals(e.getIsDelete())).collect(Collectors.toList());
 
-                        if (false) {
+                        if (aiForecastVos.size() < 5) {
                             aiInfoListVO.setNormalDistribution("数据量过少,无统计学意义");
                         } else {
 
