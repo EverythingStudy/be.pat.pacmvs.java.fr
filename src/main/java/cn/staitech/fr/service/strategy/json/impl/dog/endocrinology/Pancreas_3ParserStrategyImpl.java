@@ -157,7 +157,7 @@ public class Pancreas_3ParserStrategyImpl extends AbstractCustomParserStrategy{
 //		commonJsonParser.putAnnotationDynamicData(jsonTask, "305077", "305078", annotationBy);
 
 		indicatorResultsMap.put("间质面积", createIndicator(G_305027_organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "305027"));
-		indicatorResultsMap.put("导管面积（全片）", createIndicator(H_30506F_organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "30506F"));
+		indicatorResultsMap.put("导管面积", createIndicator(H_30506F_organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "30506F"));
 		indicatorResultsMap.put("血管面积", createIndicator(I_305003_organArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "305003"));
 //		indicatorResultsMap.put("组织轮廓面积", createIndicator(J_organArea, SQ_MM, "301111"));
 //		indicatorResultsMap.put("胰岛细胞核数量（全片）", createIndicator(String.valueOf(K_305078_count), PIECE, "305077,305078"));
