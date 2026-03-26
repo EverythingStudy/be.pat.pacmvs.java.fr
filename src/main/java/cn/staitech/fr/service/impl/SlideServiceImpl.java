@@ -453,21 +453,21 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
     @Override
     public List<String> getAnimalCode(SlideSelectListReq req) {
         List<SlidePageVo> slideSelectList = this.baseMapper.getSlideSelectList(req);
-        List<String> animalCodes = slideSelectList.stream().filter(Objects::nonNull) .map(SlidePageVo::getAnimalCode).distinct().sorted().collect(Collectors.toList());
+        List<String> animalCodes = slideSelectList.stream().filter(e -> StringUtils.isNotEmpty(e.getAnimalCode())).map(SlidePageVo::getAnimalCode).distinct().sorted().collect(Collectors.toList());
         return animalCodes;
     }
 
     @Override
     public List<String> getWaxCode(SlideSelectListReq req) {
         List<SlidePageVo> slideSelectList = this.baseMapper.getSlideSelectList(req);
-        List<String> waxCode = slideSelectList.stream().filter(Objects::nonNull) .map(SlidePageVo::getWaxCode).distinct().sorted().collect(Collectors.toList());
+        List<String> waxCode = slideSelectList.stream().filter(e -> StringUtils.isNotEmpty(e.getWaxCode())).map(SlidePageVo::getWaxCode).distinct().sorted().collect(Collectors.toList());
         return waxCode;
     }
 
     @Override
     public List<String> getGroupCode(SlideSelectListReq req) {
         List<SlidePageVo> slideSelectList = this.baseMapper.getSlideSelectList(req);
-        List<String> groupCode = slideSelectList.stream().filter(Objects::nonNull) .map(SlidePageVo::getGroupCode).distinct().sorted().collect(Collectors.toList());
+        List<String> groupCode = slideSelectList.stream().filter(e -> StringUtils.isNotEmpty(e.getGroupCode())).map(SlidePageVo::getGroupCode).distinct().sorted().collect(Collectors.toList());
         return groupCode;
     }
 
