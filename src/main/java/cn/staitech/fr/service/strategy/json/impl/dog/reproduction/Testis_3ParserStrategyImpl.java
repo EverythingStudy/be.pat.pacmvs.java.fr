@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -93,7 +94,7 @@ public class Testis_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         resultsMap.put("间质细胞核数量", createIndicator(countH, PIECE, "32E0FE"));
 
         // 1=I：睾丸面积
-        resultsMap.put("睾丸面积", createNameIndicator("Testicular area", organAreaI, SQ_MM, "32E111"));
+        resultsMap.put("睾丸面积", createNameIndicator("Testicular area", organAreaI.setScale(3, RoundingMode.HALF_UP), SQ_MM, "32E111"));
         // 2=B：生精小管面积（全片）
         resultsMap.put("生精小管面积（全片）", createNameIndicator("Seminiferous tubules area (all)", organAreaB, SQ_MM, "32E0FA"));
         // 3=B/I：生精小管面积占比
