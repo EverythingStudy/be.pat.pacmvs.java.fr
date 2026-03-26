@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -94,7 +95,7 @@ public class Epididymides_3ParserStrategyImpl extends AbstractCustomParserStrate
         resultsMap.put("精子面积（全片）", createIndicator(organAreaG, SQ_MM, this.areaUtils.getStructureIds("32F0F5", "32F0F7")));
 
         // 1=I：附睾面积
-        resultsMap.put("附睾面积", createNameIndicator("Epididymal area", organAreaI, SQ_MM, "32F111"));
+        resultsMap.put("附睾面积", createNameIndicator("Epididymal area", organAreaI.setScale(3, RoundingMode.HALF_UP), SQ_MM, "32F111"));
         // 2=B/I：输出小管和附睾管面积占比（全片）
         BigDecimal bi = getProportion(organAreaB, organAreaI);
         resultsMap.put("输出小管和附睾管面积占比（全片）", createNameIndicator("Efferent ducts and epididymal ducts area%（all）", bi, PERCENTAGE, this.areaUtils.getStructureIds("32F0F5", "32F111")));
