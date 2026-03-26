@@ -105,7 +105,7 @@ public class Ovaries_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         BigDecimal fg7 = getProportion(organAreaF, organAreaG.multiply(new BigDecimal(1000000)));
         resultsMap.put("血管内红细胞面积占比", createNameIndicator("Intravascular Erythrocyte area%", fg7, PERCENTAGE, this.areaUtils.getStructureIds("324003", "324004", "324111")));
         // 8=G：卵巢面积
-        resultsMap.put("卵巢面积", createNameIndicator("Ovary area", organAreaG, SQ_MM, "324111"));
+        resultsMap.put("卵巢面积", createNameIndicator("Ovary area", organAreaG.setScale(3, RoundingMode.HALF_UP), SQ_MM, "324111"));
 
         this.aiForecastService.addAiForecast(jsonTask.getSingleId(), resultsMap);
     }
