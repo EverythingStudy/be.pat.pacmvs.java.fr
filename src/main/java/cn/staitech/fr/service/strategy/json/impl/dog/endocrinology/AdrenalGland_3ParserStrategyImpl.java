@@ -176,7 +176,7 @@ public class AdrenalGland_3ParserStrategyImpl extends AbstractCustomParserStrate
 		indicatorResultsMap.put("髓质红细胞面积占比", createNameIndicator("Medullary erythrocyte area%", String.valueOf(b10), PERCENTAGE, "30103,301004,301111"));
 		
 		//肾上腺面积 11 mm² Adrenal gland area 11=J
-		indicatorResultsMap.put("肾上腺面积", createNameIndicator("Adrenal gland area", String.valueOf(J_301111_area), PERCENTAGE, "301111"));
+		indicatorResultsMap.put("肾上腺面积", createNameIndicator("Adrenal gland area", J_301111_area, PERCENTAGE, "301111"));
 		
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 	}
