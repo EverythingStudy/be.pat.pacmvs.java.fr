@@ -85,7 +85,7 @@ public class Prostate_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         resultsMap.put("腺泡/导管面积（全片）", createIndicator(organAreaB, SQ_MM, "32C06C"));
 
         // 1=F-G：前列腺面积mm2
-        resultsMap.put("前列腺面积", createNameIndicator("Prostate gland area", organAreaF.subtract(organAreaG).setScale(3, RoundingMode.HALF_UP), SQ_MM, this.areaUtils.getStructureIds("32C111", "32C060")));
+        resultsMap.put("前列腺面积", createNameIndicator("Prostate gland area", organAreaF.subtract(organAreaG), SQ_MM, this.areaUtils.getStructureIds("32C111", "32C060")));
         // 2=B/F：腺泡/导管面积占比
         resultsMap.put("腺泡/导管面积占比", createNameIndicator("Acinar area%", getProportion(organAreaB, organAreaF), PERCENTAGE, this.areaUtils.getStructureIds("32C111", "32C06C")));
         // 3=1-D/A：腺泡/导管面积占比（单个）
