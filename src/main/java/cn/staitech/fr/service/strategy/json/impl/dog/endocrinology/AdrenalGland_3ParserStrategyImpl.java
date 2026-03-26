@@ -169,7 +169,7 @@ public class AdrenalGland_3ParserStrategyImpl extends AbstractCustomParserStrate
 //		indicatorResultsMap.put("髓质细胞核密度", createNameIndicator("Nucleus density of zona fasciculate and zona reticularis", String.valueOf(b8), SQ_MM_PIECE, "30103E,30103E,301068"));
 		//皮质红细胞面积占比 9 % Cortial erythrocyte area% 9=H/J
 		BigDecimal b9 = bigDecimalDivideCheck(H_30103D_301004_area, J_301111_area);
-		indicatorResultsMap.put("束状带+网状带面积占比", createNameIndicator("Zona fasciculate and zona reticularis%", String.valueOf(b9), PERCENTAGE, "301057,301111"));
+		indicatorResultsMap.put("皮质红细胞面积占比", createNameIndicator("Zona fasciculate and zona reticularis%", String.valueOf(b9), PERCENTAGE, "301057,301111"));
 		
 		//髓质红细胞面积占比 10 % Medullary erythrocyte area% 10=I/J
 		BigDecimal b10 = bigDecimalDivideCheck(I_30103E_301004_area, J_301111_area);
