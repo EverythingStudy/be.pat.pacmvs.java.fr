@@ -8,12 +8,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class DynamicThreadPoolConfig {
-    private static final int CORE_POOL_SIZE = Math.max(2, Runtime.getRuntime().availableProcessors());
-    private static final int MAX_POOL_SIZE = Math.max(10, Runtime.getRuntime().availableProcessors() * 2);
-
     @Bean
     public ExecutorService executorService() {
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(5), new ThreadFactory() {
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 10, 1000L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(10000), new ThreadFactory() {
             private final AtomicInteger threadNumber = new AtomicInteger(1);
 
             @Override
