@@ -4,11 +4,15 @@ import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Slide;
 import cn.staitech.fr.domain.out.AiInfoListRequest;
+import cn.staitech.fr.vo.AiForecastVo;
 import cn.staitech.fr.vo.project.*;
 import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.system.api.domain.biz.AddSingleSlide;
 import cn.staitech.system.api.domain.biz.DelSingleSlide;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -80,4 +84,8 @@ public interface SlideService extends IService<Slide> {
      * @return
      */
     List<SlidePageVo> list(SlideListReq req);
+
+    List<BigDecimal> readFileSingle(String filePath) throws IOException;
+
+    public void markMinMax(List<AiForecastVo> list);
 }

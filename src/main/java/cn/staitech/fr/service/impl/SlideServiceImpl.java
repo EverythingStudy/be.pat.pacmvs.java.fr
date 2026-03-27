@@ -938,7 +938,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
      * 单文件极速读取核心逻辑
      * 不使用 split，不使用 Scanner，手动解析字符
      */
-    private static List<BigDecimal> readFileSingle(String filePath) throws IOException {
+    public List<BigDecimal> readFileSingle(String filePath) throws IOException {
         int index1 = filePath.lastIndexOf("-");
         int index2 = filePath.indexOf(".txt");
         int size= Integer.parseInt(filePath.substring(index1 + 1, index2));
@@ -980,7 +980,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
      * 找出最大 最小的标准差 如果存在多个相同的话只剔除第一个
      * @param list
      */
-    public static void markMinMax(List<AiForecastVo> list) {
+    public void markMinMax(List<AiForecastVo> list) {
         if (list == null || list.isEmpty()) return;
 
         List<AiForecastVo> aiForecastVos = list.stream().filter(obj -> obj.getIsDelete().equals("0")).collect(Collectors.toList());
