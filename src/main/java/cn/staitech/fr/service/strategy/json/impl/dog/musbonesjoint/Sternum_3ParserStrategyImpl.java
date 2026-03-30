@@ -27,7 +27,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component("Bone_with_bone_marrow_sternum_3")
-public class Sternum_3ParserStrategyImpl extends AbstractCustomParserStrategy implements OutlineCustom {
+public class Sternum_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 
     @Resource
     private AiForecastService aiForecastService;
@@ -90,6 +90,11 @@ public class Sternum_3ParserStrategyImpl extends AbstractCustomParserStrategy im
         if (bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
             densityOfMegakaryocyte = bigDecimalDivideCheck(new BigDecimal(mucosaCountC), bigDecimalF);
         }
+        //5 红系细胞密度  个/103 μm2	5=A/F
+        BigDecimal erythroidCellDensity = BigDecimal.ZERO;
+        if (bigDecimalF.compareTo(BigDecimal.ZERO) != 0) {
+            erythroidCellDensity = bigDecimalDivideCheck(new BigDecimal(mucosaCountA), bigDecimalF);
+        }
         indicatorResultsMap.put("红系细胞核数量", new IndicatorAddIn("", String.valueOf(mucosaCountA), PIECE, CommonConstant.NUMBER_1, "34E011"));
         indicatorResultsMap.put("巨核系细胞数量", new IndicatorAddIn("", String.valueOf(mucosaCountC), PIECE, CommonConstant.NUMBER_1, "34E022"));
         indicatorResultsMap.put("红细胞面积", new IndicatorAddIn("", String.valueOf(bigDecimalD), SQ_MM, CommonConstant.NUMBER_1, "34E004"));
@@ -117,11 +122,11 @@ public class Sternum_3ParserStrategyImpl extends AbstractCustomParserStrategy im
          */
 
         indicatorResultsMap.put("红细胞面积占比", new IndicatorAddIn("Erythrocyte area%", String.valueOf(erythrocyteArea.setScale(3, RoundingMode.HALF_UP)), PERCENTAGE, CommonConstant.NUMBER_0,"34E004,34E111"));
-        indicatorResultsMap.put("脂肪细胞面积占比", new IndicatorAddIn("Adipocyte area%", String.valueOf(adipocyteArea.setScale(3, RoundingMode.HALF_UP)), PERCENTAGE, CommonConstant.NUMBER_0, "14E012,14E111"));
+        indicatorResultsMap.put("脂肪细胞面积占比", new IndicatorAddIn("Adipocyte area%", String.valueOf(adipocyteArea.setScale(3, RoundingMode.HALF_UP)), PERCENTAGE, CommonConstant.NUMBER_0, "34E012,34E111"));
 
-        indicatorResultsMap.put("巨核系细胞密度", new IndicatorAddIn("Density of megakaryocyte", String.valueOf(densityOfMegakaryocyte.setScale(3, RoundingMode.HALF_UP)), SQ_MM_PIECE, CommonConstant.NUMBER_0, "14E022,14E111"));
-
-        indicatorResultsMap.put("胸骨面积", new IndicatorAddIn("Sternum area", String.valueOf(bigDecimalF.setScale(3, RoundingMode.HALF_UP)), SQ_MM, CommonConstant.NUMBER_0, "14E111"));
+        indicatorResultsMap.put("巨核系细胞密度", new IndicatorAddIn("Nucleus density of megakaryocyte", String.valueOf(densityOfMegakaryocyte.setScale(3, RoundingMode.HALF_UP)), SQ_UM_PICE, CommonConstant.NUMBER_0, "34E022,34E111"));
+        indicatorResultsMap.put("红系细胞核密度", new IndicatorAddIn("Nucleus density of erythropoiesis", String.valueOf(erythroidCellDensity.setScale(3, RoundingMode.HALF_UP)), SQ_UM_PICE, CommonConstant.NUMBER_0,"34E011,34E111"));
+        indicatorResultsMap.put("胸骨面积", new IndicatorAddIn("Sternum area", String.valueOf(bigDecimalF.setScale(3, RoundingMode.HALF_UP)), SQ_MM, CommonConstant.NUMBER_0, "34E111"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
 
@@ -133,12 +138,4 @@ public class Sternum_3ParserStrategyImpl extends AbstractCustomParserStrategy im
         return "Bone_with_bone_marrow_sternum_3";
     }
 
-    @Override
-    public void getCustomOutLine(JsonTask jsonTask) {
-        Map<String, IndicatorAddIn> indicatorResultsMap = new HashMap<>();
-        SingleSlide singleSlide = singleSlideMapper.selectById(jsonTask.getSingleId());
-        BigDecimal pituitaryH = new BigDecimal(singleSlide.getArea());
-        indicatorResultsMap.put("胸骨面积", createNameIndicator("Sternum area", String.valueOf(pituitaryH.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "14E111"));
-        aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
-    }
 }

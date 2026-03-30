@@ -7,6 +7,7 @@ import cn.staitech.fr.domain.in.OrganDisassemblyQueryIn;
 import cn.staitech.fr.domain.out.ExprotAiExcelVO;
 import cn.staitech.fr.domain.out.OrganDisassemblyOut;
 import cn.staitech.fr.domain.out.SingleSlideSelectBy;
+import cn.staitech.fr.vo.AiForecastVo;
 import com.baomidou.dynamic.datasource.annotation.DS;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
@@ -27,6 +28,19 @@ public interface SingleSlideMapper extends BaseMapper<SingleSlide> {
                                            @Param("categoryId") Long categoryId,
                                            @Param("specialId") Long specialId,
                                            @Param("groupCode") String groupCode);
+
+    /**
+     *
+     * @param quantitativeIndicators 具体指标
+     * @param categoryId 脏器
+     * @param specialId  项目
+     * @param groupCode  对照组
+     * @return
+     */
+    List<AiForecastVo> getReferenceScopeCopyV2(@Param("quantitativeIndicators") String quantitativeIndicators,
+                                               @Param("categoryId") Long categoryId,
+                                               @Param("specialId") Long specialId,
+                                               @Param("groupCode") String groupCode);
 
     String getGender(Long id);
 

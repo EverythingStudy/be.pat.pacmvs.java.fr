@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,7 +66,7 @@ public class Testis_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationC.setPerimeterUnit(UM);
         this.commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "32E0FA", annotationC, 1);
         // D：生精小管数量
-        Integer countD = organ.getCount();
+        Integer countD = this.commonJsonParser.getOrganAreaCount(jsonTask, "32E0FA");
         // E：生精小管内腔面积（单个）×103 μm2
         Annotation annotationE = new Annotation();
         annotationE.setAreaName("生精小管内腔面积（单个）");
@@ -82,7 +83,7 @@ public class Testis_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationG.setCountUnit(PIECE);
         this.commonJsonParser.putAnnotationDynamicData(jsonTask, "32E0FA", "32E0FD", annotationF, 1, true);
         // H：间质细胞核数量
-        Integer countH = this.commonJsonParser.getOrganArea(jsonTask, "32E0FE").getCount();
+        Integer countH = this.commonJsonParser.getOrganAreaCount(jsonTask, "32E0FE");
         // I：组织轮廓面积
         SingleSlide singleSlide = this.singleSlideMapper.selectById(jsonTask.getSingleId());
         BigDecimal organAreaI = new BigDecimal(singleSlide.getArea());

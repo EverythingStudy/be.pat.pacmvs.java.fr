@@ -218,7 +218,7 @@ public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		 */
 		//A_31B03D C_31B02D_area E_31B02E_count G_31B02F_area I_31B031_area K_31B026_area L_31B111 M_31B03E_area
 		//肾脏面积 1 平方毫米 Renal area1=L
-		indicatorResultsMap.put("肾脏面积", createNameIndicator("Renal area", String.valueOf(L_31B111), SQ_MM, "31B111"));
+		indicatorResultsMap.put("肾脏面积", createNameIndicator("Renal area", L_31B111, SQ_MM, "31B111"));
 		//皮质面积占比 2 % Cortical area% 2=A/L
 		indicatorResultsMap.put("皮质面积占比", createNameIndicator("Cortical area%", String.valueOf(getProportion(A_31B03D, L_31B111)), PERCENTAGE, "31B03D,31B111"));
 		//髓质面积占比 3 % Medulla area% 3=M/L

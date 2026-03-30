@@ -87,7 +87,7 @@ public class JsonTaskParserService implements DisposableBean{
     private SpecialStructureConfig specialStructureConfig;
     
     @Resource
-    @Qualifier("taskExecutor") 
+    //@Qualifier("taskExecutor")
     private ExecutorService executorService;
     private Executor ttlExecutor;
 
