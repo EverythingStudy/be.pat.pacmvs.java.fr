@@ -85,7 +85,7 @@ public class CanidaeSciaticNerveParserStrategyImpl extends AbstractCustomParserS
 		if(null != bigDecimalB){
 			bigDecimalB = bigDecimalB.setScale(3, RoundingMode.HALF_UP);
 			bigDecimalB = commonJsonParser.getBigDecimalValue(bigDecimalB);
-//			indicatorResultsMap.put("神经外膜结缔组织面积", new IndicatorAddIn("", String.valueOf(bigDecimalB.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "1","1400BA"));
+			indicatorResultsMap.put("神经外膜结缔组织面积", new IndicatorAddIn("", String.valueOf(bigDecimalB.setScale(3, RoundingMode.HALF_UP)), SQ_MM, "1",specialId+"400BA"));
 		}
 		//神经外膜结缔组织面积	2	平方毫米	Connective tissue area	2=B-A
 		if(bigDecimalB.compareTo(BigDecimal.ZERO) != 0 && pituitaryA.compareTo(BigDecimal.ZERO) != 0){
