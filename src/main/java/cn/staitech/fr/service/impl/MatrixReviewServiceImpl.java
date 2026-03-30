@@ -60,8 +60,9 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
 
     @Resource
     private AiForecastMapper aiForecastMapper;
-    @Resource
-    private ExecutorService executorService;
+
+    @Resource(name = "slideFileThreadPool")
+    private ExecutorService slideFileThreadPool;
 
     @Value("${waxPath}")
     private String waxPath;
@@ -197,7 +198,7 @@ public class MatrixReviewServiceImpl implements MatrixReviewService {
                                             log.error("读取文件失败: {}", path, e);
                                             return Collections.<BigDecimal>emptyList(); // 空集合
                                         }
-                                    }, executorService)).collect(Collectors.toList());
+                                    },slideFileThreadPool)).collect(Collectors.toList());
 
                                     // 3. 等待所有任务完成并合并结果
                                     for (CompletableFuture<List<BigDecimal>> future : futures) {

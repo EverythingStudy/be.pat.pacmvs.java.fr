@@ -91,8 +91,10 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
     private StructureTagMapper structureTagMapper;
     @Autowired
     private SlideMapper slideMapper;
-    @Resource
-    private ExecutorService executorService;
+
+    @Resource(name = "slideFileThreadPool")
+    private ExecutorService slideFileThreadPool;
+
     //默认对照组值
     private static final String DEFAULT_CONTROL_GROUP_VALUE = "1";
     @Autowired
@@ -845,7 +847,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
                                         log.error("读取文件失败: {}", path, e);
                                         return Collections.<BigDecimal>emptyList(); // 空集合
                                     }
-                                }, executorService)).collect(Collectors.toList());
+                                }, slideFileThreadPool)).collect(Collectors.toList());
 
                                 // 3. 等待所有任务完成并合并结果
                                 for (CompletableFuture<List<BigDecimal>> future : futures) {
