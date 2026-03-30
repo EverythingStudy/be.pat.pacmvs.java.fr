@@ -23,7 +23,7 @@ public class DynamicDataPool {
     private Integer dynamicMaxMultiple;
     
     private ExecutorService dynamicDataThreadPool;
-    
+    private ExecutorService slideFileThreadPool;
     private ThreadPoolExecutor recognitionExecutor; 
 
     @Bean("dynamicDataThreadPool")
@@ -50,7 +50,7 @@ public class DynamicDataPool {
         int corePoolSize = Runtime.getRuntime().availableProcessors();
         int maximumPoolSize = corePoolSize * 2;
 
-        this.dynamicDataThreadPool = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(200), new ThreadFactory() {
+        this.slideFileThreadPool = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(200), new ThreadFactory() {
             private final AtomicInteger threadNumber = new AtomicInteger(1);
 
             @Override
@@ -60,7 +60,7 @@ public class DynamicDataPool {
                 return thread;
             }
         }, new ThreadPoolExecutor.CallerRunsPolicy());
-        return this.dynamicDataThreadPool;
+        return this.slideFileThreadPool;
     }
 
     /**
@@ -70,6 +70,7 @@ public class DynamicDataPool {
     public void shutdown() {
     	shutdownExecutor(dynamicDataThreadPool, "动态数据线程池");
         shutdownExecutor(recognitionExecutor, "识别任务线程池");
+        shutdownExecutor(slideFileThreadPool, "切片文件线程池");
     }
 
     private void shutdownExecutor(ExecutorService executor, String name) {
