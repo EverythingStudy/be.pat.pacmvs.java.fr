@@ -71,11 +71,11 @@ public class CanidaeSpinalCordParserStrategyImpl extends AbstractCustomParserStr
 
         Map<String, IndicatorAddIn> indicatorResultsMap = new LinkedHashMap<>();
 
-        //--indicatorResultsMap.put("灰质面积（全片 ）", new IndicatorAddIn("", bigDecimalG.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, specialId+"390B3"));
-        //--indicatorResultsMap.put("白质面积（全片 ）", new IndicatorAddIn("", bigDecimalH.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "1", specialId+"390B2"));
-        //--indicatorResultsMap.put("中央管面积（全片 ）", new IndicatorAddIn("", areaUtils.convertToSquareMicrometer(bigDecimalI.toString()), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, specialId+"390B4"));
-        //--indicatorResultsMap.put("室管膜细胞核数量（全片 ）", new IndicatorAddIn("", mucosaCountD.toString(), PIECE, "1",areaUtils.getStructureIds(specialId+"390B4",specialId+"390B5")));
-        //--indicatorResultsMap.put("红细胞面积（全片 ）", new IndicatorAddIn("", bigDecimalK.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, specialId+"39004"));
+        indicatorResultsMap.put("灰质面积（单个）", new IndicatorAddIn("", bigDecimalG.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, specialId+"390B3"));
+        indicatorResultsMap.put("白质面积（单个）", new IndicatorAddIn("", bigDecimalH.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "1", specialId+"390B2"));
+        indicatorResultsMap.put("中央管面积（单个）", new IndicatorAddIn("", areaUtils.convertToSquareMicrometer(bigDecimalI.toString()), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, specialId+"390B4"));
+        indicatorResultsMap.put("室管膜细胞核数量（单个）", new IndicatorAddIn("", mucosaCountD.toString(), PIECE, "1",areaUtils.getStructureIds(specialId+"390B4",specialId+"390B5")));
+        indicatorResultsMap.put("红细胞面积（单个）", new IndicatorAddIn("", bigDecimalK.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, CommonConstant.NUMBER_1, specialId+"39004"));
 
 
         BigDecimal bigDecimalG_H = bigDSlideArea;//BigDecimal.ZERO;
