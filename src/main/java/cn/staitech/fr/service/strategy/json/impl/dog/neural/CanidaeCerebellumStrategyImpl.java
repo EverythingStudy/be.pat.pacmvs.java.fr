@@ -78,11 +78,11 @@ public class CanidaeCerebellumStrategyImpl extends AbstractCustomParserStrategy 
 
         // 算法输出指标 -------------------------------------------------------------
         // A
-       //-- map.put("颗粒细胞层和浦肯野细胞层面积", new IndicatorAddIn("Granulocyte and Purkinje cell layer area", DecimalUtils.setScale3(choroidOPlexusAreaAnnotation), SQ_MM, CommonConstant.NUMBER_1, specialId+"3E0A5"));
+        map.put("颗粒细胞层＋浦肯野细胞层面积", new IndicatorAddIn("Granulocyte and Purkinje cell layer area", DecimalUtils.setScale3(choroidOPlexusAreaAnnotation), SQ_MM, CommonConstant.NUMBER_1, specialId+"3E0A5"));
         // B
-       //-- map.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", areaUtils.convertToSquareMicrometer(extravascularErythrocyteArea.toString()), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, specialId+"3E003,"+specialId+"3E004"));
+       map.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", areaUtils.convertToSquareMicrometer(extravascularErythrocyteArea.toString()), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, specialId+"3E003,"+specialId+"3E004"));
         // C
-        //--map.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", areaUtils.convertToSquareMicrometer(intravascularErythrocyteArea.toString()), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, specialId+"3E003,"+specialId+"3E004"));
+        map.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", areaUtils.convertToSquareMicrometer(intravascularErythrocyteArea.toString()), SQ_MM, CommonConstant.NUMBER_1, specialId+"3E003,"+specialId+"3E004"));
 
         // 产品呈现指标 -------------------------------------------------------------
         if (accurateAreaBigDecimal.compareTo(BigDecimal.ZERO) != 0) {
