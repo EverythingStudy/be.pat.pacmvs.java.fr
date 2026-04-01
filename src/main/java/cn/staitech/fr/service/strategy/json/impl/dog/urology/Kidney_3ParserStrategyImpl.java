@@ -1,7 +1,6 @@
 package cn.staitech.fr.service.strategy.json.impl.dog.urology;
 
 import cn.hutool.core.util.ObjectUtil;
-import cn.staitech.fr.constant.CommonConstant;
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.JsonTask;
 import cn.staitech.fr.domain.SingleSlide;
@@ -248,7 +247,7 @@ public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		indicatorResultsMap.put("皮质肾小管面积占比", createNameIndicator("Tubules of renal cortical  area%", String.valueOf(getProportion(I_31B031_area, A_31B03D)), PERCENTAGE, "31B031,31B03D"));
 		
 		//肾小管面积(单个)10 10³平方微米 Renal tubule area (per)10=H 以95%置信区间和均数±标准差呈现
-		String itaS = getSingleResult(jsonTask, "31B031");
+		String itaS = getSingleResult(jsonTask);
 		indicatorResultsMap.put("肾小管面积(单个)", createNameIndicator("Renal tubule area (per)", itaS, SQ_UM_THOUSAND, "31B031"));
 		
 		
@@ -448,9 +447,9 @@ public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 	}
 	
 	
-	private String getSingleResult(JsonTask jsonTask,String structureId) {
+	private String getSingleResult(JsonTask jsonTask) {
 		List<BigDecimal> list = new ArrayList<>();
-		List<Annotation> structureContourList = getStructureContourList(jsonTask, "107088");
+		List<Annotation> structureContourList = getStructureContourList(jsonTask, "31B031");
 		if (CollectionUtils.isNotEmpty(structureContourList)) {
 			for (Annotation annotation : structureContourList) {
 				// A 甲状腺滤泡面积（单个）	A	103平方微米	单个甲状腺滤泡（107088）面积
@@ -458,9 +457,8 @@ public class Kidney_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 				list.add(structureAreaNumA);
 			}
 		}
-		
-		String result = MathUtils.getConfidenceInterval(list);
-		return result;
+
+        return MathUtils.getConfidenceInterval(list);
 	}
 
 	@Override
