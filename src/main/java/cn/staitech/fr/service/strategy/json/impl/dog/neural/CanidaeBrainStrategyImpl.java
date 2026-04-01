@@ -78,7 +78,7 @@ public class CanidaeBrainStrategyImpl  extends AbstractCustomParserStrategy {
 
         // 算法输出指标 -------------------------------------------------------------
         // A
-        map.put("脉络丛面积", new IndicatorAddIn("Choroid Plexus area", DecimalUtils.setScale3(choroidOPlexusAreaAnnotation), SQ_MM, CommonConstant.NUMBER_1, specialId+"33209C"));
+        map.put("脉络丛面积", new IndicatorAddIn("Choroid Plexus area", DecimalUtils.setScale3(choroidOPlexusAreaAnnotation), SQ_MM, CommonConstant.NUMBER_1, specialId+"3209C"));
         // B
         map.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", areaUtils.convertToSquareMicrometer(extravascularErythrocyteArea.toString()), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, specialId+"32003,"+specialId+"32004"));
         // C
