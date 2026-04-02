@@ -81,7 +81,7 @@ public class Testis_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         Annotation annotationG = new Annotation();
         annotationG.setCountName("支持细胞核数量（单个）");
         annotationG.setCountUnit(PIECE);
-        this.commonJsonParser.putAnnotationDynamicData(jsonTask, "32E0FA", "32E0FD", annotationF, 1, true);
+        this.commonJsonParser.putAnnotationDynamicData(jsonTask, "32E0FA", "32E0FD", annotationG, 1, true);
         // H：间质细胞核数量
         Integer countH = this.commonJsonParser.getOrganAreaCount(jsonTask, "32E0FE");
         // I：组织轮廓面积
