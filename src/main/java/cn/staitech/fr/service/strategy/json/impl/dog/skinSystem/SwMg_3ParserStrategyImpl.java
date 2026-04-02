@@ -235,10 +235,10 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		 */
 		BigDecimal A_sub_F = A_37A111_area.subtract(F_37A07A_area);
 		// 6 表皮角质层面积占比 % Stratum corneum area% 6=H/(A-F)
-		map.put("表皮角质层面积占比", createNameIndicator("Stratum corneum area%", getProportion(H_37A096_area, N_37A0C3_area), PERCENTAGE, "37A096"));
+		map.put("表皮角质层面积占比", createNameIndicator("Stratum corneum area%", getProportion(H_37A096_area, N_37A0C3_area), PERCENTAGE, "37A096,37A0C3"));
 
 		// 7 表皮颗粒层+棘层+基底细胞层面积占比 % Nucleated cell layer area% 7=I/(A-F)
-		map.put("表皮基底层+棘层+颗粒层面积占比", createNameIndicator("Nucleated cell layer area%", getProportion(I_37A097_area, N_37A0C3_area), PERCENTAGE, "37A097"));
+		map.put("表皮基底层+棘层+颗粒层面积占比", createNameIndicator("Nucleated cell layer area%", getProportion(I_37A097_area, N_37A0C3_area), PERCENTAGE, "37A097,37A0C3"));
 		// 8 毛囊面积（单个）×10³ μm2 Hair follicle area（per）8=J以95%置信区间和均数±标准差呈现
 		List<Annotation> skinStructureContourList = commonJsonParser.getStructureContourList(jsonTask, "37A098");
 		List<BigDecimal> skinLists = new ArrayList<>();
@@ -252,16 +252,16 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		map.put("毛囊面积（单个）", createNameIndicator("Hair follicle area（per）", MathUtils.getConfidenceInterval(skinLists), MULTIPLIED_SQ_UM_THOUSAND, "37A098"));
 
 		// 9 毛囊密度 个/mm² Density of hair follicles
-		map.put("毛囊密度", createNameIndicator("Density of hair follicles", getProportion(new BigDecimal(K_37A098_count), N_37A0C3_area), SQ_MM_PIECE, "37A098"));
+		map.put("毛囊密度", createNameIndicator("Density of hair follicles", getProportion(new BigDecimal(K_37A098_count), N_37A0C3_area), SQ_MM_PIECE, "37A098,37A0C3"));
 
 		// 10皮脂腺密度 个/mm² Density of Sebaceous glands
-		map.put("皮脂腺密度", createNameIndicator("Density of Sebaceous glands", getProportion(new BigDecimal(M_37A099_count), N_37A0C3_area), SQ_MM_PIECE,  "37A099"));
+		map.put("皮脂腺密度", createNameIndicator("Density of Sebaceous glands", getProportion(new BigDecimal(M_37A099_count), N_37A0C3_area), SQ_MM_PIECE,  "37A099,37A0C3"));
 
 		// 11 皮脂腺面积占比 % Sebaceous glands area% 11=L/(A-F)运算前注意统一单位
-		map.put("皮脂腺面积占比", createNameIndicator("Sebaceous glands area%", getProportion(L_37A099_area, N_37A0C3_area), PERCENTAGE,  "37A099"));
+		map.put("皮脂腺面积占比", createNameIndicator("Sebaceous glands area%", getProportion(L_37A099_area, N_37A0C3_area), PERCENTAGE,  "37A099,37A0C3"));
 
 		// 12 毛囊面积占比 % Hair follicles area% 12=O/(A-F)
-		map.put("毛囊面积占比", createNameIndicator("Hair follicles area%", getProportion(O_37A098_area, N_37A0C3_area), PERCENTAGE,  "37A098"));
+		map.put("毛囊面积占比", createNameIndicator("Hair follicles area%", getProportion(O_37A098_area, N_37A0C3_area), PERCENTAGE,  "37A098,37A0C3"));
 
 		// 13 皮肤面积 mm² Skin area1 3=A-F
 		map.put("皮肤面积", createNameIndicator("Skin area1", N_37A0C3_area, SQ_MM, "37A0C3"));
