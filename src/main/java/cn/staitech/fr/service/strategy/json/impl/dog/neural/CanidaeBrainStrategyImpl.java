@@ -67,35 +67,34 @@ public class CanidaeBrainStrategyImpl  extends AbstractCustomParserStrategy {
         Map<String, IndicatorAddIn> map = new LinkedHashMap<>();
         String specialId = "3";
         // A 脉络丛面积	mm2	无
-        BigDecimal choroidOPlexusAreaAnnotation = commonJsonParser.getOrganArea(jsonTask, specialId+"3209C").getStructureAreaNum();
-        // B 血管外红细胞面积	103 μm2	无 (查询血管外红细胞面积)
-        BigDecimal extravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, specialId+"32003", specialId+"32004", false).getStructureAreaNum();
-        // C 血管内红细胞面积	mm2	无 (查询血管内红细胞面积)
-        BigDecimal intravascularErythrocyteArea = commonJsonParser.getInsideOrOutside(jsonTask, specialId+"32003", specialId+"32004", true).getStructureAreaNum();
+        BigDecimal bigDecimalA = commonJsonParser.getOrganArea(jsonTask, specialId+"3209C").getStructureAreaNum();
+        // B 血管外红细胞面积	mm2
+        BigDecimal bigDecimalB = commonJsonParser.getInsideOrOutside(jsonTask, specialId+"32003", specialId+"32004", false).getStructureAreaNum();
+        // C 血管内红细胞面积	mm2
+        BigDecimal bigDecimalC = commonJsonParser.getInsideOrOutside(jsonTask, specialId+"32003", specialId+"32004", true).getStructureAreaNum();
         // D:精细轮廓总面积（大鼠大脑）- 平方毫米
         String accurateArea = singleSlideMapper.selectById(jsonTask.getSingleId()).getArea();
-        BigDecimal accurateAreaBigDecimal = new BigDecimal(accurateArea);
+        BigDecimal bigDecimalD = new BigDecimal(accurateArea);
 
         // 算法输出指标 -------------------------------------------------------------
         // A
-        map.put("脉络丛面积", new IndicatorAddIn("Choroid Plexus area", DecimalUtils.setScale3(choroidOPlexusAreaAnnotation), SQ_MM, CommonConstant.NUMBER_1, specialId+"3209C"));
+        map.put("脉络丛面积", createIndicator(bigDecimalA, SQ_MM, "33209C"));
         // B
-        map.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area", areaUtils.convertToSquareMicrometer(extravascularErythrocyteArea.toString()), SQ_UM_THOUSAND, CommonConstant.NUMBER_1, specialId+"32003,"+specialId+"32004"));
+        map.put("血管外红细胞面积",  createIndicator(bigDecimalB.multiply(new BigDecimal(1000)), MULTIPLIED_SQ_UM_THOUSAND, "332003,332004"));
         // C
-        map.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area", areaUtils.convertToSquareMicrometer(intravascularErythrocyteArea.toString()), SQ_MM, CommonConstant.NUMBER_1, specialId+"32003,"+specialId+"32004"));
+        map.put("血管内红细胞面积",  createIndicator(bigDecimalC, SQ_MM, "332003,332004"));
 
-        // 产品呈现指标 -------------------------------------------------------------
-        //if (accurateAreaBigDecimal.compareTo(BigDecimal.ZERO) != 0) {
-            // 1 脉络丛面积占比	%	Choroid Plexus area %	1=A/D	无
-        map.put("脉络丛面积占比", new IndicatorAddIn("Choroid Plexus area %", getProportion(choroidOPlexusAreaAnnotation, accurateAreaBigDecimal).toString(), PERCENTAGE, areaUtils.getStructureIds(specialId+"3209C", specialId+"32111")));
-            // 2 血管外红细胞面积占比	%	Extravascular Erythrocyte area%	2=B/D	无
-        map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular Erythrocyte area%", getProportion(extravascularErythrocyteArea, accurateAreaBigDecimal).toString(), PERCENTAGE, specialId+"32003,"+specialId+"32004,"+specialId+"32111"));
-            // 3 血管内红细胞面积占比%	Intravascular Erythrocyte area%	3=C/D	无
-        map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", getProportion(intravascularErythrocyteArea, accurateAreaBigDecimal).toString(), PERCENTAGE, specialId+"32003,"+specialId+"32004,"+specialId+"32111"));
-       // }
-
+        // 1 脉络丛面积占比	%	Choroid Plexus area %	1=A/D	无
+        BigDecimal ad1 = getProportion(bigDecimalA, bigDecimalD);
+        map.put("脉络丛面积占比", createNameIndicator("Choroid Plexus area %", ad1, PERCENTAGE, "33209C,332111"));
+        // 2 血管外红细胞面积占比	%	Extravascular Erythrocyte area%	2=B/D	无
+        BigDecimal bd2 = getProportion(bigDecimalB, bigDecimalD);
+        map.put("血管外红细胞面积占比", createNameIndicator("Extravascular Erythrocyte area%", bd2, PERCENTAGE, "332003,332004,332111"));
+        // 3 血管内红细胞面积占比%	Intravascular Erythrocyte area%	3=C/D	无
+        BigDecimal cd3 = getProportion(bigDecimalC, bigDecimalD);
+        map.put("血管内红细胞面积占比", createNameIndicator("Intravascular Erythrocyte area%", cd3, PERCENTAGE, "332003,332004,332111"));
         // D 大脑面积	4	平方毫米	Brain area	4=D	无
-        map.put("大脑面积", new IndicatorAddIn("Brain area", DecimalUtils.setScale3(accurateAreaBigDecimal), CommonConstant.SQUARE_MILLIMETRE, specialId+"32111"));
+        map.put("大脑面积", createNameIndicator("Brain area", bigDecimalD, SQ_MM, "332111"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
     }
 
