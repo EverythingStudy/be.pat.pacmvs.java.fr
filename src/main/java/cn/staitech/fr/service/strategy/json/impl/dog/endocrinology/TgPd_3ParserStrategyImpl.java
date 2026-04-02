@@ -321,10 +321,10 @@ public class TgPd_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         
         //甲状旁腺
         //12 甲状旁腺细胞核密度 个/10³ μm² Nucleus density of chief cell 12=K/L运算前注意统一单位
-        map.put("甲状旁腺细胞核密度", createNameIndicator("Nucleus density of chief cell", getProportion(new BigDecimal(K_37F092_count) , L_37F07D_area), SQ_UM_PICE, "37F092,37F07D"));
+        map.put("甲状旁腺细胞核密度", createNameIndicator("Nucleus density of chief cell", getProportion(new BigDecimal(K_37F092_count) , L_37F07D_area), SQ_UM_PICE, "37F092"));
         
         //13 甲状旁腺面积 ×10³ μm² Parathyroid gland area 13=L
-        map.put("甲状旁腺面积", createNameIndicator("Parathyroid gland area", DecimalUtils.setScale3(L_37F07D_area), MULTIPLIED_SQ_UM_THOUSAND, "37F07D"));
+        map.put("甲状旁腺面积", createNameIndicator("Parathyroid gland area", DecimalUtils.setScale3(L_37F07D_area), MULTIPLIED_SQ_UM_THOUSAND, null));
         
         
         //  甲状腺滤泡上皮细胞核密度（单个）	个/10³平方微米	Nucleus density of follicular cell (per)	8=H/(A-B) 	以95%置信区间和均数±标准差呈现
