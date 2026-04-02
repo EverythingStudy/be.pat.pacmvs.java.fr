@@ -296,28 +296,28 @@ public class TgPd_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         if (H_37F07C_area.compareTo(BigDecimal.ZERO) != 0) {
         	// 4 甲状腺血管面积占比   % Vessel area % 4=D/H 运算前注意统一单位   D 10³平方微米 H平方微米
             BigDecimal vesselAreaRate = getProportion(D_37F003_area, H_37F07C_area); 
-            map.put("甲状腺血管面积占比", createNameIndicator("Vessel area", vesselAreaRate, PERCENTAGE, "37F003"));
+            map.put("甲状腺血管面积占比", createNameIndicator("Vessel area", vesselAreaRate, PERCENTAGE, "37F003,37F07C"));
 
             //5 甲状腺血管内红细胞面积占比  %  Intravascular erythrocyte area% 5=E/H运算前注意统一单位
-            map.put("甲状腺血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", getProportion(E_37F003_37F004_area, H_37F07C_area), PERCENTAGE, "37F003,37F004"));
+            map.put("甲状腺血管内红细胞面积占比", createNameIndicator("Intravascular erythrocyte area%", getProportion(E_37F003_37F004_area, H_37F07C_area), PERCENTAGE, "37F003,37F004,37F07C"));
 
             // 6 甲状腺血管外红细胞面积占比 %  Extravascular erythrocyte area% 6=F/H运算前注意统一单位
-            map.put("甲状腺血管外红细胞面积占比", createNameIndicator("Extravascular erythrocyte area%", getProportion(F_37F003_37F004_area, H_37F07C_area), PERCENTAGE, "37F003,37F004"));
+            map.put("甲状腺血管外红细胞面积占比", createNameIndicator("Extravascular erythrocyte area%", getProportion(F_37F003_37F004_area, H_37F07C_area), PERCENTAGE, "37F003,37F004,37F07C"));
 
         } else {
             log.info("singleId{}组织轮廓面积为0", jsonTask.getSingleId());
         }
         // 8 甲状腺滤泡面积占比  % Thyroid follicle area% 8=C/H
-        map.put("甲状腺滤泡面积占比", createNameIndicator("Thyroid follicle area%", getProportion(C_37F088_area, H_37F07C_area), PERCENTAGE, "37F088"));
+        map.put("甲状腺滤泡面积占比", createNameIndicator("Thyroid follicle area%", getProportion(C_37F088_area, H_37F07C_area), PERCENTAGE, "37F088,37F07C"));
 
         // 9 甲状腺面积 mm² Thyroid gland area 9=H
-        map.put("甲状腺面积", createNameIndicator("Thyroid gland area", DecimalUtils.setScale3(H_37F07C_area), SQ_MM, null));
+        map.put("甲状腺面积", createNameIndicator("Thyroid gland area", DecimalUtils.setScale3(H_37F07C_area), SQ_MM, "37F07C"));
         
         //10 甲状腺C细胞核密度  个/mm² Nucleus density of  C cell 10=I/H
-        map.put("甲状腺C细胞核密度", createNameIndicator("Nucleus density of  C cell", getProportion(new BigDecimal(I_37F08F_count) , H_37F07C_area), SQ_MM_PIECE, "37F08F"));
+        map.put("甲状腺C细胞核密度", createNameIndicator("Nucleus density of  C cell", getProportion(new BigDecimal(I_37F08F_count) , H_37F07C_area), SQ_MM_PIECE, "37F08F,37F07C"));
 
         //11 甲状腺C细胞团面积占比  % Nuclear density of C-cell cluster 11=J/H
-        map.put("甲状腺C细胞团面积占比", createNameIndicator("Nuclear density of C-cell cluster", getProportion(J_37F08B_area, H_37F07C_area), PERCENTAGE, "37F08B"));
+        map.put("甲状腺C细胞团面积占比", createNameIndicator("Nuclear density of C-cell cluster", getProportion(J_37F08B_area, H_37F07C_area), PERCENTAGE, "37F08B,37F07C"));
         
         //甲状旁腺
         //12 甲状旁腺细胞核密度 个/10³ μm² Nucleus density of chief cell 12=K/L运算前注意统一单位
