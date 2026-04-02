@@ -74,11 +74,9 @@ public class CanidaeSciaticNerveParserStrategyImpl extends AbstractCustomParserS
         // 神经外膜结缔组织面积
         BigDecimal bigDecimalB = getOrganArea(jsonTask, "3400BA").getStructureAreaNum();
 
+        indicatorResultsMap.put("神经束膜内缘内面积", createIndicator(bigDecimalA, SQ_MM, "3400BB"));
         indicatorResultsMap.put("神经外膜结缔组织面积", createIndicator(bigDecimalB, SQ_MM, "3400BA"));
-
         indicatorResultsMap.put("神经束膜内缘内面积", createNameIndicator("Nerve fiber bundles area", bigDecimalA, SQ_MM, "3400BB"));
-
-        // 结缔组织面积
         indicatorResultsMap.put("结缔组织面积", createNameIndicator("Connective tissue area", bigDecimalB.subtract(bigDecimalA), SQ_MM, "3400BB,3400BA"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
