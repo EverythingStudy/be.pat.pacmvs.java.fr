@@ -104,17 +104,17 @@ public class Aorta_3ParserStrategyImpl extends AbstractCustomParserStrategy impl
 
         Map<String, IndicatorAddIn> result = new HashMap<>();
 
-        // 算法输出指标：空腔面积 A
-        result.put("空腔面积", createIndicator(cavityAreaA.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_CAVITY));
-
-        // 算法输出指标：空腔周长 B
-        result.put("空腔周长", createIndicator(cavityPerimeterB.setScale(3, RoundingMode.HALF_UP).toString(), MM, STRUCTURE_CAVITY));
-
-        // 算法输出指标：组织轮廓周长 C
-        result.put("组织轮廓周长", createIndicator(tissuePerimeterC.setScale(3, RoundingMode.HALF_UP).toString(), MM, STRUCTURE_OUTLINE));
-
-        // 算法输出指标：组织轮廓面积 D
-        result.put("组织轮廓面积", createIndicator(tissueAreaD.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_OUTLINE));
+//        // 算法输出指标：空腔面积 A
+//        result.put("空腔面积", createIndicator(cavityAreaA.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_CAVITY));
+//
+//        // 算法输出指标：空腔周长 B
+//        result.put("空腔周长", createIndicator(cavityPerimeterB.setScale(3, RoundingMode.HALF_UP).toString(), MM, STRUCTURE_CAVITY));
+//
+//        // 算法输出指标：组织轮廓周长 C
+//        result.put("组织轮廓周长", createIndicator(tissuePerimeterC.setScale(3, RoundingMode.HALF_UP).toString(), MM, STRUCTURE_OUTLINE));
+//
+//        // 算法输出指标：组织轮廓面积 D
+//        result.put("组织轮廓面积", createIndicator(tissueAreaD.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_OUTLINE));
 
         // 主动脉壁面积 mm² = D - A
         BigDecimal wallArea = tissueAreaD.subtract(cavityAreaA);
