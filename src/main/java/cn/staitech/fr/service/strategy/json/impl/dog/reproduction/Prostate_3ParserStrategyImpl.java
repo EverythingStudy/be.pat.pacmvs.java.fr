@@ -73,7 +73,7 @@ public class Prostate_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         Annotation annotationE = new Annotation();
         annotationE.setCountName("腺泡/导管细胞核数量（单个）");
         annotationE.setCountUnit(PIECE);
-        this.commonJsonParser.putAnnotationDynamicData(jsonTask, "32C06C", "32C061", annotationD, 1, true);
+        this.commonJsonParser.putAnnotationDynamicData(jsonTask, "32C06C", "32C061", annotationE, 1, true);
         // F：组织轮廓面积mm2
         SingleSlide singleSlide = this.singleSlideMapper.selectById(jsonTask.getSingleId());
         BigDecimal organAreaF = new BigDecimal(singleSlide.getArea());
