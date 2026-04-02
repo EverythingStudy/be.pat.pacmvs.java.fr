@@ -64,9 +64,9 @@ public class Prostate_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationC.setPerimeterName("腺泡/导管周长（单个）");
         annotationC.setPerimeterUnit(UM);
         this.commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "32C06C", annotationC, 1);
-        // D 管腔面积（单个）管腔面积（单个）
+        // D 管腔面积（单个）
         Annotation annotationD = new Annotation();
-        annotationD.setAreaName("管腔面积（单个）管腔面积（单个）");
+        annotationD.setAreaName("管腔面积（单个）");
         annotationD.setAreaUnit(MULTIPLIED_SQ_UM_THOUSAND);
         this.commonJsonParser.putAnnotationDynamicData(jsonTask, "32C06C", "32C0F4", annotationD, 1, true);
         // E：腺泡/导管细胞核数量（单个）

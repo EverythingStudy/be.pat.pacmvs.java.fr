@@ -82,7 +82,6 @@ public class CanidaeOpticNerveParserStrategyImpl extends AbstractCustomParserStr
         BigDecimal organAreaA = getOrganArea(jsonTask, "33F0BB").getStructureAreaNum();
         BigDecimal organAreaB = getOrganArea(jsonTask, "33F0BA").getStructureAreaNum();
 
-        indicatorResultsMap.put("神经束膜内缘内面积", createIndicator(organAreaA, SQ_MM, "33F0BB"));
         indicatorResultsMap.put("神经外膜结缔组织面积", createIndicator(organAreaB, SQ_MM, "33F0BA"));
 
         indicatorResultsMap.put("神经束膜内缘内面积", createNameIndicator("Nerve fiber bundles area", organAreaA, SQ_MM, "33F0BB"));
