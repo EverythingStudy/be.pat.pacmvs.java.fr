@@ -69,40 +69,7 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 	@Override
 	public void alculationIndicators(JsonTask jsonTask) {
 		log.info("指标计算开始-皮肤（乳腺附近）及乳腺");
-		/**
-		 * 
-		 * 脏器结构编码
-		 * 
-			乳腺
 
-			乳腺腺泡/导管 37A06C
-			乳腺腺泡/导管细胞核 37A061
-			乳腺组织轮廓 37A07A
-			皮肤与乳腺组织轮廓 37A111
-
-			皮肤
-
-			表皮角质层 37A096
-			表皮颗粒层+棘层+基底细胞层 37A097
-			毛囊 37A098
-			皮脂腺 37A099
-			皮肤 组织轮廓 37A0C3
-		 */
-
-		/**
-		 * 
-		 * 算法输出指标 指标代码（仅限本文档） 单位（保留小数点后三位） 备注 相关指标
-		 * 乳腺
-		 *  A 皮肤与乳腺总面积  mm² 仅辅助指标6、7、9、10、11、12、13计算，数值不显示在页面指标表格里 37A111
-			B 乳腺腺泡/导管数量  个 无 37A06C
-			C 乳腺腺泡/导管面积（全片） mm² 数据相加输出 37A06C
-			D 乳腺细胞核数量（单个）个 单个腺泡/导管内细胞核数量输出显示在单个腺泡/导管轮廓弹窗中，不显示在指标表格里 37A06C、37A061
-			E 乳腺腺泡/导管面积（单个）×10³ μm2 单个腺泡/导管面积输出显示在单个腺泡/导管轮廓弹窗中，不显示在指标表格里 37A06C
-			F 乳腺面积 mm² 仅辅助指标5计算，数值不显示在页面指标表格里 37A07A
-			G 乳腺细胞核数量（全片）个 37A061
-		 * 
-		 * 
-		 */
 		//-------------------乳腺--------------------------------------
 		// A 皮肤与乳腺总面积  mm² 仅辅助指标6、7、9、10、11、12、13计算，数值不显示在页面指标表格里 37A111
 		SingleSlide singleSlidea = singleSlideMapper.selectById(jsonTask.getSingleId());
@@ -122,7 +89,7 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		//E 乳腺腺泡/导管面积（单个）×10³ μm2 单个腺泡/导管面积输出显示在单个腺泡/导管轮廓弹窗中，不显示在指标表格里 37A06C
 		Annotation annotationE = new Annotation();
 		annotationE.setAreaName("乳腺腺泡和导管面积（单个）");
-		annotationE.setAreaUnit(SQ_UM_THOUSAND);
+		annotationE.setAreaUnit(MULTIPLIED_SQ_UM_THOUSAND);
 		commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "37A06C", annotationE, 1);
 
 		//F 乳腺面积 mm² 仅辅助指标5计算，数值不显示在页面指标表格里 37A07A
@@ -181,21 +148,11 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		/**
 		 * 
 		 * 算法输出指标 指标代码（仅限本文档） 单位（保留小数点后三位） 备注 相关指标
-		 * 乳腺
-		 *  A 皮肤与乳腺总面积  mm² 仅辅助指标6、7、9、10、11、12、13计算，数值不显示在页面指标表格里 37A111
-			B 乳腺腺泡/导管数量  个 无 37A06C
-			C 乳腺腺泡/导管面积（全片） mm² 数据相加输出 37A06C
-			D 乳腺细胞核数量（单个）个 单个腺泡/导管内细胞核数量输出显示在单个腺泡/导管轮廓弹窗中，不显示在指标表格里 37A06C、37A061
-			E 乳腺腺泡/导管面积（单个）×10³ μm2 单个腺泡/导管面积输出显示在单个腺泡/导管轮廓弹窗中，不显示在指标表格里 37A06C
-			F 乳腺面积 mm² 仅辅助指标5计算，数值不显示在页面指标表格里 37A07A
-			G 乳腺细胞核数量（全片）个 37A061
-		 * 
-		 * 
 		 */
 		//A 皮肤与乳腺总面积  mm² 仅辅助指标6、7、9、10、11、12、13计算，数值不显示在页面指标表格里 37A111
 		//map.put("皮肤与乳腺总面积", createIndicator(DecimalUtils.setScale3(A_37A111_area).toString(), SQ_MM, "37A111"));
 		//B 乳腺腺泡/导管数量  个 无 37A06C
-		map.put("乳腺腺泡/导管数量", createNameIndicator(B_37A06C_count.toString(), PIECE, "37A06C"));
+		map.put("乳腺腺泡/导管数量", createIndicator(B_37A06C_count.toString(), PIECE, "37A06C"));
 		//C 乳腺腺泡/导管面积（全片） mm² 数据相加输出 37A06C
 		map.put("乳腺腺泡/导管面积（全片）", createIndicator(C_37A06C_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "37A06C"));
 		//F 乳腺面积 mm² 仅辅助指标5计算，数值不显示在页面指标表格里 37A07A
@@ -205,15 +162,6 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 
 		/**
 		 * 算法输出指标 指标代码（仅限本文档） 单位（保留小数点后三位） 备注 相关指标
-		 * 皮肤
-		    H 表皮角质层面积 mm² 若多个数据则相加输出 37A096
-			I 表皮颗粒层+棘层+基底细胞层面积 mm² 若多个数据则相加输出 37A097
-			J 毛囊面积（单个）×10³ μm2 单个毛囊面积输出显示在单个毛囊轮廓弹窗中，不显示在指标表格里 37A098
-			K 毛囊数量  个 无 37A098
-			L 皮脂腺面积 ×10³ μm2 数据相加输出 37A099
-			M 皮脂腺数量 个 无 37A099
-			N 皮肤面积 mm² 仅辅助指标13计算，数值不显示在页面指标表格里 37A0C3
-			O 毛囊面积（全片）mm² 无 37A098
 		 */
 		//H 表皮角质层面积 mm² 若多个数据则相加输出 37A096
 		map.put("表皮角质层面积", createIndicator(H_37A096_area, SQ_MM, "37A096"));
@@ -221,13 +169,13 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		map.put("表皮颗粒层+棘层+基底细胞层面积", createIndicator(I_37A097_area, SQ_MM, "37A097"));
 		//J 毛囊面积（单个）×10³ μm2 单个毛囊面积输出显示在单个毛囊轮廓弹窗中，不显示在指标表格里 37A098
 		//K 毛囊数量  个 无 37A098
-		map.put("毛囊数量", createNameIndicator(K_37A098_count.toString(), PIECE, "37A098"));
+		map.put("毛囊数量", createIndicator(K_37A098_count.toString(), PIECE, "37A098"));
 		//L 皮脂腺面积 ×10³ μm2 数据相加输出 37A099
 		map.put("皮脂腺面积", createIndicator(L_37A099_area, MULTIPLIED_SQ_UM_THOUSAND, "37A099"));
 		//M 皮脂腺数量 个 无 37A099
-		map.put("皮脂腺数量", createNameIndicator(M_37A099_count.toString(), PIECE, "37A099"));
+		map.put("皮脂腺数量", createIndicator(M_37A099_count.toString(), PIECE, "37A099"));
 		//N 皮肤面积 mm² 仅辅助指标13计算，数值不显示在页面指标表格里 37A0C3
-		map.put("皮肤面积", createIndicator(N_37A0C3_area, SQ_MM, "37A0C3"));
+		//map.put("皮肤面积", createIndicator(N_37A0C3_area, SQ_MM, "37A0C3"));
 		//O 毛囊面积（全片）mm² 无 37A098
 		map.put("毛囊面积（全片）", createIndicator(O_37A098_area, SQ_MM, "37A098"));
 
@@ -238,13 +186,6 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		//----------------产品呈现指标----------------------------
 		/**
 		 * 产品呈现指标 指标代码（仅限本文档） 单位（保留小数点后三位） English 计算方式 备注
-		 * 
-		 * 乳腺
-		 *  1 乳腺腺泡和导管数量 个 Number of acinus and ducts 1=B
-			2 乳腺腺泡和导管面积占比 % Acinus and ducts area% 2=C/F
-			3 腺泡或导管细胞核密度（单个）个/10³ μm2 Nucleus density of acinus or ducts （per）3=D/E以95%置信区间和均数±标准差呈现
-			4 乳腺细胞核密度（全片）个/mm² Nucleus density of mammary gland（all）4=G/C
-			5 乳腺面积 mm² Mammary gland area 5=F
 		 */
 
 		//1 乳腺腺泡和导管数量 个 Number of acinus and ducts 1=B
@@ -294,10 +235,10 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		 */
 		BigDecimal A_sub_F = A_37A111_area.subtract(F_37A07A_area);
 		// 6 表皮角质层面积占比 % Stratum corneum area% 6=H/(A-F)
-		map.put("表皮角质层面积占比", createNameIndicator("Stratum corneum area%", getProportion(H_37A096_area, A_sub_F), PERCENTAGE, "37A096,37A07A,37A111"));
+		map.put("表皮角质层面积占比", createNameIndicator("Stratum corneum area%", getProportion(H_37A096_area, N_37A0C3_area), PERCENTAGE, "37A096"));
 
 		// 7 表皮颗粒层+棘层+基底细胞层面积占比 % Nucleated cell layer area% 7=I/(A-F)
-		map.put("表皮基底层+棘层+颗粒层面积占比", createNameIndicator("Nucleated cell layer area%", getProportion(I_37A097_area, A_sub_F), PERCENTAGE, "37A097,37A07A,37A111"));
+		map.put("表皮基底层+棘层+颗粒层面积占比", createNameIndicator("Nucleated cell layer area%", getProportion(I_37A097_area, N_37A0C3_area), PERCENTAGE, "37A097"));
 		// 8 毛囊面积（单个）×10³ μm2 Hair follicle area（per）8=J以95%置信区间和均数±标准差呈现
 		List<Annotation> skinStructureContourList = commonJsonParser.getStructureContourList(jsonTask, "37A098");
 		List<BigDecimal> skinLists = new ArrayList<>();
@@ -310,20 +251,20 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		}
 		map.put("毛囊面积（单个）", createNameIndicator("Hair follicle area（per）", MathUtils.getConfidenceInterval(skinLists), MULTIPLIED_SQ_UM_THOUSAND, "37A098"));
 
-		// 9 毛囊密度 个/mm² Density of hair follicles 9=K/(A-F)
-		map.put("毛囊密度", createNameIndicator("Density of hair follicles", getProportion(new BigDecimal(K_37A098_count), A_sub_F), SQ_MM_PIECE, "37A098,37A07A,37A111"));
+		// 9 毛囊密度 个/mm² Density of hair follicles
+		map.put("毛囊密度", createNameIndicator("Density of hair follicles", getProportion(new BigDecimal(K_37A098_count), N_37A0C3_area), SQ_MM_PIECE, "37A098"));
 
-		// 10皮脂腺密度 个/mm² Density of Sebaceous glands 10=M/(A-F)
-		map.put("皮脂腺密度", createNameIndicator("Density of Sebaceous glands", getProportion(new BigDecimal(M_37A099_count), A_sub_F), SQ_MM_PIECE,  "37A099,37A07A,37A111"));
+		// 10皮脂腺密度 个/mm² Density of Sebaceous glands
+		map.put("皮脂腺密度", createNameIndicator("Density of Sebaceous glands", getProportion(new BigDecimal(M_37A099_count), N_37A0C3_area), SQ_MM_PIECE,  "37A099"));
 
 		// 11 皮脂腺面积占比 % Sebaceous glands area% 11=L/(A-F)运算前注意统一单位
-		map.put("皮脂腺面积占比", createNameIndicator("Sebaceous glands area%", getProportion(L_37A099_area, A_sub_F), PERCENTAGE,  "37A099,37A07A,37A111"));
+		map.put("皮脂腺面积占比", createNameIndicator("Sebaceous glands area%", getProportion(L_37A099_area, N_37A0C3_area), PERCENTAGE,  "37A099"));
 
 		// 12 毛囊面积占比 % Hair follicles area% 12=O/(A-F)
-		map.put("毛囊面积占比", createNameIndicator("Hair follicles area%", getProportion(O_37A098_area, A_sub_F), PERCENTAGE,  "37A098,37A07A,37A111"));
+		map.put("毛囊面积占比", createNameIndicator("Hair follicles area%", getProportion(O_37A098_area, N_37A0C3_area), PERCENTAGE,  "37A098"));
 
 		// 13 皮肤面积 mm² Skin area1 3=A-F
-		map.put("皮肤面积", createNameIndicator("Skin area1", A_sub_F, SQ_MM, "37A07A,37A111"));	
+		map.put("皮肤面积", createNameIndicator("Skin area1", N_37A0C3_area, SQ_MM, "37A0C3"));
 
 		aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
 

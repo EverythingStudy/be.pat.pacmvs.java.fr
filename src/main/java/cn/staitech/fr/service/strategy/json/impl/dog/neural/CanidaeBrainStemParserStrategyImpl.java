@@ -104,7 +104,7 @@ public class CanidaeBrainStemParserStrategyImpl extends AbstractCustomParserStra
         // A
         map.put("血管内红细胞面积", new IndicatorAddIn("Intravascular Erythrocyte area%", DecimalUtils.setScale3(intravascularErythrocyteArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1,areaUtils.getStructureIds(speciesId+"3D003",speciesId+"3D004")));
         // B
-        map.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area%", DecimalUtils.setScale3(extravascularErythrocyteArea), SQ_UM_THOUSAND, CommonConstant.NUMBER_1,areaUtils.getStructureIds(speciesId+"3D003",speciesId+"3D004")));
+        map.put("血管外红细胞面积", new IndicatorAddIn("Extravascular Erythrocyte area%", DecimalUtils.setScale3(extravascularErythrocyteArea), MULTIPLIED_SQ_UM_THOUSAND, CommonConstant.NUMBER_1,areaUtils.getStructureIds(speciesId+"3D003",speciesId+"3D004")));
         // 小脑
         //-- map.put("分子层红细胞面积", new IndicatorAddIn("erythrocyte area", DecimalUtils.setScale3(molecularLevelerythrocyteArea), CommonConstant.SQUARE_MILLIMETRE, CommonConstant.NUMBER_1));
 
@@ -112,12 +112,12 @@ public class CanidaeBrainStemParserStrategyImpl extends AbstractCustomParserStra
 
             // 脑干
             // 血管外红细胞面积占比	1	%	Extravascular erythrocyte area%	1=B/D	无
-        BigDecimal extravascularErythrocyteAreaRate = commonJsonParser.getProportion(extravascularErythrocyteArea,accurateAreaDecimal);//extravascularErythrocyteArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
-        map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", DecimalUtils.percentScale3(extravascularErythrocyteAreaRate), "%",areaUtils.getStructureIds(speciesId+"3D003",speciesId+"3D004",speciesId+"3D111")));
+        BigDecimal extravascularErythrocyteAreaRate = commonJsonParser.getProportion(extravascularErythrocyteArea,new BigDecimal(areaUtils.convertToSquareMicrometer(accurateAreaDecimal.toString())));//extravascularErythrocyteArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+        map.put("血管外红细胞面积占比", new IndicatorAddIn("Extravascular erythrocyte area%", String.valueOf(extravascularErythrocyteAreaRate), "%",areaUtils.getStructureIds(speciesId+"3D003",speciesId+"3D004")));
 
             // 血管内红细胞面积	2	%	Intravascular Erythrocyte area%	A/D	无
-        BigDecimal intravascularErythrocyteAreaRate = commonJsonParser.getProportion(intravascularErythrocyteArea,accurateAreaDecimal);//intravascularErythrocyteArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
-        map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", DecimalUtils.percentScale3(intravascularErythrocyteAreaRate), "%",areaUtils.getStructureIds(speciesId+"3D003",speciesId+"3D004",speciesId+"3D111")));
+        BigDecimal intravascularErythrocyteAreaRate = commonJsonParser.getProportion(intravascularErythrocyteArea,new BigDecimal(areaUtils.convertToSquareMicrometer(accurateAreaDecimal.toString())));//intravascularErythrocyteArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
+        map.put("血管内红细胞面积占比", new IndicatorAddIn("Intravascular Erythrocyte area%", DecimalUtils.percentScale3(intravascularErythrocyteAreaRate), "%",areaUtils.getStructureIds(speciesId+"3D003",speciesId+"3D004")));
             // 分子层红细胞面积占比	2	%	Molecular level erythrocyte area%	2=B/C	无
 //            BigDecimal molecularLevelErythrocyteAreaRate = molecularLevelerythrocyteArea.divide(accurateAreaDecimal, 7, RoundingMode.HALF_UP);
 //             map.put("分子层红细胞面积占比", new IndicatorAddIn("Molecular level erythrocyte area%", DecimalUtils.percentScale3(molecularLevelErythrocyteAreaRate), "%"));
