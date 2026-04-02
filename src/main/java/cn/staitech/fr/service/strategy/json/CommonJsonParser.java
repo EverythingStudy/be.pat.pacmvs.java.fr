@@ -901,7 +901,7 @@ public class CommonJsonParser {
         String countUnit = annotation.getCountUnit();
 
         for (Annotation item : annotationList) {
-            Annotation annotationBy = getContourInsideOrOutside1(jsonTask, item.getContour(), structureIds, isInside);
+            Annotation annotationBy = getContourInsideOrOutside(jsonTask, item.getContour(), structureIds, isInside);
 
             if (annotationBy == null) {
                 continue;
@@ -922,7 +922,7 @@ public class CommonJsonParser {
                         dynamicData.setData(convertToSquareMicrometer(String.valueOf(annotationBy.getStructureAreaNum())));
                         break;
                     case 2:
-                        dynamicData.setData(String.valueOf(convertToMicrometer(annotationBy.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString())));
+                        dynamicData.setData(String.valueOf(convertToMicrometer(annotationBy.getStructureAreaNum().toString())));
                         break;
                     default:
                         dynamicData.setData(String.valueOf(annotationBy.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP)));
