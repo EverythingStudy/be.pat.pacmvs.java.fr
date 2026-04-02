@@ -1075,6 +1075,11 @@ public class CommonJsonParser {
         return result.toString();
     }
 
+    public static void main(String[] args) {
+        CommonJsonParser p = new CommonJsonParser();
+        String a =BigDecimal.valueOf(428.401).multiply(new BigDecimal("0.000001")).setScale(3, RoundingMode.HALF_UP).toString();
+        System.out.println(String.valueOf(p.convertToMicrometer(a)));
+    }
 
     public Annotation getAnnotationMessage(Annotation annotation) {
         Annotation annotations = annotationMapper.getInsideOrOutside(annotation);
