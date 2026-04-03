@@ -120,7 +120,7 @@ public class Aorta_3ParserStrategyImpl extends AbstractCustomParserStrategy impl
         BigDecimal wallArea = tissueAreaD.subtract(cavityAreaA);
         if (wallArea.compareTo(BigDecimal.ZERO) >= 0) {
             result.put("主动脉壁面积", createNameIndicator("Aorta wall area", wallArea.setScale(3, RoundingMode.HALF_UP).toString(),
-                            SQ_MM, STRUCTURE_OUTLINE + "," + STRUCTURE_CAVITY));
+                            SQ_MM, null));
         }
 
         // 主动脉壁平均厚度 µm = 2 * (D - A) / (B + C)
@@ -137,7 +137,7 @@ public class Aorta_3ParserStrategyImpl extends AbstractCustomParserStrategy impl
 
             result.put("主动脉壁平均厚度",
                     createNameIndicator("Average thickness of aorta wall", thicknessInUm.toString(),
-                            UM, STRUCTURE_OUTLINE + "," + STRUCTURE_CAVITY));
+                            UM, null));
         }
 
         return result;
