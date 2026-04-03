@@ -244,7 +244,7 @@ public class TgPd_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         //算法输出指标------------------------------------------------------------------------------------------
         //-----------甲状腺
         //C 甲状腺滤泡面积（全片） mm² 37F088
-        map.put("甲状腺滤泡面积（全片）", createIndicator(C_37F088_area.toString(), SQ_MM, "37F088"));
+        map.put("甲状腺滤泡面积（全片）", createIndicator(C_37F088_area, SQ_MM, "37F088"));
         // D 血管面积 ×10³ μm² 数据相加输出 37F003
         map.put("血管面积", createIndicator(D_37F003_Micron_area.toString(), MULTIPLIED_SQ_UM_THOUSAND, "37F003"));
         // E  血管内红细胞面积×10³ μm² 数据相加输出 37F003、37F004
@@ -328,7 +328,7 @@ public class TgPd_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         
         
         //  甲状腺滤泡上皮细胞核密度（单个）	个/10³平方微米	Nucleus density of follicular cell (per)	8=H/(A-B) 	以95%置信区间和均数±标准差呈现
-        //map.put("甲状腺滤泡上皮细胞核密度（单个）", createNameIndicator("Nucleus density of follicular cell (per)", MathUtils.getConfidenceInterval(list8), SQ_UM_THOUSAND, "37F088,37F089,37F08A"));
+        map.put("甲状腺滤泡上皮细胞核密度（单个）", createNameIndicator("Nucleus density of follicular cell (per)", MathUtils.getConfidenceInterval(list8), SQ_UM_PICE, "37F088,37F089,37F08A"));
 
         aiForecastService.addAiForecast(jsonTask.getSingleId(), map);
         
