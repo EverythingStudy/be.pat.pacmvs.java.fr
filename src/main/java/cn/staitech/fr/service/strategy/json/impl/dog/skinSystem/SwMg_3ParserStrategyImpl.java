@@ -137,8 +137,11 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		Integer M_37A099_count = commonJsonParser.getOrganAreaCount(jsonTask, "37A099");
 
 		//N 皮肤面积 mm² 仅辅助指标13计算，数值不显示在页面指标表格里 37A0C3
-		BigDecimal N_37A0C3_area = commonJsonParser.getOrganArea(jsonTask, "37A0C3").getStructureAreaNum();
-
+		SingleSlide singleSlideN_ = singleSlideService.getSingleSlide(jsonTask.getSingleId(), jsonTask.getImageId(), "37A0C3");
+		BigDecimal N_37A0C3_area = BigDecimal.ZERO;
+		if(null != singleSlideN_) {
+			N_37A0C3_area = new BigDecimal(singleSlideN_.getArea());
+		}
 
 		//O 毛囊面积（全片）mm² 无 37A098
 		BigDecimal O_37A098_area = commonJsonParser.getOrganArea(jsonTask, "37A098").getStructureAreaNum();
