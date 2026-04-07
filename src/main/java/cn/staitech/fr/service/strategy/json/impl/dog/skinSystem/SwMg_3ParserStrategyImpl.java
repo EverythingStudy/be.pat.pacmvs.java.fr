@@ -241,7 +241,7 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		map.put("表皮角质层面积占比", createNameIndicator("Stratum corneum area%", getProportion(H_37A096_area, N_37A0C3_area), PERCENTAGE, "37A096,37A0C3"));
 
 		// 7 表皮颗粒层+棘层+基底细胞层面积占比 % Nucleated cell layer area% 7=I/(A-F)
-		map.put("表皮基底层+棘层+颗粒层面积占比", createNameIndicator("Nucleated cell layer area%", getProportion(I_37A097_area, N_37A0C3_area), PERCENTAGE, "37A097,37A0C3"));
+		map.put("表皮颗粒层+棘层+基底细胞层面积占比", createNameIndicator("Nucleated cell layer area%", getProportion(I_37A097_area, N_37A0C3_area), PERCENTAGE, "37A097,37A0C3"));
 		// 8 毛囊面积（单个）×10³ μm2 Hair follicle area（per）8=J以95%置信区间和均数±标准差呈现
 		List<Annotation> skinStructureContourList = commonJsonParser.getStructureContourList(jsonTask, "37A098");
 		List<BigDecimal> skinLists = new ArrayList<>();
