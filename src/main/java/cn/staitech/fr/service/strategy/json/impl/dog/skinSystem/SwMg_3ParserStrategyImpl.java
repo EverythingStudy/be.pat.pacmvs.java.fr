@@ -72,8 +72,8 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 
 		//-------------------乳腺--------------------------------------
 		// A 皮肤与乳腺总面积  mm² 仅辅助指标6、7、9、10、11、12、13计算，数值不显示在页面指标表格里 37A111
-		SingleSlide singleSlidea = singleSlideMapper.selectById(jsonTask.getSingleId());
-		BigDecimal A_37A111_area = new BigDecimal(singleSlidea.getArea());
+//		SingleSlide singleSlidea = singleSlideMapper.selectById(jsonTask.getSingleId());
+//		BigDecimal A_37A111_area = new BigDecimal(singleSlidea.getArea());
 
 		//B 乳腺腺泡/导管数量  个 无 37A06C
 		Integer B_37A06C_count = commonJsonParser.getOrganAreaCount(jsonTask, "37A06C");
@@ -236,7 +236,7 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 			12 毛囊面积占比 % Hair follicles area% 12=O/(A-F)
 			13 皮肤面积 mm² Skin area1 3=A-F
 		 */
-		BigDecimal A_sub_F = A_37A111_area.subtract(F_37A07A_area);
+		//BigDecimal A_sub_F = A_37A111_area.subtract(F_37A07A_area);
 		// 6 表皮角质层面积占比 % Stratum corneum area% 6=H/(A-F)
 		map.put("表皮角质层面积占比", createNameIndicator("Stratum corneum area%", getProportion(H_37A096_area, N_37A0C3_area), PERCENTAGE, "37A096,37A0C3"));
 
