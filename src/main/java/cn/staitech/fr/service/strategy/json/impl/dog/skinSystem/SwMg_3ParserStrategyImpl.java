@@ -261,7 +261,8 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		map.put("皮脂腺密度", createNameIndicator("Density of Sebaceous glands", getProportion(new BigDecimal(M_37A099_count), N_37A0C3_area), SQ_MM_PIECE,  "37A099,37A0C3"));
 
 		// 11 皮脂腺面积占比 % Sebaceous glands area% 11=L/(A-F)运算前注意统一单位
-		map.put("皮脂腺面积占比", createNameIndicator("Sebaceous glands area%", getProportion(L_37A099_area, N_37A0C3_area), PERCENTAGE,  "37A099,37A0C3"));
+
+		map.put("皮脂腺面积占比", createNameIndicator("Sebaceous glands area%", getProportion(L_37A099_area, new BigDecimal(areaUtils.convertToSquareMicrometer(N_37A0C3_area.toString()))), PERCENTAGE,  "37A099,37A0C3"));
 
 		// 12 毛囊面积占比 % Hair follicles area% 12=O/(A-F)
 		map.put("毛囊面积占比", createNameIndicator("Hair follicles area%", getProportion(O_37A098_area, N_37A0C3_area), PERCENTAGE,  "37A098,37A0C3"));
