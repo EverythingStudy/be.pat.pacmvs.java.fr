@@ -155,7 +155,7 @@ public class SwMg_3ParserStrategyImpl extends AbstractCustomParserStrategy {
 		//A 皮肤与乳腺总面积  mm² 仅辅助指标6、7、9、10、11、12、13计算，数值不显示在页面指标表格里 37A111
 		//map.put("皮肤与乳腺总面积", createIndicator(DecimalUtils.setScale3(A_37A111_area).toString(), SQ_MM, "37A111"));
 		//B 乳腺腺泡/导管数量  个 无 37A06C
-		map.put("乳腺腺泡/导管数量", createIndicator(B_37A06C_count.toString(), PIECE, "37A06C"));
+		//map.put("乳腺腺泡/导管数量", createIndicator(B_37A06C_count.toString(), PIECE, "37A06C"));
 		//C 乳腺腺泡/导管面积（全片） mm² 数据相加输出 37A06C
 		map.put("乳腺腺泡/导管面积（全片）", createIndicator(C_37A06C_area.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, "37A06C"));
 		//F 乳腺面积 mm² 仅辅助指标5计算，数值不显示在页面指标表格里 37A07A
