@@ -85,7 +85,7 @@ public class SlideServiceImpl extends ServiceImpl<SlideMapper, Slide> implements
     private String aiUrl;
     @Value("${organ.check.confirm.url:http://192.168.160.112:8003/CreateAIwtfc/}")
     private String organCheckConfirmUrl;
-    @Value("${ai.timeout:5000}")
+    @Value("${ai.timeout:15000}")
     private Integer timeout;
     @Autowired
     private StructureTagMapper structureTagMapper;
