@@ -75,7 +75,7 @@ public class Muscle_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         annotation1.setAreaUnit(SQ_UM);
         commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "35C02A", annotation1, 2);
 
-        resultsMap.put("肌纤维面积（全片）", createIndicator(organAreaB.toString(), SQ_MM, "35C02A"));
+        resultsMap.put("肌纤维面积（全片）", createIndicator(organAreaB, SQ_MM, "35C02A"));
         resultsMap.put("间质面积", createIndicator(areaUtils.convertToSquareMicrometer(organAreaB.toString()), SQ_UM_THOUSAND, "35C027"));
         resultsMap.put("肌细胞核数量", createIndicator(organAreaD, PIECE, "35C05A"));
 

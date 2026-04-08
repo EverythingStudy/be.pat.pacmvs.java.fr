@@ -236,7 +236,7 @@ public class Liver_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationA.setCountUnit(PIECE);
         annotationA.setAreaName("胆管面积（单个门管区）");
         annotationA.setAreaUnit(SQ_UM);
-        commonJsonParser.putAnnotationDynamicData(jsonTask, "312145", "31214A", annotationA, 2,true);
+        commonJsonParser.putAnnotationDynamicData1(jsonTask, "312145", "31214A", annotationA, 2,true);
         log.info("保存胆管数量/面积（单个门管区）动态数据：jsonTask id:[{}] singleSlide id:[{}]", jsonTask.getTaskId(), jsonTask.getSingleId());
 
         indicatorResultsMap.put("中央静脉面积", new IndicatorAddIn("", DecimalUtils.setScale3(centralVeinArea), MULTIPLIED_SQ_UM_THOUSAND, CommonConstant.NUMBER_1, "312146"));

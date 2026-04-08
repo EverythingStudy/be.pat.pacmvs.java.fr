@@ -73,8 +73,8 @@ public class Epididymides_3ParserStrategyImpl extends AbstractCustomParserStrate
         BigDecimal organAreaE = this.commonJsonParser.getInsideOrOutside(jsonTask, "32F0F5", "32F0F4", true).getStructureAreaNum();
         // F：精子面积（单个）×103 μm2
         Annotation annotationF = new Annotation();
-        annotationA.setAreaName("精子面积（单个）");
-        annotationA.setAreaUnit(MULTIPLIED_SQ_UM_THOUSAND);
+        annotationF.setAreaName("精子面积（单个）");
+        annotationF.setAreaUnit(MULTIPLIED_SQ_UM_THOUSAND);
         this.commonJsonParser.putAnnotationDynamicData(jsonTask, "32F0F5", "32F0F7", annotationF, 1, true);
         // G：精子面积（全片）mm2
         BigDecimal organAreaG = this.commonJsonParser.getInsideOrOutside(jsonTask, "32F0F5", "32F0F7", true).getStructureAreaNum();

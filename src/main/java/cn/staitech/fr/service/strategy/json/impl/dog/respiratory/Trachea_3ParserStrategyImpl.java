@@ -85,7 +85,7 @@ public class Trachea_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         indicatorResultsMap.put("黏膜上皮细胞核数量", new IndicatorAddIn("黏膜上皮细胞核数量", String.valueOf(mucosaCount), PIECE, CommonConstant.NUMBER_1, "34D036"));
 
         // 产品呈现指标 -------------------------------------------------------------
-        indicatorResultsMap.put("黏膜上皮层平均厚度", new IndicatorAddIn("Average thickness of mucosal epithelium", areaUtils.convertToSquareMicrometer(String.valueOf(averageThicknessOfMucosalEpithelium)), UM, CommonConstant.NUMBER_0, "14D035"));
+        indicatorResultsMap.put("黏膜上皮层平均厚度", new IndicatorAddIn("Average thickness of mucosal epithelium", areaUtils.convertToSquareMicrometer(String.valueOf(averageThicknessOfMucosalEpithelium)), UM, CommonConstant.NUMBER_0, "34D035"));
         indicatorResultsMap.put("黏膜上皮细胞核密度", new IndicatorAddIn("Nucleus density of mucosal epithelium", String.valueOf(BigDecimal.valueOf(nucleusDensityOfMucosalEpithelium).setScale(3, RoundingMode.HALF_UP)), SQ_UM_PICE, CommonConstant.NUMBER_0, "34D036,34D035"));
         indicatorResultsMap.put("气管面积", new IndicatorAddIn("Tracheal area", String.valueOf(accurateArea.setScale(3, RoundingMode.HALF_UP)), SQ_MM, CommonConstant.NUMBER_0, "34D111"));
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);

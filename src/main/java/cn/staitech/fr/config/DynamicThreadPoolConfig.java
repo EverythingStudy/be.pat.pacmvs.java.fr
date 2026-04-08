@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DynamicThreadPoolConfig {
     @Bean
     public ExecutorService executorService() {
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 10, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(20000), new ThreadFactory() {
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(5), new ThreadFactory() {
             private final AtomicInteger threadNumber = new AtomicInteger(1);
 
             @Override

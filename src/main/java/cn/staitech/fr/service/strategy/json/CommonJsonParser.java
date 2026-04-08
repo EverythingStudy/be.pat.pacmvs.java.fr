@@ -507,6 +507,41 @@ public class CommonJsonParser {
         return getAnnotationMessage(annotation);
     }
 
+    public Annotation getInsideOrOutside1(JsonTask jsonTask, String structureId, String structureIds, Boolean InsideOrOutside) {
+        // 查询所有未被删除且登录机构相同的数据
+        Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
+        // 定位表
+        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
+
+        // 脏器轮廓信息
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(sequenceNumber);
+        annotation.setSingleSlideId(jsonTask.getSingleId());//单脏器切片id
+        annotation.setCategoryId(pathologicalMap.get(structureId));// 标注类别ID
+        // 查询合并后的轮廓数据
+        Annotation annotationBy = annotationMapper.collectAiGeometry(annotation);
+        if (annotationBy == null) {
+            return new Annotation();
+        }
+        annotation.setContour(annotationBy.getCollectContour());
+        // 校验轮廓的合理性
+        String result = annotationMapper.stIsValid(annotation).getResults();
+        if (Objects.equals(result, "f")) {
+            Annotation annotation1 = annotationMapper.stMakeValid(annotation);
+            String result1 = annotationMapper.stIsValid(annotation1).getResults();
+            if (Objects.equals(result1, "t")) {
+                annotation.setContour(annotation1.getContour());
+            } else {
+                return new Annotation();
+            }
+        }
+        annotation.setInsideOrOutside(InsideOrOutside);
+        annotation.setCategoryId(pathologicalMap.get(structureIds));
+        // 查询面积和周长
+
+        return getAnnotationMessage(annotation);
+    }
+
 
     public Annotation getContourInsideOrOutside(JsonTask jsonTask, String contour, String structureIds, Boolean InsideOrOutside) {
         // 查询所有未被删除且登录机构相同的数据
@@ -535,6 +570,35 @@ public class CommonJsonParser {
         annotation.setCategoryId(pathologicalMap.get(structureIds));
         // 查询面积和周长
         return getAnnotationMessage(annotation);
+    }
+
+    public Annotation getContourInsideOrOutside1(JsonTask jsonTask, String contour, String structureIds, Boolean InsideOrOutside) {
+        // 查询所有未被删除且登录机构相同的数据
+        Map<String, Long> pathologicalMap = getPathologicalMap(jsonTask.getOrganizationId());
+        // 定位表
+        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
+
+        // 脏器轮廓信息
+        Annotation annotation = new Annotation();
+        annotation.setSequenceNumber(sequenceNumber);
+
+        annotation.setContour(contour);
+        // 校验轮廓的合理性
+        String result = annotationMapper.stIsValid(annotation).getResults();
+        if (Objects.equals(result, "f")) {
+            Annotation annotation1 = annotationMapper.stMakeValid(annotation);
+            String result1 = annotationMapper.stIsValid(annotation1).getResults();
+            if (Objects.equals(result1, "t")) {
+                annotation.setContour(annotation1.getContour());
+            } else {
+                return new Annotation();
+            }
+        }
+        annotation.setSingleSlideId(jsonTask.getSingleId());
+        annotation.setInsideOrOutside(InsideOrOutside);
+        annotation.setCategoryId(pathologicalMap.get(structureIds));
+        // 查询面积和周长
+        return getAnnotationMessage1(annotation);
     }
 
     public void putAnnotationDynamicData(JsonTask jsonTask, String structureId, String structureIds, Annotation annotation) {
@@ -771,7 +835,94 @@ public class CommonJsonParser {
                         dynamicData.setData(convertToSquareMicrometer(String.valueOf(annotationBy.getStructureAreaNum())));
                         break;
                     case 2:
-                        dynamicData.setData(String.valueOf(convertToMicrometer(annotationBy.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP).toString())));
+                        dynamicData.setData(String.valueOf(convertToMicrometer(annotationBy.getStructureAreaNum().toString())));
+                        break;
+                    default:
+                        dynamicData.setData(String.valueOf(annotationBy.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP)));
+                        break;
+                }
+                dynamicData.setUnit(areaUnit);
+                jsonArray = updateDynamicDataList(existingNames, jsonArray, dynamicData);
+            }
+
+            // 处理周长数据
+            if (hasPerimeterName) {
+                DynamicData dynamicData = new DynamicData();
+                dynamicData.setName(annotation.getPerimeterName());
+                dynamicData.setData(String.valueOf(annotationBy.getStructurePerimeterNum()));
+                dynamicData.setUnit(perimeterUnit);
+                jsonArray = updateDynamicDataList(existingNames, jsonArray, dynamicData);
+            }
+
+            // 处理计数数据
+            if (hasCountName) {
+                DynamicData dynamicData = new DynamicData();
+                dynamicData.setName(annotation.getCountName());
+                dynamicData.setData(String.valueOf(annotationBy.getCount()));
+                dynamicData.setUnit(countUnit);
+                jsonArray = updateDynamicDataList(existingNames, jsonArray, dynamicData);
+            }
+
+            // 更新注解对象
+            if (jsonArray.size() > 0) {
+                JSONObject resultJson = new JSONObject();
+                resultJson.put("dynamicData", jsonArray);
+                item.setSequenceNumber(sequenceNumber);
+                item.setDynamicData(resultJson.toString());
+                item.setSingleSlideId(jsonTask.getSingleId());
+                batchUpdates.add(item);
+            }
+        }
+
+        // 批量更新数据库
+        if (!batchUpdates.isEmpty()) {
+            batchUpdateAnnotations(batchUpdates);
+        }
+    }
+
+    public void putAnnotationDynamicData1(JsonTask jsonTask, String structureId, String structureIds, Annotation annotation, Integer type,Boolean isInside) {
+        Long sequenceNumber = getSequenceNumber(jsonTask.getSpecialId());
+        List<Annotation> annotationList = getStructureContourList(jsonTask, structureId);
+
+        if (CollectionUtil.isEmpty(annotationList)) {
+            return;
+        }
+
+        // 批量处理数据
+        List<Annotation> batchUpdates = new ArrayList<>(annotationList.size());
+
+        // 预处理通用数据
+        boolean hasAreaName = annotation.getAreaName() != null;
+        boolean hasPerimeterName = annotation.getPerimeterName() != null;
+        boolean hasCountName = annotation.getCountName() != null;
+
+        String areaUnit = annotation.getAreaUnit();
+        String perimeterUnit = annotation.getPerimeterUnit();
+        String countUnit = annotation.getCountUnit();
+
+        for (Annotation item : annotationList) {
+            Annotation annotationBy = getContourInsideOrOutside(jsonTask, item.getContour(), structureIds, isInside);
+
+            if (annotationBy == null) {
+                continue;
+            }
+
+            // 预处理动态数据
+            JSONObject dynamicDataJson = getOrCreateDynamicDataJson(item);
+            JSONArray jsonArray = dynamicDataJson.getJSONArray("dynamicData");
+            Set<String> existingNames = extractExistingNames(jsonArray);
+
+            // 处理面积数据
+            if (hasAreaName) {
+                DynamicData dynamicData = new DynamicData();
+                dynamicData.setName(annotation.getAreaName());
+
+                switch (type) {
+                    case 1:
+                        dynamicData.setData(convertToSquareMicrometer(String.valueOf(annotationBy.getStructureAreaNum())));
+                        break;
+                    case 2:
+                        dynamicData.setData(String.valueOf(convertToMicrometer(annotationBy.getStructureAreaNum().toString())));
                         break;
                     default:
                         dynamicData.setData(String.valueOf(annotationBy.getStructureAreaNum().setScale(3, RoundingMode.HALF_UP)));
@@ -906,7 +1057,7 @@ public class CommonJsonParser {
     }
 
 
-    public String convertToMicrometer(String str) {
+    public static String convertToMicrometer(String str) {
         BigDecimal result = BigDecimal.ZERO;
         if (!StringUtils.isEmpty(str)) {
             BigDecimal areaNum = new BigDecimal(str).multiply(BigDecimal.valueOf(1000000));
@@ -925,6 +1076,7 @@ public class CommonJsonParser {
     }
 
 
+
     public Annotation getAnnotationMessage(Annotation annotation) {
         Annotation annotations = annotationMapper.getInsideOrOutside(annotation);
         if (null != annotations) {
@@ -933,6 +1085,25 @@ public class CommonJsonParser {
             } else {
                 BigDecimal structureAreaNum = new BigDecimal(annotations.getArea());
                 annotations.setStructureAreaNum(structureAreaNum.multiply(new BigDecimal("0.000001")));
+            }
+            if (StringUtils.isEmpty(annotations.getPerimeter())) {
+                annotations.setStructurePerimeterNum(BigDecimal.ZERO);
+            } else {
+                BigDecimal structurePerimeterNum = new BigDecimal(annotations.getPerimeter());
+                annotations.setStructurePerimeterNum(structurePerimeterNum.multiply(new BigDecimal("0.001")));
+            }
+        }
+        return annotations;
+    }
+
+    public Annotation getAnnotationMessage1(Annotation annotation) {
+        Annotation annotations = annotationMapper.getInsideOrOutside(annotation);
+        if (null != annotations) {
+            if (StringUtils.isEmpty(annotations.getArea())) {
+                annotations.setStructureAreaNum(BigDecimal.ZERO);
+            } else {
+                BigDecimal structureAreaNum = new BigDecimal(annotations.getArea());
+                annotations.setStructureAreaNum(structureAreaNum);
             }
             if (StringUtils.isEmpty(annotations.getPerimeter())) {
                 annotations.setStructurePerimeterNum(BigDecimal.ZERO);

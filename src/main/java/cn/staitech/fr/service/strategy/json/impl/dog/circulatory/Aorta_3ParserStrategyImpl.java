@@ -104,23 +104,23 @@ public class Aorta_3ParserStrategyImpl extends AbstractCustomParserStrategy impl
 
         Map<String, IndicatorAddIn> result = new HashMap<>();
 
-        // 算法输出指标：空腔面积 A
-        result.put("空腔面积", createIndicator(cavityAreaA.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_CAVITY));
-
-        // 算法输出指标：空腔周长 B
-        result.put("空腔周长", createIndicator(cavityPerimeterB.setScale(3, RoundingMode.HALF_UP).toString(), MM, STRUCTURE_CAVITY));
-
-        // 算法输出指标：组织轮廓周长 C
-        result.put("组织轮廓周长", createIndicator(tissuePerimeterC.setScale(3, RoundingMode.HALF_UP).toString(), MM, STRUCTURE_OUTLINE));
-
-        // 算法输出指标：组织轮廓面积 D
-        result.put("组织轮廓面积", createIndicator(tissueAreaD.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_OUTLINE));
+//        // 算法输出指标：空腔面积 A
+//        result.put("空腔面积", createIndicator(cavityAreaA.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_CAVITY));
+//
+//        // 算法输出指标：空腔周长 B
+//        result.put("空腔周长", createIndicator(cavityPerimeterB.setScale(3, RoundingMode.HALF_UP).toString(), MM, STRUCTURE_CAVITY));
+//
+//        // 算法输出指标：组织轮廓周长 C
+//        result.put("组织轮廓周长", createIndicator(tissuePerimeterC.setScale(3, RoundingMode.HALF_UP).toString(), MM, STRUCTURE_OUTLINE));
+//
+//        // 算法输出指标：组织轮廓面积 D
+//        result.put("组织轮廓面积", createIndicator(tissueAreaD.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_OUTLINE));
 
         // 主动脉壁面积 mm² = D - A
         BigDecimal wallArea = tissueAreaD.subtract(cavityAreaA);
         if (wallArea.compareTo(BigDecimal.ZERO) >= 0) {
             result.put("主动脉壁面积", createNameIndicator("Aorta wall area", wallArea.setScale(3, RoundingMode.HALF_UP).toString(),
-                            SQ_MM, STRUCTURE_OUTLINE + "," + STRUCTURE_CAVITY));
+                            SQ_MM, null));
         }
 
         // 主动脉壁平均厚度 µm = 2 * (D - A) / (B + C)
@@ -137,7 +137,7 @@ public class Aorta_3ParserStrategyImpl extends AbstractCustomParserStrategy impl
 
             result.put("主动脉壁平均厚度",
                     createNameIndicator("Average thickness of aorta wall", thicknessInUm.toString(),
-                            UM, STRUCTURE_OUTLINE + "," + STRUCTURE_CAVITY));
+                            UM, null));
         }
 
         return result;

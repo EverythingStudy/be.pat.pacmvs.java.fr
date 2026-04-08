@@ -64,16 +64,16 @@ public class Prostate_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         annotationC.setPerimeterName("腺泡/导管周长（单个）");
         annotationC.setPerimeterUnit(UM);
         this.commonJsonParser.putSingleAnnotationDynamicData(jsonTask, "32C06C", annotationC, 1);
-        // D 管腔面积（单个）管腔面积（单个）
+        // D 管腔面积（单个）
         Annotation annotationD = new Annotation();
-        annotationD.setAreaName("管腔面积（单个）管腔面积（单个）");
+        annotationD.setAreaName("管腔面积（单个）");
         annotationD.setAreaUnit(MULTIPLIED_SQ_UM_THOUSAND);
         this.commonJsonParser.putAnnotationDynamicData(jsonTask, "32C06C", "32C0F4", annotationD, 1, true);
         // E：腺泡/导管细胞核数量（单个）
         Annotation annotationE = new Annotation();
         annotationE.setCountName("腺泡/导管细胞核数量（单个）");
         annotationE.setCountUnit(PIECE);
-        this.commonJsonParser.putAnnotationDynamicData(jsonTask, "32C06C", "32C061", annotationD, 1, true);
+        this.commonJsonParser.putAnnotationDynamicData(jsonTask, "32C06C", "32C061", annotationE, 1, true);
         // F：组织轮廓面积mm2
         SingleSlide singleSlide = this.singleSlideMapper.selectById(jsonTask.getSingleId());
         BigDecimal organAreaF = new BigDecimal(singleSlide.getArea());
@@ -85,7 +85,7 @@ public class Prostate_3ParserStrategyImpl extends AbstractCustomParserStrategy {
         resultsMap.put("腺泡/导管面积（全片）", createIndicator(organAreaB, SQ_MM, "32C06C"));
 
         // 1=F-G：前列腺面积mm2
-        resultsMap.put("前列腺面积", createNameIndicator("Prostate gland area", organAreaF.subtract(organAreaG), SQ_MM, this.areaUtils.getStructureIds("32C111", "32C060")));
+        resultsMap.put("前列腺面积", createNameIndicator("Prostate gland area", organAreaF.subtract(organAreaG), SQ_MM, "32C111"));
         // 2=B/F：腺泡/导管面积占比
         resultsMap.put("腺泡/导管面积占比", createNameIndicator("Acinar area%", getProportion(organAreaB, organAreaF), PERCENTAGE, this.areaUtils.getStructureIds("32C111", "32C06C")));
         // 3=1-D/A：腺泡/导管面积占比（单个）
