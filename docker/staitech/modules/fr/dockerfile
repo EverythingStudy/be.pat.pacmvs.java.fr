@@ -16,4 +16,4 @@ WORKDIR /home/staitech
 COPY ./jar/staitech-modules-fr.jar /home/staitech/staitech-modules-fr.jar
 
 # 启动系统服务
-ENTRYPOINT ["java","-jar","staitech-modules-fr.jar"]
+ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar staitech-modules-fr.jar"]
