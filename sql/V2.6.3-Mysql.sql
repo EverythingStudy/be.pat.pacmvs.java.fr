@@ -9,3 +9,7 @@ ALTER TABLE fr_production
     ADD COLUMN `algorithm_method` varchar(255) NULL COMMENT '对应算法接口脏器编码：只记录不同的' AFTER `abbreviation`;
 ALTER TABLE fr_ai_forecast
     ADD COLUMN `file_url` varchar(255) NULL COMMENT '计算均值±方差的原始数据，存放到文件' AFTER `structure_ids`;
+
+UPDATE `sys_role` SET `role_key` = 'FacMgmt' WHERE `role_id` = 25;
+UPDATE `sys_role` SET `role_key` = 'PathoDiagnMgr' WHERE `role_id` = 26;
+UPDATE `sys_role` SET `role_key` = 'ImageMgmt' WHERE `role_id` = 22;

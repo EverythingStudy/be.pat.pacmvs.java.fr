@@ -61,15 +61,15 @@ public class Esophagus_2ParserStrategyImpl extends AbstractCustomParserStrategy 
     public void init() {
         setCommonJsonParser(commonJsonParser);
         setCommonJsonCheck(commonJsonCheck);
-        log.info("Dog EsophagusParserStrategyImpl init");
+        log.info("Mouse Esophagus_2ParserStrategyImpl init");
     }
 
     @Override
     public void alculationIndicators(JsonTask jsonTask) {
-        log.info("犬食管指标计算开始 singleId={}", jsonTask.getSingleId());
+        log.info("小鼠食管指标计算开始 singleId={}", jsonTask.getSingleId());
         Map<String, IndicatorAddIn> indicatorResultsMap = buildEsophagusIndicators(jsonTask);
         aiForecastService.addAiForecast(jsonTask.getSingleId(), indicatorResultsMap);
-        log.info("犬食管指标计算完成");
+        log.info("小鼠管指标计算完成");
     }
 
     @Override
