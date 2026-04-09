@@ -471,9 +471,10 @@ public class ProjectServiceImpl extends ServiceImpl<ProjectMapper, Project> impl
         List<String> buttons = new ArrayList<>();
         Integer status = project.getStatus();
         log.info("当前用户角色：{}", JSON.toJSONString(SecurityUtils.getRoles()));
+        boolean qualityAdmin = SysRoleUtils.isQualityAdmin();
         if (SecurityUtils.isOrgAdmin() || (SecurityUtils.getUserId().equals(project.getPrincipal()) && matchAdmin)) {
             buttons = ProjectButtonGenerator.generateButtons(status, Constants.ROLE_OWNER);
-        } else if (count > 0 && matchAdmin) {
+        } else if ((count > 0 && matchAdmin) || qualityAdmin) {
             buttons = ProjectButtonGenerator.generateButtons(status, Constants.ROLE_MEMBER);
         } else {
             buttons = ProjectButtonGenerator.generateButtons(status, Constants.ROLE_OTHER);
