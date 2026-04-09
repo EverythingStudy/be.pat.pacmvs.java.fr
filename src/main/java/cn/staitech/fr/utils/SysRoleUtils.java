@@ -13,10 +13,11 @@ public class SysRoleUtils {
         return roleSort;
     }
 
-    public static String IS_QUALITY_ADMIN = "质量保证人员";
-    public static String NUMBER_ADMIN = "数字阅片";
-    public static String IS_ORG_ADMIN = "机构管理员";
-    public static String INTELL_ADMIN = "智能阅片";
+    public static String IS_QUALITY_ADMIN = "QA"; //质量保证人员
+    public static String NUMBER_ADMIN = "PathoDiagn"; //数字阅片
+    public static String IS_ORG_ADMIN = "FacMgmt"; //机构管理员
+    public static String INTELL_ADMIN = "PathoDiagnAI"; //智能阅片
+
     /**
      * 判断是否为质量保证管理员
      * @return
@@ -26,8 +27,8 @@ public class SysRoleUtils {
         List<SysRole> roles = SecurityUtils.getRoles();
         boolean isFind = false;
         for (SysRole role : roles) {
-            if(null != role.getRoleName()) {
-                if(IS_QUALITY_ADMIN.equals(role.getRoleName())) {
+            if(null != role.getRoleKey()) {
+                if(IS_QUALITY_ADMIN.equals(role.getRoleKey())) {
                     isFind = true;
                 }
             }
@@ -39,14 +40,14 @@ public class SysRoleUtils {
      * 匹配给定参数的角色信息
      * @return
      */
-    public static boolean matchAdmin(String ... roleName) {
+    public static boolean matchAdmin(String ... roleKey) {
         //拿到质量保证管理员角色
         List<SysRole> roles = SecurityUtils.getRoles();
         boolean isFind = false;
         for (SysRole role : roles) {
-            if(null != role.getRoleName()) {
-                for (String s : roleName) {
-                    if(s.equals(role.getRoleName())) {
+            if(null != role.getRoleKey()) {
+                for (String s : roleKey) {
+                    if(s.equals(role.getRoleKey())) {
                         isFind = true;
                         break;
                     }
