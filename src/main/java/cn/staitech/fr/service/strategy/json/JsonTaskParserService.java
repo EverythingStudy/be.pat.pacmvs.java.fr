@@ -282,7 +282,7 @@ public class JsonTaskParserService implements DisposableBean{
         //部分成功-->以脏器为单位 (指标计算)结构分析完成-->forecastStatus结构化状态：1
         updateSingleSlideStatus(jsonTask.getSingleId(), ForecastStatusEnum.FORECAST_SUCCESS.getCode());
         //删除临时文件
-        //commonJsonParser.batchDeleteBySingleSlideId(jsonTask);
+        commonJsonParser.batchDeleteBySingleSlideId(jsonTask);
     }
 
     private Boolean verifyCategoryStructure(JsonTask jsonTask) {
