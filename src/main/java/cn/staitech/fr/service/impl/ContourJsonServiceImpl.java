@@ -82,7 +82,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
     private CommonJsonParser commonJsonParser;
 
 
-    ExecutorService EXECUTOR = new ThreadPoolExecutor((int) (Runtime.getRuntime().availableProcessors() * 3), Runtime.getRuntime().availableProcessors() * 8, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new CustomRejectedExecutionHandler());
+    ExecutorService EXECUTOR = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors() * 2, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new CustomRejectedExecutionHandler());
 
     static class CustomRejectedExecutionHandler implements RejectedExecutionHandler {
         @Override
