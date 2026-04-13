@@ -16,7 +16,7 @@ public class SysRoleUtils {
     public static String IS_QUALITY_ADMIN = "QA"; //质量保证人员
     public static String NUMBER_ADMIN = "PathoDiagn"; //数字阅片
     public static String IS_ORG_ADMIN = "FacMgmt"; //机构管理员
-    public static String INTELL_ADMIN = "PathoDiagnAI"; //智能阅片
+    public static String INTELL_ADMIN = "PathoDiagnMgr"; //智能阅片
 
     /**
      * 判断是否为质量保证管理员
