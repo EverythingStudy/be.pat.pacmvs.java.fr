@@ -104,22 +104,22 @@ public class Esophagus_2ParserStrategyImpl extends AbstractCustomParserStrategy 
         Map<String, IndicatorAddIn> result = new HashMap<>();
 
         // 算法输出指标 B、C、D E
-        result.put("角质层面积", createIndicator(areaB.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRATUM_CORNEUM));
+        result.put("角质层面积", createIndicator(areaB.setScale(3, RoundingMode.HALF_UP).toString(), MULTIPLIED_SQ_UM_THOUSAND, STRATUM_CORNEUM));
         result.put("颗粒层+棘层+基底细胞层面积", createIndicator(areaC.setScale(3, RoundingMode.HALF_UP).toString(), MULTIPLIED_SQ_UM_THOUSAND, GRANULAR_SPINOUS_BASAL));
         result.put("黏膜固有层+黏膜肌层+黏膜下层面积", createIndicator(areaD.setScale(3, RoundingMode.HALF_UP).toString(), MULTIPLIED_SQ_UM_THOUSAND, STRUCTURE_LAMINA_MUSCULAR_SUBMUCOSA));
         result.put("肌层面积", createIndicator(areaE.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_MUSCULAR));
 
         // 指标：1、2、4 占比，5 食管面积
         if (wallArea.compareTo(BigDecimal.ZERO) > 0) {
-            result.put("角质层面积占比", createNameIndicator("Stratum corneum area%",getProportion(areaB.divide(new BigDecimal(1000)).setScale(3, RoundingMode.HALF_UP), wallArea).toString(), PERCENTAGE,STRATUM_CORNEUM + "," + STRUCTURE_OUTLINE + "," + STRUCTURE_LUMEN));
-            result.put("颗粒层+棘层+基底细胞层面积占比", createNameIndicator("Nucleated cell layer area% ",getProportion(areaC.divide(new BigDecimal(1000)).setScale(3, RoundingMode.HALF_UP), wallArea).toString(), PERCENTAGE,GRANULAR_SPINOUS_BASAL + "," + STRUCTURE_OUTLINE + "," + STRUCTURE_LUMEN));
-            result.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", createNameIndicator("Subepithelium area %",getProportion(areaD.divide(new BigDecimal(1000)), wallArea).toString(), PERCENTAGE,STRUCTURE_LAMINA_MUSCULAR_SUBMUCOSA + "," + STRUCTURE_OUTLINE + "," + STRUCTURE_LUMEN));
-            result.put("肌层面积占比", createNameIndicator("Muscularis area%",getProportion(areaE.divide(new BigDecimal(1000)), wallArea).toString(), PERCENTAGE,STRUCTURE_MUSCULAR + "," + STRUCTURE_OUTLINE + "," + STRUCTURE_LUMEN));
+            result.put("角质层面积占比", createNameIndicator("Stratum corneum area%",getProportion(areaB, wallArea).toString(), PERCENTAGE,STRATUM_CORNEUM));
+            result.put("颗粒层+棘层+基底细胞层面积占比", createNameIndicator("Nucleated cell layer area% ",getProportion(areaC, wallArea).toString(), PERCENTAGE,GRANULAR_SPINOUS_BASAL));
+            result.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", createNameIndicator("Subepithelium area %",getProportion(areaD, wallArea).toString(), PERCENTAGE,STRUCTURE_LAMINA_MUSCULAR_SUBMUCOSA));
+            result.put("肌层面积占比", createNameIndicator("Muscularis area%",getProportion(areaE, wallArea).toString(), PERCENTAGE,STRUCTURE_MUSCULAR + "," + STRUCTURE_OUTLINE + "," + STRUCTURE_LUMEN));
         } else {
-            result.put("角质层面积占比", createNameIndicator("Stratum corneum area%","0.00", PERCENTAGE,STRATUM_CORNEUM + "," + STRUCTURE_OUTLINE + "," + STRUCTURE_LUMEN));
-            result.put("颗粒层+棘层+基底细胞层面积占比", createNameIndicator("Nucleated cell layer area% ","0.00", PERCENTAGE,GRANULAR_SPINOUS_BASAL + "," + STRUCTURE_OUTLINE + "," + STRUCTURE_LUMEN));
-            result.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", createNameIndicator("Subepithelium area %","0.00", PERCENTAGE,STRUCTURE_LAMINA_MUSCULAR_SUBMUCOSA + "," + STRUCTURE_OUTLINE + "," + STRUCTURE_LUMEN));
-            result.put("肌层面积占比", createNameIndicator("Muscularis area%","0.00", PERCENTAGE,STRUCTURE_MUSCULAR + "," + STRUCTURE_OUTLINE + "," + STRUCTURE_LUMEN));
+            result.put("角质层面积占比", createNameIndicator("Stratum corneum area%","0.00", PERCENTAGE,STRATUM_CORNEUM));
+            result.put("颗粒层+棘层+基底细胞层面积占比", createNameIndicator("Nucleated cell layer area% ","0.00", PERCENTAGE,GRANULAR_SPINOUS_BASAL));
+            result.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", createNameIndicator("Subepithelium area %","0.00", PERCENTAGE,STRUCTURE_LAMINA_MUSCULAR_SUBMUCOSA));
+            result.put("肌层面积占比", createNameIndicator("Muscularis area%","0.00", PERCENTAGE,STRUCTURE_MUSCULAR ));
         }
 
         // 5 食管面积 mm² = F - A
