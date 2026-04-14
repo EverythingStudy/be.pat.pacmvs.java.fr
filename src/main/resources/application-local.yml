@@ -284,6 +284,9 @@ organ-structures:
       - structure-id: 34E011,34E022,34E004,34E012,34E111
     35C: # 骨骼肌
       - structure-id: 35C027,35C02A,35C05A,35C111
+    # 小鼠
+    20F: #食管
+      - structure-id: 22F12E,20F12F,20F13B,20F00C
   outline: # 脏器结构轮廓
     "02": #哈德氏腺
       - structure-id: 102111
