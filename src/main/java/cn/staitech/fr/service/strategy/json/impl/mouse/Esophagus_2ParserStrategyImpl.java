@@ -33,7 +33,7 @@ public class Esophagus_2ParserStrategyImpl extends AbstractCustomParserStrategy 
     /** 食管腔 */
     private static final String STRUCTURE_LUMEN = "20F120";
     /** 角质层面积 */
-    private static final String STRATUM_CORNEUM = "22F12E";
+    private static final String STRATUM_CORNEUM = "20F12E";
     /**颗粒层+棘层+基底细胞层面积 */
     private static final String GRANULAR_SPINOUS_BASAL = "20F12F";
     /** 黏膜固有层+黏膜肌层+黏膜下层 */
