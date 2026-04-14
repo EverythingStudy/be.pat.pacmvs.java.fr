@@ -114,7 +114,7 @@ public class Esophagus_2ParserStrategyImpl extends AbstractCustomParserStrategy 
             result.put("角质层面积占比", createNameIndicator("Stratum corneum area%",getProportion(areaB, wallArea).toString(), PERCENTAGE,STRATUM_CORNEUM));
             result.put("颗粒层+棘层+基底细胞层面积占比", createNameIndicator("Nucleated cell layer area% ",getProportion(areaC, wallArea).toString(), PERCENTAGE,GRANULAR_SPINOUS_BASAL));
             result.put("黏膜固有层+黏膜肌层+黏膜下层面积占比", createNameIndicator("Subepithelium area %",getProportion(areaD, wallArea).toString(), PERCENTAGE,STRUCTURE_LAMINA_MUSCULAR_SUBMUCOSA));
-            result.put("肌层面积占比", createNameIndicator("Muscularis area%",getProportion(areaE, wallArea).toString(), PERCENTAGE,STRUCTURE_MUSCULAR + "," + STRUCTURE_OUTLINE + "," + STRUCTURE_LUMEN));
+            result.put("肌层面积占比", createNameIndicator("Muscularis area%",getProportion(areaE, wallArea).toString(), PERCENTAGE,STRUCTURE_MUSCULAR ));
         } else {
             result.put("角质层面积占比", createNameIndicator("Stratum corneum area%","0.00", PERCENTAGE,STRATUM_CORNEUM));
             result.put("颗粒层+棘层+基底细胞层面积占比", createNameIndicator("Nucleated cell layer area% ","0.00", PERCENTAGE,GRANULAR_SPINOUS_BASAL));
