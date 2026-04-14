@@ -93,9 +93,9 @@ WHERE
     a.species_id = '2';
 
 -- 结构标签颜色
-UPDATE tb_structure_tag SET rgb = 'rgb(255, 200, 255)',hex = '#FFC8FF' WHERE organization_id = 1 AND structure_id = '20F12E';
-UPDATE tb_structure_tag SET rgb = 'rgb(0, 255, 0)',hex = '#00FF00' WHERE organization_id = 1 AND structure_id = '20F12F';
-UPDATE tb_structure_tag SET rgb = 'rgb(77, 190, 238)',hex = '#4DBEEE' WHERE organization_id = 1 AND structure_id = '20F00C';
-UPDATE tb_structure_tag SET rgb = 'rgb(255, 128, 128)',hex = '#FF8080' WHERE organization_id = 1 AND structure_id = '20F120';
-UPDATE tb_structure_tag SET rgb = 'rgb(0, 0, 255)',hex = '#0000FF' WHERE organization_id = 1 AND structure_id = '20F13B';
-UPDATE tb_structure_tag SET rgb = 'rgb(162, 20, 47)',hex = '#A2142F' WHERE organization_id = 1 AND structure_id = '20F111';
+UPDATE tb_structure_tag SET rgb = 'rgb(255,200,255)',hex = '#FFC8FF' WHERE organization_id = 1 AND structure_id = '20F12E';
+UPDATE tb_structure_tag SET rgb = 'rgb(0,255,0)',hex = '#00FF00' WHERE organization_id = 1 AND structure_id = '20F12F';
+UPDATE tb_structure_tag SET rgb = 'rgb(77,190,238)',hex = '#4DBEEE' WHERE organization_id = 1 AND structure_id = '20F00C';
+UPDATE tb_structure_tag SET rgb = 'rgb(255,128,128)',hex = '#FF8080' WHERE organization_id = 1 AND structure_id = '20F120';
+UPDATE tb_structure_tag SET rgb = 'rgb(0,0,255)',hex = '#0000FF' WHERE organization_id = 1 AND structure_id = '20F13B';
+UPDATE tb_structure_tag SET rgb = 'rgb(162,20,47)',hex = '#A2142F' WHERE organization_id = 1 AND structure_id = '20F111';
