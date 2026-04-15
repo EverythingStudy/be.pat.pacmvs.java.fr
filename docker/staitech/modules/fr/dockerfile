@@ -14,6 +14,8 @@ RUN mkdir -p /home/staitech
 WORKDIR /home/staitech
 # 复制jar文件到路径
 COPY ./jar/staitech-modules-fr.jar /home/staitech/staitech-modules-fr.jar
+COPY jmx_prometheus_javaagent-0.16.1.jar jmx_prometheus_javaagent.jar
+COPY jmx_config.yaml jmx_config.yaml
 
 # 启动系统服务
-ENTRYPOINT ["sh","-c","java $JAVA_OPTS -jar staitech-modules-fr.jar"]
+ENTRYPOINT ["sh","-c","java $JAVA_OPTS -javaagent:/home/staitech/jmx_prometheus_javaagent.jar=1234:/home/staitech/jmx_config.yaml -jar staitech-modules-fr.jar"]

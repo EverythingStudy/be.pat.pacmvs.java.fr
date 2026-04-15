@@ -1,0 +1,125 @@
+# JMX Exporter Configuration for Prometheus
+
+# Wait time before starting to expose metrics (in seconds)
+startDelaySeconds: 0
+
+# JMX URL. If left empty, will connect to the local JVM.
+jmxUrl: ""
+
+# SSL connection for JMX (default: false)
+ssl: false
+
+# Convert output metric names to lowercase (default: false)
+lowercaseOutputName: true
+
+# Convert output label names to lowercase (default: false)
+lowercaseOutputLabelNames: true
+
+# Metrics Exposure
+# Limit which JMX object names to include (whitelist)
+whitelistObjectNames:
+  # JVM memory usage (heap & non-heap)
+  - "java.lang:type=Memory"
+  # JVM threads
+  - "java.lang:type=Threading"
+  # Operating system statistics (e.g., system load, file descriptor count)
+  - "java.lang:type=OperatingSystem"
+  # Garbage collectors statistics
+  - "java.lang:type=GarbageCollector,*"
+  # JVM memory pools
+  - "java.lang:type=MemoryPool,*"
+  # JVM class loading statistics
+  - "java.lang:type=ClassLoading"
+  # JVM compilation statistics
+  - "java.lang:type=Compilation"
+  # JVM runtime statistics
+  - "java.lang:type=Runtime"
+  # JMX thread-related stats
+  - "java.lang:type=ThreadInfo"
+
+# Limit which JMX object names to exclude (blacklist)
+blacklistObjectNames:
+  # You may want to exclude thread info if it's too verbose
+  - "java.lang:type=Threading,name=ThreadInfo,*"
+  # Exclude non-heap memory usage if it's not needed
+  - "java.lang:type=Memory/NonHeapMemoryUsage"
+
+# Rules to filter individual attributes for each object (expose only specific attributes)
+rules:
+  # Memory Usage Rule: Expose HeapMemoryUsage & NonHeapMemoryUsage
+  - pattern: 'java.lang:type=Memory'
+    name: 'jvm_memory'
+    value: 'HeapMemoryUsage'
+  - pattern: 'java.lang:type=Memory'
+    name: 'jvm_memory_non_heap'
+    value: 'NonHeapMemoryUsage'
+
+  # GC Rule: Expose GC Duration and Count (per collector)
+  - pattern: 'java.lang:type=GarbageCollector,*'
+    name: 'jvm_gc_duration_seconds'
+    value: 'CollectionTime'
+  - pattern: 'java.lang:type=GarbageCollector,*'
+    name: 'jvm_gc_count'
+    value: 'CollectionCount'
+
+  # Threading Rule: Expose thread counts
+  - pattern: 'java.lang:type=Threading'
+    name: 'jvm_threads'
+    value: 'ThreadCount'
+
+  # Operating System Rule: Expose system load and file descriptor count
+  - pattern: 'java.lang:type=OperatingSystem'
+    name: 'os_system_load_average'
+    value: 'SystemLoadAverage'
+  - pattern: 'java.lang:type=OperatingSystem'
+    name: 'os_file_descriptor_count'
+    value: 'OpenFileDescriptorCount'
+
+  # Class Loading Rule: Expose loaded class count and unloadable class count
+  - pattern: 'java.lang:type=ClassLoading'
+    name: 'jvm_classes'
+    value: 'LoadedClassCount'
+  - pattern: 'java.lang:type=ClassLoading'
+    name: 'jvm_classes_unloaded'
+    value: 'UnloadedClassCount'
+
+  # Compilation Rule: Expose compilation time and frequency
+  - pattern: 'java.lang:type=Compilation'
+    name: 'jvm_compilation_time_seconds'
+    value: 'TotalCompilationTime'
+
+  # Runtime Rule: Expose JVM uptime
+  - pattern: 'java.lang:type=Runtime'
+    name: 'jvm_uptime_seconds'
+    value: 'Uptime'
+
+  # Thread Info Rule: Expose thread states
+  - pattern: 'java.lang:type=Threading,name=ThreadInfo,*'
+    name: 'jvm_thread_state'
+    value: 'ThreadState'
+
+# Customizable Metric Names and Labels
+renameMetrics:
+  - from: 'java.lang:type=Memory/HeapMemoryUsage/used'
+    to: 'jvm_memory_used_bytes'
+  - from: 'java.lang:type=Memory/NonHeapMemoryUsage/used'
+    to: 'jvm_non_heap_memory_used_bytes'
+  - from: 'java.lang:type=OperatingSystem/FreePhysicalMemorySize'
+    to: 'os_free_physical_memory_bytes'
+  - from: 'java.lang:type=OperatingSystem/TotalPhysicalMemorySize'
+    to: 'os_total_physical_memory_bytes'
+
+# GC Duration Buckets (for histogram, e.g., "collection duration time")
+gcDurationBuckets: [0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
+
+# Expose raw JMX data for debugging (set to true to enable)
+dumpRaw: false
+
+# Metric Name Prefix (optional)
+# If you want to add a prefix to all metrics, set this value
+metricNamePrefix: "jvm_"
+
+# Additional Configuration Options:
+# - Timeout for JMX connection (in seconds)
+# - Define how long to wait before failing to connect to JMX (e.g., retry interval)
+# - If needed, you can set `jmxUrl` for remote monitoring and SSL configurations.
