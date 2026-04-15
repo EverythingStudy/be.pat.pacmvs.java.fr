@@ -123,7 +123,7 @@ public class Esophagus_2ParserStrategyImpl extends AbstractCustomParserStrategy 
         }
 
         // 5 食管面积 mm² = F - A
-        result.put("食管面积", createNameIndicator("Esophagus area", wallArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_OUTLINE + "," + STRUCTURE_LUMEN));
+        result.put("食管面积", createNameIndicator("Esophagus area", wallArea.setScale(3, RoundingMode.HALF_UP).toString(), SQ_MM, STRUCTURE_OUTLINE));
 
         return result;
     }
