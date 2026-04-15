@@ -68,7 +68,7 @@ WHERE a.species_id = '2' AND a.organization_id = 1;
 
 -- 结构初始化（6条）
 INSERT INTO tb_structure (species_id,organ_code,structure_id,name,name_en,type,organization_id,structure_size) VALUES ('2','0F','20F12E','角质层','Stratum Corneum','RO',1,1);
-INSERT INTO tb_structure (species_id,organ_code,structure_id,name,name_en,type,organization_id,structure_size) VALUES ('2','0F','20F12F','颗粒层+棘层+基底细胞曾','Nucleated Cell Layer','RO',1,1);
+INSERT INTO tb_structure (species_id,organ_code,structure_id,name,name_en,type,organization_id,structure_size) VALUES ('2','0F','20F12F','颗粒层+棘层+基底细胞层','Nucleated Cell Layer','RO',1,1);
 INSERT INTO tb_structure (species_id,organ_code,structure_id,name,name_en,type,organization_id,structure_size) VALUES ('2','0F','20F00C','肌层','Muscularis','RO',1,1);
 INSERT INTO tb_structure (species_id,organ_code,structure_id,name,name_en,type,organization_id,structure_size) VALUES ('2','0F','20F120','食管腔','Lumen','RO',1,1);
 INSERT INTO tb_structure (species_id,organ_code,structure_id,name,name_en,type,organization_id,structure_size) VALUES ('2','0F','20F13B','黏膜固有层+黏膜肌层+黏膜下层','Subepithelium','RO',1,1);
