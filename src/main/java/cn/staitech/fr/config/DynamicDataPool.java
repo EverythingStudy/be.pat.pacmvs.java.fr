@@ -69,7 +69,7 @@ public class DynamicDataPool {
     @PreDestroy
     public void shutdown() {
     	shutdownExecutor(dynamicDataThreadPool, "动态数据线程池");
-        shutdownExecutor(recognitionExecutor, "识别任务线程池");
+        //shutdownExecutor(recognitionExecutor, "识别任务线程池");
         shutdownExecutor(slideFileThreadPool, "切片文件线程池");
     }
 
@@ -118,7 +118,7 @@ public class DynamicDataPool {
      * 新增：任务线程池
      * 策略：低并发、有界队列、快速失败（防止 OOM 和主线程阻塞）
      */
-    @Bean("taskExecutor")
+    //@Bean("taskExecutor")
     public ThreadPoolExecutor taskExecutor() {
         int processors = Runtime.getRuntime().availableProcessors();
         
@@ -174,7 +174,7 @@ public class DynamicDataPool {
      * 用途：用于 submitPathList 中的大量文件 IO 和几何计算任务
      * 策略：IO 密集型 (CPU * 2 ~ CPU * 4)，有界队列，失败快速抛出异常
      */
-    @Bean("recognitionExecutor")
+    //@Bean("recognitionExecutor")
     public ThreadPoolExecutor recognitionExecutor() {
         int processors = Runtime.getRuntime().availableProcessors();
         

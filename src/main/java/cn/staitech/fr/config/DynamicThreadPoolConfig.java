@@ -1,5 +1,6 @@
 package cn.staitech.fr.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
@@ -7,9 +8,11 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
+@Slf4j
 public class DynamicThreadPoolConfig {
     @Bean
     public ExecutorService executorService() {
+        log.info("系统CPU核心数识别为: {}", Runtime.getRuntime().availableProcessors());
         ThreadPoolExecutor executor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(5), new ThreadFactory() {
             private final AtomicInteger threadNumber = new AtomicInteger(1);
 
