@@ -82,7 +82,22 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
     private CommonJsonParser commonJsonParser;
 
 
-    ExecutorService EXECUTOR = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors() * 2, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(), new CustomRejectedExecutionHandler());
+    ExecutorService EXECUTOR = new ThreadPoolExecutor(Runtime.getRuntime().availableProcessors(),
+            Runtime.getRuntime().availableProcessors() * 2,
+            60L,
+            TimeUnit.SECONDS,
+            new LinkedBlockingQueue<>(),
+            new ThreadFactory() {
+                private final AtomicInteger threadNumber = new AtomicInteger(1);
+                @Override
+                public Thread newThread(Runnable r) {
+                    Thread thread = new Thread(r, "ai-json-thread-" + threadNumber.getAndIncrement());
+                    thread.setDaemon(false);
+                    log.info("创建AiJson任务线程: {}", threadNumber.get());
+                    return thread;
+                }
+            },
+            new CustomRejectedExecutionHandler());
 
     static class CustomRejectedExecutionHandler implements RejectedExecutionHandler {
         @Override

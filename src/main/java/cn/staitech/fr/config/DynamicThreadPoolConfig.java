@@ -13,13 +13,14 @@ public class DynamicThreadPoolConfig {
     @Bean
     public ExecutorService executorService() {
         log.info("系统CPU核心数识别为: {}", Runtime.getRuntime().availableProcessors());
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(3, 10, 1000L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(5), new ThreadFactory() {
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(3, 10, 10L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(5), new ThreadFactory() {
             private final AtomicInteger threadNumber = new AtomicInteger(1);
 
             @Override
             public Thread newThread(Runnable r) {
-                Thread thread = new Thread(r, "dynamic-pool-thread-" + threadNumber.getAndIncrement());
+                Thread thread = new Thread(r, "json-task-thread-" + threadNumber.getAndIncrement());
                 thread.setDaemon(false);
+                log.info("创建JsonTask任务线程: {}", threadNumber.get());
                 return thread;
             }
         }, new ThreadPoolExecutor.CallerRunsPolicy());
