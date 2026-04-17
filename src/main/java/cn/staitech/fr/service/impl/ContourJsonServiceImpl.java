@@ -91,9 +91,9 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                 private final AtomicInteger threadNumber = new AtomicInteger(1);
                 @Override
                 public Thread newThread(Runnable r) {
+                    log.info("创建AiJson任务线程: {}", threadNumber.get());
                     Thread thread = new Thread(r, "ai-json-thread-" + threadNumber.getAndIncrement());
                     thread.setDaemon(false);
-                    log.info("创建AiJson任务线程: {}", threadNumber.get());
                     return thread;
                 }
             },
