@@ -16,6 +16,7 @@ WORKDIR /home/staitech
 COPY ./jar/staitech-modules-fr.jar /home/staitech/staitech-modules-fr.jar
 COPY jmx_prometheus_javaagent-0.16.1.jar jmx_prometheus_javaagent.jar
 COPY jmx_config.yaml jmx_config.yaml
+COPY arthas-boot.jar arthas-boot.jar
 
 # 启动系统服务
 ENTRYPOINT ["sh","-c","java $JAVA_OPTS -javaagent:/home/staitech/jmx_prometheus_javaagent.jar=1234:/home/staitech/jmx_config.yaml -jar staitech-modules-fr.jar"]
