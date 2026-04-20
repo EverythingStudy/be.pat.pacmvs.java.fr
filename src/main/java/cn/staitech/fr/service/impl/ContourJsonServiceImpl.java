@@ -99,7 +99,26 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                     return thread;
                 }
             },
-            new CustomRejectedExecutionHandler());
+            new CustomRejectedExecutionHandler()) {
+        @Override
+        public void execute(Runnable command) {
+            // 这个日志一定会打印，无论是否被 TtlExecutors 包装
+            log.info("[AiJson线程池监控-提交] 队列数={}, 线程数={}, 活跃数={}", getQueue().size(), getPoolSize(), getActiveCount());
+            super.execute(command);
+        }
+
+        @Override
+        protected void beforeExecute(Thread t, Runnable r) {
+            log.info("[AiJson线程池监控-开始] 线程名称={}, 队列数={}, 线程数={}, 活跃数={}", t.getName(), getQueue().size(), getPoolSize(), getActiveCount());
+            super.beforeExecute(t, r);
+        }
+
+        @Override
+        protected void afterExecute(Runnable r, Throwable t) {
+            super.afterExecute(r, t);
+            log.info("[AiJson线程池监控-完成] 已完成={}, 队列数={}, 线程数={}, 活跃数={}", getCompletedTaskCount(), getQueue().size(), getPoolSize(), getActiveCount());
+        }
+    };
 
     static class CustomRejectedExecutionHandler implements RejectedExecutionHandler {
         @Override
