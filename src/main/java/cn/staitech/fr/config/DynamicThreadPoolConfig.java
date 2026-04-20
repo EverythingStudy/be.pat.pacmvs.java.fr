@@ -18,8 +18,9 @@ public class DynamicThreadPoolConfig {
 
             @Override
             public Thread newThread(Runnable r) {
-                log.info("创建JsonTask任务线程: {}", threadNumber.get());
-                Thread thread = new Thread(r, "json-task-thread-" + threadNumber.getAndIncrement());
+                int num = threadNumber.getAndIncrement();
+                log.info("创建JsonTask任务线程: {}", num);
+                Thread thread = new Thread(r, "json-task-thread-" + num);
                 thread.setDaemon(false);
                 return thread;
             }
