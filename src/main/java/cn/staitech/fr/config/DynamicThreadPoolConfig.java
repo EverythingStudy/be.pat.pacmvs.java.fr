@@ -13,7 +13,7 @@ public class DynamicThreadPoolConfig {
     @Bean
     public ExecutorService executorService() {
         log.info("系统CPU核心数识别为: {}", Runtime.getRuntime().availableProcessors());
-        ThreadPoolExecutor executor = new ThreadPoolExecutor(3, 10, 10L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(5), new ThreadFactory() {
+        ThreadPoolExecutor executor = new ThreadPoolExecutor(3, 10, 60L, TimeUnit.SECONDS, new ArrayBlockingQueue<>(5), new ThreadFactory() {
             private final AtomicInteger threadNumber = new AtomicInteger(1);
 
             @Override
