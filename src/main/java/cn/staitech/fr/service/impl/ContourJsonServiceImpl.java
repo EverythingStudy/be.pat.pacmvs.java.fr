@@ -337,7 +337,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
             }
             log.info("进入切分single{},filePath:[{}],list:[{}]", single.getSingleId(), outputPath, list.size());
             // 写入文件
-            writeFilteredGeoJson(list, outputPath);
+            writeFilteredGeoJsonNew(list, outputPath);
         } else if (size == 2) {
             preFeature(features, dynamicDataMap, tree, geometryMap);
             // 过滤出符合条件的切片
@@ -570,7 +570,7 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                     // 将列表中得数据根据structureSize将structureId分成列表
                     String outputPath = outputDir + "/" + fileName + ".json";
                     // 写入文件
-                    writeFilteredGeoJson(filteredFeatures, outputPath);
+                    writeFilteredGeoJsonNew(filteredFeatures, outputPath);
                 }
             } catch (Exception e) {
                 log.error("Error processing file: [{}]", e.getMessage(), e);
