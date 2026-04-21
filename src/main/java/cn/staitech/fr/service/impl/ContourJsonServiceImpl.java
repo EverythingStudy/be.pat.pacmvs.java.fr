@@ -572,8 +572,8 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                     // 写入文件
                     writeFilteredGeoJson(filteredFeatures, outputPath);
                 }
-            } catch (JSONException e) {
-                log.error("Error processing file: [{}]", e.getMessage());
+            } catch (Exception e) {
+                log.error("Error processing file: [{}]", e.getMessage(), e);
             } finally {
                 countDownLatch.countDown();
             }
@@ -852,6 +852,44 @@ public class ContourJsonServiceImpl extends ServiceImpl<ContourJsonMapper, Conto
                 }
                 exportJson(filePath, jsonString);
             }
+        }
+    }
+
+    /**
+     * 写入geojson文件
+     *
+     * @auther yxy
+     */
+    private static void writeFilteredGeoJsonNew(List<Features> list, String filePath) {
+        if (list.isEmpty()) {
+            return;
+        }
+        Path path = Paths.get(filePath);
+        // 已有文件：定位到 ]} 前面，替换为 ,新features]}
+        try (RandomAccessFile raf = new RandomAccessFile(path.toFile(), "rw")) {
+            long len = raf.length();
+            // 新文件：逐片段写，不构造超大 String
+            if (len == 0) {
+                // 头部
+                raf.write("{\"type\":\"FeatureCollection\",\"features\":[".getBytes(StandardCharsets.UTF_8));
+            } else {
+                // 已有文件：定位到 ] 前面，直接覆盖为 , + features + ]}
+                raf.seek(len - 2);
+                // 覆盖 ]
+                raf.write(',');
+            }
+            // 构造 ,feature1,feature2]}
+            for (int i = 0; i < list.size(); i++) {
+                if (i > 0) {
+                    raf.write(',');
+                }
+                raf.write(JSON.toJSONString(list.get(i)).getBytes(StandardCharsets.UTF_8));
+            }
+            // 尾部
+            raf.write(']');
+            raf.write('}');
+        } catch (Exception e) {
+            log.error("写入失败: {}", filePath, e);
         }
     }
 
