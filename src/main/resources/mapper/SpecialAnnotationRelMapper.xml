@@ -25,22 +25,4 @@
     <select id="selectTableSpecialCount" parameterType="cn.staitech.fr.domain.Annotation" resultType="int">
         select count(distinct(special_id)) from fr_special_annotation_rel t where t.sequence_number = #{sequenceNumber}
     </select>
-    
-    
-    <select id="getSeqNumberList"  resultMap="BaseResultMap">
-    	SELECT DISTINCT
-			( t2.sequence_number ) 
-		FROM
-			fr_special_annotation_rel t2 
-		WHERE
-			t2.special_id IN (
-			SELECT
-				t1.special_id 
-			FROM
-				fr_special t1 
-			WHERE
-			t1.del_flag = '0' 
-			)
-			ORDER BY sequence_number
-    </select>
 </mapper>

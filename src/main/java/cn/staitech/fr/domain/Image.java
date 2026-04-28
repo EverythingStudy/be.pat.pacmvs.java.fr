@@ -15,11 +15,7 @@ import lombok.NoArgsConstructor;
 import java.util.Date;
 import java.util.Map;
 
-/**
- * 图像表 tb_image
- *
- * @author WangFeng
- */
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -128,6 +124,9 @@ public class Image extends BaseEntity {
     @TableField(value = "status")
     @ApiModelProperty(value = "文件状态:0上传中、1上传失败、2解析中、3解析失败、4可用")
     private Integer status;
+    @TableField(exist = false)
+    @ApiModelProperty(value = "文件状态名称")
+    private String fileStatus;
     @ApiModelProperty(value = "机构编号")
     @TableField(value = "organization_id")
     private Long organizationId;
@@ -169,7 +168,6 @@ public class Image extends BaseEntity {
     @TableField(exist = false)
     private String folderName;
     
-   //2024.09.11
     @ApiModelProperty(value = "专题id")
     private Long topicId;
     @ApiModelProperty(value = "专题号")
@@ -177,14 +175,15 @@ public class Image extends BaseEntity {
     @ApiModelProperty(value = "动物号")
     private String animalCode;
     @ApiModelProperty(value = "蜡块号")
-    private Integer waxCode;
+    private String waxCode;
     @ApiModelProperty(value = "组别号")
     private String groupCode;
     @ApiModelProperty(value = "性别（M；F）")
     private String sexFlag;
     @ApiModelProperty(value = "文件名解析状态（0失败1成功）")
     private Integer analyzeStatus;
-    
-    
+    @TableField(exist = false)
+    @ApiModelProperty(value = "文件名解析状态名称")
+    private String analyzeStatusName;
 
 }

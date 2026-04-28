@@ -1,0 +1,46 @@
+package cn.staitech.fr.vo.project;
+
+import cn.staitech.fr.enums.GenderEnum;
+import cn.staitech.sft.logaudit.annotation.IdField;
+import cn.staitech.sft.logaudit.annotation.IgnoreLogField;
+import cn.staitech.sft.logaudit.annotation.LogFieldEnumConvert;
+import cn.staitech.sft.logaudit.req.LogAuditBaseReq;
+import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotNull;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class ProjectMemberInfo extends LogAuditBaseReq {
+    @IgnoreLogField
+    @ApiModelProperty(value = "用户id")
+    @IdField(index = 1,name = "用户编号",nameEn = "User ID")
+    private Long userId;
+
+    @IgnoreLogField
+    @ApiModelProperty(value = "项目成员id", required = true)
+    private Long memberId;
+
+    @IdField(index = 2,name = "用户名称",nameEn = "User Name")
+    @ApiModelProperty(value = "系统姓名")
+    private String nickName;
+
+    @ApiModelProperty(value = "注册姓名")
+    private String userName;
+
+    @LogFieldEnumConvert(enumClass = GenderEnum.class,valueField = "code",convertField = "info")
+    @ApiModelProperty(value = "性别")
+    private String sex;
+
+    @ApiModelProperty(value = "手机")
+    private String phonenumber;
+
+    @ApiModelProperty(value = "系统角色")
+    private String roleName;
+}

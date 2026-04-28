@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import java.util.List;
 
 /**
@@ -31,7 +30,8 @@ public class SpeciesController {
     @ApiOperation(value = "种属下拉框", notes = "种属下拉框")
     @GetMapping("/speciesList")
     public R<List<Species>> speciesList() {
-        List<Species> reviewContents = speciesService.getSpeciesList();
-        return R.ok(reviewContents);
+        List<Species> speciesList = speciesService.getSpeciesList();
+        return R.ok(speciesList);
     }
+
 }

@@ -5,55 +5,315 @@
 <mapper namespace="cn.staitech.fr.mapper.AnnotationMapper">
 
     <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.Annotation">
-            <result property="annotationId" column="annotation_id" jdbcType="BIGINT"/>
-            <result property="area" column="area" jdbcType="VARCHAR"/>
-            <result property="perimeter" column="perimeter" jdbcType="VARCHAR"/>
-            <result property="description" column="description" jdbcType="VARCHAR"/>
-            <result property="categoryId" column="category_id" jdbcType="BIGINT"/>
-            <result property="locationType" column="location_type" jdbcType="VARCHAR"/>
-            <result property="annotationType" column="annotation_type" jdbcType="VARCHAR"/>
-            <result property="createBy" column="create_by" jdbcType="BIGINT"/>
-            <result property="createTime" column="create_time" jdbcType="DATE"/>
-            <result property="updateBy" column="update_by" jdbcType="BIGINT"/>
-            <result property="updateTime" column="update_time" jdbcType="DATE"/>
-            <result property="slideId" column="slide_id" jdbcType="BIGINT"/>
-            <result property="jsonId" column="json_id" jdbcType="VARCHAR"/>
+        <id property="annotationId" column="annotation_id" jdbcType="BIGINT"/>
+        <result property="area" column="area" jdbcType="VARCHAR"/>
+        <result property="perimeter" column="perimeter" jdbcType="VARCHAR"/>
+        <result property="description" column="description" jdbcType="VARCHAR"/>
+        <result property="categoryId" column="category_id" jdbcType="BIGINT"/>
+        <result property="locationType" column="location_type" jdbcType="VARCHAR"/>
+        <result property="annotationType" column="annotation_type" jdbcType="VARCHAR"/>
+        <result property="createBy" column="create_by" jdbcType="BIGINT"/>
+        <result property="createTime" column="create_time" jdbcType="DATE"/>
+        <result property="updateBy" column="update_by" jdbcType="BIGINT"/>
+        <result property="updateTime" column="update_time" jdbcType="DATE"/>
+        <result property="projectId" column="project_id" jdbcType="BIGINT"/>
+        <result property="slideId" column="slide_id" jdbcType="BIGINT"/>
+        <result property="id" column="id" jdbcType="VARCHAR"/>
+        <result property="contour40000" column="contour40000" jdbcType="OTHER"/>
+        <result property="contour10000" column="contour10000" jdbcType="OTHER"/>
+        <result property="contour2500" column="contour2500" jdbcType="OTHER"/>
+        <result property="contour625" column="contour625" jdbcType="OTHER"/>
+        <result property="contourType" column="contour_type" jdbcType="BIGINT"/>
+        <result property="dynamicData" column="dynamic_data"  jdbcType="VARCHAR"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        contour_id,area,perimeter,
-        description,category_id,annotation,
-        location_type,annotation_type,create_by,
-        create_time,update_by,update_time,
-        slide_id,json_id
+        annotation_id,area,perimeter,
+        description,category_id,location_type,
+        annotation_type,create_by,create_time,
+        update_by,update_time,project_id,
+        slide_id,id,contour40000,contour10000
+        ,contour2500,contour625,contour_type
     </sql>
 
-    <select id="stClosestPoint" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
-        SELECT
-            st_asgeojson ( st_closestpoint ( st_geomfromgeojson ( #{contourOne} ), st_geomfromgeojson ( #{contourTwo} ) ) ) AS contourOne,
-            st_asgeojson ( st_closestpoint ( st_geomfromgeojson ( #{contourTwo} ), st_geomfromgeojson ( #{contourOne} ) ) ) AS contourTwo
+    <insert id="insert" parameterType="cn.staitech.fr.domain.Annotation" useGeneratedKeys="true"
+            keyProperty="annotationId">
+        insert into fr_annotation (
+        <if test="area != null and area != '' ">area,</if>
+        <if test="perimeter != null and perimeter != '' ">perimeter,</if>
+        <if test="categoryId != null">category_id,</if>
+        <if test="description != null and description != '' ">description,</if>
+        <if test="locationType != null and locationType != '' ">location_type,</if>
+        <if test="annotationType != null and annotationType != '' ">annotation_type,</if>
+        <if test="contour != null">
+            contour40000,
+        </if>
+        <if test="createBy != null and createBy != ''">create_by,</if>
+        <if test="updateBy != null and updateBy != ''">update_by,</if>
+        <if test="slideId != null and slideId != ''">slide_id,</if>
+        <if test="id != null and id != ''">id,</if>
+        <if test="contourType != null and contourType != ''">contour_type,</if>
+        <if test="singleSlideId != null and singleSlideId != ''">single_slide_id,</if>
+        <if test="single != null and single != ''">single,</if>
+        create_time
+        )values(
+        <if test="area != null and area != ''">#{area},</if>
+        <if test="perimeter != null and perimeter != ''">#{perimeter},</if>
+        <if test="categoryId != null">#{categoryId},</if>
+        <if test="description != null">#{description},</if>
+        <if test="locationType != null and locationType != ''">#{locationType},</if>
+        <if test="annotationType != null and annotationType != ''">#{annotationType},</if>
+        <if test="contour != null">
+            st_geomfromgeojson(#{contour}),
+        </if>
+        <if test="createBy != null and createBy != ''">#{createBy},</if>
+        <if test="updateBy != null and updateBy != ''">#{updateBy},</if>
+        <if test="slideId != null and slideId != ''">#{slideId},</if>
+        <if test="id != null and id != ''">#{id},</if>
+        <if test="contourType != null and contourType != ''">#{contourType},</if>
+        <if test="singleSlideId != null and singleSlideId != ''">#{singleSlideId},</if>
+        <if test="single != null and single != ''">#{single},</if>
+        now()
+        )
+    </insert>
+
+    <update id="updateById" parameterType="cn.staitech.fr.domain.Annotation" useGeneratedKeys="true"
+            keyProperty="annotationId">
+        update fr_annotation
+        <set>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="area != null">area = #{area},</if>
+            <if test="perimeter != null">perimeter = #{perimeter},</if>
+            <if test="locationType != null and locationType != ''">location_type = #{locationType},</if>
+            <if test="annotationType != null and annotationType != ''">annotation_type = #{annotationType},</if>
+            <if test="updateBy != null and updateBy != ''">update_by = #{updateBy},</if>
+            <if test="contour != null">
+                contour40000 = st_geomfromgeojson(#{contour}),
+            </if>
+            <if test="contourPolygon != null">
+                contour_polygon = st_geomfromgeojson(#{contourPolygon}),
+            </if>
+            <if test="id != null and id != ''">id = #{id},</if>
+            update_time = now()
+        </set>
+        where annotation_id = #{annotationId}
+    </update>
+
+
+    <!--查询表下记录总数-->
+    <select id="selectTableRecordCount" parameterType="cn.staitech.fr.domain.Annotation" resultType="int">
+        SELECT n_live_tup
+        FROM pg_stat_user_tables
+        where schemaname = 'public'
+          and relname = 'fr_ai_annotation_${sequenceNumber}'
     </select>
 
-
-    <select id="stDistance" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
-        SELECT
-            ST_Distance ( st_geomfromgeojson ( #{contourOne} ), st_geomfromgeojson ( #{contourTwo} ) ) AS minDistance
+    <!--查询是放存在表-->
+    <select id="selectExistTable" parameterType="cn.staitech.fr.domain.Annotation" resultType="int">
+        select count(*)
+        from pg_class
+        where relname = 'fr_ai_annotation_${sequenceNumber}'
     </select>
 
-    <select id="avgDistance" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
-        WITH
-            poly1_points AS (
-                SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourOne}))).geom AS geom
-            ),
-            poly2_points AS (
-        SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourTwo}))).geom AS geom
-                ),
-            point_distances AS (
-        SELECT AVG(ST_Distance(p1.geom, p2.geom)) AS meanDistance
-        FROM poly1_points p1
-            CROSS JOIN poly2_points p2
+    <insert id="createTableSequence" parameterType="cn.staitech.fr.domain.Annotation">
+        DROP
+        SEQUENCE IF EXISTS fr_ai_annotation_${sequenceNumber}_annotation_id_seq;
+	    CREATE
+        SEQUENCE fr_ai_annotation_${sequenceNumber}_annotation_id_seq START
+        1;
+    </insert>
+
+
+    <insert id="createTable" parameterType="cn.staitech.fr.domain.Annotation">
+        CREATE TABLE "public".fr_ai_annotation_${sequenceNumber}
+        (
+            "annotation_id"   int8 NOT NULL DEFAULT nextval('fr_ai_annotation_${sequenceNumber}_annotation_id_seq'::regclass),
+            "area"            VARCHAR(50) COLLATE "pg_catalog"."default",
+            "perimeter"       VARCHAR(50) COLLATE "pg_catalog"."default",
+            "description"     VARCHAR(100) COLLATE "pg_catalog"."default",
+            "category_id"     INT8,
+            "contour625"      geometry ( GEOMETRY ),
+            "contour2500"     geometry ( GEOMETRY ),
+            "contour10000"    geometry ( GEOMETRY ),
+            "contour40000"    geometry ( GEOMETRY ),
+            "contour5000"     geometry ( GEOMETRY ),
+            "location_type"   VARCHAR(100) COLLATE "pg_catalog"."default",
+            "annotation_type" VARCHAR(50) COLLATE "pg_catalog"."default",
+            "create_by"       INT8,
+            "create_time"     timestamp,
+            "update_by"       INT8,
+            "update_time"     timestamp,
+            "slide_id"        INT8,
+            "single_slide_id" INT8,
+            "single"          INT2          DEFAULT 1,
+            "contour_type"    INT8          DEFAULT 4,
+            "structure_size"  INT2,
+            "cell_type"       VARCHAR(50) COLLATE "pg_catalog"."default",
+            "id"              VARCHAR(500) COLLATE "pg_catalog"."default",
+            "dynamic_data"    VARCHAR(1000) COLLATE "pg_catalog"."default",
+            CONSTRAINT "fr_ai_annotation_${sequenceNumber}_pkey" PRIMARY KEY ("annotation_id")
+        );
+
+
+        ALTER TABLE "fr_ai_annotation_${sequenceNumber}" OWNER TO "postgres";
+
+
+        CREATE INDEX "fr_ai_annotation_${sequenceNumber}_slide_id_idx" ON "public"."fr_ai_annotation_${sequenceNumber}" USING btree (
+            "single_slide_id" "pg_catalog"."int8_ops" ASC NULLS LAST
+            );
+
+        CREATE INDEX "fr_ai_annotation_${sequenceNumber}_contour40000_idx" ON "public"."fr_ai_annotation_${sequenceNumber}" USING gist (
+            "contour40000" "public"."gist_geometry_ops_2d"
+            );
+
+        CREATE INDEX "fr_ai_annotation_${sequenceNumber}_contour625_idx" ON "public"."fr_ai_annotation_${sequenceNumber}" USING gist (
+            "contour625" "public"."gist_geometry_ops_2d"
+            );
+
+        CREATE INDEX "fr_ai_annotation_${sequenceNumber}_contour2500_idx" ON "public"."fr_ai_annotation_${sequenceNumber}" USING gist (
+            "contour2500" "public"."gist_geometry_ops_2d"
+            );
+
+        CREATE INDEX "fr_ai_annotation_${sequenceNumber}_contour10000_idx" ON "public"."fr_ai_annotation_${sequenceNumber}" USING gist (
+            "contour10000" "public"."gist_geometry_ops_2d"
+            );
+        CREATE INDEX "idx_fr_ai_annotation_${sequenceNumber}_category_slide" ON "public"."fr_ai_annotation_${sequenceNumber}" USING btree (
+            "category_id" "pg_catalog"."int8_ops" ASC NULLS LAST,
+            "single_slide_id" "pg_catalog"."int8_ops" ASC NULLS LAST
+            );
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."annotation_id" IS '主键id';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."area" IS '面积';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."perimeter" IS '周长';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."description" IS '轮廓描述';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."category_id" IS '轮廓标签id';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour40000" IS '轮廓坐标';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour625" IS '轮廓坐标625';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour2500" IS '轮廓坐标2500';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour10000" IS '轮廓坐标10000';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."location_type" IS '轮廓类型';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."annotation_type" IS '标注类型(AI表示AI算出的标注，Draw表示前端绘制的标注)';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."create_by" IS '标注创建者';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."create_time" IS '创建时间';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."update_by" IS '更新者';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."update_time" IS '更新时间';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."slide_id" IS '切片id';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."single_slide_id" IS '单切片id';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."single" IS '单切片id标识';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."contour_type" IS '轮廓类型标识';
+
+        COMMENT
+        ON COLUMN "public"."fr_ai_annotation_${sequenceNumber}"."id" IS 'geojson中数据id';
+    </insert>
+
+
+    <insert id="batchSave" parameterType="cn.staitech.fr.domain.Annotation">
+        insert into fr_ai_annotation_${sequenceNumber} (
+        area,
+        perimeter,
+        category_id ,
+        contour40000,
+        contour625,
+        contour2500,
+        contour10000,
+        contour5000,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        slide_id,
+        single_slide_id,
+        structure_size,
+        cell_type,
+        id
+        )
+        values
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.area},
+            #{item.perimeter},
+            #{item.categoryId},
+            st_geomfromgeojson(#{item.contour40000}),
+            st_geomfromgeojson(#{item.contour625}),
+            st_geomfromgeojson(#{item.contour2500}),
+            st_geomfromgeojson(#{item.contour10000}),
+            st_geomfromgeojson(#{item.contour5000}),
+            #{item.locationType},
+            #{item.annotationType},
+            #{item.createBy},
+            NOW(),
+            #{item.slideId},
+            #{item.singleSlideId},
+            #{item.structureSize},
+            #{item.cellType},
+            #{item.id}
             )
-        SELECT * FROM point_distances;
+        </foreach>
+    </insert>
+
+
+    <select id="selectById" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        select annotation_id,
+               area,
+               perimeter,
+               description,
+               category_id,
+               location_type,
+               annotation_type,
+               create_by,
+               create_time,
+               update_by,
+               update_time,
+               slide_id,
+               id,
+               contour_type,
+               single_slide_id,
+               single,
+               ST_AsGeoJSON(contour40000) AS contour,
+               ST_AsGeoJSON(contour40000) AS contour40000,
+               ST_AsGeoJSON(contour10000) AS contour10000,
+               ST_AsGeoJSON(contour2500)  AS contour2500,
+               ST_AsGeoJSON(contour625)   AS contour625
+        from fr_annotation
+        where annotation_id = #{annotationId}
     </select>
 
     <select id="selectByIds" parameterType="cn.staitech.fr.domain.Annotation"
@@ -70,165 +330,45 @@
                update_by,
                update_time,
                slide_id,
-               json_id,
-               ST_AsGeoJSON(contour) AS contour
-        from fr_annotation_${sequenceNumber}
+               id,
+               contour_type,
+               single_slide_id,
+               single,
+               ST_AsGeoJSON(contour40000) AS contour,
+               ST_AsGeoJSON(contour40000) AS contour40000,
+               ST_AsGeoJSON(contour10000) AS contour10000,
+               ST_AsGeoJSON(contour2500)  AS contour2500,
+               ST_AsGeoJSON(contour625)   AS contour625
+        from fr_annotation
         where annotation_id = #{annotationId}
     </select>
 
-
-
-
-    <select id="selectContourType" parameterType="cn.staitech.fr.domain.Annotation"
+    <select id="aiSelectById" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
-        SELECT GeometryType(st_geomfromgeojson(#{contour})) as location_type
+        select annotation_id,
+               area,
+               perimeter,
+               description,
+               category_id,
+               location_type,
+               annotation_type,
+               create_by,
+               create_time,
+               update_by,
+               update_time,
+               slide_id,
+               id,
+               contour_type,
+               single_slide_id,
+               single,
+               ST_AsGeoJSON(contour40000) AS contour,
+               ST_AsGeoJSON(contour40000) AS contour40000,
+               ST_AsGeoJSON(contour10000) AS contour10000,
+               ST_AsGeoJSON(contour2500)  AS contour2500,
+               ST_AsGeoJSON(contour625)   AS contour625
+        from fr_ai_annotation_${sequenceNumber}
+        where annotation_id = #{annotationId}
     </select>
-
-    <select id="getArea" parameterType="cn.staitech.fr.domain.Annotation"
-            resultMap="BaseResultMap">
-        select ST_Perimeter(st_geomfromgeojson(#{contour})) as perimeter,
-               ST_Area(st_geomfromgeojson(#{contour}))      as area
-    </select>
-
-    <!--查询是放存在表-->
-    <select id="selectExistTable" parameterType="cn.staitech.fr.domain.Annotation" resultType="int">
-        select count(*)
-        from pg_class
-        where relname = 'fr_annotation_${sequenceNumber}'
-    </select>
-
-    <insert id="createTableSequence" parameterType="cn.staitech.fr.domain.Annotation">
-        DROP
-        SEQUENCE IF EXISTS fr_annotation_${sequenceNumber}_annotation_id_seq;
-	    CREATE
-        SEQUENCE fr_annotation_${sequenceNumber}_annotation_id_seq START
-        1;
-
-        DROP
-        SEQUENCE IF EXISTS fr_annotation_del_${sequenceNumber}_annotation_id_seq;
-	    CREATE
-        SEQUENCE fr_annotation_del_${sequenceNumber}_annotation_id_seq START
-        1;
-    </insert>
-
-    <insert id="createTable" parameterType="cn.staitech.fr.domain.Annotation">
-        CREATE TABLE "public".fr_annotation_${sequenceNumber}
-        (
-            "annotation_id"   int8 NOT NULL DEFAULT nextval('fr_annotation_${sequenceNumber}_annotation_id_seq'::regclass),
-            "area" varchar(50) COLLATE "pg_catalog"."default",
-		  	"perimeter" varchar(50) COLLATE "pg_catalog"."default",
-		     "description" varchar(100) COLLATE "pg_catalog"."default",
-		     "category_id" int8,
-		     "contour" geometry(GEOMETRY),
-		     "location_type" varchar(100) COLLATE "pg_catalog"."default",
-		      "annotation_type" varchar(50) COLLATE "pg_catalog"."default" DEFAULT 'draw'::character varying,
-		      "create_by" int8,
-		      "create_time" date,
-		      "update_by" int8,
-		       "update_time" date,
-		       "slide_id" int8,
-		       "json_id" varchar(500) COLLATE "pg_catalog"."default"
-        );
-
-        ALTER TABLE "fr_annotation_${sequenceNumber}" OWNER TO "postgres";
-        COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."annotation_id" IS '主键id';
-		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."area" IS '面积';
-		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."perimeter" IS '周长';
-		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."description" IS '轮廓描述';
-		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."category_id" IS '轮廓标签id';
-		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."contour" IS '轮廓坐标625';
-		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."location_type" IS '轮廓类型';
-		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."annotation_type" IS '标注类型(AI表示AI算出的标注，Draw表示前端绘制的标注)';
-		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."create_by" IS '标注创建者';
-		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."create_time" IS '创建时间';
-		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."update_by" IS '更新者';
-		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."update_time" IS '更新时间';
-		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."slide_id" IS '切片id';
-		COMMENT ON COLUMN "public"."fr_annotation_${sequenceNumber}"."json_id" IS 'geojson中数据id';
-
-        CREATE TABLE "public".fr_annotation_del_${sequenceNumber}
-        (
-            "annotation_id"   int8 NOT NULL DEFAULT nextval('fr_annotation_del_${sequenceNumber}_annotation_id_seq'::regclass),
-            "area" varchar(50) COLLATE "pg_catalog"."default",
-            "perimeter" varchar(50) COLLATE "pg_catalog"."default",
-            "description" varchar(100) COLLATE "pg_catalog"."default",
-            "category_id" int8,
-            "contour" geometry(GEOMETRY),
-            "location_type" varchar(100) COLLATE "pg_catalog"."default",
-            "annotation_type" varchar(50) COLLATE "pg_catalog"."default" DEFAULT 'draw'::character varying,
-            "create_by" int8,
-            "create_time" date,
-            "update_by" int8,
-            "update_time" date,
-            "delete_by" int8,
-            "delete_time" date,
-            "slide_id" int8,
-            "json_id" varchar(500) COLLATE "pg_catalog"."default"
-        );
-
-        ALTER TABLE "fr_annotation_del_${sequenceNumber}" OWNER TO "postgres";
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."annotation_id" IS '主键id';
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."area" IS '面积';
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."perimeter" IS '周长';
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."description" IS '轮廓描述';
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."category_id" IS '轮廓标签id';
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."contour" IS '轮廓坐标625';
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."location_type" IS '轮廓类型';
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."annotation_type" IS '标注类型(AI表示AI算出的标注，Draw表示前端绘制的标注)';
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."create_by" IS '标注创建者';
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."create_time" IS '创建时间';
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."update_by" IS '更新者';
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."update_time" IS '更新时间';
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."delete_by" IS '删除者';
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."update_time" IS '删除时间';
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."slide_id" IS '切片id';
-        COMMENT ON COLUMN "public"."fr_annotation_del_${sequenceNumber}"."json_id" IS 'geojson中数据id';
-    </insert>
-
-    <!--查询表下记录总数-->
-    <select id="selectTableRecordCount" parameterType="cn.staitech.fr.domain.Annotation" resultType="int">
-        SELECT n_live_tup
-        FROM pg_stat_user_tables
-        where schemaname = 'public'
-          and relname = 'fr_annotation_${sequenceNumber}'
-    </select>
-
-    <insert id="insert" parameterType="cn.staitech.fr.domain.Annotation" useGeneratedKeys="true" keyProperty="annotationId">
-        insert into fr_annotation_${sequenceNumber} (
-        <if test="area != null and area != '' ">area,</if>
-        <if test="perimeter != null and perimeter != '' ">perimeter,</if>
-        <if test="categoryId != null">category_id,</if>
-        <if test="description != null and description != '' ">description,</if>
-        <if test="locationType != null and locationType != '' ">location_type,</if>
-        <if test="annotationType != null and annotationType != '' ">annotation_type,</if>
-        <if test="contour != null">contour,</if>
-        <if test="createBy != null and createBy != ''">create_by,</if>
-        <if test="slideId != null and slideId != ''">slide_id,</if>
-        <if test="jsonId != null and jsonId != ''">json_id,</if>
-        create_time
-        )values(
-        <if test="area != null and area != ''">#{area},</if>
-        <if test="perimeter != null and perimeter != ''">#{perimeter},</if>
-        <if test="categoryId != null">#{categoryId},</if>
-        <if test="description != null">#{description},</if>
-        <if test="locationType != null and locationType != ''">#{locationType},</if>
-        <if test="annotationType != null and annotationType != ''">#{annotationType},</if>
-        <if test="contour != null">st_geomfromgeojson(#{contour}),</if>
-        <if test="createBy != null and createBy != ''">#{createBy},</if>
-        <if test="slideId != null and slideId != ''">#{slideId},</if>
-        <if test="jsonId != null and jsonId != ''">#{jsonId},</if>
-        now()
-        )
-    </insert>
-
-    <delete id="deleteByIds" parameterType="cn.staitech.fr.domain.Annotation">
-        delete from
-                   fr_annotation_${sequenceNumber}
-        where
-            annotation_id = #{annotationId}
-    </delete>
-
-
 
     <select id="selectListBy" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
@@ -237,7 +377,7 @@
         area,
         perimeter,
         description,
-        category_id,
+--         category_id,
         location_type,
         annotation_type,
         create_by,
@@ -245,31 +385,56 @@
         update_by,
         update_time,
         slide_id,
-        json_id,
+--         json_id,
+        contour_type,
         ST_AsGeoJSON(contour) as contour
-        from fr_annotation_${sequenceNumber}
+--         single_slide_id
+        from fr_annotation
         <where>
+            contour_type != 1
             <if test="slideId != null">
                 AND slide_id = #{slideId}
+                AND single_slide_id is null
+                <if test="categoryIdLists != null and categoryIdLists.size() > 0">
+                    AND category_id not in
+                    <foreach collection="categoryIdLists" item="item" index="index" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
             </if>
-        </where>
-    </select>
-
-
-	<!--根据标签查询是否存在记录-->
-    <select id="getCountByCategory" parameterType="cn.staitech.fr.domain.Annotation" resultType="int">
-        select count(*)
-        from fr_annotation_${sequenceNumber}
-        <where>
-        	<if test="categoryId != null">
-               and category_id = #{categoryId}
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
             </if>
-            <if test="createBy != null">
-               and create_by = #{createBy}
+            <if test="singleSlideId != null">
+                AND single_slide_id = #{singleSlideId}
             </if>
-            <if test="slideIdList != null and slideIdList.size()>0">
-                and slide_id in
-                <foreach collection="slideIdList" item="item" open="(" separator="," close=")">
+            <if test="slideIdList != null and slideIdList.size() > 0">
+                AND slide_id in
+                <foreach collection="slideIdList" item="item" index="index" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="filigreeContour != null and filigreeContour == true">
+                AND contour_type = 3
+                <if test="categoryIdLists != null and categoryIdLists.size() > 0">
+                    AND category_id not in
+                    <foreach collection="categoryIdLists" item="item" index="index" open="(" separator="," close=")">
+                        #{item}
+                    </foreach>
+                </if>
+            </if>
+            <if test="filigreeContour != null and filigreeContour == false">
+                AND contour_type != 3
+            </if>
+            <if test="contourType != null">
+                AND contour_type = #{contourType}
+            </if>
+            <if test="contour != null">
+                AND ST_Intersects(st_geomfromgeojson(#{contour}),contour${magnification})
+            </if>
+            <if test="categoryIdList != null and categoryIdList.size() > 0">
+                AND category_id not in
+                <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">
                     #{item}
                 </foreach>
             </if>
@@ -277,79 +442,7 @@
     </select>
 
 
-    <update id="updateByIds" parameterType="cn.staitech.fr.domain.Annotation">
-        update fr_annotation_${sequenceNumber}
-        <set>
-            <if test="area != null and area != ''">
-                area = #{area},
-            </if>
-            <if test="perimeter != null and perimeter != ''">
-                perimeter = #{perimeter},
-            </if>
-            <if test="description != null and description != ''">
-                description = #{description},
-            </if>
-            <if test="contour != null and contour != ''">
-                contour = st_geomfromgeojson(#{contour}),
-            </if>
-            <if test="updateBy != null and updateBy != ''">
-                update_by = #{updateBy},
-            </if>
-            <if test="categoryId != null">
-                category_id = #{categoryId},
-            </if>
-            update_time = now()
-        </set>
-        where annotation_id = #{annotationId}
-    </update>
-
-    <select id="mergeContour" parameterType="cn.staitech.fr.domain.Annotation"
-            resultMap="BaseResultMap">
-        <if test="operation != null and operation == 'UNION'">
-            select
-            ST_AsGeoJSON(ST_Union((select contour from fr_annotation_${sequenceNumber} where annotation_id =
-            #{annotationId}),st_geomfromgeojson(#{contour}))) as contour
-        </if>
-        <if test="operation != null and operation == 'DIFFERENCE'">
-            select
-            ST_AsGeoJSON(ST_Difference((select contour from fr_annotation_${sequenceNumber} where annotation_id =
-            #{annotationId}),st_geomfromgeojson(#{contour}))) as contour
-        </if>
-    </select>
-
-
-    <select id="selectListRoiContDel" parameterType="cn.staitech.fr.vo.annotation.in.RoiIn"
-            resultMap="BaseResultMap">
-        select
-        annotation_id,
-        category_id,
-        create_by,
-        ST_AsGeoJSON(contour) AS contour
-        from fr_annotation_${sequenceNumber}
-        <where>
-            annotation_type = 'Draw'
-            AND create_by = #{createBy}
-            AND slide_id = #{slideId}
-            AND category_id in
-            <foreach collection="categoryIds" item="categoryId" index="index" open="(" separator="," close=")">
-                #{categoryId}
-            </foreach>
-        </where>
-    </select>
-
-    <select id="deleteRoiContDel" parameterType="cn.staitech.fr.vo.annotation.in.RoiIn" resultType="java.lang.Integer">
-        delete
-        from fr_annotation_${sequenceNumber}
-        <where>
-        AND annotation_id in
-            <foreach collection="annotationIdList" item="annotationId" index="index" open="(" separator="," close=")">
-                #{annotationId}
-            </foreach>
-        </where>
-    </select>
-
-
-    <select id="selectInList" parameterType="cn.staitech.fr.vo.annotation.in.MarkingMerge"
+    <select id="aiSelectListBy" parameterType="cn.staitech.fr.domain.Annotation"
             resultMap="BaseResultMap">
         select
         annotation_id,
@@ -364,17 +457,623 @@
         update_by,
         update_time,
         slide_id,
-        json_id,
-        ST_AsGeoJSON(contour) AS contour
-        from fr_annotation_${sequenceNumber}
+        id,
+        CASE
+            ${magnification}
+        WHEN '5000' THEN
+            CASE
+                structure_size
+            WHEN 2 THEN
+                ST_AsGeoJSON(contour10000)
+            WHEN 3 THEN
+                case
+                    cell_type
+                when 'cell' then
+                    ST_AsGeoJSON(contour5000)
+                else
+                    ST_AsGeoJSON(contour10000)
+                end
+            ELSE
+                NULL
+            END
+        ELSE
+            ST_AsGeoJSON(contour${magnification})
+        END AS contour,
+        single_slide_id,
+        contour_type,
+        cell_type,
+        single,
+        dynamic_data
+        from fr_ai_annotation_${sequenceNumber}
         <where>
-            annotation_id in
-            <foreach collection="markingIdList" item="annotationId" index="index" open="(" separator="," close=")">
-                #{annotationId,jdbcType=BIGINT}
+            <if test="singleSlideId != null">
+                single_slide_id = #{singleSlideId}
+            </if>
+            <if test="contour != null">
+                AND ST_Intersects(st_geomfromgeojson(#{contour}),contour${magnifications})
+            </if>
+            <if test="structureSizeList != null and structureSizeList.size > 0">
+                AND structure_size in
+                <foreach collection="structureSizeList" item="structureSize" open="(" separator="," close=")">
+                    #{structureSize}
+                </foreach>
+            </if>
+            <if test="categoryIdList != null and categoryIdList.size > 0">
+                AND category_id not in
+                <foreach collection="categoryIdList" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="singleSlideIdList != null and singleSlideIdList.size > 0">
+                AND single_slide_id in
+                <foreach collection="singleSlideIdList" item="singleSlideId" open="(" separator="," close=")">
+                    #{singleSlideId}
+                </foreach>
+            </if>
+        </where>
+    </select>
+
+    <select id="aiSelectList" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        select
+        annotation_id,
+        area,
+        perimeter,
+        cast(area as float8) * 0.000001 as structureAreaNum,
+        cast(perimeter as float8) * 0.001 as structurePerimeterNum,
+        description,
+        category_id,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        slide_id,
+        id,
+        st_asgeojson(contour40000) as contour,
+        single_slide_id,
+        contour_type,
+        cell_type,
+        single,
+        dynamic_data
+        from fr_ai_annotation_${sequenceNumber}
+        <where>
+            <if test="singleSlideId != null">
+                single_slide_id = #{singleSlideId}
+            </if>
+            <if test="annotationId != null">
+                AND annotation_id = #{annotationId}
+            </if>
+            <if test="categoryId != null">
+                AND category_id = #{categoryId}
+            </if>
+        </where>
+    </select>
+
+    <select id="mergeContour" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        <if test="operation != null and operation == 'UNION'">
+            select
+            ST_AsGeoJSON(ST_Union((select contour from fr_annotation where annotation_id =
+            #{annotationId}),st_geomfromgeojson(#{contour}))) as contour
+        </if>
+        <if test="operation != null and operation == 'DIFFERENCE'">
+            select
+            ST_AsGeoJSON(ST_Difference((select contour from fr_annotation where annotation_id =
+            #{annotationId}),st_geomfromgeojson(#{contour}))) as contour
+        </if>
+    </select>
+
+    <select id="selectContourType" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT GeometryType(st_geomfromgeojson(#{contour})) as location_type
+    </select>
+
+    <delete id="deleteById" parameterType="cn.staitech.fr.domain.Annotation">
+        delete
+        from fr_annotation
+        where annotation_id = #{annotationId}
+    </delete>
+
+<!--    <select id="selectInList" parameterType="cn.staitech.fr.vo.annotation.MarkingMerge"-->
+<!--            resultMap="BaseResultMap">-->
+<!--        select-->
+<!--        annotation_id,-->
+<!--        area,-->
+<!--        perimeter,-->
+<!--        description,-->
+<!--        category_id,-->
+<!--        location_type,-->
+<!--        annotation_type,-->
+<!--        create_by,-->
+<!--        create_time,-->
+<!--        update_by,-->
+<!--        update_time,-->
+<!--        project_id,-->
+<!--        slide_id,-->
+<!--        id,-->
+<!--        ST_AsGeoJSON(contour40000) AS contour-->
+<!--        from fr_annotation-->
+<!--        <where>-->
+<!--            annotation_id in-->
+<!--            <foreach collection="markingIdList" item="annotationId" index="index" open="(" separator="," close=")">-->
+<!--                #{annotationId,jdbcType=BIGINT}-->
+<!--            </foreach>-->
+<!--        </where>-->
+<!--    </select>-->
+
+
+    <select id="selectCategoryList" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT category_id
+        FROM fr_annotation
+        WHERE slide_id = #{slideId}
+          AND category_id != 0
+        GROUP BY category_id
+    </select>
+
+<!--    <select id="getCategoryCount" parameterType="cn.staitech.fr.domain.Annotation"-->
+<!--            resultType="cn.staitech.fr.vo.annotation.AnnotationCountByCategory">-->
+<!--        select t.category_id, count(1) total_count-->
+<!--        from fr_annotation t-->
+<!--        where t.slide_id = #{slideId}-->
+<!--        and t.contour_type = 2-->
+<!--        <if test="categoryIdList != null and categoryIdList.size() > 0">-->
+<!--            AND t.category_id not in-->
+<!--            <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">-->
+<!--                #{item}-->
+<!--            </foreach>-->
+<!--        </if>-->
+<!--        GROUP BY t.category_id-->
+<!--    </select>-->
+
+    <select id="getAnnoListByParm" parameterType="cn.staitech.fr.domain.Annotation"
+            resultType="cn.staitech.fr.domain.Annotation">
+        SELECT
+        annotation_id,
+        area,
+        perimeter,
+        description,
+        category_id,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        project_id,
+        slide_id,
+        id
+        <!-- ,contour -->
+        FROM fr_annotation
+        WHERE contour_type = 2
+        <if test="slideIdList != null and slideIdList.size() > 0">
+            AND slide_id in
+            <foreach collection="slideIdList" item="item" index="index" open="(" separator="," close=")">
+                #{item}
             </foreach>
+        </if>
+        <if test="categoryIdList != null and categoryIdList.size() > 0">
+            AND category_id not in
+            <foreach collection="categoryIdList" item="item" index="index" open="(" separator="," close=")">
+                #{item}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="collectGeometry" parameterType="long" resultMap="BaseResultMap">
+        SELECT st_asgeojson(st_union(contour)) as collectContour
+        FROM fr_annotation
+        WHERE single_slide_id = #{singleSlideId}
+        <!-- 标注类型：默认 0  1 粗轮廓 2 精细轮廓 -->
+          AND contour_type = 1
+    </select>
+
+    <select id="unionGeometryArea" parameterType="long" resultMap="BaseResultMap">
+        SELECT
+            st_area ( st_union ( contour ) ) AS area,
+            ST_Perimeter ( ST_Collect ( contour ) ) AS perimeter
+        FROM
+            fr_annotation
+        WHERE
+            single_slide_id = #{singleSlideId}
+          AND contour_type = 3
+    </select>
+
+
+    <select id="stUnionContourArea" parameterType="long" resultMap="BaseResultMap">
+        SELECT st_area(st_asgeojson(ST_Collect(contour))) as area,
+               st_asgeojson(ST_Collect(contour)) as collectContour
+        FROM fr_annotation
+        WHERE single_slide_id = #{singleSlideId}
+          AND category_id = #{categoryId}
+          <!-- 标注类型：默认 0  1 粗轮廓 2 精细轮廓 -->
+          AND contour_type = 1
+    </select>
+
+    <select id="intersectsGeometry" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT ST_Intersects(st_geomfromgeojson(#{collectContour}), st_geomfromgeojson(#{contour})) as intersectsResults
+    </select>
+
+    <select id="countDucts" parameterType="cn.staitech.fr.domain.Annotation" resultType="java.lang.Integer">
+        SELECT count(0)
+        from fr_ai_annotation_${sequenceNumber}
+        where single_slide_id = #{singleSlideId}
+          and category_id = #{categoryId}
+    </select>
+
+
+    <select id="stIsValid" parameterType="cn.staitech.fr.domain.Annotation"
+            resultType="cn.staitech.fr.domain.Annotation">
+        select ST_IsValid(st_geomfromgeojson(#{contour})) as results
+    </select>
+
+
+    <select id="stIsValidAnnotation" parameterType="cn.staitech.fr.domain.Annotation"
+            resultType="cn.staitech.fr.domain.Annotation">
+        select ST_IsValid(st_geomfromgeojson(#{contour40000})) as results40000,
+               ST_IsValid(st_geomfromgeojson(#{contour10000})) as results10000,
+               ST_IsValid(st_geomfromgeojson(#{contour2500})) as results2500,
+               ST_IsValid(st_geomfromgeojson(#{contour625})) as results625
+
+    </select>
+    
+    <select id="getDelAnnotation" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+    	SELECT *
+			FROM fr_ai_annotation_${sequenceNumber}
+		WHERE single_slide_id = #{singleSlideId}
+	  <if test="contour != null">
+	    AND ST_Intersects(st_geomfromgeojson(#{contour}), contour40000) = #{insideOrOutside}
+	  </if>
+    </select>
+    
+
+    <delete id="deleteAiAnnotation" parameterType="cn.staitech.fr.domain.Annotation">
+        delete
+        FROM
+        fr_ai_annotation_${sequenceNumber}
+        WHERE
+        single_slide_id = #{singleSlideId}
+        <if test="contour != null">
+            AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000) = #{insideOrOutside}
+        </if>
+    </delete>
+
+
+
+
+    <!-- 批量删除方法 -->
+    <delete id="batchDeleteBySsIds" parameterType="map">
+        DELETE
+        FROM
+        fr_ai_annotation_${sequenceNumber}
+        WHERE annotation_id IN
+        <foreach item="annotationId" index="index" collection="list" open="(" separator="," close=")">
+            #{annotationId}
+        </foreach>
+    </delete>
+
+    <select id="getArea" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        select ST_Perimeter(st_geomfromgeojson(#{contour})) as perimeter,
+               ST_Area(st_geomfromgeojson(#{contour}))      as area,
+               ST_Area(ST_MakeValid(st_geomfromgeojson(#{contour})))   as  effectiveArea
+    </select>
+    
+    <select id="getOrganArea" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT ST_Area(ST_Collect(contour))      AS area,
+               ST_Perimeter(ST_Collect(contour)) AS perimeter
+        from fr_annotation
+        where single_slide_id = #{singleSlideId}
+        <if test="categoryId != null">
+          and category_id = #{categoryId}
+        </if>
+        <if test="structureId != null">
+          and structure_id = #{structureId}
+        </if>
+          and contour_type = 2
+    </select>
+
+    <select id="getStructureArea" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT
+        sum(cast(area as float8)) AS area,
+        sum(cast(perimeter as float8)) AS perimeter
+        from fr_ai_annotation_${sequenceNumber}
+        where category_id = #{categoryId}
+        <if test="singleSlideId != null">
+            AND single_slide_id = #{singleSlideId}
+        </if>
+        <if test="slideId != null">
+            AND slide_id = #{slideId}
+        </if>
+    </select>
+
+    <select id="getInsideOrOutside" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT
+        sum(cast(area as float8)) AS area,
+        sum(cast(perimeter as float8)) AS perimeter,
+        count(annotation_id) as count
+        from fr_ai_annotation_${sequenceNumber}
+        where category_id = #{categoryId}
+        <if test="singleSlideId != null">
+            AND single_slide_id = #{singleSlideId}
+        </if>
+        <if test="contour != null">
+            AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000) = #{insideOrOutside}
+        </if>
+    </select>
+
+    <select id="getInsideOrOutsideList" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT
+        annotation_id,
+        area,
+        perimeter,
+        cast(area as float8) * 0.000001 as structureAreaNum,
+        cast(perimeter as float8) * 0.001 as structurePerimeterNum,
+        description,
+        category_id,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        slide_id,
+        id,
+        st_asgeojson(contour40000) as contour,
+        single_slide_id,
+        contour_type,
+        cell_type,
+        single,
+        dynamic_data
+        from fr_ai_annotation_${sequenceNumber}
+        where category_id = #{categoryId}
+        <if test="singleSlideId != null">
+            AND single_slide_id = #{singleSlideId}
+        </if>
+        <if test="contour != null">
+            AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = #{insideOrOutside}
+        </if>
+    </select>
+
+    <select id="getInsideOrOutsideCount" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        SELECT
+            count(annotation_id) as count
+        from fr_ai_annotation_${sequenceNumber}
+        where category_id = #{categoryId}
+        <if test="singleSlideId != null">
+            AND single_slide_id = #{singleSlideId}
+        </if>
+        <if test="contour != null">
+            AND ST_Intersects ( st_geomfromgeojson(#{contour}), contour40000 ) = #{insideOrOutside}
+        </if>
+    </select>
+
+    <select id="collectAiGeometry" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT st_asgeojson(ST_Collect(contour40000)) as collectContour
+        FROM fr_ai_annotation_${sequenceNumber}
+        WHERE single_slide_id = #{singleSlideId}
+          AND category_id = #{categoryId}
+    </select>
+
+    <select id="stEnvelope" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT st_asgeojson(ST_Envelope(contour40000)) as contourPolygon
+        FROM fr_annotation
+        WHERE annotation_id = #{annotationId}
+    </select>
+
+    <select id="stContains" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT ST_Contains(st_geomfromgeojson(#{collectContour}), st_geomfromgeojson(#{contour})) as Results
+    </select>
+
+    <select id="selectAnnotationIsValid" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT st_asgeojson(contour40000) as contour
+        FROM fr_annotation
+        where contour_type = 3
+          and ST_IsValid(contour40000) = 't'
+          and single_slide_id = #{singleSlideId}
+    </select>
+
+    <select id="stClosestPoint" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT
+            st_asgeojson ( st_closestpoint ( st_geomfromgeojson ( #{contourOne} ), st_geomfromgeojson ( #{contourTwo} ) ) ) AS contourOne,
+            st_asgeojson ( st_closestpoint ( st_geomfromgeojson ( #{contourTwo} ), st_geomfromgeojson ( #{contourOne} ) ) ) AS contourTwo
+    </select>
+
+
+    <select id="stDistance" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT
+            ST_Distance ( st_geomfromgeojson ( #{contourOne} ), st_geomfromgeojson ( #{contourTwo} ) ) AS minDistance
+    </select>
+
+    <select id="avgDistance" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        WITH poly1_points AS (SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourOne})))
+            .geom AS geom
+            )
+           , poly2_points AS (
+        SELECT (ST_DumpPoints(ST_GeomFromGeoJSON(#{contourTwo}))).geom AS geom )
+             , point_distances AS (
+        SELECT AVG (ST_Distance(p1.geom, p2.geom)) AS meanDistance
+        FROM poly1_points p1
+            CROSS JOIN poly2_points p2
+            )
+        SELECT *
+        FROM point_distances;
+    </select>
+
+
+    <update id="aiUpdateById" parameterType="cn.staitech.fr.domain.Annotation" useGeneratedKeys="true"
+            keyProperty="annotationId">
+        update fr_ai_annotation_${sequenceNumber}
+        <set>
+            <if test="dynamicData != null">dynamic_data = #{dynamicData}</if>
+        </set>
+        where annotation_id = #{annotationId}
+    </update>
+    
+    <select id="getSpinalCordAnno" parameterType="cn.staitech.fr.domain.Annotation"
+            resultMap="BaseResultMap">
+        select
+        annotation_id,
+        area,
+        perimeter,
+        description,
+        category_id,
+        location_type,
+        annotation_type,
+        create_by,
+        create_time,
+        update_by,
+        update_time,
+        slide_id,
+        id,
+        contour_type,
+         ST_AsGeoJSON(contour40000) AS contour,
+         ST_AsGeoJSON(contour40000) AS contour40000,
+         ST_AsGeoJSON(contour10000) AS contour10000,
+         ST_AsGeoJSON(contour2500)  AS contour2500,
+         ST_AsGeoJSON(contour625)   AS contour625,
+        single_slide_id,
+        single
+        from fr_annotation
+        <where>
+            <if test="singleSlideId != null">
+                AND single_slide_id = #{singleSlideId}
+            </if>
+            <if test="contourType != null">
+                AND contour_type = #{contourType}
+            </if>
+            <if test="category_id != null">
+                AND category_id = #{categoryId}
+            </if>
         </where>
     </select>
 
 
+    <select id="stMakeValid" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT st_asgeojson(ST_MakeValid ( st_geomfromgeojson ( #{contour} ) ) ) AS contour
+    </select>
+
+	<update id="dropTable" parameterType="cn.staitech.fr.domain.Annotation">
+        DROP TABLE IF EXISTS fr_ai_annotation_${sequenceNumber};
+        DROP SEQUENCE IF EXISTS fr_ai_annotation_${sequenceNumber}_annotation_id_seq;
+    </update>
+    <update id="batchUpdate">
+        <foreach collection="list" item="item" separator=";">
+            update fr_ai_annotation_${sequenceNumber} set dynamic_data = #{item.dynamicData}  where annotation_id = #{item.annotationId}
+        </foreach>
+    </update>
+
+
+    <insert id="transferData" parameterType="Map">
+        insert into fr_ai_annotation_${specialSequenceNumber} (area,
+                                                               perimeter,
+                                                               description,
+                                                               category_id,
+                                                               contour625,
+                                                               contour2500,
+                                                               contour10000,
+                                                               contour40000,
+                                                               contour5000,
+                                                               location_type,
+                                                               annotation_type,
+                                                               create_by,
+                                                               create_time,
+                                                               update_by,
+                                                               update_time,
+                                                               slide_id,
+                                                               single_slide_id,
+                                                               single,
+                                                               contour_type,
+                                                               structure_size,
+                                                               cell_type,
+                                                               id,
+                                                               dynamic_data)
+        select area,
+               perimeter,
+               description,
+               category_id,
+               contour625,
+               contour2500,
+               contour10000,
+               contour40000,
+               contour5000,
+               location_type,
+               annotation_type,
+               create_by,
+               create_time,
+               update_by,
+               update_time,
+               slide_id,
+               single_slide_id,
+               single,
+               contour_type,
+               structure_size,
+               cell_type,
+               id,
+               dynamic_data
+        from fr_ai_annotation_${sequenceNumber};
+    </insert>
+    
+	 <select id="selectIdList" parameterType="cn.staitech.fr.domain.Annotation"  resultMap="BaseResultMap">
+        select id,dynamic_data from
+                                fr_ai_annotation_${sequenceNumber}
+        where
+            id in
+        <foreach collection="idList" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+    
+    
+    <select id="getAIDataList" parameterType="cn.staitech.fr.domain.Annotation"  resultMap="BaseResultMap">
+        select id,dynamic_data 
+          from fr_ai_annotation_${sequenceNumber}
+        where
+            single_slide_id = #{singleSlideId}
+    </select>
+    
+    <select id="collectGeometryStIsValid" parameterType="long" resultType="cn.staitech.fr.domain.Annotation">
+        SELECT ST_IsValid(st_asgeojson(st_union(contour))) as results
+        FROM fr_annotation
+        WHERE single_slide_id = #{singleSlideId}
+        <!-- 标注类型：默认 0  1 粗轮廓 2 精细轮廓 -->
+          AND contour_type = 1
+    </select>
+    
+    <select id="getCollectGeometryStIsValid" parameterType="cn.staitech.fr.domain.Annotation" resultType="cn.staitech.fr.domain.Annotation">
+        SELECT ST_IsValid(st_asgeojson(st_union(contour))) as results
+        FROM fr_annotation
+        WHERE 
+        slide_id IN ( SELECT DISTINCT ( slide_id ) FROM fr_annotation WHERE single_slide_id = #{singleSlideId} )
+        AND tag_id = #{tagId} 
+        <!-- 标注类型：默认 0  1 粗轮廓 2 精细轮廓 -->
+         AND contour_type = 1
+    </select>
+    
+    <select id="getCollectGeometryIsValid" parameterType="cn.staitech.fr.domain.Annotation" resultMap="BaseResultMap">
+        SELECT st_asgeojson(st_union(contour)) as collectContour
+        FROM fr_annotation
+        WHERE 
+        slide_id IN ( SELECT DISTINCT ( slide_id ) FROM fr_annotation WHERE single_slide_id = #{singleSlideId} )
+        AND tag_id = #{tagId} 
+        <!-- 标注类型：默认 0  1 粗轮廓 2 精细轮廓 -->
+         AND contour_type = 1
+    </select>
+	<delete id="deleteBySingleSlideIdBatch" >
+        DELETE
+        FROM fr_ai_annotation_${annotation.sequenceNumber}
+        WHERE annotation_id IN (
+            SELECT annotation_id
+            FROM fr_ai_annotation_${annotation.sequenceNumber}
+            WHERE single_slide_id = #{annotation.singleSlideId}
+            LIMIT #{batchSize}
+            );
+    </delete>
 
 </mapper>

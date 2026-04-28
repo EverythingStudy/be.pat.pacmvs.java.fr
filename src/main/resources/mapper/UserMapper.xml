@@ -5,36 +5,33 @@
 <mapper namespace="cn.staitech.fr.mapper.UserMapper">
 
     <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.User">
-            <id property="userId" column="user_id" jdbcType="BIGINT"/>
-            <result property="userCode" column="user_code" jdbcType="INTEGER"/>
-            <result property="roleId" column="role_id" jdbcType="BIGINT"/>
-            <result property="organizationId" column="organization_id" jdbcType="BIGINT"/>
-            <result property="userName" column="user_name" jdbcType="VARCHAR"/>
-            <result property="nickName" column="nick_name" jdbcType="VARCHAR"/>
-            <result property="userType" column="user_type" jdbcType="VARCHAR"/>
-            <result property="dept" column="dept" jdbcType="VARCHAR"/>
-            <result property="email" column="email" jdbcType="VARCHAR"/>
-            <result property="phonenumber" column="phonenumber" jdbcType="VARCHAR"/>
-            <result property="sex" column="sex" jdbcType="CHAR"/>
-            <result property="password" column="password" jdbcType="VARCHAR"/>
-            <result property="status" column="status" jdbcType="CHAR"/>
-            <result property="delFlag" column="del_flag" jdbcType="CHAR"/>
-            <result property="loginStatus" column="login_status" jdbcType="CHAR"/>
-            <result property="loginIp" column="login_ip" jdbcType="VARCHAR"/>
-            <result property="loginDate" column="login_date" jdbcType="TIMESTAMP"/>
-            <result property="createBy" column="create_by" jdbcType="BIGINT"/>
-            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="updateBy" column="update_by" jdbcType="BIGINT"/>
-            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+            <id property="userId" column="user_id" />
+            <result property="userCode" column="user_code" />
+            <result property="roleId" column="role_id" />
+            <result property="organizationId" column="organization_id" />
+            <result property="userName" column="user_name" />
+            <result property="nickName" column="nick_name" />
+            <result property="userType" column="user_type" />
+            <result property="dept" column="dept" />
+            <result property="email" column="email" />
+            <result property="phonenumber" column="phonenumber" />
+            <result property="sex" column="sex" />
+            <result property="password" column="password" />
+            <result property="status" column="status" />
+            <result property="delFlag" column="del_flag" />
+            <result property="loginStatus" column="login_status" />
+            <result property="loginIp" column="login_ip" />
+            <result property="loginDate" column="login_date" />
+            <result property="createBy" column="create_by" />
+            <result property="createTime" column="create_time" />
+            <result property="updateBy" column="update_by" />
+            <result property="updateTime" column="update_time" />
     </resultMap>
 
     <sql id="Base_Column_List">
-        user_id,user_code,role_id,
-        organization_id,user_name,nick_name,
-        user_type,dept,email,
-        phonenumber,sex,password,
-        status,del_flag,login_status,
-        login_ip,login_date,create_by,
-        create_time,update_by,update_time
+        user_id,user_code,role_id,organization_id,user_name,nick_name,
+        user_type,dept,email,phonenumber,sex,
+        password,status,del_flag,login_status,login_ip,
+        login_date,create_by,create_time,update_by,update_time
     </sql>
 </mapper>

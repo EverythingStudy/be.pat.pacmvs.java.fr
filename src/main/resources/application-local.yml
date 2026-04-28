@@ -1,0 +1,311 @@
+feign:
+  httpclient:
+    connection-timeout: 30000
+# spring配置
+spring:
+  profiles: local
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+  redis:
+    host: 192.168.52.201
+    port: 6379
+    password: shengtong
+  datasource:
+    dynamic:
+      datasource:
+        # 主库数据源
+        master:
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://192.168.160.105:3306/pathmedics?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8
+          username: shengtong
+          password: shengtong
+          type: com.zaxxer.hikari.HikariDataSource
+          hikari:
+            max-pool-size: 20
+            #minimum-idle: 5
+            min-idle: 5
+            idle-timeout: 300000
+            max-lifetime: 1800000
+            connection-timeout: 5000
+            validation-timeout: 5000
+            is_auto-commit: true
+            pool-name: "bizHikariCP"
+            connection-test-query: "SELECT 1"
+            is_register-mbeans: true
+        # 从库数据源
+        slave:
+          url: jdbc:postgresql://192.168.160.105:5432/pathmedics
+          username: postgres
+          password: 123456
+          driver-class-name: org.postgresql.Driver
+          type: com.zaxxer.hikari.HikariDataSource
+          hikari:
+            max-pool-size: 20
+            min-idle: 5
+            idle-timeout: 300000
+            max-lifetime: 1800000
+            connection-timeout: 5000
+            validation-timeout: 5000
+            is_auto-commit: true
+            pool-name: "bizHikariCP"
+            connection-test-query: "SELECT 1"
+            is_register-mbeans: true
+      # 指定默认数据源名称
+      primary: master
+  rabbitmq:
+    host: 192.168.180.131
+    port: 5672
+    username: guest
+    password: admin
+    virtual-host: /
+    publisher-returns: true
+    publisher-confirm-type: correlated
+    listener:
+      simple:
+        default-requeue-rejected: false
+        acknowledge-mode: manual
+        retry:
+          enabled: true
+          max-attempts: 3
+          initial-interval: 2000
+      direct:
+        acknowledge-mode: manual
+# mybatis配置
+mybatis:
+  # 搜索指定包别名
+  typeAliasesPackage: cn.staitech.fr
+  # 配置mapper的扫描，找到所有的mapper.xml映射文件
+  mapperLocations: classpath:mapper/**/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    # log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+# swagger配置
+swagger:
+  title: 标注模块接口文档
+  license: Powered By staitech
+  licenseUrl: http://www.staitech.cn
+
+logging:
+  level:
+    # Spring Boot 2.4+ 使用 ConfigDataEnvironment
+    org.springframework.boot.context.config.ConfigDataEnvironment: DEBUG
+    # 如果还看不到，可以同时打开更底层的 ConfigFileApplicationListener
+    org.springframework.boot.context.config.ConfigFileApplicationListener: TRACE
+    org.springframework.amqp.rabbit.core.RabbitTemplate: DEBUG
+    cn.staitech.fr.mapper: DEBUG
+management:
+  endpoints:
+    web:
+      exposure:
+        include: env,health,info  # 只放必要的
+  endpoint:
+    env:
+      enabled: true
+waxPath: /home/pat_saas/temp/
+# 脏器结构配置
+organ-structures:
+  structures:
+    # 脏器ID: [结构列表]
+    "01": # 肾上腺
+      - structure-id: 10103D,10103E,101068,101004,
+    08: # 甲状旁腺
+      - structure-id: 108091
+    09: # 唾液腺，腮腺
+      - structure-id: 10906F,109003,10906E
+    0A: # 唾液腺，舌下腺
+      - structure-id: 10A06F,10A121,10A06D
+    0B: #  唾液腺，颌下腺
+      - structure-id: 10B125,10B128,10B126,10B003,10B004
+    0D: # 舌
+      - structure-id: 10D12E,10D12F,10D01C
+    0E: # 喉
+      - structure-id: "10E035,10E133"
+    10: #  胃（腺胃和非腺胃）
+      - structure-id: 11013F,110140,110023,110024,11012E,11012F,110035
+    12: #  肝脏
+      - structure-id: 11214D,112004
+    14: #  肠，盲肠
+      - structure-id: 114008,114009,11400C,114049,114156
+    15: #  肠，结肠
+      - structure-id: 115008,115009,11500C,115156
+    16: #  肠，直肠
+      - structure-id: 116008,116009,11600C,116156
+    17: #  肠，回肠（含派氏结）
+      - structure-id: 117008,117009,11700C,117049,117156
+    18: #  肠，空肠
+      - structure-id: 118008,118009,11800C,118156
+    19: #  肠，十二指肠
+      - structure-id: 11900C,11901E
+    1B: #  肾脏
+      - structure-id: 11B02D,11B03D
+    1E: #  膀胱
+      - structure-id: 11E034,11E035,11E037,11E036,11E003,11E004
+    2B: #  凝固腺
+      - structure-id: 12B074,12B0E9,12B0ED
+    2C: #  前列腺
+      - structure-id: 12C06D,12C0E9
+    2D: #  精囊腺
+      - structure-id: 12D074,12D0E9,12D0ED
+    2E: #  睾丸
+      - structure-id: 12E0FA,12E0FB,12E0FC,12E0FD,12E0FE,12E003
+    2F: #  附睾
+      - structure-id: 12F0F5,12F0F4,12F0F6,12F0F7,12F003
+    32: #  大脑
+      - structure-id: 13209C,132003,132004
+    39: #  脊髓（颈、胸、腰）
+      - structure-id: 1390B3,1390B2,1390B4,139004
+    45: #  脾脏
+      - structure-id: 145047,145045,145048,14504D,145004
+    46: #  肠系膜淋巴结
+      - structure-id: 146050,146051,14603E
+    47: #  腹股沟淋巴结
+      - structure-id: 147050,147051,14703E
+    48: #  颌下淋巴结
+      - structure-id: 148050,148051,14803E
+    4C: #  肺（含支气管）
+      - structure-id: 14C002,14C003,14C004,14C006
+    4D: #  气管
+      - structure-id: 14D007,14D035,14D036,14D00B
+    5C: #  骨骼肌
+      - structure-id: 15C02A,15C003,15C004,15C027
+    69: #  泪腺
+      - structure-id: 16906F,16906E,16906A,169027
+    7A: #  皮肤（乳腺附近）及乳腺
+      - structure-id: 17A096,17A097,17A098,17A099,17A0C3,17A005,17A06C,17A03F
+    7C: #  卵巢与输卵管
+      - structure-id: 17C0CA,17C004,17C0CB,17C003
+    24: #  卵巢
+      - structure-id: 1240CA
+    7D: #  小脑与脑干
+      - structure-id: 17D003,17D004,17D0A5
+    44: # 胸腺
+      - structure-id: 14403F,144004,14403D,14403E
+    "05": # 胰腺
+      - structure-id: 105075,105076,105077,105027,10506F,105003,105004
+    "06": #垂体
+      - structure-id: 10607F,106080,106081,106080,106083,106004
+    4E: #胸骨
+      - structure-id: 14E022,14E004,14E012
+    50: #股骨
+      - structure-id: 150010,150022,150004,150012
+    51: #胫骨
+      - structure-id: 151010,151022,151004,151012
+    "07": #甲状腺
+      - structure-id: 107088,10708A,107003,107004,10708D,107089
+    "02": #哈德氏腺
+      - structure-id: 10206D,10206E
+    5E: # 心脏
+      - structure-id: 15E003
+    "0F": # 食管
+      - structure-id: 10F12E,10F12F,10F00C,10F120,10F13B
+    "7B": # 眼球
+      - structure-id: 17B101,17B102,17B103
+    "5D": # 主动脉
+      - structure-id: 15D113
+    30E:
+      - structure-id: 30E111,30E035,30E133
+    311:
+      - structure-id: 311111,311035,311036
+    312:
+      - structure-id: 312111,312145,312146,312147,312149,31214A,31214D
+    309:
+      - structure-id: 309111,30906F,30906E,30906D,30904F,30903F
+    30D:
+      - structure-id: 30D111,30D114,30D01C
+    30A:
+      - structure-id: 30A111,30A06F,30A06E,30A06D
+    30B:
+      - structure-id: 30B06F,30B111,30B06E,30B06D
+    344: # 胸腺
+      - structure-id: 34403D,34403E,344004,344111
+    345: # 脾脏
+      - structure-id: 345046,345047,345004,345051,345048,34504A,34505B,345111
+    346: # 肠系膜淋巴结
+      - structure-id: 346054,346051,346052,34603E,346111
+    347: # 腹股沟淋巴结
+      - structure-id: 347054,347051,347052,34703E,347111
+    348: # 颌下淋巴结
+      - structure-id: 348054,348051,348052,34803E,348111
+#    34B: # 淋巴结
+#      - structure-id: 34B054,34B051,34B052,34B03E,34B111
+    369: # 泪腺
+      - structure-id: 36906D,369111
+    35F: # 眼球
+      - structure-id: 35F101,35F103,35F111
+    33F: # 视神经 https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1VLPq2F4Xv5p6Ad9nL1
+      - structure-id: 33F0BB,33F0BA,33F111
+    340: #  坐骨神经    https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1LMDpOH4Xv5p6Ad9nL1
+      - structure-id: 3400BB,3400BA,340111
+    332: #  大脑    https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1dnZwOH4Xv5p6Ad9nL1
+      - structure-id: 33209C,332003,332004,332111
+    33E: #  小脑    https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1LMNAbU4Xv5p6Ad9nL1
+      - structure-id: 33E0A5,33E003,33E004,33E111
+    339: #   脊髓-339-SC   https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1LMYLaT4Xv5p6Ad9nL1
+      - structure-id: 3390B3,3390B2,3390B4,3390B5,339004,339111
+    33D: #   脑干-33D-BS   https://docs.staitech.cn/i/nodes/7gNKMlbrq3WXA1dnP0rc4Xv5p6Ad9nL1
+      - structure-id: 33D003,33D004,33D111
+    35E: #   血液循环系统-心脏
+      - structure-id: 35E003,35E111
+    35D: #   血液循环系统-主动脉
+      - structure-id: 35D113,35D111
+    30F: # 消化系统-消化道-食管
+      - structure-id: 30F035,30F00C,30F120,30F13B,30F111
+    314: # 消化系统-消化道-盲肠
+      - structure-id: 31401E,31401F,31400C,314049,314111
+    315: # 消化系统-消化道-结肠
+      - structure-id: 31501E,31501F,31500C,315049,315111
+    316: # 消化系统-消化道-直肠
+      - structure-id: 31601E,31601F,31600C,316049,316111
+    317: # 消化系统-消化道-回肠
+      - structure-id: 31701E,31701F,31700C,317064,317049,317111
+    318: # 消化系统-消化道-空肠
+      - structure-id: 31801E,31801F,31800C,318064,318049,318111
+    319: # 消化系统-消化道-十二指肠
+      - structure-id: 31901E,31901F,31900C,319064,319049,319111
+    310: # 消化系统-消化道-胃
+      - structure-id: 31001E,31001F,31000C,310111
+    324: # 卵巢
+      - structure-id: 324004,324003,324111
+    32C: # 前列腺
+      - structure-id: 32C06C,32C0F4,32C061,32C060,32C111
+    32E: # 睾丸
+      - structure-id: 32E0FA,32E0FB,32E0FC,32E0FD,32E0FE,32E111
+    32F: # 附睾
+      - structure-id: 32F0F5,32F0F4,32F0F7,32F0F6,32F111
+    34C: #肺脏
+      - structure-id: 34C002,34C003,34C004,34C006,34C027,34C111
+    34D: # 气管
+      - structure-id: 34D036,34D035,34D111
+    350: # 股骨
+      - structure-id: 35000B,350111
+    34E: # 胸骨
+      - structure-id: 34E011,34E022,34E004,34E012,34E111
+    35C: # 骨骼肌
+      - structure-id: 35C027,35C02A,35C05A,35C111
+    # 小鼠
+    20F: #食管
+      - structure-id: 22F12E,20F12F,20F13B,20F00C
+  outline: # 脏器结构轮廓
+    "02": #哈德氏腺
+      - structure-id: 102111
+    "0F": # 食管
+      - structure-id: 10F111
+    3F: # 视神经
+      - structure-id: 13F0BA
+    40: # 神经，坐骨
+      - structure-id: 1400BA
+    5D: # 主动脉
+      - structure-id: 15D111
+    5E: # 心脏
+      - structure-id: 15E111
+
+
+queues:
+  algoMsg: test
+  algoMsgRetry: algo.message.retry.queue
+  delayTime: 60*60*1000
+dynamic:
+  corePoolSize: 2
+  maxPoolSize: 2

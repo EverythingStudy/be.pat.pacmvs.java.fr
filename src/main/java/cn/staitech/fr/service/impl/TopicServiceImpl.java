@@ -18,7 +18,7 @@ public class TopicServiceImpl extends ServiceImpl<TopicMapper, Topic> implements
 
     @Override
     public R<List<Topic>> getTopicList() {
-        log.info("获取专题列表接口开始：");
+        log.info("获取项目列表接口开始：");
         Long organizationId = SecurityUtils.getLoginUser().getSysUser().getOrganizationId();
         List<Topic> list = this.baseMapper.getTopicList(organizationId);
         return R.ok(list);

@@ -1,7 +1,11 @@
 package cn.staitech.fr.service;
 
+import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.AccessProjectRecords;
+import cn.staitech.fr.vo.AccessProjectRecordsVo;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface AccessProjectRecordsService extends IService<AccessProjectRecords> {
 
+    R<List<AccessProjectRecordsVo>> accessProjectStatistics() throws Exception;
+
+    public R saveAccessProjectRecords(AccessProjectRecords accessProjectRecords);
 }

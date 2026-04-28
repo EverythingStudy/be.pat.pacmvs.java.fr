@@ -1,9 +1,12 @@
 # Tomcat
 server:
   port: 9701
-
 knife4j:
   enable: true
+management:
+  health:
+    elasticsearch:
+      enabled: false
 # Spring
 spring:
   messages:
@@ -26,7 +29,8 @@ spring:
         namespace: @nacosNamespace@
         # nacos group
         group: @nacosGroup@
-       # register-enabled: false
+        timeout: 10000
+        #register-enabled: false
       config:
         # 配置中心地址
         server-addr: @serverAddr@
@@ -39,4 +43,5 @@ spring:
         # 共享配置
         shared-configs:
           - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+        timeout: 10000
 

@@ -3,7 +3,7 @@
     <!-- 日志存放路径 -->
     <property name="log.path" value="logs/staitech-fr"/>
     <!-- 日志输出格式 -->
-    <property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n"/>
+    <property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] [%X{traceId}] [%X{trace_id}] %-5level %logger{20} - [%method,%line] - %msg%n"/>
 
     <!-- 控制台输出 -->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
@@ -73,7 +73,7 @@
                     <!-- 日志文件名格式 -->
                     <fileNamePattern>${log.path}/${logFileName}/${logFileName}.info.%d{yyyy-MM-dd}.log</fileNamePattern>
                     <!-- 日志最大的历史 10天 -->
-                    <maxHistory>2</maxHistory>
+                    <maxHistory>7</maxHistory>
                 </rollingPolicy>
                 <encoder>
                     <pattern>${log.pattern}</pattern>
@@ -85,13 +85,15 @@
     <!-- 系统模块日志级别控制  -->
     <!--    <logger name="cn.staitech" level="info" />-->
     <logger name="cn.staitech" level="debug"/>
-    <logger name="cn.staitech.fr.mapper.AnnotationMapper" level="debug"/>
-    <logger name="cn.staitech.fr.service.impl.AnnotationServiceImpl" level="debug"/>
+    <logger name="cn.staitech.fr.mapper.AnnotationMapper" level="info"/>
+    <logger name="cn.staitech.fr.service.impl.AnnotationServiceImpl" level="info"/>
     <!-- Spring日志级别控制  -->
     <!--	<logger name="org.springframework" level="warn" />-->
     <logger name="org.springframework" level="info"/>
     <!--项目启动时，打印加载nacos的配置文件日志-->
     <logger name="com.alibaba.cloud.nacos.client" level="debug"/>
+    <!-- 数据源名称 -->
+    <logger name="com.baomidou.dynamic.datasource" level="info" />
     <!--系统操作日志-->
     <root level="info">
         <appender-ref ref="console"/>

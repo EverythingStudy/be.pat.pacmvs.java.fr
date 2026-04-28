@@ -3,7 +3,7 @@
 <mapper namespace="cn.staitech.fr.mapper.SpecialLockLogMapper">
 
     <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.SpecialLockLog">
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.ProjectLockLog">
         <id column="lock_log_id" property="lockLogId" />
         <result column="special_id" property="specialId" />
         <result column="type" property="type" />

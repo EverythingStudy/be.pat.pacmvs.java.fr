@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.staitech.fr.mapper.StructureMapper">
+
+    <resultMap id="BaseResultMap" type="cn.staitech.fr.domain.Structure">
+        <result property="speciesId" column="species_id" jdbcType="VARCHAR"/>
+        <result property="organCode" column="organ_code" jdbcType="VARCHAR"/>
+        <result property="structureId" column="structure_id" jdbcType="VARCHAR"/>
+        <result property="name" column="name" jdbcType="VARCHAR"/>
+        <result property="nameEn" column="name_en" jdbcType="VARCHAR"/>
+        <result property="structureSize" column="structure_size" jdbcType="SMALLINT"/>
+        <result property="type" column="type" jdbcType="VARCHAR"/>
+        <result property="organizationId" column="organization_id" jdbcType="BIGINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        species_id
+        ,organ_code,structure_id,
+        name,name_en,structure_size,
+        type,organization_id
+    </sql>
+    <select id="queryList" parameterType="cn.staitech.fr.domain.Structure"
+            resultType="cn.staitech.fr.domain.Structure">
+        SELECT organ_code,`name`, `name_en`, species_id, structure_id,organization_id,type,structure_size FROM
+        tb_structure
+        <where>
+            <if test="structureId != null">
+                AND structure_id = #{structureId}
+            </if>
+            <if test="speciesId != null">
+                AND species_id = #{speciesId}
+            </if>
+            <if test="organCode != null">
+                AND organ_code = #{organCode}
+            </if>
+            <if test="type != null">
+                AND type = #{type}
+            </if>
+            <if test="organizationId != null">
+                AND organization_id = #{organizationId}
+            </if>
+        </where>
+    </select>
+</mapper>

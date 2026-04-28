@@ -1,0 +1,241 @@
+DROP TABLE if EXISTS tb_species_wax_code_template;
+CREATE TABLE `tb_species_wax_code_template` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `species_id` varchar(100) DEFAULT NULL COMMENT '种属ID',
+  `wax_code` varchar(255)  DEFAULT NULL COMMENT '蜡块编号',
+  `organ_name` varchar(255) DEFAULT NULL COMMENT '脏器名称',
+  `organ_en` varchar(255) DEFAULT NULL COMMENT '英文名称',
+  `block_count` int NOT NULL DEFAULT '0' COMMENT '取材块数',
+  `sex_flag` char(1)  DEFAULT 'N' COMMENT '性别（M；F；N）',
+  `organ_code` varchar(255) DEFAULT NULL COMMENT '脏器编码',
+  `abbreviation` varchar(255) DEFAULT NULL COMMENT '脏器缩写',
+  `create_by` bigint DEFAULT NULL COMMENT '创建人id',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` bigint DEFAULT NULL COMMENT '更新人id',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_species_id` (`species_id`) USING BTREE
+) COMMENT = '种属蜡块模板表';
+
+DROP TABLE if EXISTS fr_production;
+CREATE TABLE `fr_production` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键',
+  `special_id` bigint NOT NULL DEFAULT '0' COMMENT '专题ID',
+  `organ_tag_id` bigint NOT NULL DEFAULT '0' COMMENT '脏器标签ID',
+  `species_id` varchar(100) DEFAULT NULL COMMENT '种属ID',
+  `wax_code` varchar(255)  DEFAULT NULL COMMENT '蜡块编号',
+  `organ_name` varchar(255) DEFAULT NULL COMMENT '脏器名称',
+  `organ_en` varchar(255) DEFAULT NULL COMMENT '英文名称',
+  `block_count` int NOT NULL DEFAULT '0' COMMENT '取材块数',
+  `sex_flag` char(1)  DEFAULT 'N' COMMENT '性别（M；F；N）',
+  `organ_code` varchar(255) DEFAULT NULL COMMENT '脏器编码',
+  `abbreviation` varchar(255) DEFAULT NULL COMMENT '脏器缩写',
+  `organization_id` bigint NOT NULL DEFAULT '0' COMMENT '机构ID',
+  `create_by` bigint DEFAULT NULL COMMENT '创建人id',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `update_by` bigint DEFAULT NULL COMMENT '更新人id',
+  `update_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_special_id` (`species_id`) USING BTREE,
+  KEY `idx_species_id` (`species_id`) USING BTREE
+) COMMENT = '专题制片信息';
+
+ALTER TABLE `fr_slide`
+ADD COLUMN `ai_status` int NOT NULL DEFAULT 0 COMMENT 'AI分析状态：0-未分析；1-脏器识别中；2-脏器识别异常；3-脏器识别完成（算法接口成功并且核对一致）' AFTER `viewers`;
+
+-- 以下sql林亚提供
+CREATE TABLE `fr_single_slide`
+(
+    `single_id`            bigint                                                        NOT NULL AUTO_INCREMENT COMMENT '单脏器切片id',
+    `slide_id`             bigint                                                        NOT NULL COMMENT '切片id',
+    `thumb_url`            varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT '单脏器图片缩略图地址',
+    `category_id`          bigint                                                        NOT NULL COMMENT '单脏器类型',
+    `forecast_status`      char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci               DEFAULT '0' COMMENT '结构化状态 0未预测、1预测成功、2预测失败、3预测中',
+    `diagnosis_status`     char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci               DEFAULT '0' COMMENT '人工诊断状态 0：未诊断；1：已诊断',
+    `create_time`          datetime                                                      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
+    `description`          varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci          DEFAULT NULL COMMENT '单切片描述',
+    `abnormal_status`      char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci               DEFAULT '0' COMMENT '异常状态 0：默认值 ；1：未见异常',
+    `abnormal_create_by`   bigint                                                                 DEFAULT NULL COMMENT '未见异常创建人',
+    `abnormal_create_time` datetime                                                               DEFAULT NULL COMMENT '未见异常创建时间',
+    `area`                 varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci          DEFAULT NULL COMMENT '精细轮廓总面积',
+    `ai_status_fine`       int                                                                    DEFAULT '0' COMMENT '精轮廓状态：0未预测、1预测成功、2预测失败、3预测中',
+    `fine_contour_time`    bigint                                                                 DEFAULT NULL COMMENT '精轮廓总时间',
+    `structure_time`       bigint                                                                 DEFAULT NULL COMMENT '结构化总时间',
+    `start_time`           datetime                                                               DEFAULT NULL COMMENT 'ai算法开始时间',
+    `perimeter`            varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci          DEFAULT NULL,
+    `task_id`              varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci          DEFAULT NULL COMMENT '任务id',
+    PRIMARY KEY (`single_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=756 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='单脏器切片表';
+
+ALTER TABLE `fr_single_slide` ADD INDEX `idx_slide_id`(`slide_id`) USING BTREE;
+
+CREATE TABLE `fr_json_file`
+(
+    `file_id`        bigint NOT NULL AUTO_INCREMENT COMMENT '文件ID',
+    `task_id`        bigint NOT NULL COMMENT '任务ID',
+    `file_url`       varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '文件路径',
+    `structure_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '结构名称',
+    `status`         int                                                           DEFAULT NULL COMMENT '状态(0未进行解析、1解析中、2解析成功、3解析失败)',
+    `times`          int                                                           DEFAULT NULL COMMENT '执行次数（第几次）',
+    `start_time`     datetime                                                      DEFAULT NULL COMMENT '开始时间',
+    `end_time`       datetime                                                      DEFAULT NULL COMMENT '结束时间',
+    `create_time`    datetime                                                      DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`    datetime                                                      DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`file_id`, `task_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=4229 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='ai预测json文件表';
+
+CREATE TABLE `fr_json_task`
+(
+    `task_id`         bigint NOT NULL AUTO_INCREMENT COMMENT '任务ID',
+    `slide_id`        bigint                                                        DEFAULT NULL COMMENT '切片ID',
+    `special_id`      int                                                           DEFAULT NULL COMMENT '专题ID',
+    `image_id`        int                                                           DEFAULT NULL COMMENT '图像ID',
+    `single_id`       bigint                                                        DEFAULT NULL COMMENT '单脏器切片id',
+    `organization_id` bigint                                                        DEFAULT '0' COMMENT '机构ID',
+    `category_id`     bigint                                                        DEFAULT NULL COMMENT '脏器标签ID',
+    `algorithm_code`  varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '算法ID',
+    `code`            varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '算法返回状态',
+    `msg`             varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '算法返回msg',
+    `data`            text CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci COMMENT '算法返回数据',
+    `status`          int                                                           DEFAULT NULL COMMENT '0未进行解析、1解析中、2解析成功、3解析失败',
+    `times`           int                                                           DEFAULT NULL COMMENT '执行次数（第几次）',
+    `start_time`      datetime                                                      DEFAULT NULL COMMENT '开始时间',
+    `end_time`        datetime                                                      DEFAULT NULL COMMENT '结束时间',
+    `create_time`     datetime                                                      DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`     datetime                                                      DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`task_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=134 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='json解析任务表';
+
+CREATE TABLE `fr_ai_forecast`
+(
+    `forecast_id`                int NOT NULL AUTO_INCREMENT,
+    `quantitative_indicators`    varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '定量指标',
+    `quantitative_indicators_en` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '定量指标英文',
+    `results`                    varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '0' COMMENT '预测结果',
+    `forecast_range`             varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '范围',
+    `create_by`                  bigint                                                        DEFAULT NULL COMMENT '创建者',
+    `create_time`                datetime                                                      DEFAULT NULL COMMENT '创建时间',
+    `single_slide_id`            bigint                                                        DEFAULT NULL COMMENT '单脏器切片id',
+    `unit`                       varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '单位',
+    `struct_type`                char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci      DEFAULT '0' COMMENT ' 结构指标类别0：产品呈现指标1：算法输出指标',
+    PRIMARY KEY (`forecast_id`) USING BTREE
+) ENGINE=InnoDB AUTO_INCREMENT=4536 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='量化指标表';
+
+
+ALTER TABLE `fr_json_file`
+    ADD COLUMN `structure_id` varchar(16) NULL COMMENT '结构Id' AFTER `file_url`,
+    ADD COLUMN `ai_status` int NULL COMMENT 'AI识别状态 0成功 1失败' AFTER `structure_name`;
+
+CREATE TABLE `fr_contour_json`
+(
+    `contour_json_id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键id',
+    `slide_id`        bigint                                                        DEFAULT NULL COMMENT '切片id',
+    `tile_name`       varchar(255)                                                  DEFAULT NULL COMMENT '瓦片名称',
+    `structure_size`  int                                                           DEFAULT NULL COMMENT '结构大小',
+    `create_by`       bigint                                                        DEFAULT NULL COMMENT '创建者',
+    `create_time`     datetime                                                      DEFAULT NULL COMMENT '创建时间',
+    `single_slide_id` bigint                                                        DEFAULT NULL COMMENT '单切片id',
+    `middle`          varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '中结构json文件',
+    `small`           varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '小结构json文件',
+    `middle_small`    varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+    `big`             varchar(255)                                                  DEFAULT NULL COMMENT '大结构json文件',
+    PRIMARY KEY (`contour_json_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1024859 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+ALTER TABLE `fr_ai_forecast`
+    ADD COLUMN `structure_ids` varchar(255) NULL COMMENT '指标计算机构编码' AFTER `struct_type`;
+
+
+ALTER TABLE `fr_slide`
+    ADD COLUMN `group_code` varchar(2) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '组别号',
+    ADD COLUMN `gender_flag` char(1) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '性别（M:雄；F:雌）',
+    ADD COLUMN `wax_code` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '蜡块编号';
+
+
+CREATE TABLE `tb_access_view_records` (
+                                          `view_record_id` bigint NOT NULL AUTO_INCREMENT COMMENT '记录id',
+                                          `user_id` bigint DEFAULT NULL COMMENT '用户id',
+                                          `slide_id` bigint DEFAULT NULL COMMENT '切片id',
+                                          `project_id` bigint DEFAULT NULL COMMENT '项目id',
+                                          `access_time` datetime DEFAULT NULL COMMENT '访问时间',
+                                          PRIMARY KEY (`view_record_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=126 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='访问view页面次数记录首页日活';
+
+
+
+
+update sys_menu set icon='/menuIcons/index_system_management.svg' where menu_id='1';
+update sys_menu set icon='/menuIcons/system_user.svg' where menu_id='5';
+update sys_menu set icon='/menuIcons/system_role.svg' where menu_id='6';
+update sys_menu set icon='/menuIcons/system_org.svg' where menu_id='8';
+update sys_menu set icon='/menuIcons/system_log.svg' where menu_id='7';
+update sys_menu set icon='/menuIcons/index_slice_management.svg' where menu_id='2';
+update sys_menu set icon='/menuIcons/orginal_slice.svg' where menu_id='57';
+update sys_menu set icon='/menuIcons/index_tag_management.svg' where menu_id='3';
+update sys_menu set icon='/menuIcons/indicator.svg' where menu_id='32';
+update sys_menu set icon='/menuIcons/org_tag.svg' where menu_id='703';
+update sys_menu set icon='/menuIcons/index_readFilm.svg' where menu_id='651';
+update sys_menu set icon='/menuIcons/project_read.svg' where menu_id='652';
+update sys_menu set icon='/menuIcons/config_base_info.svg' where menu_id='701';
+update sys_menu set icon='/menuIcons/config_slice.svg' where menu_id='654';
+update sys_menu set icon='/menuIcons/config_user.svg' where menu_id='663';
+update sys_menu set icon='/menuIcons/config_create_slice.svg' where menu_id='709';
+update sys_menu set icon='/menuIcons/project_recovery.svg' where menu_id='670';
+update sys_menu set icon='/menuIcons/archived_project.svg' where menu_id='698';
+update sys_menu set icon='/menuIcons/read_slice_list.svg' where menu_id='699';
+update sys_menu set icon='/menuIcons/read_slice_list.svg' where menu_id='681';
+
+
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (706, '批量删除', '批量删除(en)', 4, '', NULL, 654, NULL, 1, 'F', 1, '0', 'readFilmCreate:sliceConfig:removeBatch', ' ', 5, '2025-06-23 13:54:14', NULL, NULL, '', NULL, '0', '0', '0', '0');
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (707, '关联新切片', '关联新切片(en)', 5, '', NULL, 654, NULL, 1, 'F', 1, '0', 'readFilmCreate:sliceConfig:choiceLinkNew', '#', 5, '2025-06-23 13:55:35', 5, '2025-06-23 13:55:40', '', NULL, '0', '0', '0', '0');
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (708, '详情', '详情(en)', 1, '', NULL, 698, NULL, 1, 'C', 1, '0', 'archivedTopic:list:detail', '#', 5, '2025-06-23 14:41:28', 5, '2025-06-23 14:41:51', '', NULL, '0', '0', '0', '0');
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (709, '制片信息', '制片信息(en)', 4, 'production', 'subject/topic-config-readFilm/production-config/index', 653, NULL, 1, 'C', 1, '0', 'readFilmCreate:production', '/menuIcons/config_create_slice.svg', 5, '2025-08-07 14:04:00', 9, '2025-08-22 13:43:31', '', NULL, '0', '0', '0', '0');
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (710, '新增蜡块', '新增蜡块(en)', 1, '', NULL, 709, NULL, 1, 'F', 1, '0', 'readFilmCreate:production:add', ' ', 5, '2025-08-07 14:05:02', NULL, NULL, '', NULL, '0', '0', '0', '0');
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (711, '批量删除', '批量删除(en)', 2, '', NULL, 709, NULL, 1, 'F', 1, '0', 'readFilmCreate:production:batchDelete', ' ', 5, '2025-08-07 14:05:25', NULL, NULL, '', NULL, '0', '0', '0', '0');
+
+update sys_menu set status='1' where menu_id=59;
+update sys_menu set status='1' where menu_id=61;
+
+-- fr_single_slide加入筛差状态
+ALTER TABLE fr_single_slide
+ADD COLUMN screening_difference_status int NOT NULL DEFAULT 0 COMMENT '筛差状态：0未预测、1预测成功、2预测失败、3预测中' AFTER ai_status_fine;
+-- 制片信息是否保存过
+ALTER TABLE fr_special
+ADD COLUMN production_save tinyint NOT NULL DEFAULT 0 COMMENT '制片信息是否保存过：0-未保存过；1-保存过' AFTER `is_permanent_del`;
+-- viewers默认值
+ALTER TABLE fr_slide MODIFY COLUMN viewers JSON DEFAULT (JSON_ARRAY()) COMMENT '已阅片用户';
+UPDATE fr_slide SET viewers = JSON_ARRAY() WHERE viewers IS NULL;
+
+-- 删除708
+DELETE FROM sys_menu WHERE menu_id = 708;
+
+ALTER TABLE `pathmedics`.`fr_json_task` ADD UNIQUE INDEX `uk_single_id` ( `single_id` ) COMMENT '切片id';
+
+
+--2025-11-05 新增sql
+INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (712, '列表', 'list', 7, '', NULL, 5, NULL, 1, 'F', 1, '0', 'system:user:list', '#', 5, '2025-11-03 14:05:32', 5, '2025-11-03 14:05:52', '', NULL, '0', '0', '0', '0');
+INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (713, '列表', 'list', 6, '', NULL, 6, NULL, 1, 'F', 1, '0', 'system:role:list', ' ', 5, '2025-11-03 14:06:50', NULL, NULL, '', NULL, '0', '0', '0', '0');
+INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (714, '列表', 'list', 6, '', NULL, 8, NULL, 1, 'F', 1, '0', 'system:organization:list', ' ', 5, '2025-11-03 14:08:08', NULL, NULL, '', NULL, '0', '0', '0', '0');
+INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (715, '列表', 'list', 1, '', NULL, 7, NULL, 1, 'F', 1, '0', 'system:log:list', ' ', 5, '2025-11-03 14:09:05', NULL, NULL, '', NULL, '0', '0', '0', '0');
+INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (716, '列表', 'list', 8, '', NULL, 57, NULL, 1, 'F', 1, '0', 'section:slices:list', ' ', 5, '2025-11-03 14:10:13', NULL, NULL, '', NULL, '0', '0', '0', '0');
+INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (717, '列表', 'list', 6, '', NULL, 32, NULL, 1, 'F', 1, '0', 'project:pathology:list', ' ', 5, '2025-11-03 14:11:40', NULL, NULL, '', NULL, '0', '0', '0', '0');
+INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (718, '列表', 'list', 1, '', NULL, 703, NULL, 1, 'F', 1, '0', 'project:organLabel:list', ' ', 5, '2025-11-03 14:12:50', NULL, NULL, '', NULL, '0', '0', '0', '0');
+INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (719, '列表', 'list', 15, '', NULL, 652, NULL, 1, 'F', 1, '0', 'readFilmCreate:list', ' ', 5, '2025-11-03 14:13:41', NULL, NULL, '', NULL, '0', '0', '0', '0');
+INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (720, '列表', 'list', 6, '', NULL, 654, NULL, 1, 'F', 1, '0', 'readFilmCreate:sliceConfig:list', ' ', 5, '2025-11-03 14:15:55', NULL, NULL, '', NULL, '0', '0', '0', '0');
+INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (721, '列表', 'list', 3, '', NULL, 663, NULL, 1, 'F', 1, '0', 'readFilmCreate:users:list', ' ', 5, '2025-11-03 14:16:53', NULL, NULL, '', NULL, '0', '0', '0', '0');
+INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (722, '列表', 'list', 3, '', NULL, 709, NULL, 1, 'F', 1, '0', 'readFilmCreate:production:list', ' ', 5, '2025-11-03 14:17:44', NULL, NULL, '', NULL, '0', '0', '0', '0');
+INSERT INTO  `sys_menu` (`menu_id`, `menu_name`, `menu_name_en`, `order_num`, `path`, `component`, `parent_id`, `query`, `is_cache`, `menu_type`, `is_frame`, `status`, `perms`, `icon`, `create_by`, `create_time`, `update_by`, `update_time`, `remark`, `is_functional_modules`, `visible`, `full_width`, `no_fit`, `no_header`) VALUES (723, '列表', 'list', 3, '', NULL, 670, NULL, 1, 'F', 1, '0', 'topicRecycleBin:list', ' ', 5, '2025-11-03 14:21:02', NULL, NULL, '', NULL, '0', '0', '0', '0');
+
+
+update sys_menu set status='1' where menu_id=59;
+update sys_menu set status='1' where menu_id=61;
+update sys_menu set status='1' where menu_id=62;
+update sys_menu set status='1' where menu_id=656;
+update sys_menu set status='1' where menu_id=684;
+update sys_menu set status='1' where menu_id=685;
+update sys_menu set status='1' where menu_id=694;
+update sys_menu set status='1' where menu_id=667;
+update sys_menu set status='1' where menu_id=668;
+update sys_menu set status='1' where menu_id=706;
+update sys_menu set status='1' where menu_id=669;
+update sys_menu set menu_name='新增项目',menu_name_en='新增项目(en)' where menu_id=655;

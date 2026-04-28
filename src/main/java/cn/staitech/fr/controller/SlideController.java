@@ -1,18 +1,29 @@
 package cn.staitech.fr.controller;
 
-import cn.staitech.common.core.domain.PageResponse;
+import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
+import cn.staitech.common.core.utils.StringUtils;
+import cn.staitech.common.core.utils.SysRoleUtil;
+import cn.staitech.common.core.utils.poi.ExcelUtil;
 import cn.staitech.common.core.web.controller.BaseController;
+import cn.staitech.common.security.utils.SecurityUtils;
+import cn.staitech.fr.domain.Project;
 import cn.staitech.fr.domain.Slide;
-import cn.staitech.fr.domain.in.ChoiceImageListInVo;
-import cn.staitech.fr.domain.in.ChoiceSaveInVo;
-import cn.staitech.fr.domain.in.SlideListQueryIn;
-import cn.staitech.fr.domain.out.ImageListOutVO;
-import cn.staitech.fr.domain.out.SlideListQueryOut;
-import cn.staitech.fr.domain.out.SlideSelectBy;
-import cn.staitech.fr.service.ImageService;
+import cn.staitech.fr.domain.in.SlideInfoReq;
+import cn.staitech.fr.domain.in.VisitReq;
+import cn.staitech.fr.domain.out.AiInfoListRequest;
+import cn.staitech.fr.domain.out.ExportAiListVO;
+import cn.staitech.fr.mapper.ProjectMapper;
+import cn.staitech.fr.mapper.SlideMapper;
+import cn.staitech.fr.service.AccessViewRecordsService;
+import cn.staitech.fr.utils.SysRoleUtils;
+import cn.staitech.fr.vo.project.*;
+import cn.staitech.fr.vo.project.slide.*;
 import cn.staitech.fr.service.SlideService;
 import cn.staitech.fr.utils.MessageSource;
+import cn.staitech.sft.logaudit.annotation.LogAudit;
+import cn.staitech.system.api.domain.biz.AddSingleSlide;
+import cn.staitech.system.api.domain.biz.DelSingleSlide;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -21,44 +32,127 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
- * @Author wudi
- * @Date 2024/4/1 9:22
- * @desc
+ * @author mugw
+ * @version 2.6.0
+ * @description 项目切片管理
+ * @date 2025/5/14 13:44:14
  */
 @Slf4j
-@Api(value = "专题切片", tags = "专题切片")
+@Api(value = "项目切片管理", tags = {"V2.6.0"})
 @RestController
 @RequestMapping("/slide")
 public class SlideController  extends BaseController {
 
-    @Autowired
-    private ImageService imageService;
-
-    @Autowired
+    @Resource
     private SlideService slideService;
+    @Resource
+    private SlideMapper slideMapper;
+    @Resource
+    private AccessViewRecordsService accessViewRecordsService;
 
-
-    @ApiOperation(value = "选片列表-选前")
-    @PostMapping("/choiceImageList")
-    public R<PageResponse<ImageListOutVO>> choiceList(@Validated @RequestBody ChoiceImageListInVo image) {
-        PageResponse<ImageListOutVO> page = imageService.choiceImageList(image);
-        return R.ok(page);
+    @ApiOperation(value = "获取动物编号下拉列表")
+    @PostMapping("/getAnimalCode")
+    public R<List<String>> getAnimalCode(@RequestBody SlideSelectListReq req) {
+        return R.ok(slideService.getAnimalCode(req));
     }
 
-    @ApiOperation(value = "选片保存")
+    @ApiOperation(value = "获取蜡块下拉列表")
+    @PostMapping("/getWaxCode")
+    public R<List<String>> getWaxCode(@RequestBody SlideSelectListReq req) {
+        return R.ok(slideService.getWaxCode(req));
+    }
+
+    @ApiOperation(value = "获取组号下拉列表")
+    @PostMapping("/getGroupCode")
+    public R<List<String>> getGroupCode(@RequestBody SlideSelectListReq req) {
+        return R.ok(slideService.getGroupCode(req));
+    }
+
+    @ApiOperation(value = "获取脏器下拉列表")
+    @PostMapping("/getOrganCode")
+    public R<List<SlideOrganTagVo> > getOrganCode(@RequestBody SlideSelectListReq req) {
+        req.setOrganizationId(SecurityUtils.getOrganizationId());
+        return R.ok(slideService.getOrganCode(req));
+    }
+
+    @ApiOperation(value = "查看Ai切片是否分析完成，没有完成返回false，完成返回true")
+    @PostMapping("/isAiSlideFinished")
+    public R<Boolean> isAiSlideFinished(@RequestBody SlideSelectListReq req) {
+        return R.ok(slideService.isAiSlideFinished(Long.valueOf(req.getProjectId())));
+    }
+
+
+    @ApiOperation(value = "项目阅片-已选切片分页查询")
+    @PostMapping("/page")
+    public R<CustomPage<SlidePageVo>> page(@Validated @RequestBody SlidePageReq req) {
+        return slideService.pageNew(req);
+    }
+
+    @ApiOperation(value = "根据切片ID集合查询切片信息")
+    @PostMapping("/list")
+    public R<List<SlidePageVo>> list(@Validated @RequestBody SlideListReq req) {
+        List<SlidePageVo> list = this.slideService.list(req);
+        return R.ok(list);
+    }
+
+    @ApiOperation(value = "项目阅片-已选切片无权限分页")
+    @PostMapping("/pageNoAccessPermission")
+    public R<CustomPage<SlidePageVo>> pageNoAccessPermission(@Validated @RequestBody SlidePageReq req) {
+        return slideService.page(req,true,false);
+    }
+
+
+    @ApiOperation(value = "项目配置-已选切片分页查询")
+    @PostMapping("/pageConfigSlide")
+    public R<CustomPage<SlidePageVo>> pageConfigSlide(@Validated @RequestBody SlidePageReq req) {
+        return slideService.page(req,true,true);
+    }
+
+    @ApiOperation(value = "项目配置-未选片分页查询")
+    @PostMapping("/choiceImageList")
+    public R<CustomPage<ImageVO>> choiceList(@Validated @RequestBody ChoiceImagePageReq image) {
+        return slideService.choiceImageList(image);
+    }
+
+    @LogAudit
+    @ApiOperation(value = "项目配置-选片保存", tags = {"I18n"})
     @PostMapping(value = "/choiceSave")
-    public R choiceSave(@RequestBody @Validated ChoiceSaveInVo choiceSaveInVo) {
+    public R choiceSave(@RequestBody @Validated ProjectImageVo choiceSaveInVo) {
         return slideService.choiceSave(choiceSaveInVo);
     }
 
-    @ApiOperation(value = "选片列表-选后")
-    @PostMapping("/list")
-    public R<PageResponse<SlideListQueryOut>> list(@Validated @RequestBody SlideListQueryIn req) {
-        PageResponse<SlideListQueryOut> page = slideService.slideListQuery(req);
-        return R.ok(page);
+    @LogAudit
+    @ApiOperation(value = "项目配置-选片当前专题下原始切片保存", tags = {"I18n"})
+    @PostMapping(value = "/choiceAll")
+    public R choiceAll(@RequestBody @Validated ProjectImageVo choiceSaveInVo) throws Exception {
+        return slideService.choiceAll(choiceSaveInVo);
+    }
+
+    @LogAudit(deleteBusiness= true,batch= true)
+    @ApiOperation(value = "项目配置-删除切片", tags = {"I18n"})
+    @PostMapping("/deleteSlide")
+    public R deleteSlide(@RequestBody @Validated ProjectImageVo req)throws  Exception {
+        return slideService.deleteSlide(req);
+    }
+
+    @LogAudit(deleteBusiness= true,batch= true)
+    @ApiOperation(value = "项目配置-删除切片", tags = {"I18n"})
+    @PostMapping("/deleteSlideByIds")
+    public R deleteSlideByIds(@RequestBody @Validated ProjectImageVo req)throws  Exception {
+        return slideService.deleteSlide(req);
+    }
+
+    @ApiOperation(value = "项目配置-检查删除切片")
+    @PostMapping("/checkDeleteSlide")
+    public R checkDeleteSlide(@RequestBody @Validated SlideDelVo slideDelIn)throws  Exception {
+        return slideService.checkDeleteSlide(slideDelIn.getProjectId(),slideDelIn.getSlideIds());
     }
 
     @ApiOperation(value = "更新单切片描述")
@@ -74,30 +168,92 @@ public class SlideController  extends BaseController {
 
     @ApiOperation(value = "矩阵阅片-切片维度(相邻切片)")
     @PostMapping("/slideAdjacent")
-    public R<HashMap<String, SlideListQueryOut>> slideAdjacent(@RequestBody @Validated SlideListQueryIn req) {
-        HashMap<String, SlideListQueryOut> resp = slideService.slideAdjacent(req);
+    public R<HashMap<String, SlidePageVo>> slideAdjacent(@RequestBody @Validated SlidePageReq req) {
+        HashMap<String, SlidePageVo> resp = slideService.slideAdjacent(req);
         return R.ok(resp);
     }
 
-
-    @ApiOperation(value = "查询切片、图片详情接口")
-    @GetMapping("/slideInfo")
-    public R<SlideSelectBy> slideInfo(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "标注id", required = true) Long slideId) {
-        return R.ok(slideService.pageImageCsvListVOBy(slideId));
+    @ApiOperation(value = "查询切片、图片详情接口。调用后更新阅片状态",tags = {"I18n"})
+    @PostMapping("/slideInfo")
+    public R<SlideDetailVo> slideInfo(@RequestBody SlideInfoReq req) {
+        SlideDetailVo slideInfo = slideMapper.getSlideInfo(req.getSlideId());
+        return R.ok(slideInfo);
     }
 
-    @ApiOperation(value = "选片列表-选后-删除")
-    @GetMapping("/delete")
-    public R deleteById(@RequestParam(value = "slideId") @ApiParam(name = "slideId", value = "标注id", required = true) Long slideId) {
-        return slideService.deleteById(slideId);
-
+    @ApiOperation(value = "查询机构编码数据")
+    @PostMapping("/getOrganizationCode")
+    public R<String> getOrganizationCode() {
+        String organizationCode = SysRoleUtils.getOrganization03Code(SecurityUtils.getOrganizationId());
+        return R.ok(organizationCode);
     }
-    
-    @ApiOperation(value = "选片列表-全部删除")
-    @GetMapping("/deleteAll")
-    public R deleteAll(@RequestParam(value = "specialId",required = true) @ApiParam(name = "specialId", value = "专题id") Long specialId,
-                       @RequestParam(value = "slideId",required = false) @ApiParam(name = "slideId", value = "切片id") Long slideId) {
-        return slideService.deleteAll(specialId,slideId);
 
+
+    @ApiOperation(value = "阅片记录")
+    @PostMapping("/visit")
+    @LogAudit
+    public R visit(@RequestBody VisitReq visitReq) {
+        accessViewRecordsService.saveAccessViewRecords(visitReq.getSlideId());
+        return R.ok(slideService.getSlideInfo(visitReq.getSlideId()));
     }
+
+
+    @ApiOperation(value = "AI分析")
+    @PostMapping("/aiAnalysis")
+    public R<String> aiAnalysis(@RequestBody @Validated AiAnalysisReq req) {
+        return this.slideService.aiAnalysis(req);
+    }
+
+    @ApiOperation(value = "脏器识别校对-python服务使用")
+    @PostMapping("/organCheck")
+    public R<OrganCheckVo> organCheck(@RequestBody @Validated OrganCheckReq req) {
+        return R.ok(this.slideService.organCheck(req));
+    }
+
+    @ApiOperation(value = "脏器识别校对-view页面数据")
+    @PostMapping("/organCheckView")
+    public R<OrganCheckViewVo> organCheckView(@RequestBody @Validated OrganCheckViewReq req) {
+        return R.ok(this.slideService.organCheckView(req));
+    }
+
+    @ApiOperation(value = "脏器识别校对-确认修改")
+    @PostMapping("/organCheckConfirm")
+    public R<String> organCheckConfirm(@RequestBody @Validated OrganCheckViewReq req) {
+        return this.slideService.organCheckConfirm(req);
+    }
+
+//    @ApiOperation(value = "导出AI指标信息")
+//    @PostMapping("/exportAiInfo")
+//    public void exportAiInfo(HttpServletResponse response, ExportAiInfoReq req) {
+//        List<ExportAiInfoVo> list = slideService.exportAiInfo(req);
+//        ExcelUtil<ExportAiInfoVo> util = new ExcelUtil<ExportAiInfoVo>(ExportAiInfoVo.class);
+//        util.exportExcel(response, list, "导出AI指标信息");
+//    }
+
+
+    @ApiOperation(value = "AI分析列表数据")
+    @PostMapping("/getAiInfoList")
+    public R<AiInfoAnalyzeVo> getAiInfoList(@RequestBody AiInfoListRequest request) {
+        return R.ok(slideService.getAiInfoList(request));
+    }
+
+    @ApiOperation(value = "脏器识别校对-标签下拉列表")
+    @PostMapping("/organList")
+    public R<List<OrganTagVO>> organList(@RequestBody @Validated ProductionReq req) {
+        List<OrganTagVO> list = this.slideService.organList(req.getProjectId());
+        return R.ok(list);
+    }
+
+    @ApiOperation(value = "添加脏器-feign服务")
+    @PostMapping("/addSingleSlide")
+    public R<Long> addSingleSlide(@RequestBody @Validated AddSingleSlide req) {
+        Long id = this.slideService.addSingleSlide(req);
+        return R.ok(id);
+    }
+
+    @ApiOperation(value = "删除脏器-feign服务")
+    @PostMapping("/delSingleSlide")
+    public R<Integer> delSingleSlide(@RequestBody @Validated DelSingleSlide req) {
+        return R.ok(this.slideService.delSingleSlide(req));
+    }
+
 }

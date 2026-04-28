@@ -1,46 +1,53 @@
 package cn.staitech.fr.mapper;
 
 import java.util.List;
-import java.util.Map;
-
+import cn.staitech.common.core.domain.CustomPage;
+import cn.staitech.fr.domain.out.AiInfoListRequest;
+import cn.staitech.fr.vo.project.AiAnalysisBO;
+import cn.staitech.fr.vo.project.OrganCheckConfirmBO;
+import cn.staitech.fr.vo.project.SlideDownLoadReq;
+import cn.staitech.fr.vo.project.slide.*;
 import org.apache.ibatis.annotations.Param;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-
 import cn.staitech.fr.domain.Slide;
-import cn.staitech.fr.domain.in.SlideListQueryIn;
-import cn.staitech.fr.domain.out.AlgorithmImageOut;
-import cn.staitech.fr.domain.out.SlideListQueryOut;
-import cn.staitech.fr.domain.out.SlideSelectBy;
+
+import javax.validation.constraints.NotNull;
 
 
-/**
-* @author admin
-* @description 针对表【fr_slide(专题选片表)】的数据库操作Mapper
-* @createDate 2024-03-29 13:33:37
-* @Entity cn.staitech.fr.domain.Slide
-*/
 public interface SlideMapper extends BaseMapper<Slide> {
     String selectBySpecialId(Long specialId);
-    /**
-     * 
-    * @Title: getAlgorithmImage
-    * @Description: 查下启动的所有切片信息
-    * @param @param queryMap
-    * @param @return
-    * @return List<AlgorithmImageOut>
-    * @throws
-     */
-    List<AlgorithmImageOut> getAlgorithmImage(Map<String,Object> queryMap);
 
-    List<SlideListQueryOut> slideListQuery(SlideListQueryIn req);
+    CustomPage<SlidePageVo> page(CustomPage page, @Param("params") SlidePageReq req);
 
-    SlideListQueryOut slideQueryBy(Long slideId);
+    List<SlidePageVo> slideListQuery(@Param("params") SlidePageReq req);
+
+    SlidePageVo slideQueryBy(Long slideId);
 
     List<Slide> selectListByWax(@Param("topicId") Long topicId, @Param("speciesId")String speciesId);
     
-    SlideSelectBy pageImageCsvListVOBy(Long slideId);
+    SlideDetailVo getSlideInfo(Long slideId);
 
+    List<String> selectWaxCodes(@Param("projectId") Long projectId);
+
+    List<SlidePageVo> getSlideSelectList(SlideSelectListReq req);
+
+    boolean isAiSlideFinished(Long projectId);
+
+    List<SlideOrganTagVo> getOrganCode(SlideSelectListReq req);
+
+    List<AiAnalysisBO> selectAiAnalysis(@Param("projectId")Long projectId);
+
+    List<ExportAiInfoVo> exportAiInfo(ExportAiInfoReq req);
+
+    List<AiInfoListVO> getAiInfoList(AiInfoListRequest request);
+
+    List<OrganCheckConfirmBO> selectOrganCheckConfirmBO(Long slideId);
+
+    CustomPage<SlidePageVo> pageNew(CustomPage<SlidePageVo> page, @Param("params") SlidePageReq req);
+
+    List<SlidePageVo> exportStructureList(@Param("params") SlideDownLoadReq req);
+
+    List<SlidePageVo> list(@Param("params") SlideListReq req);
 }
 
 

@@ -1,38 +1,91 @@
 package cn.staitech.fr.service;
 
-import cn.staitech.common.core.domain.PageResponse;
+import cn.staitech.common.core.domain.CustomPage;
 import cn.staitech.common.core.domain.R;
 import cn.staitech.fr.domain.Slide;
-import cn.staitech.fr.domain.in.ChoiceSaveInVo;
-import cn.staitech.fr.domain.in.SlideListQueryIn;
-import cn.staitech.fr.domain.out.SlideListQueryOut;
-import cn.staitech.fr.domain.out.SlideSelectBy;
+import cn.staitech.fr.domain.out.AiInfoListRequest;
+import cn.staitech.fr.vo.AiForecastVo;
+import cn.staitech.fr.vo.project.*;
+import cn.staitech.fr.vo.project.slide.*;
+import cn.staitech.system.api.domain.biz.AddSingleSlide;
+import cn.staitech.system.api.domain.biz.DelSingleSlide;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.HashMap;
+import java.util.List;
 
 /**
 * @author admin
-* @description 针对表【fr_slide(专题选片表)】的数据库操作Service
+* @description 针对表【fr_slide(项目选片表)】的数据库操作Service
 * @createDate 2024-03-29 13:33:37
 */
 public interface SlideService extends IService<Slide> {
 
-    R choiceSave(ChoiceSaveInVo choiceSaveInVo);
+    R<CustomPage<SlidePageVo>> page(SlidePageReq req, boolean isPageConfigSlide, boolean isAccessPermission);
 
-    PageResponse<SlideListQueryOut> slideListQuery(SlideListQueryIn req);
+    R<CustomPage<ImageVO>> choiceImageList(ChoiceImagePageReq image);
 
-    HashMap<String, SlideListQueryOut> slideAdjacent(SlideListQueryIn req);
+    R deleteSlide(ProjectImageVo req) throws  Exception;
+
+    R checkDeleteSlide(Long projectId, List<Long> slideIds) throws  Exception;
+
+    R choiceSave(ProjectImageVo choiceSaveInVo);
+
+    R choiceAll(ProjectImageVo req) throws Exception;
+
+    HashMap<String, SlidePageVo> slideAdjacent(SlidePageReq req);
+
+    SlideDetailVo getSlideInfo(Long slideId);
+
+    boolean checkAiExecuted(Long projectId);
+    List<String> getAnimalCode(SlideSelectListReq req);
+
+    List<String> getWaxCode(SlideSelectListReq req);
+
+    List<String> getGroupCode(SlideSelectListReq req);
+
+    List<SlideOrganTagVo> getOrganCode(SlideSelectListReq req);
 
     /**
-     * 查询切片、图片信息接口
-     *
-     * @param slideId 切片id
+     * 查看Ai切片是否分析完成，没有完成返回false，完成返回true
+     * @param projectId
      * @return
      */
-    SlideSelectBy pageImageCsvListVOBy(Long slideId);
+    boolean isAiSlideFinished(Long projectId);
 
-    R deleteById(Long slideId);
-    
-    R deleteAll(Long specialId,Long slideId);
+    R<String> aiAnalysis(AiAnalysisReq req);
+
+    List<ExportAiInfoVo> exportAiInfo(ExportAiInfoReq req);
+
+    OrganCheckVo organCheck(OrganCheckReq req);
+
+    OrganCheckViewVo organCheckView(OrganCheckViewReq req);
+
+    R<String> organCheckConfirm(OrganCheckViewReq req);
+
+    List<OrganTagVO> organList(Long projectId);
+
+    AiInfoAnalyzeVo getAiInfoList(AiInfoListRequest request);
+
+    Boolean getAiInfoListCheck(Long projectId, Long singleSlideId);
+
+    Long addSingleSlide(AddSingleSlide req);
+
+    int delSingleSlide(DelSingleSlide req);
+
+
+    R<CustomPage<SlidePageVo>> pageNew(SlidePageReq req);
+
+    /**
+     * 根据切片ID集合查询切片信息
+     * @param req
+     * @return
+     */
+    List<SlidePageVo> list(SlideListReq req);
+
+    List<BigDecimal> readFileSingle(String filePath) throws IOException;
+
+    public void markMinMax(List<AiForecastVo> list);
 }

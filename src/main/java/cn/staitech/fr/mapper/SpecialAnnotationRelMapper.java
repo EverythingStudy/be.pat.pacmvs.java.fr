@@ -2,9 +2,6 @@ package cn.staitech.fr.mapper;
 
 import cn.staitech.fr.domain.Annotation;
 import cn.staitech.fr.domain.SpecialAnnotationRel;
-
-import java.util.List;
-
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -16,10 +13,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 public interface SpecialAnnotationRelMapper extends BaseMapper<SpecialAnnotationRel> {
 
     Integer selectTableSpecialCount(Annotation annotation);
-    
-    
-    List<SpecialAnnotationRel> getSeqNumberList();
-    
 
 }
 
